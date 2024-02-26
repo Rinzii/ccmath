@@ -1,0 +1,61 @@
+# User Specific Generated Files
+**/.vs/*
+**/.vscode/*
+**/.idea/*
+.idea/*
+.vs/*
+.vscode/*
+build/*
+out/*
+.cache
+.DS_Store
+
+# User Specific Configuration Files
+CMakeSettings.json
+compile_commands.json
+/CMakeUserPresets.json
+
+### C++ specific
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+### JetBrains Specific
+
+# File-based project format
+*.iws
+
+# CMake
+# This is the default naming convention use for generating cmake builds.
+# If the user did not configure there project properly then this is here to prevent an accidental push of these files
+cmake-build-*/
+

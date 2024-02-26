@@ -1,0 +1,60 @@
+name: build
+on:
+  push:
+    tags-ignore: v*.*
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: install g++11 and ninja
+        run: sudo apt install -yqq ninja-build g++-11
+      - name: update to clang 16
+        run: sudo apt --purge remove python3-lldb-14 && sudo wget https://apt.llvm.org/llvm.sh && sudo chmod +x llvm.sh && sudo ./llvm.sh 16
+      - name: configure gcc
+        run: cmake -S . --preset=default -B build -DCMAKE_CXX_COMPILER=g++-11
+      - name: configure clang
+        run: cmake -S . --preset=ninja-clang -B clang -DCMAKE_CXX_COMPILER=clang++-16
+      - name: build gcc
+        run: cmake --build build --config=Release
+      - name: build clang
+        run: cmake --build clang --config=Release
+      - name: test
+        run: cd build && ctest -C Release
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: configure
+        run: cmake -S . --preset=vs22 -B build
+      - name: build
+        run: cmake --build build --config=Release
+      - name: test
+        run: cd build && ctest -C Release
+
+  build-macos:
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v2
+      - name: install homebrew formulae
+        run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      - name: install ninja and gcc
+        run: brew install ninja gcc@11
+      - name: update AppleClang to 14.0.3
+        run: sudo xcode-select -s /Applications/Xcode_14.3.app/Contents/Developer
+      - name: configure gcc
+        run: cmake -S . --preset=default -B build -DCMAKE_CXX_COMPILER=g++-11
+      - name: configure clang
+        run: cmake -S . --preset=ninja-clang -B clang
+      - name: build gcc
+        run: cmake --build build --config=Release
+      - name: build clang
+        run: cmake --build clang --config=Release
+      - name: test
+        run: cd build && ctest -C Release
