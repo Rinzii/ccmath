@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="2">
+    <includedir>
+        <dir name="../include/ccmath"/>
+    </includedir>
+</project>
