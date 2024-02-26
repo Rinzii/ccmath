@@ -1,4 +1,4 @@
-# ccmath - A C++17 constexpr-Compatible Math Library
+# ccmath - A C++17 constexpr-Compatible CMath Library
 
 ccmath is a C++17 library that provides a re-implementation of the standard `<cmath>` library with all features made `constexpr`. This enables compile-time evaluation of mathematical functions, improving performance and allowing for more efficient code in scenarios where constant expressions are required.
 
