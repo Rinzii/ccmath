@@ -11,15 +11,10 @@
 //#include <type_traits>
 #include <limits>
 
-
-
 #include "ccmath/detail/compare/isnan.hpp"
 #include "ccmath/detail/compare/isfinite.hpp"
 #include "ccmath/detail/nearest/trunc.hpp"
 #include "ccmath/detail/compare/signbit.hpp"
-
-#include <cmath>
-
 
 namespace ccm
 {
@@ -27,67 +22,60 @@ namespace ccm
     {
         namespace impl
         {
-			template <typename T>
-			inline constexpr T fmod_impl_internal(T x, T y)
+			template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+			inline constexpr T fmod_impl_calculate(T x, T y)
 			{
 				// Calculate the remainder of the division of x by y.
-                return x - (ccm::trunc(x / y) * y);
+                return x - (ccm::trunc<T>(x / y) * y);
+			}
+
+			template <typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
+			inline constexpr T fmod_impl_calculate(T x, T y)
+			{
+				// Calculate the remainder of the division of x by y.
+				// static_cast is required to prevent the compiler from complaining about narrowing with integer types.
+				return static_cast<T>(x - (ccm::trunc<T>(x / y) * y));
 			}
 
 			// Special case for floating point types
-			template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, bool> = true>
-			inline constexpr Real fmod_impl_switch(Real x, Real y) noexcept
+			template <typename T>
+			inline constexpr T fmod_impl_check(T x, T y) noexcept
 			{
 				// NOTE: We do not raise FE_INVALID even is situations where the standard demands it.
-				if constexpr (std::numeric_limits<Real>::is_iec559)
+				if constexpr (std::numeric_limits<T>::is_iec559)
 				{
 					// If x is ±0 and y is not zero, ±0 is returned.
-					if ((x == static_cast<Real>(0.0) || static_cast<Real>(x) == static_cast<Real>(-0.0)) && (y != static_cast<Real>(0.0)))
+					if ((x == static_cast<T>(0.0) || static_cast<T>(x) == static_cast<T>(-0.0)) && (y != static_cast<T>(0.0)))
 					{
 						// The standard specifies that plus or minus 0 is returned depending on the sign of x.
 						if (ccm::signbit(x))
 						{
-							return -Real{0.0};
+							return -static_cast<T>(0.0);
 						}
 						else
 						{
-							return Real{0.0};
+							return static_cast<T>(0.0);
 						}
 					}
 
 					// If x is ±∞ and y is not NaN, NaN is returned.
-					if ((x == +std::numeric_limits<Real>::infinity() || x == -std::numeric_limits<Real>::infinity()) && !ccm::isnan(y))
+					if ((x == +std::numeric_limits<T>::infinity() || x == -std::numeric_limits<T>::infinity()) && !ccm::isnan(y))
 					{
-						// The standard specifies that we always return the same sign as x.
-						if (ccm::signbit(x))
-						{
-							return -std::numeric_limits<Real>::quiet_NaN();
-						}
-						else
-						{
-							return std::numeric_limits<Real>::quiet_NaN();
-						}
+						// For some reason all the major compilers return a negative NaN even though I can't find anywhere
+						// in the standard that specifies this. I'm going to follow suit and return a negative NaN for now.
+						// Overall, this has little effect on checking for NaN. We only really care for conformance with the standard.
+						return -std::numeric_limits<T>::quiet_NaN();
 					}
 
 					// If y is ±0 and x is not NaN, NaN is returned.
-					if ((y == static_cast<Real>(0.0) || static_cast<Real>(y) == static_cast<Real>(-0.0)) && !ccm::isnan(x))
+					if ((y == static_cast<T>(0.0) || static_cast<T>(y) == static_cast<T>(-0.0)) && !ccm::isnan(x))
 					{
-						// The standard specifies that we always return the same sign as x.
-						if (ccm::signbit(x))
-						{
-							return -std::numeric_limits<Real>::quiet_NaN();
-						}
-						else
-						{
-							// NOTE: even though the standard specifies that we should return +NaN. On some compilers they return -NaN.
-							// We will return +NaN to be consistent with what is specified in the standard, but be
-							// aware that this edge case may be different from std::fmod.
-							return std::numeric_limits<Real>::quiet_NaN();
-						}
+						// Same issue as before. All major compilers return a negative NaN.
+						return -std::numeric_limits<T>::quiet_NaN();
 					}
 
 					// If y is ±∞ and x is finite, x is returned.
-					if ((y == +std::numeric_limits<Real>::infinity() || y == -std::numeric_limits<Real>::infinity()) && ccm::isfinite(x))
+					if ((y == +std::numeric_limits<T>::infinity() || y == -std::numeric_limits<T>::infinity()) && ccm::isfinite(x))
 					{
 						return x;
 					}
@@ -95,25 +83,20 @@ namespace ccm
 					// If either argument is NaN, NaN is returned.
 					if (ccm::isnan(x) || ccm::isnan(y))
 					{
-						if (ccm::signbit(x)) // If x is negative then return negative NaN
-						{
-							return -std::numeric_limits<Real>::quiet_NaN();
-						}
-						else
-						{
-							return std::numeric_limits<Real>::quiet_NaN();
-						}
+						// Same problem as before but this time all major compilers return a positive NaN.
+						return std::numeric_limits<T>::quiet_NaN();
 					}
 				}
 
-				return fmod_impl_internal(x, y);
+				return fmod_impl_calculate(x, y);
 			}
 
-			template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-			inline constexpr double fmod_impl_switch(Integer x, Integer y) noexcept
+			template <typename T, typename U, typename TC = std::common_type_t<T, U>>
+			inline constexpr TC fmod_impl_type_check(T x, U y) noexcept
 			{
-				return fmod_impl_switch<double>(static_cast<double>(x), static_cast<double>(y));
+				return fmod_impl_check(static_cast<TC>(x), static_cast<TC>(y));
 			}
+
         }
     }
 
@@ -125,11 +108,23 @@ namespace ccm
 	 * @param y A floating-point value.
 	 * @return The floating-point remainder of the division operation x/y.
 	 */
-	template <typename T>
-    inline constexpr T fmod(T x, T y)
+	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, int> = 0>
+    inline constexpr Real fmod(Real x, Real y)
     {
-        return impl::fmod_impl_switch(x, y);
+        return impl::fmod_impl_check(x, y);
     }
+
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>
+	inline constexpr double fmod(Integer x, Integer y)
+	{
+		return impl::fmod_impl_type_check(x, y);
+	}
+
+	template <typename T, typename U>
+	inline constexpr std::common_type_t<T, U> fmod(T x, T y)
+	{
+		return impl::fmod_impl_type_check(x, y);
+	}
 
 	inline constexpr float fmodf(float x, float y)
     {
@@ -140,13 +135,5 @@ namespace ccm
     {
         return fmod<long double>(x, y);
     }
-
-
-
-
-
-
-
-
 
 } // namespace ccm
