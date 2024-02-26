@@ -23,7 +23,7 @@ jobs:
       - name: build clang
         run: cmake --build clang --config=Release
       - name: test
-        run: cd build && ctest -C Release
+        run: cd build && ctest -C Release --output-on-failure
 
   build-windows:
     runs-on: windows-latest
@@ -34,7 +34,7 @@ jobs:
       - name: build
         run: cmake --build build --config=Release
       - name: test
-        run: cd build && ctest -C Release
+        run: cd build && ctest -C Release --output-on-failure
 
   build-macos:
     runs-on: macos-13
@@ -55,4 +55,4 @@ jobs:
       - name: build clang
         run: cmake --build clang --config=Release
       - name: test
-        run: cd build && ctest -C Release
+        run: cd build && ctest -C Release --output-on-failure
