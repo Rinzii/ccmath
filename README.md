@@ -15,7 +15,7 @@ ccmath is a C++17 library that provides a re-implementation of the standard `<cm
 
 ## Usage
 
-To use ccmath in your C++17 projects, simply include the ccmath.hpp header file and start using the provided functions. Here's a basic example:
+To use ccmath in your projects, simply include the ccmath.hpp header file and start using the provided functions. Here's a basic example:
 
 ```cpp
 
@@ -45,13 +45,12 @@ FetchContent_MakeAvailable(ccmath)
 
 ## Compatability
 
-ccmath is designed to be compatible with any C++17-compliant compiler that supports constexpr functionality. It should work seamlessly with popular compilers such as GCC, Clang, and MSVC.
+ccmath is designed to be compatible with any C++17-compliant compiler. It should work seamlessly with popular compilers such as GCC, Clang, and MSVC.
 
 ## Contributing
 
-Contributions to ccmath are welcome! If you encounter any bugs, have suggestions for improvements, or would like to contribute new features, feel free to open an issue or submit a pull request on the GitHub repository.
+Contributions to ccmath are welcome! If you encounter any bugs, have suggestions for improvements, or would like to contribute new features, feel free to open an issue or submit a pull request!
 
 ## License
 
 ccmath is distributed under the MIT License. See the LICENSE file for more information.
-Acknowledgments
