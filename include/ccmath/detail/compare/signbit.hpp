@@ -85,7 +85,7 @@ namespace ccm
 #elif defined(CCMATH_HAS_BIT_CAST)
         return std::bit_cast<T>(x) >> (sizeof(T) * 8 - 1);
 #elif defined(_MSC_VER)
-		return _signbit(x);
+		return (x == T(0)) ? (_fpclass(x) == _FPCLASS_NZ) : (x < T(0));
 #elif defined(__GNUC__)
 		return __builtin_signbit(x);
 #else
