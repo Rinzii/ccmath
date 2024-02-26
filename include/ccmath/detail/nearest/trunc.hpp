@@ -10,7 +10,7 @@
 
 #include "ccmath/detail/basic/abs.hpp"
 #include "ccmath/detail/compare/isnan.hpp"
-#include "ccmath/internal/helpers/narrow_cast.hpp"
+//#include "ccmath/internal/helpers/narrow_cast.hpp"
 
 #include <limits>
 #include <type_traits>
@@ -45,7 +45,7 @@ namespace ccm
                     }
                 }
 
-				return internal::narrow_cast<T>(static_cast<long long>(x));
+				return static_cast<T>(static_cast<long long>(x));
             }
         } // namespace impl
     } // namespace
@@ -57,8 +57,8 @@ namespace ccm
 	 * @param x The value to truncate.
 	 * @return Returns a truncated value.
 	 */
-	template <typename T>
-	inline constexpr T trunc(T x) noexcept
+	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, int> = 0>
+	inline constexpr Real trunc(Real x) noexcept
 	{
 		return impl::trunc_impl(x);
 	}
@@ -72,7 +72,7 @@ namespace ccm
 	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, int> = 0>
 	inline constexpr double trunc(Integer x) noexcept
     {
-        return internal::narrow_cast<double>(x);
+        return static_cast<double>(x);
     }
 
 	/**
