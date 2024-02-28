@@ -11,6 +11,7 @@
 #include <cmath>
 #include <limits>
 #include "ccmath/detail/nearest/trunc.hpp"
+#include "ccmath/internal/helpers/not_null.hpp"
 
 TEST(CcmathNearestTests, Trunc)
 {
@@ -22,6 +23,8 @@ TEST(CcmathNearestTests, Trunc)
     EXPECT_EQ(ccm::trunc(-1.9), std::trunc(-1.9));
     EXPECT_EQ(ccm::trunc(std::numeric_limits<double>::infinity()), std::trunc(std::numeric_limits<double>::infinity()));
     EXPECT_EQ(ccm::trunc(-std::numeric_limits<double>::infinity()), std::trunc(-std::numeric_limits<double>::infinity()));
+	EXPECT_EQ(ccm::trunc(std::numeric_limits<double>::quiet_NaN()), std::trunc(std::numeric_limits<double>::quiet_NaN()));
+	EXPECT_EQ(ccm::trunc(-std::numeric_limits<double>::quiet_NaN()), std::trunc(-std::numeric_limits<double>::quiet_NaN()));
     EXPECT_TRUE(std::isnan(ccm::trunc(std::nan(""))));
     EXPECT_TRUE(std::isnan(ccm::trunc(-std::nan(""))));
     EXPECT_EQ(ccm::trunc(0.0), std::trunc(0.0));
@@ -54,6 +57,9 @@ TEST(CcmathNearestTests, Trunc)
     EXPECT_EQ(ccm::truncf(-0.9f), std::truncf(-0.9f));
     EXPECT_EQ(ccm::truncf(0.9999999999999999f), std::truncf(0.9999999999999999f));
     EXPECT_EQ(ccm::truncf(-0.9999999999999999f), std::truncf(-0.9999999999999999f));
+
+	//EXPECT_FLOAT_EQ(ccm::fmod(30.508474576271183309f, 6.1016949152542370172f), std::fmod(30.508474576271183309f, 6.1016949152542370172f));
+	EXPECT_EQ(ccm::truncf(30.508474576271183309f), std::truncf(30.508474576271183309f));
 
 
 	// Test with long double using std::truncl and ccm::truncl

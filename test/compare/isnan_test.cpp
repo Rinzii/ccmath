@@ -12,7 +12,7 @@
 #include <limits>
 #include "ccmath/detail/compare/isnan.hpp"
 
-TEST(CcmathBasicTests, IsNan)
+TEST(CcmathCompareTests, IsNan)
 {
 
 }

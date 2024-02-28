@@ -12,7 +12,7 @@
 #include <limits>
 #include "ccmath/detail/compare/isinf.hpp"
 
-TEST(CcmathBasicTests, IsInf)
+TEST(CcmathCompareTests, IsInf)
 {
 
 }

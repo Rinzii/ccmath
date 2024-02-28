@@ -57,7 +57,7 @@ namespace ccm
 	 * @param x The value to truncate.
 	 * @return Returns a truncated value.
 	 */
-	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, int> = 0>
+	template <typename Real, std::enable_if_t<std::is_floating_point<Real>::value, int> = 0>
 	inline constexpr Real trunc(Real x) noexcept
 	{
 		return impl::trunc_impl(x);

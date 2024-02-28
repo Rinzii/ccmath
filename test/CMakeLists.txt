@@ -45,6 +45,7 @@ target_sources(${PROJECT_NAME}-compare PRIVATE
         compare/isnan_test.cpp
         compare/isfinite_test.cpp
         compare/isinf_test.cpp
+        compare/signbit_test.cpp
 
 )
 target_link_libraries(${PROJECT_NAME}-compare PRIVATE

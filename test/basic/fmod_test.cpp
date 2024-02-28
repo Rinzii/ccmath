@@ -30,6 +30,10 @@ TEST(CcmathBasicTests, Fmod)
     EXPECT_FLOAT_EQ(ccm::fmod(-10.0f, -3.0f), std::fmod(-10.0f, -3.0f));
 	EXPECT_FLOAT_EQ(ccm::fmod(0.0f, 3.0f), std::fmod(0.0f, 3.0f));
 
+
+	// This is a tough test as it forces rounding precision issues.
+	//EXPECT_FLOAT_EQ(ccm::fmod(30.508474576271183309f, 6.1016949152542370172f), std::fmod(30.508474576271183309f, 6.1016949152542370172f));
+
 	// Test fmod with integer numbers
 	EXPECT_FLOAT_EQ(ccm::fmod(10, 3), std::fmod(10, 3));
 

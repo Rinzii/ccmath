@@ -2,6 +2,8 @@ set(ccmath_internal_helpers_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/endian.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/narrow_cast.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/promote.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/make_mantisa.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/not_null.hpp
 )
 
 set(ccmath_internal_typetraits_headers
