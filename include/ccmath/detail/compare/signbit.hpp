@@ -71,7 +71,12 @@ namespace ccm
 
 		if (x == 0 || ccm::isnan(x))
 		{
-			if (__builtin_copysign(1.0, x) < 0) { return true; }
+			// If constexpr only works with gcc 7.1. Without if constexpr we work till GCC 5.1+
+			// This works with clang 5.0.0
+			// TODO: Add a compatibility layer for if constexpr to allow us to continue using gcc 5.1+
+			if constexpr (std::is_same_v<T, float>) { return __builtin_copysignf(1.0f, x) < 0; }
+			else if constexpr (std::is_same_v<T, double>) { return __builtin_copysign(1.0, x) < 0; }
+			else if constexpr (std::is_same_v<T, long double>) { return __builtin_copysignl(1.0l, x) < 0; }
 
 			return false;
 		}
