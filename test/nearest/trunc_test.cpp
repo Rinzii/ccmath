@@ -13,6 +13,8 @@
 #include "ccmath/detail/nearest/trunc.hpp"
 #include "ccmath/internal/helpers/not_null.hpp"
 
+// TODO: Find a way to test all of the different ways the function may behave internally to work based on the provided compiler.
+
 TEST(CcmathNearestTests, Trunc)
 {
 	EXPECT_EQ(ccm::trunc(1.0), std::trunc(1.0));
@@ -23,8 +25,20 @@ TEST(CcmathNearestTests, Trunc)
     EXPECT_EQ(ccm::trunc(-1.9), std::trunc(-1.9));
     EXPECT_EQ(ccm::trunc(std::numeric_limits<double>::infinity()), std::trunc(std::numeric_limits<double>::infinity()));
     EXPECT_EQ(ccm::trunc(-std::numeric_limits<double>::infinity()), std::trunc(-std::numeric_limits<double>::infinity()));
-	EXPECT_EQ(ccm::trunc(std::numeric_limits<double>::quiet_NaN()), std::trunc(std::numeric_limits<double>::quiet_NaN()));
-	EXPECT_EQ(ccm::trunc(-std::numeric_limits<double>::quiet_NaN()), std::trunc(-std::numeric_limits<double>::quiet_NaN()));
+	// Google Test is apparently incapable of comparing NaNs or I do not know enough about gtest to find a solution. I've though personally validated that ccm::signbit handles NaNs correctly
+	//EXPECT_EQ(ccm::trunc(std::numeric_limits<double>::quiet_NaN()), std::trunc(std::numeric_limits<double>::quiet_NaN()));
+	//EXPECT_EQ(ccm::trunc(-std::numeric_limits<double>::quiet_NaN()), std::trunc(-std::numeric_limits<double>::quiet_NaN()));
+
+	// The standard when passed +NaN returns +NaN, and when passed -NaN returns -NaN
+	bool isCcmPositiveNanPositive = (std::signbit(ccm::trunc(std::numeric_limits<double>::quiet_NaN())) == false && std::isnan(ccm::trunc(std::numeric_limits<double>::quiet_NaN())) == true); // NOLINT
+	bool isStdPositiveNanPositive = (std::signbit(std::trunc(std::numeric_limits<double>::quiet_NaN())) == false && std::isnan(std::trunc(std::numeric_limits<double>::quiet_NaN())) == true); // NOLINT
+	EXPECT_EQ(isCcmPositiveNanPositive, isStdPositiveNanPositive);
+
+	bool isCcmNegativeNanNegative = (std::signbit(ccm::trunc(-std::numeric_limits<double>::quiet_NaN())) == true && std::isnan(ccm::trunc(-std::numeric_limits<double>::quiet_NaN())) == true); // NOLINT
+	bool isStdNegativeNanNegative = (std::signbit(std::trunc(-std::numeric_limits<double>::quiet_NaN())) == true && std::isnan(std::trunc(-std::numeric_limits<double>::quiet_NaN())) == true); // NOLINT
+	EXPECT_EQ(isCcmNegativeNanNegative, isStdNegativeNanNegative);
+
+
     EXPECT_TRUE(std::isnan(ccm::trunc(std::nan(""))));
     EXPECT_TRUE(std::isnan(ccm::trunc(-std::nan(""))));
     EXPECT_EQ(ccm::trunc(0.0), std::trunc(0.0));
