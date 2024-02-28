@@ -10,7 +10,7 @@
 
 #include "ccmath/detail/basic/abs.hpp"
 #include "ccmath/detail/compare/isnan.hpp"
-//#include "ccmath/internal/helpers/narrow_cast.hpp"
+#include "ccmath/detail/compare/signbit.hpp"
 
 #include <limits>
 #include <type_traits>
@@ -21,34 +21,32 @@ namespace ccm
 	namespace
 	{
 		namespace impl
-        {
+		{
 			// Follows the requirements of std::trunc
 			// https://en.cppreference.com/w/cpp/numeric/math/trunc
-            template <typename T>
-            inline constexpr T trunc_impl(T x) noexcept
-            {
-                if constexpr (std::numeric_limits<T>::is_iec559)
-                {
+			template <typename T>
+			inline constexpr T trunc_impl(T x) noexcept
+			{
+				if constexpr (std::numeric_limits<T>::is_iec559)
+				{
+					// If x is NaN then return Positive NaN or Negative NaN depending on the sign of x
 					if (ccm::isnan(x))
-                    {
-                        return std::numeric_limits<T>::quiet_NaN();
-                    }
+					{
+						if (ccm::signbit<T>(x)) { return -std::numeric_limits<T>::quiet_NaN(); }
+						else { return std::numeric_limits<T>::quiet_NaN(); }
+					}
 
-                    if (x == std::numeric_limits<T>::infinity() || x == -std::numeric_limits<T>::infinity())
-                    {
-                        return x;
-                    }
+					// If x == ±∞ then return x
+					if (x == std::numeric_limits<T>::infinity() || x == -std::numeric_limits<T>::infinity()) { return x; }
 
-					if (x == static_cast<T>(-0.0) || x == static_cast<T>(+0.0))
-                    {
-                        return x;
-                    }
-                }
+					// If x == ±0 then return x
+					if (x == static_cast<T>(0.0)) { return x; }
+				}
 
 				return static_cast<T>(static_cast<long long>(x));
-            }
-        } // namespace impl
-    } // namespace
+			}
+		} // namespace impl
+	}	  // namespace
 	/// @endcond
 
 	/**
@@ -71,9 +69,9 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, int> = 0>
 	inline constexpr double trunc(Integer x) noexcept
-    {
-        return static_cast<double>(x);
-    }
+	{
+		return static_cast<double>(x);
+	}
 
 	/**
 	 * @brief Specialization for float that returns the integral value nearest to x with the magnitude of the integral value always less than or equal to x.
@@ -82,18 +80,18 @@ namespace ccm
 	 */
 	float truncf(float x) noexcept
 	{
-        return trunc(x);
-    }
+		return trunc(x);
+	}
 
 	/**
-	 * @brief Specialization for long double that returns the integral value nearest to x with the magnitude of the integral value always less than or equal to x.
+	 * @brief Specialization for long double that returns the integral value nearest to x with the magnitude of the integral value always less than or equal to
+	 * x.
 	 * @param x The long double to truncate.
 	 * @return Returns a truncated long double.
 	 */
 	long double truncl(long double x) noexcept
 	{
-        return trunc(x);
-    }
-
+		return trunc(x);
+	}
 
 } // namespace ccm
