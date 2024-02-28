@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "ccmath/detail/compare/isnan.hpp"
+
 // If we have C++23, we can use std::signbit as it is constexpr
 #if (defined(__cpp_lib_constexpr_cmath) && __cpp_lib_constexpr_cmath >= 202202L)
 	#include <cmath>
@@ -67,7 +69,7 @@ namespace ccm
 #elif defined(CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN)
 		// use __builtin_copysign to check for the sign of zero
 
-		if (x == 0)
+		if (x == 0 || ccm::isnan(x))
 		{
 			if (__builtin_copysign(1.0, x) < 0) { return true; }
 
