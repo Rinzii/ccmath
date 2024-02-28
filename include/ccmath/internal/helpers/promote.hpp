@@ -10,7 +10,7 @@
 
 #include <type_traits>
 
-namespace ccm::helper
+namespace ccm::helpers
 {
 	template <typename T, bool = std::is_integral_v<T>>
     struct promote

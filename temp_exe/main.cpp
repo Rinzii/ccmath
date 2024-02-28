@@ -7,19 +7,19 @@
  */
 
 #include <cmath>
-#include <ccmath/detail/basic/fmod.hpp>
+#include <ccmath/detail/compare/signbit.hpp>
 #include <iostream>
-
-#include <math.h>
 
 int main()
 {
 
-	auto test = std::fmod(10.0f, 0.0f);
-	auto test2 = ccm::fmod(10.0f, 0.0f);
 
+// EXPECT_EQ(ccm::signbit(-0.0), std::signbit(-0.0));
 
-	std::cout << "std::fmod(10.0f, 0.0f) = " << test << std::endl;
-	std::cout << "ccm::fmod(10.0f, 0.0f) = " << test2 << std::endl;
+    auto a = ccm::signbit(-0.0);
+
+    std::cout << "ccm::signbit(-0.0) = " << a << std::endl;
+	std::cout << "std::signbit(0.0) = " << std::signbit(0.0) << std::endl;
+
     return 0;
 }

@@ -13,7 +13,7 @@
 #include <limits>
 
 
-TEST(CcmathBasicTests, IsFinite)
+TEST(CcmathCompareTests, IsFinite)
 {
 
 }

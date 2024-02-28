@@ -16,19 +16,12 @@ namespace ccm
 		{
 			template <typename T>
 			constexpr T pow_dbl(const T base, const T exp) noexcept
-            {
-                return exp == 0 ? 1 : base * pow_dbl(base, exp - 1);
-            }
+			{
+				return exp == 0 ? 1 : base * pow_dbl(base, exp - 1);
+			}
+		}
 	}
 
-	template <typename T>
-	constexpr T pow(T x)
-	{
-		return x * x;
-	}
 
-}
-
-
-
+} // namespace ccm
 

@@ -31,7 +31,7 @@ namespace ccm
     }
 
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>
-	inline constexpr bool isnan(Integer x)
+	inline constexpr bool isnan(Integer /* unused */)
 	{
 			// Is nan for integers is always false. As only floating point numbers can be nan.
             return false;

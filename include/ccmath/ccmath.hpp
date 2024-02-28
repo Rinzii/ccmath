@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "ccmath/basic.hpp"
-
 
 /*
 CCMATH REQUIREMENTS:
@@ -21,99 +19,124 @@ CCMATH REQUIREMENTS:
  * Performance is are primary concern. Everything must be as fast as possible.
  * Anything implemented by cmath that is already constexpr is allowed to be wrapped by ccmath and not implemented by ccmath.
 
-
-TODO: These are the functions that are currently located in cmath and are to be implemented
-TODO: We don't have ti implement the entire API of cmath exactly how it is implemented in cmath. We allow for some flexibility in the API.
-
- TYPES:
-    float_t
-    double_t
-
- MACROS:
-    HUGE_VALF - indicates the overflow value for float, double and long double respectively
-    HUGE_VAL
-    HUGE_VALL
-    INFINITY - evaluates to positive infinity or the value guaranteed to overflow a float
-    NAN - evaluates to a quiet NaN of type float
-    math_errhandling - defines the error handling mechanism used by the common mathematical functions
-    MATH_ERRNO
-    MATH_ERREXCEPT
-
-    Classification macros:
-    FP_NORMAL - indicates a floating-point category
-    FP_SUBNORMAL
-    FP_ZERO
-    FP_INFINITE
-    FP_NAN
-
- FUNCTIONS:
-    abs - absolute value of a floating point value (|x|)
-    fabs
-    fabsf
-    fabsl
-
-    fmod - remainder of the floating point division operation
-    fmodf
-    fmodl
-
-    remainder - signed remainder of the division operation
-    remainderf
-    remainderl
-
-    remquo - signed remainder as well as the three last bits of the division operation
-    remquof
-    remquol
-
-    fma - fused multiply-add operation
-    fmaf
-    fmal
-
-    fmax - larger of two floating-point values
-    fmaxf
-    fmaxl
-
-    fmin - smaller of two floating-point values
-    fminf
-    fminl
-
-    fdim -positive difference of two floating point values (max(0,x−y))
-    fdimf
-    fdiml
-
-    nan - not-a-number (NaN)
-	nanf
-    nanl
-
-    lerp - linear interpolation function
-
-    exp - returns e raised to the given power (e^x)
-    expf
-    expl
-
-    exp2 - returns 2 raised to the given power (2^x)
-    exp2f
-    exp2l
-
-    expm1 - returns e raised to the given power minus one (e^x - 1)
-    expm1f
-    expm1l
-
-    log - computes natural (base e) logarithm (ln x)
-    logf
-    logl
-
-    log10 - computes common (base 10) logarithm (log10 x)
-    log10f
-    log10l
-
-    log2 - computes binary (base 2) logarithm (log2 x)
-    log2f
-    log2l
-
-
-
-
-
-
-
  */
+
+/// Basic math functions
+
+#include "ccmath/detail/basic/abs.hpp"
+#include "ccmath/detail/basic/fdim.hpp"
+#include "ccmath/detail/basic/fma.hpp"
+#include "ccmath/detail/basic/fmod.hpp"
+#include "ccmath/detail/basic/max.hpp"
+#include "ccmath/detail/basic/min.hpp"
+#include "ccmath/detail/basic/remainder.hpp"
+#include "ccmath/detail/basic/remquo.hpp"
+
+
+/// Comparison functions
+
+#include "ccmath/detail/compare/fpclassify.hpp"
+#include "ccmath/detail/compare/isfinite.hpp"
+#include "ccmath/detail/compare/isgreater.hpp"
+#include "ccmath/detail/compare/isgreaterequal.hpp"
+#include "ccmath/detail/compare/isinf.hpp"
+#include "ccmath/detail/compare/isless.hpp"
+#include "ccmath/detail/compare/islessequal.hpp"
+#include "ccmath/detail/compare/islessgreater.hpp"
+#include "ccmath/detail/compare/isnan.hpp"
+#include "ccmath/detail/compare/isnormal.hpp"
+#include "ccmath/detail/compare/isunordered.hpp"
+#include "ccmath/detail/compare/signbit.hpp"
+
+
+/// Exponential functions
+
+#include "ccmath/detail/exponential/exp.hpp"
+#include "ccmath/detail/exponential/exp2.hpp"
+#include "ccmath/detail/exponential/expm1.hpp"
+#include "ccmath/detail/exponential/log.hpp"
+#include "ccmath/detail/exponential/log1p.hpp"
+#include "ccmath/detail/exponential/log2.hpp"
+#include "ccmath/detail/exponential/log10.hpp"
+
+
+/// Float manipulation functions
+
+#include "ccmath/detail/fmanip/copysign.hpp"
+#include "ccmath/detail/fmanip/frexp.hpp"
+#include "ccmath/detail/fmanip/ilogb.hpp"
+#include "ccmath/detail/fmanip/ldexp.hpp"
+#include "ccmath/detail/fmanip/logb.hpp"
+#include "ccmath/detail/fmanip/modf.hpp"
+#include "ccmath/detail/fmanip/nextafter.hpp"
+#include "ccmath/detail/fmanip/scalbn.hpp"
+
+
+/// Hyperbolic functions
+
+#include "ccmath/detail/hyperbolic/acosh.hpp"
+#include "ccmath/detail/hyperbolic/asinh.hpp"
+#include "ccmath/detail/hyperbolic/atanh.hpp"
+#include "ccmath/detail/hyperbolic/cosh.hpp"
+#include "ccmath/detail/hyperbolic/sinh.hpp"
+#include "ccmath/detail/hyperbolic/tanh.hpp"
+
+
+/// Nearest functions
+
+#include "ccmath/detail/nearest/ceil.hpp"
+#include "ccmath/detail/nearest/floor.hpp"
+#include "ccmath/detail/nearest/nearbyint.hpp"
+#include "ccmath/detail/nearest/rint.hpp"
+#include "ccmath/detail/nearest/round.hpp"
+#include "ccmath/detail/nearest/trunc.hpp"
+
+
+/// Power functions
+
+#include "ccmath/detail/power/cbrt.hpp"
+#include "ccmath/detail/power/hypot.hpp"
+#include "ccmath/detail/power/pow.hpp"
+#include "ccmath/detail/power/sqrt.hpp"
+
+
+/// Special functions
+
+#include "ccmath/detail/special/assoc_laguerre.hpp"
+#include "ccmath/detail/special/assoc_legendre.hpp"
+#include "ccmath/detail/special/beta.hpp"
+#include "ccmath/detail/special/comp_ellint_1.hpp"
+#include "ccmath/detail/special/comp_ellint_2.hpp"
+#include "ccmath/detail/special/comp_ellint_3.hpp"
+#include "ccmath/detail/special/cyl_bessel_i.hpp"
+#include "ccmath/detail/special/cyl_bessel_j.hpp"
+#include "ccmath/detail/special/cyl_bessel_k.hpp"
+#include "ccmath/detail/special/cyl_neumann.hpp"
+#include "ccmath/detail/special/ellint_1.hpp"
+#include "ccmath/detail/special/ellint_2.hpp"
+#include "ccmath/detail/special/ellint_3.hpp"
+#include "ccmath/detail/special/expint.hpp"
+#include "ccmath/detail/special/hermite.hpp"
+#include "ccmath/detail/special/laguerre.hpp"
+#include "ccmath/detail/special/legendre.hpp"
+#include "ccmath/detail/special/riemann_zeta.hpp"
+#include "ccmath/detail/special/sph_bessel.hpp"
+#include "ccmath/detail/special/sph_legendre.hpp"
+#include "ccmath/detail/special/sph_neumann.hpp"
+
+
+/// Trigonometric functions
+#include "ccmath/detail/trig/acos.hpp"
+#include "ccmath/detail/trig/asin.hpp"
+#include "ccmath/detail/trig/atan.hpp"
+#include "ccmath/detail/trig/atan2.hpp"
+#include "ccmath/detail/trig/cos.hpp"
+#include "ccmath/detail/trig/sin.hpp"
+#include "ccmath/detail/trig/tan.hpp"
+
+
+/// Uncategorized functions
+
+#include "ccmath/detail/gamma.hpp"
+#include "ccmath/detail/lerp.hpp"
+#include "ccmath/detail/lgamma.hpp"

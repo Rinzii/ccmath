@@ -27,7 +27,7 @@
 
 
 
-namespace ccm::internal
+namespace ccm::helpers
 {
 	// NOLINTBEGIN
 
