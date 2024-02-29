@@ -13,30 +13,22 @@
 
 namespace ccm
 {
-	namespace
-	{
-		namespace impl
-		{
-			template <typename T>
-            inline constexpr bool isinf_impl(T x) noexcept
-            {
-                if constexpr (std::numeric_limits<T>::is_signed)
-				{
-				    return x == -std::numeric_limits<T>::infinity() || x == std::numeric_limits<T>::infinity();
-                }
-                else
-                {
-                    return x == std::numeric_limits<T>::infinity();
-                }
-            }
-		}
-	}
-
+	/**
+	 * @brief
+	 * @tparam Real
+	 * @param x
+	 * @return
+	 */
 	template <typename Real, typename = std::enable_if_t<std::is_floating_point_v<Real>>>
     inline constexpr bool isinf(Real x) noexcept
     {
-		return impl::isinf_impl(x);
+		if constexpr (std::numeric_limits<Real>::is_signed)
+		{
+			return x == -std::numeric_limits<Real>::infinity() || x == std::numeric_limits<Real>::infinity();
+		}
+		else
+		{
+			return x == std::numeric_limits<Real>::infinity();
+		}
     }
-
-
 } // namespace ccm
