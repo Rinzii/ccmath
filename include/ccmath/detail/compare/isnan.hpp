@@ -10,20 +10,12 @@
 
 #include <type_traits>
 
-// isnan is defined as constexpr in C++23
-#if defined(__cpp_lib_constexpr_cmath) && __cpp_lib_constexpr_cmath >= 202202L
-#include <cmath>
-#endif
-
 namespace ccm
 {
     template <typename T>
     inline constexpr bool isnan(T x) noexcept
     {
-		// isnan is defined as constexpr in C++23
-        #if defined(__cpp_lib_constexpr_cmath) && __cpp_lib_constexpr_cmath >= 202202L
-            return std::isnan(x);
-		#elif defined(__GNUC__)
+		#if defined(__GNUC__)
 			return __builtin_isnan(x); // GCC and Clang implement this as constexpr
 		#else
 			return x != x; // NOLINT

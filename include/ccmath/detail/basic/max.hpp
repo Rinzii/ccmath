@@ -8,11 +8,6 @@
 
 #pragma once
 
-// Prevent possible conflicts such as when windows.h is included
-#ifdef max
-#undef max
-#endif
-
 #include <type_traits>
 #include <limits>
 
