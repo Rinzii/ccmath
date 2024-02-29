@@ -11,12 +11,7 @@
 #include "ccmath/detail/compare/isnan.hpp"
 #include "ccmath/internal/utility/unreachable.hpp"
 
-
 #include <limits>
-
-#if defined(__cpp_lib_constexpr_cmath) && __cpp_lib_constexpr_cmath >= 202202L
-	#include <cmath>
-#endif
 
 namespace ccm
 {
@@ -27,11 +22,6 @@ namespace ccm
 			template <typename T>
 			inline constexpr T abs_impl(T x) noexcept
 			{
-				// If we are using C++23 then just use std::abs.
-#if defined(__cpp_lib_constexpr_cmath) && __cpp_lib_constexpr_cmath >= 202202L
-				return std::abs(x);
-#endif
-
 				// If we are NOT dealing with an integral type check for NaN.
 				if constexpr (!std::is_integral_v<T>)
                 {
@@ -42,13 +32,7 @@ namespace ccm
                     }
                 }
 
-				// If x is -0.0, return 0. This is a special edge case.
-				if (x == static_cast<T>(-0.0))
-				{
-					return static_cast<T>(0);
-				}
-
-				// If x is equal to zero, return zero.
+				// If x is equal to ±zero, return +zero.
 				// Otherwise, if x is less than zero, return -x, otherwise return x.
 				return x >= T{0} ? x : -x;
 			}
