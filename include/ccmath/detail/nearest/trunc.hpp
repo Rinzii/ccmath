@@ -9,45 +9,15 @@
 #pragma once
 
 #include "ccmath/detail/basic/abs.hpp"
-#include "ccmath/detail/compare/isnan.hpp"
 #include "ccmath/detail/compare/signbit.hpp"
 
-#include <limits>
-#include <type_traits>
+#ifdef truncf
+#undef truncf
+#endif
 
 namespace ccm
 {
-	/// @cond DEV
-	namespace
-	{
-		namespace impl
-		{
-			// Follows the requirements of std::trunc
-			// https://en.cppreference.com/w/cpp/numeric/math/trunc
-			template <typename T>
-			inline constexpr T trunc_impl(T x) noexcept
-			{
-				if constexpr (std::numeric_limits<T>::is_iec559)
-				{
-					// If x is NaN then return Positive NaN or Negative NaN depending on the sign of x
-					if (ccm::isnan(x))
-					{
-						if (ccm::signbit<T>(x)) { return -std::numeric_limits<T>::quiet_NaN(); }
-						else { return std::numeric_limits<T>::quiet_NaN(); }
-					}
 
-					// If x == ±∞ then return x
-					if (x == std::numeric_limits<T>::infinity() || x == -std::numeric_limits<T>::infinity()) { return x; }
-
-					// If x == ±0 then return x
-					if (x == static_cast<T>(0.0)) { return x; }
-				}
-
-				return static_cast<T>(static_cast<long long>(x));
-			}
-		} // namespace impl
-	}	  // namespace
-	/// @endcond
 
 	/**
 	 * @brief Returns the integral value nearest to x with the magnitude of the integral value always less than or equal to x.
@@ -55,10 +25,28 @@ namespace ccm
 	 * @param x The value to truncate.
 	 * @return Returns a truncated value.
 	 */
-	template <typename Real, std::enable_if_t<std::is_floating_point<Real>::value, int> = 0>
-	inline constexpr Real trunc(Real x) noexcept
+	// Follows the requirements of std::trunc
+	// https://en.cppreference.com/w/cpp/numeric/math/trunc
+	template <typename T, std::enable_if_t<std::is_floating_point<T>::value, int> = 0>
+	inline constexpr T trunc(T x) noexcept
 	{
-		return impl::trunc_impl(x);
+		if constexpr (std::numeric_limits<T>::is_iec559)
+		{
+			// If x is NaN then return Positive NaN or Negative NaN depending on the sign of x
+			if (ccm::isnan(x))
+			{
+				if (ccm::signbit<T>(x)) { return -std::numeric_limits<T>::quiet_NaN(); }
+				else { return std::numeric_limits<T>::quiet_NaN(); }
+			}
+
+			// If x == ±∞ then return x
+			if (x == std::numeric_limits<T>::infinity() || x == -std::numeric_limits<T>::infinity()) { return x; }
+
+			// If x == ±0 then return x
+			if (x == static_cast<T>(0.0)) { return x; }
+		}
+
+		return static_cast<T>(static_cast<long long>(x));
 	}
 
 	/**

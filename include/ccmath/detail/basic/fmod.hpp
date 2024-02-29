@@ -8,7 +8,6 @@
 
 #pragma once
 
-// #include <type_traits>
 #include <limits>
 
 #include "ccmath/detail/compare/isfinite.hpp"
