@@ -8,6 +8,7 @@ set(ccmath_internal_helpers_headers
 
 set(ccmath_internal_typetraits_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/type_traits/is_constant_evaluated.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/type_traits/floating_point_traits.hpp
 )
 
 set(ccmath_internal_utility_headers
