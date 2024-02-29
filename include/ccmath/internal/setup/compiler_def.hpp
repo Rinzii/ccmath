@@ -61,6 +61,22 @@
 	#endif
 #endif
 
+// Apple Clang
+#if defined(__apple_build_version__) && defined(__clang__)
+    #define CCMATH_COMPILER_APPLE_CLANG
+    #define CCMATH_COMPILER_APPLE_CLANG_VER ((__clang_major__ * 100) + (__clang_minor__ * 10) + __clang_patchlevel__)
+    #define CCMATH_COMPILER_APPLE_CLANG_VER_MAJOR __clang_major__
+    #define CCMATH_COMPILER_APPLE_CLANG_VER_MINOR __clang_minor__
+    #define CCMATH_COMPILER_APPLE_CLANG_VER_PATCH __clang_patchlevel__
+
+    #ifndef CCMATH_COMPILER_CLANG_BASED
+        #define CCMATH_COMPILER_CLANG_BASED
+    #endif
+    #ifndef CCMATH_FOUND_COMPILER
+        #define CCMATH_FOUND_COMPILER
+    #endif
+#endif
+
 // Intel DPC++ Compiler
 #if defined(SYCL_LANGUAGE_VERSION) && defined (__INTEL_LLVM_COMPILER)
 	#define CCMATH_COMPILER_INTEL
