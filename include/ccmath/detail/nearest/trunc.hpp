@@ -11,10 +11,6 @@
 #include "ccmath/detail/basic/abs.hpp"
 #include "ccmath/detail/compare/signbit.hpp"
 
-#ifdef truncf
-#undef truncf
-#endif
-
 namespace ccm
 {
 
