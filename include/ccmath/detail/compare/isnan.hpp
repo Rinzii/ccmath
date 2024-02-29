@@ -12,6 +12,12 @@
 
 namespace ccm
 {
+	/**
+	 * @brief
+	 * @tparam T
+	 * @param x
+	 * @return
+	 */
     template <typename T>
     inline constexpr bool isnan(T x) noexcept
     {
