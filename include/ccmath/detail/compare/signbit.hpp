@@ -13,6 +13,8 @@
 
 #include "ccmath/detail/compare/isnan.hpp"
 
+#include "ccmath/internal/type_traits/floating_point_traits.hpp"
+
 // If we have C++23, we can use std::signbit as it is constexpr
 #if (defined(__cpp_lib_constexpr_cmath) && __cpp_lib_constexpr_cmath >= 202202L)
 	#include <cmath>
@@ -94,7 +96,6 @@ namespace ccm
 		return __builtin_signbit(x);
 #elif defined(CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN)
 		// use __builtin_copysign to check for the sign of zero
-
 		if (x == 0 || ccm::isnan(x))
 		{
 			// If constexpr only works with gcc 7.1+. Without if constexpr we work till GCC 5.1+
@@ -112,9 +113,8 @@ namespace ccm
 		// Check for the sign of +0.0 and -0.0 with __builtin_bit_cast
 		if (x == 0)
 		{
-			constexpr auto signbit_mask = static_cast<std::uint64_t>(1) << (std::numeric_limits<std::uint64_t>::digits - 1);
-			const auto bits				= __builtin_bit_cast(std::uint64_t, x);
-			return (bits & signbit_mask) != 0;
+			const auto bits = __builtin_bit_cast(helpers::float_bits_t<T>, x);
+			return (bits & helpers::sign_mask_v<T>) != 0;
 		}
 
 		return x < static_cast<T>(0);
@@ -129,13 +129,13 @@ namespace ccm
 	}
 
 	/**
-     * @brief Detects the sign bit of a number.
-     * @tparam T An integral type.
-     * @param x An integral number.
-     * @return true if \p x is negative, false otherwise.
-     *
-     * @note This function is constexpr and will return the same values as std::signbit along with being static_assert-able.
-     */
+	 * @brief Detects the sign bit of a number.
+	 * @tparam T An integral type.
+	 * @param x An integral number.
+	 * @return true if \p x is negative, false otherwise.
+	 *
+	 * @note This function is constexpr and will return the same values as std::signbit along with being static_assert-able.
+	 */
 	template <typename T, std::enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value, int> = 0>
 	[[nodiscard]] inline constexpr bool signbit(T x) noexcept
 	{
@@ -144,13 +144,13 @@ namespace ccm
 	}
 
 	/**
-     * @brief Detects the sign bit of a number.
-     * @tparam T An integral type.
-     * @param x An integral number.
-     * @return false as an unsigned number can't be negative.
-     *
-     * @note This function is constexpr and will return the same values as std::signbit along with being static_assert-able.
-     */
+	 * @brief Detects the sign bit of a number.
+	 * @tparam T An integral type.
+	 * @param x An integral number.
+	 * @return false as an unsigned number can't be negative.
+	 *
+	 * @note This function is constexpr and will return the same values as std::signbit along with being static_assert-able.
+	 */
 	template <typename T, std::enable_if_t<std::is_integral<T>::value && !std::is_signed<T>::value, int> = 0>
 	[[nodiscard]] inline constexpr bool signbit(T /* unused */) noexcept
 	{
@@ -162,21 +162,21 @@ namespace ccm
 
 // Clean up the global namespace
 #ifdef CCMATH_HAS_CONSTEXPR_SIGNBIT
-    #undef CCMATH_HAS_CONSTEXPR_SIGNBIT
+	#undef CCMATH_HAS_CONSTEXPR_SIGNBIT
 #endif
 
 #ifdef CCMATH_HAS_BUILTIN_BIT_CAST
-    #undef CCMATH_HAS_BUILTIN_BIT_CAST
+	#undef CCMATH_HAS_BUILTIN_BIT_CAST
 #endif
 
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
-    #undef CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
+	#undef CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
 #endif
 
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-    #undef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+	#undef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
 #endif
 
 #ifdef CCMATH_MSVC_DOES_NOT_HAVE_ASSERTABLE_CONSTEXPR_SIGNBIT
-    #undef CCMATH_MSVC_DOES_NOT_HAVE_ASSERTABLE_CONSTEXPR_SIGNBIT
+	#undef CCMATH_MSVC_DOES_NOT_HAVE_ASSERTABLE_CONSTEXPR_SIGNBIT
 #endif
