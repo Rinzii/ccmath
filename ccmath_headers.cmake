@@ -4,6 +4,15 @@ set(ccmath_internal_helpers_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/promote.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/make_mantisa.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/not_null.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/fpclassify_helper.hpp
+)
+
+set(ccmath_internal_setup_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/setup/compiler_def.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/setup/compiler_undef.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/setup/builtin_support_def.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/setup/builtin_support_undef.hpp
+
 )
 
 set(ccmath_internal_typetraits_headers
@@ -18,6 +27,7 @@ set(ccmath_internal_utility_headers
 
 set(ccmath_internal_headers
         ${ccmath_internal_helpers_headers}
+        ${ccmath_internal_setup_headers}
         ${ccmath_internal_typetraits_headers}
         ${ccmath_internal_utility_headers}
 
