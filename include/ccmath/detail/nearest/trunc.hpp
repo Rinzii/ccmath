@@ -62,7 +62,7 @@ namespace ccm
 	 * @param x The float to truncate.
 	 * @return Returns a truncated float.
 	 */
-	float truncf(float x) noexcept
+	inline constexpr float truncf(float x) noexcept
 	{
 		return trunc(x);
 	}
@@ -73,7 +73,7 @@ namespace ccm
 	 * @param x The long double to truncate.
 	 * @return Returns a truncated long double.
 	 */
-	long double truncl(long double x) noexcept
+	inline constexpr long double truncl(long double x) noexcept
 	{
 		return trunc(x);
 	}
