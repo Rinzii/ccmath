@@ -6,9 +6,16 @@
  * See LICENSE for more information.
  */
 
-#include <cmath>
+//#include <cmath>
 #include <ccmath/detail/compare/signbit.hpp>
 #include <iostream>
+
+#include "ccmath/detail/compare/fpclassify.hpp"
+
+// Clean up the global namespace
+#include "ccmath/internal/setup/builtin_support_def.hpp"
+
+
 
 int main()
 {
@@ -16,10 +23,14 @@ int main()
 
 // EXPECT_EQ(ccm::signbit(-0.0), std::signbit(-0.0));
 
-    auto a = ccm::signbit(-0.0);
+    constexpr double a = -0.0;
+	constexpr double val = ccm::signbit(a);
+	static_assert(val == true, "ccm::signbit(-0.0) != true");
+
+	ccm::fpclassify(a);
 
     std::cout << "ccm::signbit(-0.0) = " << a << std::endl;
-	std::cout << "std::signbit(0.0) = " << std::signbit(0.0) << std::endl;
+
 
     return 0;
 }

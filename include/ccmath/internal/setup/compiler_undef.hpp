@@ -1,0 +1,113 @@
+/*
+ * Copyright (c) 2024-Present Ian Pike
+ * Copyright (c) 2024-Present ccmath contributors
+ *
+ * This library is provided under the MIT License.
+ * See LICENSE for more information.
+ */
+
+#pragma once
+
+// Undefine all the compiler macros to clean up the global namespace
+
+// GCC
+#ifdef CCMATH_COMPILER_GCC
+	#undef CCMATH_COMPILER_GCC
+#endif
+
+#ifdef CCMATH_COMPILER_GCC_VER
+	#undef CCMATH_COMPILER_GCC_VER
+#endif
+
+#ifdef CCMATH_COMPILER_GCC_VER_MAJOR
+	#undef CCMATH_COMPILER_GCC_VER_MAJOR
+#endif
+
+#ifdef CCMATH_COMPILER_GCC_VER_MINOR
+    #undef CCMATH_COMPILER_GCC_VER_MINOR
+#endif
+
+#ifdef CCMATH_COMPILER_GCC_VER_PATCH
+    #undef CCMATH_COMPILER_GCC_VER_PATCH
+#endif
+
+// MSVC
+#ifdef CCMATH_COMPILER_MSVC
+    #undef CCMATH_COMPILER_MSVC
+#endif
+
+#ifdef CCMATH_COMPILER_MSVC_VER
+    #undef CCMATH_COMPILER_MSVC_VER
+#endif
+
+// Clang
+
+#ifdef CCMATH_COMPILER_CLANG
+    #undef CCMATH_COMPILER_CLANG
+#endif
+
+#ifdef CCMATH_COMPILER_CLANG_VER
+    #undef CCMATH_COMPILER_CLANG_VER
+#endif
+
+#ifdef CCMATH_COMPILER_CLANG_VER_MAJOR
+    #undef CCMATH_COMPILER_CLANG_VER_MAJOR
+#endif
+
+#ifdef CCMATH_COMPILER_CLANG_VER_MINOR
+    #undef CCMATH_COMPILER_CLANG_VER_MINOR
+#endif
+
+#ifdef CCMATH_COMPILER_CLANG_VER_PATCH
+	#undef CCMATH_COMPILER_CLANG_VER_PATCH
+#endif
+
+// Clang CL
+#ifdef CCMATH_COMPILER_CLANG_CL
+	#undef CCMATH_COMPILER_CLANG_CL
+#endif
+
+#ifdef CCMATH_COMPILER_CLANG_CL_VER
+    #undef CCMATH_COMPILER_CLANG_CL_VER
+#endif
+
+#ifdef CCMATH_COMPILER_CLANG_CL_VER_MAJOR
+    #undef CCMATH_COMPILER_CLANG_CL_VER_MAJOR
+#endif
+
+#ifdef CCMATH_COMPILER_CLANG_CL_VER_MINOR
+    #undef CCMATH_COMPILER_CLANG_CL_VER_MINOR
+#endif
+
+#ifdef CCMATH_COMPILER_CLANG_CL_VER_PATCH
+    #undef CCMATH_COMPILER_CLANG_CL_VER_PATCH
+#endif
+
+// Clang Based
+#ifdef CCMATH_COMPILER_CLANG_BASED
+    #undef CCMATH_COMPILER_CLANG_BASED
+#endif
+
+// Intel
+#ifdef CCMATH_COMPILER_INTEL
+    #undef CCMATH_COMPILER_INTEL
+#endif
+
+#ifdef CCMATH_COMPILER_INTEL_VER
+    #undef CCMATH_COMPILER_INTEL_VER
+#endif
+
+
+// Nvidia
+#ifdef CCMATH_COMPILER_NVIDIA
+    #undef CCMATH_COMPILER_NVIDIA
+#endif
+
+#ifdef CCMATH_COMPILER_NVIDIA_VER
+    #undef CCMATH_COMPILER_NVIDIA_VER
+#endif
+
+// Unknown
+#ifdef CCMATH_UNKNOWN_COMPILER
+    #undef CCMATH_UNKNOWN_COMPILER
+#endif

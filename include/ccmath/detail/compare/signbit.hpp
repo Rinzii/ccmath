@@ -94,6 +94,15 @@ namespace ccm
 		return std::signbit(x);
 #elif defined(CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT)
 		return __builtin_signbit(x);
+#elif defined(CCMATH_HAS_BUILTIN_BIT_CAST)
+		// Check for the sign of +0.0 and -0.0 with __builtin_bit_cast
+		if (x == 0)
+		{
+			const auto bits = __builtin_bit_cast(helpers::float_bits_t<T>, x);
+			return (bits & helpers::sign_mask_v<T>) != 0;
+		}
+
+		return x < static_cast<T>(0);
 #elif defined(CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN)
 		// use __builtin_copysign to check for the sign of zero
 		if (x == 0 || ccm::isnan(x))
@@ -106,15 +115,6 @@ namespace ccm
 			else if constexpr (std::is_same_v<T, long double>) { return __builtin_copysignl(1.0l, x) < 0; }
 
 			return false;
-		}
-
-		return x < static_cast<T>(0);
-#elif defined(CCMATH_HAS_BUILTIN_BIT_CAST)
-		// Check for the sign of +0.0 and -0.0 with __builtin_bit_cast
-		if (x == 0)
-		{
-			const auto bits = __builtin_bit_cast(helpers::float_bits_t<T>, x);
-			return (bits & helpers::sign_mask_v<T>) != 0;
 		}
 
 		return x < static_cast<T>(0);
@@ -136,8 +136,8 @@ namespace ccm
 	 *
 	 * @note This function is constexpr and will return the same values as std::signbit along with being static_assert-able.
 	 */
-	template <typename T, std::enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value, int> = 0>
-	[[nodiscard]] inline constexpr bool signbit(T x) noexcept
+	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value && std::is_signed<Integer>::value, int> = 0>
+	[[nodiscard]] inline constexpr bool signbit(Integer x) noexcept
 	{
 		// There is no concept of -0 for integers. So we can just check if the number is less than 0.
 		return x < 0;
@@ -151,8 +151,8 @@ namespace ccm
 	 *
 	 * @note This function is constexpr and will return the same values as std::signbit along with being static_assert-able.
 	 */
-	template <typename T, std::enable_if_t<std::is_integral<T>::value && !std::is_signed<T>::value, int> = 0>
-	[[nodiscard]] inline constexpr bool signbit(T /* unused */) noexcept
+	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value && !std::is_signed<Integer>::value, int> = 0>
+	[[nodiscard]] inline constexpr bool signbit(Integer /* unused */) noexcept
 	{
 		// If the number is unsigned then it can't be negative.
 		return false;
