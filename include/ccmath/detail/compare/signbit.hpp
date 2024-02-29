@@ -6,6 +6,9 @@
  * See LICENSE for more information.
  */
 
+// From Ian: Sorry for the macro gore. Kinda required to make this work in a constexpr context. :(
+// TODO: Move all the macro gore into two files. One to define the macros and another to undefine them.
+
 #pragma once
 
 #include "ccmath/detail/compare/isnan.hpp"
@@ -30,7 +33,7 @@
 // Some compilers have __builtin_signbit which is constexpr for some compilers
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
 	#if !defined(CCMATH_HAS_CONSTEXPR_SIGNBIT)
-		// GCC 6.1 has constexpr __builtin_signbit that DOES allow static_assert
+		// GCC 6.1 has constexpr __builtin_signbit that DOES allow static_assert. Clang does not.
 		#if defined(__GNUC__) && (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)
 			#define CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
 		#endif
@@ -51,6 +54,7 @@
 	#endif
 #endif
 
+// This is are last resort for MSVC.
 #if defined(_MSVC_VER) && !defined(CCMATH_HAS_CONSTEXPR_BUILTIN_BIT_CAST) && !defined(CCMATH_HAS_CONSTEXPR_SIGNBIT) &&                                         \
 	!defined(CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN)
 	#define CCMATH_MSVC_DOES_NOT_HAVE_ASSERTABLE_CONSTEXPR_SIGNBIT
@@ -74,6 +78,12 @@ namespace ccm
 	 *
 	 * @warning ccm::signbit will not work with static_assert on MSVC 19.26 and earlier. This is due to the fact that
 	 * MSVC does not provide a constexpr signbit until 19.27. This is a limitation of MSVC and not ccmath.
+	 *
+	 * @attention Implementing signbit is a non-trivial task and requires a lot of compiler magic to allow for ccm::signbit to be
+	 * fully constexpr and static_assert-able while also conforming to the standard. CCMath has done its best to provide
+	 * a constexpr signbit for all compilers, but we feel that not covering edge cases would be unacceptable and as such
+	 * if your compiler is not supported a static assertion will be triggered. If this happens to you please report it to
+	 * the dev team and we will try to bring support to your compiler ASAP if we are able to!
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point<T>::value, int> = 0>
 	[[nodiscard]] inline constexpr bool signbit(T x) noexcept
@@ -107,14 +117,13 @@ namespace ccm
 			return (bits & signbit_mask) != 0;
 		}
 
-		// This does not work for -0.0, but there is no way to check for -0.0 without doing extreme UB.
 		return x < static_cast<T>(0);
 #elif defined(CCMATH_MSVC_DOES_NOT_HAVE_ASSERTABLE_CONSTEXPR_SIGNBIT)
 		// If we don't have access to MSBC 19.27 or later, we can use _fpclass and _FPCLASS_NZ to
 		// check for the sign of zero. This is is constexpr, but it is not static_assert-able.
 		return ((x == T(0)) ? (_fpclass(x) == _FPCLASS_NZ) : (x < T(0))); // This won't work in static assertions
 #else
-		static_assert(false, "signbit is not implemented for this compiler");
+		static_assert(false, "ccm::signbit is not implemented for this compiler. Please report this issue to the dev!");
 		return false;
 #endif
 	}
