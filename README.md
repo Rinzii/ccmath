@@ -18,8 +18,8 @@ To use ccmath in your projects, simply include the ccmath.hpp header file and st
 
 ```cpp
 
-#include <ccmath/ccmath.hpp>
-#include <iostream>
+#include <ccmath/ccmath.hpp> // Monolithic header file that includes all functions. Similar to including <cmath>
+#include <iostream> // For std::cout
 
 int main() {
     constexpr double x = ccmath::sqrt(25.0);  // Compile-time evaluation of square root
@@ -50,7 +50,23 @@ ccmath is designed to be compatible with any C++17-compliant compiler. It should
 
 Contributions to ccmath are welcome! If you encounter any bugs, have suggestions for improvements, or would like to contribute new features, feel free to open an issue or submit a pull request!
 
-## Implementation Progress
+## Implementation Progress (Sub Sections)
+| Section            | % done | In Progress? |
+|--------------------|--------|--------------|
+| Basic              | 80     | ✓            |
+| Compare            | 40     | ✓            |
+| Exponential        | 0      |              |
+| Float Manipulation | 0      |              |
+| Hyperbolic         | 0      |              |
+| Nearest            | 15     |              |
+| Power              | 5      |              |
+| Special Functions  | 0      |              |
+| Trigonometric      | 0      |              |
+| Misc Functions     | 0      |              |
+
+> Last Updated: 2024-2-29
+
+## Implementation Progress (All Functions)
 
 | Feature        | % done | TODO                                                                                 |
 |----------------|--------|--------------------------------------------------------------------------------------|
@@ -99,7 +115,7 @@ Contributions to ccmath are welcome! If you encounter any bugs, have suggestions
 | nearbyint      | 0      | Implement function                                                                   |
 | rint           | 0      | Implement function                                                                   |
 | round          | 0      | Implement function                                                                   |
-| trunc          | 80     | Continue refinment and solve all issues                                              |
+| trunc          | 80     | Continue refinement and solve all issues                                             |
 | cbrt           | 0      | Implement function                                                                   |
 | hypot          | 0      | Implement function                                                                   |
 | pow            | 20     | Continue implementation process and add documentation and tests                      |
@@ -135,6 +151,9 @@ Contributions to ccmath are welcome! If you encounter any bugs, have suggestions
 | gamma          | 0      | Implement function                                                                   |
 | lerp           | 0      | Implement function                                                                   |
 | lgamma         | 0      | Implement function                                                                   |
+
+> Last Updated: 2024-2-29
+
 
 ## License
 
