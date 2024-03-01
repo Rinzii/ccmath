@@ -27,10 +27,6 @@ namespace ccm
     {
 		#if defined(__GNUC__)
 			return __builtin_isnan(x); // GCC and Clang implement this as constexpr
-        #elif (defined(_MSC_VER) && _MSC_VER >= 1927) && !defined(__clang__)
-		    // This is a constexpr implementation of isnan for MSVC that works with MSVC 19.27
-		    using traits = ccm::helpers::floating_point_traits<T>;
-			return  ccm::helpers::floating_point_abs_bits(x) > traits::shifted_exponent_mask;
 		#else // If we can't use the builtin, fallback to this comparison and hope for the best.
 			return x != x; // NOLINT
 		#endif
