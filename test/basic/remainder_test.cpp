@@ -8,11 +8,20 @@
 
 #include <gtest/gtest.h>
 
-// TODO: Investigate why when including remainder it causes a linker error with gtest. This appears to not be an issue outside of the test environment.
 #include <ccmath/detail/basic/remainder.hpp>
-//#include <cmath>
+#include <cmath>
 
 
 TEST(CcmathBasicTests, Remainder)
 {
+	EXPECT_EQ(ccm::remainder(1.0, 1.0), std::remainder(1.0, 1.0));
+    EXPECT_EQ(std::isnan(ccm::remainder(1.0, 0.0)), std::isnan(std::remainder(1.0, 0.0)));
+    EXPECT_EQ(std::isnan(ccm::remainder(0.0, 1.0)), std::isnan(std::remainder(0.0, 1.0)));
+    EXPECT_EQ(std::isnan(ccm::remainder(0.0, 0.0)), std::isnan(std::remainder(0.0, 0.0)));
+    EXPECT_EQ(ccm::remainder(-1.0, 1.0), std::remainder(-1.0, 1.0));
+    EXPECT_EQ(ccm::remainder(1.0, -1.0), std::remainder(1.0, -1.0));
+    EXPECT_EQ(ccm::remainder(-1.0, -1.0), std::remainder(-1.0, -1.0));
+    EXPECT_EQ(std::isnan(ccm::remainder(-1.0, 0.0)), std::isnan(std::remainder(-1.0, 0.0)));
+
+
 }
