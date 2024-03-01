@@ -6,11 +6,21 @@
  * See LICENSE for more information.
  */
 
+// Currently supported compilers:
+// - GCC
+// - Clang
+// - Apple Clang
+// - Intel DPC++
+// - Nvidia HPC SDK
+// - MSVC
+
+/// ATTENTION: If you add a new compiler remember to add it to compiler_undef.hpp also!
+
 #pragma once
 
 #if defined(__GNUC__) && !defined(CCMATH_COMPILER_GCC)
 	#define CCMATH_COMPILER_GCC
-    #define CCMATH_COMPILER_GCC_VER ((__GNUC__ * 100) + (__GNUC_MINOR__ * 10) + __GNUC_PATCHLEVEL__)
+    #define CCMATH_COMPILER_GCC_VER ((__GNUC__ * 10000) + (__GNUC_MINOR__ * 100) + __GNUC_PATCHLEVEL__)
 	#define CCMATH_COMPILER_GCC_VER_MAJOR __GNUC__
     #define CCMATH_COMPILER_GCC_VER_MINOR __GNUC_MINOR__
     #define CCMATH_COMPILER_GCC_VER_PATCH __GNUC_PATCHLEVEL__
@@ -32,7 +42,7 @@
 
 #if defined(_MSC_VER) && defined(__clang__)
 	#define CCMATH_COMPILER_CLANG_CL
-	#define CCMATH_COMPILER_CLANG_CL_VER ((__clang_major__ * 100) + (__clang_minor__ * 10) + __clang_patchlevel__)
+	#define CCMATH_COMPILER_CLANG_CL_VER ((__clang_major__ * 10000) + (__clang_minor__ * 100) + __clang_patchlevel__)
     #define CCMATH_COMPILER_CLANG_CL_VER_MAJOR __clang_major__
     #define CCMATH_COMPILER_CLANG_CL_VER_MINOR __clang_minor__
     #define CCMATH_COMPILER_CLANG_CL_VER_PATCH __clang_patchlevel__
@@ -64,7 +74,7 @@
 // Apple Clang
 #if defined(__apple_build_version__) && defined(__clang__)
     #define CCMATH_COMPILER_APPLE_CLANG
-    #define CCMATH_COMPILER_APPLE_CLANG_VER ((__clang_major__ * 100) + (__clang_minor__ * 10) + __clang_patchlevel__)
+    #define CCMATH_COMPILER_APPLE_CLANG_VER ((__clang_major__ * 10000) + (__clang_minor__ * 100) + __clang_patchlevel__)
     #define CCMATH_COMPILER_APPLE_CLANG_VER_MAJOR __clang_major__
     #define CCMATH_COMPILER_APPLE_CLANG_VER_MINOR __clang_minor__
     #define CCMATH_COMPILER_APPLE_CLANG_VER_PATCH __clang_patchlevel__
