@@ -16,8 +16,6 @@
 
 /// ATTENTION: If you add a new compiler remember to add it to compiler_undef.hpp also!
 
-#pragma once
-
 #if defined(__GNUC__) && !defined(CCMATH_COMPILER_GCC)
 	#define CCMATH_COMPILER_GCC
     #define CCMATH_COMPILER_GCC_VER ((__GNUC__ * 10000) + (__GNUC_MINOR__ * 100) + __GNUC_PATCHLEVEL__)

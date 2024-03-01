@@ -6,8 +6,6 @@
  * See LICENSE for more information.
  */
 
-#pragma once
-
 // Undefine all the compiler macros to clean up the global namespace
 
 // GCC

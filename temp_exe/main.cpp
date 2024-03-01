@@ -7,19 +7,11 @@
  */
 
 //#include <cmath>
-#include <ccmath/detail/compare/signbit.hpp>
 #include <iostream>
 
-#include "ccmath/detail/compare/fpclassify.hpp"
-#include "ccmath/detail/nearest/trunc.hpp"
-#include "ccmath/detail/basic/remainder.hpp"
-
-
-// Clean up the global namespace
-#include "ccmath/internal/setup/builtin_support_def.hpp"
+#include "ccmath/ccmath.hpp"
 
 #include <cmath>
-
 
 
 int main()
@@ -32,22 +24,14 @@ int main()
 	constexpr double val = ccm::signbit(a);
 	static_assert(val == true, "ccm::signbit(-0.0) != true");
 
-	ccm::fpclassify(a);
+	// 	EXPECT_EQ(ccm::trunc(-std::numeric_limits<double>::quiet_NaN()), std::trunc(-std::numeric_limits<double>::quiet_NaN()));
 
-    std::cout << "ccm::signbit(-0.0) = " << a << std::endl;
+	constexpr double b = -std::numeric_limits<double>::quiet_NaN();
+	constexpr double val2 = ccm::trunc(b);
+	static_assert(ccm::isnan(val2), "ccm::trunc(-std::numeric_limits<double>::quiet_NaN()) != std::trunc(-std::numeric_limits<double>::quiet_NaN())");
 
-	auto b = ccm::trunc(1.5);
 
-	std::cout << "ccm::trunc(1.5) = " << b << std::endl;
-
-	auto c = ccm::remainder(10.0, 3.0);
-
-	std::cout << "ccm::remainder(10.0, 3.0) = " << c << std::endl;
-
-	auto d = std::remainder(10.0, 3.0);
-
-	std::cout << "std::remainder(10.0, 3.0) = " << d << std::endl;
-
+	double b2 = ccm::trunc(-std::numeric_limits<double>::quiet_NaN());
 
     return 0;
 }
