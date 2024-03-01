@@ -15,6 +15,14 @@
 
 #include "ccmath/internal/type_traits/floating_point_traits.hpp"
 
+// If we have C++23, we can use std::signbit as it is constexpr
+#if (defined(__cpp_lib_constexpr_cmath) && __cpp_lib_constexpr_cmath >= 202202L)
+	#include <cmath>
+	#ifndef CCMATH_HAS_CONSTEXPR_SIGNBIT
+		#define CCMATH_HAS_CONSTEXPR_SIGNBIT
+	#endif
+#endif
+
 // We only implement this for MSVC as that is the only manner to get constexpr signbit that is also static_assert-able
 #ifndef CCMATH_HAS_BUILTIN_BIT_CAST
 	#if (defined(_MSC_VER) && _MSC_VER >= 1927)
@@ -82,11 +90,13 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point<T>::value, int> = 0>
 	[[nodiscard]] inline constexpr bool signbit(T x) noexcept
 	{
-#if defined(CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT)
+#if defined(CCMATH_HAS_CONSTEXPR_SIGNBIT)
+		return std::signbit(x);
+#elif defined(CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT)
 		return __builtin_signbit(x);
 #elif defined(CCMATH_HAS_BUILTIN_BIT_CAST)
 		// Check for the sign of +0.0 and -0.0 with __builtin_bit_cast
-		if (x == 0)
+		if (x == static_cast<T>(0) || ccm::isnan(x))
 		{
 			const auto bits = __builtin_bit_cast(helpers::float_bits_t<T>, x);
 			return (bits & helpers::sign_mask_v<T>) != 0;
@@ -95,7 +105,7 @@ namespace ccm
 		return x < static_cast<T>(0);
 #elif defined(CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN)
 		// use __builtin_copysign to check for the sign of zero
-		if (x == 0 || ccm::isnan(x))
+		if (x == static_cast<T>(0) || ccm::isnan(x))
 		{
 			// If constexpr only works with gcc 7.1+. Without if constexpr we work till GCC 5.1+
 			// This works with clang 5.0.0 no problem even with if constexpr
@@ -111,7 +121,7 @@ namespace ccm
 #elif defined(CCMATH_MSVC_DOES_NOT_HAVE_ASSERTABLE_CONSTEXPR_SIGNBIT)
 		// If we don't have access to MSBC 19.27 or later, we can use _fpclass and _FPCLASS_NZ to
 		// check for the sign of zero. This is is constexpr, but it is not static_assert-able.
-		return ((x == T(0)) ? (_fpclass(x) == _FPCLASS_NZ) : (x < T(0))); // This won't work in static assertions
+		return ((x == static_cast<T>(0)) ? (_fpclass(x) == _FPCLASS_NZ) : (x < T(0))); // This won't work in static assertions
 #else
 		static_assert(false, "ccm::signbit is not implemented for this compiler. Please report this issue to the dev!");
 		return false;

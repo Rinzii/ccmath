@@ -34,6 +34,7 @@ TEST(CcmathNearestTests, Trunc)
 	bool isStdPositiveNanPositive = (std::signbit(std::trunc(std::numeric_limits<double>::quiet_NaN())) == false && std::isnan(std::trunc(std::numeric_limits<double>::quiet_NaN())) == true); // NOLINT
 	EXPECT_EQ(isCcmPositiveNanPositive, isStdPositiveNanPositive);
 
+
 	bool isCcmNegativeNanNegative = (std::signbit(ccm::trunc(-std::numeric_limits<double>::quiet_NaN())) == true && std::isnan(ccm::trunc(-std::numeric_limits<double>::quiet_NaN())) == true); // NOLINT
 	bool isStdNegativeNanNegative = (std::signbit(std::trunc(-std::numeric_limits<double>::quiet_NaN())) == true && std::isnan(std::trunc(-std::numeric_limits<double>::quiet_NaN())) == true); // NOLINT
 	EXPECT_EQ(isCcmNegativeNanNegative, isStdNegativeNanNegative);
