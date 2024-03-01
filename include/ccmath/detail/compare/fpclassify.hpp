@@ -8,26 +8,9 @@
 
 #pragma once
 
-#if defined(_MSC_VER) && !defined(__clang__) && !defined(CC_MATH_USING_MSVC)
-	#define CCMATH_USING_MSVC
-#endif
-
-#if defined(__clang__) && !defined(CC_MATH_USING_CLANG)
-	#define CCMATH_USING_CLANG
-#endif
-
-#if defined(__GNUC__) && !defined(CC_MATH_USING_GCC)
-	#define CCMATH_USING_GCC
-#endif
-
-#if !defined(CC_MATH_USING_MSVC) || !defined(CC_MATH_USING_CLANG) || !defined(CC_MATH_USING_GCC)
-	#define CCMATH_UNKNOWN_COMPILER
-#endif
-
 #include "ccmath/detail/basic/abs.hpp"
 #include "ccmath/detail/compare/isinf.hpp"
 #include "ccmath/detail/compare/isnan.hpp"
-
 #include "ccmath/internal/helpers/fpclassify_helper.hpp"
 
 namespace ccm
@@ -35,16 +18,16 @@ namespace ccm
 	/**
 	 * @brief Classify the floating point number
 	 * @attention This function is heavily implementation defined and may not work as expected on unknown compilers
-	 * @tparam T
-	 * @param num
-	 * @return
+	 * @tparam T The type of the floating point number
+	 * @param num The number to classify
+	 * @return The classification of the number as an integer
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	inline constexpr int fpclassify(T num)
 	{
 		if (ccm::isnan(num)) { return static_cast<int>(ccm::helpers::floating_point_defines::eFP_NAN); }
 		else if (ccm::isinf(num)) { return static_cast<int>(ccm::helpers::floating_point_defines::eFP_INFINITE); }
-		else if (num == 0) { return static_cast<int>(ccm::helpers::floating_point_defines::eFP_ZERO); }
+		else if (num == static_cast<T>(0)) { return static_cast<int>(ccm::helpers::floating_point_defines::eFP_ZERO); }
 		else if (ccm::abs(num) < std::numeric_limits<T>::min() && ccm::abs(num) > 0)
 		{
 			return static_cast<int>(ccm::helpers::floating_point_defines::eFP_SUBNORMAL);
