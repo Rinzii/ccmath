@@ -17,8 +17,6 @@
 
 
 // This file is used to detect if the compiler has support for certain builtins that are static_assert-able constexpr
-// TODO: Verify Apple Clang shares functionality with Clang for all builtin support
-
 
 /// CCMATH_HAS_BUILTIN_BIT_CAST
 /// This is a macro that is defined if the compiler has __builtin_bit_cast
@@ -26,6 +24,8 @@
 /// Compilers with Support:
 /// - GCC 11.1+
 /// - Clang 9.0.0+
+/// - Clang-CL 9.0.0+ (This is a guess based on Clang support. Needs verification!)
+/// - Apple Clang 9.0.0+ (This is a guess based on Clang support. Needs verification!)
 /// - DPC++ 2021.1.2+ (Maybe lower? This is as low as I can test currently)
 /// - NVIDIA HPC 22.7+ (Maybe lower? This is as low as I can test currently)
 /// - MSVC 19.27+
@@ -42,6 +42,22 @@
     #ifndef CCMATH_HAS_BUILTIN_BIT_CAST
         #define CCMATH_HAS_BUILTIN_BIT_CAST
     #endif
+#endif
+
+// Clang-CL 9.0.0+ has __builtin_bit_cast
+// NOTE: This is a guess based on Clang support. Needs verification!
+#if defined(CCMATH_COMPILER_CLANG_CL) && CCMATH_COMPILER_CLANG_CL_VER_MAJOR >= 9
+	#ifndef CCMATH_HAS_BUILTIN_BIT_CAST
+		#define CCMATH_HAS_BUILTIN_BIT_CAST
+	#endif
+#endif
+
+// Apple Clang 9.0.0+ has __builtin_bit_cast
+// TODO: Verify Apple Clang shares functionality with Clang for all builtin support
+#if defined(CCMATH_COMPILER_APPLE_CLANG) && CCMATH_COMPILER_APPLE_CLANG_VER_MAJOR >= 9
+	#ifndef CCMATH_HAS_BUILTIN_BIT_CAST
+		#define CCMATH_HAS_BUILTIN_BIT_CAST
+	#endif
 #endif
 
 // DPC++ 2021.1.2+ has __builtin_bit_cast
@@ -94,6 +110,8 @@
 /// Compilers with Support:
 /// - GCC 5.1+
 /// - Clang 5.0.0+
+/// - Clang-CL 5.0.0+ (This is a guess based on Clang support. Needs verification!)
+/// - Apple Clang 5.0.0+ (This is a guess based on Clang support. Needs verification!)
 /// - DPC++ 2021.1.2+ (Maybe lower? This is as low as I can test currently)
 /// - NVIDIA HPC 24.1+
 
@@ -109,6 +127,22 @@
     #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
         #define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
     #endif
+#endif
+
+// Clang-CL 5.0.0+ has constexpr __builtin_copysign that DOES allow static_assert.
+// NOTE: This is a guess based on Clang support. Needs verification!
+#if defined(CCMATH_COMPILER_CLANG_CL) && CCMATH_COMPILER_CLANG_CL_VER_MAJOR >= 5
+	#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+	#endif
+#endif
+
+// Apple Clang 5.0.0+ has constexpr __builtin_copysign that DOES allow static_assert.
+// TODO: Verify Apple Clang shares functionality with Clang for all builtin support
+#if defined(CCMATH_COMPILER_APPLE_CLANG) && CCMATH_COMPILER_APPLE_CLANG_VER_MAJOR >= 5
+	#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+	#endif
 #endif
 
 // DPC++ 2021.1.2+ has constexpr __builtin_copysign that DOES allow static_assert.
