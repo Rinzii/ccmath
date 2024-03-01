@@ -15,9 +15,10 @@
 // Currently supported compilers:
 // - GCC
 // - Clang
+// - Apple Clang
+// - MSVC
 // - Intel DPC++
 // - Nvidia HPC SDK
-// - MSVC
 
 // Identify the compiler
 #include "ccmath/internal/setup/compiler_def.hpp"
@@ -32,19 +33,19 @@ namespace ccm::helpers
 		eFP_ZERO = 0,
 		eFP_SUBNORMAL = -2,
 		eFP_NORMAL = -1
-#elif defined(CCMATH_COMPILER_APPLE_CLANG) // Apple Clang has a different set of defines
+#elif defined(CCMATH_COMPILER_APPLE_CLANG) // Apple Clang has a different set of defines than Clang
         eFP_NAN = 1,
         eFP_INFINITE = 2,
         eFP_ZERO = 3,
         eFP_SUBNORMAL = 5,
         eFP_NORMAL = 4,
-#elif defined(CCMATH_COMPILER_CLANG) || defined(CCMATH_COMPILER_GCC) || defined(CCMATH_COMPILER_CLANG_BASED)
+#elif defined(CCMATH_COMPILER_CLANG) || defined(CCMATH_COMPILER_GCC) || defined(CCMATH_COMPILER_CLANG_BASED) // Clang and GCC have the same defines
         eFP_NAN = 0,
         eFP_INFINITE = 1,
         eFP_ZERO = 2,
         eFP_SUBNORMAL = 3,
         eFP_NORMAL = 4,
-#else // Unknown compiler throws a static_assert
+#else // Unknown compiler throws a static_assert. Since FP_* macros are extremely implementation specific, we can't provide a default.
         eFP_NAN = 0,
         eFP_INFINITE,
         eFP_ZERO,
