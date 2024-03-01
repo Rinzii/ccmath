@@ -10,40 +10,121 @@
 
 #include "ccmath/internal/setup/compiler_def.hpp"
 
+/// !!! ATTENTION !!!
+/// If you add a new builtin here, remember you HAVE to also undefine
+/// any new macro created inside of builtin_support_undef.hpp
+/// !!! ATTENTION !!!
+
 
 // This file is used to detect if the compiler has support for certain builtins that are static_assert-able constexpr
+// TODO: Verify Apple Clang shares functionality with Clang for all builtin support
 
-#ifndef CCMATH_HAS_BUILTIN_BIT_CAST
-	#if (defined(_MSC_VER) && _MSC_VER >= 1927)
-		#define CCMATH_HAS_BUILTIN_BIT_CAST
+
+/// CCMATH_HAS_BUILTIN_BIT_CAST
+/// This is a macro that is defined if the compiler has __builtin_bit_cast
+///
+/// Compilers with Support:
+/// - GCC 11.1+
+/// - Clang 9.0.0+
+/// - DPC++ 2021.1.2+ (Maybe lower? This is as low as I can test currently)
+/// - NVIDIA HPC 22.7+ (Maybe lower? This is as low as I can test currently)
+/// - MSVC 19.27+
+
+// GCC 11.1+ has __builtin_bit_cast
+#if defined(CCMATH_COMPILER_GCC) && CCMATH_COMPILER_GCC_VER_MAJOR >= 11 && CCMATH_COMPILER_GCC_VER_MINOR >= 1
+    #ifndef CCMATH_HAS_BUILTIN_BIT_CAST
+        #define CCMATH_HAS_BUILTIN_BIT_CAST
     #endif
-
 #endif
 
-// Some compilers have __builtin_signbit which is constexpr for some compilers
-#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
-	#if !defined(CCMATH_HAS_CONSTEXPR_SIGNBIT)
-		// GCC 6.1 has constexpr __builtin_signbit that DOES allow static_assert. Clang does not.
-		#if defined(__GNUC__) && (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)
-			#define CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
-		#endif
+// Clang 9.0.0+ has __builtin_bit_cast
+#if defined(CCMATH_COMPILER_CLANG) && CCMATH_COMPILER_CLANG_VER_MAJOR >= 9
+    #ifndef CCMATH_HAS_BUILTIN_BIT_CAST
+        #define CCMATH_HAS_BUILTIN_BIT_CAST
+    #endif
+#endif
+
+// DPC++ 2021.1.2+ has __builtin_bit_cast
+#if defined(CCMATH_COMPILER_INTEL) && CCMATH_COMPILER_INTEL_VER >= 20210102
+    #ifndef CCMATH_HAS_BUILTIN_BIT_CAST
+        #define CCMATH_HAS_BUILTIN_BIT_CAST
+    #endif
+#endif
+
+// NVIDIA HPC 22.7+ has __builtin_bit_cast (Maybe lower? This is as low as I can test currently)
+#if defined(CCMATH_COMPILER_NVIDIA) && CCMATH_COMPILER_NVIDIA_VER_MAJOR >= 22 && CCMATH_COMPILER_NVIDIA_VER_MINOR >= 7
+	#ifndef CCMATH_HAS_BUILTIN_BIT_CAST
+		#define CCMATH_HAS_BUILTIN_BIT_CAST
 	#endif
 #endif
 
-#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-	#if !defined(CCMATH_HAS_CONSTEXPR_SIGNBIT)
-		// GCC 6.1 has constexpr __builtin_copysign that DOES allow static_assert
-		#if defined(__GNUC__) && (__GNUC__ >= 6 && __GNUC_MINOR__ >= 1)
-			#define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-		#endif
+// MSVC 19.27+ has __builtin_bit_cast
+#if (defined(CCMATH_COMPILER_MSVC) && CCMATH_COMPILER_MSVC_VER >= 1927)
+    #ifndef CCMATH_HAS_BUILTIN_BIT_CAST
+        #define CCMATH_HAS_BUILTIN_BIT_CAST
+    #endif
+#endif
 
-		// Clang 5.0.0 has constexpr __builtin_copysign that DOES allow static_assert
-		#if defined(__clang__) && (__clang_major__ >= 5)
-			#define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-		#endif
+
+/// CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
+/// This is a macro that is defined if the compiler has constexpr __builtin_signbit that allows static_assert
+///
+/// Compilers with Support:
+/// - GCC 6.1+
+/// - NVIDIA HPC 24.1+
+
+// GCC 6.1 has constexpr __builtin_signbit that DOES allow static_assert.
+#if defined(CCMATH_COMPILER_GCC) && CCMATH_COMPILER_GCC_VER_MAJOR >= 6 && CCMATH_COMPILER_GCC_VER_MINOR >= 1
+	#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
+	    #define CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
+	#endif
+#endif
+
+// NVIDIA HPC 24.1+ has constexpr __builtin_signbit that DOES allow static_assert
+#if defined(CCMATH_COMPILER_NVIDIA) && CCMATH_COMPILER_NVIDIA_VER_MAJOR >= 24 && CCMATH_COMPILER_NVIDIA_VER_MINOR >= 1
+	#ifndef CCMATH_HAS_BUILTIN_BIT_CAST
+		#define CCMATH_HAS_BUILTIN_BIT_CAST
 	#endif
 #endif
 
 
+/// CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+/// This is a macro that is defined if the compiler has constexpr __builtin_copysign that allows static_assert
+///
+/// Compilers with Support:
+/// - GCC 5.1+
+/// - Clang 5.0.0+
+/// - DPC++ 2021.1.2+ (Maybe lower? This is as low as I can test currently)
+/// - NVIDIA HPC 24.1+
+
+// GCC 5.1+ has constexpr __builtin_copysign that DOES allow static_assert.
+#if defined(CCMATH_COMPILER_GCC) && CCMATH_COMPILER_GCC_VER_MAJOR >= 5 && CCMATH_COMPILER_GCC_VER_MINOR >= 1
+	#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+	#endif
+#endif
+
+// Clang 5.0.0+ has constexpr __builtin_copysign that DOES allow static_assert.
+#if defined(CCMATH_COMPILER_CLANG) && CCMATH_COMPILER_CLANG_VER_MAJOR >= 5
+    #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+        #define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+    #endif
+#endif
+
+// DPC++ 2021.1.2+ has constexpr __builtin_copysign that DOES allow static_assert.
+#if defined(CCMATH_COMPILER_INTEL) && CCMATH_COMPILER_INTEL_VER >= 20210102
+    #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+        #define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+    #endif
+#endif
+
+// NVIDIA HPC 24.1+ has constexpr __builtin_copysign that DOES allow static_assert.
+#if defined(CCMATH_COMPILER_NVIDIA) && CCMATH_COMPILER_NVIDIA_VER_MAJOR >= 24 && CCMATH_COMPILER_NVIDIA_VER_MINOR >= 1
+    #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+        #define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+    #endif
+#endif
+
+// TODO: Add more builtins as more are required for the library
 
 #include "ccmath/internal/setup/compiler_undef.hpp"
