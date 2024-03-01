@@ -10,29 +10,41 @@
 
 #include <type_traits>
 
+#if (defined(_MSC_VER) && _MSC_VER >= 1927) && !defined(__clang__)
+#include "ccmath/internal/type_traits/floating_point_traits.hpp"
+#endif
+
 namespace ccm
 {
 	/**
-	 * @brief
-	 * @tparam T
-	 * @param x
-	 * @return
+	 * @brief Check if the given number is NaN.
+	 * @tparam T The type of the number to check.
+	 * @param x The number to check.
+	 * @return True if the number is NaN, false otherwise.
 	 */
-    template <typename T>
-    inline constexpr bool isnan(T x) noexcept
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, int> = 0>
+    [[nodiscard]] inline constexpr bool isnan(T x) noexcept
     {
 		#if defined(__GNUC__)
 			return __builtin_isnan(x); // GCC and Clang implement this as constexpr
-		#else
+        #elif (defined(_MSC_VER) && _MSC_VER >= 1927) && !defined(__clang__)
+		    // This is a constexpr implementation of isnan for MSVC that works with MSVC 19.27
+		    using traits = ccm::helpers::floating_point_traits<T>;
+			return  ccm::helpers::floating_point_abs_bits(x) > traits::shifted_exponent_mask;
+		#else // If we can't use the builtin, fallback to this comparison and hope for the best.
 			return x != x; // NOLINT
 		#endif
     }
 
+	/**
+	 * @brief Check if the given number is NaN.
+	 * @tparam Integer The type of the number to check.
+	 * @return False, as integers can never be NaN.
+	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>
-	inline constexpr bool isnan(Integer /* unused */)
+	[[nodiscard]] inline constexpr bool isnan(Integer /* x */)
 	{
-			// Is nan for integers is always false. As only floating point numbers can be nan.
-            return false;
+            return false; // Integers can never be NaN.
     }
 
 }

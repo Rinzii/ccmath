@@ -69,8 +69,16 @@ namespace ccm::helpers
 	template <typename T>
 	inline constexpr typename floating_point_traits<T>::uint_type sign_mask_v = floating_point_traits<T>::shifted_sign_mask;
 
+	// TODO: Add checking for if we support __builtin_bit_cast or not.
 
-
-
+	// Taken from MSVC STL for better MSVC compatibility
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+	[[nodiscard]] constexpr T floating_point_abs_bits(const T & x) noexcept
+    {
+        using traits = floating_point_traits<T>;
+		using uint_type = typename traits::uint_type;
+		const auto bits = __builtin_bit_cast(uint_type, x);
+		return bits & ~traits::shifted_sign_mask;
+    }
 }
 
