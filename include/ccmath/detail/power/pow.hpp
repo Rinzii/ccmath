@@ -1,10 +1,10 @@
 /*
-* Copyright (c) 2024-Present Ian Pike
-* Copyright (c) 2024-Present cmath contributors
-*
-* This library is provided under the MIT License.
-* See LICENSE for more information.
-*/
+ * Copyright (c) 2024-Present Ian Pike
+ * Copyright (c) 2024-Present cmath contributors
+ *
+ * This library is provided under the MIT License.
+ * See LICENSE for more information.
+ */
 
 #pragma once
 
@@ -19,9 +19,7 @@ namespace ccm
 			{
 				return exp == 0 ? 1 : base * pow_dbl(base, exp - 1);
 			}
-		}
-	}
-
+		} // namespace detail
+	}	  // namespace
 
 } // namespace ccm
-

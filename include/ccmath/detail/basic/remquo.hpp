@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "ccmath/detail/compare/isnan.hpp"
-#include "ccmath/detail/compare/isinf.hpp"
 #include "ccmath/detail/basic/remainder.hpp"
+#include "ccmath/detail/compare/isinf.hpp"
+#include "ccmath/detail/compare/isnan.hpp"
 
 namespace ccm
 {
@@ -20,18 +20,23 @@ namespace ccm
 	 * @param x Floating-point or integer values
 	 * @param y Floating-point or integer values
 	 * @param quo Pointer to int to store the sign and some bits of x / y
-	 * @return If successful, returns the floating-point remainder of the division x / y as defined in ccm::remainder, and stores, in *quo, the sign and at least three of the least significant bits of x / y
+	 * @return If successful, returns the floating-point remainder of the division x / y as defined in ccm::remainder, and stores, in *quo, the sign and at
+	 * least three of the least significant bits of x / y
+	 *
+	 * @warning This function is still extremely experimental and almost certainly not work as expected.
+	 * @note This function should work as expected with GCC 7.1 and later.
 	 */
-	template<typename T>
-    inline constexpr T remquo(T x, T y, int* quo)
-    {
-#if false && (defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 7 && __GNUC_MINOR__ >= 1)
-        // Works with GCC 7.1
-        // Not static_assert-able
-        return __builtin_remquo(x, y, quo);
+	template <typename T>
+	inline constexpr T remquo(T x, T y, int * quo)
+	{
+#if (defined(__GNUC__) && __GNUC__ >= 7 && __GNUC_MINOR__ >= 1)
+		// Works with GCC 7.1
+		// Not static_assert-able
+		return __builtin_remquo(x, y, quo);
 #else
 		// TODO: This function is a lot trickier to get working with constexpr.
-		// TODO: I'm putting this on hold for now and not require it for the first release.
+		//       I'm putting this on hold for now and not requiring it for v0.1.0.
+		//       Since remquo is not a commonly used function, I'm not going to worry about it for now.
 		if constexpr (std::is_floating_point_v<T>)
 		{
 			// If x is ±∞ and y is not NaN, NaN is returned.
@@ -50,6 +55,7 @@ namespace ccm
 
 		return r;
 #endif
-    }
-
+	}
 } // namespace ccm
+
+/// @ingroup basic
