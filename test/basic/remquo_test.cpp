@@ -15,5 +15,6 @@
 
 TEST(CcmathBasicTests, Remquo)
 {
-
+	// TODO: Implement test cases for remquo once the function is ready.
+	//       For the time being remquo is being pushed to the back burner for implementation later.
 }
