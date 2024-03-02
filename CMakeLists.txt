@@ -2,9 +2,7 @@ cmake_minimum_required(VERSION 3.18)
 
 enable_language(CXX)
 
-# We will hit 1.0.0 when we have a stable API
-# We will hit 0.1.0 when we have finished the basic API
-set(CCMATH_BUILD_VERSION 0.0.1)
+set(CCMATH_BUILD_VERSION 0.1.0)
 set(INTERNAL_PROJ_DEFAULT_NAME ccmath)
 
 project(${INTERNAL_PROJ_DEFAULT_NAME} VERSION ${CCMATH_BUILD_VERSION})
@@ -23,7 +21,7 @@ option(CCMATH_BUILD_TEST "Build ccmath tests" ${is_root_project})
 option(CCMATH_BUILD_EXAMPLES "Build ccmath examples" ${is_root_project})
 option(CCMATH_BUILD_BENCHMARKS "Build ccmath benchmarks" ${is_root_project})
 option(CCMATH_INSTALL "Setup install and package steps" ${is_root_project})
-option(CCMATH_USE_SIMD "Use SIMD instructions" OFF)
+option(CCMATH_USE_SIMD "Use SIMD instructions" OFF) # SIMD is not yet implemented.
 
 # include the global configuration file
 include(cmake/GlobalConfig.cmake)
