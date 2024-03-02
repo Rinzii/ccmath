@@ -14,7 +14,10 @@
 // - Nvidia HPC SDK
 // - MSVC
 
-/// ATTENTION: If you add a new compiler remember to add it to compiler_undef.hpp also!
+/// !!! ATTENTION !!!
+/// If you add a new compiler macro remember to undefine it inside of compiler_undef.hpp also!
+/// !!! ATTENTION !!!
+
 
 #if defined(__GNUC__) && !defined(CCMATH_COMPILER_GCC)
 	#define CCMATH_COMPILER_GCC
