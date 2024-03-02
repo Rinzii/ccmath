@@ -23,6 +23,7 @@ namespace ccm
 	 * @return True if the number is NaN, false otherwise.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, int> = 0>
+<<<<<<< HEAD
 	[[nodiscard]] inline constexpr bool isnan(T x) noexcept
 	{
 #if defined(__GNUC__)
@@ -31,6 +32,16 @@ namespace ccm
 		return x != x; // NOLINT
 #endif
 	}
+=======
+    [[nodiscard]] inline constexpr bool isnan(T x) noexcept
+    {
+		#if defined(__GNUC__)
+			return __builtin_isnan(x); // GCC and Clang implement this as constexpr
+		#else // If we can't use the builtin, fallback to this comparison and hope for the best.
+			return x != x; // NOLINT
+		#endif
+    }
+>>>>>>> 35921f6a7694983073fd81e0894043b36543469f
 
 	/**
 	 * @brief Check if the given number is NaN.
