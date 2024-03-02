@@ -24,11 +24,22 @@ int main()
 	constexpr double val = ccm::signbit(a);
 	static_assert(val == true, "ccm::signbit(-0.0) != true");
 
+	std::remquo(1.0, 2.0, nullptr);
+	__builtin_remquo(1.0, 2.0, nullptr);
 	// 	EXPECT_EQ(ccm::trunc(-std::numeric_limits<double>::quiet_NaN()), std::trunc(-std::numeric_limits<double>::quiet_NaN()));
 
 	constexpr double b = -std::numeric_limits<double>::quiet_NaN();
 	constexpr double val2 = ccm::trunc(b);
 	static_assert(ccm::isnan(val2), "ccm::trunc(-std::numeric_limits<double>::quiet_NaN()) != std::trunc(-std::numeric_limits<double>::quiet_NaN())");
+
+	// Test constexpr remquo
+	constexpr double x = 1.0;
+	constexpr double y = 2.0;
+	static constexpr int * quo = nullptr;
+	constexpr double result = ccm::remquo(x, y, quo);
+
+    // Test trunc
+    double b1 = std::trunc(-std::numeric_limits<double>::quiet_NaN());
 
 
 	double b2 = ccm::trunc(-std::numeric_limits<double>::quiet_NaN());

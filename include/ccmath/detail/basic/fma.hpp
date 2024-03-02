@@ -25,6 +25,7 @@ namespace ccm
 
 				// If the compiler has a builtin, use it
 #if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER) && !defined(__INTEL_LLVM_COMPILER)
+				// TODO: Add a wrapper for if constexpr
 				if constexpr (std::is_same_v<T, float>)
 				{
 					return __builtin_fmaf(x, y, z);
