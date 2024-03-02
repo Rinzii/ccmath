@@ -13,19 +13,17 @@
 
 #include "ccmath/detail/compare/isnan.hpp"
 
-// TODO: Implement a version of fmax that allows two different types to be compared.
-
 namespace ccm
 {
 	/**
 	 * @brief Returns the larger of the two values.
 	 * @tparam T Type of the values to compare.
-	 * @param a Left-hand side of the comparison.
-	 * @param b Right-hand side of the comparison.
+	 * @param x Left-hand side of the comparison.
+	 * @param y Right-hand side of the comparison.
 	 * @return
 	 */
 	template <typename T>
-    inline constexpr T max(T x, T y)
+    inline constexpr T max(T x, T y) noexcept
     {
 		if constexpr (std::is_floating_point<T>::value)
 		{
@@ -48,26 +46,87 @@ namespace ccm
         return (x > y) ? x : y;
     }
 
+	/**
+	 * @brief Returns the larger of the two values.
+	 * @tparam T Type of left-hand side of the comparison.
+	 * @tparam U Type of right-hand side of the comparison.
+	 * @param x Left-hand side of the comparison.
+	 * @param y Right-hand side of the comparison.
+	 * @return
+	 */
+	template <typename T, typename U>
+	inline constexpr auto max(T x, U y) noexcept
+	{
+		// Find the common type of the two arguments
+        using shared_type = std::common_type_t<T, U>;
+
+        // Then cast the arguments to the common type and call the single argument version
+        return static_cast<shared_type>(max(static_cast<shared_type>(x), static_cast<shared_type>(y)));
+	}
+
+	/**
+     * @brief Returns the larger of the two floating point values.
+     * @tparam T Type of the values to compare.
+     * @param x Left-hand side of the comparison.
+     * @param y Right-hand side of the comparison.
+     * @return
+     */
 	template <typename T>
-	inline constexpr T fmax(T a, T b)
+	inline constexpr T fmax(T x, T y) noexcept
 	{
-		return max<T>(a, b);
+		return max<T>(x, y);
 	}
 
+	/**
+	 * @brief Returns the larger of the two values.
+	 * @tparam T Type of left-hand side of the comparison.
+	 * @tparam U Type of right-hand side of the comparison.
+	 * @param x Left-hand side of the comparison.
+	 * @param y Right-hand side of the comparison.
+	 * @return
+	 */
+	template <typename T, typename U>
+	inline constexpr auto fmax(T x, U y) noexcept
+	{
+		// Find the common type of the two arguments
+		using shared_type = std::common_type_t<T, U>;
+
+		// Then cast the arguments to the common type and call the single argument version
+		return static_cast<shared_type>(max<shared_type>(static_cast<shared_type>(x), static_cast<shared_type>(y)));
+	}
+
+	/**
+     * @brief Returns the larger of the two floating point values.
+     * @param x Left-hand side of the comparison.
+     * @param y Right-hand side of the comparison.
+     * @return
+     */
 	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, int> = 0>
-	inline constexpr double fmax(Integer a, Integer b)
+	inline constexpr double fmax(Integer x, Integer y) noexcept
 	{
-		return max<double>(static_cast<double>(a), static_cast<double>(b));
+		return max<double>(static_cast<double>(x), static_cast<double>(y));
 	}
 
-	inline constexpr float fmaxf(float a, float b)
+	/**
+     * @brief Returns the larger of the two floating point values.
+     * @param x Left-hand side of the comparison.
+     * @param y Right-hand side of the comparison.
+     * @return
+     */
+	inline constexpr float fmaxf(float x, float y) noexcept
     {
-        return fmax<float>(a, b);
+        return fmax<float>(x, y);
     }
 
-	inline constexpr long double fmaxl(long double a, long double b)
+	/**
+     * @brief Returns the larger of the two floating point values.
+     * @param x Left-hand side of the comparison.
+     * @param y Right-hand side of the comparison.
+     * @return
+     */
+	inline constexpr long double fmaxl(long double x, long double y) noexcept
     {
-        return fmax<long double>(a, b);
+        return fmax<long double>(x, y);
     }
 
 
