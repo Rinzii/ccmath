@@ -7,3 +7,12 @@
  */
 
 #pragma once
+
+#include "ccmath/detail/fmanip/copysign.hpp"
+#include "ccmath/detail/fmanip/frexp.hpp"
+#include "ccmath/detail/fmanip/ilogb.hpp"
+#include "ccmath/detail/fmanip/ldexp.hpp"
+#include "ccmath/detail/fmanip/logb.hpp"
+#include "ccmath/detail/fmanip/modf.hpp"
+#include "ccmath/detail/fmanip/nextafter.hpp"
+#include "ccmath/detail/fmanip/scalbn.hpp"

@@ -14,7 +14,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   set(is_root_project ON)
 endif()
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -24,7 +24,6 @@ option(CCMATH_BUILD_EXAMPLES "Build ccmath examples" ${is_root_project})
 option(CCMATH_BUILD_BENCHMARKS "Build ccmath benchmarks" ${is_root_project})
 option(CCMATH_INSTALL "Setup install and package steps" ${is_root_project})
 option(CCMATH_USE_SIMD "Use SIMD instructions" OFF)
-option(CCMATH_BUILD_EXE "Build ccmath benchmarks" ${is_root_project}) # TODO: This will be removed once we reach a stable API
 
 # include the global configuration file
 include(cmake/GlobalConfig.cmake)
@@ -65,8 +64,8 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
 
 configure_file(cmake/version.hpp.in "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp" @ONLY)
 
-if (CCMATH_BUILD_EXE)
-  add_subdirectory(temp_exe)
+if (CCMATH_BUILD_EXAMPLES)
+  add_subdirectory(example)
 endif()
 
 if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TEST)

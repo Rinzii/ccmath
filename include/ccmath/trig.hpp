@@ -7,3 +7,11 @@
  */
 
 #pragma once
+
+#include "ccmath/detail/trig/acos.hpp"
+#include "ccmath/detail/trig/asin.hpp"
+#include "ccmath/detail/trig/atan.hpp"
+#include "ccmath/detail/trig/atan2.hpp"
+#include "ccmath/detail/trig/cos.hpp"
+#include "ccmath/detail/trig/sin.hpp"
+#include "ccmath/detail/trig/tan.hpp"
