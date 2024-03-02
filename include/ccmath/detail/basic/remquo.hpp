@@ -14,6 +14,14 @@
 
 namespace ccm
 {
+	/**
+	 * @brief  Signed remainder as well as the three last bits of the division operation
+	 * @tparam T The type of the arguments
+	 * @param x Floating-point or integer values
+	 * @param y Floating-point or integer values
+	 * @param quo Pointer to int to store the sign and some bits of x / y
+	 * @return If successful, returns the floating-point remainder of the division x / y as defined in ccm::remainder, and stores, in *quo, the sign and at least three of the least significant bits of x / y
+	 */
 	template<typename T>
     inline constexpr T remquo(T x, T y, int* quo)
     {
