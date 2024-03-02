@@ -14,7 +14,6 @@
 
 namespace ccm
 {
-
 	/**
 	 * @brief Returns the remainder of the division of x by y.
 	 * @tparam T Type of the values to compare.
@@ -41,16 +40,39 @@ namespace ccm
 	}
 
 	/**
-     * @brief Returns the remainder of the division of x by y.
-     * @tparam Integer Type of the values to compare.
-     * @param x Dividend.
-     * @param y Divisor.
-     * @return The remainder of the division of x by y as a double.
-     */
+	 * @brief Returns the remainder of the division of x by y.
+	 * @tparam Integer Type of the values to compare.
+	 * @param x Dividend.
+	 * @param y Divisor.
+	 * @return The remainder of the division of x by y as a double.
+	 */
 	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, int> = 0>
 	inline constexpr double remainder(Integer x, Integer y)
 	{
 		return remainder<double>(static_cast<double>(x), static_cast<double>(y));
 	}
 
+	/**
+	 * @brief Returns the remainder of the division of x by y.
+	 * @param x Dividend.
+	 * @param y Divisor.
+	 * @return The remainder of the division of x by y.
+	 */
+	inline constexpr float remainderf(float x, float y)
+	{
+		return remainder<float>(x, y);
+	}
+
+	/**
+	 * @brief Returns the remainder of the division of x by y.
+	 * @param x Dividend.
+	 * @param y Divisor.
+	 * @return The remainder of the division of x by y.
+	 */
+	inline constexpr long double remainderl(long double x, long double y)
+	{
+		return remainder<long double>(x, y);
+	}
 } // namespace ccm
+
+/// @ingroup basic
