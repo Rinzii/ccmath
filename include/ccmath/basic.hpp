@@ -16,4 +16,3 @@
 #include "ccmath/detail/basic/min.hpp"
 #include "ccmath/detail/basic/remainder.hpp"
 #include "ccmath/detail/basic/remquo.hpp"
-

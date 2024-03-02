@@ -14,7 +14,6 @@
 namespace ccm
 {
 
-
 	/**
 	 * @brief Returns the integral value nearest to x with the magnitude of the integral value always less than or equal to x.
 	 * @tparam T The type of the input.

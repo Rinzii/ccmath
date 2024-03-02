@@ -18,6 +18,7 @@
 
 namespace ccm
 {
+	/// @cond MATH_DETAIL
 	namespace
 	{
 		namespace impl
@@ -70,6 +71,7 @@ namespace ccm
 
 		} // namespace impl
 	}	  // namespace
+	/// @endcond
 
 	/**
 	 * @brief Returns the floating-point remainder of the division operation x/y.
@@ -85,26 +87,54 @@ namespace ccm
 		return impl::fmod_impl_check(x, y);
 	}
 
+	/**
+	 * @brief Returns the floating-point remainder of the division operation x/y.
+	 * @tparam Integer An integral type.
+	 * @param x An integral value.
+	 * @param y An integral value.
+	 * @return The floating-point remainder of the division operation x/y.
+	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>
 	inline constexpr double fmod(Integer x, Integer y)
 	{
 		return impl::fmod_impl_type_check(x, y);
 	}
 
+	/**
+	 * @brief Returns the floating-point remainder of the division operation x/y.
+	 * @tparam T A floating-point or integral type.
+	 * @tparam U A floating-point or integral type.
+	 * @param x A floating-point or integral value.
+	 * @param y A floating-point or integral value.
+	 * @return The floating-point remainder of the division operation x/y.
+	 */
 	template <typename T, typename U>
-	inline constexpr std::common_type_t<T, U> fmod(T x, T y)
+	inline constexpr auto fmod(T x, T y)
 	{
 		return impl::fmod_impl_type_check(x, y);
 	}
 
+	/**
+	 * @brief Returns the floating-point remainder of the division operation x/y.
+	 * @param x A floating-point value.
+	 * @param y A floating-point value.
+	 * @return The floating-point remainder of the division operation x/y.
+	 */
 	inline constexpr float fmodf(float x, float y)
 	{
 		return fmod<float>(x, y);
 	}
 
+	/**
+	 * @brief Returns the floating-point remainder of the division operation x/y.
+	 * @param x A floating-point value.
+	 * @param y A floating-point value.
+	 * @return The floating-point remainder of the division operation x/y.
+	 */
 	inline constexpr long double fmodl(long double x, long double y)
 	{
 		return fmod<long double>(x, y);
 	}
-
 } // namespace ccm
+
+/// @ingroup basic

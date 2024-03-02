@@ -6,9 +6,11 @@
  * See LICENSE for more information.
  */
 
-#pragma once
 
-#include "ccmath/detail/power/cbrt.hpp"
-#include "ccmath/detail/power/hypot.hpp"
-#include "ccmath/detail/power/pow.hpp"
-#include "ccmath/detail/power/sqrt.hpp"
+int main()
+{
+
+	// TODO: Implement actual examples showcasing the library
+
+    return 0;
+}
