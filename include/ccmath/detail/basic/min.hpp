@@ -43,14 +43,14 @@ namespace ccm
                 return (x < y) ? x : y;
             }
 
-			template <typename T1, typename T2>
-			inline constexpr auto min_impl(const T1 x, const T2 y) noexcept
+			template <typename T, typename U>
+			inline constexpr auto min_impl(const T x, const U y) noexcept
             {
 				// Find the common type of the two arguments
-				using shared_type = std::common_type_t<T1, T2>;
+				using shared_type = std::common_type_t<T, U>;
 
 				// Then cast the arguments to the common type and call the single argument version
-				return static_cast<shared_type>(min_impl(static_cast<shared_type>(x), static_cast<shared_type>(y)));
+				return static_cast<shared_type>(min_impl<shared_type>(static_cast<shared_type>(x), static_cast<shared_type>(y)));
             }
 		}
 	}
