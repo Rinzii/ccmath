@@ -9,6 +9,7 @@ set(ccmath_internal_helpers_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/find_number.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/is_odd.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/exponentiation_helpers.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/bits.hpp
 )
 
 set(ccmath_internal_predef_headers
@@ -73,7 +74,7 @@ set(ccmath_detail_compare_headers
 set(ccmath_detail_exponential_details_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/details/log_float_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/details/log_double_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/details/log_ldouble_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/details/log_data.hpp
 
 )
 
