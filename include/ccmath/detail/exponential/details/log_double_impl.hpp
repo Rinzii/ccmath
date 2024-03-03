@@ -8,7 +8,6 @@
 
 #pragma once
 
-
 #include "ccmath/detail/compare/isnan.hpp"
 
 #include <array>
@@ -17,7 +16,6 @@
 #include <type_traits>
 
 #include "ccmath/internal/predef/unlikely.hpp"
-
 
 namespace ccm::internal
 {
@@ -172,14 +170,14 @@ namespace ccm::internal
 			};
 
 			constexpr ccm::internal::impl::log_data internalLogData = ccm::internal::impl::log_data();
-			constexpr auto tab_values						  = internalLogData.tab;
-			constexpr auto tab2_values					  = internalLogData.tab2;
-			constexpr auto poly_values						  = internalLogData.poly;
-			constexpr auto poly1_values						  = internalLogData.poly1;
-			constexpr auto ln2hi_value					  = internalLogData.ln2hi;
-			constexpr auto ln2lo_value					  = internalLogData.ln2lo;
-			constexpr auto k_logTableN					  = (1 << ccm::internal::impl::k_logTableBits);
-			constexpr auto k_logTableOff				  = 0x3fe6000000000000;
+			constexpr auto tab_values								= internalLogData.tab;
+			constexpr auto tab2_values								= internalLogData.tab2;
+			constexpr auto poly_values								= internalLogData.poly;
+			constexpr auto poly1_values								= internalLogData.poly1;
+			constexpr auto ln2hi_value								= internalLogData.ln2hi;
+			constexpr auto ln2lo_value								= internalLogData.ln2lo;
+			constexpr auto k_logTableN								= (1 << ccm::internal::impl::k_logTableBits);
+			constexpr auto k_logTableOff							= 0x3fe6000000000000;
 
 			// Get the top 16 bits of a double.
 			inline constexpr std::uint32_t top16_bits_of_double(double x) noexcept
@@ -201,68 +199,69 @@ namespace ccm::internal
 			// TODO: Better comment the code and give variables better names
 			inline constexpr double log_double_impl(double x)
 			{
-				long double w {};
-				long double z {};
-				long double r {};
-				long double r2 {};
-				long double r3 {};
-				long double y {};
-				long double inverseCoeff {};
-				long double logarithmCoeff {};
-				long double kd {};
-				long double highPart {};
-				long double lowPart {};
+				long double workspace{};
+				long double normVal{};
+				long double rem{};
+				long double remSqr{};
+				long double remCubed{};
+				long double result{};
+				long double inverseCoeff{};
+				long double logarithmCoeff{};
+				long double scaleFactor{};
+				long double highPart{};
+				long double lowPart{};
 
-				std::uint64_t ix {};
-				std::uint64_t iz {};
-				std::uint64_t tmp {};
-				std::uint32_t top {};
+				std::uint64_t intX{};
+				std::uint64_t intNorm{};
+				std::uint64_t tmp{};
+				std::uint32_t top{};
 
-				int k {};
-				int i {};
+				int expo{};
+				int i{};
 
-				ix	= double_to_uint64(x);
-				top = top16_bits_of_double(x);
+				intX = double_to_uint64(x);
+				top	 = top16_bits_of_double(x);
 
 				constexpr std::uint64_t low	 = double_to_uint64(1.0 - 0x1p-4);
 				constexpr std::uint64_t high = double_to_uint64(1.0 + 0x1p-4);
 
-				if (CCM_UNLIKELY(ix - low < high - low))
+				if (CCM_UNLIKELY(intX - low < high - low))
 				{
 					// Handle close to 1.0 inputs separately.
 					// Fix sign of zero with downward rounding when x==1.
-					if (CCM_UNLIKELY(ix == double_to_uint64(1.0))) { return 0; }
+					if (CCM_UNLIKELY(intX == double_to_uint64(1.0))) { return 0; }
 
-					r  = x - 1.0;
-					r2 = r * r;
-					r3 = r * r2;
-					y  = r3 *
-						(poly1_values[1] + r * poly1_values[2] + r2 * poly1_values[3] +
-						 r3 * (poly1_values[4] + r * poly1_values[5] + r2 * poly1_values[6] + r3 * (poly1_values[7] + r * poly1_values[8] + r2 * poly1_values[9] + r3 * poly1_values[10])));
+					rem		 = x - 1.0;
+					remSqr	 = rem * rem;
+					remCubed = rem * remSqr;
+					result =
+						remCubed * (poly1_values[1] + rem * poly1_values[2] + remSqr * poly1_values[3] +
+									remCubed * (poly1_values[4] + rem * poly1_values[5] + remSqr * poly1_values[6] +
+												remCubed * (poly1_values[7] + rem * poly1_values[8] + remSqr * poly1_values[9] + remCubed * poly1_values[10])));
 
 					// Worst-case error is around 0.507 ULP.
-					w			 = r * 0x1p27;
-					long double rhi = r + w - w;
-					long double rlo = r - rhi;
-					w			 = rhi * rhi * poly1_values[0]; // poly1_values[0] == -0.5.
-					highPart			 = r + w;
-					lowPart			 = r - highPart + w;
-					lowPart += poly1_values[0] * rlo * (rhi + r);
-					y += lowPart;
-					y += highPart;
-					return static_cast<double>(y);
+					workspace		= rem * 0x1p27;
+					long double rhi = rem + workspace - workspace;
+					long double rlo = rem - rhi;
+					workspace		= rhi * rhi * poly1_values[0]; // poly1_values[0] == -0.5.
+					highPart		= rem + workspace;
+					lowPart			= rem - highPart + workspace;
+					lowPart += poly1_values[0] * rlo * (rhi + rem);
+					result += lowPart;
+					result += highPart;
+					return static_cast<double>(result);
 				}
 
 				if (CCM_UNLIKELY(top - 0x0010 >= 0x7ff0 - 0x0010))
 				{
 					// x < 0x1p-1022 or inf or nan.
-					if (ix * 2 == 0)
+					if (intX * 2 == 0)
 					{
 						// Division by zero
 						return -1 / x;
 					}
 
-					if (ix == double_to_uint64(std::numeric_limits<double>::infinity())) // log(inf) == inf
+					if (intX == double_to_uint64(std::numeric_limits<double>::infinity())) // log(inf) == inf
 					{
 						return x;
 					}
@@ -274,49 +273,49 @@ namespace ccm::internal
 					}
 
 					/* x is subnormal, normalize it.  */
-					ix = double_to_uint64(x * 0x1p52);
-					ix -= 52ULL << 52;
+					intX = double_to_uint64(x * 0x1p52);
+					intX -= 52ULL << 52;
 				}
 
-			    /*
-                 * x = 2^k z; where z is in range [0x3fe6000000000000, 2 * 0x3fe6000000000000) and exact.
-                 * The range is split into N subintervals.
-                 * The ith subinterval contains z and c is near its center.
-                 */
+				/*
+				 * x = 2^k z; where z is in range [0x3fe6000000000000, 2 * 0x3fe6000000000000) and exact.
+				 * The range is split into N sub-intervals.
+				 * The ith sub-interval contains z and c is near its center.
+				 */
 
-				tmp	 = ix - k_logTableOff;
-				i	 = (tmp >> (52 - ccm::internal::impl::k_logTableBits)) % k_logTableN; // NOLINT
-				k	 = static_cast<std::int64_t>(tmp) >> 52; // Arithmetic shift // NOLINT
-				iz	 = ix - (tmp & 0xfffULL << 52);
-				inverseCoeff = tab_values[i].invc;
+				tmp			   = intX - k_logTableOff;
+				i			   = (tmp >> (52 - ccm::internal::impl::k_logTableBits)) % k_logTableN; // NOLINT
+				expo		   = static_cast<std::int64_t>(tmp) >> 52;								// Arithmetic shift // NOLINT
+				intNorm		   = intX - (tmp & 0xfffULL << 52);
+				inverseCoeff   = tab_values[i].invc;
 				logarithmCoeff = tab_values[i].logc;
-				z	 = uint64_to_double(iz);
+				normVal		   = uint64_to_double(intNorm);
 
 				// log(x) = log1p(z/c-1) + log(c) + k*Ln2.
-				// r ~= z/c - 1, |r| < 1/(2*N).
-				r = (z - tab2_values[i].chi - tab2_values[i].clo) * inverseCoeff;
+				// rem ~= z/c - 1, |rem| < 1/(2*N).
+				rem = (normVal - tab2_values[i].chi - tab2_values[i].clo) * inverseCoeff;
 
-				kd = static_cast<long double>(k);
+				scaleFactor = static_cast<long double>(expo);
 
 				// hi + lo = r + log(c) + k*Ln2.
-				w  = kd * ln2hi_value + logarithmCoeff;
-				highPart = w + r;
-				lowPart = w - highPart + r + kd * ln2lo_value;
+				workspace = scaleFactor * ln2hi_value + logarithmCoeff;
+				highPart  = workspace + rem;
+				lowPart	  = workspace - highPart + rem + scaleFactor * ln2lo_value;
 
-				// log(x) = lo + (log1p(r) - r) + hi.
-				r2 = r * r; // rounding error: 0x1p-54/N^2.
+				// log(x) = lo + (log1p(rem) - rem) + hi.
+				remSqr = rem * rem; // rounding error: 0x1p-54/N^2.
 				// Worst case error if |y| > 0x1p-4: 0.519 ULP (0.520 ULP without fma).
 				//   0.5 + 2.06/N + abs-poly-error*2^56 ULP (+ 0.001 ULP without fma).
-				y = lowPart + r2 * poly_values[0] + r * r2 * (poly_values[1] + r * poly_values[2] + r2 * (poly_values[3] + r * poly_values[4])) + highPart;
-				return static_cast<double>(y);
+				result = lowPart + remSqr * poly_values[0] +
+						 rem * remSqr * (poly_values[1] + rem * poly_values[2] + remSqr * (poly_values[3] + rem * poly_values[4])) + highPart;
+				return static_cast<double>(result);
 			}
-		}
-	}
-
+		} // namespace impl
+	}	  // namespace
 
 	template <typename T>
 	[[nodiscard]] inline constexpr T log_double(T num) noexcept
 	{
 		return static_cast<T>(impl::log_double_impl(static_cast<double>(num)));
 	}
-}
+} // namespace ccm::internal
