@@ -53,9 +53,9 @@ Contributions to ccmath are welcome! If you encounter any bugs, have suggestions
 ## Implementation Progress (Sub Sections)
 | Section            | % done | In Progress? | Notes?                                                                    | Planned Completion Version |
 |--------------------|--------|--------------|---------------------------------------------------------------------------|----------------------------|
-| Basic              | 91     |              | Remquo is being pushed back to a later release due to technical problems. | v0.1.0 (Released)         |
-| Compare            | 40     | ✓            |                                                                           |
-| Exponential        | 0      | ✓            |                                                                           |
+| Basic              | 91     |              | Remquo is being pushed back to a later release due to technical problems. | v0.1.0 (Released)          |
+| Compare            | 90     |              |                                                                           | v0.2.0                     |
+| Exponential        | 15     | ✓            |                                                                           | v0.2.0                     |              
 | Float Manipulation | 0      |              |                                                                           |
 | Hyperbolic         | 0      |              |                                                                           |
 | Nearest            | 15     |              |                                                                           |
@@ -84,7 +84,7 @@ Contributions to ccmath are welcome! If you encounter any bugs, have suggestions
 | isinf          | 98     | Improve documentation                                                                    |
 | isless         | 100    |                                                                                          |
 | islessequal    | 100    |                                                                                          |
-| islessgreater  | 0      |                                                                                          |
+| islessgreater  | 100    |                                                                                          |
 | isnan          | 95     | Add more support for built-in functions and improve documentation                        |
 | isnormal       | 100    |                                                                                          |
 | isunordered    | 100    |                                                                                          |
@@ -92,7 +92,7 @@ Contributions to ccmath are welcome! If you encounter any bugs, have suggestions
 | exp            | 35     | Continue implementation process and add documentation and tests                          |
 | exp2           | 0      | Implement function                                                                       |
 | expm1          | 0      | Implement function                                                                       |
-| log            | 0      | Implement function                                                                       |
+| log            | 50     | Continue implementation process and add documentation and more tests                     |
 | log1p          | 0      | Implement function                                                                       |
 | log2           | 0      | Implement function                                                                       |
 | log10          | 0      | Implement function                                                                       |
