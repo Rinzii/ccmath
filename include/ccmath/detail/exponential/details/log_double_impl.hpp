@@ -172,27 +172,27 @@ namespace ccm::internal
 			};
 
 			constexpr ccm::internal::impl::log_data internalLogData = ccm::internal::impl::log_data();
-			constexpr auto logDataT						  = internalLogData.tab;
-			constexpr auto logDataT2					  = internalLogData.tab2;
-			constexpr auto logDataA						  = internalLogData.poly;
-			constexpr auto logDataB						  = internalLogData.poly1;
-			constexpr auto logDataLn2Hi					  = internalLogData.ln2hi;
-			constexpr auto logDataLn2Lo					  = internalLogData.ln2lo;
+			constexpr auto tab_values						  = internalLogData.tab;
+			constexpr auto tab2_values					  = internalLogData.tab2;
+			constexpr auto poly_values						  = internalLogData.poly;
+			constexpr auto poly1_values						  = internalLogData.poly1;
+			constexpr auto ln2hi_value					  = internalLogData.ln2hi;
+			constexpr auto ln2lo_value					  = internalLogData.ln2lo;
 			constexpr auto k_logTableN					  = (1 << ccm::internal::impl::k_logTableBits);
 			constexpr auto k_logTableOff				  = 0x3fe6000000000000;
 
 			// Get the top 16 bits of a double.
-			inline constexpr std::uint32_t top16(double x) noexcept
+			inline constexpr std::uint32_t top16_bits_of_double(double x) noexcept
 			{
 				return __builtin_bit_cast(std::uint64_t, x) >> 48;
 			}
 
-			inline constexpr std::uint64_t as_uint64(double x) noexcept
+			inline constexpr std::uint64_t double_to_uint64(double x) noexcept
 			{
 				return __builtin_bit_cast(std::uint64_t, x);
 			}
 
-			inline constexpr double as_double(std::uint64_t x) noexcept
+			inline constexpr double uint64_to_double(std::uint64_t x) noexcept
 			{
 				return __builtin_bit_cast(double, x);
 			}
@@ -207,11 +207,11 @@ namespace ccm::internal
 				long double r2 {};
 				long double r3 {};
 				long double y {};
-				long double invc {};
-				long double logc {};
+				long double inverseCoeff {};
+				long double logarithmCoeff {};
 				long double kd {};
-				long double hi {};
-				long double lo {};
+				long double highPart {};
+				long double lowPart {};
 
 				std::uint64_t ix {};
 				std::uint64_t iz {};
@@ -221,35 +221,35 @@ namespace ccm::internal
 				int k {};
 				int i {};
 
-				ix	= as_uint64(x);
-				top = top16(x);
+				ix	= double_to_uint64(x);
+				top = top16_bits_of_double(x);
 
-				constexpr std::uint64_t low	 = as_uint64(1.0 - 0x1p-4);
-				constexpr std::uint64_t high = as_uint64(1.0 + 0x1p-4);
+				constexpr std::uint64_t low	 = double_to_uint64(1.0 - 0x1p-4);
+				constexpr std::uint64_t high = double_to_uint64(1.0 + 0x1p-4);
 
 				if (CCM_UNLIKELY(ix - low < high - low))
 				{
 					// Handle close to 1.0 inputs separately.
 					// Fix sign of zero with downward rounding when x==1.
-					if (CCM_UNLIKELY(ix == as_uint64(1.0))) { return 0; }
+					if (CCM_UNLIKELY(ix == double_to_uint64(1.0))) { return 0; }
 
 					r  = x - 1.0;
 					r2 = r * r;
 					r3 = r * r2;
 					y  = r3 *
-						(logDataB[1] + r * logDataB[2] + r2 * logDataB[3] +
-						 r3 * (logDataB[4] + r * logDataB[5] + r2 * logDataB[6] + r3 * (logDataB[7] + r * logDataB[8] + r2 * logDataB[9] + r3 * logDataB[10])));
+						(poly1_values[1] + r * poly1_values[2] + r2 * poly1_values[3] +
+						 r3 * (poly1_values[4] + r * poly1_values[5] + r2 * poly1_values[6] + r3 * (poly1_values[7] + r * poly1_values[8] + r2 * poly1_values[9] + r3 * poly1_values[10])));
 
 					// Worst-case error is around 0.507 ULP.
 					w			 = r * 0x1p27;
 					long double rhi = r + w - w;
 					long double rlo = r - rhi;
-					w			 = rhi * rhi * logDataB[0]; /* logDataB[0] == -0.5.  */
-					hi			 = r + w;
-					lo			 = r - hi + w;
-					lo += logDataB[0] * rlo * (rhi + r);
-					y += lo;
-					y += hi;
+					w			 = rhi * rhi * poly1_values[0]; // poly1_values[0] == -0.5.
+					highPart			 = r + w;
+					lowPart			 = r - highPart + w;
+					lowPart += poly1_values[0] * rlo * (rhi + r);
+					y += lowPart;
+					y += highPart;
 					return static_cast<double>(y);
 				}
 
@@ -262,7 +262,7 @@ namespace ccm::internal
 						return -1 / x;
 					}
 
-					if (ix == as_uint64(std::numeric_limits<double>::infinity())) // log(inf) == inf
+					if (ix == double_to_uint64(std::numeric_limits<double>::infinity())) // log(inf) == inf
 					{
 						return x;
 					}
@@ -274,7 +274,7 @@ namespace ccm::internal
 					}
 
 					/* x is subnormal, normalize it.  */
-					ix = as_uint64(x * 0x1p52);
+					ix = double_to_uint64(x * 0x1p52);
 					ix -= 52ULL << 52;
 				}
 
@@ -288,26 +288,26 @@ namespace ccm::internal
 				i	 = (tmp >> (52 - ccm::internal::impl::k_logTableBits)) % k_logTableN; // NOLINT
 				k	 = static_cast<std::int64_t>(tmp) >> 52; // Arithmetic shift // NOLINT
 				iz	 = ix - (tmp & 0xfffULL << 52);
-				invc = logDataT[i].invc;
-				logc = logDataT[i].logc;
-				z	 = as_double(iz);
+				inverseCoeff = tab_values[i].invc;
+				logarithmCoeff = tab_values[i].logc;
+				z	 = uint64_to_double(iz);
 
 				// log(x) = log1p(z/c-1) + log(c) + k*Ln2.
 				// r ~= z/c - 1, |r| < 1/(2*N).
-				r = (z - logDataT2[i].chi - logDataT2[i].clo) * invc;
+				r = (z - tab2_values[i].chi - tab2_values[i].clo) * inverseCoeff;
 
 				kd = static_cast<long double>(k);
 
-				//hi + lo = r + log(c) + k*Ln2.
-				w  = kd * logDataLn2Hi + logc;
-				hi = w + r;
-				lo = w - hi + r + kd * logDataLn2Lo;
+				// hi + lo = r + log(c) + k*Ln2.
+				w  = kd * ln2hi_value + logarithmCoeff;
+				highPart = w + r;
+				lowPart = w - highPart + r + kd * ln2lo_value;
 
 				// log(x) = lo + (log1p(r) - r) + hi.
 				r2 = r * r; // rounding error: 0x1p-54/N^2.
 				// Worst case error if |y| > 0x1p-4: 0.519 ULP (0.520 ULP without fma).
 				//   0.5 + 2.06/N + abs-poly-error*2^56 ULP (+ 0.001 ULP without fma).
-				y = lo + r2 * logDataA[0] + r * r2 * (logDataA[1] + r * logDataA[2] + r2 * (logDataA[3] + r * logDataA[4])) + hi;
+				y = lowPart + r2 * poly_values[0] + r * r2 * (poly_values[1] + r * poly_values[2] + r2 * (poly_values[3] + r * poly_values[4])) + highPart;
 				return static_cast<double>(y);
 			}
 		}
