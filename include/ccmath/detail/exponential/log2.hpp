@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <bits/stdc++.h>
-
 #include "ccmath/detail/compare/isnan.hpp"
 
 #include <type_traits>
