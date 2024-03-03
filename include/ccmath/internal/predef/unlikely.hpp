@@ -13,8 +13,6 @@
 		#define CCM_UNLIKELY(x) [[unlikely]] (x)
 	#elif defined(__GNUC__) || defined(__clang__)
 		#define CCM_UNLIKELY(x) __builtin_expect((x), 0)
-	#elif defined(_MSC_VER)
-		#define CCM_UNLIKELY(x) __assume(x)
 	#else
 		#define CCM_UNLIKELY(x) (x)
 	#endif
