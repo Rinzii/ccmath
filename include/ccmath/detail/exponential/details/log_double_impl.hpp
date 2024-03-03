@@ -17,6 +17,8 @@
 
 #include "ccmath/internal/predef/unlikely.hpp"
 
+
+
 namespace ccm::internal
 {
 	namespace
@@ -31,9 +33,16 @@ namespace ccm::internal
 			{
 				double ln2hi{0x1.62e42fefa3800p-1};
 				double ln2lo{0x1.ef35793c76730p-45};
+
+				// relative error: 0x1.926199e8p-56
+				// abs error: 0x1.882ff33p-65
+				// in -0x1.fp-9 0x1.fp-9
 				std::array<double, k_logPolyOrder - 1> poly{
 					-0x1.0000000000001p-1, 0x1.555555551305bp-2, -0x1.fffffffeb459p-3, 0x1.999b324f10111p-3, -0x1.55575e506c89fp-3,
 				};
+
+				// relative error: 0x1.c04d76cp-63
+				// in -0x1p-4 0x1.09p-4 (|log(1+x)| > 0x1p-4 outside the interval)
 				std::array<double, k_logPoly1Order - 1> poly1{
 					-0x1p-1,
 					0x1.5555555555577p-2,
@@ -262,7 +271,7 @@ namespace ccm::internal
 				if (CCM_UNLIKELY(top - 0x0010 >= 0x7ff0 - 0x0010))
 				{
 					// x < 0x1p-1022 or inf or nan.
-					// TODO: This actually like never will be hit, but double check this.
+					// TODO: This actually likely never will be hit, but double check this.
 					if (intX * 2 == 0)
 					{
 						// Handle division by zero
