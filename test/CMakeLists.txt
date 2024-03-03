@@ -43,9 +43,16 @@ target_link_libraries(${PROJECT_NAME}-basic PRIVATE
 add_executable(${PROJECT_NAME}-compare)
 target_sources(${PROJECT_NAME}-compare PRIVATE
         compare/fpclassify_test.cpp
-        compare/isnan_test.cpp
         compare/isfinite_test.cpp
+        compare/isgreater_test.cpp
+        compare/isgreaterequal_test.cpp
         compare/isinf_test.cpp
+        compare/isless_test.cpp
+        compare/islessequal_test.cpp
+        compare/islessgreater_test.cpp
+        compare/isnan_test.cpp
+        compare/isnormal_test.cpp
+        compare/isunordered_test.cpp
         compare/signbit_test.cpp
 
 )
