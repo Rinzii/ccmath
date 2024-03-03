@@ -23,13 +23,13 @@ namespace ccm
 	inline constexpr T log(const T num) noexcept
 	{
 		// If the argument is ±0, -∞ is returned.
-		if (num <= static_cast<T>(0)) { return -std::numeric_limits<T>::infinity(); }
+		if (num == static_cast<T>(0)) { return -std::numeric_limits<T>::infinity(); }
 
 		// If the number is 1, return +0.
 		if (num == static_cast<T>(1)) { return static_cast<T>(0); }
 
-		// If the argument is negative, NaN is returned.
-		if (num < static_cast<T>(0)) { return std::numeric_limits<T>::quiet_NaN(); }
+		// If the argument is negative, -NaN is returned.
+		if (num < static_cast<T>(0)) { return -std::numeric_limits<T>::quiet_NaN(); }
 
 		// If the argument is +∞, +∞ is returned.
 		if (num == std::numeric_limits<T>::infinity()) { return std::numeric_limits<T>::infinity(); }
