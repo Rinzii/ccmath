@@ -196,9 +196,9 @@ namespace ccm::internal
 			}
 
 			// Inspired by code from glibc
-			// TODO: Better comment the code and give variables better names
 			inline constexpr double log_double_impl(double x)
 			{
+				// Declare variables for intermediate calculations
 				long double workspace{};
 				long double normVal{};
 				long double rem{};
@@ -211,26 +211,31 @@ namespace ccm::internal
 				long double highPart{};
 				long double lowPart{};
 
+				// Declare variables for bitwise operations
 				std::uint64_t intX{};
 				std::uint64_t intNorm{};
 				std::uint64_t tmp{};
 				std::uint32_t top{};
 
+				// Declare variables for exponent and loop iteration
 				int expo{};
 				int i{};
 
+				// Convert input double to uint64_t and extract top 16 bits
 				intX = double_to_uint64(x);
 				top	 = top16_bits_of_double(x);
 
+				// Constants for comparison
 				constexpr std::uint64_t low	 = double_to_uint64(1.0 - 0x1p-4);
 				constexpr std::uint64_t high = double_to_uint64(1.0 + 0x1p-4);
 
+				// Handle special cases where input is close to 1.0
 				if (CCM_UNLIKELY(intX - low < high - low))
 				{
-					// Handle close to 1.0 inputs separately.
-					// Fix sign of zero with downward rounding when x==1.
+					// Handle the case where x is exactly 1.0
 					if (CCM_UNLIKELY(intX == double_to_uint64(1.0))) { return 0; }
 
+					// Compute the logarithm using polynomial approximation
 					rem		 = x - 1.0;
 					remSqr	 = rem * rem;
 					remCubed = rem * remSqr;
@@ -239,6 +244,7 @@ namespace ccm::internal
 									remCubed * (poly1_values[4] + rem * poly1_values[5] + remSqr * poly1_values[6] +
 												remCubed * (poly1_values[7] + rem * poly1_values[8] + remSqr * poly1_values[9] + remCubed * poly1_values[10])));
 
+					// Additional error correction
 					// Worst-case error is around 0.507 ULP.
 					workspace		= rem * 0x1p27;
 					long double rhi = rem + workspace - workspace;
@@ -252,12 +258,14 @@ namespace ccm::internal
 					return static_cast<double>(result);
 				}
 
+				// Handle special cases for very small or very large inputs
 				if (CCM_UNLIKELY(top - 0x0010 >= 0x7ff0 - 0x0010))
 				{
 					// x < 0x1p-1022 or inf or nan.
+					// TODO: This actually like never will be hit, but double check this.
 					if (intX * 2 == 0)
 					{
-						// Division by zero
+						// Handle division by zero
 						return -1 / x;
 					}
 
@@ -268,44 +276,51 @@ namespace ccm::internal
 
 					if ((top & 0x8000) || (top & 0x7ff0) == 0x7ff0)
 					{
+						// Handle NaN case
 						double nanY = (x - x) / (x - x);
 						return nanY;
 					}
 
-					/* x is subnormal, normalize it.  */
+					// x is subnormal, normalize it.
 					intX = double_to_uint64(x * 0x1p52);
 					intX -= 52ULL << 52;
 				}
 
 				/*
+				 * k = expo, z = normVal, N = k_logTableN
 				 * x = 2^k z; where z is in range [0x3fe6000000000000, 2 * 0x3fe6000000000000) and exact.
 				 * The range is split into N sub-intervals.
-				 * The ith sub-interval contains z and c is near its center.
+				 * The i-th sub-interval contains z and c is near its center.
 				 */
 
-				tmp			   = intX - k_logTableOff;
-				i			   = (tmp >> (52 - ccm::internal::impl::k_logTableBits)) % k_logTableN; // NOLINT
-				expo		   = static_cast<std::int64_t>(tmp) >> 52;								// Arithmetic shift // NOLINT
-				intNorm		   = intX - (tmp & 0xfffULL << 52);
+				// Calculate logarithm for normalized inputs
+				tmp = intX - k_logTableOff;
+				// NOLINTBEGIN
+				i	 = (tmp >> (52 - ccm::internal::impl::k_logTableBits)) % k_logTableN;
+				expo = static_cast<std::int64_t>(tmp) >> 52;
+				// NOLINTEND
+				intNorm		   = intX - (tmp & 0xfffULL << 52); // Arithmetic shift
 				inverseCoeff   = tab_values[i].invc;
 				logarithmCoeff = tab_values[i].logc;
 				normVal		   = uint64_to_double(intNorm);
 
+				// Calculate intermediate value for logarithm computation
 				// log(x) = log1p(z/c-1) + log(c) + k*Ln2.
-				// rem ~= z/c - 1, |rem| < 1/(2*N).
-				rem = (normVal - tab2_values[i].chi - tab2_values[i].clo) * inverseCoeff;
-
+				// r ~= z/c - 1, |r| < 1/(2*N)
+				rem			= (normVal - tab2_values[i].chi - tab2_values[i].clo) * inverseCoeff;
 				scaleFactor = static_cast<long double>(expo);
 
+				// Calculate high and low parts of logarithm
 				// hi + lo = r + log(c) + k*Ln2.
 				workspace = scaleFactor * ln2hi_value + logarithmCoeff;
 				highPart  = workspace + rem;
 				lowPart	  = workspace - highPart + rem + scaleFactor * ln2lo_value;
 
-				// log(x) = lo + (log1p(rem) - rem) + hi.
+				// Final computation of logarithm
+				// log(x) = lo + (log1p(r) - r) + hi.
 				remSqr = rem * rem; // rounding error: 0x1p-54/N^2.
 				// Worst case error if |y| > 0x1p-4: 0.519 ULP (0.520 ULP without fma).
-				//   0.5 + 2.06/N + abs-poly-error*2^56 ULP (+ 0.001 ULP without fma).
+				// 0.5 + 2.06/N + abs-poly-error*2^56 ULP (+ 0.001 ULP without fma).
 				result = lowPart + remSqr * poly_values[0] +
 						 rem * remSqr * (poly_values[1] + rem * poly_values[2] + remSqr * (poly_values[3] + rem * poly_values[4])) + highPart;
 				return static_cast<double>(result);
