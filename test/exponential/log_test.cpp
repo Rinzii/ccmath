@@ -13,13 +13,6 @@
 #include "ccmath/detail/exponential/log.hpp"
 
 
-// Helper function to compare floating point numbers
-template <typename T>
-bool is_close(T a, T b, T epsilon = 3.32628e-08)
-{
-    return std::abs(a - b) < epsilon;
-}
-
 TEST(CcmathExponentialTests, Log)
 {
 	// Verify function is static assert-able
@@ -47,5 +40,18 @@ TEST(CcmathExponentialTests, Log)
 	EXPECT_EQ(ccm::log(262144.0), std::log(262144.0));
 	EXPECT_EQ(ccm::log(524288.0), std::log(524288.0));
 	EXPECT_EQ(ccm::log(1048576.0), std::log(1048576.0));
+
+
+	// Check for edge cases
+	bool ccmCheckForNan = std::isnan(ccm::log(std::numeric_limits<double>::quiet_NaN()));
+	bool stdCheckForNan = std::isnan(std::log(std::numeric_limits<double>::quiet_NaN()));
+	EXPECT_EQ(ccmCheckForNan, stdCheckForNan);
+	EXPECT_EQ(ccm::log(std::numeric_limits<double>::infinity()), std::log(std::numeric_limits<double>::infinity()));
+	bool ccmCheckForNegativeNan = std::isnan(ccm::log(-1.0));
+	bool stdCheckForNegativeNan = std::isnan(std::log(-1.0));
+	EXPECT_EQ(ccmCheckForNegativeNan, stdCheckForNegativeNan);
+	EXPECT_EQ(ccm::log(0.0), std::log(0.0));
+	EXPECT_EQ(ccm::log(-0.0), std::log(-0.0));
+
 
 }
