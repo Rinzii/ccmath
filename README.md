@@ -53,9 +53,9 @@ Contributions to ccmath are welcome! If you encounter any bugs, have suggestions
 ## Implementation Progress (Sub Sections)
 | Section            | % done | In Progress? | Notes?                                                                    | Planned Completion Version |
 |--------------------|--------|--------------|---------------------------------------------------------------------------|----------------------------|
-| Basic              | 91     | ✓            | Remquo is being pushed back to a later release due to technical problems. | v0.1.0                     |
+| Basic              | 91     |              | Remquo is being pushed back to a later release due to technical problems. | v0.1.0 (Released)         |
 | Compare            | 40     | ✓            |                                                                           |
-| Exponential        | 0      |              |                                                                           |
+| Exponential        | 0      | ✓            |                                                                           |
 | Float Manipulation | 0      |              |                                                                           |
 | Hyperbolic         | 0      |              |                                                                           |
 | Nearest            | 15     |              |                                                                           |
@@ -64,7 +64,7 @@ Contributions to ccmath are welcome! If you encounter any bugs, have suggestions
 | Trigonometric      | 0      |              |                                                                           |
 | Misc Functions     | 0      |              |                                                                           |
 
-> Last Updated: Mar 02, 2024
+> Last Updated: Mar 03, 2024
 
 ## Implementation Progress (All Functions)
 
@@ -79,15 +79,15 @@ Contributions to ccmath are welcome! If you encounter any bugs, have suggestions
 | remquo         | 40     | Partially implemented, but being pushed back to later release due to technical problems. |
 | fpclassify     | 100    |                                                                                          |
 | isfinite       | 100    |                                                                                          |
-| isgreater      | 0      | Implement function                                                                       |
-| isgreaterequal | 0      | Implement function                                                                       |
+| isgreater      | 100    |                                                                                          |
+| isgreaterequal | 100    |                                                                                          |
 | isinf          | 98     | Improve documentation                                                                    |
-| isless         | 0      | Implement function                                                                       |
-| islessequal    | 0      | Implement function                                                                       |
-| islessgreater  | 0      | Implement function                                                                       |
+| isless         | 100    |                                                                                          |
+| islessequal    | 100    |                                                                                          |
+| islessgreater  | 0      |                                                                                          |
 | isnan          | 95     | Add more support for built-in functions and improve documentation                        |
-| isnormal       | 0      | Implement function                                                                       |
-| isunordered    | 0      | Implement function                                                                       |
+| isnormal       | 100    |                                                                                          |
+| isunordered    | 100    |                                                                                          |
 | signbit        | 90     | Add more fallbacks and builtin support if possible and improve reliability with MSVC     |
 | exp            | 35     | Continue implementation process and add documentation and tests                          |
 | exp2           | 0      | Implement function                                                                       |
@@ -152,7 +152,7 @@ Contributions to ccmath are welcome! If you encounter any bugs, have suggestions
 | lerp           | 0      | Implement function                                                                       |
 | lgamma         | 0      | Implement function                                                                       |
 
-> Last Updated: Mar 02, 2024
+> Last Updated: Mar 03, 2024
 
 
 ## License
