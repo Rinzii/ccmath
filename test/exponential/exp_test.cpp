@@ -14,5 +14,8 @@
 
 TEST(CcmathExponentialTests, Exp)
 {
+	//EXPECT_EQ(ccm::exp(1.0), std::exp(1.0));
+	//EXPECT_EQ(ccm::exp(2.0), std::exp(2.0));
+	//EXPECT_EQ(ccm::exp(4.0), std::exp(4.0));
 
 }

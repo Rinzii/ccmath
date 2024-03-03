@@ -8,14 +8,12 @@
 
 #pragma once
 
-#include <bits/stdc++.h>
-
-#include "ccmath/detail/compare/isnan.hpp"
-
-#include <type_traits>
-
-namespace ccm
+namespace ccm::helpers
 {
-	//template
-
-} // namespace ccm
+	template <typename T>
+    [[nodiscard]]
+    inline constexpr bool is_odd(T value) noexcept
+    {
+        return value % 2 != 0;
+    }
+}

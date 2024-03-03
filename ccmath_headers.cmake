@@ -5,6 +5,10 @@ set(ccmath_internal_helpers_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/make_mantisa.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/not_null.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/fpclassify_helper.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/pow_integral.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/find_number.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/is_odd.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/exponentiation_helpers.hpp
 )
 
 set(ccmath_internal_setup_headers
@@ -172,6 +176,7 @@ set(ccmath_root_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/special.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/trig.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/ccmath.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/numbers.hpp
 )
 
 set(ccmath_headers
