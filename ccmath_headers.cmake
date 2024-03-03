@@ -11,6 +11,10 @@ set(ccmath_internal_helpers_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/exponentiation_helpers.hpp
 )
 
+set(ccmath_internal_predef_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/unlikely.hpp
+)
+
 set(ccmath_internal_setup_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/setup/compiler_def.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/setup/compiler_undef.hpp
@@ -31,6 +35,7 @@ set(ccmath_internal_utility_headers
 
 set(ccmath_internal_headers
         ${ccmath_internal_helpers_headers}
+        ${ccmath_internal_predef_headers}
         ${ccmath_internal_setup_headers}
         ${ccmath_internal_typetraits_headers}
         ${ccmath_internal_utility_headers}
@@ -65,7 +70,15 @@ set(ccmath_detail_compare_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/compare/signbit.hpp
 )
 
+set(ccmath_detail_exponential_details_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/details/log_float_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/details/log_double_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/details/log_ldouble_impl.hpp
+
+)
+
 set(ccmath_detail_exponential_headers
+        ${ccmath_detail_exponential_details_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/exp.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/exp2.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/expm1.hpp
