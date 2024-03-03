@@ -55,7 +55,7 @@ Contributions to ccmath are welcome! If you encounter any bugs, have suggestions
 |--------------------|--------|--------------|---------------------------------------------------------------------------|----------------------------|
 | Basic              | 91     |              | Remquo is being pushed back to a later release due to technical problems. | v0.1.0 (Released)          |
 | Compare            | 90     |              |                                                                           | v0.2.0                     |
-| Exponential        | 15     | ✓            |                                                                           | v0.2.0                     |              
+| Exponential        | 25     | ✓            |                                                                           | v0.2.0                     |              
 | Float Manipulation | 0      |              |                                                                           |
 | Hyperbolic         | 0      |              |                                                                           |
 | Nearest            | 15     |              |                                                                           |
@@ -92,7 +92,7 @@ Contributions to ccmath are welcome! If you encounter any bugs, have suggestions
 | exp            | 35     | Continue implementation process and add documentation and tests                          |
 | exp2           | 0      | Implement function                                                                       |
 | expm1          | 0      | Implement function                                                                       |
-| log            | 50     | Continue implementation process and add documentation and more tests                     |
+| log            | 95     | Add more test cases that cover a larger subset of edge cases.                            |
 | log1p          | 0      | Implement function                                                                       |
 | log2           | 0      | Implement function                                                                       |
 | log10          | 0      | Implement function                                                                       |
