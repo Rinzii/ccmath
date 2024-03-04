@@ -32,7 +32,6 @@ namespace ccm::internal
 			constexpr auto k_logTableN_flt								= (1 << ccm::internal::k_logTableBitsFlt);
 			constexpr auto k_logTableOff_flt							= 0x3f330000;
 
-			// Inspired by code from glibc
 			inline constexpr float log_float_impl(float x)
 			{
 				// Declare variables for intermediate calculations
