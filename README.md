@@ -4,11 +4,11 @@ ccmath is a C++17 library that provides a re-implementation of the standard `<cm
 
 ## Features
 
-- **constexpr Compatibility**: All functions provided by ccmath are implemented as `constexpr`, allowing them to be evaluated at compile time when used with constant expressions.
+- **Full constexpr Compatibility**: All functions provided by ccmath are implemented as `constexpr`, allowing them to be evaluated at compile time when used with constant expressions.
 
 - **Standard Math Functions**: ccmath provides a comprehensive set of mathematical functions similar to those in the standard `<cmath>` library, including trigonometric, exponential, logarithmic, and other common mathematical operations. If `<cmath>` has it then it is likely ccmath has implemented it.
 
-- **Performance Optimization**: By leveraging constexpr, ccmath aims to optimize performance by computing mathematical expressions at compile time where possible, reducing runtime overhead.
+- **Performance Optimization**: By leveraging constexpr, ccmath aims to optimize performance by computing mathematical expressions at compile time when possible, reducing runtime overhead.
 
 - **No External Dependencies**: ccmath has no external dependencies and only requires a C++17-compliant compiler.
 
@@ -33,25 +33,34 @@ int main() {
 ccmath has a comprehensive cmake setup and can be easily included in your project using fetchcontent like so:
 
 ```cmake
+cmake_minimum_required(VERSION 3.11) # FetchContent is new in version 3.11.
+
 include(FetchContent)
 FetchContent_Declare(
         ccmath
         GIT_REPOSITORY https://github.com/Rinzii/ccmath.git
-        GIT_TAG main
+        GIT_TAG v0.1.0 # Replace with the version you want to use
 )
 FetchContent_MakeAvailable(ccmath)
+
+target_link_libraries(main PRIVATE ccmath::ccmath)
 ```
 
-## Compatability
+## Compiler Support
+* GCC 11.1+
+* Clang 9.0.0+
+* AppleClang 14.0.3+ (Lowest tested version)
+* MSVC 19.26+
+* Intel DPC++ 2022.0.0+
+* Nvidia HPC SDK 22.7+ (Lowest tested version)
 
-ccmath is designed to be compatible with any C++17-compliant compiler. It should work seamlessly with popular compilers such as GCC, Clang, and MSVC.
 
 ## Contributing
 
-Contributions to ccmath are welcome! If you encounter any bugs, have suggestions for improvements, or would like to contribute new features, feel free to open an issue or submit a pull request!
+CCmath is an open-source project, and it needs your help to go on growing and improving. If you want to get involved and suggest some additional features, file a bug report or submit a patch, please have a look at the contribution guidelines.
 
-## Implementation Progress (Sub Sections)
-| Section            | % done | In Progress? | Notes?                                                                    | Planned Completion Version |
+## Implementation Progress (Modules)
+| Module             | % done | In Progress? | Notes?                                                                    | Planned Completion Version |
 |--------------------|--------|--------------|---------------------------------------------------------------------------|----------------------------|
 | Basic              | 91     |              | Remquo is being pushed back to a later release due to technical problems. | v0.1.0 (Released)          |
 | Compare            | 90     |              |                                                                           | v0.2.0                     |
@@ -66,7 +75,7 @@ Contributions to ccmath are welcome! If you encounter any bugs, have suggestions
 
 > Last Updated: Mar 03, 2024
 
-## Implementation Progress (All Functions)
+## Implementation Progress (Functions)
 
 | Feature        | % done | TODO                                                                                     |
 |----------------|--------|------------------------------------------------------------------------------------------|
