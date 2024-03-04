@@ -146,4 +146,10 @@ namespace ccm::internal
 			}
 		} // namespace impl
 	}	  // namespace
+
+	template <typename T>
+	[[nodiscard]] inline constexpr T log2_double(T num) noexcept
+	{
+		return static_cast<T>(impl::log2_double_impl(static_cast<double>(num)));
+	}
 } // namespace ccm::internal
