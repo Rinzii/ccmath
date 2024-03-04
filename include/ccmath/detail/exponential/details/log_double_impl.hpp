@@ -36,7 +36,6 @@ namespace ccm::internal
 			constexpr auto k_logTableN_dbl								 = (1 << ccm::internal::k_logTableBitsDbl);
 			constexpr auto k_logTableOff_dbl							 = 0x3fe6000000000000;
 
-			// Inspired by code from glibc
 			inline constexpr double log_double_impl(double x)
 			{
 				// Declare variables for intermediate calculations
