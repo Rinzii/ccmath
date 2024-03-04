@@ -39,6 +39,11 @@ namespace ccm::helpers
 		return bit_cast<std::uint64_t>(x) >> 48;
 	}
 
+	inline constexpr std::uint32_t top12_bits_of_double(double x) noexcept
+	{
+		return bit_cast<std::uint64_t>(x) >> 52;
+	}
+
 	inline constexpr std::uint64_t double_to_uint64(double x) noexcept
 	{
 		return bit_cast<std::uint64_t>(x);
