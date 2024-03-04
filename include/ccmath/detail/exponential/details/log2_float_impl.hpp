@@ -33,7 +33,7 @@ namespace ccm::internal
 			constexpr auto k_logTableN_flt								= (1 << ccm::internal::k_logTableBitsFlt);
 			constexpr auto k_logTableOff_flt							= 0x3f330000;
 			*/
-			inline constexpr double log2_double_impl(double x)
+			inline constexpr double log2_float_impl(double x)
 			{
 				ccm::double_t z{};
 				ccm::double_t r{};
@@ -81,9 +81,12 @@ namespace ccm::internal
 
 					rhi = ccm::helpers::uint64_to_double(ccm::helpers::double_to_uint64(r) & -1ULL << 32);
 					rlo = r - rhi;
-					hi = rhi * ccm::internal::ln2_hi;
+					//hi = rhi * ccm::internal::ln2_hi;
+
+
                 }
 
+				return 0;
 			}
 		}
     }
