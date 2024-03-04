@@ -75,7 +75,9 @@ set(ccmath_detail_exponential_details_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/details/log_float_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/details/log_double_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/details/log_data.hpp
-
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/details/log2_float_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/details/log2_double_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/details/log2_data.hpp
 )
 
 set(ccmath_detail_exponential_headers
