@@ -44,6 +44,6 @@ namespace ccm
 	inline constexpr T lerp(T a, T b, T t)
 	{
 		// TODO: Implement promotion and edge cases. 
-		return lerp_impl(a, b, t);
+		return impl::lerp_impl(a, b, t);
 	}
 } // namespace ccm
