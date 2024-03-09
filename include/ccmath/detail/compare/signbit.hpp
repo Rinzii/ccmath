@@ -52,7 +52,7 @@
 #if defined(_MSVC_VER) && !defined(CCMATH_HAS_CONSTEXPR_BUILTIN_BIT_CAST) && !defined(CCMATH_HAS_CONSTEXPR_SIGNBIT) &&                                         \
 	!defined(CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN)
 	#define CCMATH_MSVC_DOES_NOT_HAVE_ASSERTABLE_CONSTEXPR_SIGNBIT
-	#include "float.h" // for _fpclass and _FPCLASS_NZ
+	#include <cfloat> // for _fpclass and _FPCLASS_NZ
 #endif
 
 namespace ccm
@@ -72,6 +72,8 @@ namespace ccm
 	 *
 	 * @warning ccm::signbit will not work with static_assert on MSVC 19.26 and earlier. This is due to the fact that
 	 * MSVC does not provide a constexpr signbit until 19.27. This is a limitation of MSVC and not ccmath.
+	 *
+	 * @warning ccm::signbit currently is only ensured to work on little-endian systems. There is currently no guarantee this it will work on big-endian systems.
 	 *
 	 * @attention Implementing signbit is a non-trivial task and requires a lot of compiler magic to allow for ccm::signbit to be
 	 * fully constexpr and static_assert-able while also conforming to the standard. CCMath has done its best to provide
