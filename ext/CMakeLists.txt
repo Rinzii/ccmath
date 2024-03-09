@@ -33,9 +33,6 @@ if (CCMATH_BUILD_TEST)
 endif()
 
 
-
-#find_package(Threads REQUIRED)
-
 add_library(${PROJECT_NAME} INTERFACE)
 add_library(${INTERNAL_PROJ_DEFAULT_NAME}::ext ALIAS ${PROJECT_NAME})
 
@@ -45,7 +42,3 @@ if(CCMATH_BUILD_TEST)
           )
 endif ()
 
-# TODO: May not actually require this. Later decide if I want to remove it.
-target_link_libraries(${PROJECT_NAME} INTERFACE
-        Threads::Threads
-        )
