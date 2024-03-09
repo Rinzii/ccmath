@@ -14,6 +14,13 @@
 namespace ccm::helpers
 {
 
+	/**
+	 * @brief
+	 * @tparam To
+	 * @tparam From
+	 * @param src
+	 * @return
+	 */
 	template<class To, class From>
 	std::enable_if_t<
 		sizeof(To) == sizeof(From) &&
@@ -28,6 +35,19 @@ namespace ccm::helpers
 
         return __builtin_bit_cast(To, src);
     }
+
+	inline constexpr std::uint32_t get_exponent_of_double(double x) noexcept
+	{
+		// Reinterpret the binary representation of x as an std::uint64_t
+		std::uint64_t bits = bit_cast<std::uint64_t>(x);
+
+		// Extract the exponent bits (bits 62-52) and remove bias (1023)
+		std::uint32_t exponent = static_cast<std::uint32_t>((bits >> 52) & 0x7FF) - 1023;
+
+		return exponent;
+	}
+
+
 
 	/**
 	 * @brief Helper function to get the top 16-bits of a double.
