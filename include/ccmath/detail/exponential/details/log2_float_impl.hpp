@@ -19,75 +19,95 @@
 #include "ccmath/internal/helpers/floating_point_type.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 
+#include "log2_data.hpp"
+
 namespace ccm::internal
 {
 	namespace
 	{
 		namespace impl
 		{
-			/*
-			constexpr ccm::internal::log_data<float> internalLogDataFlt = ccm::internal::log_data<float>();
+			constexpr ccm::internal::log2_data<float> internalLogDataFlt = ccm::internal::log2_data<float>();
 			constexpr auto tab_values_flt								= internalLogDataFlt.tab;
 			constexpr auto poly_values_flt								= internalLogDataFlt.poly;
-			constexpr auto ln2_value_flt								= internalLogDataFlt.ln2;
-			constexpr auto k_logTableN_flt								= (1 << ccm::internal::k_logTableBitsFlt);
+			constexpr auto k_logTableN_flt								= (1 << ccm::internal::k_log2TableBitsFlt);
 			constexpr auto k_logTableOff_flt							= 0x3f330000;
-			*/
-			inline constexpr double log2_float_impl(double x)
+
+			inline constexpr double log2_float_impl(float x)
 			{
-				ccm::double_t z{};
-				ccm::double_t r{};
-				ccm::double_t r2{};
-				ccm::double_t r4{};
-				ccm::double_t y{};
-				ccm::double_t invc{};
-				ccm::double_t logc{};
-				ccm::double_t kd{};
-				ccm::double_t hi{};
-				ccm::double_t lo{};
-				ccm::double_t t1{};
-				ccm::double_t t2{};
-				ccm::double_t t3{};
-				ccm::double_t p{};
+				ccm::double_t normVal{};
+				ccm::double_t rem{};
+				ccm::double_t remSqr{};
+				ccm::double_t result{};
+				ccm::double_t result0{};
+				ccm::double_t polynomialTerm{};
+				ccm::double_t inverseCoeff{};
+				ccm::double_t logarithmCoeff{};
 
-				std::uint64_t ix{};
-				std::uint64_t iz{};
-				std::uint64_t tmp{};
-
+				std::uint32_t intX{};
+				std::uint32_t intNorm{};
+				std::uint32_t tmp{};
 				std::uint32_t top{};
 
-				int k{};
+				int expo{};
 				int i{};
 
-				ix = ccm::helpers::double_to_uint64(x);
-				top = ccm::helpers::top16_bits_of_double(x);
+				intX = ccm::helpers::float_to_uint32(x);
 
-				constexpr std::uint64_t low = ccm::helpers::double_to_uint64(1.0 - 0x1.5b51p-5);
-				constexpr std::uint64_t high = ccm::helpers::double_to_uint64(1.0 + 0x1.6ab2p-5);
-
-				// Handle special cases where x is very close to 1.0
-				if (CCM_UNLIKELY(ix - low < high - low))
+				// If x == 1 then fix the result to 0 with downward rounding
+				if (CCM_UNLIKELY(intX == 0x3f800000))
                 {
-					// Handle the case where x is exactly 1.0
-					if (CCM_UNLIKELY(ix == ccm::helpers::double_to_uint64(1.0)))
-                    {
-                        return 0.0;
-                    }
-
-					r = x - 1.0;
-
-					ccm::double_t rhi{};
-					ccm::double_t rlo{};
-
-					rhi = ccm::helpers::uint64_to_double(ccm::helpers::double_to_uint64(r) & -1ULL << 32);
-					rlo = r - rhi;
-					//hi = rhi * ccm::internal::ln2_hi;
-
-
+                    return 0;
                 }
 
-				return 0;
+				if (CCM_UNLIKELY(intX - 0x00800000 >= 0x7f800000 - 0x00800000))
+				{
+					// TODO: Maybe handle division by zero here?
+
+					// If x is NaN, return NaN
+					if (intX & 0x80000000 || intX * 2 >= 0xff000000)
+					{
+						float invalidResult = (x - x) / (x - x);
+						return invalidResult;
+					}
+
+					// If x is subnormal, normalize it
+					intX = ccm::helpers::float_to_uint32(x * 0x1p23f);
+					intX -= 23 << 23;
+				}
+
+				// x = 2^expo * normVal; where normVal is in range [k_logTableOff_flt, 2 * k_logTableOff_flt] and exact.
+				// We split the rang into N sub-intervals.
+				// The i-th sub-interval contains normVal and c is near its center.
+				tmp = intX - k_logTableOff_flt;
+				i	 = (tmp >> (23 - ccm::internal::k_log2TableBitsFlt)) % k_logTableN_flt; // NOLINT
+				top  = tmp & 0xff800000;
+				intNorm       = intX - top;
+				// NOLINTNEXTLINE
+				expo          = static_cast<std::uint32_t>(tmp) >> 23; // Arithmetic shift.
+				inverseCoeff  = tab_values_flt[i].invc;
+				logarithmCoeff = tab_values_flt[i].logc;
+				normVal       = static_cast<ccm::double_t>(ccm::helpers::uint32_to_float(intNorm));
+
+				// log2(x) = log1p(normVal/c-1)/ln2 + log2(c) + expo
+				rem = normVal * inverseCoeff - 1.0;
+				result0 = logarithmCoeff + static_cast<ccm::double_t>(expo);
+
+				// Pipelined polynomial evaluation to approximate log1p(r)/ln2.
+				remSqr = rem * rem;
+				result = poly_values_flt[1] * rem + poly_values_flt[2];
+				result = poly_values_flt[0] * remSqr + result;
+				polynomialTerm = poly_values_flt[3] * rem + result0;
+				result = result * remSqr + polynomialTerm;
+
+				return result;
 			}
 		}
     }
+
+	template <typename T>
+	[[nodiscard]] inline constexpr T log2_float(T num) noexcept
+	{
+		return static_cast<T>(impl::log2_float_impl(static_cast<float>(num)));
+	}
 }
