@@ -14,6 +14,9 @@
 
 TEST(CcmathCompareTests, IsNormal)
 {
+	// Test that isnormal is static_assert-able
+    static_assert(ccm::isnormal(1.0) == true, "isnormal has failed testing that it is static_assert-able!");
+
 	// TODO: Add more tests for isnormal
 	EXPECT_EQ(ccm::isnormal(1.0), std::isnormal(1.0));
     EXPECT_EQ(ccm::isnormal(0.0), std::isnormal(0.0));

@@ -14,6 +14,9 @@
 
 TEST(CcmathCompareTests, IsLess)
 {
+	// Test that isless is static_assert-able
+    static_assert(ccm::isless(1.0, 0.0) == false, "isless has failed testing that it is static_assert-able!");
+
 	EXPECT_EQ(ccm::isless(1.0, 1.0), std::isless(1.0, 1.0));
 	EXPECT_EQ(ccm::isless(1.0, 0.0), std::isless(1.0, 0.0));
 	EXPECT_EQ(ccm::isless(0.0, 1.0), std::isless(0.0, 1.0));
