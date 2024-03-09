@@ -15,14 +15,6 @@
 
 #include "ccmath/internal/type_traits/floating_point_traits.hpp"
 
-// If we have C++23, we can use std::signbit as it is constexpr
-#if (defined(__cpp_lib_constexpr_cmath) && __cpp_lib_constexpr_cmath >= 202202L)
-	#include <cmath>
-	#ifndef CCMATH_HAS_CONSTEXPR_SIGNBIT
-		#define CCMATH_HAS_CONSTEXPR_SIGNBIT
-	#endif
-#endif
-
 // We only implement this for MSVC as that is the only manner to get constexpr signbit that is also static_assert-able
 #ifndef CCMATH_HAS_BUILTIN_BIT_CAST
 	#if (defined(_MSC_VER) && _MSC_VER >= 1927)
@@ -90,9 +82,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point<T>::value, int> = 0>
 	[[nodiscard]] inline constexpr bool signbit(T x) noexcept
 	{
-#if defined(CCMATH_HAS_CONSTEXPR_SIGNBIT)
-		return std::signbit(x);
-#elif defined(CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT)
+#if defined(CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT)
 		return __builtin_signbit(x);
 #elif defined(CCMATH_HAS_BUILTIN_BIT_CAST)
 		// Check for the sign of +0.0 and -0.0 with __builtin_bit_cast
