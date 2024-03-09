@@ -54,6 +54,8 @@ target_link_libraries(main PRIVATE ccmath::ccmath)
 * Intel DPC++ 2022.0.0+
 * Nvidia HPC SDK 22.7+ (Lowest tested version)
 
+> [!NOTE]
+> Currently working on finding manners to lower these requirements.
 
 ## Contributing
 
@@ -63,17 +65,17 @@ CCmath is an open-source project, and it needs your help to go on growing and im
 | Module             | % done | In Progress? | Notes?                                                                    | Planned Completion Version |
 |--------------------|--------|--------------|---------------------------------------------------------------------------|----------------------------|
 | Basic              | 91     |              | Remquo is being pushed back to a later release due to technical problems. | v0.1.0 (Released)          |
-| Compare            | 90     |              |                                                                           | v0.2.0                     |
-| Exponential        | 25     | ✓            |                                                                           | v0.2.0                     |              
+| Compare            | 100    |              |                                                                           | v0.2.0                     |
+| Exponential        | 33     | ✓            |                                                                           | v0.2.0                     |              
 | Float Manipulation | 0      |              |                                                                           |
 | Hyperbolic         | 0      |              |                                                                           |
 | Nearest            | 15     |              |                                                                           |
 | Power              | 5      |              |                                                                           |
 | Special Functions  | 0      |              |                                                                           |
 | Trigonometric      | 0      |              |                                                                           |
-| Misc Functions     | 0      |              |                                                                           |
+| Misc Functions     | 10     |              |                                                                           |
 
-> Last Updated: Mar 03, 2024
+> Last Updated: Mar 09, 2024
 
 ## Implementation Progress (Functions)
 
@@ -90,20 +92,20 @@ CCmath is an open-source project, and it needs your help to go on growing and im
 | isfinite       | 100    |                                                                                          |
 | isgreater      | 100    |                                                                                          |
 | isgreaterequal | 100    |                                                                                          |
-| isinf          | 98     | Improve documentation                                                                    |
+| isinf          | 100    | Improve documentation                                                                    |
 | isless         | 100    |                                                                                          |
 | islessequal    | 100    |                                                                                          |
 | islessgreater  | 100    |                                                                                          |
-| isnan          | 95     | Add more support for built-in functions and improve documentation                        |
+| isnan          | 100    | Functional, need improved documentation and more test cases.                             |
 | isnormal       | 100    |                                                                                          |
 | isunordered    | 100    |                                                                                          |
-| signbit        | 90     | Add more fallbacks and builtin support if possible and improve reliability with MSVC     |
+| signbit        | 100    | Need to find manner of implementing signbit on lower versions of MSVC.                   |
 | exp            | 35     | Continue implementation process and add documentation and tests                          |
 | exp2           | 0      | Implement function                                                                       |
 | expm1          | 0      | Implement function                                                                       |
-| log            | 95     | Add more test cases that cover a larger subset of edge cases.                            |
+| log            | 100    | Functional, but fallbacks without requiring recent compiler versions is desired.         |
 | log1p          | 0      | Implement function                                                                       |
-| log2           | 0      | Implement function                                                                       |
+| log2           | 100    | Functional, but fallbacks without requiring recent compiler versions is desired.         |
 | log10          | 0      | Implement function                                                                       |
 | copysign       | 0      | Implement function                                                                       |
 | frexp          | 0      | Implement function                                                                       |
@@ -158,10 +160,10 @@ CCmath is an open-source project, and it needs your help to go on growing and im
 | sin            | 0      | Implement function                                                                       |
 | tan            | 0      | Implement function                                                                       |
 | gamma          | 0      | Implement function                                                                       |
-| lerp           | 0      | Implement function                                                                       |
+| lerp           | 30     | Need to finish implementation process along with handling edge cases and promotion.      |
 | lgamma         | 0      | Implement function                                                                       |
 
-> Last Updated: Mar 03, 2024
+> Last Updated: Mar 09, 2024
 
 
 ## License
