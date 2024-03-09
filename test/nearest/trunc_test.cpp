@@ -11,7 +11,6 @@
 #include <cmath>
 #include <limits>
 #include "ccmath/detail/nearest/trunc.hpp"
-#include "ccmath/internal/helpers/not_null.hpp"
 
 // TODO: Find a way to test all of the different ways the function may behave internally to work based on the provided compiler.
 
