@@ -17,7 +17,7 @@ TEST(CcmathExponentialTests, Log)
 {
 	// Verify function is static assert-able
 	// 1.3862943611198906 was generated with std::log(4.0)
-	static_assert(ccm::log(4.0) == 1.3862943611198906, "FAIL");
+	static_assert(ccm::log(4.0) == 1.3862943611198906, "log has failed testing that it is static_assert-able!");
 
 	EXPECT_EQ(ccm::log(1.0), std::log(1.0));
 	EXPECT_EQ(ccm::log(2.0), std::log(2.0));

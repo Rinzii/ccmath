@@ -14,6 +14,9 @@
 
 TEST(CcmathCompareTests, Fpclassify)
 {
+	// Test that fpclassify is static_assert-able
+	static_assert(ccm::fpclassify(1.0) == std::fpclassify(1.0), "fpclassify has failed testing that it is static_assert-able!");
+
 	EXPECT_EQ(ccm::fpclassify(1.0), std::fpclassify(1.0));
     EXPECT_EQ(ccm::fpclassify(0.0), std::fpclassify(0.0));
     EXPECT_EQ(ccm::fpclassify(-1.0), std::fpclassify(-1.0));
