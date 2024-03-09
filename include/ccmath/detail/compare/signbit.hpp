@@ -43,14 +43,6 @@
 	#endif
 #endif
 
-// This is are last resort for MSVC. This is constexpr, but it is not static_assert-able.
-// TODO: Decide if it is improper to allow this inconsistent behavior for MSVC 19.26 and earlier against how every other approach behaves.
-#if defined(_MSVC_VER) && !defined(CCMATH_HAS_CONSTEXPR_BUILTIN_BIT_CAST) && !defined(CCMATH_HAS_CONSTEXPR_SIGNBIT) &&                                         \
-	!defined(CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN)
-	#define CCMATH_MSVC_DOES_NOT_HAVE_ASSERTABLE_CONSTEXPR_SIGNBIT
-	#include <cfloat> // for _fpclass and _FPCLASS_NZ
-#endif
-
 namespace ccm
 {
 	/**
@@ -61,13 +53,7 @@ namespace ccm
 	 *
 	 * @note This function has multiple implementations based on the compiler and the version of
 	 * the the compiler used. With nearly all implementations, this function is fully constexpr and will return
-	 * the same values as std::signbit along with being static_assert-able. The only exception is MSVC 19.26 and earlier
-	 * and unknown compilers that support none of possible implementations.
-	 *
-	 * @note ccm::signbit by default will use std::signbit if using C++23 or later.
-	 *
-	 * @warning ccm::signbit will not work with static_assert on MSVC 19.26 and earlier. This is due to the fact that
-	 * MSVC does not provide a constexpr signbit until 19.27. This is a limitation of MSVC and not ccmath.
+	 * the same values as std::signbit along with being static_assert-able.
 	 *
 	 * @warning ccm::signbit currently is only ensured to work on little-endian systems. There is currently no guarantee this it will work on big-endian
 	 * systems.
@@ -107,12 +93,6 @@ namespace ccm
 		}
 
 		return x < static_cast<T>(0);
-#elif defined(CCMATH_MSVC_DOES_NOT_HAVE_ASSERTABLE_CONSTEXPR_SIGNBIT)
-		// If we don't have access to MSVC 19.27 or later, we can use _fpclass and _FPCLASS_NZ to
-		// check for the sign of zero. This is is constexpr, but it is not static_assert-able.
-		// TODO: Decide if it is improper to allow this inconsistent behavior for MSVC 19.26 and earlier against how every other approach behaves with
-		// ccm::signbit.
-		return ((x == static_cast<T>(0)) ? (_fpclass(x) == _FPCLASS_NZ) : (x < T(0))); // This won't work in static assertions
 #else
 		static_assert(false, "ccm::signbit is not implemented for this compiler. Please report this issue to the dev!");
 		return false;
@@ -166,8 +146,4 @@ namespace ccm
 
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
 	#undef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-#endif
-
-#ifdef CCMATH_MSVC_DOES_NOT_HAVE_ASSERTABLE_CONSTEXPR_SIGNBIT
-	#undef CCMATH_MSVC_DOES_NOT_HAVE_ASSERTABLE_CONSTEXPR_SIGNBIT
 #endif
