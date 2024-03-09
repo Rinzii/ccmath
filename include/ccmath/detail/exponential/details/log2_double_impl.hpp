@@ -101,12 +101,9 @@ namespace ccm::internal
 
 				if (CCM_UNLIKELY(top - 0x0010 >= 0x7ff0 - 0x0010))
 				{
-					if (intX == ccm::helpers::double_to_uint64((std::numeric_limits<double>::infinity)())) { return x; }
-
-					if ((top & 0x8000) || (top & 0x7ff0) == 0x7ff0) { return std::numeric_limits<double>::quiet_NaN(); }
 
 					// x is subnormal, normalize it.
-					intX = ccm::helpers::double_to_uint64(x * 0x1p52); // 0x1p52 = 4.5036e+15
+					intX = ccm::helpers::double_to_uint64(x * 0x1p52); // 0x1p52 = 4.5036e+15 = 2^52
 					intX -= 52ULL << 52;
 				}
 
