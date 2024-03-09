@@ -13,54 +13,34 @@
 
 #include "ccmath/detail/compare/isnan.hpp"
 
-#include "ccmath/internal/type_traits/floating_point_traits.hpp"
+// Some compilers have __builtin_signbit which is constexpr for some compilers
+#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
+	// GCC 6.1+ has constexpr __builtin_signbit that DOES allow static_assert. Clang & MSVC do not.
+	#if defined(__GNUC__) && (__GNUC__ >= 6 && __GNUC_MINOR__ >= 1)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
+	#endif
+#endif
 
-// If we have C++23, we can use std::signbit as it is constexpr
-#if (defined(__cpp_lib_constexpr_cmath) && __cpp_lib_constexpr_cmath >= 202202L)
-	#include <cmath>
-	#ifndef CCMATH_HAS_CONSTEXPR_SIGNBIT
-		#define CCMATH_HAS_CONSTEXPR_SIGNBIT
+#if !defined(CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN) && !defined(CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT)
+	// GCC 6.1 has constexpr __builtin_copysign that DOES allow static_assert
+	#if defined(__GNUC__) && (__GNUC__ >= 6 && __GNUC_MINOR__ >= 1)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+	#endif
+
+	// Clang 5.0.0 has constexpr __builtin_copysign that DOES allow static_assert
+	#if defined(__clang__) && (__clang_major__ >= 5)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
 	#endif
 #endif
 
 // We only implement this for MSVC as that is the only manner to get constexpr signbit that is also static_assert-able
-#ifndef CCMATH_HAS_BUILTIN_BIT_CAST
+#if !defined(CCMATH_HAS_BUILTIN_BIT_CAST) && !defined(CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT) && !defined(CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN)
 	#if (defined(_MSC_VER) && _MSC_VER >= 1927)
 		#define CCMATH_HAS_BUILTIN_BIT_CAST
+		#include "ccmath/internal/type_traits/floating_point_traits.hpp"
 		#include <limits>  // for std::numeric_limits
 		#include <cstdint> // for std::uint64_t
 	#endif
-#endif
-
-// Some compilers have __builtin_signbit which is constexpr for some compilers
-#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
-	#if !defined(CCMATH_HAS_CONSTEXPR_SIGNBIT)
-		// GCC 6.1 has constexpr __builtin_signbit that DOES allow static_assert. Clang does not.
-		#if defined(__GNUC__) && (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)
-			#define CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
-		#endif
-	#endif
-#endif
-
-#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-	#if !defined(CCMATH_HAS_CONSTEXPR_SIGNBIT)
-		// GCC 6.1 has constexpr __builtin_copysign that DOES allow static_assert
-		#if defined(__GNUC__) && (__GNUC__ >= 6 && __GNUC_MINOR__ >= 1)
-			#define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-		#endif
-
-		// Clang 5.0.0 has constexpr __builtin_copysign that DOES allow static_assert
-		#if defined(__clang__) && (__clang_major__ >= 5)
-			#define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-		#endif
-	#endif
-#endif
-
-// This is are last resort for MSVC.
-#if defined(_MSVC_VER) && !defined(CCMATH_HAS_CONSTEXPR_BUILTIN_BIT_CAST) && !defined(CCMATH_HAS_CONSTEXPR_SIGNBIT) &&                                         \
-	!defined(CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN)
-	#define CCMATH_MSVC_DOES_NOT_HAVE_ASSERTABLE_CONSTEXPR_SIGNBIT
-	#include "float.h" // for _fpclass and _FPCLASS_NZ
 #endif
 
 namespace ccm
@@ -73,13 +53,10 @@ namespace ccm
 	 *
 	 * @note This function has multiple implementations based on the compiler and the version of
 	 * the the compiler used. With nearly all implementations, this function is fully constexpr and will return
-	 * the same values as std::signbit along with being static_assert-able. The only exception is MSVC 19.26 and earlier
-	 * and unknown compilers that support none of possible implementations.
+	 * the same values as std::signbit along with being static_assert-able.
 	 *
-	 * @note ccm::signbit by default will use std::signbit if using C++23 or later.
-	 *
-	 * @warning ccm::signbit will not work with static_assert on MSVC 19.26 and earlier. This is due to the fact that
-	 * MSVC does not provide a constexpr signbit until 19.27. This is a limitation of MSVC and not ccmath.
+	 * @warning ccm::signbit currently is only ensured to work on little-endian systems. There is currently no guarantee this it will work on big-endian
+	 * systems.
 	 *
 	 * @attention Implementing signbit is a non-trivial task and requires a lot of compiler magic to allow for ccm::signbit to be
 	 * fully constexpr and static_assert-able while also conforming to the standard. CCMath has done its best to provide
@@ -90,19 +67,8 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point<T>::value, int> = 0>
 	[[nodiscard]] inline constexpr bool signbit(T x) noexcept
 	{
-#if defined(CCMATH_HAS_CONSTEXPR_SIGNBIT)
-		return std::signbit(x);
-#elif defined(CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT)
+#if defined(CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT)
 		return __builtin_signbit(x);
-#elif defined(CCMATH_HAS_BUILTIN_BIT_CAST)
-		// Check for the sign of +0.0 and -0.0 with __builtin_bit_cast
-		if (x == static_cast<T>(0) || ccm::isnan(x))
-		{
-			const auto bits = __builtin_bit_cast(helpers::float_bits_t<T>, x);
-			return (bits & helpers::sign_mask_v<T>) != 0;
-		}
-
-		return x < static_cast<T>(0);
 #elif defined(CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN)
 		// use __builtin_copysign to check for the sign of zero
 		if (x == static_cast<T>(0) || ccm::isnan(x))
@@ -118,10 +84,15 @@ namespace ccm
 		}
 
 		return x < static_cast<T>(0);
-#elif defined(CCMATH_MSVC_DOES_NOT_HAVE_ASSERTABLE_CONSTEXPR_SIGNBIT)
-		// If we don't have access to MSBC 19.27 or later, we can use _fpclass and _FPCLASS_NZ to
-		// check for the sign of zero. This is is constexpr, but it is not static_assert-able.
-		return ((x == static_cast<T>(0)) ? (_fpclass(x) == _FPCLASS_NZ) : (x < T(0))); // This won't work in static assertions
+#elif defined(CCMATH_HAS_BUILTIN_BIT_CAST)
+		// Check for the sign of +0.0 and -0.0 with __builtin_bit_cast
+		if (x == static_cast<T>(0) || ccm::isnan(x))
+		{
+			const auto bits = __builtin_bit_cast(helpers::float_bits_t<T>, x);
+			return (bits & helpers::sign_mask_v<T>) != 0;
+		}
+
+		return x < static_cast<T>(0);
 #else
 		static_assert(false, "ccm::signbit is not implemented for this compiler. Please report this issue to the dev!");
 		return false;
@@ -175,8 +146,4 @@ namespace ccm
 
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
 	#undef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-#endif
-
-#ifdef CCMATH_MSVC_DOES_NOT_HAVE_ASSERTABLE_CONSTEXPR_SIGNBIT
-	#undef CCMATH_MSVC_DOES_NOT_HAVE_ASSERTABLE_CONSTEXPR_SIGNBIT
 #endif

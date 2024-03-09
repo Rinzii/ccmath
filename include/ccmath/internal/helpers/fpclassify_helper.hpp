@@ -51,7 +51,6 @@ namespace ccm::helpers
         eFP_ZERO,
         eFP_SUBNORMAL,
         eFP_NORMAL
-		// TODO: What the fuck? Why is this assertion being hit before the preprocessor has defined the compiler?
 		static_assert(false, "FP_* macros are extremely implementation specific and are not defined for this compiler. Please add support for this compiler.")
 #endif
     };

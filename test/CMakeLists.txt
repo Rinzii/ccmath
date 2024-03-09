@@ -43,13 +43,53 @@ target_link_libraries(${PROJECT_NAME}-basic PRIVATE
 add_executable(${PROJECT_NAME}-compare)
 target_sources(${PROJECT_NAME}-compare PRIVATE
         compare/fpclassify_test.cpp
-        compare/isnan_test.cpp
         compare/isfinite_test.cpp
+        compare/isgreater_test.cpp
+        compare/isgreaterequal_test.cpp
         compare/isinf_test.cpp
+        compare/isless_test.cpp
+        compare/islessequal_test.cpp
+        compare/islessgreater_test.cpp
+        compare/isnan_test.cpp
+        compare/isnormal_test.cpp
+        compare/isunordered_test.cpp
         compare/signbit_test.cpp
 
 )
 target_link_libraries(${PROJECT_NAME}-compare PRIVATE
+        ccmath::test
+        gtest::gtest
+)
+
+add_executable(${PROJECT_NAME}-exponential)
+target_sources(${PROJECT_NAME}-exponential PRIVATE
+        exponential/exp2_test.cpp
+        exponential/exp_test.cpp
+        exponential/expm1_test.cpp
+        exponential/log1p_test.cpp
+        exponential/log2_test.cpp
+        exponential/log10_test.cpp
+        exponential/log_test.cpp
+
+
+)
+target_link_libraries(${PROJECT_NAME}-exponential PRIVATE
+        ccmath::test
+        gtest::gtest
+)
+
+add_executable(${PROJECT_NAME}-fmanip)
+target_sources(${PROJECT_NAME}-fmanip PRIVATE
+        fmanip/copysign_test.cpp
+        fmanip/frexp_test.cpp
+        fmanip/ilogb_test.cpp
+        fmanip/ldexp_test.cpp
+        fmanip/logb_test.cpp
+        fmanip/modf_test.cpp
+        fmanip/nextafter_test.cpp
+        fmanip/scalbn_test.cpp
+)
+target_link_libraries(${PROJECT_NAME}-fmanip PRIVATE
         ccmath::test
         gtest::gtest
 )
@@ -85,6 +125,8 @@ endif()
 add_test(NAME ${PROJECT_NAME}-basic COMMAND ${PROJECT_NAME}-basic)
 add_test(NAME ${PROJECT_NAME}-compare COMMAND ${PROJECT_NAME}-compare)
 add_test(NAME ${PROJECT_NAME}-nearest COMMAND ${PROJECT_NAME}-nearest)
+add_test(NAME ${PROJECT_NAME}-exponential COMMAND ${PROJECT_NAME}-exponential)
+add_test(NAME ${PROJECT_NAME}-fmanip COMMAND ${PROJECT_NAME}-fmanip)
 
 
 
