@@ -10,6 +10,8 @@
 
 #include <cfloat>
 
+// Mirror float_t and double_t from <cmath> to avoid having a dependency of <cmath>.
+
 #ifdef FLT_EVAL_METHOD
 	# if FLT_EVAL_METHOD == -1
 		#  define CCM_FLT_EVAL_METHOD	2
