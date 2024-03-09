@@ -18,6 +18,8 @@ namespace ccm
      * @tparam T The type of the number.
      * @param num A floating-point or integer value to find the natural logarithm of.
      * @return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
+     *
+    * @warning ccm::log is currently only ensured to work on little-endian systems. There is currently no guarantee this it will work on big-endian systems.
 	 */
 	template <typename T>
 	inline constexpr T log(const T num) noexcept
