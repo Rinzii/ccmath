@@ -11,7 +11,6 @@
 #include <limits>
 #include <type_traits>
 
-#include "ccmath/internal/helpers/is_odd.hpp"
 
 #include <unordered_map>
 

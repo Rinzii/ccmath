@@ -27,12 +27,12 @@ namespace ccm::internal
 		namespace impl
 		{
 			constexpr ccm::internal::log_data<double> internalLogDataDbl = ccm::internal::log_data<double>();
-			constexpr auto tab_values_dbl								 = internalLogDataDbl.tab;
-			constexpr auto tab2_values_dbl								 = internalLogDataDbl.tab2;
-			constexpr auto poly_values_dbl								 = internalLogDataDbl.poly;
-			constexpr auto poly1_values_dbl								 = internalLogDataDbl.poly1;
-			constexpr auto ln2hi_value_dbl								 = internalLogDataDbl.ln2hi;
-			constexpr auto ln2lo_value_dbl								 = internalLogDataDbl.ln2lo;
+			constexpr auto log_tab_values_dbl								 = internalLogDataDbl.tab;
+			constexpr auto log_tab2_values_dbl								 = internalLogDataDbl.tab2;
+			constexpr auto log_poly_values_dbl								 = internalLogDataDbl.poly;
+			constexpr auto log_poly1_values_dbl								 = internalLogDataDbl.poly1;
+			constexpr auto log_ln2hi_value_dbl								 = internalLogDataDbl.ln2hi;
+			constexpr auto log_ln2lo_value_dbl								 = internalLogDataDbl.ln2lo;
 			constexpr auto k_logTableN_dbl								 = (1 << ccm::internal::k_logTableBitsDbl);
 			constexpr auto k_logTableOff_dbl							 = 0x3fe6000000000000;
 
@@ -79,20 +79,20 @@ namespace ccm::internal
 					rem		 = x - 1.0;
 					remSqr	 = rem * rem;
 					remCubed = rem * remSqr;
-					result	 = remCubed * (poly1_values_dbl[1] + rem * poly1_values_dbl[2] + remSqr * poly1_values_dbl[3] +
-										   remCubed * (poly1_values_dbl[4] + rem * poly1_values_dbl[5] + remSqr * poly1_values_dbl[6] +
-													   remCubed * (poly1_values_dbl[7] + rem * poly1_values_dbl[8] + remSqr * poly1_values_dbl[9] +
-																   remCubed * poly1_values_dbl[10])));
+					result	 = remCubed * (log_poly1_values_dbl[1] + rem * log_poly1_values_dbl[2] + remSqr * log_poly1_values_dbl[3] +
+										   remCubed * (log_poly1_values_dbl[4] + rem * log_poly1_values_dbl[5] + remSqr * log_poly1_values_dbl[6] +
+													   remCubed * (log_poly1_values_dbl[7] + rem * log_poly1_values_dbl[8] + remSqr * log_poly1_values_dbl[9] +
+																   remCubed * log_poly1_values_dbl[10])));
 
 					// Additional error correction
 					// Worst-case error is around 0.507 ULP.
 					workspace		  = rem * 0x1p27;
 					ccm::double_t rhi = rem + workspace - workspace;
 					ccm::double_t rlo = rem - rhi;
-					workspace		  = rhi * rhi * poly1_values_dbl[0]; // poly1_values[0] == -0.5.
+					workspace		  = rhi * rhi * log_poly1_values_dbl[0]; // poly1_values[0] == -0.5.
 					highPart		  = rem + workspace;
 					lowPart			  = rem - highPart + workspace;
-					lowPart += poly1_values_dbl[0] * rlo * (rhi + rem);
+					lowPart += log_poly1_values_dbl[0] * rlo * (rhi + rem);
 					result += lowPart;
 					result += highPart;
 					return static_cast<double>(result);
@@ -119,29 +119,29 @@ namespace ccm::internal
 				expo = static_cast<std::int64_t>(tmp) >> 52;
 				// NOLINTEND
 				intNorm		   = intX - (tmp & 0xfffULL << 52); // Arithmetic shift
-				inverseCoeff   = tab_values_dbl[i].invc;
-				logarithmCoeff = tab_values_dbl[i].logc;
+				inverseCoeff   = log_tab_values_dbl[i].invc;
+				logarithmCoeff = log_tab_values_dbl[i].logc;
 				normVal		   = ccm::helpers::uint64_to_double(intNorm);
 
 				// Calculate intermediate value for logarithm computation
 				// log(x) = log1p(normVal/c-1) + log(c) + expo*Ln2.
 				// r ~= z/c - 1, |r| < 1/(2*N)
-				rem			= (normVal - tab2_values_dbl[i].chi - tab2_values_dbl[i].clo) * inverseCoeff;
+				rem			= (normVal - log_tab2_values_dbl[i].chi - log_tab2_values_dbl[i].clo) * inverseCoeff;
 				scaleFactor = static_cast<ccm::double_t>(expo);
 
 				// Calculate high and low parts of logarithm
 				// hi + lo = r + log(c) + expo*Ln2.
-				workspace = scaleFactor * ln2hi_value_dbl + logarithmCoeff;
+				workspace = scaleFactor * log_ln2hi_value_dbl + logarithmCoeff;
 				highPart  = workspace + rem;
-				lowPart	  = workspace - highPart + rem + scaleFactor * ln2lo_value_dbl;
+				lowPart	  = workspace - highPart + rem + scaleFactor * log_ln2lo_value_dbl;
 
 				// Final computation of logarithm
 				// log(x) = lo + (log1p(rem) - rem) + hi.
 				remSqr = rem * rem; // rounding error: 0x1p-54/k_logTableN^2.
 				// Worst case error if |result| > 0x1p-4: 0.520 ULP
 				// 0.5 + 2.06/k_logTableN + abs-poly-error*2^56+0.001 ULP
-				result = lowPart + remSqr * poly_values_dbl[0] +
-						 rem * remSqr * (poly_values_dbl[1] + rem * poly_values_dbl[2] + remSqr * (poly_values_dbl[3] + rem * poly_values_dbl[4])) + highPart;
+				result = lowPart + remSqr * log_poly_values_dbl[0] +
+						 rem * remSqr * (log_poly_values_dbl[1] + rem * log_poly_values_dbl[2] + remSqr * (log_poly_values_dbl[3] + rem * log_poly_values_dbl[4])) + highPart;
 				return static_cast<double>(result);
 			}
 		} // namespace impl

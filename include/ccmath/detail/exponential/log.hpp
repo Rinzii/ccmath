@@ -21,7 +21,7 @@ namespace ccm
      *
     * @warning ccm::log is currently only ensured to work on little-endian systems. There is currently no guarantee this it will work on big-endian systems.
 	 */
-	template <typename T>
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	inline constexpr T log(const T num) noexcept
 	{
 		// If the argument is ±0, -∞ is returned.
