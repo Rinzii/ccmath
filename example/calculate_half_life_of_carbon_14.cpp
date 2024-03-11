@@ -6,14 +6,7 @@
  * See LICENSE for more information.
  */
 
-#pragma once
-
-namespace ccm::helpers
+int main()
 {
-	template <typename T>
-    [[nodiscard]]
-    inline constexpr bool is_odd(T value) noexcept
-    {
-        return value % 2 != 0;
-    }
+	
 }

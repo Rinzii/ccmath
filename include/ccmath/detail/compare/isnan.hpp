@@ -10,10 +10,6 @@
 
 #include <type_traits>
 
-#if (defined(_MSC_VER) && _MSC_VER >= 1927) && !defined(__clang__)
-	#include "ccmath/internal/type_traits/floating_point_traits.hpp"
-#endif
-
 namespace ccm
 {
 	/**
@@ -44,3 +40,5 @@ namespace ccm
 	}
 
 } // namespace ccm
+
+/// @ingroup compare

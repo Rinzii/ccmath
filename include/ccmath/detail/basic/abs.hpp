@@ -9,7 +9,6 @@
 #pragma once
 
 #include "ccmath/detail/compare/isnan.hpp"
-#include "ccmath/internal/utility/unreachable.hpp"
 
 #include <limits>
 
@@ -53,7 +52,6 @@ namespace ccm
 		else
 		{
 			static_assert(sizeof(T) == 0, "Taking the absolute value of an unsigned type that cannot be converted to int by integral promotion is ill-formed.");
-			ccm::unreachable(); // Give the compiler a hint that this branch is unreachable.
 		}
 	}
 

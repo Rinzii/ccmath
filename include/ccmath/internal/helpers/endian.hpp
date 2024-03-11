@@ -7,6 +7,7 @@
  */
 
 #pragma once
+
 namespace ccm::helpers
 {
 	enum class endian
