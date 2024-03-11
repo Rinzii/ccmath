@@ -6,6 +6,16 @@ project(${INTERNAL_PROJ_DEFAULT_NAME}-ext)
 
 include(FetchContent)
 
+if (CCMATH_BUILD_BENCHMARKS)
+  set(BENCHMARK_ENABLE_TESTING NO)
+  FetchContent_Declare(
+          benchmark
+          GIT_REPOSITORY https://github.com/google/benchmark.git
+          GIT_TAG v1.8.3
+  )
+  FetchContent_MakeAvailable(benchmark)
+endif ()
+
 
 
 if (CCMATH_BUILD_TEST)
@@ -39,6 +49,12 @@ add_library(${INTERNAL_PROJ_DEFAULT_NAME}::ext ALIAS ${PROJECT_NAME})
 if(CCMATH_BUILD_TEST)
   target_link_libraries(${PROJECT_NAME} INTERFACE
           gtest::gtest
+          )
+endif ()
+
+if(CCMATH_BUILD_BENCHMARKS)
+  target_link_libraries(${PROJECT_NAME} INTERFACE
+          benchmark::benchmark
           )
 endif ()
 

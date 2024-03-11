@@ -70,6 +70,10 @@ if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TEST)
   add_subdirectory(ext)
 endif()
 
+if (CCMATH_BUILD_BENCHMARKS)
+  add_subdirectory(benchmark)
+endif()
+
 if (CCMATH_BUILD_TEST)
   enable_testing()
   add_subdirectory(test)
