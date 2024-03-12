@@ -15,7 +15,8 @@
 TEST(CcmathCompareTests, Fpclassify)
 {
 	// Test that fpclassify is static_assert-able
-	// TODO: Having issues with static_assert for fpclassify on windows and macos
+	// No implementation should be lower than -100.
+	// Since we are only testing that fpclassify is static_assert-able, we don't need to test the value it returns.
 	static_assert(ccm::fpclassify(1.0) > -100, "fpclassify has failed testing that it is static_assert-able!");
 
 	EXPECT_EQ(ccm::fpclassify(1.0), std::fpclassify(1.0));
