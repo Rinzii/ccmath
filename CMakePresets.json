@@ -36,6 +36,16 @@
 			}
 		},
 		{
+			"name": "ninja-nvidia-hpc",
+			"description": "Build configuration using Ninja Multi-config / clang",
+			"inherits": "default",
+			"binaryDir": "${sourceDir}/out/nvidia-hpc",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "nvc",
+				"CMAKE_CXX_COMPILER": "nvc++"
+			}
+		},
+		{
 			"name": "ninja-ubsan",
 			"description": "UBSan build configuration using Ninja Multi-config",
 			"inherits": "default",
