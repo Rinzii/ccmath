@@ -39,12 +39,6 @@ namespace ccm::helpers
         eFP_ZERO = 3,
         eFP_SUBNORMAL = 5,
         eFP_NORMAL = 4,
-#elif defined(CCMATH_COMPILER_NVIDIA)
-		eFP_NAN = 0,
-		eFP_INFINITE = 1,
-		eFP_ZERO = 2,
-		eFP_SUBNORMAL = 3,
-		eFP_NORMAL = 4,
 #elif defined(CCMATH_COMPILER_CLANG) || defined(CCMATH_COMPILER_GCC) || defined(CCMATH_COMPILER_CLANG_BASED) // Clang and GCC have the same defines
         eFP_NAN = 0,
         eFP_INFINITE = 1,
