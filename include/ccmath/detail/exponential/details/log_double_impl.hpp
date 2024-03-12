@@ -52,18 +52,16 @@ namespace ccm::internal
 				ccm::double_t lowPart{};
 
 				// Declare variables for bitwise operations
-				std::uint64_t intX{};
 				std::uint64_t intNorm{};
 				std::uint64_t tmp{};
-				std::uint32_t top{};
 
 				// Declare variables for exponent and loop iteration
-				int expo{};
-				int i{};
+				std::int64_t expo{};
+				std::int64_t i{};
 
 				// Convert input double to uint64_t and extract top 16 bits
-				intX = ccm::helpers::double_to_uint64(x);
-				top	 = ccm::helpers::top16_bits_of_double(x);
+				std::uint64_t intX = ccm::helpers::double_to_uint64(x);
+				std::uint32_t top = ccm::helpers::top16_bits_of_double(x);
 
 				// Constants for comparison
 				constexpr std::uint64_t low	 = ccm::helpers::double_to_uint64(1.0 - 0x1p-4);

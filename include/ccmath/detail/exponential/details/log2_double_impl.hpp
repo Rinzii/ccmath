@@ -54,17 +54,15 @@ namespace ccm::internal
 				ccm::double_t logExpoSum{};
 				ccm::double_t polynomialTerm{};
 
-				std::uint64_t intX{};
 				std::uint64_t intNorm{};
 				std::uint64_t tmp{};
 
-				std::uint32_t top{};
 
-				int expo{};
-				int i{};
+				std::int64_t expo{};
+				std::int64_t i{};
 
-				intX = ccm::helpers::double_to_uint64(x);
-				top	 = ccm::helpers::top16_bits_of_double(x);
+				std::uint64_t  intX = ccm::helpers::double_to_uint64(x);
+				std::uint32_t top	 = ccm::helpers::top16_bits_of_double(x);
 
 				constexpr std::uint64_t low	 = ccm::helpers::double_to_uint64(1.0 - 0x1.5b51p-5);
 				constexpr std::uint64_t high = ccm::helpers::double_to_uint64(1.0 + 0x1.6ab2p-5);

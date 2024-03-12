@@ -33,6 +33,12 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU)
   target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
           -Wall -Wextra -Wpedantic -Wconversion -Werror=return-type
   )
+  # TODO: Remove this later.
+  #       Some variables have been provided but are not currently being used, but it would not atm make sense to remove them.
+  #       So to clean up the warnings we are just silencing these specific cases.
+  target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+          -Wno-unused-but-set-variable -Wno-unused-value
+  )
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL MSVC)

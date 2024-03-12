@@ -74,12 +74,12 @@ namespace ccm::helpers
 	 */
 	inline constexpr std::uint32_t top16_bits_of_double(double x) noexcept
 	{
-		return bit_cast<std::uint64_t>(x) >> 48;
+		return static_cast<std::uint32_t>(bit_cast<std::uint64_t>(x) >> 48);
 	}
 
 	inline constexpr std::uint32_t top12_bits_of_double(double x) noexcept
 	{
-		return bit_cast<std::uint64_t>(x) >> 52;
+		return static_cast<std::uint32_t>(bit_cast<std::uint64_t>(x) >> 52);
 	}
 
 	inline constexpr std::uint64_t double_to_uint64(double x) noexcept
