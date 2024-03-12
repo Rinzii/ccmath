@@ -44,7 +44,7 @@ namespace ccm::helpers
 		constexpr static int eFP_INFINITE = 1;
 		constexpr static int eFP_ZERO = 2;
 		constexpr static int eFP_SUBNORMAL = 2;
-		constexpr static int eFP_NORMAL = -4;
+		constexpr static int eFP_NORMAL = 4;
 #elif defined(CCMATH_COMPILER_CLANG) || defined(CCMATH_COMPILER_GCC) || defined(CCMATH_COMPILER_CLANG_BASED) // Clang and GCC have the same defines
 		constexpr static int eFP_NAN = 0;
 		constexpr static int eFP_INFINITE = 1;
@@ -58,5 +58,5 @@ namespace ccm::helpers
 }
 
 // Clean up the global namespace
-//#include "ccmath/internal/setup/compiler_undef.hpp"
+#include "ccmath/internal/setup/compiler_undef.hpp"
 
