@@ -19,6 +19,9 @@ CCMATH REQUIREMENTS:
  * Anything implemented by cmath that is already constexpr is allowed to be wrapped by ccmath and not implemented by ccmath.
  */
 
+// Includes ccm::float_t and ccm::double_t
+#include "ccmath/internal/helpers/floating_point_type.hpp"
+
 /// Basic math functions
 #include "ccmath/basic.hpp"
 

@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-#include <ccmath/detail/basic/fmod.hpp>
+#include <ccmath/ccmath.hpp>
 #include <cmath>
 #include <limits>
 #include <type_traits>

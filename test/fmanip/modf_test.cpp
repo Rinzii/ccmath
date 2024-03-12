@@ -10,7 +10,7 @@
 
 #include <cmath>
 #include <limits>
-#include "ccmath/detail/fmanip/modf.hpp"
+#include "ccmath/ccmath.hpp"
 
 TEST(CcmathFmanipTests, Modf)
 {

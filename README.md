@@ -4,11 +4,11 @@ ccmath is a C++17 library that provides a re-implementation of the standard `<cm
 
 ## Features
 
-- **Full constexpr Compatibility**: All functions provided by ccmath are implemented as `constexpr`, allowing them to be evaluated at compile time when used with constant expressions.
+- **Full constexpr Compatibility**: All functions provided by ccmath are implemented as `constexpr` along with an active effort made to ensure all functions work within `static_assert`. The primary goal is to ensure every function can be evaluated at compile time.
 
-- **Standard Math Functions**: ccmath provides a comprehensive set of mathematical functions similar to those in the standard `<cmath>` library, including trigonometric, exponential, logarithmic, and other common mathematical operations. If `<cmath>` has it then it is likely ccmath has implemented it.
+- **Dropin Replacement for Standard Math Library**: ccmath provides a comprehensive set of mathematical functions that are 1:1 compatible with the C++ standard library `<cmath>`. The goal of ccmath is to effectively be a drop in replacement for `<cmath>` with little to no discernable difference between the two. This includes trigonometric, exponential, logarithmic, and other common mathematical operations. If `<cmath>` has it then it is likely ccmath has implemented it.
 
-- **Performance Optimization**: By leveraging constexpr, ccmath aims to optimize performance by computing mathematical expressions at compile time when possible, reducing runtime overhead.
+- **Performance Optimization**: Past all of the functions being able to be evaluated at compile time, ccmath was also built with speed in mind. We strive to have speeds nearly as fast as the standards implementation.
 
 - **No External Dependencies**: ccmath has no external dependencies and only requires a C++17-compliant compiler.
 
@@ -33,7 +33,7 @@ int main() {
 ccmath has a comprehensive cmake setup and can be easily included in your project using fetchcontent like so:
 
 ```cmake
-cmake_minimum_required(VERSION 3.11) # FetchContent is new in version 3.11.
+cmake_minimum_required(VERSION 3.18)
 
 include(FetchContent)
 FetchContent_Declare(

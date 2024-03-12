@@ -10,7 +10,7 @@
 
 #include <cmath>
 #include <limits>
-#include "ccmath/detail/exponential/log10.hpp"
+#include "ccmath/ccmath.hpp"
 
 TEST(CcmathExponentialTests, Log10)
 {

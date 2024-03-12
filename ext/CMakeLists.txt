@@ -6,9 +6,28 @@ project(${INTERNAL_PROJ_DEFAULT_NAME}-ext)
 
 include(FetchContent)
 
-
+if (CCMATH_BUILD_BENCHMARKS)
+  # Intel does implement the regex library but google test is unable to detect this.
+  # Lets help them out and set the var ourselves.
+  if (CCMATH_COMPILER_INTEL)
+    set(HAVE_STD_REGEX ON CACHE BOOL "" FORCE)
+  endif ()
+  set(BENCHMARK_ENABLE_TESTING NO)
+  FetchContent_Declare(
+          benchmark
+          GIT_REPOSITORY https://github.com/google/benchmark.git
+          GIT_TAG v1.8.3
+  )
+  FetchContent_MakeAvailable(benchmark)
+endif ()
 
 if (CCMATH_BUILD_TEST)
+  # Intel does implement the regex library but google test is unable to detect this.
+  # Lets help them out and set the var ourselves.
+  if (CCMATH_COMPILER_INTEL)
+    set(HAVE_STD_REGEX ON CACHE BOOL "" FORCE)
+  endif ()
+
   # PThreads are not available on Windows
   # So tell gtest to not use them.
   if(CCMATH_WINDOWS)
@@ -39,6 +58,12 @@ add_library(${INTERNAL_PROJ_DEFAULT_NAME}::ext ALIAS ${PROJECT_NAME})
 if(CCMATH_BUILD_TEST)
   target_link_libraries(${PROJECT_NAME} INTERFACE
           gtest::gtest
+          )
+endif ()
+
+if(CCMATH_BUILD_BENCHMARKS)
+  target_link_libraries(${PROJECT_NAME} INTERFACE
+          benchmark::benchmark
           )
 endif ()
 
