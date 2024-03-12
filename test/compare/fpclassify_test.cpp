@@ -10,7 +10,7 @@
 
 #include <cmath>
 #include <limits>
-#include "ccmath/detail/compare/fpclassify.hpp"
+#include <ccmath/ccmath.hpp>
 
 TEST(CcmathCompareTests, Fpclassify)
 {

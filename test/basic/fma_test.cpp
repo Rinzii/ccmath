@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-#include <ccmath/detail/basic/fma.hpp>
+#include <ccmath/ccmath.hpp>
 #include <cmath>
 
 // TODO: Add more tests for fma

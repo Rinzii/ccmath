@@ -10,7 +10,7 @@
 
 #include <cmath>
 #include <limits>
-#include "ccmath/detail/compare/isinf.hpp"
+#include <ccmath/ccmath.hpp>
 
 // TODO: add more tests for isinf
 

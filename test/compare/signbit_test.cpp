@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 #include <cmath>
-#include <ccmath/detail/compare/signbit.hpp>
+#include <ccmath/ccmath.hpp>
 #include <limits>
 
 

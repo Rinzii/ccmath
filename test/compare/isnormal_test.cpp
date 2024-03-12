@@ -10,7 +10,7 @@
 
 #include <cmath>
 #include <limits>
-#include "ccmath/detail/compare/isnormal.hpp"
+#include <ccmath/ccmath.hpp>
 
 TEST(CcmathCompareTests, IsNormal)
 {
