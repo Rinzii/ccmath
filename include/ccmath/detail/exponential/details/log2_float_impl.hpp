@@ -27,11 +27,11 @@ namespace ccm::internal
 	{
 		namespace impl
 		{
-			constexpr ccm::internal::log2_data<float> internalLogDataFlt = ccm::internal::log2_data<float>();
-			constexpr auto tab_values_flt								= internalLogDataFlt.tab;
-			constexpr auto poly_values_flt								= internalLogDataFlt.poly;
-			constexpr auto k_logTableN_flt								= (1 << ccm::internal::k_log2TableBitsFlt);
-			constexpr auto k_logTableOff_flt							= 0x3f330000;
+			constexpr ccm::internal::log2_data<float> internalLog2DataFlt = ccm::internal::log2_data<float>();
+			constexpr auto log2_tab_values_flt								= internalLog2DataFlt.tab;
+			constexpr auto log2_poly_values_flt								= internalLog2DataFlt.poly;
+			constexpr auto k_log2TableN_flt								= (1 << ccm::internal::k_log2TableBitsFlt);
+			constexpr auto k_log2TableOff_flt							= 0x3f330000;
 
 			inline constexpr double log2_float_impl(float x)
 			{
@@ -79,14 +79,14 @@ namespace ccm::internal
 				// x = 2^expo * normVal; where normVal is in range [k_logTableOff_flt, 2 * k_logTableOff_flt] and exact.
 				// We split the rang into N sub-intervals.
 				// The i-th sub-interval contains normVal and c is near its center.
-				tmp = intX - k_logTableOff_flt;
-				i	 = (tmp >> (23 - ccm::internal::k_log2TableBitsFlt)) % k_logTableN_flt; // NOLINT
+				tmp = intX - k_log2TableOff_flt;
+				i	 = (tmp >> (23 - ccm::internal::k_log2TableBitsFlt)) % k_log2TableN_flt; // NOLINT
 				top  = tmp & 0xff800000;
 				intNorm       = intX - top;
 				// NOLINTNEXTLINE
 				expo          = static_cast<std::uint32_t>(tmp) >> 23; // Arithmetic shift.
-				inverseCoeff  = tab_values_flt[i].invc;
-				logarithmCoeff = tab_values_flt[i].logc;
+				inverseCoeff  = log2_tab_values_flt[i].invc;
+				logarithmCoeff = log2_tab_values_flt[i].logc;
 				normVal       = static_cast<ccm::double_t>(ccm::helpers::uint32_to_float(intNorm));
 
 				// log2(x) = log1p(normVal/c-1)/ln2 + log2(c) + expo
@@ -95,9 +95,9 @@ namespace ccm::internal
 
 				// Pipelined polynomial evaluation to approximate log1p(r)/ln2.
 				remSqr = rem * rem;
-				result = poly_values_flt[1] * rem + poly_values_flt[2];
-				result = poly_values_flt[0] * remSqr + result;
-				polynomialTerm = poly_values_flt[3] * rem + result0;
+				result = log2_poly_values_flt[1] * rem + log2_poly_values_flt[2];
+				result = log2_poly_values_flt[0] * remSqr + result;
+				polynomialTerm = log2_poly_values_flt[3] * rem + result0;
 				result = result * remSqr + polynomialTerm;
 
 				return result;

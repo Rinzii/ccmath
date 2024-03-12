@@ -10,7 +10,7 @@
 
 #include <cmath>
 #include <limits>
-#include "ccmath/detail/fmanip/logb.hpp"
+#include "ccmath/ccmath.hpp"
 
 TEST(CcmathFmanipTests, Logb)
 {

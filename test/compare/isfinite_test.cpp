@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-#include <ccmath/detail/compare/isfinite.hpp>
+#include <ccmath/ccmath.hpp>
 #include <cmath>
 #include <limits>
 

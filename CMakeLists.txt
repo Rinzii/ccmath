@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
 
-enable_language(CXX)
-
 set(CCMATH_BUILD_VERSION 0.1.1)
 set(INTERNAL_PROJ_DEFAULT_NAME ccmath)
 
@@ -33,6 +31,12 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU)
   target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
           -Wall -Wextra -Wpedantic -Wconversion -Werror=return-type
   )
+  # TODO: Remove this later.
+  #       Some variables have been provided but are not currently being used, but it would not atm make sense to remove them.
+  #       So to clean up the warnings we are just silencing these specific cases.
+  target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+          -Wno-unused-but-set-variable -Wno-unused-value
+  )
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL MSVC)
@@ -58,16 +62,18 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
 )
 
 
-
-
 configure_file(cmake/version.hpp.in "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp" @ONLY)
+
+if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TEST)
+  add_subdirectory(ext)
+endif()
 
 if (CCMATH_BUILD_EXAMPLES)
   add_subdirectory(example)
 endif()
 
-if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TEST)
-  add_subdirectory(ext)
+if (CCMATH_BUILD_BENCHMARKS)
+  add_subdirectory(benchmark)
 endif()
 
 if (CCMATH_BUILD_TEST)
@@ -77,7 +83,7 @@ endif()
 
 if (CCMATH_USE_SIMD)
   # TODO: Add a better way to handle enabling simd internally.
-  add_compile_definitions(INTERNAL_ENABLE_CHECK_FOR_SIMD)
+  add_compile_definitions(INTERNAL_CCMATH_ENABLE_CHECK_FOR_SIMD)
 endif ()
 
 

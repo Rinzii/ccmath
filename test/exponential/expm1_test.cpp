@@ -10,7 +10,7 @@
 
 #include <cmath>
 #include <limits>
-#include "ccmath/detail/exponential/expm1.hpp"
+#include "ccmath/ccmath.hpp"
 
 TEST(CcmathExponentialTests, Expm1)
 {

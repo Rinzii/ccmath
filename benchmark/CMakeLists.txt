@@ -14,6 +14,7 @@ add_executable(${PROJECT_NAME})
 add_executable(${INTERNAL_PROJ_DEFAULT_NAME}::benchmark ALIAS ${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME} PUBLIC
         ccmath::ccmath
+        benchmark::benchmark
 )
 target_include_directories(${PROJECT_NAME} PUBLIC .)
 target_sources(${PROJECT_NAME} PRIVATE

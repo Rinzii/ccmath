@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-#include <ccmath/detail/basic/min.hpp>
+#include <ccmath/ccmath.hpp>
 #include <cmath>
 #include <limits>
 

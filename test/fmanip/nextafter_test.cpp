@@ -10,7 +10,7 @@
 
 #include <cmath>
 #include <limits>
-#include "ccmath/detail/fmanip/nextafter.hpp"
+#include "ccmath/ccmath.hpp"
 
 TEST(CcmathFmanipTests, Nextafter)
 {

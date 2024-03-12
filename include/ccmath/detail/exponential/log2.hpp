@@ -24,7 +24,7 @@ namespace ccm
 	 * @param num The number to calculate the base 2 logarithm of.
 	 * @return The base 2 logarithm of the number.
 	 */
-	template <typename T>
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, int> = 0>
 	inline constexpr T log2(T num) noexcept
 	{
 		// If the argument is ±0, -∞ is returned

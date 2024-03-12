@@ -10,7 +10,7 @@
 
 #include <cmath>
 #include <limits>
-#include "ccmath/detail/fmanip/ilogb.hpp"
+#include "ccmath/ccmath.hpp"
 
 TEST(CcmathFmanipTests, ILogb)
 {

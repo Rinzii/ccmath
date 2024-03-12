@@ -10,7 +10,7 @@
 
 #include <cmath>
 #include <limits>
-#include "ccmath/detail/compare/isless.hpp"
+#include <ccmath/ccmath.hpp>
 
 TEST(CcmathCompareTests, IsLess)
 {
