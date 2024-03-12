@@ -26,6 +26,16 @@
 			}
 		},
 		{
+			"name": "ninja-intel",
+			"description": "Build configuration using Ninja Multi-config / clang",
+			"inherits": "default",
+			"binaryDir": "${sourceDir}/out/intel",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "icx",
+				"CMAKE_CXX_COMPILER": "icx"
+			}
+		},
+		{
 			"name": "ninja-ubsan",
 			"description": "UBSan build configuration using Ninja Multi-config",
 			"inherits": "default",

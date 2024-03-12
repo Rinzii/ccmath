@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
 
-enable_language(CXX)
-
 set(CCMATH_BUILD_VERSION 0.1.1)
 set(INTERNAL_PROJ_DEFAULT_NAME ccmath)
 
@@ -64,16 +62,14 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
 )
 
 
-
-
 configure_file(cmake/version.hpp.in "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp" @ONLY)
-
-if (CCMATH_BUILD_EXAMPLES)
-  add_subdirectory(example)
-endif()
 
 if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TEST)
   add_subdirectory(ext)
+endif()
+
+if (CCMATH_BUILD_EXAMPLES)
+  add_subdirectory(example)
 endif()
 
 if (CCMATH_BUILD_BENCHMARKS)
@@ -87,7 +83,7 @@ endif()
 
 if (CCMATH_USE_SIMD)
   # TODO: Add a better way to handle enabling simd internally.
-  add_compile_definitions(INTERNAL_ENABLE_CHECK_FOR_SIMD)
+  add_compile_definitions(INTERNAL_CCMATH_ENABLE_CHECK_FOR_SIMD)
 endif ()
 
 

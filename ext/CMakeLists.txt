@@ -7,6 +7,11 @@ project(${INTERNAL_PROJ_DEFAULT_NAME}-ext)
 include(FetchContent)
 
 if (CCMATH_BUILD_BENCHMARKS)
+  # Intel does implement the regex library but google test is unable to detect this.
+  # Lets help them out and set the var ourselves.
+  if (CCMATH_COMPILER_INTEL)
+    set(HAVE_STD_REGEX ON CACHE BOOL "" FORCE)
+  endif ()
   set(BENCHMARK_ENABLE_TESTING NO)
   FetchContent_Declare(
           benchmark
@@ -16,9 +21,13 @@ if (CCMATH_BUILD_BENCHMARKS)
   FetchContent_MakeAvailable(benchmark)
 endif ()
 
-
-
 if (CCMATH_BUILD_TEST)
+  # Intel does implement the regex library but google test is unable to detect this.
+  # Lets help them out and set the var ourselves.
+  if (CCMATH_COMPILER_INTEL)
+    set(HAVE_STD_REGEX ON CACHE BOOL "" FORCE)
+  endif ()
+
   # PThreads are not available on Windows
   # So tell gtest to not use them.
   if(CCMATH_WINDOWS)
