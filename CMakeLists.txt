@@ -46,6 +46,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL MSVC)
 endif()
 
 include(ccmath_headers.cmake)
+message(WARNING "ccmath_headers: ${ccmath_headers}")
 
 add_library(${PROJECT_NAME} INTERFACE)
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})

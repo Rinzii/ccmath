@@ -15,7 +15,7 @@
 #include <limits>
 #include <type_traits>
 
-#include "ccmath/detail/exponential/details/log_data.hpp"
+#include "ccmath/detail/exponential/impl/log_data.hpp"
 #include "ccmath/internal/helpers/bits.hpp"
 #include "ccmath/internal/helpers/floating_point_type.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"

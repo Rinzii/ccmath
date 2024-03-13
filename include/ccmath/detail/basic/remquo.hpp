@@ -11,6 +11,10 @@
 #include "ccmath/detail/basic/remainder.hpp"
 #include "ccmath/detail/compare/isinf.hpp"
 #include "ccmath/detail/compare/isnan.hpp"
+#include "ccmath/internal/helpers/bits.hpp"
+
+
+
 
 namespace ccm
 {
@@ -51,7 +55,8 @@ namespace ccm
 
 		T r = ccm::remainder(x, y);
 		// Having a lot of issues with handling the quo parameter. May use __builtin_bit_cast to handle this.
-		//*quo = static_cast<int>(x / y) & ~(std::numeric_limits<int>::min)();
+
+
 
 		return r;
 #endif

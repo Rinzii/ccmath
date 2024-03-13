@@ -10,8 +10,8 @@
 
 #include "ccmath/detail/compare/isnan.hpp"
 #include "ccmath/detail/compare/signbit.hpp"
-#include "ccmath/detail/exponential/details/log2_double_impl.hpp"
-#include "ccmath/detail/exponential/details/log2_float_impl.hpp"
+#include "ccmath/detail/exponential/impl/log2_double_impl.hpp"
+#include "ccmath/detail/exponential/impl/log2_float_impl.hpp"
 
 #include <limits>
 #include <type_traits>
