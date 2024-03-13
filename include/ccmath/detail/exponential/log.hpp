@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "ccmath/detail/exponential/details/log_double_impl.hpp"
-#include "ccmath/detail/exponential/details/log_float_impl.hpp"
+#include "ccmath/detail/exponential/impl/log_double_impl.hpp"
+#include "ccmath/detail/exponential/impl/log_float_impl.hpp"
 
 namespace ccm
 {
