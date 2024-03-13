@@ -8,7 +8,6 @@ set(ccmath_internal_helpers_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/find_number.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/floating_point_type.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/fpclassify_helper.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/long_double_helpers.hpp
 )
 
 set(ccmath_internal_predef_headers
