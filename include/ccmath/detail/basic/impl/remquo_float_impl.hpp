@@ -13,10 +13,6 @@
 
 #include "ccmath/internal/helpers/bits.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
-
-#include "ccmath/detail/compare/isfinite.hpp"
-#include "ccmath/detail/compare/isnan.hpp"
-
 #include "ccmath/detail/basic/abs.hpp"
 #include "ccmath/detail/basic/fmod.hpp"
 
