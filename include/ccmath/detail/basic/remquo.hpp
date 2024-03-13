@@ -8,9 +8,8 @@
 
 #pragma once
 
-#include "ccmath/detail/basic/remainder.hpp"
-#include "ccmath/detail/compare/isinf.hpp"
-#include "ccmath/detail/compare/isnan.hpp"
+#include "ccmath/detail/basic/impl/remquo_double_impl.hpp"
+#include "ccmath/detail/basic/impl/remquo_float_impl.hpp"
 
 namespace ccm
 {
@@ -23,38 +22,52 @@ namespace ccm
 	 * @return If successful, returns the floating-point remainder of the division x / y as defined in ccm::remainder, and stores, in *quo, the sign and at
 	 * least three of the least significant bits of x / y
 	 *
-	 * @warning This function is still extremely experimental and almost certainly not work as expected.
-	 * @note This function should work as expected with GCC 7.1 and later.
+	 * @attention If you want the quotient pointer to work within a constant context you must perform something like as follows: (The below code will work with
+	 * constexpr and static_assert)
+	 *
+	 * @code
+	 * constexpr double get_remainder(double x, double y)
+	 * {
+	 *      int quotient {0};
+	 *      double remainder = ccm::remquo(x, y, &quotient);
+	 *      return remainder;
+	 *  }
+	 *
+	 *  constexpr int get_quotient(double x, double y)
+	 *  {
+	 *      int quotient {0};
+	 *      ccm::remquo(x, y, &quotient);
+	 *      return quotient;
+	 *  }
+	 *  @endcode
 	 */
-	template <typename T>
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	inline constexpr T remquo(T x, T y, int * quo)
 	{
-#if (defined(__GNUC__) && __GNUC__ >= 7 && __GNUC_MINOR__ >= 1)
-		// Works with GCC 7.1
-		// Not static_assert-able
-		return __builtin_remquo(x, y, quo);
-#else
-		// TODO: This function is a lot trickier to get working with constexpr.
-		//       I'm putting this on hold for now and not requiring it for v0.1.0.
-		//       Since remquo is not a commonly used function, I'm not going to worry about it for now.
-		if constexpr (std::is_floating_point_v<T>)
+		// We are not using __builtin_remquo with GCC due to a failure for it to work with static_assert
+		// Our implementation does not have this issue.
+
+		// If x is ±∞ and y is not NaN, NaN is returned.
+		if (CCM_UNLIKELY(ccm::isinf(x) && !ccm::isnan(y))) { return (x * y) / (x * y); }
+
+		// If y is ±0 and x is not NaN, NaN is returned.
+		if (CCM_UNLIKELY(y == 0.0 && !ccm::isnan(x))) { return (x * y) / (x * y); }
+
+		// If either x or y is NaN, NaN is returned.
+		if (CCM_UNLIKELY(ccm::isnan(x)))
 		{
-			// If x is ±∞ and y is not NaN, NaN is returned.
-			// If y is ±0 and x is not NaN, NaN is returned.
-			// If either argument is NaN, NaN is returned.
-			if ((ccm::isinf(x) && !ccm::isnan(y)) || (y == 0 && !ccm::isnan(x)) || (ccm::isnan(x) || ccm::isnan(y)))
-			{
-				// All major compilers return -NaN.
-				return -std::numeric_limits<T>::quiet_NaN();
-			}
+			if (ccm::signbit(x)) { return -std::numeric_limits<T>::quiet_NaN(); }
+			else { return std::numeric_limits<T>::quiet_NaN(); }
 		}
 
-		T r = ccm::remainder(x, y);
-		// Having a lot of issues with handling the quo parameter. May use __builtin_bit_cast to handle this.
-		//*quo = static_cast<int>(x / y) & ~(std::numeric_limits<int>::min)();
+		if (CCM_UNLIKELY(ccm::isnan(y)))
+		{
+			if (ccm::signbit(y)) { return -std::numeric_limits<T>::quiet_NaN(); }
+			else { return std::numeric_limits<T>::quiet_NaN(); }
+		}
 
-		return r;
-#endif
+		if constexpr (std::is_same_v<T, float>) { return ccm::internal::remquo_float(x, y, quo); }
+		else { return ccm::internal::remquo_double(x, y, quo); }
 	}
 } // namespace ccm
 
