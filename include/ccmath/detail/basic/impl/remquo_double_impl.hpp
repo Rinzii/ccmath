@@ -28,26 +28,32 @@ namespace ccm::internal
 		{
 			inline constexpr double remquo_double_impl(double x, double y, int * quo) noexcept
 			{
-				// Assume all edge case checking is done before calling this function.
 				std::int64_t x_i64{};
 				std::int64_t y_i64{};
 				std::uint64_t x_sign{};
 				std::uint64_t quotient_sign{};
 				int computed_quotient{};
 
-				x_i64		  = ccm::helpers::double_to_int64(x);
-				y_i64		  = ccm::helpers::double_to_int64(y);
+				x_i64 = ccm::helpers::double_to_int64(x);
+				y_i64 = ccm::helpers::double_to_int64(y);
 
 				// Determine the signs of x and the quotient.
 				x_sign		  = static_cast<std::uint64_t>(x_i64) & 0x8000000000000000ULL;
 				quotient_sign = x_sign ^ (static_cast<std::uint64_t>(y_i64) & 0x8000000000000000ULL);
 
 				// Clear the sign bits from the int64_t representations of x and y.
-				y_i64 &= 0x7fffffffffffffffULL;
 				x_i64 &= 0x7fffffffffffffffULL;
+				y_i64 &= 0x7fffffffffffffffULL;
+
+				// If y is zero.
+				if (CCM_UNLIKELY(y_i64 == 0)) { return (x * y) / (x * y); }
+
+				// If x is not finite or y is NaN.
+				if (CCM_UNLIKELY(x_i64 >= 0x7ff0000000000000ULL || y_i64 > 0x7ff0000000000000ULL)) { return (x * y) / (x * y); }
 
 				// b (or bit 54) represents the highest bit we can compare against for both signed and unsigned integers without causing an overflow.
-				// Here we are checking that if y_i64 is within the range of signed 64-bit integers that can be represented without setting the MSB (i.e., positive or zero).
+				// Here we are checking that if y_i64 is within the range of signed 64-bit integers that can be represented without setting the MSB (i.e.,
+				// positive or zero).
 				if (y_i64 <= 0x7fbfffffffffffffULL)
 				{
 					x = ccm::fmod(x, 8 * y); // now x < (8 * y)
@@ -62,7 +68,6 @@ namespace ccm::internal
 				x				  = ccm::fabs(x);
 				y				  = ccm::helpers::int64_to_double(y_i64);
 				computed_quotient = 0;
-
 
 				if (y_i64 <= 0x7fcfffffffffffffULL && x >= 4 * y)
 				{
@@ -116,7 +121,7 @@ namespace ccm::internal
 	}	  // namespace
 
 	template <typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
-	inline constexpr T remquo_double(T x, T y, int* quo) noexcept
+	inline constexpr T remquo_double(T x, T y, int * quo) noexcept
 	{
 		return static_cast<T>(impl::remquo_double_impl(x, y, quo));
 	}

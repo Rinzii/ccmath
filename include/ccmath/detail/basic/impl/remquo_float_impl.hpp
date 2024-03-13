@@ -28,7 +28,6 @@ namespace ccm::internal
 		{
 			inline constexpr float remquo_float_impl(float x, float y, int * quo) noexcept
 			{
-				// Assume all edge case checking is done before calling this function.
 				std::int32_t x_i32{};
 				std::int32_t y_i32{};
 				std::uint32_t x_sign{};
@@ -43,8 +42,14 @@ namespace ccm::internal
 				quotient_sign = x_sign ^ (static_cast<std::uint32_t>(y_i32) & 0x80000000);
 
 				// Clear the sign bits from the int32_t representations of x and y.
-				y_i32 &= 0x7fffffff;
 				x_i32 &= 0x7fffffff;
+				y_i32 &= 0x7fffffff;
+
+				// If y is zero.
+				if (CCM_UNLIKELY(y_i32 == 0)) { return (x * y) / (x * y); }
+
+				// If x is not finite or y is NaN.
+				if (CCM_UNLIKELY(x_i32 >= 0x7f800000 || y_i32 > 0x7f800000)) { return (x * y) / (x * y); }
 
 				if (y_i32 <= 0x7dffffff)
 				{
