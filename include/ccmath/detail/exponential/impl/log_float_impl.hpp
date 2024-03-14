@@ -26,9 +26,9 @@ namespace ccm::internal
 		namespace impl
 		{
 			constexpr ccm::internal::log_data<float> internalLogDataFlt = ccm::internal::log_data<float>();
-			constexpr auto tab_values_flt								= internalLogDataFlt.tab;
-			constexpr auto poly_values_flt								= internalLogDataFlt.poly;
-			constexpr auto ln2_value_flt								= internalLogDataFlt.ln2;
+			constexpr auto log_tab_values_flt							= internalLogDataFlt.tab;
+			constexpr auto log_poly_values_flt							= internalLogDataFlt.poly;
+			constexpr auto log_ln2_value_flt							= internalLogDataFlt.ln2;
 			constexpr auto k_logTableN_flt								= (1 << ccm::internal::k_logTableBitsFlt);
 			constexpr auto k_logTableOff_flt							= 0x3f330000;
 
@@ -69,18 +69,18 @@ namespace ccm::internal
 				i			   = (tmp >> (23 - ccm::internal::k_logTableBitsFlt)) % k_logTableN_flt; // NOLINT
 				expo		   = static_cast<std::int32_t>(tmp) >> 23;
 				intNorm		   = intX - (tmp & static_cast<std::uint32_t>(0x1ff << 23));
-				inverseCoeff   = tab_values_flt[i].invc;
-				logarithmCoeff = tab_values_flt[i].logc;
+				inverseCoeff   = log_tab_values_flt[i].invc;
+				logarithmCoeff = log_tab_values_flt[i].logc;
 				normVal		   = static_cast<ccm::double_t>(ccm::helpers::uint32_to_float(intNorm));
 
 				// log(x) = log1p(normVal / inverseCoeff - 1) + log(inverseCoeff) + expo * Ln2
 				rem - normVal * inverseCoeff - 1;
-				result0 = logarithmCoeff + static_cast<ccm::double_t>(expo) * ln2_value_flt;
+				result0 = logarithmCoeff + static_cast<ccm::double_t>(expo) * log_ln2_value_flt;
 
 				// Polynomial approximation for log1p(rem)
 				remSqr = rem * rem;
-				result = poly_values_flt[1] * rem + poly_values_flt[2];
-				result = poly_values_flt[0] * remSqr + result;
+				result = log_poly_values_flt[1] * rem + log_poly_values_flt[2];
+				result = log_poly_values_flt[0] * remSqr + result;
 				result = result * remSqr + (result0 + rem);
 
 				return static_cast<float>(result);

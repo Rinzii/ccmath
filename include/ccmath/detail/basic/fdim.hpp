@@ -10,34 +10,10 @@
 
 #include <limits>
 #include <type_traits>
-
 #include "ccmath/detail/compare/isnan.hpp"
 
 namespace ccm
 {
-	/// @cond MATH_DETAIL
-	namespace
-	{
-		namespace impl
-		{
-			template <typename T>
-			inline constexpr T fdim_impl(T x, T y)
-			{
-				if constexpr (std::is_floating_point_v<T>)
-				{
-					if (ccm::isnan(x)) { return x; }
-					if (ccm::isnan(y)) { return y; }
-				}
-
-				if (x <= y) { return T(+0.0); }
-				else if ((y < T(0.0)) && (x > (std::numeric_limits<T>::max() + y))) { return std::numeric_limits<T>::infinity(); }
-				else { return x - y; }
-			}
-
-		} // namespace impl
-	}	  // namespace
-	/// @endcond
-
 	/**
 	 * @brief Computes the positive difference of two floating point values (max(0,x−y))
 	 * @tparam T A floating-point type.
@@ -48,7 +24,11 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point<T>::value, int> = 0>
 	inline constexpr T fdim(T x, T y)
 	{
-		return impl::fdim_impl(x, y);
+        if (ccm::isnan(x)) { return x; }
+        if (ccm::isnan(y)) { return y; }
+		if (x <= y) { return T(+0.0); }
+		else if ((y < T(0.0)) && (x > (std::numeric_limits<T>::max() + y))) { return std::numeric_limits<T>::infinity(); }
+		else { return x - y; }
 	}
 
 	/**
@@ -66,7 +46,7 @@ namespace ccm
 		using shared_type = std::common_type_t<T, U>;
 
 		// Convert the arguments to the common type
-		return fdim(static_cast<shared_type>(x), static_cast<shared_type>(y));
+		return fdim<shared_type>(static_cast<shared_type>(x), static_cast<shared_type>(y));
 	}
 
 	/**
@@ -79,7 +59,7 @@ namespace ccm
 	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, int> = 0>
 	inline constexpr double fdim(Integer x, Integer y)
 	{
-		return fdim(static_cast<double>(x), static_cast<double>(y));
+		return fdim<double>(static_cast<double>(x), static_cast<double>(y));
 	}
 
 	/**
@@ -90,7 +70,7 @@ namespace ccm
 	 */
 	inline constexpr float fdimf(float x, float y)
 	{
-		return fdim(x, y);
+		return fdim<float>(x, y);
 	}
 
 	/**
@@ -101,7 +81,7 @@ namespace ccm
 	 */
 	inline constexpr long double fdiml(long double x, long double y)
 	{
-		return fdim(x, y);
+		return fdim<long double>(x, y);
 	}
 } // namespace ccm
 
