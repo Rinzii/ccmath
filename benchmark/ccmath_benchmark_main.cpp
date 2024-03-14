@@ -105,6 +105,27 @@ static void BM_ccm_abs(benchmark::State& state) {
 }
 BENCHMARK(BM_ccm_abs)->Arg(16)->Arg(256)->Arg(4096)->Arg(65536)->Complexity();
 
+static void BM_std_log_rand_double(bm::State& state) {
+	auto randomDoubles = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
+	while (state.KeepRunning()) {
+		for (auto x : randomDoubles) {
+			bm::DoNotOptimize(std::log(x));
+		}
+	}
+	state.SetComplexityN(state.range(0));
+}
+BENCHMARK(BM_std_log_rand_double)->Range(8, 8<<10)->Complexity();
+
+static void BM_ccm_log_rand_double(bm::State& state) {
+    auto randomDoubles = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
+    while (state.KeepRunning()) {
+        for (auto x : randomDoubles) {
+            bm::DoNotOptimize(ccm::log(x));
+        }
+    }
+    state.SetComplexityN(state.range(0));
+}
+BENCHMARK(BM_ccm_log_rand_double)->Range(8, 8<<10)->Complexity();
 
 static void BM_ccm_log(bm::State& state) {
 	for (auto _ : state) {
@@ -121,6 +142,28 @@ static void BM_std_log(bm::State& state) {
 	state.SetComplexityN(state.range(0));
 }
 BENCHMARK(BM_std_log)->Arg(16)->Arg(256)->Arg(4096)->Arg(65536)->Complexity();
+
+static void BM_std_log2_rand_double(bm::State& state) {
+    auto randomDoubles = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
+    while (state.KeepRunning()) {
+        for (auto x : randomDoubles) {
+            bm::DoNotOptimize(std::log2(x));
+        }
+    }
+    state.SetComplexityN(state.range(0));
+}
+BENCHMARK(BM_std_log2_rand_double)->Range(8, 8<<10)->Complexity();
+
+static void BM_ccm_log2_rand_double(bm::State& state) {
+    auto randomDoubles = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
+    while (state.KeepRunning()) {
+        for (auto x : randomDoubles) {
+            bm::DoNotOptimize(ccm::log2(x));
+        }
+    }
+    state.SetComplexityN(state.range(0));
+}
+BENCHMARK(BM_ccm_log2_rand_double)->Range(8, 8<<10)->Complexity();
 
 static void BM_ccm_log2(bm::State& state) {
 	for (auto _ : state) {
