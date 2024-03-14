@@ -87,19 +87,40 @@ namespace ccm::helpers
 		return bit_cast<std::uint64_t>(x);
 	}
 
+	inline constexpr std::int64_t double_to_int64(double x) noexcept
+	{
+		return bit_cast<std::int64_t>(x);
+	}
+
 	inline constexpr double uint64_to_double(std::uint64_t x) noexcept
 	{
 		return bit_cast<double>(x);
 	}
+
+	inline constexpr double int64_to_double(std::int64_t x) noexcept
+    {
+        return bit_cast<double>(x);
+    }
 
 	inline constexpr std::uint32_t float_to_uint32(float x) noexcept
 	{
 		return bit_cast<std::uint32_t>(x);
 	}
 
-	inline constexpr double uint32_to_float(std::uint32_t x) noexcept
+	inline constexpr std::int32_t float_to_int32(float x) noexcept
+    {
+        return bit_cast<std::int32_t>(x);
+    }
+
+	inline constexpr float uint32_to_float(std::uint32_t x) noexcept
 	{
 		return bit_cast<float>(x);
 	}
+
+	inline constexpr float int32_to_float(std::int32_t x) noexcept
+    {
+        return bit_cast<float>(x);
+    }
+
 
 } // namespace ccm::helpers

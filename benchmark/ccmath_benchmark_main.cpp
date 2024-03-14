@@ -110,6 +110,7 @@ static void BM_ccm_log(bm::State& state) {
 	for (auto _ : state) {
 		bm::DoNotOptimize(ccm::log(state.range(0)));
 	}
+	state.SetComplexityN(state.range(0));
 }
 BENCHMARK(BM_ccm_log)->Arg(16)->Arg(256)->Arg(4096)->Arg(65536)->Complexity();
 

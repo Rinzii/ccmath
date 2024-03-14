@@ -15,7 +15,7 @@
 #include <limits>
 #include <type_traits>
 
-#include "ccmath/detail/exponential/details/log_data.hpp"
+#include "ccmath/detail/exponential/impl/log_data.hpp"
 #include "ccmath/internal/helpers/bits.hpp"
 #include "ccmath/internal/helpers/floating_point_type.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
@@ -27,12 +27,12 @@ namespace ccm::internal
 		namespace impl
 		{
 			constexpr ccm::internal::log_data<double> internalLogDataDbl = ccm::internal::log_data<double>();
-			constexpr auto log_tab_values_dbl								 = internalLogDataDbl.tab;
-			constexpr auto log_tab2_values_dbl								 = internalLogDataDbl.tab2;
-			constexpr auto log_poly_values_dbl								 = internalLogDataDbl.poly;
-			constexpr auto log_poly1_values_dbl								 = internalLogDataDbl.poly1;
-			constexpr auto log_ln2hi_value_dbl								 = internalLogDataDbl.ln2hi;
-			constexpr auto log_ln2lo_value_dbl								 = internalLogDataDbl.ln2lo;
+			constexpr auto log_tab_values_dbl							 = internalLogDataDbl.tab;
+			constexpr auto log_tab2_values_dbl							 = internalLogDataDbl.tab2;
+			constexpr auto log_poly_values_dbl							 = internalLogDataDbl.poly;
+			constexpr auto log_poly1_values_dbl							 = internalLogDataDbl.poly1;
+			constexpr auto log_ln2hi_value_dbl							 = internalLogDataDbl.ln2hi;
+			constexpr auto log_ln2lo_value_dbl							 = internalLogDataDbl.ln2lo;
 			constexpr auto k_logTableN_dbl								 = (1 << ccm::internal::k_logTableBitsDbl);
 			constexpr auto k_logTableOff_dbl							 = 0x3fe6000000000000;
 
@@ -61,7 +61,7 @@ namespace ccm::internal
 
 				// Convert input double to uint64_t and extract top 16 bits
 				std::uint64_t intX = ccm::helpers::double_to_uint64(x);
-				std::uint32_t top = ccm::helpers::top16_bits_of_double(x);
+				std::uint32_t top  = ccm::helpers::top16_bits_of_double(x);
 
 				// Constants for comparison
 				constexpr std::uint64_t low	 = ccm::helpers::double_to_uint64(1.0 - 0x1p-4);
@@ -138,8 +138,10 @@ namespace ccm::internal
 				remSqr = rem * rem; // rounding error: 0x1p-54/k_logTableN^2.
 				// Worst case error if |result| > 0x1p-4: 0.520 ULP
 				// 0.5 + 2.06/k_logTableN + abs-poly-error*2^56+0.001 ULP
-				result = lowPart + remSqr * log_poly_values_dbl[0] +
-						 rem * remSqr * (log_poly_values_dbl[1] + rem * log_poly_values_dbl[2] + remSqr * (log_poly_values_dbl[3] + rem * log_poly_values_dbl[4])) + highPart;
+				result =
+					lowPart + remSqr * log_poly_values_dbl[0] +
+					rem * remSqr * (log_poly_values_dbl[1] + rem * log_poly_values_dbl[2] + remSqr * (log_poly_values_dbl[3] + rem * log_poly_values_dbl[4])) +
+					highPart;
 				return static_cast<double>(result);
 			}
 		} // namespace impl

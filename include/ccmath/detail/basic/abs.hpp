@@ -9,7 +9,6 @@
 #pragma once
 
 #include "ccmath/detail/compare/isnan.hpp"
-
 #include <limits>
 
 namespace ccm

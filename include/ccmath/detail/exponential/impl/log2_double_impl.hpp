@@ -15,7 +15,7 @@
 #include <limits>
 #include <type_traits>
 
-#include "ccmath/detail/exponential/details/log2_data.hpp"
+#include "ccmath/detail/exponential/impl/log2_data.hpp"
 #include "ccmath/internal/helpers/bits.hpp"
 #include "ccmath/internal/helpers/floating_point_type.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
@@ -27,14 +27,14 @@ namespace ccm::internal
 		namespace impl
 		{
 			constexpr ccm::internal::log2_data<double> internalLog2DataDbl = ccm::internal::log2_data<double>();
-			constexpr auto log2_tab_values_dbl								  = internalLog2DataDbl.tab;
-			constexpr auto log2_tab2_values_dbl								  = internalLog2DataDbl.tab2;
-			constexpr auto log2_poly_values_dbl								  = internalLog2DataDbl.poly;
-			constexpr auto log2_poly1_values_dbl								  = internalLog2DataDbl.poly1;
-			constexpr auto log2_inverse_ln2_high_value_dbl					  = internalLog2DataDbl.invln2hi;
-			constexpr auto log2_inverse_ln2_low_value_dbl					  = internalLog2DataDbl.invln2lo;
-			constexpr auto k_log2TableN_dbl								  = (1 << ccm::internal::k_log2TableBitsDbl);
-			constexpr auto k_log2TableOff_dbl							  = 0x3fe6000000000000;
+			constexpr auto log2_tab_values_dbl							   = internalLog2DataDbl.tab;
+			constexpr auto log2_tab2_values_dbl							   = internalLog2DataDbl.tab2;
+			constexpr auto log2_poly_values_dbl							   = internalLog2DataDbl.poly;
+			constexpr auto log2_poly1_values_dbl						   = internalLog2DataDbl.poly1;
+			constexpr auto log2_inverse_ln2_high_value_dbl				   = internalLog2DataDbl.invln2hi;
+			constexpr auto log2_inverse_ln2_low_value_dbl				   = internalLog2DataDbl.invln2lo;
+			constexpr auto k_log2TableN_dbl								   = (1 << ccm::internal::k_log2TableBitsDbl);
+			constexpr auto k_log2TableOff_dbl							   = 0x3fe6000000000000;
 
 			inline constexpr double log2_double_impl(double x)
 			{
@@ -57,12 +57,11 @@ namespace ccm::internal
 				std::uint64_t intNorm{};
 				std::uint64_t tmp{};
 
-
 				std::int64_t expo{};
 				std::int64_t i{};
 
-				std::uint64_t  intX = ccm::helpers::double_to_uint64(x);
-				std::uint32_t top	 = ccm::helpers::top16_bits_of_double(x);
+				std::uint64_t intX = ccm::helpers::double_to_uint64(x);
+				std::uint32_t top  = ccm::helpers::top16_bits_of_double(x);
 
 				constexpr std::uint64_t low	 = ccm::helpers::double_to_uint64(1.0 - 0x1.5b51p-5);
 				constexpr std::uint64_t high = ccm::helpers::double_to_uint64(1.0 + 0x1.6ab2p-5);
@@ -89,9 +88,10 @@ namespace ccm::internal
 					polynomialTerm = remSqr * (log2_poly1_values_dbl[0] + rem * log2_poly1_values_dbl[1]);
 					result		   = highPart + polynomialTerm;
 					lowPart += highPart - result + polynomialTerm;
-					lowPart +=
-						remQuad * (log2_poly1_values_dbl[2] + rem * log2_poly1_values_dbl[3] + remSqr * (log2_poly1_values_dbl[4] + rem * log2_poly1_values_dbl[5]) +
-								   remQuad * (log2_poly1_values_dbl[6] + rem * log2_poly1_values_dbl[7] + remSqr * (log2_poly1_values_dbl[8] + rem * log2_poly1_values_dbl[9])));
+					lowPart += remQuad * (log2_poly1_values_dbl[2] + rem * log2_poly1_values_dbl[3] +
+										  remSqr * (log2_poly1_values_dbl[4] + rem * log2_poly1_values_dbl[5]) +
+										  remQuad * (log2_poly1_values_dbl[6] + rem * log2_poly1_values_dbl[7] +
+													 remSqr * (log2_poly1_values_dbl[8] + rem * log2_poly1_values_dbl[9])));
 					result += lowPart;
 
 					return result;
@@ -113,7 +113,7 @@ namespace ccm::internal
 				i	 = (tmp >> (52 - ccm::internal::k_log2TableBitsDbl)) % k_log2TableN_dbl;
 				expo = static_cast<std::int64_t>(tmp) >> 52; // Arithmetic shift.
 				// NOLINTEND
-				intNorm	   = intX - (tmp & 0xfffULL << 52);
+				intNorm		   = intX - (tmp & 0xfffULL << 52);
 				inverseCoeff   = log2_tab_values_dbl[i].invc;
 				logarithmCoeff = log2_tab_values_dbl[i].logc;
 				normVal		   = ccm::helpers::uint64_to_double(intNorm);

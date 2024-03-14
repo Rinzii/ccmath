@@ -1,3 +1,7 @@
+##########################################
+# Internal headers
+##########################################
+
 set(ccmath_internal_helpers_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/bits.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/endian.hpp
@@ -39,7 +43,18 @@ set(ccmath_internal_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/version.hpp
 )
 
+
+##########################################
+# Detail headers
+##########################################
+
+set(ccmath_detail_basic_impl_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/basic/impl/remquo_float_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/basic/impl/remquo_double_impl.hpp
+)
+
 set(ccmath_detail_basic_headers
+        ${ccmath_detail_basic_impl_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/basic/abs.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/basic/fdim.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/basic/fma.hpp
@@ -65,17 +80,17 @@ set(ccmath_detail_compare_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/compare/signbit.hpp
 )
 
-set(ccmath_detail_exponential_details_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/details/log_float_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/details/log_double_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/details/log_data.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/details/log2_float_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/details/log2_double_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/details/log2_data.hpp
+set(ccmath_detail_exponential_impl_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/log_float_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/log_double_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/log_data.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/log2_float_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/log2_double_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/log2_data.hpp
 )
 
 set(ccmath_detail_exponential_headers
-        ${ccmath_detail_exponential_details_headers}
+        ${ccmath_detail_exponential_impl_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/exp.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/exp2.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/expm1.hpp
@@ -174,6 +189,11 @@ set(ccmath_detail_headers
         ${ccmath_detail_trig_headers}
         ${ccmath_detail_root_headers}
 )
+
+
+##########################################
+# Root headers
+##########################################
 
 set(ccmath_root_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/basic.hpp
