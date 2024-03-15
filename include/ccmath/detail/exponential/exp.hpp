@@ -27,7 +27,7 @@ namespace ccm
 	template <typename T>
 	inline constexpr T exp(T x)
 	{
-		return 0;
+		return x;
 	}
 
 } // namespace ccm
