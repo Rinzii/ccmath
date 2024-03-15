@@ -20,16 +20,16 @@ namespace ccm
         {
         }
 
-        std::string to_string() const
+        [[nodiscard]] std::string to_string() const
         {
             return std::to_string(m_major) + "." + std::to_string(m_minor) + "." + std::to_string(m_patch);
         }
 
-        constexpr int major() const { return m_major; }
-		constexpr int minor() const { return m_minor; }
-		constexpr int patch() const { return m_patch; }
-		constexpr int full() const { return m_major * 10000 + m_minor * 100 + m_patch; }
-		constexpr int get() const { return full(); }
+        [[nodiscard]] constexpr int major() const { return m_major; }
+		[[nodiscard]] constexpr int minor() const { return m_minor; }
+		[[nodiscard]] constexpr int patch() const { return m_patch; }
+		[[nodiscard]] constexpr int full() const { return m_major * 10000 + m_minor * 100 + m_patch; }
+		[[nodiscard]] constexpr int get() const { return full(); }
 
 		constexpr bool operator==(const Version& other) const
         {
