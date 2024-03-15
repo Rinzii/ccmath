@@ -11,10 +11,12 @@
 #include <cstdint>
 #include <limits>
 
-#include "ccmath/internal/helpers/bits.hpp"
-#include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/detail/basic/abs.hpp"
 #include "ccmath/detail/basic/fmod.hpp"
+#include "ccmath/internal/helpers/bits.hpp"
+#include "ccmath/internal/predef/unlikely.hpp"
+
+#include "ccmath/internal/predef/compiler_warnings_and_errors_def.hpp"
 
 namespace ccm::internal
 {
@@ -43,6 +45,13 @@ namespace ccm::internal
 
 				// If y is zero.
 				if (CCM_UNLIKELY(y_i64 == 0)) { return (x * y) / (x * y); }
+
+				// GCC and Clang do not like comparing signed and unsigned integers.
+				// The outcome of these comparisons is well-defined, so we can safely disable these warnings.
+				// clang-format off
+				CCM_DISABLE_GCC_WARNING(-Wsign-compare)
+				CCM_DISABLE_CLANG_WARNING(-Wsign-compare)
+				// clang-format on
 
 				// If x is not finite or y is NaN.
 				if (CCM_UNLIKELY(x_i64 >= 0x7ff0000000000000ULL || y_i64 > 0x7ff0000000000000ULL)) { return (x * y) / (x * y); }
@@ -105,6 +114,9 @@ namespace ccm::internal
 					}
 				}
 
+				CCM_RESTORE_GCC_WARNING()
+				CCM_RESTORE_CLANG_WARNING()
+
 				*quo = quotient_sign ? -computed_quotient : computed_quotient;
 
 				// Make sure that the correct sign of zero results in round down mode.
@@ -122,3 +134,5 @@ namespace ccm::internal
 		return static_cast<T>(impl::remquo_double_impl(x, y, quo));
 	}
 } // namespace ccm::internal
+
+#include "ccmath/internal/predef/compiler_warnings_and_errors_undef.hpp"

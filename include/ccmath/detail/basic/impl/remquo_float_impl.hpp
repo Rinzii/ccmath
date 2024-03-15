@@ -35,7 +35,7 @@ namespace ccm::internal
 
 				// Determine the signs of x and the quotient.
 				x_sign		  = static_cast<std::uint32_t>(x_i32) & 0x80000000;
-				quotient_sign = x_sign ^ (static_cast<std::uint32_t>(y_i32) & 0x80000000);
+				quotient_sign = static_cast<int>(x_sign ^ (static_cast<std::uint32_t>(y_i32) & 0x80000000));
 
 				// Clear the sign bits from the int32_t representations of x and y.
 				x_i32 &= 0x7fffffff;
@@ -87,7 +87,7 @@ namespace ccm::internal
 				}
 				else
 				{
-					float y_half = 0.5 * y;
+					float y_half = 0.5f * y;
 					if (x > y_half)
 					{
 						x -= y;
