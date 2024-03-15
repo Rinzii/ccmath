@@ -34,7 +34,7 @@ namespace ccm
      * @return false, as all integers are ordered.
      */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	inline constexpr bool isunordered(Integer x, Integer y) noexcept
+	inline constexpr bool isunordered(Integer /* x */, Integer /* y */) noexcept
 	{
 		return false; // All integers are ordered
 	}
