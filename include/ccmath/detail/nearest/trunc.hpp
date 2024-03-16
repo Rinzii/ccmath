@@ -28,7 +28,7 @@ namespace ccm
         if (ccm::isnan(x))
         {
             if (ccm::signbit<T>(x)) { return -std::numeric_limits<T>::quiet_NaN(); }
-            else { return std::numeric_limits<T>::quiet_NaN(); }
+            return std::numeric_limits<T>::quiet_NaN();
         }
 
         // If x == ±∞ then return x
@@ -46,7 +46,7 @@ namespace ccm
 	 * @param x The value to truncate.
 	 * @return Returns a truncated value.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, int> = 0>
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>
 	inline constexpr double trunc(Integer x) noexcept
 	{
 		return static_cast<double>(x);

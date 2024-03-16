@@ -43,10 +43,11 @@ namespace ccm
 		if (ccm::isnan(num))
 		{
 			if (ccm::signbit(num)) { return -std::numeric_limits<T>::quiet_NaN(); }
-			else { return std::numeric_limits<T>::quiet_NaN(); }
+			return std::numeric_limits<T>::quiet_NaN();
 		}
 
-		// We can not handle long double at this time due to problems with long double being platform dependent with its bit size.
+		// We cannot handle long double at this time due to problems
+		// with long double being platform-dependent with its bit size.
 		if constexpr (std::is_same_v<T, float>) { return ccm::internal::log2_float(num); }
 		else { return ccm::internal::log2_double(num); }
 	}

@@ -27,8 +27,8 @@ namespace ccm::internal
 		namespace impl
 		{
 			constexpr ccm::internal::log2_data<double> internalLog2DataDbl = ccm::internal::log2_data<double>();
-			constexpr auto log2_tab_values_dbl							   = internalLog2DataDbl.tab;
-			constexpr auto log2_tab2_values_dbl							   = internalLog2DataDbl.tab2;
+			constexpr auto log2_tab_values_dbl							   = ccm::internal::log2_data<double, 0>::tab;
+			constexpr auto log2_tab2_values_dbl							   = ccm::internal::log2_data<double, 0>::tab2;
 			constexpr auto log2_poly_values_dbl							   = internalLog2DataDbl.poly;
 			constexpr auto log2_poly1_values_dbl						   = internalLog2DataDbl.poly1;
 			constexpr auto log2_inverse_ln2_high_value_dbl				   = internalLog2DataDbl.invln2hi;
@@ -84,7 +84,7 @@ namespace ccm::internal
 					remSqr	= rem * rem; // rounding error: 0x1p-62.
 					remQuad = remSqr * remSqr;
 
-					// Worst-case error is less than 0.55 ULP
+					// The Worst-case error is less than 0.55 ULP
 					polynomialTerm = remSqr * (log2_poly1_values_dbl[0] + rem * log2_poly1_values_dbl[1]);
 					result		   = highPart + polynomialTerm;
 					lowPart += highPart - result + polynomialTerm;
@@ -114,8 +114,8 @@ namespace ccm::internal
 				expo = static_cast<std::int64_t>(tmp) >> 52; // Arithmetic shift.
 				// NOLINTEND
 				intNorm		   = intX - (tmp & 0xfffULL << 52);
-				inverseCoeff   = log2_tab_values_dbl[i].invc;
-				logarithmCoeff = log2_tab_values_dbl[i].logc;
+				inverseCoeff   = log2_tab_values_dbl.at(static_cast<unsigned long>(i)).invc;
+				logarithmCoeff = log2_tab_values_dbl.at(static_cast<unsigned long>(i)).logc;
 				normVal		   = ccm::helpers::uint64_to_double(intNorm);
 				expoDbl		   = static_cast<double_t>(expo);
 
@@ -123,7 +123,7 @@ namespace ccm::internal
 				ccm::double_t remLo{};
 
 				// rounding error: 0x1p-55/N + 0x1p-65.
-				rem			= (normVal - log2_tab2_values_dbl[i].chi - log2_tab2_values_dbl[i].clo) * inverseCoeff;
+				rem			= (normVal - log2_tab2_values_dbl.at(static_cast<unsigned long>(i)).chi - log2_tab2_values_dbl.at(static_cast<unsigned long>(i)).clo) * inverseCoeff;
 				remHi		= ccm::helpers::uint64_to_double(ccm::helpers::double_to_uint64(rem) & -1ULL << 32);
 				remLo		= rem - remHi;
 				remHighPart = remHi * log2_inverse_ln2_high_value_dbl;

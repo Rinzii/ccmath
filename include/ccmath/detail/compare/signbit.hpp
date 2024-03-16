@@ -64,7 +64,7 @@ namespace ccm
 	 * if your compiler is not supported a static assertion will be triggered. If this happens to you please report it to
 	 * the dev team and we will try to bring support to your compiler ASAP if we are able to!
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point<T>::value, int> = 0>
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 	[[nodiscard]] inline constexpr bool signbit(T x) noexcept
 	{
 #if defined(CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT)
@@ -107,7 +107,7 @@ namespace ccm
 	 *
 	 * @note This function is constexpr and will return the same values as std::signbit along with being static_assert-able.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value && std::is_signed<Integer>::value, int> = 0>
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer> && std::is_signed_v<Integer>, int> = 0>
 	[[nodiscard]] inline constexpr bool signbit(Integer x) noexcept
 	{
 		// There is no concept of -0 for integers. So we can just check if the number is less than 0.
@@ -122,10 +122,10 @@ namespace ccm
 	 *
 	 * @note This function is constexpr and will return the same values as std::signbit along with being static_assert-able.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value && !std::is_signed<Integer>::value, int> = 0>
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer> && !std::is_signed_v<Integer>, int> = 0>
 	[[nodiscard]] inline constexpr bool signbit(Integer /* unused */) noexcept
 	{
-		// If the number is unsigned then it can't be negative.
+		// If the number is unsigned, then it can't be negative.
 		return false;
 	}
 

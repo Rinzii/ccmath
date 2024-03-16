@@ -8,6 +8,8 @@ set(ccmath_internal_helpers_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/find_number.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/floating_point_type.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/fpclassify_helper.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/meta_compare.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/exp_helpers.hpp
 )
 
 set(ccmath_internal_predef_headers
@@ -83,6 +85,9 @@ set(ccmath_detail_compare_headers
 )
 
 set(ccmath_detail_exponential_impl_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/exp_float_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/exp_double_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/exp_data.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/log_float_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/log_double_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/log_data.hpp

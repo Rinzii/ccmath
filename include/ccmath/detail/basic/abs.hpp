@@ -43,7 +43,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_unsigned_v<T>, bool> = true>
 	constexpr T abs(T x) noexcept
 	{
-		// If abs is called with an argument of type X for which is_unsigned_v<X> is true and
+		// If abs is called with an argument of type X for which is_unsigned_v<X> is true, and
 		// if X cannot be converted to int by integral promotion, the program is ill-formed.
 		// See: http://eel.is/c++draft/c.math.abs#3
 		// See: ISO/IEC 9899:2018, 7.12.7.2, 7.22.6.1

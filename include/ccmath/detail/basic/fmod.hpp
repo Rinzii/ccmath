@@ -35,13 +35,13 @@ namespace ccm
 					{
 						// The standard specifies that plus or minus 0 is returned depending on the sign of x.
 						if (ccm::signbit(x)) { return -static_cast<T>(0.0); }
-						else { return static_cast<T>(0.0); }
+						return static_cast<T>(0.0);
 					}
 
 					// If x is ±∞ and y is not NaN OR if y is ±0 and x is not NaN, -NaN is returned
 					if ((ccm::isinf(x) && !ccm::isnan(y)) || (y == static_cast<T>(0.0) && !ccm::isnan(x)))
 					{
-						// For some reason all the major compilers return a negative NaN even though I can't find anywhere
+						// For some reason, all the major compilers return a negative NaN even though I can't find anywhere
 						// in the standard that specifies this. I'm going to follow suit and return a negative NaN for now.
 						// Overall, this has little effect on checking for NaN. We only really care for conformance with the standard.
 						return -std::numeric_limits<T>::quiet_NaN();

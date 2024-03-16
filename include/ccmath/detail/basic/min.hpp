@@ -27,7 +27,7 @@ namespace ccm
 		if constexpr (std::is_floating_point_v<T>)
 		{
 			if (ccm::isnan(x)) { return y; }
-			else if (ccm::isnan(y)) { return x; }
+			if (ccm::isnan(y)) { return x; }
 		}
 
 		return (x < y) ? x : y;

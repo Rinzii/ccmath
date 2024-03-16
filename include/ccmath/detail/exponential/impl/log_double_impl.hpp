@@ -27,8 +27,8 @@ namespace ccm::internal
 		namespace impl
 		{
 			constexpr ccm::internal::log_data<double> internalLogDataDbl = ccm::internal::log_data<double>();
-			constexpr auto log_tab_values_dbl							 = internalLogDataDbl.tab;
-			constexpr auto log_tab2_values_dbl							 = internalLogDataDbl.tab2;
+			constexpr auto log_tab_values_dbl							 = ccm::internal::log_data<double, 0>::tab;
+			constexpr auto log_tab2_values_dbl							 = ccm::internal::log_data<double, 0>::tab2;
 			constexpr auto log_poly_values_dbl							 = internalLogDataDbl.poly;
 			constexpr auto log_poly1_values_dbl							 = internalLogDataDbl.poly1;
 			constexpr auto log_ln2hi_value_dbl							 = internalLogDataDbl.ln2hi;
@@ -117,14 +117,14 @@ namespace ccm::internal
 				expo = static_cast<std::int64_t>(tmp) >> 52;
 				// NOLINTEND
 				intNorm		   = intX - (tmp & 0xfffULL << 52); // Arithmetic shift
-				inverseCoeff   = log_tab_values_dbl[i].invc;
-				logarithmCoeff = log_tab_values_dbl[i].logc;
+				inverseCoeff   = log_tab_values_dbl.at(static_cast<unsigned long>(i)).invc;
+				logarithmCoeff = log_tab_values_dbl.at(static_cast<unsigned long>(i)).logc;
 				normVal		   = ccm::helpers::uint64_to_double(intNorm);
 
 				// Calculate intermediate value for logarithm computation
 				// log(x) = log1p(normVal/c-1) + log(c) + expo*Ln2.
 				// r ~= z/c - 1, |r| < 1/(2*N)
-				rem			= (normVal - log_tab2_values_dbl[i].chi - log_tab2_values_dbl[i].clo) * inverseCoeff;
+				rem			= (normVal - log_tab2_values_dbl.at(static_cast<unsigned long>(i)).chi - log_tab2_values_dbl.at(static_cast<unsigned long>(i)).clo) * inverseCoeff;
 				scaleFactor = static_cast<ccm::double_t>(expo);
 
 				// Calculate high and low parts of logarithm

@@ -1,20 +1,23 @@
-# ccmath - A C++17 constexpr-Compatible CMath Library
+# CCMath - A C++17 constexpr-Compatible CMath Library
 
-ccmath is a C++17 library that provides a re-implementation of the standard `<cmath>` library with all features made `constexpr`. This enables compile-time evaluation of mathematical functions, improving performance and allowing for more efficient code in scenarios where constant expressions are required.
+CCMath is a C++17 library that provides a re-implementation of the standard `<cmath>` library with all features made `constexpr`.
+This enables compile-time evaluation of mathematical functions,
+improving performance and allows for more efficient code in scenarios where constant expressions are required.
 
 ## Features
 
-- **Full constexpr Compatibility**: All functions provided by ccmath are implemented as `constexpr` along with an active effort made to ensure all functions work within `static_assert`. The primary goal is to ensure every function can be evaluated at compile time.
+- **Full constexpr Compatibility**: All functions provided by CCMath are implemented as `constexpr` along with an active effort made to ensure all functions work within `static_assert`. The primary goal is to ensure every function can be evaluated at compile time.
 
-- **Drop In Replacement for Standard Math Library**: ccmath provides a comprehensive set of mathematical functions that are 1:1 compatible with the C++ standard library `<cmath>`. The goal of ccmath is to effectively be a drop in replacement for `<cmath>` with little to no discernable difference between the two. This includes trigonometric, exponential, logarithmic, and other common mathematical operations. If `<cmath>` has it then it is likely ccmath has implemented it.
+- **Drop-in Replacement for the Standard Math Library**: CCMath provides a comprehensive set of mathematical functions that are 1:1 compatible with the C++ standard library `<cmath>`. The goal of CCMath is to effectively be a drop-in replacement for `<cmath>` with little to no discernible difference between the two. This includes trigonometric, exponential, logarithmic, and other common mathematical operations. If `<cmath>` has it then it is likely CCMath has implemented it.
 
-- **Performance Optimization**: Besides all the functions being able to be evaluated at compile time, ccmath was also built with speed in mind. We strive to have speeds nearly as fast as the standard implementation.
+- **Performance Optimization**: Besides all the functions being able to be evaluated at compile time, CCMath was also built with speed in mind. We strive to have speeds nearly as fast as the standard implementation.
 
-- **No External Dependencies**: ccmath has no external dependencies and only requires a C++17-compliant compiler.
+- **No External Dependencies**: CCMath has no external dependencies and only requires a modern C++17-compliant compiler.
 
 ## Usage
 
-To use ccmath in your projects, simply include the ccmath.hpp header file and start using the provided functions. Here's a basic example:
+To use CCMath in your projects, include the `<ccmath/ccmath.hpp>` header file and start using the provided functions.
+Here's a basic example:
 
 ```cpp
 
@@ -28,9 +31,9 @@ int main() {
 }
 ```
 
-## Adding ccmath to your project
+## Adding CCMath to your project
 
-ccmath has a comprehensive cmake setup and can be easily included in your project using fetchcontent like so:
+CCMath has a comprehensive cmake setup and can be easily included in your project using fetchcontent like so:
 
 ```cmake
 cmake_minimum_required(VERSION 3.18)
@@ -168,4 +171,4 @@ CCmath is an open-source project, and it needs your help to go on growing and im
 
 ## License
 
-ccmath is distributed under the MIT License. See the LICENSE file for more information.
+CCMath is distributed under the MIT License. See the LICENSE file for more information.

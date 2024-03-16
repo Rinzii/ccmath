@@ -5,7 +5,8 @@ AccessModifierOffset: -4
 AlignConsecutiveAssignments: Consecutive
 AlignConsecutiveMacros: Consecutive
 AlignEscapedNewlines: Right
-AlignTrailingComments: Always
+AlignTrailingComments:
+    Kind: Always
 AllowShortEnumsOnASingleLine: true
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: InlineOnly
@@ -46,7 +47,7 @@ IncludeCategories:
     # Headers in <> with .hpp extension.
     - Regex: '<([A-Za-z0-9\/-_])+\.hpp>'
       Priority: 20
-    # Headers in <> without extension.
+    # Headers in <> without an extension.
     - Regex: '<([A-Za-z0-9\/-_])+>'
       Priority: 30
 NamespaceIndentation: All

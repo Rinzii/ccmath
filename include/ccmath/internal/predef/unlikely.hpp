@@ -12,8 +12,8 @@
 	#if defined(__cplusplus) && __cplusplus >= 202003L
 		#define CCM_UNLIKELY(x) [[unlikely]] (x)
 	#elif defined(__GNUC__) || defined(__clang__)
-		#define CCM_UNLIKELY(x) __builtin_expect((x), 0)
+		#define CCM_UNLIKELY(x) __builtin_expect(!!(x), 0)
 	#else
-		#define CCM_UNLIKELY(x) (x)
-	#endif
-#endif
+		#define CCM_UNLIKELY(x) (!!(x))
+	#endif // defined(__cplusplus) && __cplusplus >= 202003L
+#endif // CCM_UNLIKELY

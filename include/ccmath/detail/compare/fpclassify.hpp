@@ -26,12 +26,12 @@ namespace ccm
 	inline constexpr int fpclassify(T num)
 	{
 		if (ccm::isnan(num)) { return static_cast<int>(ccm::helpers::floating_point_defines::eFP_NAN); }
-		else if (ccm::isinf(num)) { return static_cast<int>(ccm::helpers::floating_point_defines::eFP_INFINITE); }
-		else if (num == static_cast<T>(0)) { return static_cast<int>(ccm::helpers::floating_point_defines::eFP_ZERO); }
-		else if (ccm::abs(num) < std::numeric_limits<T>::min() && ccm::abs(num) > 0)
+		if (ccm::isinf(num)) { return static_cast<int>(ccm::helpers::floating_point_defines::eFP_INFINITE); }
+		if (num == static_cast<T>(0)) { return static_cast<int>(ccm::helpers::floating_point_defines::eFP_ZERO); }
+		if (ccm::abs(num) < std::numeric_limits<T>::min() && ccm::abs(num) > 0)
 		{
 			return static_cast<int>(ccm::helpers::floating_point_defines::eFP_SUBNORMAL);
 		}
-		else { return static_cast<int>(ccm::helpers::floating_point_defines::eFP_NORMAL); }
+		return static_cast<int>(ccm::helpers::floating_point_defines::eFP_NORMAL);
 	}
 } // namespace ccm

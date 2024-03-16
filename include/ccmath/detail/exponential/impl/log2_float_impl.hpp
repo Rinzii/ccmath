@@ -28,7 +28,7 @@ namespace ccm::internal
 		namespace impl
 		{
 			constexpr ccm::internal::log2_data<float> internalLog2DataFlt = ccm::internal::log2_data<float>();
-			constexpr auto log2_tab_values_flt							  = internalLog2DataFlt.tab;
+			constexpr auto log2_tab_values_flt							  = ccm::internal::log2_data<float, 0>::tab;
 			constexpr auto log2_poly_values_flt							  = internalLog2DataFlt.poly;
 			constexpr auto k_log2TableN_flt								  = (1 << ccm::internal::k_log2TableBitsFlt);
 			constexpr auto k_log2TableOff_flt							  = 0x3f330000;
@@ -62,14 +62,14 @@ namespace ccm::internal
 					// TODO: Maybe handle division by zero here?
 
 					// If x is NaN, return NaN
-					if (intX & 0x80000000 || intX * 2 >= 0xff000000)
+					if (((intX & 0x80000000) != 0U) || intX * 2 >= 0xff000000)
 					{
 						float invalidResult = (x - x) / (x - x);
 						return invalidResult;
 					}
 
 					// If x is subnormal, normalize it
-					intX = ccm::helpers::float_to_uint32(x * 0x1p23f);
+					intX = ccm::helpers::float_to_uint32(x * 0x1p23F);
 					intX -= 23 << 23;
 				}
 
@@ -82,8 +82,8 @@ namespace ccm::internal
 				intNorm = intX - top;
 				// NOLINTNEXTLINE
 				expo		   = static_cast<std::uint32_t>(tmp) >> 23; // Arithmetic shift.
-				inverseCoeff   = log2_tab_values_flt[i].invc;
-				logarithmCoeff = log2_tab_values_flt[i].logc;
+				inverseCoeff   = log2_tab_values_flt.at(static_cast<unsigned long>(i)).invc;
+				logarithmCoeff = log2_tab_values_flt.at(static_cast<unsigned long>(i)).logc;
 				normVal		   = static_cast<ccm::double_t>(ccm::helpers::uint32_to_float(intNorm));
 
 				// log2(x) = log1p(normVal/c-1)/ln2 + log2(c) + expo

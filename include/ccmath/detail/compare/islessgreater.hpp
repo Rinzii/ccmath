@@ -22,7 +22,7 @@ namespace ccm
 	template <typename T>
 	inline constexpr bool islessgreater(T x, T y) noexcept
     {
-		        return x < y || x > y;
+		return x < y || x > y;
 	}
 
 	/**

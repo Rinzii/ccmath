@@ -27,7 +27,7 @@ namespace ccm
 		if (ccm::isnan(mag) || ccm::isnan(sgn))
 		{
 			if (ccm::signbit(sgn)) { return -std::numeric_limits<T>::quiet_NaN(); }
-			else { return std::numeric_limits<T>::quiet_NaN(); }
+			return std::numeric_limits<T>::quiet_NaN();
 		}
 
 		T sign_bit = ccm::signbit(sgn) ? -1 : 1;

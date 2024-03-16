@@ -25,7 +25,7 @@ namespace ccm
 	template <typename T>
 	inline constexpr T max(T x, T y) noexcept
 	{
-		if constexpr (std::is_floating_point<T>::value)
+		if constexpr (std::is_floating_point_v<T>)
 		{
 			if (ccm::isnan(x) && ccm::isnan(y)) { return std::numeric_limits<T>::quiet_NaN(); }
 
@@ -92,7 +92,7 @@ namespace ccm
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, int> = 0>
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>
 	inline constexpr double fmax(Integer x, Integer y) noexcept
 	{
 		return max<double>(static_cast<double>(x), static_cast<double>(y));

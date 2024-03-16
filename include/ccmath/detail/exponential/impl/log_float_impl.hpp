@@ -26,7 +26,7 @@ namespace ccm::internal
 		namespace impl
 		{
 			constexpr ccm::internal::log_data<float> internalLogDataFlt = ccm::internal::log_data<float>();
-			constexpr auto log_tab_values_flt							= internalLogDataFlt.tab;
+			constexpr auto log_tab_values_flt							= ccm::internal::log_data<float, 0>::tab;
 			constexpr auto log_poly_values_flt							= internalLogDataFlt.poly;
 			constexpr auto log_ln2_value_flt							= internalLogDataFlt.ln2;
 			constexpr auto k_logTableN_flt								= (1 << ccm::internal::k_logTableBitsFlt);
@@ -60,7 +60,7 @@ namespace ccm::internal
 				if (CCM_UNLIKELY(intX - 0x00800000 >= 0x7f800000 - 0x00800000))
 				{
 					// If x is subnormal, normalize it.
-					intX = ccm::helpers::float_to_uint32(x * 0x1p23f);
+					intX = ccm::helpers::float_to_uint32(x * 0x1p23F);
 					intX -= 23 << 23;
 				}
 
@@ -69,8 +69,8 @@ namespace ccm::internal
 				i			   = (tmp >> (23 - ccm::internal::k_logTableBitsFlt)) % k_logTableN_flt; // NOLINT
 				expo		   = static_cast<std::int32_t>(tmp) >> 23;
 				intNorm		   = intX - (tmp & static_cast<std::uint32_t>(0x1ff << 23));
-				inverseCoeff   = log_tab_values_flt[i].invc;
-				logarithmCoeff = log_tab_values_flt[i].logc;
+				inverseCoeff   = log_tab_values_flt.at(static_cast<unsigned long>(i)).invc;
+				logarithmCoeff = log_tab_values_flt.at(static_cast<unsigned long>(i)).logc;
 				normVal		   = static_cast<ccm::double_t>(ccm::helpers::uint32_to_float(intNorm));
 
 				// log(x) = log1p(normVal / inverseCoeff - 1) + log(inverseCoeff) + expo * Ln2
