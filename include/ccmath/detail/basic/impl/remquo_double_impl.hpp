@@ -24,6 +24,7 @@ namespace ccm::internal
 	{
 		namespace impl
 		{
+			// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 			inline constexpr double remquo_double_impl(double x, double y, int * quo) noexcept
 			{
 				std::int64_t x_i64{};
@@ -54,7 +55,7 @@ namespace ccm::internal
 				// clang-format on
 
 				// If x is not finite or y is NaN.
-				if (CCM_UNLIKELY(x_i64 >= 0x7ff0000000000000ULL || y_i64 > 0x7ff0000000000000ULL)) { return (x * y) / (x * y); }
+				if (CCM_UNLIKELY(x_i64 >= 0x7ff0000000000000ULL || y_i64 > 0x7ff0000000000000ULL)) { return (x * y) / (x * y); } // NOLINT(readability-simplify-boolean-expr)
 
 				// b (or bit 54) represents the highest bit we can compare against for both signed and unsigned integers without causing an overflow.
 				// Here we are checking that if y_i64 is within the range of signed 64-bit integers that can be represented without setting the MSB (i.e.,
@@ -66,7 +67,7 @@ namespace ccm::internal
 
 				if (CCM_UNLIKELY(x_i64 == y_i64))
 				{
-					*quo = quotient_sign ? -1 : 1;
+					*quo = quotient_sign != 0U ? -1 : 1;
 					return 0.0 * x;
 				}
 
@@ -117,11 +118,11 @@ namespace ccm::internal
 				CCM_RESTORE_GCC_WARNING()
 				CCM_RESTORE_CLANG_WARNING()
 
-				*quo = quotient_sign ? -computed_quotient : computed_quotient;
+				*quo = quotient_sign != 0U ? -computed_quotient : computed_quotient;
 
 				// Make sure that the correct sign of zero results in round down mode.
 				if (x == 0.0) { x = 0.0; }
-				if (x_sign) { x = -x; }
+				if (x_sign != 0U) { x = -x; }
 
 				return x;
 			}

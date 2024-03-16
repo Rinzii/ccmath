@@ -22,6 +22,7 @@ namespace ccm::internal
 	{
 		namespace impl
 		{
+			// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 			inline constexpr float remquo_float_impl(float x, float y, int * quo) noexcept
 			{
 				std::int32_t x_i32{};
@@ -45,7 +46,7 @@ namespace ccm::internal
 				if (CCM_UNLIKELY(y_i32 == 0)) { return (x * y) / (x * y); }
 
 				// If x is not finite or y is NaN.
-				if (CCM_UNLIKELY(x_i32 >= 0x7f800000 || y_i32 > 0x7f800000)) { return (x * y) / (x * y); }
+				if (CCM_UNLIKELY(x_i32 >= 0x7f800000 || y_i32 > 0x7f800000)) { return (x * y) / (x * y); } // NOLINT(readability-simplify-boolean-expr)
 
 				if (y_i32 <= 0x7dffffff)
 				{
@@ -54,8 +55,8 @@ namespace ccm::internal
 
 				if ((x_i32 - y_i32) == 0)
 				{
-					*quo = quotient_sign ? -1 : 1;
-					return 0.0f * x;
+					*quo = quotient_sign != 0 ? -1 : 1;
+					return 0.0F * x;
 				}
 
 				x				  = ccm::fabsf(x);
@@ -87,7 +88,7 @@ namespace ccm::internal
 				}
 				else
 				{
-					float y_half = 0.5f * y;
+					float y_half = 0.5F * y;
 					if (x > y_half)
 					{
 						x -= y;
@@ -99,11 +100,11 @@ namespace ccm::internal
 						}
 					}
 				}
-				*quo = quotient_sign ? -computed_quotient : computed_quotient;
+				*quo = quotient_sign != 0 ? -computed_quotient : computed_quotient;
 
 				// Make sure that the correct sign of zero results in round down mode.
-				if (x == 0.0f) { x = 0.0f; }
-				if (x_sign) { x = -x; }
+				if (x == 0.0F) { x = 0.0F; }
+				if (x_sign != 0U) { x = -x; }
 
 				return x;
 			}

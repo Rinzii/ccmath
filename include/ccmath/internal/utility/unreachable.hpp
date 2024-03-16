@@ -16,7 +16,7 @@ namespace ccm
 {
 	[[noreturn]] inline void unreachable()
 	{
-		// If we can't use the standard library's unreachable function
+		// If we can't use the standard library's unreachable function,
 		// Then we'll use the compiler specific extensions if possible.
 #if defined(__cpp_lib_unreachable) && __cpp_lib_unreachable >= 202202L
 		std::unreachable();

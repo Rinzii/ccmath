@@ -13,9 +13,14 @@ set(ccmath_internal_helpers_headers
 )
 
 set(ccmath_internal_predef_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/assume.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_warnings_and_errors_def.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_warnings_and_errors_undef.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/has_attribute.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/likely.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/unlikely.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/no_debug.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/suppress.hpp
 )
 
 set(ccmath_internal_setup_headers

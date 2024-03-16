@@ -1,6 +1,7 @@
 ---
 Checks: '-*,
 bugprone-*,
+-bugprone-easily-swappable-parameters,
 modernize-*,
 -modernize-use-trailing-return-type,
 performance-*,

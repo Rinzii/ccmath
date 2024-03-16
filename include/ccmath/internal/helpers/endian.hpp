@@ -8,9 +8,11 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace ccm::helpers
 {
-	enum class endian
+	enum class endian : std::uint16_t
 	{
 		// TODO: Add support for other compilers besides just MSVC, GCC, and Clang.
 

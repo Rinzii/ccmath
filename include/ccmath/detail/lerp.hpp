@@ -32,10 +32,9 @@ namespace ccm
 				{
     				return b < x ? x : b;
 				}
-  				else
-				{
-    				return x < b ? x : b;
-				}
+
+				return x < b ? x : b;
+
 			}
 		}
 	}

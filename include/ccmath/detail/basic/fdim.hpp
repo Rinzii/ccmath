@@ -39,7 +39,7 @@ namespace ccm
 	 * @param y A floating-point value.
 	 * @return If successful, returns the positive difference between x and y.
 	 */
-	template <typename T, typename U, std::enable_if_t<std::is_floating_point_v<T> && std::is_floating_point<U>::value, int> = 0>
+	template <typename T, typename U, std::enable_if_t<std::is_floating_point_v<T> && std::is_floating_point_v<U>, int> = 0>
 	inline constexpr auto fdim(T x, U y)
 	{
 		// Find the common type of the two arguments

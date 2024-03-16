@@ -34,21 +34,17 @@
 	#  define CCMATH_HAS_BUILTIN_IS_CONSTANT_EVALUATED
 #endif
 
-namespace ccm::type_traits
+namespace ccm::traits
 {
-	template <typename T>
-	inline constexpr bool is_constant_evaluated(T x) noexcept
+	inline constexpr bool is_constant_evaluated() noexcept
 	{
 #if defined(CCMATH_HAS_IS_CONSTANT_EVALUATED)
 		return std::is_constant_evaluated();
 #elif defined(CCMATH_HAS_BUILTIN_IS_CONSTANT_EVALUATED)
         return __builtin_is_constant_evaluated();
-#elif defined(__GNUC__) && (__GNUC__ >= 6)
-        return __builtin_constant_p(x);
 #else
         return false;
 #endif
-
 	}
 } // namespace ccm::type_traits
 

@@ -41,7 +41,7 @@
 
 // GCC (a.k.a. GNUC)
 #elif defined(__GNUC__)
-	#define CCM_COMPILER_GCC	 1
+	#define CCM_COMPILER_GCC	 1 // NOLINT
 	#define CCM_COMPILER_VERSION (__GNUC__ * 100 + __GNUC_MINOR__ * 10 + __GNUC_PATCHLEVEL__)
 
 #elif defined(_MSC_VER)
