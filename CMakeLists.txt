@@ -65,7 +65,7 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
 configure_file(cmake/version.hpp.in "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp" @ONLY)
 
 if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TEST)
-  add_subdirectory(ext)
+  add_subdirectory(thirdparty)
 endif()
 
 if (CCMATH_BUILD_EXAMPLES)

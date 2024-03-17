@@ -7,11 +7,13 @@
  */
 
 #include <benchmark/benchmark.h>
-#include <vector>
 #include <random>
+#include <vector>
 
-#include <cmath>
 #include "ccmath/ccmath.hpp"
+#include <cmath>
+
+// NOLINTBEGIN
 
 namespace bm = benchmark;
 
@@ -40,13 +42,8 @@ std::vector<double> generateRandomDoubles(size_t count, unsigned int seed) {
 	return randomDouble;
 }
 
-
-
-
-
-
 static void BM_std_fma(bm::State& state) {
-    for (auto _ : state) {
+    for ([[maybe_unused]] auto _ : state) {
         bm::DoNotOptimize(std::fma(state.range(0), state.range(1), state.range(2)));
     }
     state.SetComplexityN(state.range(0));
@@ -54,7 +51,7 @@ static void BM_std_fma(bm::State& state) {
 BENCHMARK(BM_std_fma)->Args({16, 16, 16})->Args({256, 256, 256})->Args({4096, 4096, 4096})->Args({65536, 65536, 65536})->Complexity();
 
 static void BM_ccm_fma(bm::State& state) {
-    for (auto _ : state) {
+    for ([[maybe_unused]] auto _ : state) {
         bm::DoNotOptimize(ccm::fma(state.range(0), state.range(1), state.range(2)));
     }
     state.SetComplexityN(state.range(0));
@@ -204,4 +201,34 @@ static void BM_std_log2(bm::State& state) {
 }
 BENCHMARK(BM_std_log2)->Arg(16)->Arg(256)->Arg(4096)->Arg(65536)->Complexity();
 
+static void BM_ccm_lerp(bm::State& state) {
+    for (auto _ : state) {
+        bm::DoNotOptimize(ccm::lerp(state.range(0), state.range(1), state.range(2)));
+    }
+    state.SetComplexityN(state.range(0));
+}
+BENCHMARK(BM_ccm_lerp)->Args({16, 16, 16})->Args({256, 256, 256})->Args({4096, 4096, 4096})->Args({65536, 65536, 65536})->Complexity();
+
+static void BM_ccm_lerp2(bm::State& state) {
+	for (auto _ : state) {
+		bm::DoNotOptimize(ccm::lerp2(state.range(0), state.range(1), state.range(2)));
+	}
+	state.SetComplexityN(state.range(0));
+}
+BENCHMARK(BM_ccm_lerp2)->Args({16, 16, 16})->Args({256, 256, 256})->Args({4096, 4096, 4096})->Args({65536, 65536, 65536})->Complexity();
+
+
+static void BM_std_lerp(bm::State& state) {
+    for (auto _ : state) {
+        bm::DoNotOptimize(ccm::lerp(state.range(0), state.range(1), state.range(2)));
+    }
+    state.SetComplexityN(state.range(0));
+}
+BENCHMARK(BM_std_lerp)->Args({16, 16, 16})->Args({256, 256, 256})->Args({4096, 4096, 4096})->Args({65536, 65536, 65536})->Complexity();
+
+
+
 BENCHMARK_MAIN();
+
+
+// NOLINTEND

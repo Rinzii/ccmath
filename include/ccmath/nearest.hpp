@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "ccmath/detail/nearest/ceil.hpp"
-#include "ccmath/detail/nearest/floor.hpp"
-#include "ccmath/detail/nearest/nearbyint.hpp"
-#include "ccmath/detail/nearest/rint.hpp"
-#include "ccmath/detail/nearest/round.hpp"
-#include "ccmath/detail/nearest/trunc.hpp"
+#include "ccmath/math/nearest/ceil.hpp"
+#include "ccmath/math/nearest/floor.hpp"
+#include "ccmath/math/nearest/nearbyint.hpp"
+#include "ccmath/math/nearest/rint.hpp"
+#include "ccmath/math/nearest/round.hpp"
+#include "ccmath/math/nearest/trunc.hpp"

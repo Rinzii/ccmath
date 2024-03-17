@@ -58,136 +58,136 @@ set(ccmath_internal_headers
 ##########################################
 
 set(ccmath_detail_basic_impl_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/basic/impl/remquo_float_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/basic/impl/remquo_double_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/remquo_float_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/remquo_double_impl.hpp
 )
 
 set(ccmath_detail_basic_headers
         ${ccmath_detail_basic_impl_headers}
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/basic/abs.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/basic/fdim.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/basic/fma.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/basic/fmod.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/basic/max.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/basic/min.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/basic/remainder.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/basic/remquo.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/abs.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/fdim.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/fma.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/fmod.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/max.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/min.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/remainder.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/remquo.hpp
 )
 
 set(ccmath_detail_compare_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/compare/fpclassify.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/compare/isfinite.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/compare/isgreater.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/compare/isgreaterequal.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/compare/isinf.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/compare/isless.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/compare/islessequal.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/compare/islessgreater.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/compare/isnan.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/compare/isnormal.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/compare/isunordered.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/compare/signbit.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/fpclassify.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/isfinite.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/isgreater.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/isgreaterequal.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/isinf.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/isless.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/islessequal.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/islessgreater.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/isnan.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/isnormal.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/isunordered.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/signbit.hpp
 )
 
 set(ccmath_detail_exponential_impl_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/exp_float_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/exp_double_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/exp_data.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/log_float_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/log_double_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/log_data.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/log2_float_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/log2_double_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/impl/log2_data.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/exp_float_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/exp_double_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/exp_data.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/log_float_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/log_double_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/log_data.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/log2_float_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/log2_double_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/log2_data.hpp
 )
 
 set(ccmath_detail_exponential_headers
         ${ccmath_detail_exponential_impl_headers}
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/exp.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/exp2.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/expm1.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/log.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/log1p.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/log2.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/exponential/log10.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/exp.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/exp2.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/expm1.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/log.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/log1p.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/log2.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/log10.hpp
 )
 
 set(ccmath_detail_fmanip_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/fmanip/copysign.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/fmanip/frexp.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/fmanip/ilogb.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/fmanip/ldexp.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/fmanip/logb.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/fmanip/modf.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/fmanip/nextafter.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/fmanip/scalbn.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/copysign.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/frexp.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/ilogb.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/ldexp.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/logb.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/modf.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/nextafter.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/scalbn.hpp
 )
 
 set(ccmath_detail_hyperbolic_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/hyperbolic/acosh.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/hyperbolic/asinh.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/hyperbolic/atanh.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/hyperbolic/cosh.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/hyperbolic/sinh.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/hyperbolic/tanh.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/hyperbolic/acosh.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/hyperbolic/asinh.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/hyperbolic/atanh.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/hyperbolic/cosh.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/hyperbolic/sinh.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/hyperbolic/tanh.hpp
 )
 
 set(ccmath_detail_nearest_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/nearest/ceil.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/nearest/floor.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/nearest/nearbyint.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/nearest/rint.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/nearest/round.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/nearest/trunc.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/nearest/ceil.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/nearest/floor.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/nearest/nearbyint.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/nearest/rint.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/nearest/round.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/nearest/trunc.hpp
 )
 
 set(ccmath_detail_power_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/power/cbrt.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/power/hypot.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/power/pow.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/power/sqrt.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/power/cbrt.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/power/hypot.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/power/pow.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/power/sqrt.hpp
 )
 
 set(ccmath_detail_special_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/assoc_laguerre.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/assoc_legendre.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/beta.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/comp_ellint_1.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/comp_ellint_2.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/comp_ellint_3.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/cyl_bessel_i.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/cyl_bessel_j.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/cyl_bessel_k.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/cyl_neumann.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/ellint_1.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/ellint_2.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/ellint_3.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/expint.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/hermite.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/laguerre.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/legendre.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/riemann_zeta.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/sph_bessel.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/sph_legendre.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/special/sph_neumann.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/assoc_laguerre.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/assoc_legendre.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/beta.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/comp_ellint_1.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/comp_ellint_2.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/comp_ellint_3.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/cyl_bessel_i.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/cyl_bessel_j.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/cyl_bessel_k.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/cyl_neumann.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/ellint_1.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/ellint_2.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/ellint_3.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/expint.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/hermite.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/laguerre.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/legendre.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/riemann_zeta.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/sph_bessel.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/sph_legendre.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/sph_neumann.hpp
 )
 
 set(ccmath_detail_trig_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/trig/acos.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/trig/asin.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/trig/atan.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/trig/atan2.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/trig/cos.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/trig/sin.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/trig/tan.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/trig/acos.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/trig/asin.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/trig/atan.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/trig/atan2.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/trig/cos.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/trig/sin.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/trig/tan.hpp
 )
 
 
 set(ccmath_detail_root_headers
         # Functions without a specified category
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/gamma.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/lerp.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/detail/lgamma.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/gamma.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/lerp.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/lgamma.hpp
 )
 
 set(ccmath_detail_headers

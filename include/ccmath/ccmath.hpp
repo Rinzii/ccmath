@@ -50,6 +50,6 @@ CCMATH REQUIREMENTS:
 #include "ccmath/trig.hpp"
 
 /// Uncategorized functions
-#include "ccmath/detail/gamma.hpp"
-#include "ccmath/detail/lerp.hpp"
-#include "ccmath/detail/lgamma.hpp"
+#include "ccmath/math/gamma.hpp"
+#include "ccmath/math/lerp.hpp"
+#include "ccmath/math/lgamma.hpp"
