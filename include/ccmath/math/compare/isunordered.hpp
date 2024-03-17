@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <type_traits>
 #include "ccmath/math/compare/isnan.hpp"
+#include <type_traits>
 
 namespace ccm
 {

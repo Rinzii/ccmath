@@ -10,9 +10,8 @@
 
 #include <cstdint>
 #include <type_traits>
-#include "ccmath/internal/helpers/floating_point_type.hpp"
 #include "ccmath/internal/helpers/exp_helpers.hpp"
-
+#include "ccmath/internal/type/fp_types.hpp"
 
 namespace ccm::internal
 {

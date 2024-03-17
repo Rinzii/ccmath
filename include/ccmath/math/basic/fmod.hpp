@@ -10,6 +10,7 @@
 
 #include <limits>
 
+#include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/math/compare/isfinite.hpp"
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
@@ -23,7 +24,6 @@ namespace ccm
 	{
 		namespace impl
 		{
-			// NOTE: We do not raise FE_INVALID even is situations where the standard demands it.
 			template <typename T>
 			inline constexpr T fmod_impl_check(T x, T y) noexcept
 			{
@@ -39,7 +39,7 @@ namespace ccm
 					}
 
 					// If x is ±∞ and y is not NaN OR if y is ±0 and x is not NaN, -NaN is returned
-					if ((ccm::isinf(x) && !ccm::isnan(y)) || (y == static_cast<T>(0.0) && !ccm::isnan(x)))
+					if (CCM_UNLIKELY(((ccm::isinf(x) && !ccm::isnan(y)) || (y == static_cast<T>(0.0) && !ccm::isnan(x)))))
 					{
 						// For some reason, all the major compilers return a negative NaN even though I can't find anywhere
 						// in the standard that specifies this. I'm going to follow suit and return a negative NaN for now.
@@ -48,12 +48,12 @@ namespace ccm
 					}
 
 					// If y is ±∞ and x is finite, x is returned.
-					if (ccm::isinf(y) && ccm::isfinite(x)) { return x; }
+					if (CCM_UNLIKELY(ccm::isinf(y) && ccm::isfinite(x))) { return x; }
 
 					// If either argument is NaN, NaN is returned.
-					if (ccm::isnan(x) || ccm::isnan(y))
+					if (CCM_UNLIKELY(ccm::isnan(x) || ccm::isnan(y)))
 					{
-						// Same problem as before but this time all major compilers return a positive NaN.
+						// Same problem as before, but this time all major compilers return a positive NaN.
 						return std::numeric_limits<T>::quiet_NaN();
 					}
 				}

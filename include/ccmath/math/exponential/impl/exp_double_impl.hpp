@@ -8,11 +8,10 @@
 
 #pragma once
 
-#include "ccmath/internal/helpers/floating_point_type.hpp"
+#include <cstdint>
 #include "ccmath/internal/helpers/exp_helpers.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
-#include <cstdint>
-
+#include "ccmath/internal/type/fp_types.hpp"
 
 namespace ccm::internal
 {

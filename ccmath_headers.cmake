@@ -2,18 +2,19 @@
 # Internal headers
 ##########################################
 
+set(ccmath_internal_config_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/compiler_def.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/compiler_undef.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/builtin_support_def.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/builtin_support_undef.hpp
+)
+
 set(ccmath_internal_helpers_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/bits.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/endian.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/find_number.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/floating_point_type.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/fpclassify_helper.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/meta_compare.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/exp_helpers.hpp
 )
 
 set(ccmath_internal_predef_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/assume.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_warnings_and_errors_def.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_warnings_and_errors_undef.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/has_attribute.hpp
@@ -23,30 +24,27 @@ set(ccmath_internal_predef_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/suppress.hpp
 )
 
-set(ccmath_internal_setup_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/setup/compiler_def.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/setup/compiler_undef.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/setup/builtin_support_def.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/setup/builtin_support_undef.hpp
-
+set(ccmath_internal_support_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/bits.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/endian.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/floating_point_traits.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/is_constant_evaluated.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/meta_compare.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/unreachable.hpp
 )
 
-set(ccmath_internal_typetraits_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/type_traits/is_constant_evaluated.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/type_traits/floating_point_traits.hpp
-)
-
-set(ccmath_internal_utility_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/utility/unreachable.hpp
+set(ccmath_internal_types_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/fp_types.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/int128.hpp
 )
 
 
 set(ccmath_internal_headers
         ${ccmath_internal_helpers_headers}
         ${ccmath_internal_predef_headers}
-        ${ccmath_internal_setup_headers}
-        ${ccmath_internal_typetraits_headers}
-        ${ccmath_internal_utility_headers}
+        ${ccmath_internal_config_headers}
+        ${ccmath_internal_support_headers}
+        ${ccmath_internal_types_headers}
 
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/setup.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/version.hpp

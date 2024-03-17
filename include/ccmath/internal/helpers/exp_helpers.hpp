@@ -8,10 +8,10 @@
 
 #pragma once
 
+#include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/support/meta_compare.hpp"
 #include <cfloat>
 #include <type_traits>
-#include "ccmath/internal/helpers/bits.hpp"
-#include "ccmath/internal/helpers/meta_compare.hpp"
 
 namespace ccm::helpers
 {

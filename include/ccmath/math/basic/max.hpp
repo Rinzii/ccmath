@@ -8,10 +8,11 @@
 
 #pragma once
 
+#include "ccmath/math/compare/isnan.hpp"
+#include "ccmath/internal/predef/unlikely.hpp"
+
 #include <limits>
 #include <type_traits>
-
-#include "ccmath/math/compare/isnan.hpp"
 
 namespace ccm
 {
@@ -27,11 +28,11 @@ namespace ccm
 	{
 		if constexpr (std::is_floating_point_v<T>)
 		{
-			if (ccm::isnan(x) && ccm::isnan(y)) { return std::numeric_limits<T>::quiet_NaN(); }
+			if (CCM_UNLIKELY(ccm::isnan(x) && ccm::isnan(y))) { return std::numeric_limits<T>::quiet_NaN(); }
 
-			if (ccm::isnan(x)) { return y; }
+			if (CCM_UNLIKELY(ccm::isnan(x))) { return y; }
 
-			if (ccm::isnan(y)) { return x; }
+			if (CCM_UNLIKELY(ccm::isnan(y))) { return x; }
 		}
 
 		return (x > y) ? x : y;

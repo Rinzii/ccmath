@@ -20,7 +20,7 @@ CCMATH REQUIREMENTS:
  */
 
 // Includes ccm::float_t and ccm::double_t
-#include "ccmath/internal/helpers/floating_point_type.hpp"
+#include "ccmath/internal/types/fp_types.hpp"
 
 /// Basic math functions
 #include "ccmath/basic.hpp"

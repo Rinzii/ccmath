@@ -11,8 +11,8 @@
 #include <cstdint>
 #include <limits>
 
-#include "ccmath/internal/helpers/bits.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/support/bits.hpp"
 #include "ccmath/math/basic/abs.hpp"
 #include "ccmath/math/basic/fmod.hpp"
 

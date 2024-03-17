@@ -11,6 +11,7 @@
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/nearest/trunc.hpp"
+#include "ccmath/internal/predef/unlikely.hpp"
 
 namespace ccm
 {
@@ -24,17 +25,14 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, int> = 0>
 	inline constexpr T remainder(T x, T y)
 	{
-		if constexpr (std::is_floating_point_v<T>)
-		{
-			// If x is ±∞ and y is not NaN, NaN is returned.
-			// If y is ±0 and x is not NaN, NaN is returned.
-			// If either argument is NaN, NaN is returned.
-			if ((ccm::isinf(x) && !ccm::isnan(y)) || (y == 0 && !ccm::isnan(x)) || (ccm::isnan(x) || ccm::isnan(y)))
-			{
-				// All major compilers return -NaN.
-				return -std::numeric_limits<T>::quiet_NaN();
-			}
-		}
+        // If x is ±∞ and y is not NaN, NaN is returned.
+        // If y is ±0 and x is not NaN, NaN is returned.
+        // If either argument is NaN, NaN is returned.
+        if (CCM_UNLIKELY((ccm::isinf(x) && !ccm::isnan(y)) || (y == 0 && !ccm::isnan(x)) || (ccm::isnan(x) || ccm::isnan(y))))
+        {
+            // All major compilers return -NaN.
+            return -std::numeric_limits<T>::quiet_NaN();
+        }
 
 		return static_cast<T>(x - (ccm::trunc<T>(x / y) * y));
 	}

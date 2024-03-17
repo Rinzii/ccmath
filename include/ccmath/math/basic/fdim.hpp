@@ -8,9 +8,10 @@
 
 #pragma once
 
+#include "ccmath/math/compare/isnan.hpp"
+#include "ccmath/internal/predef/unlikely.hpp"
 #include <limits>
 #include <type_traits>
-#include "ccmath/math/compare/isnan.hpp"
 
 namespace ccm
 {
@@ -24,10 +25,10 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 	inline constexpr T fdim(T x, T y)
 	{
-        if (ccm::isnan(x)) { return x; }
-        if (ccm::isnan(y)) { return y; }
-		if (x <= y) { return T(+0.0); }
-		if ((y < T(0.0)) && (x > (std::numeric_limits<T>::max() + y))) { return std::numeric_limits<T>::infinity(); }
+        if (CCM_UNLIKELY(ccm::isnan(x))) { return x; }
+        if (CCM_UNLIKELY(ccm::isnan(y))) { return y; }
+		if (x <= y) { return static_cast<T>(+0.0); }
+		if ((y < static_cast<T>(0.0)) && (x > (std::numeric_limits<T>::max() + y))) { return std::numeric_limits<T>::infinity(); }
 		return x - y;
 	}
 

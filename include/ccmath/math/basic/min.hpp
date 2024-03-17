@@ -8,8 +8,9 @@
 
 #pragma once
 
-#include <type_traits>
 #include "ccmath/math/compare/isnan.hpp"
+#include "ccmath/internal/predef/unlikely.hpp"
+#include <type_traits>
 
 namespace ccm
 {
@@ -26,8 +27,8 @@ namespace ccm
 		// If we are comparing floating point numbers, we need to check for NaN
 		if constexpr (std::is_floating_point_v<T>)
 		{
-			if (ccm::isnan(x)) { return y; }
-			if (ccm::isnan(y)) { return x; }
+			if (CCM_UNLIKELY(ccm::isnan(x))) { return y; }
+			if (CCM_UNLIKELY(ccm::isnan(y))) { return x; }
 		}
 
 		return (x < y) ? x : y;

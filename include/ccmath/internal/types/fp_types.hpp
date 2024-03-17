@@ -36,6 +36,6 @@ namespace ccm
 	typedef long double float_t;
 	typedef long double double_t;
 # else
-	#  error "Unknown __GLIBC_FLT_EVAL_METHOD"
+	#  error "Unknown CCM_FLT_EVAL_METHOD"
 # endif
 }

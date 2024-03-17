@@ -21,7 +21,7 @@
 // - Nvidia HPC SDK
 
 // Identify the compiler
-#include "ccmath/internal/setup/compiler_def.hpp"
+#include "ccmath/internal/config/compiler_def.hpp"
 
 namespace ccm::helpers
 {
@@ -58,5 +58,5 @@ namespace ccm::helpers
 }
 
 // Clean up the global namespace
-#include "ccmath/internal/setup/compiler_undef.hpp"
+#include "ccmath/internal/config/compiler_undef.hpp"
 

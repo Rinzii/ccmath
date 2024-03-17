@@ -24,20 +24,20 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	inline constexpr T log(const T num) noexcept
 	{
-		// If the argument is ±0, -∞ is returned.
-		if (num == static_cast<T>(0)) { return -std::numeric_limits<T>::infinity(); }
-
 		// If the number is 1, return +0.
 		if (num == static_cast<T>(1)) { return static_cast<T>(0); }
+
+		// If the argument is ±0, -∞ is returned.
+		if (num == static_cast<T>(0)) { return -std::numeric_limits<T>::infinity(); }
 
 		// If the argument is negative, -NaN is returned.
 		if (num < static_cast<T>(0)) { return -std::numeric_limits<T>::quiet_NaN(); }
 
 		// If the argument is +∞, +∞ is returned.
-		if (num == std::numeric_limits<T>::infinity()) { return std::numeric_limits<T>::infinity(); }
+		if (CCM_UNLIKELY(num == std::numeric_limits<T>::infinity())) { return std::numeric_limits<T>::infinity(); }
 
 		// If the argument is NaN, NaN is returned.
-		if (ccm::isnan(num)) { return std::numeric_limits<T>::quiet_NaN(); }
+		if (CCM_UNLIKELY(ccm::isnan(num))) { return std::numeric_limits<T>::quiet_NaN(); }
 
 		// Select the correct implementation based on the type.
 		if constexpr (std::is_same_v<T, float>) { return ccm::internal::log_float(num); }

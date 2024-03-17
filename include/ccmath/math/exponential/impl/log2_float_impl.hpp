@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "ccmath/math/compare/isnan.hpp"
-#include "ccmath/internal/helpers/bits.hpp"
-#include "ccmath/internal/helpers/floating_point_type.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/types/fp_types.hpp"
+#include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/exponential/impl/log2_data.hpp"
 
 #include <array>

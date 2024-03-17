@@ -14,17 +14,17 @@
 namespace ccm::helpers::traits
 {
 	// clang-format off
-	template <typename T> struct is_char_type : std::false_type {};
-	template <> struct is_char_type<char> : std::true_type {};
-	template <> struct is_char_type<wchar_t> : std::true_type {};
+	template <typename T> struct is_char : std::false_type {};
+	template <> struct is_char<char> : std::true_type {};
+	template <> struct is_char<wchar_t> : std::true_type {};
 #if (__cplusplus >= 202002L) || defined(__cpp_char8_t) || defined(__cpp_lib_char8_t) // C++20 defines char8_t
-    template <> struct is_char_type<char8_t> : std::true_type {};
+    template <> struct is_char<char8_t> : std::true_type {};
 #endif
-	template <> struct is_char_type<char16_t> : std::true_type {};
-	template <> struct is_char_type<char32_t> : std::true_type {};
-	template <> struct is_char_type<signed char> : std::true_type {};
-	template <> struct is_char_type<unsigned char> : std::true_type {};
-	template <typename T> inline constexpr bool is_char_type_v = is_char_type<T>::value;
+	template <> struct is_char<char16_t> : std::true_type {};
+	template <> struct is_char<char32_t> : std::true_type {};
+	template <> struct is_char<signed char> : std::true_type {};
+	template <> struct is_char<unsigned char> : std::true_type {};
+	template <typename T> inline constexpr bool is_char_v = is_char<T>::value;
 	// clang-format on
 
 } // namespace ccm::helpers::traits
@@ -49,23 +49,15 @@ namespace ccm::helpers
 		return __builtin_bit_cast(To, src);
 	}
 
-	template <class T, std::enable_if_t<std::is_integral_v<T> && std::is_unsigned_v<T> && !ccm::helpers::traits::is_char_type_v<T> && !std::is_same_v<T, bool>,
+	template <class T, std::enable_if_t<std::is_integral_v<T> && std::is_unsigned_v<T> && !ccm::helpers::traits::is_char_v<T> && !std::is_same_v<T, bool>,
 										bool> = true>
 	constexpr bool has_single_bit(T x) noexcept
 	{
 		return x && !(x & (x - 1));
 	}
 
-	inline constexpr std::uint32_t get_exponent_of_double(double x) noexcept
-	{
-		// Reinterpret the binary representation of x as an std::uint64_t
-		std::uint64_t bits = bit_cast<std::uint64_t>(x);
 
-		// Extract the exponent bits (bits 62-52) and remove bias (1023)
-		std::uint32_t exponent = static_cast<std::uint32_t>((bits >> 52) & 0x7FF) - 1023;
 
-		return exponent;
-	}
 
 	/**
 	 * @brief Helper function to get the top 16-bits of a double.

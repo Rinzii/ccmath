@@ -42,6 +42,8 @@ std::vector<double> generateRandomDoubles(size_t count, unsigned int seed) {
 	return randomDouble;
 }
 
+/*
+
 static void BM_std_fma(bm::State& state) {
     for ([[maybe_unused]] auto _ : state) {
         bm::DoNotOptimize(std::fma(state.range(0), state.range(1), state.range(2)));
@@ -58,8 +60,9 @@ static void BM_ccm_fma(bm::State& state) {
 }
 BENCHMARK(BM_ccm_fma)->Args({16, 16, 16})->Args({256, 256, 256})->Args({4096, 4096, 4096})->Args({65536, 65536, 65536})->Complexity();
 
+*/
 
-
+/*
 // Benchmarking std::abs with the same set of random integers
 static void BM_std_abs_rand_int(benchmark::State& state) {
 	auto randomIntegers = generateRandomIntegers(static_cast<size_t>(state.range(0)), DefaultSeed);
@@ -83,7 +86,7 @@ static void BM_ccm_abs_rand_int(benchmark::State& state) {
 	state.SetComplexityN(state.range(0));
 }
 BENCHMARK(BM_ccm_abs_rand_int)->Range(8, 8<<10)->Complexity();
-
+*/
 // Benchmarking std::abs with the same set of random integers
 static void BM_std_abs_rand_double(benchmark::State& state) {
 	auto randomIntegers = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
@@ -124,6 +127,8 @@ static void BM_ccm_abs(benchmark::State& state) {
 	state.SetComplexityN(state.range(0));
 }
 BENCHMARK(BM_ccm_abs)->Arg(16)->Arg(256)->Arg(4096)->Arg(65536)->Complexity();
+
+/*
 
 static void BM_std_log_rand_double(bm::State& state) {
 	auto randomDoubles = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
@@ -226,7 +231,7 @@ static void BM_std_lerp(bm::State& state) {
 }
 BENCHMARK(BM_std_lerp)->Args({16, 16, 16})->Args({256, 256, 256})->Args({4096, 4096, 4096})->Args({65536, 65536, 65536})->Complexity();
 
-
+*/
 
 BENCHMARK_MAIN();
 

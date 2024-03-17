@@ -21,7 +21,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, int> = 0>
 	[[nodiscard]] inline constexpr bool isnan(T x) noexcept
 	{
-#if defined(__GNUC__)
+#if defined(__GNUC__) || defined(__clang__)
 		return __builtin_isnan(x); // GCC and Clang implement this as constexpr
 #else							   // If we can't use the builtin, fallback to this comparison and hope for the best.
 		return x != x; // NOLINT

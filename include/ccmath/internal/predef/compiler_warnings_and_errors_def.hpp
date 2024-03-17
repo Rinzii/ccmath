@@ -163,10 +163,15 @@
 ///
 #ifndef CCM_DISABLE_IGNORE_GCC_WARNING
 	#if defined(__GNUC__) && !defined(__clang__)
-		#define CCM_GCC_IGNORE_DISABLE_HELP0(x) #x														 // Helper macros - do not use directly
-		#define CCM_GCC_IGNORE_DISABLE_HELP1(x) CCM_GCC_IGNORE_DISABLE_HELP0(GCC diagnostic warning x) // Helper macros - do not use directly
-		#define CCM_GCC_IGNORE_DISABLE_HELP2(x) CCM_GCC_IGNORE_DISABLE_HELP1(#x)						 // Helper macros - do not use directly
-
+        #ifndef CCM_GCC_IGNORE_DISABLE_HELP0
+		    #define CCM_GCC_IGNORE_DISABLE_HELP0(x) #x														 // Helper macros - do not use directly
+        #endif
+        #ifndef CCM_GCC_IGNORE_DISABLE_HELP1
+            #define CCM_GCC_IGNORE_DISABLE_HELP1(x) CCM_GCC_IGNORE_DISABLE_HELP0(GCC diagnostic warning x) // Helper macros - do not use directly
+        #endif
+        #ifndef CCM_GCC_IGNORE_DISABLE_HELP2
+            #define CCM_GCC_IGNORE_DISABLE_HELP2(x) CCM_GCC_IGNORE_DISABLE_HELP1(#x)						 // Helper macros - do not use directly
+        #endif
 		// This will disable suppression of an ignored warning for GCC
 		// Must be called after CCM_ENABLE_IGNORE_GCC_WARNING(w).
 		#define CCM_DISABLE_IGNORE_GCC_WARNING(w) _Pragma(CCM_GCC_IGNORE_DISABLE_HELP2(w)) _Pragma("GCC diagnostic pop")

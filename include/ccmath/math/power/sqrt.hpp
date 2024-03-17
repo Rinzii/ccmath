@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <cfenv> // To get rounding mode
+
 namespace ccm
 {
 
