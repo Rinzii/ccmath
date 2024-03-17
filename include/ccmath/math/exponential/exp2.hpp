@@ -10,5 +10,10 @@
 
 namespace ccm
 {
+	template<typename T>
+    inline constexpr T exp2(T x)
+    {
+        return 0;
+    }
 
 } // namespace ccm
