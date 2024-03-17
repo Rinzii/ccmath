@@ -37,7 +37,7 @@
 #if !defined(CCMATH_HAS_BUILTIN_BIT_CAST) && !defined(CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT) && !defined(CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN)
 	#if (defined(_MSC_VER) && _MSC_VER >= 1927)
 		#define CCMATH_HAS_BUILTIN_BIT_CAST
-		#include "ccmath/internal/type_traits/floating_point_traits.hpp"
+		#include "ccmath/internal/support/floating_point_traits.hpp"
 		#include <limits>  // for std::numeric_limits
 		#include <cstdint> // for std::uint64_t
 	#endif
