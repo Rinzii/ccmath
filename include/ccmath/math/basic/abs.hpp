@@ -9,6 +9,7 @@
 #pragma once
 
 #include "ccmath/math/compare/isnan.hpp"
+#include "ccmath/internal/predef/unlikely.hpp"
 #include <limits>
 
 namespace ccm
@@ -19,16 +20,20 @@ namespace ccm
 	 * @param x A floating-point or integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename T>
+	template <typename T, std::enable_if_t<!std::is_integral_v<T> && !std::is_unsigned_v<T>, bool> = true>
 	constexpr T abs(T x) noexcept
 	{
-		// If we are NOT dealing with an integral type check for NaN.
-		if constexpr (!std::is_integral_v<T>)
-		{
-			// If x is NaN, return a quiet NaN.
-			if (ccm::isnan<T>(x)) { return std::numeric_limits<T>::quiet_NaN(); }
-		}
+        // If x is NaN, return a quiet NaN.
+        if (CCM_UNLIKELY(ccm::isnan<T>(x))) { return std::numeric_limits<T>::quiet_NaN(); }
 
+		// If x is equal to ±zero, return +zero.
+		// Otherwise, if x is less than zero, return -x, otherwise return x.
+		return x >= T{0} ? x : -x;
+	}
+
+	template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_unsigned_v<T>, bool> = true>
+	constexpr T abs(T x) noexcept
+	{
 		// If x is equal to ±zero, return +zero.
 		// Otherwise, if x is less than zero, return -x, otherwise return x.
 		return x >= T{0} ? x : -x;
