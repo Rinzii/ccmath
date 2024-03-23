@@ -8,13 +8,7 @@
 
 #pragma once
 
-#include "ccmath/internal/setup/compiler_def.hpp"
-
-/// !!! ATTENTION !!!
-/// If you add a new builtin here, remember you HAVE to also undefine
-/// any new macro created inside of builtin_support_undef.hpp
-/// !!! ATTENTION !!!
-
+#include "ccmath/internal/config/compiler.hpp"
 
 // This file is used to detect if the compiler has support for certain builtins that are static_assert-able constexpr
 
@@ -161,4 +155,3 @@
 
 // TODO: Add more builtins as more are required for the library
 
-#include "ccmath/internal/setup/compiler_undef.hpp"
