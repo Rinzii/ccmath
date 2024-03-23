@@ -122,7 +122,8 @@ namespace ccm::internal
 				ccm::double_t remLo{};
 
 				// rounding error: 0x1p-55/N + 0x1p-65.
-				rem			= (normVal - log2_tab2_values_dbl.at(static_cast<unsigned long>(i)).chi - log2_tab2_values_dbl.at(static_cast<unsigned long>(i)).clo) * inverseCoeff;
+				rem = (normVal - log2_tab2_values_dbl.at(static_cast<unsigned long>(i)).chi - log2_tab2_values_dbl.at(static_cast<unsigned long>(i)).clo) *
+					  inverseCoeff;
 				remHi		= ccm::helpers::uint64_to_double(ccm::helpers::double_to_uint64(rem) & -1ULL << 32);
 				remLo		= rem - remHi;
 				remHighPart = remHi * log2_inverse_ln2_high_value_dbl;
@@ -147,7 +148,7 @@ namespace ccm::internal
 				return result;
 			}
 		} // namespace impl
-	}	  // namespace
+	} // namespace
 
 	template <typename T>
 	[[nodiscard]] inline constexpr T log2_double(T num) noexcept
