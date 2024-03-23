@@ -8,10 +8,10 @@
 
 #pragma once
 
+#include "ccmath/internal/helpers/exp_helpers.hpp"
+#include "ccmath/internal/types/fp_types.hpp"
 #include <cstdint>
 #include <type_traits>
-#include "ccmath/internal/helpers/exp_helpers.hpp"
-#include "ccmath/internal/type/fp_types.hpp"
 
 namespace ccm::internal
 {
@@ -19,7 +19,10 @@ namespace ccm::internal
 	{
 		namespace impl
 		{
-
+			inline constexpr float exp_float_impl(float x)
+			{
+				return 0;
+			}
 
 		} // namespace impl
 	}	  // namespace
