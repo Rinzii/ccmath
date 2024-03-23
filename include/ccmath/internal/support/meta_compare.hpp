@@ -55,6 +55,8 @@ namespace ccm::helpers
 	inline constexpr bool or_v = or_<Bn...>::value;
 	template<typename... Bn>
 	inline constexpr bool and_v = and_<Bn...>::value;
+	template<typename Pp>
+	inline constexpr bool not_v = not_<Pp>::value;
 
 
 }
