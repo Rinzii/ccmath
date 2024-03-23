@@ -42,4 +42,35 @@ TEST(CcmathExponentialTests, Exp)
 	EXPECT_EQ(testCcmExpThatNanReturnsNan, testStdExpThatNanReturnsNan);
 	EXPECT_EQ(testCcmExpThatNanIsPositive, testStdExpThatNanIsPositive);
 
+	// Now test floats
+
+	EXPECT_EQ(ccm::exp(1.0F), std::exp(1.0F));
+	EXPECT_EQ(ccm::exp(2.0F), std::exp(2.0F));
+	EXPECT_EQ(ccm::exp(4.0F), std::exp(4.0F));
+	EXPECT_EQ(ccm::exp(8.0F), std::exp(8.0F));
+	EXPECT_EQ(ccm::exp(16.0F), std::exp(16.0F));
+	EXPECT_EQ(ccm::exp(32.0F), std::exp(32.0F));
+	EXPECT_EQ(ccm::exp(64.0F), std::exp(64.0F));
+	EXPECT_EQ(ccm::exp(128.0F), std::exp(128.0F));
+	EXPECT_EQ(ccm::exp(256.0F), std::exp(256.0F));
+	EXPECT_EQ(ccm::exp(512.0F), std::exp(512.0F));
+	EXPECT_EQ(ccm::exp(1024.0F), std::exp(1024.0F));
+	EXPECT_EQ(ccm::exp(2048.0F), std::exp(2048.0F));
+	EXPECT_EQ(ccm::exp(4096.0F), std::exp(4096.0F));
+
+	// Test Edge Cases
+
+	EXPECT_EQ(ccm::exp(0.0F), std::exp(0.0F));
+	EXPECT_EQ(ccm::exp(-0.0F), std::exp(-0.0F));
+	EXPECT_EQ(ccm::exp(std::numeric_limits<float>::infinity()), std::exp(std::numeric_limits<float>::infinity()));
+	EXPECT_EQ(ccm::exp(-std::numeric_limits<float>::infinity()), std::exp(-std::numeric_limits<float>::infinity()));
+
+	bool testCcmExpThatNanReturnsNanF = std::isnan(ccm::exp(std::numeric_limits<float>::quiet_NaN()));
+	bool testStdExpThatNanReturnsNanF = std::isnan(std::exp(std::numeric_limits<float>::quiet_NaN()));
+	bool testCcmExpThatNanIsPositiveF = std::signbit(ccm::exp(std::numeric_limits<float>::quiet_NaN()));
+	bool testStdExpThatNanIsPositiveF = std::signbit(std::exp(std::numeric_limits<float>::quiet_NaN()));
+	EXPECT_EQ(testCcmExpThatNanReturnsNanF, testStdExpThatNanReturnsNanF);
+	EXPECT_EQ(testCcmExpThatNanIsPositiveF, testStdExpThatNanIsPositiveF);
+
+
 }
