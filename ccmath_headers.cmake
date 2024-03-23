@@ -3,10 +3,8 @@
 ##########################################
 
 set(ccmath_internal_config_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/compiler_def.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/compiler_undef.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/builtin_support_def.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/builtin_support_undef.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/compiler.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/builtin_support.hpp
 )
 
 set(ccmath_internal_helpers_headers
@@ -28,6 +26,7 @@ set(ccmath_internal_support_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/bits.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/endian.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/floating_point_traits.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fp_bits.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/is_constant_evaluated.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/meta_compare.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/unreachable.hpp
