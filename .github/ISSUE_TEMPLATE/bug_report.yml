@@ -1,0 +1,76 @@
+name: Bug Report
+description: Create a report to help us improve
+title: '[BUG]: '
+labels: ['bug']
+body:
+  - type: checkboxes
+    attributes:
+      label: Due Diligence
+      description: Before you submit a bug report, please check the following
+      options:
+        - label: I have searched for similar issues before starting this bug report
+          required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+      placeholder: e.g. ccm::sqrt(4) is incorrectly outputting 1.9999999... instead of 2.0 on clang-12 x86-64
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Steps used to reproduce the bug.
+      placeholder: |
+        1. Set the compiler to clang-12 on x86-64
+        2. Write the following code:
+        ```cpp
+        #include <iostream> // std::cout and std::endl
+        #include <ccmath/ccmath.hpp>
+        int main() {
+          std::cout << ccm::sqrt(4) << std::endl;
+        }
+        ```
+        3. Execute the program
+        4. See the output
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+      placeholder: The output should be outputting 2.0 as this is the square root of 4, but it is outputting 1.9999999... instead.
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: '# System information'
+  - type: input
+    id: compiler-version-and-type
+    attributes:
+      label: Compiler version and type
+      description: The name of your compile and it's version
+      placeholder: GCC 13.2.1 (20230801)
+    validations:
+      required: true
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating System
+      description:
+        If applicable (i.e, an issue with how the code compiles for your OS) the OS version this bug is happening in
+      placeholder: Ubuntu Linux 22.04
+    validations:
+      required: false
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain your problem.
+      placeholder: As you can see here, the output is not showing up
+      value: Not applicable
+    validations:
+      required: false
