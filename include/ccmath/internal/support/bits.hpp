@@ -59,7 +59,7 @@ namespace ccm::helpers
 	}
 
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	inline constexpr std::uint32_t get_exponent_of_floating_point(T x) noexcept
+	inline constexpr std::int32_t get_exponent_of_floating_point(T x) noexcept
 	{
 		const auto bits				= bit_cast<float_bits_t<T>>(x);
 		const auto shifted_exponent = bits >> ccm::helpers::floating_point_traits<T>::exponent_shift;

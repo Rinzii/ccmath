@@ -35,6 +35,10 @@ namespace ccm::helpers
 		static constexpr std::uint32_t special_nan_mantissa_mask = 0x00400000U; // 1u << (mantissa_bits - 2)
 		static constexpr std::uint32_t shifted_sign_mask		 = 0x80000000U; // 1u << sign_shift
 		static constexpr std::uint32_t shifted_exponent_mask	 = 0x7F800000U; // exponent_mask << exponent_shift
+
+												//0x7FFFFFFFFFFFFFFF
+		static constexpr float normalize_factor = 4294967296.f;
+
 	};
 
 	template <>
@@ -44,7 +48,7 @@ namespace ccm::helpers
 		static constexpr std::int32_t exponent_bits			  = 11;	   // sizeof(double) * CHAR_BIT - DBL_MANT_DIG
 		static constexpr std::int32_t maximum_binary_exponent = 1023;  // DBL_MAX_EXP - 1
 		static constexpr std::int32_t minimum_binary_exponent = -1022; // DBL_MIN_EXP - 1
-		static constexpr std::int32_t exponent_bias			  = 1023;
+		static constexpr std::int64_t exponent_bias			  = 1023;
 		static constexpr std::int32_t sign_shift			  = 63; // exponent_bits + mantissa_bits - 1
 		static constexpr std::int32_t exponent_shift		  = 52; // mantissa_bits - 1
 
@@ -56,6 +60,9 @@ namespace ccm::helpers
 		static constexpr std::uint64_t special_nan_mantissa_mask = 0x0008000000000000U; // 1ULL << (mantissa_bits - 2)
 		static constexpr std::uint64_t shifted_sign_mask		 = 0x8000000000000000U; // 1ULL << sign_shift
 		static constexpr std::uint64_t shifted_exponent_mask	 = 0x7FF0000000000000U; // exponent_mask << exponent_shift
+
+												 //0x43F0000000000000
+		static constexpr double normalize_factor = 18446744073709551616.0;
 	};
 
 	template <>

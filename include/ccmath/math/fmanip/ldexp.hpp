@@ -22,7 +22,7 @@ namespace ccm
 		int32_t oldexp = ccm::helpers::get_exponent_of_floating_point<T>(x);
 
 		// if the mantissa is 0 and the original exponent is 0
-		if ((oldexp == 0) && ((ccm::helpers::bit_cast<ccm::helpers::floating_point_traits<T>::uint_type>(x) &
+		if ((oldexp == 0) && ((ccm::helpers::bit_cast<ccm::helpers::float_bits_t<T>>(x) &
 							   ccm::helpers::floating_point_traits<T>::normal_mantissa_mask) == 0))
 		{
 			return x;
@@ -43,7 +43,7 @@ namespace ccm
 		// normalizes an abnormal floating point
 		if (oldexp == 0)
 		{
-			factor = 1 << (sizeof(T) * 8); //8 is bits in a byte
+			factor = ccm::helpers::floating_point_traits<T>::normalize_factor;
 			x *= factor;
 			powerOf2 = -sizeof(T) * 8; //8 is bits in a byte
 			oldexp	 = ccm::helpers::get_exponent_of_floating_point<T>(x);
@@ -62,7 +62,7 @@ namespace ccm
 		// denormal, or underflow
 		powerOf2 += sizeof(T) * 8; //8 is bits in a byte
 		x = ccm::helpers::set_exponent_of_floating_point<T>(x, powerOf2);
-		factor = 1 << (sizeof(T) * 8); // 8 is bits in a byte
+		factor = ccm::helpers::floating_point_traits<T>::normalize_factor; // 8 is bits in a byte
 		x /= factor;
 		if (x == static_cast<T>(0))
 		{
