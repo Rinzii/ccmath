@@ -37,7 +37,7 @@ namespace ccm::helpers
 		static constexpr std::uint32_t shifted_exponent_mask	 = 0x7F800000U; // exponent_mask << exponent_shift
 
 												//0x7FFFFFFFFFFFFFFF
-		static constexpr float normalize_factor = 4294967296.f;
+		static constexpr float normalize_factor = 4294967296.f; //2^32
 
 	};
 
@@ -62,7 +62,7 @@ namespace ccm::helpers
 		static constexpr std::uint64_t shifted_exponent_mask	 = 0x7FF0000000000000U; // exponent_mask << exponent_shift
 
 												 //0x43F0000000000000
-		static constexpr double normalize_factor = 18446744073709551616.0;
+		static constexpr double normalize_factor = 18446744073709551616.0; //2^64
 	};
 
 	template <>

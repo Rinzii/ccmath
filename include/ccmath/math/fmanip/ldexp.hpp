@@ -39,12 +39,10 @@ namespace ccm
 			// error == range
 			return 0;
 		}
-		T factor;
 		// normalizes an abnormal floating point
 		if (oldexp == 0)
 		{
-			factor = ccm::helpers::floating_point_traits<T>::normalize_factor;
-			x *= factor;
+			x *= ccm::helpers::floating_point_traits<T>::normalize_factor;
 			powerOf2 = -sizeof(T) * 8; //8 is bits in a byte
 			oldexp	 = ccm::helpers::get_exponent_of_floating_point<T>(x);
 		}
@@ -62,8 +60,7 @@ namespace ccm
 		// denormal, or underflow
 		powerOf2 += sizeof(T) * 8; //8 is bits in a byte
 		x = ccm::helpers::set_exponent_of_floating_point<T>(x, powerOf2);
-		factor = ccm::helpers::floating_point_traits<T>::normalize_factor; // 8 is bits in a byte
-		x /= factor;
+		x /= ccm::helpers::floating_point_traits<T>::normalize_factor;
 		if (x == static_cast<T>(0))
 		{
 			// underflow report
