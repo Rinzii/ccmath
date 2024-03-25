@@ -57,12 +57,11 @@ namespace ccm
 		}
 		if (powerOf2 > 0)
 		{
-			ccm::helpers::set_exponent_of_floating_point<T>(x, powerOf2);
-			return x;
+			return ccm::helpers::set_exponent_of_floating_point<T>(x, powerOf2);
 		}
 		// denormal, or underflow
 		powerOf2 += sizeof(T) * CHAR_BIT;
-		ccm::helpers::set_exponent_of_floating_point<T>(x, powerOf2);
+		x = ccm::helpers::set_exponent_of_floating_point<T>(x, powerOf2);
 		factor = 1 << (sizeof(T) * CHAR_BIT);
 		x /= factor;
 		if (x == static_cast<T>(0))

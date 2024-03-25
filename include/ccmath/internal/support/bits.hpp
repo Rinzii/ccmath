@@ -66,7 +66,7 @@ namespace ccm::helpers
 	}
 
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	inline constexpr void set_exponent_of_floating_point(T & x, int exp) noexcept
+	inline constexpr T set_exponent_of_floating_point(T x, int exp) noexcept
 	{
 		const auto bit_casted			  = bit_cast<float_bits_t<T>>(x);
 		const auto inverted_exponent_mask = ~ccm::helpers::floating_point_traits<T>::shifted_exponent_mask;
@@ -74,7 +74,7 @@ namespace ccm::helpers
 		const auto shifted_masked_exponent = masked_exponent << ccm::helpers::floating_point_traits<T>::exponent_shift;
 		const auto final_bits			   = (bit_casted & inverted_exponent_mask) | shifted_masked_exponent;
 
-		x = bit_cast<T>(final_bits);
+		return bit_cast<T>(final_bits);
 	}
 
 
