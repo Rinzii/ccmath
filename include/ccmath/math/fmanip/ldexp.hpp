@@ -8,6 +8,9 @@
 
 #pragma once
 
+#include <ccmath/internal/support/bits.hpp>
+#include "ccmath/internal/support/floating_point_traits.hpp" //this is included in bits, but i'm going to include it anyways
+
 namespace ccm
 {
 	// this function multiples parameter x by two to the power of paramter powerOf2
