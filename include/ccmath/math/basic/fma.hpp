@@ -25,32 +25,27 @@ namespace ccm
 	 * @return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
 	 * calculated as a single ternary floating-point operation).
 	 */
-	template <typename T>
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	inline constexpr T fma(T x, T y, T z) noexcept
 	{
-		if constexpr (std::is_floating_point_v<T>)
-		{
-			// GCC has a constexpr builtin for fma
-#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER) && !defined(__INTEL_LLVM_COMPILER) && !defined(__NVCOMPILER) &&                     \
-	!defined(__NVCOMPILER_LLVM__)
-			if constexpr (std::is_same_v<T, float>) { return __builtin_fmaf(x, y, z); }
-			else if constexpr (std::is_same_v<T, double>) { return __builtin_fma(x, y, z); }
-			else if constexpr (std::is_same_v<T, long double>) { return __builtin_fmal(x, y, z); }
-#endif
+        // Handle infinity
+        if (CCM_UNLIKELY((x == static_cast<T>(0) && ccm::isinf(y)) || (y == T{0} && ccm::isinf(x)))) { return std::numeric_limits<T>::quiet_NaN(); }
+        if (CCM_UNLIKELY(x * y == std::numeric_limits<T>::infinity() && z == -std::numeric_limits<T>::infinity())) { return std::numeric_limits<T>::infinity(); }
 
-			// Handle infinity
-			if (CCM_UNLIKELY((x == static_cast<T>(0) && ccm::isinf(y)) || (y == T{0} && ccm::isinf(x)))) { return std::numeric_limits<T>::quiet_NaN(); }
-			if (CCM_UNLIKELY(x * y == std::numeric_limits<T>::infinity() && z == -std::numeric_limits<T>::infinity())) { return std::numeric_limits<T>::infinity(); }
-
-			// Handle NaN
-			if (CCM_UNLIKELY(ccm::isnan(x) || ccm::isnan(y))) { return std::numeric_limits<T>::quiet_NaN(); }
-			if (CCM_UNLIKELY(ccm::isnan(z) && (x * y != 0 * std::numeric_limits<T>::infinity() || x * y != std::numeric_limits<T>::infinity() * 0)))
-			{
-				return std::numeric_limits<T>::quiet_NaN();
-			}
-		}
+        // Handle NaN
+        if (CCM_UNLIKELY(ccm::isnan(x) || ccm::isnan(y))) { return std::numeric_limits<T>::quiet_NaN(); }
+        if (CCM_UNLIKELY(ccm::isnan(z) && (x * y != 0 * std::numeric_limits<T>::infinity() || x * y != std::numeric_limits<T>::infinity() * 0)))
+        {
+            return std::numeric_limits<T>::quiet_NaN();
+        }
 
 		// If the compiler doesn't have a builtin, use the following and hope that the compiler is smart enough to optimize it
+		return (x * y) + z;
+	}
+
+	template <typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
+	inline constexpr T fma(T x, T y, T z) noexcept
+	{
 		return (x * y) + z;
 	}
 
