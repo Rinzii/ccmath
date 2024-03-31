@@ -39,7 +39,7 @@ namespace ccm
             return std::numeric_limits<T>::quiet_NaN();
         }
 
-		// If the compiler doesn't have a builtin, use the following and hope that the compiler is smart enough to optimize it
+		// We have to hope the compiler optimizes this. Currently there is no builtin fma that works with static_assert.
 		return (x * y) + z;
 	}
 
