@@ -24,7 +24,7 @@ namespace ccm::ext
 	 * @warning Currently waiting on ccm::exp2 to be implemented. Till then this will NOT work.
 	 */
 	template<typename T>
-    inline constexpr T slerp(T a, T b, T t, T h)
+    inline constexpr T lerp_smooth(T a, T b, T t, T h)
     {
         return b + (a - b) * ccm::exp2<T>(-t / h);
     }
