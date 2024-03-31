@@ -104,6 +104,25 @@ target_link_libraries(${PROJECT_NAME}-nearest PRIVATE
         gtest::gtest
 )
 
+add_executable(${PROJECT_NAME}-misc)
+
+# This is required as std::lerp is only available in versions of C++20 or greater.
+if(CMAKE_CXX_STANDARD GREATER_EQUAL 20)
+  target_sources(${PROJECT_NAME}-misc PRIVATE
+          misc/lerp_test_std.cpp
+
+  )
+else()
+  target_sources(${PROJECT_NAME}-misc PRIVATE
+          misc/lerp_test_no_std.cpp
+  )
+endif()
+
+target_link_libraries(${PROJECT_NAME}-misc PRIVATE
+        ccmath::test
+        gtest::gtest
+)
+
 
 if(CCMATH_OS_WINDOWS)
   # For Windows: Prevent overriding the parent project's compiler/linker settings
@@ -127,6 +146,7 @@ add_test(NAME ${PROJECT_NAME}-compare COMMAND ${PROJECT_NAME}-compare)
 add_test(NAME ${PROJECT_NAME}-nearest COMMAND ${PROJECT_NAME}-nearest)
 add_test(NAME ${PROJECT_NAME}-exponential COMMAND ${PROJECT_NAME}-exponential)
 add_test(NAME ${PROJECT_NAME}-fmanip COMMAND ${PROJECT_NAME}-fmanip)
+add_test(NAME ${PROJECT_NAME}-misc COMMAND ${PROJECT_NAME}-misc)
 
 
 
