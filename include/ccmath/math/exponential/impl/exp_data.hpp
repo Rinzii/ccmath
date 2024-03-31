@@ -23,7 +23,6 @@ namespace ccm::internal
 	// Double constants
 	constexpr std::size_t k_exp_table_bits_dbl	 = 7;
 	constexpr std::size_t k_exp_poly_order_dbl	 = 5;
-	constexpr std::size_t k_exp2_poly_order_dbl	 = 5;
 
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 	struct exp_data;
@@ -69,17 +68,6 @@ namespace ccm::internal
 			0x1.555555555543cp-3,
 			0x1.55555cf172b91p-5,
 			0x1.1111167a4d017p-7,
-		};
-
-		double exp2_shift{0x1.8p52 / (1 << k_exp_table_bits_dbl)};
-
-		// exp2 polynomial coefficients.
-		// abs error: 1.2195*2^-65
-		// ulp error: 0.511
-		// if |x| < 1/256
-		// abs error if |x| < 1/128: 1.9941*2^-56
-		std::array<double, k_exp_poly_order_dbl> exp2_poly = {
-			0x1.62e42fefa39efp-1, 0x1.ebfbdff82c424p-3, 0x1.c6b08d70cf4b5p-5, 0x1.3b2abd24650ccp-7, 0x1.5d7e09b4e3a84p-10,
 		};
 
 		// 2^(k/N) ~= H[k]*(1 + T[k]) for int k in [0,N)
