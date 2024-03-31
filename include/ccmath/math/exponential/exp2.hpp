@@ -11,7 +11,7 @@
 namespace ccm
 {
 	template<typename T>
-    inline constexpr T exp2(T x)
+    inline constexpr T exp2([[maybe_unused]] T x)
     {
         return 0;
     }
