@@ -1,6 +1,6 @@
 ---
 Language: Cpp
-BasedOnStyle: Microsoft
+BasedOnStyle: LLVM
 AccessModifierOffset: -4
 AlignConsecutiveAssignments: Consecutive
 AlignConsecutiveMacros: Consecutive
