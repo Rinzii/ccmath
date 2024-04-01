@@ -48,21 +48,7 @@ namespace ccm::internal
 				// This is a patch to fix that issue.
 
 				// Check that the last character is 1 and no other characters have been provided other than zero.
-				for (std::size_t i = 0; arg[i] != '\0'; ++i) // NOLINT
-                {
-                    if (arg[i] != '0')
-                    {
-                        msvc_one_digit_patch = false;
-                        break;
-                    }
-
-					if (arg[i] == '1' && arg[i + 1] == '\0')
-                    {
-                        msvc_one_digit_patch = true;
-                    }
-
-                    msvc_one_digit_patch = false;
-                }
+				msvc_one_digit_patch = true;
 #endif
 
 				if (!has_hex_been_detected)

@@ -40,6 +40,11 @@ TEST(CcmathBasicTests, NanDouble)
 	stdNanBits = ccm::helpers::bit_cast<std::uint64_t>(std::nan("1"));
 	EXPECT_EQ(ccmNanBits, stdNanBits);
 
+	// Check the outcome if we are handling a string with a single character that represents a number
+	ccmNanBits = ccm::helpers::bit_cast<std::uint64_t>(ccm::nan("2"));
+	stdNanBits = ccm::helpers::bit_cast<std::uint64_t>(std::nan("2"));
+	EXPECT_EQ(ccmNanBits, stdNanBits);
+
 	// Check the outcome if we are handling a string with a single character that represents a letter
 	ccmNanBits = ccm::helpers::bit_cast<std::uint64_t>(ccm::nan("a"));
 	stdNanBits = ccm::helpers::bit_cast<std::uint64_t>(std::nan("a"));
@@ -63,6 +68,16 @@ TEST(CcmathBasicTests, NanDouble)
 	// Check for multi-digit wrapping
 	ccmNanBits = ccm::helpers::bit_cast<std::uint64_t>(ccm::nan("000000000000000000000000000000000000000000000000000000001"));
 	stdNanBits = ccm::helpers::bit_cast<std::uint64_t>(std::nan("000000000000000000000000000000000000000000000000000000001"));
+	EXPECT_EQ(ccmNanBits, stdNanBits);
+
+	// Check the outcome if we are handling a string with a hex prefix and a single character
+	ccmNanBits = ccm::helpers::bit_cast<std::uint64_t>(ccm::nan("0x2"));
+	stdNanBits = ccm::helpers::bit_cast<std::uint64_t>(std::nan("0x2"));
+	EXPECT_EQ(ccmNanBits, stdNanBits);
+
+	// Check for multi-digit wrapping
+	ccmNanBits = ccm::helpers::bit_cast<std::uint64_t>(ccm::nan("000000000000000000000000000000000000000000000000000000002"));
+	stdNanBits = ccm::helpers::bit_cast<std::uint64_t>(std::nan("000000000000000000000000000000000000000000000000000000002"));
 	EXPECT_EQ(ccmNanBits, stdNanBits);
 
 
