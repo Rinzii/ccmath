@@ -29,16 +29,10 @@ TEST(CcmathBasicTests, NanStaticAssert)
 TEST(CcmathBasicTests, NanDouble)
 {
 
-	// TODO: Investigate why MSVC is adding 1 to the value of the nan bits of tests using this variable.
-#if defined(_MSC_VER)
-	const std::uint64_t addPlusOneForMsvc = 1;
-#else
-    const std::uint64_t addPlusOneForMsvc = 0;
-#endif
 
 	// Check the outcome if we are handling an empty string
-	std::uint64_t ccmNanBits = ccm::helpers::bit_cast<std::uint64_t>(ccm::nan("")) + addPlusOneForMsvc;
-	std::uint64_t stdNanBits = ccm::helpers::bit_cast<std::uint64_t>(std::nan("")) + addPlusOneForMsvc;
+	std::uint64_t ccmNanBits = ccm::helpers::bit_cast<std::uint64_t>(ccm::nan(""));
+	std::uint64_t stdNanBits = ccm::helpers::bit_cast<std::uint64_t>(std::nan(""));
 	EXPECT_EQ(ccmNanBits, stdNanBits);
 
 	// Check the outcome if we are handling a string with a single character that represents a number
@@ -57,13 +51,13 @@ TEST(CcmathBasicTests, NanDouble)
 	EXPECT_EQ(ccmNanBits, stdNanBits);
 
 	// Check the outcome if we are handling a string with multiple characters with both numbers and characters with no hex prefix
-	ccmNanBits = ccm::helpers::bit_cast<std::uint64_t>(ccm::nan("foo123bar")) + addPlusOneForMsvc;
-	stdNanBits = ccm::helpers::bit_cast<std::uint64_t>(std::nan("foo123bar")) + addPlusOneForMsvc;
+	ccmNanBits = ccm::helpers::bit_cast<std::uint64_t>(ccm::nan("foo123bar"));
+	stdNanBits = ccm::helpers::bit_cast<std::uint64_t>(std::nan("foo123bar"));
 	EXPECT_EQ(ccmNanBits, stdNanBits);
 
 	// Check the outcome if we are handling a string with a hex prefix and a single character
-	ccmNanBits = ccm::helpers::bit_cast<std::uint64_t>(ccm::nan("0x1")) + addPlusOneForMsvc;
-	stdNanBits = ccm::helpers::bit_cast<std::uint64_t>(std::nan("0x1") + addPlusOneForMsvc);
+	ccmNanBits = ccm::helpers::bit_cast<std::uint64_t>(ccm::nan("0x1"));
+	stdNanBits = ccm::helpers::bit_cast<std::uint64_t>(std::nan("0x1"));
 	EXPECT_EQ(ccmNanBits, stdNanBits);
 
 	// Check for multi-digit wrapping

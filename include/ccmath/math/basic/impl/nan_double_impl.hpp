@@ -74,7 +74,9 @@ namespace ccm::internal
 				// NOLINTEND
 
 				// Set the tag bits for NaN
-				dbl_bits |= UINT64_C(0x7FF8000000000000);
+				//dbl_bits |= UINT64_C(0x7FF8000000000000);
+				dbl_bits |= ccm::helpers::bit_cast<std::uint64_t>(std::numeric_limits<double>::quiet_NaN());
+
 
 				// Convert the uint64_t tag into a double NaN
 				return ccm::helpers::bit_cast<double>(dbl_bits);

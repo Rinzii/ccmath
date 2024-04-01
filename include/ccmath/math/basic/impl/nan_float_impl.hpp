@@ -75,9 +75,10 @@ namespace ccm::internal
 				// NOLINTEND
 
 				// Set the tag bits for NaN
-				flt_bits |= UINT32_C(0x7F800000);
+				//flt_bits |= UINT32_C(0x7F800000);
+				flt_bits |= ccm::helpers::bit_cast<std::uint32_t>(std::numeric_limits<float>::quiet_NaN());
 
-				// Convert the uint32_t bits to a float
+				// Convert the bits to a float
 				return ccm::helpers::bit_cast<float>(flt_bits);
             }
 		} // namespace impl
