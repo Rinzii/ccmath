@@ -8,6 +8,7 @@ set(ccmath_internal_config_headers
 )
 
 set(ccmath_internal_helpers_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/digit_to_int.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/fpclassify_helper.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/exp_helpers.hpp
 )
@@ -54,6 +55,8 @@ set(ccmath_internal_headers
 ##########################################
 
 set(ccmath_math_basic_impl_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/nan_float_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/nan_double_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/remquo_float_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/remquo_double_impl.hpp
 )
