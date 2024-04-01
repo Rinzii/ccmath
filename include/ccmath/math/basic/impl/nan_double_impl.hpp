@@ -28,7 +28,10 @@ namespace ccm::internal
 				std::uint64_t dbl_bits {0};
 				bool has_hex_been_detected {false};
 
-
+				if (arg == nullptr)
+                {
+                    return std::numeric_limits<double>::quiet_NaN(); // Default NaN
+                }
 
 
 				// NOLINTBEGIN
@@ -48,6 +51,7 @@ namespace ccm::internal
 				// This is a patch to fix that issue.
 
 				// Check that the last character is 1 and no other characters have been provided other than zero.
+				if
 				msvc_one_digit_patch = true;
 #endif
 
