@@ -42,12 +42,26 @@ namespace ccm::internal
 
 				bool msvc_one_digit_patch {false};
 
-#if defined(_MSC_VER)
-				// For some reason when passing '1' or '0x1' with msvc it adds on an extra bit to the number.
+#if defined(_MSC_VER) && !defined(__clang__)
+				// For some reason when passing '1' or '0x1' with msvc will cause it to adds on an extra bit to the number.
+				// I do not know why msvc does this, but it causes the number to be off by 1.
 				// This is a patch to fix that issue.
-				if (arg[0] == '1' && arg[1] == '\0')
+
+				// Check that the last character is 1 and no other characters have been provided other than zero.
+				for (std::size_t i = 0; arg[i] != '\0'; ++i) // NOLINT
                 {
-                    msvc_one_digit_patch = true;
+                    if (arg[i] != '0')
+                    {
+                        msvc_one_digit_patch = false;
+                        break;
+                    }
+
+					if (arg[i] == '1' && arg[i + 1] == '\0')
+                    {
+                        msvc_one_digit_patch = true;
+                    }
+
+                    msvc_one_digit_patch = false;
                 }
 #endif
 
