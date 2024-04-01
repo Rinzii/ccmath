@@ -31,7 +31,7 @@ target_sources(${PROJECT_NAME}-basic PRIVATE
         basic/fmod_test.cpp
         basic/max_test.cpp
         basic/min_test.cpp
-        compare/isnan_test.cpp
+        basic/nan_test.cpp
         basic/remainder_test.cpp
         basic/remquo_test.cpp
         )
