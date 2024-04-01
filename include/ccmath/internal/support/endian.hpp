@@ -26,6 +26,6 @@ namespace ccm::helpers
 		native = __BYTE_ORDER__
 #endif
 	};
-} // namespace ccm
+} // namespace ccm::helpers
 
 
