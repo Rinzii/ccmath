@@ -28,6 +28,9 @@ namespace ccm::internal
 				std::uint64_t dbl_bits {0};
 				bool has_hex_been_detected {false};
 
+
+
+
 				// NOLINTBEGIN
 
 				// Check for a hex prefix and if its detected, skip the prefix and set the flag.
@@ -36,6 +39,17 @@ namespace ccm::internal
 					arg += 2;
 					has_hex_been_detected = true;
 				}
+
+				bool msvc_one_digit_patch {false};
+
+#if defined(_MSC_VER)
+				// For some reason when passing '1' or '0x1' with msvc it adds on an extra bit to the number.
+				// This is a patch to fix that issue.
+				if (arg[0] == '1' && arg[1] == '\0')
+                {
+                    msvc_one_digit_patch = true;
+                }
+#endif
 
 				if (!has_hex_been_detected)
                 {
@@ -77,6 +91,11 @@ namespace ccm::internal
 				//dbl_bits |= UINT64_C(0x7FF8000000000000);
 				dbl_bits |= ccm::helpers::bit_cast<std::uint64_t>(std::numeric_limits<double>::quiet_NaN());
 
+				// Subtract 1 bit from the number if the msvc patch is active
+				if (msvc_one_digit_patch)
+                {
+					dbl_bits -= 1;
+                }
 
 				// Convert the uint64_t tag into a double NaN
 				return ccm::helpers::bit_cast<double>(dbl_bits);
