@@ -33,7 +33,6 @@ namespace ccm::internal
                     return std::numeric_limits<double>::quiet_NaN(); // Default NaN
                 }
 
-
 				// NOLINTBEGIN
 
 				// Check for a hex prefix and if its detected, skip the prefix and set the flag.
@@ -51,7 +50,6 @@ namespace ccm::internal
 				// This is a patch to fix that issue.
 
 				// Check that the last character is 1 and no other characters have been provided other than zero.
-				if
 				msvc_one_digit_patch = true;
 #endif
 
