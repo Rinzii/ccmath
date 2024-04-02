@@ -12,8 +12,6 @@
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 
-#include <absl/numeric/int128.h>
-
 #if LDBL_MANT_DIG == 53 && LDBL_MAX_EXP == 1024
 	#include "ccmath/math/fmanip/impl/scalbn_double_impl.hpp"
 #endif
