@@ -104,6 +104,16 @@ target_link_libraries(${PROJECT_NAME}-nearest PRIVATE
         gtest::gtest
 )
 
+add_executable(${PROJECT_NAME}-power)
+target_sources(${PROJECT_NAME}-power PRIVATE
+        power/pow_test.cpp
+
+)
+target_link_libraries(${PROJECT_NAME}-power PRIVATE
+        ccmath::test
+        gtest::gtest
+)
+
 add_executable(${PROJECT_NAME}-misc)
 
 # This is required as std::lerp is only available in versions of C++20 or greater.
@@ -143,9 +153,10 @@ endif()
 
 add_test(NAME ${PROJECT_NAME}-basic COMMAND ${PROJECT_NAME}-basic)
 add_test(NAME ${PROJECT_NAME}-compare COMMAND ${PROJECT_NAME}-compare)
-add_test(NAME ${PROJECT_NAME}-nearest COMMAND ${PROJECT_NAME}-nearest)
 add_test(NAME ${PROJECT_NAME}-exponential COMMAND ${PROJECT_NAME}-exponential)
 add_test(NAME ${PROJECT_NAME}-fmanip COMMAND ${PROJECT_NAME}-fmanip)
+add_test(NAME ${PROJECT_NAME}-nearest COMMAND ${PROJECT_NAME}-nearest)
+add_test(NAME ${PROJECT_NAME}-power COMMAND ${PROJECT_NAME}-power)
 add_test(NAME ${PROJECT_NAME}-misc COMMAND ${PROJECT_NAME}-misc)
 
 

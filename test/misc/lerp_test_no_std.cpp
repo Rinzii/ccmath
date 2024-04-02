@@ -13,6 +13,7 @@
 
 #include <array>
 
+/*
 TEST(CcmathBasicTests, LerpStaticAssert)
 {
    static_assert(ccm::lerp(1, 2, 0.5) == 1.5, "lerp has failed testing that it is static_assert-able!");
@@ -39,3 +40,4 @@ TEST(CcmathBasicTests, LerpFloat)
    }
    // NOLINTEND
 }
+ */

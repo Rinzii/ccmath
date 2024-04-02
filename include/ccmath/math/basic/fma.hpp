@@ -8,6 +8,9 @@
 
 #pragma once
 
+#include "ccmath/math/basic/impl/fma_double_impl.hpp"
+#include "ccmath/math/basic/impl/fma_float_impl.hpp"
+
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/math/compare/isnan.hpp"
@@ -16,6 +19,13 @@
 
 namespace ccm
 {
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
+	inline constexpr T new_fma(T x, T y, T z) noexcept
+	{
+		if constexpr (std::is_same_v<T, float>) { return ccm::internal::impl::fma_float_impl(x, y, z); }
+        else { return ccm::internal::impl::fma_double_impl(x, y, z); }
+	}
+
 	/**
 	 * @brief Fused multiply-add operation.
 	 * @tparam T Numeric type.
