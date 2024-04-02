@@ -33,6 +33,11 @@ namespace ccm::internal
                     return std::numeric_limits<double>::quiet_NaN(); // Default NaN
                 }
 
+				if (arg[0] == '\0')
+                {
+                    return std::numeric_limits<double>::quiet_NaN(); // Default NaN
+                }
+
 				// NOLINTBEGIN
 
 				// Check for a hex prefix and if its detected, skip the prefix and set the flag.
@@ -96,8 +101,14 @@ namespace ccm::internal
 				// Subtract 1 bit from the number if the msvc patch is active
 				if (msvc_one_digit_patch)
                 {
-					dbl_bits -= 1;
+					// TODO: Make this more efficient
+					//       Currently, MSVC always returns a Quiet NaN with no additional bits set.
+					//       This feature applies no matter what the input is.
+					return std::numeric_limits<double>::quiet_NaN(); // Default NaN
                 }
+
+				//dbl_bits -= 1;
+
 
 				// Convert the uint64_t tag into a double NaN
 				return ccm::helpers::bit_cast<double>(dbl_bits);
