@@ -31,7 +31,6 @@ namespace ccm::internal
 			{
 				return ccm::internal::impl::scalbn_double_impl(arg, exp);
 			}
-		}
 #elif (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113) && LDBL_MAX_EXP == 16384
 			inline constexpr long double scalbn_ldouble_impl(long double arg, int exp) noexcept
 			{
@@ -40,6 +39,6 @@ namespace ccm::internal
 				return 0;
 			}
 #endif
-	} // namespace impl
-} // namespace
+		} // namespace impl
+	} // namespace
 } // namespace ccm::internal
