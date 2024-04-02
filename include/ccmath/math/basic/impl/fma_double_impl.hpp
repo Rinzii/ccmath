@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "ccmath/internal/predef/unlikely.hpp"
-#include "ccmath/internal/support/bits.hpp"
 #include <cstdint>
 #include <limits>
+#include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/support/bits.hpp"
 
 namespace ccm::internal
 {
@@ -20,12 +20,12 @@ namespace ccm::internal
 		namespace impl
 		{
 			inline constexpr double fma_double_impl(double x, double y, double z) noexcept
-            {
+			{
 
-//#pragma STDC FENV_ACCESS ON
+				// #pragma STDC FENV_ACCESS ON
 
 				return 0;
-            }
+			}
 		} // namespace impl
 	} // namespace
 } // namespace ccm::internal

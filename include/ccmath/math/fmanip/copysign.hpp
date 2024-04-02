@@ -48,21 +48,21 @@ namespace ccm
 	}
 
 	/**
-     * @brief Copies the sign of a floating point value.
-     * @param x A floating-point.
-     * @param y A floating-point.
-     * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
-     */
+	 * @brief Copies the sign of a floating point value.
+	 * @param x A floating-point.
+	 * @param y A floating-point.
+	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
+	 */
 	inline constexpr float copysignf(float mag, float sgn)
 	{
 		return copysign<float>(mag, sgn);
 	}
 
 	/**
-     * @brief Copies the sign of a floating point value.
-     * @param x A floating-point.
-     * @param y A floating-point.
-     * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
+	 * @brief Copies the sign of a floating point value.
+	 * @param x A floating-point.
+	 * @param y A floating-point.
+	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
 	 */
 	inline constexpr long double copysignl(long double mag, long double sgn)
 	{

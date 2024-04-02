@@ -87,7 +87,7 @@ namespace ccm::internal
 			}
 
 		} // namespace impl
-	}	  // namespace
+	} // namespace
 
 	template <typename T>
 	[[nodiscard]] inline constexpr T log_float(T num) noexcept

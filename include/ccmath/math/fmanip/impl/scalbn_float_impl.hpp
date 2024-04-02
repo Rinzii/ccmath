@@ -30,36 +30,30 @@ namespace ccm::internal
 					tmp *= 0x1p127F;
 					exp -= 127;
 					if (exp > 127)
-                    {
+					{
 						tmp *= 0x1p127F;
-                        exp -= 127;
-                        if (exp > 127)
-                        {
-                            exp = 127;
-                        }
-                    }
+						exp -= 127;
+						if (exp > 127) { exp = 127; }
+					}
 				}
 				else if (exp < -126)
-                {
+				{
 					tmp *= 0x1p-126F * 0x1p24F;
-                    exp += 126 - 24;
-                    if (exp < -126)
-                    {
+					exp += 126 - 24;
+					if (exp < -126)
+					{
 						tmp *= 0x1p-126F * 0x1p24F;
-                        exp += 126 - 24;
-                        if (exp < -126)
-                        {
-                            exp = -126;
-                        }
-                    }
-                }
+						exp += 126 - 24;
+						if (exp < -126) { exp = -126; }
+					}
+				}
 
 				const std::uint32_t bits = ccm::helpers::bit_cast<std::uint32_t>(127 + exp) << 23;
-				arg = tmp * ccm::helpers::bit_cast<float>(bits);
+				arg						 = tmp * ccm::helpers::bit_cast<float>(bits);
 
 				return arg;
 			}
 
 		} // namespace impl
-    } // namespace
+	} // namespace
 } // namespace ccm::internal

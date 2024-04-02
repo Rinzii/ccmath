@@ -55,7 +55,10 @@ namespace ccm::internal
 				// clang-format on
 
 				// If x is not finite or y is NaN.
-				if (CCM_UNLIKELY(x_i64 >= 0x7ff0000000000000ULL || y_i64 > 0x7ff0000000000000ULL)) { return (x * y) / (x * y); } // NOLINT(readability-simplify-boolean-expr)
+				if (CCM_UNLIKELY(x_i64 >= 0x7ff0000000000000ULL || y_i64 > 0x7ff0000000000000ULL))
+				{
+					return (x * y) / (x * y);
+				} // NOLINT(readability-simplify-boolean-expr)
 
 				// b (or bit 54) represents the highest bit we can compare against for both signed and unsigned integers without causing an overflow.
 				// Here we are checking that if y_i64 is within the range of signed 64-bit integers that can be represented without setting the MSB (i.e.,
@@ -127,7 +130,7 @@ namespace ccm::internal
 				return x;
 			}
 		} // namespace impl
-	}	  // namespace
+	} // namespace
 
 	template <typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
 	inline constexpr T remquo_double(T x, T y, int * quo) noexcept

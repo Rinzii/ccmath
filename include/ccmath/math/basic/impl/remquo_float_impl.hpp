@@ -109,7 +109,7 @@ namespace ccm::internal
 				return x;
 			}
 		} // namespace impl
-	}	  // namespace
+	} // namespace
 
 	template <typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
 	inline constexpr T remquo_float(T x, T y, int * quo) noexcept

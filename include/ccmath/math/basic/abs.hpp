@@ -8,11 +8,11 @@
 
 #pragma once
 
-#include "ccmath/math/compare/isnan.hpp"
-#include "ccmath/internal/predef/unlikely.hpp"
-#include "ccmath/math/compare/isinf.hpp"
 #include <array>
 #include <limits>
+#include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/math/compare/isinf.hpp"
+#include "ccmath/math/compare/isnan.hpp"
 
 namespace ccm
 {
@@ -25,8 +25,8 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T> && !std::is_unsigned_v<T>, bool> = true>
 	constexpr T abs(T num) noexcept
 	{
-        // If num is NaN, return a quiet NaN.
-        if (CCM_UNLIKELY(ccm::isnan<T>(num))) { return std::numeric_limits<T>::quiet_NaN(); }
+		// If num is NaN, return a quiet NaN.
+		if (CCM_UNLIKELY(ccm::isnan<T>(num))) { return std::numeric_limits<T>::quiet_NaN(); }
 
 		// If num is equal to ±zero, return +zero.
 		if (static_cast<T>(0) == num) { return static_cast<T>(0); }
@@ -82,16 +82,16 @@ namespace ccm
 	}
 
 	/**
-     * @brief Computes the absolute value of a number.
-     * @tparam Integer Integer type.
-     * @param x Integer value.
-     * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
-     */
+	 * @brief Computes the absolute value of a number.
+	 * @tparam Integer Integer type.
+	 * @param x Integer value.
+	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
+	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double fabs(Integer num) noexcept
-    {
-        return abs<double>(static_cast<double>(num));
-    }
+	{
+		return abs<double>(static_cast<double>(num));
+	}
 
 	/**
 	 * @brief Computes the absolute value of a number.
@@ -114,24 +114,24 @@ namespace ccm
 	}
 
 	/**
-     * @brief Computes the absolute value of a number.
-     * @param x Integer value.
-     * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
-     */
+	 * @brief Computes the absolute value of a number.
+	 * @param x Integer value.
+	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
+	 */
 	inline constexpr long labs(long num) noexcept
-    {
-        return abs<long>(num);
-    }
+	{
+		return abs<long>(num);
+	}
 
 	/**
-     * @brief Computes the absolute value of a number.
-     * @param x Integer value.
-     * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
-     */
+	 * @brief Computes the absolute value of a number.
+	 * @param x Integer value.
+	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
+	 */
 	inline constexpr long long llabs(long long num) noexcept
-    {
-        return abs<long long>(num);
-    }
+	{
+		return abs<long long>(num);
+	}
 } // namespace ccm
 
 /// @ingroup basic

@@ -52,7 +52,6 @@ namespace ccm::internal
 			-0x1.715479ffae3dep-1,
 			0x1.715475f35c8b8p0,
 
-
 		}};
 	};
 

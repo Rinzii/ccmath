@@ -70,7 +70,7 @@ namespace ccm
 			}
 
 		} // namespace impl
-	}	  // namespace
+	} // namespace
 	/// @endcond
 
 	/**

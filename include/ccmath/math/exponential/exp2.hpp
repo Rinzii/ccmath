@@ -10,10 +10,10 @@
 
 namespace ccm
 {
-	template<typename T>
-    inline constexpr T exp2([[maybe_unused]] T x)
-    {
-        return 0;
-    }
+	template <typename T>
+	inline constexpr T exp2([[maybe_unused]] T x)
+	{
+		return 0;
+	}
 
 } // namespace ccm

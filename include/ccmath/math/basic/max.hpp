@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/math/compare/isnan.hpp"
 
 #include <limits>
 #include <type_traits>

@@ -123,7 +123,8 @@ namespace ccm::internal
 				// Calculate intermediate value for logarithm computation
 				// log(x) = log1p(normVal/c-1) + log(c) + expo*Ln2.
 				// r ~= z/c - 1, |r| < 1/(2*N)
-				rem			= (normVal - log_tab2_values_dbl.at(static_cast<unsigned long>(i)).chi - log_tab2_values_dbl.at(static_cast<unsigned long>(i)).clo) * inverseCoeff;
+				rem = (normVal - log_tab2_values_dbl.at(static_cast<unsigned long>(i)).chi - log_tab2_values_dbl.at(static_cast<unsigned long>(i)).clo) *
+					  inverseCoeff;
 				scaleFactor = static_cast<ccm::double_t>(expo);
 
 				// Calculate high and low parts of logarithm
@@ -144,7 +145,7 @@ namespace ccm::internal
 				return static_cast<double>(result);
 			}
 		} // namespace impl
-	}	  // namespace
+	} // namespace
 
 	template <typename T>
 	[[nodiscard]] inline constexpr T log_double(T num) noexcept

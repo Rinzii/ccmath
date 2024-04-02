@@ -23,7 +23,7 @@ namespace ccm
 	inline constexpr T new_fma(T x, T y, T z) noexcept
 	{
 		if constexpr (std::is_same_v<T, float>) { return ccm::internal::impl::fma_float_impl(x, y, z); }
-        else { return ccm::internal::impl::fma_double_impl(x, y, z); }
+		else { return ccm::internal::impl::fma_double_impl(x, y, z); }
 	}
 
 	/**
@@ -38,16 +38,19 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	inline constexpr T fma(T x, T y, T z) noexcept
 	{
-        // Handle infinity
-        if (CCM_UNLIKELY((x == static_cast<T>(0) && ccm::isinf(y)) || (y == T{0} && ccm::isinf(x)))) { return std::numeric_limits<T>::quiet_NaN(); }
-        if (CCM_UNLIKELY(x * y == std::numeric_limits<T>::infinity() && z == -std::numeric_limits<T>::infinity())) { return std::numeric_limits<T>::infinity(); }
+		// Handle infinity
+		if (CCM_UNLIKELY((x == static_cast<T>(0) && ccm::isinf(y)) || (y == T{0} && ccm::isinf(x)))) { return std::numeric_limits<T>::quiet_NaN(); }
+		if (CCM_UNLIKELY(x * y == std::numeric_limits<T>::infinity() && z == -std::numeric_limits<T>::infinity()))
+		{
+			return std::numeric_limits<T>::infinity();
+		}
 
-        // Handle NaN
-        if (CCM_UNLIKELY(ccm::isnan(x) || ccm::isnan(y))) { return std::numeric_limits<T>::quiet_NaN(); }
-        if (CCM_UNLIKELY(ccm::isnan(z) && (x * y != 0 * std::numeric_limits<T>::infinity() || x * y != std::numeric_limits<T>::infinity() * 0)))
-        {
-            return std::numeric_limits<T>::quiet_NaN();
-        }
+		// Handle NaN
+		if (CCM_UNLIKELY(ccm::isnan(x) || ccm::isnan(y))) { return std::numeric_limits<T>::quiet_NaN(); }
+		if (CCM_UNLIKELY(ccm::isnan(z) && (x * y != 0 * std::numeric_limits<T>::infinity() || x * y != std::numeric_limits<T>::infinity() * 0)))
+		{
+			return std::numeric_limits<T>::quiet_NaN();
+		}
 
 		// We have to hope the compiler optimizes this. Currently there is no builtin fma that works with static_assert.
 		return (x * y) + z;

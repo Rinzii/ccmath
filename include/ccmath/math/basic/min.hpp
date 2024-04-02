@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "ccmath/math/compare/isnan.hpp"
-#include "ccmath/internal/predef/unlikely.hpp"
 #include <type_traits>
+#include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/math/compare/isnan.hpp"
 
 namespace ccm
 {
@@ -37,7 +37,7 @@ namespace ccm
 	/**
 	 * @brief Computes the smaller of the two values.
 	 * @tparam T Left-hand type of the left-hand value to compare.
-     * @tparam U Right-hand type of the right-hand value to compare.
+	 * @tparam U Right-hand type of the right-hand value to compare.
 	 * @param x Left-hand side of the comparison.
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the smaller of two floating point values. The value returned is exact and does not depend on any rounding modes.

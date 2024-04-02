@@ -59,17 +59,17 @@ namespace ccm::numbers
 	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, bool> = true>
 	inline constexpr Real phi_v = Real{1.618033988749894848204586834365638};
 
-	inline constexpr double e = e_v<double>;
-	inline constexpr double log2e = log2e_v<double>;
-	inline constexpr double log10e = log10e_v<double>;
-	inline constexpr double pi = pi_v<double>;
-	inline constexpr double inv_pi = inv_pi_v<double>;
+	inline constexpr double e		   = e_v<double>;
+	inline constexpr double log2e	   = log2e_v<double>;
+	inline constexpr double log10e	   = log10e_v<double>;
+	inline constexpr double pi		   = pi_v<double>;
+	inline constexpr double inv_pi	   = inv_pi_v<double>;
 	inline constexpr double inv_sqrtpi = inv_sqrtpi_v<double>;
-	inline constexpr double ln2 = ln2_v<double>;
-	inline constexpr double ln10 = ln10_v<double>;
-	inline constexpr double sqrt2 = sqrt2_v<double>;
-	inline constexpr double sqrt3 = sqrt3_v<double>;
-	inline constexpr double inv_sqrt3 = inv_sqrt3_v<double>;
-	inline constexpr double egamma = egamma_v<double>;
-	inline constexpr double phi = phi_v<double>;
+	inline constexpr double ln2		   = ln2_v<double>;
+	inline constexpr double ln10	   = ln10_v<double>;
+	inline constexpr double sqrt2	   = sqrt2_v<double>;
+	inline constexpr double sqrt3	   = sqrt3_v<double>;
+	inline constexpr double inv_sqrt3  = inv_sqrt3_v<double>;
+	inline constexpr double egamma	   = egamma_v<double>;
+	inline constexpr double phi		   = phi_v<double>;
 } // namespace ccm::numbers

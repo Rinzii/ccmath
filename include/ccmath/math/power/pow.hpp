@@ -8,19 +8,18 @@
 
 #pragma once
 
+#include <limits>
+#include <type_traits>
 #include "ccmath/ccmath.hpp"
 #include "ccmath/math/exponential/exp.hpp"
 #include "ccmath/math/exponential/log.hpp"
-#include <limits>
-#include <type_traits>
-
 
 namespace ccm
 {
 	template <typename T>
 	inline constexpr T pow(T x, T y) noexcept
-    {
-        return 0;
-    }
+	{
+		return 0;
+	}
 
 } // namespace ccm

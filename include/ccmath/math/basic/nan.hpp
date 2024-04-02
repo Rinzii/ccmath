@@ -18,17 +18,17 @@ namespace ccm
 	 * @param arg
 	 * @return
 	 */
-	constexpr double nan(const char* arg) noexcept
+	constexpr double nan(const char * arg) noexcept
 	{
 		return ccm::internal::impl::nan_double_impl(arg);
 	}
 
-	constexpr float nanf(const char* arg) noexcept
+	constexpr float nanf(const char * arg) noexcept
 	{
 		return ccm::internal::impl::nan_float_impl(arg);
 	}
 
-	constexpr long double nanl([[maybe_unused]] const char* arg) noexcept
+	constexpr long double nanl([[maybe_unused]] const char * arg) noexcept
 	{
 		// Currently we do not yet support long double for ccm::nan
 		// Idk if we ever will, but for the time being if someone calls the function. Just return a quiet NaN.

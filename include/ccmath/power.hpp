@@ -12,4 +12,3 @@
 #include "ccmath/math/power/hypot.hpp"
 #include "ccmath/math/power/pow.hpp"
 #include "ccmath/math/power/sqrt.hpp"
-

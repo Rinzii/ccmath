@@ -8,12 +8,12 @@
 
 #pragma once
 
+#include <cstdint>
+#include <limits>
 #include "ccmath/internal/helpers/exp_helpers.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
 #include "ccmath/math/exponential/impl/exp_data.hpp"
-#include <cstdint>
-#include <limits>
 
 namespace ccm::internal
 {
@@ -22,16 +22,16 @@ namespace ccm::internal
 		namespace impl
 		{
 			constexpr ccm::internal::exp_data<double> internal_exp_data_dbl = ccm::internal::exp_data<double>();
-			constexpr auto exp_invLn2N_dbl								 = internal_exp_data_dbl.invln2N;
-			constexpr auto exp_negLn2HiN_dbl							 = internal_exp_data_dbl.negln2hiN;
-			constexpr auto exp_negLn2LoN_dbl							 = internal_exp_data_dbl.negln2loN;
-			constexpr auto exp_shift_dbl								 = internal_exp_data_dbl.shift;
-			constexpr auto exp_tab_dbl									 = internal_exp_data_dbl.tab;
-			constexpr auto exp_poly_coeff_one_dbl						 = internal_exp_data_dbl.poly[5 - k_exp_poly_order_dbl];
-			constexpr auto exp_poly_coeff_two_dbl						 = internal_exp_data_dbl.poly[6 - k_exp_poly_order_dbl];
-			constexpr auto exp_poly_coeff_three_dbl						 = internal_exp_data_dbl.poly[7 - k_exp_poly_order_dbl];
-			constexpr auto exp_poly_coeff_four_dbl						 = internal_exp_data_dbl.poly[8 - k_exp_poly_order_dbl];
-			constexpr auto k_exp_table_n_dbl							 = (1 << ccm::internal::k_exp_table_bits_dbl);
+			constexpr auto exp_invLn2N_dbl									= internal_exp_data_dbl.invln2N;
+			constexpr auto exp_negLn2HiN_dbl								= internal_exp_data_dbl.negln2hiN;
+			constexpr auto exp_negLn2LoN_dbl								= internal_exp_data_dbl.negln2loN;
+			constexpr auto exp_shift_dbl									= internal_exp_data_dbl.shift;
+			constexpr auto exp_tab_dbl										= internal_exp_data_dbl.tab;
+			constexpr auto exp_poly_coeff_one_dbl							= internal_exp_data_dbl.poly[5 - k_exp_poly_order_dbl];
+			constexpr auto exp_poly_coeff_two_dbl							= internal_exp_data_dbl.poly[6 - k_exp_poly_order_dbl];
+			constexpr auto exp_poly_coeff_three_dbl							= internal_exp_data_dbl.poly[7 - k_exp_poly_order_dbl];
+			constexpr auto exp_poly_coeff_four_dbl							= internal_exp_data_dbl.poly[8 - k_exp_poly_order_dbl];
+			constexpr auto k_exp_table_n_dbl								= (1 << ccm::internal::k_exp_table_bits_dbl);
 
 			inline constexpr double handle_special_case(ccm::double_t tmp, std::uint64_t sign_bits, std::uint64_t exponent_int64) // NOLINT
 			{

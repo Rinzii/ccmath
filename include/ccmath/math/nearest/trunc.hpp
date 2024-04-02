@@ -24,18 +24,18 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, int> = 0>
 	inline constexpr T trunc(T x) noexcept
 	{
-        // If x is NaN then return Positive NaN or Negative NaN depending on the sign of x
-        if (ccm::isnan(x))
-        {
-            if (ccm::signbit<T>(x)) { return -std::numeric_limits<T>::quiet_NaN(); }
-            return std::numeric_limits<T>::quiet_NaN();
-        }
+		// If x is NaN then return Positive NaN or Negative NaN depending on the sign of x
+		if (ccm::isnan(x))
+		{
+			if (ccm::signbit<T>(x)) { return -std::numeric_limits<T>::quiet_NaN(); }
+			return std::numeric_limits<T>::quiet_NaN();
+		}
 
-        // If x == ±∞ then return x
-        if (x == std::numeric_limits<T>::infinity() || x == -std::numeric_limits<T>::infinity()) { return x; }
+		// If x == ±∞ then return x
+		if (x == std::numeric_limits<T>::infinity() || x == -std::numeric_limits<T>::infinity()) { return x; }
 
-        // If x == ±0 then return x
-        if (x == static_cast<T>(0.0)) { return x; }
+		// If x == ±0 then return x
+		if (x == static_cast<T>(0.0)) { return x; }
 
 		return static_cast<T>(static_cast<long long>(x));
 	}

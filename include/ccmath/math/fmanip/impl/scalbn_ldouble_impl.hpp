@@ -42,6 +42,6 @@ namespace ccm::internal
 				return 0;
 			}
 #endif
-		} // namespace impl
-	} // namespace
+	} // namespace impl
+} // namespace
 } // namespace ccm::internal

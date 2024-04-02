@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "ccmath/math/basic/abs.hpp"
 #include "ccmath/internal/helpers/fpclassify_helper.hpp"
+#include "ccmath/math/basic/abs.hpp"
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 
