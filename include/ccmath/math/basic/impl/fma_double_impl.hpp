@@ -22,7 +22,7 @@ namespace ccm::internal
 			inline constexpr double fma_double_impl(double x, double y, double z) noexcept
             {
 
-#pragma STDC FENV_ACCESS ON
+//#pragma STDC FENV_ACCESS ON
 
 				return 0;
             }

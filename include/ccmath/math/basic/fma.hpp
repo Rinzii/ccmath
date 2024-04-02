@@ -11,8 +11,8 @@
 #include "ccmath/math/basic/impl/fma_double_impl.hpp"
 #include "ccmath/math/basic/impl/fma_float_impl.hpp"
 
-#include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 
 #include <type_traits>
