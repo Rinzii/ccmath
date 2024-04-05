@@ -50,7 +50,7 @@ namespace ccm::internal
 				int expo{};
 				int i{};
 
-				intX = ccm::helpers::float_to_uint32(x);
+				intX = ccm::support::float_to_uint32(x);
 
 				// If x == 1 then fix the result to 0 with downward rounding
 				if (CCM_UNLIKELY(intX == 0x3f800000)) { return 0; }
@@ -67,7 +67,7 @@ namespace ccm::internal
 					}
 
 					// If x is subnormal, normalize it
-					intX = ccm::helpers::float_to_uint32(x * 0x1p23F);
+					intX = ccm::support::float_to_uint32(x * 0x1p23F);
 					intX -= 23 << 23;
 				}
 
@@ -82,7 +82,7 @@ namespace ccm::internal
 				expo		   = static_cast<std::uint32_t>(tmp) >> 23; // Arithmetic shift.
 				inverseCoeff   = log2_tab_values_flt.at(static_cast<unsigned long>(i)).invc;
 				logarithmCoeff = log2_tab_values_flt.at(static_cast<unsigned long>(i)).logc;
-				normVal		   = static_cast<ccm::double_t>(ccm::helpers::uint32_to_float(intNorm));
+				normVal		   = static_cast<ccm::double_t>(ccm::support::uint32_to_float(intNorm));
 
 				// log2(x) = log1p(normVal/c-1)/ln2 + log2(c) + expo
 				rem		= normVal * inverseCoeff - 1.0;

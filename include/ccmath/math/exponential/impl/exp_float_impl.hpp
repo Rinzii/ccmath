@@ -41,14 +41,14 @@ namespace ccm::internal
 				ccm::double_t scale{};
 
 				x_dbl_t = static_cast<ccm::double_t>(x);
-				abs_top = ccm::helpers::top12_bits_of_float(x) & 0x7ff;
+				abs_top = ccm::support::top12_bits_of_float(x) & 0x7ff;
 
-				if (CCM_UNLIKELY(abs_top >= ccm::helpers::top12_bits_of_float(88.0F)))
+				if (CCM_UNLIKELY(abs_top >= ccm::support::top12_bits_of_float(88.0F)))
 				{
 					// |x| >= 88 or x is nan.
-					if (ccm::helpers::float_to_uint32(x) == ccm::helpers::float_to_uint32(-std::numeric_limits<float>::infinity())) { return 0.0F; }
+					if (ccm::support::float_to_uint32(x) == ccm::support::float_to_uint32(-std::numeric_limits<float>::infinity())) { return 0.0F; }
 
-					if (abs_top >= ccm::helpers::top12_bits_of_float(std::numeric_limits<float>::infinity())) { return x + x; }
+					if (abs_top >= ccm::support::top12_bits_of_float(std::numeric_limits<float>::infinity())) { return x + x; }
 
 					// Handle overflow
 					if (x > 0x1.62e42ep6F) // x > log(0x1p128) ~= 88.72
@@ -72,14 +72,14 @@ namespace ccm::internal
 				 * can be bigger which gives larger approximation error.
 				 */
 				expo	   = ccm::helpers::narrow_eval(static_cast<double>(scaled_input + exp_shift_flt)); // Must be double
-				expo_int64 = ccm::helpers::double_to_uint64(expo);
+				expo_int64 = ccm::support::double_to_uint64(expo);
 				expo -= exp_shift_flt;
 				rem = scaled_input - expo;
 
 				// exp(x) = 2^(k/N) * 2^(r/N) ~= s * (C0*r^3 + C1*r^2 + C2*r + 1)
 				tmp = static_cast<std::uint64_t>(exp_tab_flt.at(expo_int64 % k_exp_table_n_flt));
 				tmp += (expo_int64 << (52 - ccm::internal::k_exp_table_bits_flt));
-				scale		 = ccm::helpers::uint64_to_double(tmp);
+				scale		 = ccm::support::uint64_to_double(tmp);
 				scaled_input = exp_poly_scaled_flt.at(0) * rem + exp_poly_scaled_flt.at(1);
 				remSqr		 = rem * rem;
 				result		 = exp_poly_scaled_flt.at(2) * rem + 1.0F;

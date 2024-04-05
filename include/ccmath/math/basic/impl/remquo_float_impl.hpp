@@ -31,8 +31,8 @@ namespace ccm::internal
 				int quotient_sign{};
 				int computed_quotient{};
 
-				x_i32 = ccm::helpers::float_to_int32(x);
-				y_i32 = ccm::helpers::float_to_int32(y);
+				x_i32 = ccm::support::float_to_int32(x);
+				y_i32 = ccm::support::float_to_int32(y);
 
 				// Determine the signs of x and the quotient.
 				x_sign		  = static_cast<std::uint32_t>(x_i32) & 0x80000000;

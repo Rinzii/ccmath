@@ -48,8 +48,8 @@ namespace ccm::internal
 					}
 				}
 
-				const std::uint32_t bits = ccm::helpers::bit_cast<std::uint32_t>(127 + exp) << 23;
-				arg						 = tmp * ccm::helpers::bit_cast<float>(bits);
+				const std::uint32_t bits = ccm::support::bit_cast<std::uint32_t>(127 + exp) << 23;
+				arg						 = tmp * ccm::support::bit_cast<float>(bits);
 
 				return arg;
 			}

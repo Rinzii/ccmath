@@ -59,18 +59,18 @@ namespace ccm::internal
 				std::int64_t i{};
 
 				// Convert input double to uint64_t and extract top 16 bits
-				std::uint64_t intX = ccm::helpers::double_to_uint64(x);
-				std::uint32_t top  = ccm::helpers::top16_bits_of_double(x);
+				std::uint64_t intX = ccm::support::double_to_uint64(x);
+				std::uint32_t top  = ccm::support::top16_bits_of_double(x);
 
 				// Constants for comparison
-				constexpr std::uint64_t low	 = ccm::helpers::double_to_uint64(1.0 - 0x1p-4);
-				constexpr std::uint64_t high = ccm::helpers::double_to_uint64(1.0 + 0x1p-4);
+				constexpr std::uint64_t low	 = ccm::support::double_to_uint64(1.0 - 0x1p-4);
+				constexpr std::uint64_t high = ccm::support::double_to_uint64(1.0 + 0x1p-4);
 
 				// Handle special cases where input is close to 1.0
 				if (CCM_UNLIKELY(intX - low < high - low))
 				{
 					// Handle the case where x is exactly 1.0
-					if (CCM_UNLIKELY(intX == ccm::helpers::double_to_uint64(1.0))) { return 0; }
+					if (CCM_UNLIKELY(intX == ccm::support::double_to_uint64(1.0))) { return 0; }
 
 					// Compute the logarithm using polynomial approximation
 					rem		 = x - 1.0;
@@ -99,7 +99,7 @@ namespace ccm::internal
 				if (CCM_UNLIKELY(top - 0x0010 >= 0x7ff0 - 0x0010))
 				{
 					// x is subnormal, normalize it.
-					intX = ccm::helpers::double_to_uint64(x * 0x1p52);
+					intX = ccm::support::double_to_uint64(x * 0x1p52);
 					intX -= 52ULL << 52;
 				}
 
@@ -118,7 +118,7 @@ namespace ccm::internal
 				intNorm		   = intX - (tmp & 0xfffULL << 52); // Arithmetic shift
 				inverseCoeff   = log_tab_values_dbl.at(static_cast<unsigned long>(i)).invc;
 				logarithmCoeff = log_tab_values_dbl.at(static_cast<unsigned long>(i)).logc;
-				normVal		   = ccm::helpers::uint64_to_double(intNorm);
+				normVal		   = ccm::support::uint64_to_double(intNorm);
 
 				// Calculate intermediate value for logarithm computation
 				// log(x) = log1p(normVal/c-1) + log(c) + expo*Ln2.

@@ -33,8 +33,8 @@ namespace ccm::internal
 				std::uint64_t quotient_sign{};
 				int computed_quotient{};
 
-				x_i64 = ccm::helpers::double_to_int64(x);
-				y_i64 = ccm::helpers::double_to_int64(y);
+				x_i64 = ccm::support::double_to_int64(x);
+				y_i64 = ccm::support::double_to_int64(y);
 
 				// Determine the signs of x and the quotient.
 				x_sign		  = static_cast<std::uint64_t>(x_i64) & 0x8000000000000000ULL;
@@ -75,7 +75,7 @@ namespace ccm::internal
 				}
 
 				x				  = ccm::fabs(x);
-				y				  = ccm::helpers::int64_to_double(y_i64);
+				y				  = ccm::support::int64_to_double(y_i64);
 				computed_quotient = 0;
 
 				if (y_i64 <= 0x7fcfffffffffffffULL && x >= 4 * y)

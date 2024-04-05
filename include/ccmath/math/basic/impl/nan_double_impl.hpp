@@ -100,7 +100,7 @@ namespace ccm::internal
 
 				// Set the tag bits for NaN
 				// dbl_bits |= UINT64_C(0x7FF8000000000000);
-				dbl_bits |= ccm::helpers::bit_cast<std::uint64_t>(std::numeric_limits<double>::quiet_NaN());
+				dbl_bits |= ccm::support::bit_cast<std::uint64_t>(std::numeric_limits<double>::quiet_NaN());
 
 				// Subtract 1 bit from the number if the msvc patch is active
 				if (msvc_one_digit_patch)
@@ -114,7 +114,7 @@ namespace ccm::internal
 				// dbl_bits -= 1;
 
 				// Convert the uint64_t tag into a double NaN
-				return ccm::helpers::bit_cast<double>(dbl_bits);
+				return ccm::support::bit_cast<double>(dbl_bits);
 			}
 		} // namespace impl
 	} // namespace

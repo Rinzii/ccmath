@@ -49,8 +49,8 @@ namespace ccm::internal
 					}
 				}
 
-				const std::uint64_t bits = ccm::helpers::bit_cast<std::uint64_t>(1023 + static_cast<std::uint64_t>(exp)) << 52;
-				arg						 = tmp * ccm::helpers::bit_cast<double>(bits);
+				const std::uint64_t bits = ccm::support::bit_cast<std::uint64_t>(1023 + static_cast<std::uint64_t>(exp)) << 52;
+				arg						 = tmp * ccm::support::bit_cast<double>(bits);
 
 				return arg;
 			}

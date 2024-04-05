@@ -59,23 +59,23 @@ namespace ccm::internal
 				std::int64_t expo{};
 				std::int64_t i{};
 
-				std::uint64_t intX = ccm::helpers::double_to_uint64(x);
-				std::uint32_t top  = ccm::helpers::top16_bits_of_double(x);
+				std::uint64_t intX = ccm::support::double_to_uint64(x);
+				std::uint32_t top  = ccm::support::top16_bits_of_double(x);
 
-				constexpr std::uint64_t low	 = ccm::helpers::double_to_uint64(1.0 - 0x1.5b51p-5);
-				constexpr std::uint64_t high = ccm::helpers::double_to_uint64(1.0 + 0x1.6ab2p-5);
+				constexpr std::uint64_t low	 = ccm::support::double_to_uint64(1.0 - 0x1.5b51p-5);
+				constexpr std::uint64_t high = ccm::support::double_to_uint64(1.0 + 0x1.6ab2p-5);
 
 				// Handle special cases where x is very close to 1.0
 				if (CCM_UNLIKELY(intX - low < high - low))
 				{
 					// Handle the case where x is exactly 1.0
-					if (CCM_UNLIKELY(intX == ccm::helpers::double_to_uint64(1.0))) { return 0.0; }
+					if (CCM_UNLIKELY(intX == ccm::support::double_to_uint64(1.0))) { return 0.0; }
 
 					rem = x - 1.0;
 
 					ccm::double_t remHi{};
 					ccm::double_t remLo{};
-					remHi	 = ccm::helpers::uint64_to_double(ccm::helpers::double_to_uint64(rem) & -1ULL << 32);
+					remHi	 = ccm::support::uint64_to_double(ccm::support::double_to_uint64(rem) & -1ULL << 32);
 					remLo	 = rem - remHi;
 					highPart = remHi * ccm::internal::impl::log2_inverse_ln2_high_value_dbl;
 					lowPart	 = remLo * ccm::internal::impl::log2_inverse_ln2_high_value_dbl + rem * ccm::internal::impl::log2_inverse_ln2_low_value_dbl;
@@ -100,7 +100,7 @@ namespace ccm::internal
 				{
 
 					// x is subnormal, normalize it.
-					intX = ccm::helpers::double_to_uint64(x * 0x1p52); // 0x1p52 = 4.5036e+15 = 2^52
+					intX = ccm::support::double_to_uint64(x * 0x1p52); // 0x1p52 = 4.5036e+15 = 2^52
 					intX -= 52ULL << 52;
 				}
 
@@ -115,7 +115,7 @@ namespace ccm::internal
 				intNorm		   = intX - (tmp & 0xfffULL << 52);
 				inverseCoeff   = log2_tab_values_dbl.at(static_cast<unsigned long>(i)).invc;
 				logarithmCoeff = log2_tab_values_dbl.at(static_cast<unsigned long>(i)).logc;
-				normVal		   = ccm::helpers::uint64_to_double(intNorm);
+				normVal		   = ccm::support::uint64_to_double(intNorm);
 				expoDbl		   = static_cast<double_t>(expo);
 
 				ccm::double_t remHi{};
@@ -124,7 +124,7 @@ namespace ccm::internal
 				// rounding error: 0x1p-55/N + 0x1p-65.
 				rem = (normVal - log2_tab2_values_dbl.at(static_cast<unsigned long>(i)).chi - log2_tab2_values_dbl.at(static_cast<unsigned long>(i)).clo) *
 					  inverseCoeff;
-				remHi		= ccm::helpers::uint64_to_double(ccm::helpers::double_to_uint64(rem) & -1ULL << 32);
+				remHi		= ccm::support::uint64_to_double(ccm::support::double_to_uint64(rem) & -1ULL << 32);
 				remLo		= rem - remHi;
 				remHighPart = remHi * log2_inverse_ln2_high_value_dbl;
 				remLowPart	= remLo * log2_inverse_ln2_high_value_dbl + rem * log2_inverse_ln2_low_value_dbl;

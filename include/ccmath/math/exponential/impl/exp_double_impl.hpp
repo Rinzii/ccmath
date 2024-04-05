@@ -42,14 +42,14 @@ namespace ccm::internal
 				{
 					// k > 0, the exponent of scale might have overflowed by <= 460.
 					sign_bits -= 1009ULL << 52;
-					scale  = ccm::helpers::uint64_to_double(sign_bits);
+					scale  = ccm::support::uint64_to_double(sign_bits);
 					result = 0x1p1009 * (scale + scale * tmp);
 					return result;
 				}
 
 				// k < 0, need special care in the subnormal range.
 				sign_bits += 1022ULL << 52;
-				scale  = ccm::helpers::uint64_to_double(sign_bits);
+				scale  = ccm::support::uint64_to_double(sign_bits);
 				result = scale + scale * tmp;
 				if (result < 1.0)
 				{
@@ -87,21 +87,21 @@ namespace ccm::internal
 				ccm::double_t tail{};
 				ccm::double_t tmp{};
 
-				abs_top = ccm::helpers::top12_bits_of_double(x) & 0x7ff;
-				if (CCM_UNLIKELY(abs_top - ccm::helpers::top12_bits_of_double(0x1p-54) >=
-								 ccm::helpers::top12_bits_of_double(512.0) - ccm::helpers::top12_bits_of_double(0x1p-54)))
+				abs_top = ccm::support::top12_bits_of_double(x) & 0x7ff;
+				if (CCM_UNLIKELY(abs_top - ccm::support::top12_bits_of_double(0x1p-54) >=
+								 ccm::support::top12_bits_of_double(512.0) - ccm::support::top12_bits_of_double(0x1p-54)))
 				{
 					// Avoid raising underflow for tiny x. 0 is a common input.
-					if (abs_top - ccm::helpers::top12_bits_of_double(0x1p-54) >= 0x80000000) { return 1.0 + x; }
+					if (abs_top - ccm::support::top12_bits_of_double(0x1p-54) >= 0x80000000) { return 1.0 + x; }
 
-					if (abs_top >= ccm::helpers::top12_bits_of_double(1024.0))
+					if (abs_top >= ccm::support::top12_bits_of_double(1024.0))
 					{
-						if (ccm::helpers::double_to_uint64(x) == ccm::helpers::double_to_uint64(-std::numeric_limits<double>::infinity())) { return 0.0; }
+						if (ccm::support::double_to_uint64(x) == ccm::support::double_to_uint64(-std::numeric_limits<double>::infinity())) { return 0.0; }
 
-						if (abs_top >= ccm::helpers::top12_bits_of_double(std::numeric_limits<double>::infinity())) { return 1.0 + x; }
+						if (abs_top >= ccm::support::top12_bits_of_double(std::numeric_limits<double>::infinity())) { return 1.0 + x; }
 
 						// Handle underflow
-						if ((ccm::helpers::double_to_uint64(x) >> 63) != 0U) { return 0x1p-767 * 0x1p-767; }
+						if ((ccm::support::double_to_uint64(x) >> 63) != 0U) { return 0x1p-767 * 0x1p-767; }
 
 						// Handle Overflow
 						return 0x1p769 * 0x1p769;
@@ -116,7 +116,7 @@ namespace ccm::internal
 
 				// scaled_input - expo is in [-1, 1] in non-nearest rounding modes.
 				expo	   = ccm::helpers::narrow_eval(scaled_input + exp_shift_dbl);
-				expo_int64 = ccm::helpers::double_to_uint64(expo);
+				expo_int64 = ccm::support::double_to_uint64(expo);
 				expo -= exp_shift_dbl;
 
 				rem = x + expo * exp_negLn2HiN_dbl + expo * exp_negLn2LoN_dbl;
@@ -124,7 +124,7 @@ namespace ccm::internal
 				// 2^(expo/N) ~= scale * (1 + tail).
 				index = 2 * (expo_int64 % k_exp_table_n_dbl);
 				top	  = expo_int64 << (52 - k_exp_table_bits_dbl);
-				tail  = ccm::helpers::uint64_to_double(exp_tab_dbl.at(index));
+				tail  = ccm::support::uint64_to_double(exp_tab_dbl.at(index));
 
 				// This is only a valid scale when -1023*N < expo < 1024*N.
 				sign_bits = exp_tab_dbl.at(index + 1) + top;
@@ -138,7 +138,7 @@ namespace ccm::internal
 					  remSqr * remSqr * (exp_poly_coeff_three_dbl + rem * exp_poly_coeff_four_dbl);
 				if (CCM_UNLIKELY(abs_top == 0.0)) { return handle_special_case(tmp, sign_bits, expo_int64); }
 
-				scale = ccm::helpers::uint64_to_double(sign_bits);
+				scale = ccm::support::uint64_to_double(sign_bits);
 
 				// Note: tmp == 0 or |tmp| > 2^-65 and scale > 2^-739, so there is no spurious underflow here.
 				return scale + scale * tmp;
