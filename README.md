@@ -173,3 +173,10 @@ CCmath is an open-source project, and it needs your help to go on growing and im
 ## License
 
 CCMath is distributed under the MIT License. See the LICENSE file for more information.
+
+
+## Special Thanks
+
+Thanks a lot to LLVM, GCC,
+and LibM for a lot of insights and inspiration for many different tough issues
+encountered through out the development of ccmath!
