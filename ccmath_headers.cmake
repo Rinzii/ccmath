@@ -42,6 +42,7 @@ set(ccmath_internal_types_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/uint128.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/uint.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/sign.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/float128.hpp
 )
 
 
