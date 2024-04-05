@@ -60,7 +60,7 @@ namespace ccm::support
 		template <>
 		struct FPLayout<FPType::eBinary128>
 		{
-			using StorageType						 = ccm::uint128;
+			using StorageType						 = ccm::uint128_t;
 			inline static constexpr int SIGN_LEN	 = 1;
 			inline static constexpr int EXP_LEN		 = 15;
 			inline static constexpr int SIG_LEN		 = 112;
@@ -70,7 +70,7 @@ namespace ccm::support
 		template <>
 		struct FPLayout<FPType::eBinary80_x86>
 		{
-			using StorageType						 = ccm::uint128;
+			using StorageType						 = ccm::uint128_t;
 			inline static constexpr int SIGN_LEN	 = 1;
 			inline static constexpr int EXP_LEN		 = 15;
 			inline static constexpr int SIG_LEN		 = 64;
