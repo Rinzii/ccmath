@@ -6,6 +6,9 @@
  * See LICENSE for more information.
  */
 
+// Large chunks of this code is inspired by or uses code from LLVM
+// https://github.com/llvm/llvm-project/
+
 #pragma once
 
 #include "ccmath/internal/predef/likely.hpp"
