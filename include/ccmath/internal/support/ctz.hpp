@@ -42,11 +42,7 @@ namespace ccm::support
 	} // namespace internal
 
 	template <typename T>
-	constexpr int ctz(T /* x */) noexcept
-	{
-		static_assert(false, "Unsupported type for ctz"); // Prevent unsupported types from compiling, but give useful error.
-        return -1;
-	}
+	constexpr int ctz(T /* x */) noexcept;
 
 	template <>
 	constexpr int ctz(unsigned short x) noexcept
