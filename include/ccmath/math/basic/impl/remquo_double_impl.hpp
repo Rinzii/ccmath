@@ -16,7 +16,7 @@
 #include "ccmath/math/basic/abs.hpp"
 #include "ccmath/math/basic/fmod.hpp"
 
-#include "ccmath/internal/predef/compiler_warnings_and_errors_def.hpp"
+#include "ccmath/internal/predef/compiler_warnings_and_errors.hpp"
 
 namespace ccm::internal
 {
@@ -135,5 +135,3 @@ namespace ccm::internal
 		return static_cast<T>(impl::remquo_double_impl(x, y, quo));
 	}
 } // namespace ccm::internal
-
-#include "ccmath/internal/predef/compiler_warnings_and_errors_undef.hpp"
