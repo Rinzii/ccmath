@@ -20,9 +20,6 @@
 #include "ccmath/internal/types/uint128.hpp"
 #include <cstdint>
 
-// clang-format off
-CCM_DISABLE_GCC_WARNING(-Wpedantic)
-// clang-format on
 namespace ccm::support
 {
 	// The supported floating point types.
@@ -606,13 +603,9 @@ namespace ccm::support
 			else if constexpr (__LDBL_MANT_DIG__ == 64) { return FPType::eBinary80_x86; }
 			else if constexpr (__LDBL_MANT_DIG__ == 113) { return FPType::eBinary128; }
 		}
-
 #if defined(CCM_HAS_FLOAT128)
-		else if constexpr (std::is_same_v<UnqualT, float128>)
-		{
-			return FPType::eBinary128;
+		else if constexpr (std::is_same_v<UnqualT, float128>) { return FPType::eBinary128; }
 #endif
-		}
 		else { static_assert(ccm::support::always_false<UnqualT>, "Unsupported type"); }
 	}
 
@@ -645,6 +638,4 @@ namespace ccm::support
 		// Floating-point conversions.
 		inline constexpr T get_val() const { return ccm::support::bit_cast<T>(UP::bits); }
 	};
-	CCM_RESTORE_GCC_WARNING()
-
 } // namespace ccm::support
