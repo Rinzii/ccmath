@@ -17,7 +17,7 @@
 
 namespace ccm::support
 {
-	enum class float_round_style : std::int8_t
+	enum float_round_style : std::int8_t
 	{
 		round_indeterminate       = -1,
 		round_toward_zero         = 0,

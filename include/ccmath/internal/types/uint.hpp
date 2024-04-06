@@ -16,9 +16,9 @@
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/predef/compiler_warnings_and_errors.hpp" // Required to disable -fpermissive
 #include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/support/limits.hpp"
 #include "ccmath/internal/support/math_support.hpp"
 #include "ccmath/internal/support/type_identity.hpp"
-#include "ccmath/internal/support/limits.hpp"
 
 #include <array>
 #include <cstddef> // For std::size_t
@@ -36,7 +36,7 @@
 namespace ccm::internal
 {
 	// This is a workaround to get -Wpedantic to not complain about the use of
-	// unsigned __int128 in a non-iso function.
+	// unsigned __int128, a non-iso type, inside of an iso function.
 	__extension__ using uint128_t = unsigned __int128;
 } // namespace ccm::internal
 #endif // defined(__SIZEOF_INT128__)
