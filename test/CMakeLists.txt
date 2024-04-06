@@ -134,6 +134,18 @@ target_link_libraries(${PROJECT_NAME}-misc PRIVATE
 )
 
 
+# Tests for internal items
+add_executable(${PROJECT_NAME}-internal-types)
+target_sources(${PROJECT_NAME}-internal-types PRIVATE
+        internal/types/big_int_test.cpp
+
+)
+target_link_libraries(${PROJECT_NAME}-internal-types PRIVATE
+        ccmath::test
+        gtest::gtest
+)
+
+
 if(CCMATH_OS_WINDOWS)
   # For Windows: Prevent overriding the parent project's compiler/linker settings
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
@@ -159,5 +171,6 @@ add_test(NAME ${PROJECT_NAME}-nearest COMMAND ${PROJECT_NAME}-nearest)
 add_test(NAME ${PROJECT_NAME}-power COMMAND ${PROJECT_NAME}-power)
 add_test(NAME ${PROJECT_NAME}-misc COMMAND ${PROJECT_NAME}-misc)
 
-
+# Internal tests
+add_test(NAME ${PROJECT_NAME}-internal-types COMMAND ${PROJECT_NAME}-internal-types)
 
