@@ -19,10 +19,8 @@ namespace ccm
 	 * @param x The value to truncate.
 	 * @return Returns a truncated value.
 	 */
-	// Follows the requirements of std::trunc
-	// https://en.cppreference.com/w/cpp/numeric/math/trunc
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, int> = 0>
-	inline constexpr T trunc(T x) noexcept
+	constexpr T trunc(T x) noexcept
 	{
 		// If x is NaN then return Positive NaN or Negative NaN depending on the sign of x
 		if (ccm::isnan(x))
@@ -47,7 +45,7 @@ namespace ccm
 	 * @return Returns a truncated value.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>
-	inline constexpr double trunc(Integer x) noexcept
+	constexpr double trunc(Integer x) noexcept
 	{
 		return static_cast<double>(x);
 	}
@@ -57,7 +55,7 @@ namespace ccm
 	 * @param x The float to truncate.
 	 * @return Returns a truncated float.
 	 */
-	inline constexpr float truncf(float x) noexcept
+	constexpr float truncf(float x) noexcept
 	{
 		return trunc<float>(x);
 	}
@@ -68,7 +66,7 @@ namespace ccm
 	 * @param x The long double to truncate.
 	 * @return Returns a truncated long double.
 	 */
-	inline constexpr long double truncl(long double x) noexcept
+	constexpr long double truncl(long double x) noexcept
 	{
 		return trunc<long double>(x);
 	}

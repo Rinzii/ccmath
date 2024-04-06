@@ -23,7 +23,7 @@ namespace ccm
 	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
 	 */
 	template <typename T>
-	inline constexpr T floor(T num) noexcept
+	constexpr T floor(T num) noexcept
 	{
 		if constexpr (std::is_floating_point_v<T>)
 		{
@@ -44,7 +44,7 @@ namespace ccm
 	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	inline constexpr double floor(Integer num) noexcept
+	constexpr double floor(Integer num) noexcept
 	{
 		return static_cast<double>(num); // All integers already have a floor value. Just cast to double and return.
 	}
@@ -54,7 +54,7 @@ namespace ccm
 	 * @param num A floating-point value.
 	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
 	 */
-	inline constexpr float floorf(float num) noexcept
+	constexpr float floorf(float num) noexcept
 	{
 		return floor<float>(num);
 	}
@@ -64,7 +64,7 @@ namespace ccm
 	 * @param num A floating-point value.
 	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
 	 */
-	inline constexpr double floorl(double num) noexcept
+	constexpr double floorl(double num) noexcept
 	{
 		return floor<double>(num);
 	}

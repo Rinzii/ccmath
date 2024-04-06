@@ -21,10 +21,10 @@ typedef _Float128 float128;
 // identify the availability of __float128 type. As specified here: https://reviews.llvm.org/D15120
 #elif defined(__FLOAT128__) || defined(__SIZEOF_FLOAT128__)
 	#define CCM_HAS_FLOAT128
-typedef __float128 float128;
+using float128 = __float128;
 
 // If neither _Float128 nor __float128 are available, check if long double is 128 bits.
 #elif (LDBL_MANT_DIG == 113)
 	#define CCM_HAS_FLOAT128
-typedef long double float128;
+using float128 = long double;
 #endif

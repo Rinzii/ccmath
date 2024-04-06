@@ -10,7 +10,7 @@
 
 namespace ccm::helpers
 {
-	inline constexpr int digit_to_int(int c)
+	constexpr int digit_to_int(int c)
 	{
 		if ('0' <= c && c <= '9')
 		{

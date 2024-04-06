@@ -18,7 +18,7 @@ constexpr unsigned int DefaultSeed = 937162211; // Using a long prime number as 
 std::vector<int> generateRandomIntegers(size_t count, unsigned int seed) {
 	std::vector<int> randomIntegers;
 	std::mt19937 gen(seed);
-	std::uniform_int_distribution<int> dist(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+	std::uniform_int_distribution dist(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
 	for (size_t i = 0; i < count; ++i) {
 		randomIntegers.push_back(dist(gen));
 	}
@@ -29,7 +29,7 @@ std::vector<int> generateRandomIntegers(size_t count, unsigned int seed) {
 std::vector<double> generateRandomDoubles(size_t count, unsigned int seed) {
 	std::vector<double> randomDouble;
 	std::mt19937 gen(seed);
-	std::uniform_real_distribution<double> dist(std::numeric_limits<double>::min(), std::numeric_limits<double>::max());
+	std::uniform_real_distribution dist(std::numeric_limits<double>::min(), std::numeric_limits<double>::max());
 	for (size_t i = 0; i < count; ++i) {
 		randomDouble.push_back(dist(gen));
 	}

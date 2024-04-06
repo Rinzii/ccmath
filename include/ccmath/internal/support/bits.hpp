@@ -29,7 +29,7 @@ namespace ccm::support::traits
 	template <> struct is_char<char32_t> : std::true_type {};
 	template <> struct is_char<signed char> : std::true_type {};
 	template <> struct is_char<unsigned char> : std::true_type {};
-	template <typename T> inline constexpr bool is_char_v = is_char<T>::value;
+	template <typename T> constexpr bool is_char_v = is_char<T>::value;
 
     template <typename T> struct is_unsigned_integer : std::false_type {};
     template <> struct is_unsigned_integer<unsigned char> : std::true_type {};
@@ -40,7 +40,7 @@ namespace ccm::support::traits
 #if defined(__SIZEOF_INT128__)
     template <> struct is_unsigned_integer<__uint128_t> : std::true_type {};
 #endif
-    template <typename T> inline constexpr bool is_unsigned_integer_v = is_unsigned_integer<T>::value;
+    template <typename T> constexpr bool is_unsigned_integer_v = is_unsigned_integer<T>::value;
 	// clang-format on
 
 } // namespace ccm::support::traits
@@ -56,7 +56,7 @@ namespace ccm::support
 	 * @return
 	 */
 	template <class To, class From>
-	std::enable_if_t<sizeof(To) == sizeof(From) && std::is_trivially_copyable_v<From> && std::is_trivially_copyable_v<To>, To> inline constexpr bit_cast(
+	std::enable_if_t<sizeof(To) == sizeof(From) && std::is_trivially_copyable_v<From> && std::is_trivially_copyable_v<To>, To> constexpr bit_cast(
 		const From & src) noexcept
 	{
 		static_assert(std::is_trivially_constructible_v<To>, "This implementation additionally requires "
@@ -77,57 +77,57 @@ namespace ccm::support
 	 * @param x Double to get the bits from.
 	 * @return
 	 */
-	inline constexpr std::uint32_t top16_bits_of_double(double x) noexcept
+	constexpr std::uint32_t top16_bits_of_double(double x) noexcept
 	{
 		return static_cast<std::uint32_t>(bit_cast<std::uint64_t>(x) >> 48);
 	}
 
-	inline constexpr std::uint32_t top12_bits_of_double(double x) noexcept
+	constexpr std::uint32_t top12_bits_of_double(double x) noexcept
 	{
 		return static_cast<std::uint32_t>(bit_cast<std::uint64_t>(x) >> 52);
 	}
 
-	inline constexpr std::uint32_t top12_bits_of_float(float x) noexcept
+	constexpr std::uint32_t top12_bits_of_float(float x) noexcept
 	{
 		return bit_cast<std::uint32_t>(x) >> 20;
 	}
 
-	inline constexpr std::uint64_t double_to_uint64(double x) noexcept
+	constexpr std::uint64_t double_to_uint64(double x) noexcept
 	{
 		return bit_cast<std::uint64_t>(x);
 	}
 
-	inline constexpr std::int64_t double_to_int64(double x) noexcept
+	constexpr std::int64_t double_to_int64(double x) noexcept
 	{
 		return bit_cast<std::int64_t>(x);
 	}
 
-	inline constexpr double uint64_to_double(std::uint64_t x) noexcept
+	constexpr double uint64_to_double(std::uint64_t x) noexcept
 	{
 		return bit_cast<double>(x);
 	}
 
-	inline constexpr double int64_to_double(std::int64_t x) noexcept
+	constexpr double int64_to_double(std::int64_t x) noexcept
 	{
 		return bit_cast<double>(x);
 	}
 
-	inline constexpr std::uint32_t float_to_uint32(float x) noexcept
+	constexpr std::uint32_t float_to_uint32(float x) noexcept
 	{
 		return bit_cast<std::uint32_t>(x);
 	}
 
-	inline constexpr std::int32_t float_to_int32(float x) noexcept
+	constexpr std::int32_t float_to_int32(float x) noexcept
 	{
 		return bit_cast<std::int32_t>(x);
 	}
 
-	inline constexpr float uint32_to_float(std::uint32_t x) noexcept
+	constexpr float uint32_to_float(std::uint32_t x) noexcept
 	{
 		return bit_cast<float>(x);
 	}
 
-	inline constexpr float int32_to_float(std::int32_t x) noexcept
+	constexpr float int32_to_float(std::int32_t x) noexcept
 	{
 		return bit_cast<float>(x);
 	}
@@ -165,7 +165,7 @@ namespace ccm::support
 
 	// https://en.cppreference.com/w/cpp/numeric/countr_zero
 	template <typename T>
-	[[nodiscard]] inline constexpr std::enable_if_t<std::is_unsigned_v<T>, int> countr_zero(T value)
+	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> countr_zero(T value)
 	{
 		if (value == 0) { return std::numeric_limits<T>::digits; }
 
@@ -182,13 +182,13 @@ namespace ccm::support
 	}
 
 	template <typename T>
-	[[nodiscard]] inline constexpr std::enable_if_t<std::is_unsigned_v<T>, int> countr_one(T value)
+	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> countr_one(T value)
 	{
 		return value != std::numeric_limits<T>::max() ? countr_zero(static_cast<T>(~value)) : std::numeric_limits<T>::digits;
 	}
 
 	template <typename T, std::enable_if_t<ccm::support::traits::is_unsigned_integer_v<T>, bool> = true>
-	[[nodiscard]] inline constexpr std::enable_if_t<std::is_unsigned_v<T>, int> countl_zero(T value)
+	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> countl_zero(T value)
 	{
 		if (value == 0) { return std::numeric_limits<T>::digits; }
 
@@ -208,13 +208,13 @@ namespace ccm::support
 	}
 
 	template <typename T, std::enable_if_t<ccm::support::traits::is_unsigned_integer_v<T>, bool> = true>
-	[[nodiscard]] inline constexpr std::enable_if_t<std::is_unsigned_v<T>, int> countl_one(T value)
+	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> countl_one(T value)
 	{
 		return value != std::numeric_limits<T>::max() ? countl_zero(static_cast<T>(~value)) : std::numeric_limits<T>::digits;
 	}
 
 	template <typename T>
-	[[nodiscard]] inline constexpr std::enable_if_t<std::is_unsigned_v<T>, int> bit_width(T value)
+	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> bit_width(T value)
 	{
 		return std::numeric_limits<T>::digits - countl_zero(value);
 	}
@@ -227,7 +227,7 @@ namespace ccm::support
 	}
 #else  // !__has_builtin(__builtin_popcountg)
 	template <typename T>
-	[[nodiscard]] inline constexpr std::enable_if_t<std::is_unsigned_v<T>, int> popcount(T value)
+	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> popcount(T value)
 	{
 		int count = 0;
 		for (int i = 0; i != std::numeric_limits<T>::digits; ++i)
@@ -241,19 +241,19 @@ namespace ccm::support
 // If the compiler has builtin's for popcount, the create specializations that use the builtin.
 #if __has_builtin(__builtin_popcount)
 	template <>
-	[[nodiscard]] inline constexpr int popcount<unsigned char>(unsigned char value)
+	[[nodiscard]] constexpr int popcount<unsigned char>(unsigned char value)
 	{
 		return __builtin_popcount(value);
 	}
 
 	template <>
-	[[nodiscard]] inline constexpr int popcount<unsigned short>(unsigned short value)
+	[[nodiscard]] constexpr int popcount<unsigned short>(unsigned short value)
 	{
 		return __builtin_popcount(value);
 	}
 
 	template <>
-	[[nodiscard]] inline constexpr int popcount<unsigned>(unsigned value)
+	[[nodiscard]] constexpr int popcount<unsigned>(unsigned value)
 	{
 		return __builtin_popcount(value);
 	}
@@ -261,7 +261,7 @@ namespace ccm::support
 
 #if __has_builtin(__builtin_popcountl)
 	template <>
-	[[nodiscard]] inline constexpr int popcount<unsigned long>(unsigned long value)
+	[[nodiscard]] constexpr int popcount<unsigned long>(unsigned long value)
 	{
 		return __builtin_popcountl(value);
 	}
@@ -269,7 +269,7 @@ namespace ccm::support
 
 #if __has_builtin(__builtin_popcountll)
 	template <>
-	[[nodiscard]] inline constexpr int popcount<unsigned long long>(unsigned long long value)
+	[[nodiscard]] constexpr int popcount<unsigned long long>(unsigned long long value)
 	{
 		return __builtin_popcountll(value);
 	}

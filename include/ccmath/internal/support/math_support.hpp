@@ -16,7 +16,7 @@ namespace ccm::support
 	// Create a bitmask with the count right-most bits set to 1, and all other bits
 	// set to 0.  Only unsigned types are allowed.
 	template <typename T, std::size_t count>
-	inline constexpr std::enable_if_t<std::is_unsigned_v<T>, T>
+	constexpr std::enable_if_t<std::is_unsigned_v<T>, T>
 	mask_trailing_ones() {
 		constexpr unsigned T_BITS = CHAR_BIT * sizeof(T);
 		static_assert(count <= T_BITS && "Invalid bit index");
@@ -26,7 +26,7 @@ namespace ccm::support
 	// Create a bitmask with the count left-most bits set to 1, and all other bits
 	// set to 0.  Only unsigned types are allowed.
 	template <typename T, std::size_t count>
-	inline constexpr std::enable_if_t<std::is_unsigned_v<T>, T>
+	constexpr std::enable_if_t<std::is_unsigned_v<T>, T>
 	mask_leading_ones() {
 		return T(~mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>());
 	}
