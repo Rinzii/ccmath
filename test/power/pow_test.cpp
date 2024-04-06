@@ -25,5 +25,9 @@ TEST(CcmathExponentialTests, Pow)
 	EXPECT_EQ(ccm::pow(2.0, 5.0), std::pow(2.0, 5.0));
 	EXPECT_EQ(ccm::pow(2.0, 6.0), std::pow(2.0, 6.0));
 */
+	unsigned int x = 2;
+	unsigned int y = 474360680;
+	EXPECT_EQ(ccm::internal::impl::pow_expo_by_sqr2(x, y), std::pow(x, y));
+
 
 }

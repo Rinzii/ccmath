@@ -19,7 +19,7 @@ namespace ccm::internal
 	{
 		namespace impl
 		{
-			inline constexpr double fma_double_impl(double x, double y, double z) noexcept
+			inline constexpr double fma_ldouble_impl(double x, double y, double z) noexcept
 			{
 
 				// #pragma STDC FENV_ACCESS ON

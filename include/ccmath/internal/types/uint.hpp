@@ -11,6 +11,8 @@
 
 #pragma once
 
+// TODO: Currently this type is broken with gcc.
+
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/math_support.hpp"

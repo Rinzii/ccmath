@@ -8,16 +8,14 @@
 
 #pragma once
 
-#include <limits>
-#include <type_traits>
 #include "ccmath/ccmath.hpp"
 #include "ccmath/math/exponential/exp.hpp"
 #include "ccmath/math/exponential/log.hpp"
-// #include "ccmath/internal/types/uint.hpp"
+#include <limits>
+#include <type_traits>
 
 namespace ccm
 {
-
 	namespace internal
 	{
 		namespace

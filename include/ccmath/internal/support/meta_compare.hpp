@@ -10,7 +10,7 @@
 
 #include <type_traits>
 
-namespace ccm::helpers
+namespace ccm::support
 {
 	/// @cond HIDDEN_SYMBOLS
 	namespace detail

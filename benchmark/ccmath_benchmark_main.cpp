@@ -87,6 +87,8 @@ static void BM_ccm_abs_rand_int(benchmark::State& state) {
 }
 BENCHMARK(BM_ccm_abs_rand_int)->Range(8, 8<<10)->Complexity();
 */
+/*
+
 // Benchmarking std::abs with the same set of random integers
 static void BM_std_abs_rand_double(benchmark::State& state) {
 	auto randomIntegers = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
@@ -128,7 +130,6 @@ static void BM_ccm_abs(benchmark::State& state) {
 }
 BENCHMARK(BM_ccm_abs)->Arg(16)->Arg(256)->Arg(4096)->Arg(65536)->Complexity();
 
-/*
 
 static void BM_std_log_rand_double(bm::State& state) {
 	auto randomDoubles = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
@@ -233,6 +234,65 @@ BENCHMARK(BM_std_lerp)->Args({16, 16, 16})->Args({256, 256, 256})->Args({4096, 4
 
 */
 
+// pow
+static void BM_std_unsigned_int_pow(bm::State& state) {
+    for (auto _ : state) {
+        bm::DoNotOptimize(std::pow(static_cast<unsigned int>(state.range(0)), static_cast<unsigned int>(state.range(1))));
+    }
+    state.SetComplexityN(state.range(0));
+}
+BENCHMARK(BM_std_unsigned_int_pow)->Args({16, 16})->Args({256, 256})->Args({4096, 4096})->Args({65536, 65536})->Complexity();
+
+static void BM_ccm_unsigned_int_pow(bm::State& state) {
+    for (auto _ : state) {
+        bm::DoNotOptimize(ccm::pow(static_cast<unsigned int>(state.range(0)), static_cast<unsigned int>(state.range(1))));
+    }
+    state.SetComplexityN(state.range(0));
+}
+BENCHMARK(BM_ccm_unsigned_int_pow)->Args({16, 16})->Args({256, 256})->Args({4096, 4096})->Args({65536, 65536})->Complexity();
+
+static void BM_ccm_unsigned_int_pow2(bm::State& state) {
+    for (auto _ : state) {
+        bm::DoNotOptimize(ccm::internal::impl::pow_expo_by_sqr2(static_cast<unsigned int>(state.range(0)), static_cast<unsigned int>(state.range(1))));
+    }
+    state.SetComplexityN(state.range(0));
+}
+BENCHMARK(BM_ccm_unsigned_int_pow2)->Args({16, 16})->Args({256, 256})->Args({4096, 4096})->Args({65536, 65536})->Complexity();
+
+/*
+static void BM_std_unsigned_int_pow_rand(bm::State& state) {
+    auto randomIntegers = generateRandomIntegers(static_cast<size_t>(state.range(0)), DefaultSeed);
+    while (state.KeepRunning()) {
+        for (auto x : randomIntegers) {
+            bm::DoNotOptimize(std::pow(static_cast<unsigned int>(2), static_cast<unsigned int>(x)));
+        }
+    }
+    state.SetComplexityN(state.range(0));
+}
+BENCHMARK(BM_std_unsigned_int_pow_rand)->Range(8, 8<<10)->Complexity();
+
+static void BM_ccm_unsigned_int_pow_rand(bm::State& state) {
+    auto randomIntegers = generateRandomIntegers(static_cast<size_t>(state.range(0)), DefaultSeed);
+    while (state.KeepRunning()) {
+        for (auto x : randomIntegers) {
+            bm::DoNotOptimize(ccm::pow(static_cast<unsigned int>(x), static_cast<unsigned int>(x)));
+        }
+    }
+    state.SetComplexityN(state.range(0));
+}
+BENCHMARK(BM_ccm_unsigned_int_pow_rand)->Range(8, 8<<10)->Complexity();
+
+static void BM_ccm_unsigned_int_pow2_rand(bm::State& state) {
+	auto randomIntegers = generateRandomIntegers(static_cast<size_t>(state.range(0)), DefaultSeed);
+	while (state.KeepRunning()) {
+		for (auto x : randomIntegers) {
+			bm::DoNotOptimize(ccm::internal::impl::pow_expo_by_sqr2(static_cast<unsigned int>(2), static_cast<unsigned int>(x)));
+		}
+	}
+	state.SetComplexityN(state.range(0));
+}
+BENCHMARK(BM_ccm_unsigned_int_pow2_rand)->Range(8, 8<<10)->Complexity();
+*/
 BENCHMARK_MAIN();
 
 

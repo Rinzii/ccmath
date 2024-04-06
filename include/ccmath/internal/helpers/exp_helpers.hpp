@@ -22,7 +22,7 @@ namespace ccm::helpers
 #else
 	// check if the type is the same as float or double
 	template <typename T>
-	inline constexpr bool check_excess_precision = ccm::helpers::or_v<std::is_same<T, float>, std::is_same<T, double>>;
+	inline constexpr bool check_excess_precision = ccm::support::or_v<std::is_same<T, float>, std::is_same<T, double>>;
 #endif
 
 	template <typename T>
