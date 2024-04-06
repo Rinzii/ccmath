@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "ccmath/internal/types/float128.hpp"
+
 #include <cstdint>
 #include <type_traits>
 
