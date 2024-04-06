@@ -18,7 +18,10 @@ namespace ccm::internal::impl
 
 	constexpr double nan_double_impl(const char * arg) noexcept
 	{
-		static_assert(std::numeric_limits<double>::is_iec559, "IEEE-754 representation required for this implementation");
+		if constexpr (!std::numeric_limits<double>::is_iec559)
+		{
+            return 0.0;
+        }
 
 #if defined(_MSC_VER) && !defined(__clang__)
 		// Currently, MSVC always returns a Quiet NaN no matter if a payload is
