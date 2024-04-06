@@ -10,112 +10,91 @@
 
 #include "ccmath/internal/helpers/digit_to_int.hpp"
 #include "ccmath/internal/support/bits.hpp"
-
 #include <cstdint>
 #include <limits>
 
-namespace ccm::internal
+namespace ccm::internal::impl
 {
-	namespace
+
+	constexpr double nan_double_impl(const char * arg) noexcept
 	{
-		namespace impl
-		{
-
-			inline constexpr double nan_double_impl(const char * arg) noexcept
-			{
-				static_assert(std::numeric_limits<double>::is_iec559, "IEEE-754 representation required for this implementation");
-
-				std::uint64_t dbl_bits{0};
-				bool has_hex_been_detected{false};
-
-				if (arg == nullptr)
-				{
-					return std::numeric_limits<double>::quiet_NaN(); // Default NaN
-				}
-
-				if (arg[0] == '\0')
-				{
-					return std::numeric_limits<double>::quiet_NaN(); // Default NaN
-				}
-
-				// NOLINTBEGIN
-
-				// Check for a hex prefix and if its detected, skip the prefix and set the flag.
-				if (arg[0] == '0' && (arg[1] == 'x' || arg[1] == 'X'))
-				{
-					arg += 2;
-					has_hex_been_detected = true;
-				}
-
-				bool msvc_one_digit_patch{false};
+		static_assert(std::numeric_limits<double>::is_iec559, "IEEE-754 representation required for this implementation");
 
 #if defined(_MSC_VER) && !defined(__clang__)
-				// For some reason when passing '1' or '0x1' with msvc will cause it to adds on an extra bit to the number.
-				// I do not know why msvc does this, but it causes the number to be off by 1.
-				// This is a patch to fix that issue.
-
-				// Check that the last character is 1 and no other characters have been provided other than zero.
-				msvc_one_digit_patch = true;
+		// Currently, MSVC always returns a Quiet NaN with no matter if a payload is
+		// provided or not. This is different from GCC and Clang which do allow payloads to be set.
+		// So if we detect we are using MSVC without Clang-CL then
+		// we can just return NaN and not bother doing any extra work.
+		// To properly mimic the behavior of MSVC.
+		return std::numeric_limits<double>::quiet_NaN(); // Default NaN
 #endif
 
-				if (!has_hex_been_detected)
-				{
-					// Check that all of are characters are numbers. If we detect a non-number, return the default NaN.
-					for (std::size_t i = 0; arg[i] != '\0'; ++i) // NOLINT
-					{
-						if (arg[i] < '0' || arg[i] > '9')
-						{
-							return std::numeric_limits<double>::quiet_NaN(); // Default NaN
-						}
-					}
-				}
+		std::uint64_t dbl_bits{0};
+		bool has_hex_been_detected{false};
 
-				if (has_hex_been_detected)
-				{
-					// Calculate tag_value by handling wrapping for numbers larger than 8 digits
-					for (std::size_t i = 0; arg[i] != '\0'; ++i)
-					{
-						dbl_bits *= 16;
-						dbl_bits += static_cast<uint8_t>(ccm::helpers::digit_to_int(arg[i])); // Convert ASCII to numeric value
-						if (i >= 15)
-						{
-							dbl_bits %= static_cast<uint64_t>(1e18); // Wrap around for numbers larger than 8 digits
-						}
-					}
-				}
-				else
-				{
-					// Calculate tag_value by handling wrapping for numbers larger than 8 digits
-					for (std::size_t i = 0; arg[i] != '\0'; ++i)
-					{
-						dbl_bits *= 10;
-						dbl_bits += static_cast<uint8_t>(arg[i] - '0'); // Convert ASCII to numeric value
-						if (i >= 15)
-						{
-							dbl_bits %= static_cast<uint64_t>(1e18); // Wrap around for numbers larger than 8 digits
-						}
-					}
-				}
-				// NOLINTEND
+		if (arg == nullptr)
+		{
+			return std::numeric_limits<double>::quiet_NaN(); // Default NaN
+		}
 
-				// Set the tag bits for NaN
-				// dbl_bits |= UINT64_C(0x7FF8000000000000);
-				dbl_bits |= ccm::support::bit_cast<std::uint64_t>(std::numeric_limits<double>::quiet_NaN());
+		// NOLINTBEGIN
+		if (arg[0] == '\0') //
+		{
+			return std::numeric_limits<double>::quiet_NaN(); // Default NaN
+		}
 
-				// Subtract 1 bit from the number if the msvc patch is active
-				if (msvc_one_digit_patch)
+		// Check for a hex prefix and if its detected, skip the prefix and set the flag.
+		if (arg[0] == '0' && (arg[1] == 'x' || arg[1] == 'X'))
+		{
+			arg += 2;
+			has_hex_been_detected = true;
+		}
+
+		if (!has_hex_been_detected)
+		{
+			// Check that all of are characters are numbers. If we detect a non-number, return the default NaN.
+			for (std::size_t i = 0; arg[i] != '\0'; ++i) // NOLINT
+			{
+				if (arg[i] < '0' || arg[i] > '9')
 				{
-					// TODO: Make this more efficient
-					//       Currently, MSVC always returns a Quiet NaN with no additional bits set.
-					//       This feature applies no matter what the input is.
 					return std::numeric_limits<double>::quiet_NaN(); // Default NaN
 				}
-
-				// dbl_bits -= 1;
-
-				// Convert the uint64_t tag into a double NaN
-				return ccm::support::bit_cast<double>(dbl_bits);
 			}
-		} // namespace impl
-	} // namespace
-} // namespace ccm::internal
+		}
+
+		if (has_hex_been_detected)
+		{
+			// Calculate tag_value by handling wrapping for numbers larger than 8 digits
+			for (std::size_t i = 0; arg[i] != '\0'; ++i)
+			{
+				dbl_bits *= 16;
+				dbl_bits += static_cast<uint8_t>(ccm::helpers::digit_to_int(arg[i])); // Convert ASCII to numeric value
+				if (i >= 15)
+				{
+					dbl_bits %= static_cast<uint64_t>(1e18); // Wrap around for numbers larger than 8 digits
+				}
+			}
+		}
+		else
+		{
+			// Calculate tag_value by handling wrapping for numbers larger than 8 digits
+			for (std::size_t i = 0; arg[i] != '\0'; ++i)
+			{
+				dbl_bits *= 10;
+				dbl_bits += static_cast<uint8_t>(arg[i] - '0'); // Convert ASCII to numeric value
+				if (i >= 15)
+				{
+					dbl_bits %= static_cast<uint64_t>(1e18); // Wrap around for numbers larger than 8 digits
+				}
+			}
+		}
+		// NOLINTEND
+
+		// Set the tag bits for NaN
+		// dbl_bits |= UINT64_C(0x7FF8000000000000);
+		dbl_bits |= ccm::support::bit_cast<std::uint64_t>(std::numeric_limits<double>::quiet_NaN());
+
+		// Convert the uint64_t tag into a double NaN
+		return ccm::support::bit_cast<double>(dbl_bits);
+	}
+} // namespace ccm::internal::impl
