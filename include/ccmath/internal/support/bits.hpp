@@ -11,6 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/support/ctz.hpp"
+#include "ccmath/internal/predef/has_builtin.hpp"
 
 #include <cstdint>
 #include <type_traits>
@@ -219,13 +220,13 @@ namespace ccm::support
 		return std::numeric_limits<T>::digits - countl_zero(value);
 	}
 
-#if __has_builtin(__builtin_popcountg)
+#if CCM_HAS_BUILTIN(__builtin_popcountg)
 	template <typename T>
 	[[nodiscard]] LIBC_INLINE constexpr cpp::enable_if_t<cpp::is_unsigned_v<T>, int> popcount(T value)
 	{
 		return __builtin_popcountg(value);
 	}
-#else  // !__has_builtin(__builtin_popcountg)
+#else  // !CCM_HAS_BUILTIN(__builtin_popcountg)
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> popcount(T value)
 	{
@@ -236,10 +237,10 @@ namespace ccm::support
 		}
 		return count;
 	}
-#endif // __has_builtin(__builtin_popcountg)
+#endif // CCM_HAS_BUILTIN(__builtin_popcountg)
 
 // If the compiler has builtin's for popcount, the create specializations that use the builtin.
-#if __has_builtin(__builtin_popcount)
+#if CCM_HAS_BUILTIN(__builtin_popcount)
 	template <>
 	[[nodiscard]] constexpr int popcount<unsigned char>(unsigned char value)
 	{
@@ -257,22 +258,22 @@ namespace ccm::support
 	{
 		return __builtin_popcount(value);
 	}
-#endif // __has_builtin(__builtin_popcount)
+#endif // CCM_HAS_BUILTIN(__builtin_popcount)
 
-#if __has_builtin(__builtin_popcountl)
+#if CCM_HAS_BUILTIN(__builtin_popcountl)
 	template <>
 	[[nodiscard]] constexpr int popcount<unsigned long>(unsigned long value)
 	{
 		return __builtin_popcountl(value);
 	}
-#endif // __has_builtin(__builtin_popcountl)
+#endif // CCM_HAS_BUILTIN(__builtin_popcountl)
 
-#if __has_builtin(__builtin_popcountll)
+#if CCM_HAS_BUILTIN(__builtin_popcountll)
 	template <>
 	[[nodiscard]] constexpr int popcount<unsigned long long>(unsigned long long value)
 	{
 		return __builtin_popcountll(value);
 	}
-#endif // __has_builtin(__builtin_popcountll)
+#endif // CCM_HAS_BUILTIN(__builtin_popcountll)
 
 } // namespace ccm::support

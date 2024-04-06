@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "ccmath/internal/predef/has_builtin.hpp"
+
 #include <limits>
 #include <type_traits>
 
@@ -47,7 +49,7 @@ namespace ccm::support
 	template <>
 	constexpr int ctz(unsigned short x) noexcept
 	{
-#if __has_builtin(__builtin_ctzs)
+#if CCM_HAS_BUILTIN(__builtin_ctzs)
 		return __builtin_ctzs(x);
 #else
 		return internal::generic_ctz(x);
@@ -57,7 +59,7 @@ namespace ccm::support
 	template <>
 	constexpr int ctz(unsigned int x) noexcept
 	{
-#if __has_builtin(__builtin_ctz)
+#if CCM_HAS_BUILTIN(__builtin_ctz)
 		return __builtin_ctz(x);
 #else
 		return internal::generic_ctz(x);
@@ -67,7 +69,7 @@ namespace ccm::support
 	template <>
 	constexpr int ctz(unsigned long x) noexcept
 	{
-#if __has_builtin(__builtin_ctzl)
+#if CCM_HAS_BUILTIN(__builtin_ctzl)
 		return __builtin_ctzl(x);
 #else
 		return internal::generic_ctz(x);
@@ -77,7 +79,7 @@ namespace ccm::support
 	template <>
 	constexpr int ctz(unsigned long long x) noexcept
 	{
-#if __has_builtin(__builtin_ctzll)
+#if CCM_HAS_BUILTIN(__builtin_ctzll)
 		return __builtin_ctzll(x);
 #else
 		return internal::generic_ctz(x);

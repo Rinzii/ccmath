@@ -20,6 +20,7 @@ set(ccmath_internal_predef_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/unlikely.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/no_debug.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/suppress.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/has_builtin.hpp
 )
 
 set(ccmath_internal_support_headers
@@ -31,15 +32,12 @@ set(ccmath_internal_support_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/unreachable.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/ctz.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_identity.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/floating_point_bits.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/math_support.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/always_false.hpp
 )
 
 set(ccmath_internal_types_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/fp_types.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/uint128.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/uint.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/number_pair.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/sign.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/float128.hpp
 )
