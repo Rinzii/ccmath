@@ -8,13 +8,16 @@
 
 #include <gtest/gtest.h>
 
-#include <ccmath/detail/basic/max.hpp>
+#include <ccmath/ccmath.hpp>
 #include <cmath>
 #include <limits>
 
 
 TEST(CcmathBasicTests, Fmax)
 {
+	// Test that fmax works with static_assert
+	static_assert(ccm::max(1.0, 2.0) == 2, "max has failed testing that it is static_assert-able!");
+
     EXPECT_EQ(ccm::fmax(1.0, 2.0), std::fmax(1.0, 2.0));
     EXPECT_EQ(ccm::fmax(2.0, 1.0), std::fmax(2.0, 1.0));
     EXPECT_EQ(ccm::fmax(1.0, 1.0), std::fmax(1.0, 1.0));

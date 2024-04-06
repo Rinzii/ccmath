@@ -8,13 +8,16 @@
 
 #include <gtest/gtest.h>
 #include <cmath>
-#include <ccmath/detail/compare/signbit.hpp>
+#include <ccmath/ccmath.hpp>
 #include <limits>
 
 
 TEST(CcmathCompareTests, Signbit)
 {
-	// TODO: For some reason MSVC is getting confused with ambiguity between floating point numbers. Look into this later.
+	// Test that signbit is static_assert-able
+    static_assert(ccm::signbit(1.0) == false, "signbit has failed testing that it is static_assert-able!");
+
+	// MSVC has issues when std::signbit is called using an integer due to ambiguity
 	EXPECT_EQ(ccm::signbit<float>(1.0), std::signbit(1.0));
     EXPECT_EQ(ccm::signbit<float>(-1.0), std::signbit(-1.0));
     EXPECT_EQ(ccm::signbit<float>(0.0), std::signbit(0.0));
@@ -25,18 +28,7 @@ TEST(CcmathCompareTests, Signbit)
 	EXPECT_EQ(ccm::signbit<float>(-std::numeric_limits<double>::quiet_NaN()), std::signbit(-std::numeric_limits<double>::quiet_NaN()));
 
 
-	// Test integers
-	EXPECT_EQ(ccm::signbit<int>(1), std::signbit(1));
-    EXPECT_EQ(ccm::signbit<int>(-1), std::signbit(-1));
-    EXPECT_EQ(ccm::signbit<int>(0), std::signbit(0));
-    EXPECT_EQ(ccm::signbit<int>(-0), std::signbit(-0));
-    EXPECT_EQ(ccm::signbit<int>(std::numeric_limits<int>::max()), std::signbit(std::numeric_limits<int>::max()));
-	EXPECT_EQ(ccm::signbit<int>(std::numeric_limits<int>::min()), std::signbit(std::numeric_limits<int>::min()));
-	EXPECT_EQ(ccm::signbit<int>(std::numeric_limits<int>::lowest()), std::signbit(std::numeric_limits<int>::lowest()));
-	EXPECT_EQ(ccm::signbit<int>(std::numeric_limits<int>::infinity()), std::signbit(std::numeric_limits<int>::infinity()));
-	EXPECT_EQ(ccm::signbit<int>(-std::numeric_limits<int>::infinity()), std::signbit(-std::numeric_limits<int>::infinity()));
-	EXPECT_EQ(ccm::signbit<int>(std::numeric_limits<int>::quiet_NaN()), std::signbit(std::numeric_limits<int>::quiet_NaN()));
-	EXPECT_EQ(ccm::signbit<int>(-std::numeric_limits<int>::quiet_NaN()), std::signbit(-std::numeric_limits<int>::quiet_NaN()));
+
 
 
 

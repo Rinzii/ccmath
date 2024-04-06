@@ -1,10 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-enable_language(CXX)
-
-# We will hit 1.0.0 when we have a stable API
-# We will hit 0.1.0 when we have finished the basic API
-set(CCMATH_BUILD_VERSION 0.0.1)
+set(CCMATH_BUILD_VERSION 0.1.3)
 set(INTERNAL_PROJ_DEFAULT_NAME ccmath)
 
 project(${INTERNAL_PROJ_DEFAULT_NAME} VERSION ${CCMATH_BUILD_VERSION})
@@ -23,8 +19,8 @@ option(CCMATH_BUILD_TEST "Build ccmath tests" ${is_root_project})
 option(CCMATH_BUILD_EXAMPLES "Build ccmath examples" ${is_root_project})
 option(CCMATH_BUILD_BENCHMARKS "Build ccmath benchmarks" ${is_root_project})
 option(CCMATH_INSTALL "Setup install and package steps" ${is_root_project})
-option(CCMATH_USE_SIMD "Use SIMD instructions" OFF)
-option(CCMATH_BUILD_EXE "Build ccmath benchmarks" ${is_root_project}) # TODO: This will be removed once we reach a stable API
+option(CCMATH_USE_SIMD "Use SIMD instructions" OFF) # SIMD is not yet implemented.
+option(CCMATH_ENABLE_EXTENSIONS "Enable the extended ccmath library that adds helpful additional methods that are not defined by the standard" ON)
 
 # include the global configuration file
 include(cmake/GlobalConfig.cmake)
@@ -35,6 +31,13 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME}-compile-options ALIAS ${PROJECT_NAM
 if(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU)
   target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
           -Wall -Wextra -Wpedantic -Wconversion -Werror=return-type
+  )
+
+  # TODO: Remove this later.
+  #       Some variables have been provided but are not currently being used, but it would not atm make sense to remove them.
+  #       So to clean up the warnings we are just silencing these specific cases.
+  target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+          -Wno-unused-but-set-variable -Wno-unused-value
   )
 endif()
 
@@ -51,6 +54,11 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_headers}>")
 
+if (CCMATH_ENABLE_EXTENSIONS)
+  include(ccmath_extensions_headers.cmake)
+  target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_extensions_headers}>")
+endif()
+
 target_include_directories(${PROJECT_NAME} INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>)
 target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)
 
@@ -61,16 +69,18 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
 )
 
 
-
-
 configure_file(cmake/version.hpp.in "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp" @ONLY)
 
-if (CCMATH_BUILD_EXE)
-  add_subdirectory(temp_exe)
+if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TEST)
+  add_subdirectory(thirdparty)
 endif()
 
-if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TEST)
-  add_subdirectory(ext)
+if (CCMATH_BUILD_EXAMPLES)
+  add_subdirectory(example)
+endif()
+
+if (CCMATH_BUILD_BENCHMARKS)
+  add_subdirectory(benchmark)
 endif()
 
 if (CCMATH_BUILD_TEST)
@@ -80,7 +90,7 @@ endif()
 
 if (CCMATH_USE_SIMD)
   # TODO: Add a better way to handle enabling simd internally.
-  add_compile_definitions(INTERNAL_ENABLE_CHECK_FOR_SIMD)
+  add_compile_definitions(INTERNAL_CCMATH_ENABLE_CHECK_FOR_SIMD)
 endif ()
 
 

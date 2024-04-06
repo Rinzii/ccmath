@@ -10,8 +10,7 @@
 
 #include <cmath>
 #include <limits>
-#include "ccmath/detail/nearest/trunc.hpp"
-#include "ccmath/internal/helpers/not_null.hpp"
+#include "ccmath/ccmath.hpp"
 
 // TODO: Find a way to test all of the different ways the function may behave internally to work based on the provided compiler.
 
@@ -33,6 +32,7 @@ TEST(CcmathNearestTests, Trunc)
 	bool isCcmPositiveNanPositive = (std::signbit(ccm::trunc(std::numeric_limits<double>::quiet_NaN())) == false && std::isnan(ccm::trunc(std::numeric_limits<double>::quiet_NaN())) == true); // NOLINT
 	bool isStdPositiveNanPositive = (std::signbit(std::trunc(std::numeric_limits<double>::quiet_NaN())) == false && std::isnan(std::trunc(std::numeric_limits<double>::quiet_NaN())) == true); // NOLINT
 	EXPECT_EQ(isCcmPositiveNanPositive, isStdPositiveNanPositive);
+
 
 	bool isCcmNegativeNanNegative = (std::signbit(ccm::trunc(-std::numeric_limits<double>::quiet_NaN())) == true && std::isnan(ccm::trunc(-std::numeric_limits<double>::quiet_NaN())) == true); // NOLINT
 	bool isStdNegativeNanNegative = (std::signbit(std::trunc(-std::numeric_limits<double>::quiet_NaN())) == true && std::isnan(std::trunc(-std::numeric_limits<double>::quiet_NaN())) == true); // NOLINT

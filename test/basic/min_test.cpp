@@ -8,13 +8,16 @@
 
 #include <gtest/gtest.h>
 
-#include <ccmath/detail/basic/min.hpp>
+#include <ccmath/ccmath.hpp>
 #include <cmath>
 #include <limits>
 
 
 TEST(CcmathBasicTests, Min)
 {
+	// Verify that ccm::min works with static_assert
+	static_assert(ccm::min(1, 2) == 1, "min has failed testing that it is static_assert-able!");
+
 	// Test the ccm::abs function against std::abs
 	EXPECT_EQ(ccm::min(1, 2), std::min(1, 2));
 	EXPECT_EQ(ccm::min(2, 1), std::min(2, 1));

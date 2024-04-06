@@ -8,19 +8,17 @@
 
 #include <gtest/gtest.h>
 
-#include <ccmath/detail/basic/fmod.hpp>
+#include <ccmath/ccmath.hpp>
 #include <cmath>
 #include <limits>
 #include <type_traits>
 
-namespace tes
-{
-
-}
-
 
 TEST(CcmathBasicTests, Fmod)
 {
+
+	// Test that fmod works with static_assert
+	static_assert(ccm::fmod(1, 2) == 1, "fmod has failed testing that it is static_assert-able!");
 
 
     // Test fmod with floating point numbers
