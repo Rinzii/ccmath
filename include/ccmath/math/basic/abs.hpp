@@ -8,11 +8,11 @@
 
 #pragma once
 
-#include <array>
-#include <limits>
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
+#include <array>
+#include <limits>
 
 namespace ccm
 {
@@ -98,7 +98,7 @@ namespace ccm
 	 * @param x Floating-point value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
-	inline constexpr float fabsf(float num) noexcept
+	constexpr float fabsf(float num) noexcept
 	{
 		return abs<float>(num);
 	}
@@ -108,7 +108,7 @@ namespace ccm
 	 * @param x Floating-point value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
-	inline constexpr long double fabsl(long double num) noexcept
+	constexpr long double fabsl(long double num) noexcept
 	{
 		return abs<long double>(num);
 	}
@@ -118,7 +118,7 @@ namespace ccm
 	 * @param x Integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
-	inline constexpr long labs(long num) noexcept
+	constexpr long labs(long num) noexcept
 	{
 		return abs<long>(num);
 	}
@@ -128,7 +128,7 @@ namespace ccm
 	 * @param x Integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
-	inline constexpr long long llabs(long long num) noexcept
+	constexpr long long llabs(long long num) noexcept
 	{
 		return abs<long long>(num);
 	}
