@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include <limits>
-#include <type_traits>
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/math/compare/isnan.hpp"
+#include <limits>
+#include <type_traits>
 
 namespace ccm
 {
@@ -23,7 +23,7 @@ namespace ccm
 	 * @return If successful, returns the positive difference between x and y.
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
-	inline constexpr T fdim(T x, T y)
+	constexpr T fdim(T x, T y)
 	{
 		if (CCM_UNLIKELY(ccm::isnan(x))) { return x; }
 		if (CCM_UNLIKELY(ccm::isnan(y))) { return y; }
@@ -41,7 +41,7 @@ namespace ccm
 	 * @return If successful, returns the positive difference between x and y.
 	 */
 	template <typename T, typename U, std::enable_if_t<std::is_floating_point_v<T> && std::is_floating_point_v<U>, int> = 0>
-	inline constexpr auto fdim(T x, U y)
+	constexpr auto fdim(T x, U y)
 	{
 		// Find the common type of the two arguments
 		using shared_type = std::common_type_t<T, U>;
@@ -58,7 +58,7 @@ namespace ccm
 	 * @return If successful, returns the positive difference between x and y.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>
-	inline constexpr double fdim(Integer x, Integer y)
+	constexpr double fdim(Integer x, Integer y)
 	{
 		return fdim<double>(static_cast<double>(x), static_cast<double>(y));
 	}
@@ -69,7 +69,7 @@ namespace ccm
 	 * @param y A floating-point value.
 	 * @return If successful, returns the positive difference between x and y.
 	 */
-	inline constexpr float fdimf(float x, float y)
+	constexpr float fdimf(float x, float y)
 	{
 		return fdim<float>(x, y);
 	}
@@ -80,7 +80,7 @@ namespace ccm
 	 * @param y A floating-point value.
 	 * @return If successful, returns the positive difference between x and y.
 	 */
-	inline constexpr long double fdiml(long double x, long double y)
+	constexpr long double fdiml(long double x, long double y)
 	{
 		return fdim<long double>(x, y);
 	}

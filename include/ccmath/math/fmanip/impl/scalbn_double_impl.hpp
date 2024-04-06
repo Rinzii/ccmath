@@ -16,44 +16,38 @@
 #include <cstdint>
 #include <limits>
 
-namespace ccm::internal
+namespace ccm::internal::impl
 {
-	namespace
+	constexpr double scalbn_double_impl(double arg, int exp) noexcept
 	{
-		namespace impl
+		ccm::double_t tmp = arg;
+
+		if (exp > 1023)
 		{
-			inline constexpr double scalbn_double_impl(double arg, int exp) noexcept
+			tmp *= 0x1p1023;
+			exp -= 1023;
+			if (exp > 1023)
 			{
-				ccm::double_t tmp = arg;
-
-				if (exp > 1023)
-				{
-					tmp *= 0x1p1023;
-					exp -= 1023;
-					if (exp > 1023)
-					{
-						tmp *= 0x1p1023;
-						exp -= 1023;
-						if (exp > 1023) { exp = 1023; }
-					}
-				}
-				else if (exp < -1022)
-				{
-					tmp *= 0x1p-1022 * 0x1p53;
-					exp += 1022 - 53;
-					if (exp < -1022)
-					{
-						tmp *= 0x1p-1022 * 0x1p53;
-						exp += 1022 - 53;
-						if (exp < -1022) { exp = -1022; }
-					}
-				}
-
-				const std::uint64_t bits = ccm::support::bit_cast<std::uint64_t>(1023 + static_cast<std::uint64_t>(exp)) << 52;
-				arg						 = tmp * ccm::support::bit_cast<double>(bits);
-
-				return arg;
+				tmp *= 0x1p1023;
+				exp -= 1023;
+				if (exp > 1023) { exp = 1023; }
 			}
-		} // namespace impl
-	} // namespace
-} // namespace ccm::internal
+		}
+		else if (exp < -1022)
+		{
+			tmp *= 0x1p-1022 * 0x1p53;
+			exp += 1022 - 53;
+			if (exp < -1022)
+			{
+				tmp *= 0x1p-1022 * 0x1p53;
+				exp += 1022 - 53;
+				if (exp < -1022) { exp = -1022; }
+			}
+		}
+
+		const std::uint64_t bits = ccm::support::bit_cast<std::uint64_t>(1023 + static_cast<std::uint64_t>(exp)) << 52;
+		arg						 = tmp * ccm::support::bit_cast<double>(bits);
+
+		return arg;
+	}
+} // namespace ccm::internal::impl

@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <type_traits>
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/math/compare/isnan.hpp"
+#include <type_traits>
 
 namespace ccm
 {
@@ -22,7 +22,7 @@ namespace ccm
 	 * @return If successful, returns the smaller of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename T>
-	inline constexpr T min(const T x, const T y) noexcept
+	constexpr T min(const T x, const T y) noexcept
 	{
 		// If we are comparing floating point numbers, we need to check for NaN
 		if constexpr (std::is_floating_point_v<T>)
@@ -43,7 +43,7 @@ namespace ccm
 	 * @return If successful, returns the smaller of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename T, typename U>
-	inline constexpr T min(const T x, const U y) noexcept
+	constexpr T min(const T x, const U y) noexcept
 	{
 		// Find the common type of the two arguments
 		using shared_type = std::common_type_t<T, U>;
@@ -60,7 +60,7 @@ namespace ccm
 	 * @return If successful, returns the smaller of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename Real, std::enable_if_t<!std::is_integral_v<Real>, bool> = true>
-	inline constexpr Real fmin(const Real x, const Real y) noexcept
+	constexpr Real fmin(const Real x, const Real y) noexcept
 	{
 		return min<Real>(x, y);
 	}
@@ -74,7 +74,7 @@ namespace ccm
 	 * @return If successful, returns the smaller of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename T, typename U>
-	inline constexpr auto fmin(const T x, const U y) noexcept
+	constexpr auto fmin(const T x, const U y) noexcept
 	{
 		// Find the common type of the two arguments
 		using shared_type = std::common_type_t<T, U>;
@@ -91,7 +91,7 @@ namespace ccm
 	 * @return If successful, returns the smaller of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	inline constexpr Integer fmin(const Integer x, const Integer y) noexcept
+	constexpr Integer fmin(const Integer x, const Integer y) noexcept
 	{
 		return min<Integer>(x, y);
 	}

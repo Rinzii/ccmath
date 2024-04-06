@@ -8,24 +8,13 @@
 
 #pragma once
 
-#include "ccmath/math/basic/impl/fma_double_impl.hpp"
-#include "ccmath/math/basic/impl/fma_float_impl.hpp"
-
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
-
 #include <type_traits>
 
 namespace ccm
 {
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	inline constexpr T new_fma(T x, T y, T z) noexcept
-	{
-		if constexpr (std::is_same_v<T, float>) { return ccm::internal::impl::fma_float_impl(x, y, z); }
-		else { return ccm::internal::impl::fma_double_impl(x, y, z); }
-	}
-
 	/**
 	 * @brief Fused multiply-add operation.
 	 * @tparam T Numeric type.
@@ -36,7 +25,7 @@ namespace ccm
 	 * calculated as a single ternary floating-point operation).
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	inline constexpr T fma(T x, T y, T z) noexcept
+	constexpr T fma(T x, T y, T z) noexcept
 	{
 		// Handle infinity
 		if (CCM_UNLIKELY((x == static_cast<T>(0) && ccm::isinf(y)) || (y == T{0} && ccm::isinf(x)))) { return std::numeric_limits<T>::quiet_NaN(); }
@@ -57,7 +46,7 @@ namespace ccm
 	}
 
 	template <typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
-	inline constexpr T fma(T x, T y, T z) noexcept
+	constexpr T fma(T x, T y, T z) noexcept
 	{
 		return (x * y) + z;
 	}
@@ -74,7 +63,7 @@ namespace ccm
 	 * calculated as a single ternary floating-point operation).
 	 */
 	template <typename T, typename U, typename V>
-	inline constexpr auto fma(T x, U y, V z) noexcept
+	constexpr auto fma(T x, U y, V z) noexcept
 	{
 		// If our type is an integer epsilon will be set to 0 by default.
 		// Instead, set epsilon to 1 so that our type is always at least the widest floating point type.
@@ -104,7 +93,7 @@ namespace ccm
 	 * calculated as a single ternary floating-point operation).
 	 */
 	template <typename T, typename U, typename V, std::enable_if_t<std::is_integral_v<T> && std::is_integral_v<U> && std::is_integral_v<V>, bool> = true>
-	inline constexpr auto fma(T x, U y, V z) noexcept // Special case for if all types are integers.
+	constexpr auto fma(T x, U y, V z) noexcept // Special case for if all types are integers.
 	{
 		using shared_type = std::common_type_t<T, U, V>;
 		return ccm::fma<shared_type>(static_cast<shared_type>(x), static_cast<shared_type>(y), static_cast<shared_type>(z));
@@ -118,7 +107,7 @@ namespace ccm
 	 * @return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
 	 * calculated as a single ternary floating-point operation).
 	 */
-	inline constexpr float fmaf(float x, float y, float z) noexcept
+	constexpr float fmaf(float x, float y, float z) noexcept
 	{
 		return ccm::fma<float>(x, y, z);
 	}
@@ -131,7 +120,7 @@ namespace ccm
 	 * @return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
 	 * calculated as a single ternary floating-point operation).
 	 */
-	inline constexpr long double fmal(long double x, long double y, long double z) noexcept
+	constexpr long double fmal(long double x, long double y, long double z) noexcept
 	{
 		return ccm::fma<long double>(x, y, z);
 	}
