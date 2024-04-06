@@ -21,7 +21,7 @@ namespace ccm
 	 * @return true if the number has a normal value, false otherwise.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	inline constexpr bool isnormal(T num) noexcept
+	constexpr bool isnormal(T num) noexcept
 	{
 		return num != static_cast<T>(0) && !ccm::isnan(num) && !ccm::isinf(num) && ccm::abs(num) >= std::numeric_limits<T>::min();
 	}
@@ -33,7 +33,7 @@ namespace ccm
 	 * @return true if the number has a normal value, false otherwise.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	inline constexpr bool isnormal(Integer num) noexcept
+	constexpr bool isnormal(Integer num) noexcept
 	{
 		return num != static_cast<Integer>(0);
 	}

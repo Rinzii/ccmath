@@ -20,7 +20,7 @@ namespace ccm
 	 * @return true if the number has a finite value, false otherwise.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	inline constexpr bool isfinite(T x)
+	constexpr bool isfinite(T x)
 	{
 		return (!ccm::isnan(x)) && (!ccm::isinf(x));
 	}
@@ -32,7 +32,7 @@ namespace ccm
 	 * @return true if the number has a finite value, false otherwise.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	inline constexpr bool isfinite(Integer /* x */)
+	constexpr bool isfinite(Integer /* x */)
 	{
 		return false; // All integers are finite
 	}

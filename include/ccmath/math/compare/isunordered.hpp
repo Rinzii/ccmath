@@ -21,7 +21,7 @@ namespace ccm
 	 * @return true if either x or y is NaN, false otherwise.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	inline constexpr bool isunordered(T x, T y) noexcept
+	constexpr bool isunordered(T x, T y) noexcept
 	{
 		return ccm::isnan(x) || ccm::isnan(y);
 	}
@@ -34,7 +34,7 @@ namespace ccm
 	 * @return false, as all integers are ordered.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	inline constexpr bool isunordered(Integer /* x */, Integer /* y */) noexcept
+	constexpr bool isunordered(Integer /* x */, Integer /* y */) noexcept
 	{
 		return false; // All integers are ordered
 	}
@@ -48,7 +48,7 @@ namespace ccm
 	 * @return true if either x or y is NaN, false otherwise.
 	 */
 	template <typename T, typename U>
-	inline constexpr bool isunordered(T x, U y) noexcept
+	constexpr bool isunordered(T x, U y) noexcept
 	{
 		using shared_type = std::common_type_t<T, U>;
 		return static_cast<shared_type>(isunordered<shared_type>(static_cast<shared_type>(x), static_cast<shared_type>(y)));

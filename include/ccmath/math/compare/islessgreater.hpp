@@ -20,7 +20,7 @@ namespace ccm
 	 * @return true if the first argument is less than the second or greater than the second, false otherwise.
 	 */
 	template <typename T>
-	inline constexpr bool islessgreater(T x, T y) noexcept
+	constexpr bool islessgreater(T x, T y) noexcept
 	{
 		return x < y || x > y;
 	}
@@ -34,7 +34,7 @@ namespace ccm
 	 * @return true if the first argument is less than the second or greater than the second, false otherwise.
 	 */
 	template <typename T, typename U>
-	inline constexpr bool islessgreater(T x, U y) noexcept
+	constexpr bool islessgreater(T x, U y) noexcept
 	{
 		using shared_type = std::common_type_t<T, U>;
 		return static_cast<shared_type>(islessgreater<shared_type>(static_cast<shared_type>(x), static_cast<shared_type>(y)));
