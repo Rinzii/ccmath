@@ -20,9 +20,11 @@
 #include "ccmath/internal/types/uint128.hpp"
 #include <cstdint>
 
+// clang-format off
+CCM_DISABLE_GCC_WARNING(-Wpedantic)
+// clang-format on
 namespace ccm::support
 {
-
 	// The supported floating point types.
 	enum class FPType : uint8_t
 	{
@@ -44,10 +46,10 @@ namespace ccm::support
 		struct FPLayout<FPType::eBinary32>
 		{
 			using StorageType						 = uint32_t;
-			inline static constexpr int SIGN_LEN	 = 1;
-			inline static constexpr int EXP_LEN		 = 8;
-			inline static constexpr int SIG_LEN		 = 23;
-			inline static constexpr int FRACTION_LEN = SIG_LEN;
+			static constexpr int SIGN_LEN	 = 1;
+			static constexpr int EXP_LEN		 = 8;
+			static constexpr int SIG_LEN		 = 23;
+			static constexpr int FRACTION_LEN = SIG_LEN;
 		};
 
 		template <>
@@ -146,7 +148,7 @@ namespace ccm::support
 
 				inline constexpr explicit operator T() const { return value; }
 
-				[[nodiscard]] inline constexpr StorageType to_storage_type() const { return static_cast<StorageType>(value); }
+				[[nodiscard]] inline constexpr StorageType to_storage_type() const { return StorageType(value); }
 
 				inline friend constexpr bool operator==(TypedInt a, TypedInt b) { return a.value == b.value; }
 				inline friend constexpr bool operator!=(TypedInt a, TypedInt b) { return a.value != b.value; }
@@ -178,10 +180,10 @@ namespace ccm::support
 				using UP = TypedInt<uint32_t>;
 				using UP::UP;
 
-				inline constexpr explicit BiasedExponent(Exponent exp) : UP(static_cast<int32_t>(exp) + EXP_BIAS) {}
+				inline constexpr BiasedExponent(Exponent exp) : UP(static_cast<int32_t>(exp) + EXP_BIAS) {}
 
 				// Cast operator to get convert from BiasedExponent to Exponent.
-				inline constexpr explicit operator Exponent() const { return Exponent(UP::value - EXP_BIAS); }
+				inline constexpr operator Exponent() const { return Exponent(UP::value - EXP_BIAS); }
 
 				inline constexpr BiasedExponent & operator++()
 				{
@@ -282,10 +284,10 @@ namespace ccm::support
 
 		public:
 			// Builders
-			inline static constexpr RetT zero(Sign sign = Sign::positive) { return RetT(encode(sign, Exponent::subnormal(), Significand::zero())); }
-			inline static constexpr RetT one(Sign sign = Sign::positive) { return RetT(encode(sign, Exponent::zero(), Significand::zero())); }
-			inline static constexpr RetT min_subnormal(Sign sign = Sign::positive) { return RetT(encode(sign, Exponent::subnormal(), Significand::lsb())); }
-			inline static constexpr RetT max_subnormal(Sign sign = Sign::positive)
+			static constexpr RetT zero(Sign sign = Sign::positive) { return RetT(encode(sign, Exponent::subnormal(), Significand::zero())); }
+			static constexpr RetT one(Sign sign = Sign::positive) { return RetT(encode(sign, Exponent::zero(), Significand::zero())); }
+			static constexpr RetT min_subnormal(Sign sign = Sign::positive) { return RetT(encode(sign, Exponent::subnormal(), Significand::lsb())); }
+			static constexpr RetT max_subnormal(Sign sign = Sign::positive)
 			{
 				return RetT(encode(sign, Exponent::subnormal(), Significand::bits_all_ones()));
 			}
@@ -643,5 +645,6 @@ namespace ccm::support
 		// Floating-point conversions.
 		inline constexpr T get_val() const { return ccm::support::bit_cast<T>(UP::bits); }
 	};
+	CCM_RESTORE_GCC_WARNING()
 
 } // namespace ccm::support

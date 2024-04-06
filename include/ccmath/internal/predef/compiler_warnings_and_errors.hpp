@@ -10,6 +10,7 @@
 
 // clang-format off
 
+
 ///
 /// \def CCM_DISABLE_GCC_WARNING(w)
 /// \brief Disables a warning for GCC.
@@ -26,9 +27,10 @@
 ///
 #ifndef CCM_DISABLE_GCC_WARNING
 	#if defined(__GNUC__) && !defined(__clang__)
-		#define CCM_GCC_WHELP0(x) #x										 // Helper macros - do not use directly
-		#define CCM_GCC_WHELP1(x) CCM_GCC_WHELP0(GCC diagnostic ignored x) // Helper macros - do not use directly
-		#define CCM_GCC_WHELP2(x) CCM_GCC_WHELP1(#x)						 // Helper macros - do not use directly
+        // Helper macros - do not use directly
+		#define CCM_GCC_WHELP0(x) #x
+		#define CCM_GCC_WHELP1(x) CCM_GCC_WHELP0(GCC diagnostic ignored x)
+		#define CCM_GCC_WHELP2(x) CCM_GCC_WHELP1(#x)
 																			 
 		// Disables a warning for GCC. This should be written as -Wwarning-name and not as a string.
 		// Must be called before CCM_RESTORE_GCC_WARNING().

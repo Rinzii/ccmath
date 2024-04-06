@@ -36,14 +36,14 @@ namespace ccm::internal::impl
 
 		if ((exponent_int64 & 0x80000000) == 0)
 		{
-			// k > 0, the exponent of scale might have overflowed by <= 460.
+			// If k > 0 then the exponent of scale might have overflowed by <= 460.
 			sign_bits -= 1009ULL << 52;
 			scale  = ccm::support::uint64_to_double(sign_bits);
 			result = 0x1p1009 * (scale + scale * tmp);
 			return result;
 		}
 
-		// k < 0, need special care in the subnormal range.
+		// If k < 0 then we need special care in the subnormal range.
 		sign_bits += 1022ULL << 52;
 		scale  = ccm::support::uint64_to_double(sign_bits);
 		result = scale + scale * tmp;
@@ -61,6 +61,7 @@ namespace ccm::internal::impl
 			// Prevent -0.0 with downward rounding.
 			if (result == 0.0) { result = 0.0; }
 		}
+
 
 		result = 0x1p-1022 * result;
 

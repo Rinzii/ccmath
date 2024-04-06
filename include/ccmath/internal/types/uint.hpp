@@ -14,9 +14,12 @@
 // TODO: Currently this type is broken with gcc.
 
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/predef/compiler_warnings_and_errors.hpp" // Required to disable -fpermissive
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/math_support.hpp"
 #include "ccmath/internal/support/type_identity.hpp"
+#include "ccmath/internal/support/limits.hpp"
+
 #include <array>
 #include <cstddef> // For std::size_t
 #include <cstdint>
@@ -30,15 +33,20 @@
 
 #if defined(__SIZEOF_INT128__)
 	#define CCM_HAS_INT128
+namespace ccm::internal
+{
+	// This is a workaround to get -Wpedantic to not complain about the use of
+	// unsigned __int128 in a non-iso function.
+	__extension__ using uint128_t = unsigned __int128;
+} // namespace ccm::internal
 #endif // defined(__SIZEOF_INT128__)
 
-// For some reason __int128 is not checked by std::is_unsigned.
-// As such I add a specialization for it so we can identify it using std::is_unsigned.
+// Since unsigned __int128 is not a standard type, we need to add a specialization for it.
 #ifdef CCM_HAS_INT128
 namespace std
 {
 	template <>
-	struct [[maybe_unused]] is_unsigned<unsigned __int128> : std::true_type // NOLINT
+	struct [[maybe_unused]] is_unsigned<ccm::internal::uint128_t> : std::true_type // NOLINT
 	{
 	};
 } // namespace std
@@ -90,7 +98,7 @@ namespace ccm
 		{
 			static_assert(std::is_unsigned_v<T>);
 			using half_type = half_width_t<T>;
-			return DoubleWide<half_type>(static_cast<half_type>(value), static_cast<half_type>(value >> std::numeric_limits<half_type>::digits));
+			return DoubleWide<half_type>(static_cast<half_type>(value), static_cast<half_type>(value >> ccm::support::numeric_limits<half_type>::digits));
 		}
 
 		// The low part of a DoubleWide value.
@@ -173,8 +181,8 @@ namespace ccm
 			else
 			{
 				using half_word	  = half_width_t<word>;
-				const auto shiftl = [](word value) -> word { return value << std::numeric_limits<half_word>::digits; };
-				const auto shiftr = [](word value) -> word { return value >> std::numeric_limits<half_word>::digits; };
+				const auto shiftl = [](word value) -> word { return value << ccm::support::numeric_limits<half_word>::digits; };
+				const auto shiftr = [](word value) -> word { return value >> ccm::support::numeric_limits<half_word>::digits; };
 				// Here we do a one digit multiplication where 'a' and 'b' are of type
 				// word. We split 'a' and 'b' into half words and perform the classic long
 				// multiplication with 'a' and 'b' being two-digit numbers.
@@ -295,7 +303,7 @@ namespace ccm
 		inline constexpr std::array<word, N> shift(std::array<word, N> array, size_t offset)
 		{
 			static_assert(direction == LEFT || direction == RIGHT);
-			constexpr size_t WORD_BITS	= std::numeric_limits<word>::digits;
+			constexpr size_t WORD_BITS	= ccm::support::numeric_limits<word>::digits;
 			constexpr size_t TOTAL_BITS = N * WORD_BITS;
 			if (CCM_UNLIKELY(offset == 0)) { return array; }
 			if (CCM_UNLIKELY(offset >= TOTAL_BITS)) { return {}; }
@@ -354,7 +362,7 @@ namespace ccm
 		{                                                                                                                                                      \
 			const int word_count = ccm::support::NAME<word>(val[INDEX_EXPR]);                                                                                  \
 			bit_count += word_count;                                                                                                                           \
-			if (word_count != std::numeric_limits<word>::digits) break;                                                                                        \
+			if (word_count != ccm::support::numeric_limits<word>::digits) break;                                                                                        \
 		}                                                                                                                                                      \
 		return bit_count;                                                                                                                                      \
 	}
@@ -385,7 +393,7 @@ namespace ccm
 
 		inline static constexpr bool SIGNED		 = Signed;
 		inline static constexpr size_t BITS		 = Bits;
-		inline static constexpr size_t WORD_SIZE = sizeof(WordType) * std::numeric_limits<unsigned char>::digits;
+		inline static constexpr size_t WORD_SIZE = sizeof(WordType) * ccm::support::numeric_limits<unsigned char>::digits;
 
 		static_assert(Bits > 0 && Bits % WORD_SIZE == 0, "Number of bits in BigInt should be a multiple of WORD_SIZE.");
 
@@ -426,7 +434,7 @@ namespace ccm
 		template <typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
 		inline constexpr explicit BigInt(T v)
 		{
-			constexpr size_t T_SIZE = sizeof(T) * std::numeric_limits<unsigned char>::digits;
+			constexpr size_t T_SIZE = sizeof(T) * ccm::support::numeric_limits<unsigned char>::digits;
 			const bool is_neg		= Signed && (v < 0);
 			for (size_t i = 0; i < WORD_COUNT; ++i)
 			{
@@ -470,7 +478,7 @@ namespace ccm
 		template <typename T>
 		inline constexpr std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<T, bool>, T> to() const
 		{
-			constexpr size_t T_SIZE = sizeof(T) * std::numeric_limits<unsigned char>::digits;
+			constexpr size_t T_SIZE = sizeof(T) * ccm::support::numeric_limits<unsigned char>::digits;
 			T lo					= static_cast<T>(val[0]);
 			if constexpr (T_SIZE <= WORD_SIZE) { return lo; }
 			constexpr size_t MAX_COUNT = T_SIZE > Bits ? WORD_COUNT : T_SIZE / WORD_SIZE;
@@ -905,7 +913,7 @@ namespace ccm
 
 		inline constexpr void extend(size_t index, bool is_neg)
 		{
-			const WordType value = is_neg ? std::numeric_limits<WordType>::max() : std::numeric_limits<WordType>::min();
+			const WordType value = is_neg ? ccm::support::numeric_limits<WordType>::max() : ccm::support::numeric_limits<WordType>::min();
 			for (size_t i = index; i < WORD_COUNT; ++i) { val[i] = value; }
 		}
 
@@ -1001,31 +1009,33 @@ namespace ccm
 
 } // namespace ccm
 
-namespace std
+namespace ccm::support
 {
 	// Provides limits of U/Int<128>.
 	template <>
-	class std::numeric_limits<ccm::UInt<128>>
+	class numeric_limits<ccm::UInt<128>>
 	{
 	public:
-		inline static constexpr ccm::UInt<128> max() { return ccm::UInt<128>::max(); }
-		inline static constexpr ccm::UInt<128> min() { return ccm::UInt<128>::min(); }
+		static constexpr ccm::UInt<128> max() { return ccm::UInt<128>::max(); }
+		static constexpr ccm::UInt<128> min() { return ccm::UInt<128>::min(); }
 		// Meant to match std::numeric_limits interface.
 		// NOLINTNEXTLINE(readability-identifier-naming)
-		inline static constexpr int digits = 128;
+		static constexpr int digits = 128;
 	};
 
 	template <>
-	class std::numeric_limits<ccm::Int<128>>
+	class numeric_limits<ccm::Int<128>>
 	{
 	public:
-		inline static constexpr ccm::Int<128> max() { return ccm::Int<128>::max(); }
-		inline static constexpr ccm::Int<128> min() { return ccm::Int<128>::min(); }
+		static constexpr ccm::Int<128> max() { return ccm::Int<128>::max(); }
+		static constexpr ccm::Int<128> min() { return ccm::Int<128>::min(); }
 		// Meant to match std::numeric_limits interface.
 		// NOLINTNEXTLINE(readability-identifier-naming)
-		inline static constexpr int digits = 128;
+		static constexpr int digits = 128;
 	};
-} // namespace std
+} // namespace ccm::support
+
+//CCM_RESTORE_GCC_WARNING()
 
 namespace ccm
 {
@@ -1195,7 +1205,7 @@ namespace ccm
 		template <typename T>
 		[[nodiscard]] inline constexpr std::enable_if_t<is_big_int_v<T>, int> bit_width(T value)
 		{
-			return std::numeric_limits<T>::digits - ccm::support::countl_zero(value);
+			return ccm::support::numeric_limits<T>::digits - ccm::support::countl_zero(value);
 		}
 
 		// Forward-declare rotr so that rotl can use it.
@@ -1206,7 +1216,7 @@ namespace ccm
 		template <typename T>
 		[[nodiscard]] inline constexpr std::enable_if_t<is_big_int_v<T>, T> rotl(T value, int rotate)
 		{
-			constexpr unsigned N = std::numeric_limits<T>::digits;
+			constexpr unsigned N = ccm::support::numeric_limits<T>::digits;
 			rotate				 = rotate % N;
 			if (!rotate) { return value; }
 			if (rotate < 0) { return ccm::support::rotr<T>(value, -rotate); }
@@ -1217,7 +1227,7 @@ namespace ccm
 		template <typename T>
 		[[nodiscard]] inline constexpr std::enable_if_t<is_big_int_v<T>, T> rotr(T value, int rotate)
 		{
-			constexpr unsigned N = std::numeric_limits<T>::digits;
+			constexpr unsigned N = ccm::support::numeric_limits<T>::digits;
 			rotate				 = rotate % N;
 			if (!rotate) { return value; }
 			if (rotate < 0) { return ccm::support::rotl<T>(value, -rotate); }
@@ -1277,7 +1287,7 @@ namespace ccm
 	template <typename T>
 	[[nodiscard]] inline constexpr std::enable_if_t<is_big_int_v<T>, int> first_leading_zero(T value)
 	{
-		return value == std::numeric_limits<T>::max() ? 0 : ccm::support::countl_one(value) + 1;
+		return value == ccm::support::numeric_limits<T>::max() ? 0 : ccm::support::countl_one(value) + 1;
 	}
 
 	// Specialization of first_leading_one ('math_support.hpp') for BigInt.
@@ -1291,14 +1301,14 @@ namespace ccm
 	template <typename T>
 	[[nodiscard]] inline constexpr std::enable_if_t<is_big_int_v<T>, int> first_trailing_zero(T value)
 	{
-		return value == std::numeric_limits<T>::max() ? 0 : ccm::support::countr_zero(~value) + 1;
+		return value == ccm::support::numeric_limits<T>::max() ? 0 : ccm::support::countr_zero(~value) + 1;
 	}
 
 	// Specialization of first_trailing_one ('math_support.hpp') for BigInt.
 	template <typename T>
 	[[nodiscard]] inline constexpr std::enable_if_t<is_big_int_v<T>, int> first_trailing_one(T value)
 	{
-		return value == std::numeric_limits<T>::max() ? 0 : ccm::support::countr_zero(value) + 1;
+		return value == ccm::support::numeric_limits<T>::max() ? 0 : ccm::support::countr_zero(value) + 1;
 	}
 
 } // namespace ccm

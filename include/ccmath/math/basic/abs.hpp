@@ -14,6 +14,8 @@
 #include <array>
 #include <limits>
 
+#include "ccmath/internal/support/floating_point_bits.hpp"
+
 namespace ccm
 {
 	/**
