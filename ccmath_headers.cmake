@@ -100,6 +100,7 @@ set(ccmath_math_exponential_impl_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/exp_float_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/exp_double_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/exp_data.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/exp2_data.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/log_float_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/log_double_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/log_data.hpp
@@ -109,7 +110,7 @@ set(ccmath_math_exponential_impl_headers
 )
 
 set(ccmath_math_exponential_headers
-        ${ccmath_math_exponential_headers}
+        ${ccmath_math_exponential_impl_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/exp.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/exp2.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/expm1.hpp

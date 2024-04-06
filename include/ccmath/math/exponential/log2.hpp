@@ -25,7 +25,7 @@ namespace ccm
 	 * @return The base 2 logarithm of the number.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, int> = 0>
-	inline constexpr T log2(T num) noexcept
+	constexpr T log2(T num) noexcept
 	{
 		// If the argument is ±0, -∞ is returned
 		if (num == static_cast<T>(0)) { return -std::numeric_limits<T>::infinity(); }
@@ -53,17 +53,17 @@ namespace ccm
 	}
 
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>
-	inline constexpr double log2(Integer num) noexcept
+	constexpr double log2(Integer num) noexcept
 	{
 		return ccm::log2(static_cast<double>(num));
 	}
 
-	inline constexpr float log2f(float num)
+	constexpr float log2f(float num)
 	{
 		return ccm::log2(num);
 	}
 
-	inline constexpr long double log2l(long double num)
+	constexpr long double log2l(long double num)
 	{
 		return ccm::log2(num);
 	}

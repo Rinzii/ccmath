@@ -21,7 +21,6 @@
 
 namespace ccm::internal
 {
-
 	namespace impl
 	{
 		constexpr ccm::internal::log2_data<double> internalLog2DataDbl = ccm::internal::log2_data<double>();

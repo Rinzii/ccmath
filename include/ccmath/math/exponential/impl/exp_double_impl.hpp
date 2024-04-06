@@ -29,7 +29,7 @@ namespace ccm::internal::impl
 	constexpr auto exp_poly_coeff_four_dbl							= internal_exp_data_dbl.poly[8 - k_exp_poly_order_dbl];
 	constexpr auto k_exp_table_n_dbl								= (1 << ccm::internal::k_exp_table_bits_dbl);
 
-	inline constexpr double handle_special_case(ccm::double_t tmp, std::uint64_t sign_bits, std::uint64_t exponent_int64) // NOLINT
+	constexpr double handle_special_case(ccm::double_t tmp, std::uint64_t sign_bits, std::uint64_t exponent_int64) // NOLINT
 	{
 		ccm::double_t scale{};
 		ccm::double_t result{};
@@ -67,7 +67,7 @@ namespace ccm::internal::impl
 		return result;
 	}
 
-	inline constexpr double exp_double_impl(double x)
+	constexpr double exp_double_impl(double x)
 	{
 		std::uint32_t abs_top{};
 		std::uint64_t expo_int64{};

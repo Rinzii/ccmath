@@ -90,7 +90,7 @@ namespace ccm::internal
 				lowPart += log_poly1_values_dbl[0] * rlo * (rhi + rem);
 				result += lowPart;
 				result += highPart;
-				return static_cast<double>(result);
+				return result;
 			}
 
 			// Handle special cases for very small or very large inputs
