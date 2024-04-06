@@ -15,7 +15,7 @@
 namespace ccm
 {
 	template <typename T>
-	inline constexpr T scalbn(T x, int n) noexcept
+	constexpr T scalbn(T x, int n) noexcept
 	{
 		if constexpr (std::is_same_v<T, float>) { return ccm::internal::impl::scalbn_float_impl(x, n); }
 		if constexpr (std::is_same_v<T, long double>) { return ccm::internal::impl::scalbn_ldouble_impl(x, n); }
