@@ -11,8 +11,6 @@
 
 #pragma once
 
-// TODO: Currently this type is broken with gcc.
-
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/predef/compiler_warnings_and_errors.hpp" // Required to disable -fpermissive
 #include "ccmath/internal/support/bits.hpp"
@@ -73,13 +71,13 @@ namespace ccm
 		struct half_width<uint64_t> : ccm::type_identity<uint32_t>
 		{
 		};
-	#ifdef CCM_HAS_INT128
+#endif	   // CCM_HAS_INT64
+#ifdef CCM_HAS_INT128
 		template <>
 		struct half_width<__uint128_t> : ccm::type_identity<uint64_t>
 		{
 		};
-	#endif // CCM_HAS_INT128
-#endif	   // CCM_HAS_INT64
+#endif // CCM_HAS_INT128
 		template <typename T>
 		using half_width_t = typename half_width<T>::type;
 
