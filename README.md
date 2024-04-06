@@ -62,7 +62,7 @@ target_link_libraries(main PRIVATE ccmath::ccmath)
 
 ## Contributing
 
-CCmath is an open-source project, and it needs your help to go on growing and improving. If you want to get involved and suggest some additional features, file a bug report or submit a patch, please have a look at the contribution guidelines.
+CCmath is an open-source project, and it needs your help to go on growing and improving. If you want to get involved and suggest some additional features, file a bug report or submit a patch, please have a look at the [contribution guidelines](CONTRIBUTING.md)!
 
 ## Implementation Progress (Modules)
 | Module             | % done | In Progress? | Notes? | Planned Completion Version |

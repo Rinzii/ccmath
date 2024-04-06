@@ -1,5 +1,8 @@
 # Contribution Guidelines
 
+> [!IMPORTANT]
+> Currently the contribution guidelines are a work in progress. Please check back later for more information.
+
 ## Core Tenets of CCMath
 
 * All implementations have to be constexpr compatible.
