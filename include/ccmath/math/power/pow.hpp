@@ -54,7 +54,7 @@ namespace ccm
 	} // namespace internal
 
 	template <typename T>
-	inline constexpr T pow(T x, T y) noexcept
+	constexpr T pow(T x, T y) noexcept
 	{
 		if constexpr (std::is_integral_v<T> && std::is_unsigned_v<T>) { return internal::impl::pow_expo_by_sqr(x, y); }
 		return 0;

@@ -253,7 +253,7 @@ BENCHMARK(BM_ccm_unsigned_int_pow)->Args({16, 16})->Args({256, 256})->Args({4096
 
 static void BM_ccm_unsigned_int_pow2(bm::State& state) {
     for (auto _ : state) {
-        bm::DoNotOptimize(ccm::internal::impl::pow_expo_by_sqr2(static_cast<unsigned int>(state.range(0)), static_cast<unsigned int>(state.range(1))));
+        bm::DoNotOptimize(ccm::internal::impl::pow_expo_by_sqr(static_cast<unsigned int>(state.range(0)), static_cast<unsigned int>(state.range(1))));
     }
     state.SetComplexityN(state.range(0));
 }
