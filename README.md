@@ -86,7 +86,7 @@ CCmath is an open-source project, and it needs your help to go on growing and im
 |----------------|--------|---------------------------------------------------------------------------------------|
 | abs            | 100    |                                                                                       |
 | fdim           | 100    |                                                                                       |
-| fma            | 100    | Functional but more fallbacks are desired.                                            |
+| fma            | 100    | Functional. Faster implementations desired.                                           |
 | (f)max         | 100    |                                                                                       |
 | (f)min         | 100    |                                                                                       |
 | remainder      | 100    |                                                                                       |
