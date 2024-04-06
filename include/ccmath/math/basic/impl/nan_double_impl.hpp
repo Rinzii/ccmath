@@ -21,7 +21,7 @@ namespace ccm::internal::impl
 		static_assert(std::numeric_limits<double>::is_iec559, "IEEE-754 representation required for this implementation");
 
 #if defined(_MSC_VER) && !defined(__clang__)
-		// Currently, MSVC always returns a Quiet NaN with no matter if a payload is
+		// Currently, MSVC always returns a Quiet NaN no matter if a payload is
 		// provided or not. This is different from GCC and Clang which do allow payloads to be set.
 		// So if we detect we are using MSVC without Clang-CL then
 		// we can just return NaN and not bother doing any extra work.
