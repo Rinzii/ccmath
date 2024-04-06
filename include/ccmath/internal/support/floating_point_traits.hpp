@@ -58,10 +58,17 @@ namespace ccm::helpers
 		static constexpr std::uint64_t shifted_exponent_mask	 = 0x7FF0000000000000U; // exponent_mask << exponent_shift
 	};
 
+#ifdef __SIZEOF_FLOAT128__
 	template <>
 	struct floating_point_traits<long double> : floating_point_traits<double>
 	{
 	};
+#else
+    template <>
+    struct floating_point_traits<long double> : floating_point_traits<double>
+    {
+    };
+#endif
 
 	template <typename T>
 	using float_bits_t = typename floating_point_traits<T>::uint_type;
