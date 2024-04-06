@@ -17,7 +17,7 @@
 
 namespace ccm::support
 {
-	enum float_round_style : std::int8_t
+	enum class float_round_style : std::int8_t
 	{
 		round_indeterminate       = -1,
 		round_toward_zero         = 0,
@@ -66,17 +66,6 @@ namespace ccm::support
 
 		static constexpr const bool traps                    = std::numeric_limits<type>::traps;
 		static constexpr const bool tinyness_before          = std::numeric_limits<type>::tinyness_before;
-		static constexpr const float_round_style round_style = std::numeric_limits<type>::round_style;
+		static constexpr const float_round_style round_style = static_cast<float_round_style>(std::numeric_limits<type>::round_style);
 	};
-
-
-	template <class T, int digits, bool IsSigned>
-	struct compute_min {
-		static constexpr const T value = T(T(1) << digits);
-	};
-
-	template <class T, int digits>
-	struct compute_min<T, digits, false> {
-		static constexpr const T value = T(0);
-	};
-}
+} // namespace ccm::support
