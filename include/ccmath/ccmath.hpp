@@ -20,7 +20,7 @@ CCMATH REQUIREMENTS:
  */
 
 // Includes ccm::float_t and ccm::double_t
-#include "ccmath/internal/helpers/floating_point_type.hpp"
+#include "ccmath/internal/types/fp_types.hpp"
 
 /// Basic math functions
 #include "ccmath/basic.hpp"
@@ -50,6 +50,6 @@ CCMATH REQUIREMENTS:
 #include "ccmath/trig.hpp"
 
 /// Uncategorized functions
-#include "ccmath/detail/gamma.hpp"
-#include "ccmath/detail/lerp.hpp"
-#include "ccmath/detail/lgamma.hpp"
+#include "ccmath/math/gamma.hpp"
+#include "ccmath/math/lerp.hpp"
+#include "ccmath/math/lgamma.hpp"

@@ -44,7 +44,8 @@ int get_std_quo(double x, double y)
 TEST(CcmathBasicTests, Remquo)
 {
 	// Test that remquo can be uses in a static_assert
-	constexpr double sa_x = -7.0, sa_y = 2.0;
+	constexpr double sa_x = -7.0;
+	constexpr double sa_y = 2.0;
 	constexpr int sa_quotient = get_ccm_quo(sa_x, sa_y); // quotient = -4
 	constexpr double sa_remainder = get_ccm_rem(sa_x, sa_y); // remainder = 1
 	static_assert(sa_quotient == -4, "sa_quotient == -4");

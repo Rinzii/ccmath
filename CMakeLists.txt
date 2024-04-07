@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-set(CCMATH_BUILD_VERSION 0.1.2)
+set(CCMATH_BUILD_VERSION 0.1.3)
 set(INTERNAL_PROJ_DEFAULT_NAME ccmath)
 
 project(${INTERNAL_PROJ_DEFAULT_NAME} VERSION ${CCMATH_BUILD_VERSION})
@@ -20,6 +20,7 @@ option(CCMATH_BUILD_EXAMPLES "Build ccmath examples" ${is_root_project})
 option(CCMATH_BUILD_BENCHMARKS "Build ccmath benchmarks" ${is_root_project})
 option(CCMATH_INSTALL "Setup install and package steps" ${is_root_project})
 option(CCMATH_USE_SIMD "Use SIMD instructions" OFF) # SIMD is not yet implemented.
+option(CCMATH_ENABLE_EXTENSIONS "Enable the extended ccmath library that adds helpful additional methods that are not defined by the standard" ON)
 
 # include the global configuration file
 include(cmake/GlobalConfig.cmake)
@@ -31,6 +32,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU)
   target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
           -Wall -Wextra -Wpedantic -Wconversion -Werror=return-type
   )
+
   # TODO: Remove this later.
   #       Some variables have been provided but are not currently being used, but it would not atm make sense to remove them.
   #       So to clean up the warnings we are just silencing these specific cases.
@@ -52,6 +54,11 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_headers}>")
 
+if (CCMATH_ENABLE_EXTENSIONS)
+  include(ccmath_extensions_headers.cmake)
+  target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_extensions_headers}>")
+endif()
+
 target_include_directories(${PROJECT_NAME} INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>)
 target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)
 
@@ -65,7 +72,7 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
 configure_file(cmake/version.hpp.in "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp" @ONLY)
 
 if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TEST)
-  add_subdirectory(ext)
+  add_subdirectory(thirdparty)
 endif()
 
 if (CCMATH_BUILD_EXAMPLES)

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "ccmath/detail/power/cbrt.hpp"
-#include "ccmath/detail/power/hypot.hpp"
-#include "ccmath/detail/power/pow.hpp"
-#include "ccmath/detail/power/sqrt.hpp"
+#include "ccmath/math/power/cbrt.hpp"
+#include "ccmath/math/power/hypot.hpp"
+#include "ccmath/math/power/pow.hpp"
+#include "ccmath/math/power/sqrt.hpp"

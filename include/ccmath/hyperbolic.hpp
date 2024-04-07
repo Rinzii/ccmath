@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "ccmath/detail/hyperbolic/acosh.hpp"
-#include "ccmath/detail/hyperbolic/asinh.hpp"
-#include "ccmath/detail/hyperbolic/atanh.hpp"
-#include "ccmath/detail/hyperbolic/cosh.hpp"
-#include "ccmath/detail/hyperbolic/sinh.hpp"
-#include "ccmath/detail/hyperbolic/tanh.hpp"
+#include "ccmath/math/hyperbolic/acosh.hpp"
+#include "ccmath/math/hyperbolic/asinh.hpp"
+#include "ccmath/math/hyperbolic/atanh.hpp"
+#include "ccmath/math/hyperbolic/cosh.hpp"
+#include "ccmath/math/hyperbolic/sinh.hpp"
+#include "ccmath/math/hyperbolic/tanh.hpp"
