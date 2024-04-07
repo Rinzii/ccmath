@@ -18,6 +18,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 )
 target_include_directories(${PROJECT_NAME} PUBLIC .)
 target_sources(${PROJECT_NAME} PRIVATE
+        helpers/randomizers.h
         ccmath_benchmark_main.cpp
 )
 

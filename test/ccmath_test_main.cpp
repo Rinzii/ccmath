@@ -7,8 +7,6 @@
 */
 
 #include <gtest/gtest.h>
-#include "ccmath/ccmath.hpp"
-
 
 int main(int argc, char** argv)
 {

@@ -8,11 +8,12 @@
 
 #pragma once
 
-#include "ccmath/detail/basic/abs.hpp"
-#include "ccmath/detail/basic/fdim.hpp"
-#include "ccmath/detail/basic/fma.hpp"
-#include "ccmath/detail/basic/fmod.hpp"
-#include "ccmath/detail/basic/max.hpp"
-#include "ccmath/detail/basic/min.hpp"
-#include "ccmath/detail/basic/remainder.hpp"
-#include "ccmath/detail/basic/remquo.hpp"
+#include "ccmath/math/basic/abs.hpp"
+#include "ccmath/math/basic/fdim.hpp"
+#include "ccmath/math/basic/fma.hpp"
+#include "ccmath/math/basic/fmod.hpp"
+#include "ccmath/math/basic/max.hpp"
+#include "ccmath/math/basic/min.hpp"
+#include "ccmath/math/basic/nan.hpp"
+#include "ccmath/math/basic/remainder.hpp"
+#include "ccmath/math/basic/remquo.hpp"

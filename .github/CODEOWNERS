@@ -1,0 +1,5 @@
+# This file defines the owners of the code in this repository.
+# See https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners for more information.
+
+# Assign @Rinzii as code owner for all files in the repository
+*       @Rinzii
