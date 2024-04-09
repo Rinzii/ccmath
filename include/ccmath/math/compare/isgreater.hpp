@@ -20,10 +20,10 @@ namespace ccm
 	 * @return true if the first argument is greater than the second, false otherwise.
 	 */
 	template <typename T>
-	inline constexpr bool isgreater(T x, T y) noexcept
-    {
-        return x > y;
-    }
+	constexpr bool isgreater(T x, T y) noexcept
+	{
+		return x > y;
+	}
 
 	/**
 	 * @brief Checks if the first argument is greater than the second.
@@ -34,14 +34,14 @@ namespace ccm
 	 * @return true if the first argument is greater than the second, false otherwise.
 	 */
 	template <typename T, typename U>
-    inline constexpr bool isgreater(T x, U y) noexcept
-    {
+	constexpr bool isgreater(T x, U y) noexcept
+	{
 		// Find the common type of the two arguments
 		using shared_type = std::common_type_t<T, U>;
 
 		// Then cast the arguments to the common type and call the single argument version
 		return static_cast<shared_type>(isgreater<shared_type>(static_cast<shared_type>(x), static_cast<shared_type>(y)));
-    }
+	}
 } // namespace ccm
 
 /// @ingroup compare

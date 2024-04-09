@@ -8,10 +8,9 @@
 
 #pragma once
 
-#include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
-
 #include <type_traits>
 
 namespace ccm
@@ -25,32 +24,30 @@ namespace ccm
 	 * @return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
 	 * calculated as a single ternary floating-point operation).
 	 */
-	template <typename T>
-	inline constexpr T fma(T x, T y, T z) noexcept
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
+	constexpr T fma(T x, T y, T z) noexcept
 	{
-		if constexpr (std::is_floating_point_v<T>)
+		// Handle infinity
+		if (CCM_UNLIKELY((x == static_cast<T>(0) && ccm::isinf(y)) || (y == T{0} && ccm::isinf(x)))) { return std::numeric_limits<T>::quiet_NaN(); }
+		if (CCM_UNLIKELY(x * y == std::numeric_limits<T>::infinity() && z == -std::numeric_limits<T>::infinity()))
 		{
-			// GCC has a constexpr builtin for fma
-#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER) && !defined(__INTEL_LLVM_COMPILER) && !defined(__NVCOMPILER) &&                     \
-	!defined(__NVCOMPILER_LLVM__)
-			if constexpr (std::is_same_v<T, float>) { return __builtin_fmaf(x, y, z); }
-			else if constexpr (std::is_same_v<T, double>) { return __builtin_fma(x, y, z); }
-			else if constexpr (std::is_same_v<T, long double>) { return __builtin_fmal(x, y, z); }
-#endif
-
-			// Handle infinity
-			if (CCM_UNLIKELY((x == static_cast<T>(0) && ccm::isinf(y)) || (y == T{0} && ccm::isinf(x)))) { return std::numeric_limits<T>::quiet_NaN(); }
-			if (CCM_UNLIKELY(x * y == std::numeric_limits<T>::infinity() && z == -std::numeric_limits<T>::infinity())) { return std::numeric_limits<T>::infinity(); }
-
-			// Handle NaN
-			if (CCM_UNLIKELY(ccm::isnan(x) || ccm::isnan(y))) { return std::numeric_limits<T>::quiet_NaN(); }
-			if (CCM_UNLIKELY(ccm::isnan(z) && (x * y != 0 * std::numeric_limits<T>::infinity() || x * y != std::numeric_limits<T>::infinity() * 0)))
-			{
-				return std::numeric_limits<T>::quiet_NaN();
-			}
+			return std::numeric_limits<T>::infinity();
 		}
 
-		// If the compiler doesn't have a builtin, use the following and hope that the compiler is smart enough to optimize it
+		// Handle NaN
+		if (CCM_UNLIKELY(ccm::isnan(x) || ccm::isnan(y))) { return std::numeric_limits<T>::quiet_NaN(); }
+		if (CCM_UNLIKELY(ccm::isnan(z) && (x * y != 0 * std::numeric_limits<T>::infinity() || x * y != std::numeric_limits<T>::infinity() * 0)))
+		{
+			return std::numeric_limits<T>::quiet_NaN();
+		}
+
+		// We have to hope the compiler optimizes this. Currently there is no builtin fma that works with static_assert.
+		return (x * y) + z;
+	}
+
+	template <typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
+	constexpr T fma(T x, T y, T z) noexcept
+	{
 		return (x * y) + z;
 	}
 
@@ -66,7 +63,7 @@ namespace ccm
 	 * calculated as a single ternary floating-point operation).
 	 */
 	template <typename T, typename U, typename V>
-	inline constexpr auto fma(T x, U y, V z) noexcept
+	constexpr auto fma(T x, U y, V z) noexcept
 	{
 		// If our type is an integer epsilon will be set to 0 by default.
 		// Instead, set epsilon to 1 so that our type is always at least the widest floating point type.
@@ -96,7 +93,7 @@ namespace ccm
 	 * calculated as a single ternary floating-point operation).
 	 */
 	template <typename T, typename U, typename V, std::enable_if_t<std::is_integral_v<T> && std::is_integral_v<U> && std::is_integral_v<V>, bool> = true>
-	inline constexpr auto fma(T x, U y, V z) noexcept // Special case for if all types are integers.
+	constexpr auto fma(T x, U y, V z) noexcept // Special case for if all types are integers.
 	{
 		using shared_type = std::common_type_t<T, U, V>;
 		return ccm::fma<shared_type>(static_cast<shared_type>(x), static_cast<shared_type>(y), static_cast<shared_type>(z));
@@ -110,7 +107,7 @@ namespace ccm
 	 * @return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
 	 * calculated as a single ternary floating-point operation).
 	 */
-	inline constexpr float fmaf(float x, float y, float z) noexcept
+	constexpr float fmaf(float x, float y, float z) noexcept
 	{
 		return ccm::fma<float>(x, y, z);
 	}
@@ -123,7 +120,7 @@ namespace ccm
 	 * @return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
 	 * calculated as a single ternary floating-point operation).
 	 */
-	inline constexpr long double fmal(long double x, long double y, long double z) noexcept
+	constexpr long double fmal(long double x, long double y, long double z) noexcept
 	{
 		return ccm::fma<long double>(x, y, z);
 	}

@@ -42,7 +42,7 @@ namespace ccm
 	 *  @endcode
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	inline constexpr T remquo(T x, T y, int * quo)
+	constexpr T remquo(T x, T y, int * quo)
 	{
 		if constexpr (std::is_same_v<T, float>) { return ccm::internal::remquo_float(x, y, quo); }
 		else { return ccm::internal::remquo_double(x, y, quo); }
@@ -78,7 +78,7 @@ namespace ccm
 	 *  @endcode
 	 */
 	template <class Arithmetic1, class Arithmetic2, std::enable_if_t<std::is_arithmetic_v<Arithmetic1> && std::is_arithmetic_v<Arithmetic2>, bool> = true>
-	inline constexpr std::common_type_t<Arithmetic1, Arithmetic2> remquo(Arithmetic1 x, Arithmetic2 y, int * quo)
+	constexpr std::common_type_t<Arithmetic1, Arithmetic2> remquo(Arithmetic1 x, Arithmetic2 y, int * quo)
 	{
 		using shared_type = std::common_type_t<Arithmetic1, Arithmetic2>;
 		return ccm::remquo<shared_type>(static_cast<shared_type>(x), static_cast<shared_type>(y), quo);
@@ -111,7 +111,7 @@ namespace ccm
 	 *  }
 	 *  @endcode
 	 */
-	inline constexpr float remquof(float x, float y, int * quo)
+	constexpr float remquof(float x, float y, int * quo)
 	{
 		return ccm::remquo<float>(x, y, quo);
 	}
@@ -143,7 +143,7 @@ namespace ccm
 	 *  }
 	 *  @endcode
 	 */
-	inline constexpr long double remquol(long double x, long double y, int * quo)
+	constexpr long double remquol(long double x, long double y, int * quo)
 	{
 		// Currently, due to technical issues, the long double version of remquo is not implemented.
 		// For now, we will cast the long double variables to a double and call the double version of remquo.

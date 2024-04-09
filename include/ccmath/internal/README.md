@@ -4,7 +4,7 @@
 
 ## Folders
 - `config`: Predefined macros and configuration settings for the library.
-- `helpers`: Helper functions and classes used for internal implementation details.
+- `helpers`: Helper functions that are generally specific to a particular function.
 - `predef`: Predefined macro wrappers for compiler and platform-specific features.
 - `support`: Support classes and functions for internal implementation details.
-- `types`: Custom type definitions and wrappers for cmath types.
+- `types`: Custom type definitions and wrappers for ccmath types.

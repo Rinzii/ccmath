@@ -8,69 +8,64 @@
 
 #pragma once
 
-#include <limits>
-
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/math/compare/isfinite.hpp"
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/compare/signbit.hpp"
 #include "ccmath/math/nearest/trunc.hpp"
+#include <limits>
 
 namespace ccm
 {
 	/// @cond MATH_DETAIL
-	namespace
+	namespace internal::impl
 	{
-		namespace impl
+		template <typename T>
+		constexpr T fmod_impl_check(T x, T y) noexcept
 		{
-			template <typename T>
-			inline constexpr T fmod_impl_check(T x, T y) noexcept
+			// Special edge cases for floating-point types.
+			if constexpr (std::numeric_limits<T>::is_iec559)
 			{
-				// Special edge cases for floating-point types.
-				if constexpr (std::numeric_limits<T>::is_iec559)
+				// If x is ±0 and y is not zero, ±0 is returned.
+				if (x == static_cast<T>(0.0) && (y != static_cast<T>(0.0)))
 				{
-					// If x is ±0 and y is not zero, ±0 is returned.
-					if (x == static_cast<T>(0.0) && (y != static_cast<T>(0.0)))
-					{
-						// The standard specifies that plus or minus 0 is returned depending on the sign of x.
-						if (ccm::signbit(x)) { return -static_cast<T>(0.0); }
-						return static_cast<T>(0.0);
-					}
-
-					// If x is ±∞ and y is not NaN OR if y is ±0 and x is not NaN, -NaN is returned
-					if (CCM_UNLIKELY(((ccm::isinf(x) && !ccm::isnan(y)) || (y == static_cast<T>(0.0) && !ccm::isnan(x)))))
-					{
-						// For some reason, all the major compilers return a negative NaN even though I can't find anywhere
-						// in the standard that specifies this. I'm going to follow suit and return a negative NaN for now.
-						// Overall, this has little effect on checking for NaN. We only really care for conformance with the standard.
-						return -std::numeric_limits<T>::quiet_NaN();
-					}
-
-					// If y is ±∞ and x is finite, x is returned.
-					if (CCM_UNLIKELY(ccm::isinf(y) && ccm::isfinite(x))) { return x; }
-
-					// If either argument is NaN, NaN is returned.
-					if (CCM_UNLIKELY(ccm::isnan(x) || ccm::isnan(y)))
-					{
-						// Same problem as before, but this time all major compilers return a positive NaN.
-						return std::numeric_limits<T>::quiet_NaN();
-					}
+					// The standard specifies that plus or minus 0 is returned depending on the sign of x.
+					if (ccm::signbit(x)) { return -static_cast<T>(0.0); }
+					return static_cast<T>(0.0);
 				}
 
-				// Calculate the remainder of the division of x by y.
-				// static_cast is required to prevent the compiler from complaining about narrowing with integer types.
-				return static_cast<T>(x - (ccm::trunc<T>(x / y) * y));
+				// If x is ±∞ and y is not NaN OR if y is ±0 and x is not NaN, -NaN is returned
+				if (CCM_UNLIKELY(((ccm::isinf(x) && !ccm::isnan(y)) || (y == static_cast<T>(0.0) && !ccm::isnan(x)))))
+				{
+					// For some reason, all the major compilers return a negative NaN even though I can't find anywhere
+					// in the standard that specifies this. I'm going to follow suit and return a negative NaN for now.
+					// Overall, this has little effect on checking for NaN. We only really care for conformance with the standard.
+					return -std::numeric_limits<T>::quiet_NaN();
+				}
+
+				// If y is ±∞ and x is finite, x is returned.
+				if (CCM_UNLIKELY(ccm::isinf(y) && ccm::isfinite(x))) { return x; }
+
+				// If either argument is NaN, NaN is returned.
+				if (CCM_UNLIKELY(ccm::isnan(x) || ccm::isnan(y)))
+				{
+					// Same problem as before, but this time all major compilers return a positive NaN.
+					return std::numeric_limits<T>::quiet_NaN();
+				}
 			}
 
-			template <typename T, typename U, typename TC = std::common_type_t<T, U>>
-			inline constexpr TC fmod_impl_type_check(T x, U y) noexcept
-			{
-				return fmod_impl_check(static_cast<TC>(x), static_cast<TC>(y));
-			}
+			// Calculate the remainder of the division of x by y.
+			// static_cast is required to prevent the compiler from complaining about narrowing with integer types.
+			return static_cast<T>(x - (ccm::trunc<T>(x / y) * y));
+		}
 
-		} // namespace impl
-	}	  // namespace
+		template <typename T, typename U, typename TC = std::common_type_t<T, U>>
+		constexpr TC fmod_impl_type_check(T x, U y) noexcept
+		{
+			return fmod_impl_check(static_cast<TC>(x), static_cast<TC>(y));
+		}
+	} // namespace internal::impl
 	/// @endcond
 
 	/**
@@ -82,9 +77,9 @@ namespace ccm
 	 * @return The floating-point remainder of the division operation x/y.
 	 */
 	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, int> = 0>
-	inline constexpr Real fmod(Real x, Real y)
+	constexpr Real fmod(Real x, Real y)
 	{
-		return impl::fmod_impl_check(x, y);
+		return internal::impl::fmod_impl_check(x, y);
 	}
 
 	/**
@@ -95,9 +90,9 @@ namespace ccm
 	 * @return The floating-point remainder of the division operation x/y.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>
-	inline constexpr double fmod(Integer x, Integer y)
+	constexpr double fmod(Integer x, Integer y)
 	{
-		return impl::fmod_impl_type_check(x, y);
+		return internal::impl::fmod_impl_type_check(x, y);
 	}
 
 	/**
@@ -109,9 +104,9 @@ namespace ccm
 	 * @return The floating-point remainder of the division operation x/y.
 	 */
 	template <typename T, typename U>
-	inline constexpr auto fmod(T x, T y)
+	constexpr auto fmod(T x, T y)
 	{
-		return impl::fmod_impl_type_check(x, y);
+		return internal::impl::fmod_impl_type_check(x, y);
 	}
 
 	/**
@@ -120,7 +115,7 @@ namespace ccm
 	 * @param y A floating-point value.
 	 * @return The floating-point remainder of the division operation x/y.
 	 */
-	inline constexpr float fmodf(float x, float y)
+	constexpr float fmodf(float x, float y)
 	{
 		return fmod<float>(x, y);
 	}
@@ -131,7 +126,7 @@ namespace ccm
 	 * @param y A floating-point value.
 	 * @return The floating-point remainder of the division operation x/y.
 	 */
-	inline constexpr long double fmodl(long double x, long double y)
+	constexpr long double fmodl(long double x, long double y)
 	{
 		return fmod<long double>(x, y);
 	}

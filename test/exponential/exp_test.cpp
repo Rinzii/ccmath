@@ -43,6 +43,10 @@ TEST(CcmathExponentialTests, Exp)
 	EXPECT_EQ(ccm::exp(2048.0), std::exp(2048.0));
 	EXPECT_EQ(ccm::exp(4096.0), std::exp(4096.0));
 
+
+	EXPECT_EQ(ccm::exp(4096.0) * ccm::exp(4096.0), std::exp(4096.0) * std::exp(4096.0));
+
+
 	// Test Edge Cases
 
 	EXPECT_EQ(ccm::exp(0.0), std::exp(0.0));

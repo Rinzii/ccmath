@@ -22,7 +22,7 @@ namespace ccm
 	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	inline constexpr T copysign(T mag, T sgn)
+	constexpr T copysign(T mag, T sgn)
 	{
 		if (ccm::isnan(mag) || ccm::isnan(sgn))
 		{
@@ -42,29 +42,29 @@ namespace ccm
 	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	inline constexpr double copysign(Integer mag, Integer sgn)
+	constexpr double copysign(Integer mag, Integer sgn)
 	{
 		return copysign<double>(static_cast<double>(mag), static_cast<double>(sgn));
 	}
 
 	/**
-     * @brief Copies the sign of a floating point value.
-     * @param x A floating-point.
-     * @param y A floating-point.
-     * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
-     */
-	inline constexpr float copysignf(float mag, float sgn)
+	 * @brief Copies the sign of a floating point value.
+	 * @param x A floating-point.
+	 * @param y A floating-point.
+	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
+	 */
+	constexpr float copysignf(float mag, float sgn)
 	{
 		return copysign<float>(mag, sgn);
 	}
 
 	/**
-     * @brief Copies the sign of a floating point value.
-     * @param x A floating-point.
-     * @param y A floating-point.
-     * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
+	 * @brief Copies the sign of a floating point value.
+	 * @param x A floating-point.
+	 * @param y A floating-point.
+	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
 	 */
-	inline constexpr long double copysignl(long double mag, long double sgn)
+	constexpr long double copysignl(long double mag, long double sgn)
 	{
 		return copysign<long double>(mag, sgn);
 	}

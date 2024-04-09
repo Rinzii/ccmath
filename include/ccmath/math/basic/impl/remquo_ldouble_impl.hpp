@@ -30,12 +30,11 @@ namespace ccm::internal
 				std::int32_t y_int32{};
 
 				std::uint32_t x_sign{};
-                std::uint32_t y_msb{};
+				std::uint32_t y_msb{};
 				std::uint32_t x_lsb{};
 
 				int quotient_sign{};
 				int computed_quotient{};
-
 
 				// TODO: For the time being this is mega on hold until we have access to
 				//       necessary implementations of int128_t. Without them extracting the
@@ -45,7 +44,7 @@ namespace ccm::internal
 				return 0;
 			}
 		} // namespace impl
-	}	  // namespace
+	} // namespace
 
 	template <typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
 	inline constexpr T remquo_ldouble(T x, T y, int * quo) noexcept

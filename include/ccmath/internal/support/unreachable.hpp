@@ -9,7 +9,7 @@
 #pragma once
 
 #if defined(__cpp_lib_unreachable) && __cpp_lib_unreachable >= 202202L
-#include <utility>
+	#include <utility>
 #endif
 
 namespace ccm
@@ -22,12 +22,12 @@ namespace ccm
 		std::unreachable();
 #elif defined(_MSC_VER) && !defined(__clang__) // MSVC
 		__assume(false);
-#elif defined(__GNUC__) || defined(__clang__) // GCC, Clang
-        __builtin_unreachable();
-#else // Fallback
-		// In the event that no compiler specific extension is available
-		// Then do nothing.
-        static_cast<void>(0);
+#elif defined(__GNUC__) || defined(__clang__)  // GCC, Clang
+		__builtin_unreachable();
+#else										   // Fallback
+											   // In the event that no compiler specific extension is available
+											   // Then do nothing.
+		static_cast<void>(0);
 #endif
 	}
 

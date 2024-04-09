@@ -6,7 +6,10 @@
  * See LICENSE for more information.
  */
 
-int main()
+#pragma once
+
+namespace ccm::support
 {
-	
-}
+	template <typename...>
+	inline constexpr bool always_false = false;
+} // namespace ccm::support

@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "ccmath/math/basic/abs.hpp"
 #include "ccmath/internal/helpers/fpclassify_helper.hpp"
+#include "ccmath/math/basic/abs.hpp"
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 
@@ -23,15 +23,15 @@ namespace ccm
 	 * @return The classification of the number as an integer
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	inline constexpr int fpclassify(T num)
+	constexpr int fpclassify(T num)
 	{
-		if (ccm::isnan(num)) { return static_cast<int>(ccm::helpers::floating_point_defines::eFP_NAN); }
-		if (ccm::isinf(num)) { return static_cast<int>(ccm::helpers::floating_point_defines::eFP_INFINITE); }
-		if (num == static_cast<T>(0)) { return static_cast<int>(ccm::helpers::floating_point_defines::eFP_ZERO); }
+		if (ccm::isnan(num)) { return ccm::helpers::floating_point_defines::eFP_NAN; }
+		if (ccm::isinf(num)) { return ccm::helpers::floating_point_defines::eFP_INFINITE; }
+		if (num == static_cast<T>(0)) { return ccm::helpers::floating_point_defines::eFP_ZERO; }
 		if (ccm::abs(num) < std::numeric_limits<T>::min() && ccm::abs(num) > 0)
 		{
-			return static_cast<int>(ccm::helpers::floating_point_defines::eFP_SUBNORMAL);
+			return ccm::helpers::floating_point_defines::eFP_SUBNORMAL;
 		}
-		return static_cast<int>(ccm::helpers::floating_point_defines::eFP_NORMAL);
+		return ccm::helpers::floating_point_defines::eFP_NORMAL;
 	}
 } // namespace ccm

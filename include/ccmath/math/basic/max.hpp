@@ -8,9 +8,8 @@
 
 #pragma once
 
-#include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
-
+#include "ccmath/math/compare/isnan.hpp"
 #include <limits>
 #include <type_traits>
 
@@ -24,7 +23,7 @@ namespace ccm
 	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename T>
-	inline constexpr T max(T x, T y) noexcept
+	constexpr T max(T x, T y) noexcept
 	{
 		if constexpr (std::is_floating_point_v<T>)
 		{
@@ -47,7 +46,7 @@ namespace ccm
 	 * @return
 	 */
 	template <typename T, typename U>
-	inline constexpr auto max(T x, U y) noexcept
+	constexpr auto max(T x, U y) noexcept
 	{
 		// Find the common type of the two arguments
 		using shared_type = std::common_type_t<T, U>;
@@ -64,7 +63,7 @@ namespace ccm
 	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename T>
-	inline constexpr T fmax(T x, T y) noexcept
+	constexpr T fmax(T x, T y) noexcept
 	{
 		return max<T>(x, y);
 	}
@@ -78,7 +77,7 @@ namespace ccm
 	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename T, typename U>
-	inline constexpr auto fmax(T x, U y) noexcept
+	constexpr auto fmax(T x, U y) noexcept
 	{
 		// Find the common type of the two arguments
 		using shared_type = std::common_type_t<T, U>;
@@ -94,7 +93,7 @@ namespace ccm
 	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>
-	inline constexpr double fmax(Integer x, Integer y) noexcept
+	constexpr double fmax(Integer x, Integer y) noexcept
 	{
 		return max<double>(static_cast<double>(x), static_cast<double>(y));
 	}
@@ -105,7 +104,7 @@ namespace ccm
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
-	inline constexpr float fmaxf(float x, float y) noexcept
+	constexpr float fmaxf(float x, float y) noexcept
 	{
 		return fmax<float>(x, y);
 	}
@@ -116,7 +115,7 @@ namespace ccm
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
-	inline constexpr long double fmaxl(long double x, long double y) noexcept
+	constexpr long double fmaxl(long double x, long double y) noexcept
 	{
 		return fmax<long double>(x, y);
 	}

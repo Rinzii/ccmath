@@ -2,14 +2,21 @@
 Checks: '-*,
 bugprone-*,
 -bugprone-easily-swappable-parameters,
+
 modernize-*,
 -modernize-use-trailing-return-type,
+-modernize-use-constraints,
+
 performance-*,
+-performance-avoid-endl,
+
 readability-*,
 -readability-identifier-length,
 -readability-magic-numbers,
+
 cppcoreguidelines-*,
 -cppcoreguidelines-avoid-magic-numbers,
+
 cert-dcl21-cpp,
 cert-dcl58-cpp,
 cert-err34-c,

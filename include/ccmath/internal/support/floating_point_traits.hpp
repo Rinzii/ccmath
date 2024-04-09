@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "ccmath/internal/types/float128.hpp"
+
 #include <cstdint>
 #include <type_traits>
 
@@ -65,10 +67,17 @@ namespace ccm::helpers
 		static constexpr double normalize_factor = 18446744073709551616.0; //2^64
 	};
 
+#ifdef __SIZEOF_FLOAT128__
 	template <>
 	struct floating_point_traits<long double> : floating_point_traits<double>
 	{
 	};
+#else
+    template <>
+    struct floating_point_traits<long double> : floating_point_traits<double>
+    {
+    };
+#endif
 
 	template <typename T>
 	using float_bits_t = typename floating_point_traits<T>::uint_type;

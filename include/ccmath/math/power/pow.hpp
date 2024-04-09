@@ -10,42 +10,47 @@
 
 #include <limits>
 #include <type_traits>
-
-
-#include <unordered_map>
+#include "ccmath/ccmath.hpp"
+#include "ccmath/math/exponential/exp.hpp"
+#include "ccmath/math/exponential/log.hpp"
 
 namespace ccm
 {
-	namespace
+	namespace internal::impl
 	{
-		namespace detail
+		template <typename T, std::enable_if_t<std::is_integral_v<T> && std::is_unsigned_v<T>, bool> = true>
+		constexpr T pow_expo_by_sqr(T base, T exp) noexcept
 		{
-			// check that exponent does not have a fractional part
-			template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-            [[nodiscard]]
-			inline constexpr bool is_integral(T exponent) noexcept
-            {
-                return exponent == static_cast<T>(static_cast<int>(exponent));
-            }
+			// Handle common cases
+			if (exp == 0) { return 1; }			  // Anything to the power of 0 is 1
+			if (exp == 1) { return base; }		  // Anything to the power of 1 is itself
+			if (exp == 2) { return base * base; } // Anything to the power of 2 is itself squared
+			if (base == 0) { return 0; }		  // 0 to any power is 0
+			if (base == 1) { return 1; }		  // 1 to any power is 1
 
-			//lookup table for 2^i
-			template <typename T>
-			[[nodiscard]]
-			inline constexpr T two_to_pow_lookup_table(const T exponent) noexcept
-            {
-                constexpr T lookup[] = {
-                    static_cast<T>(1), static_cast<T>(2), static_cast<T>(4), static_cast<T>(8), static_cast<T>(16), static_cast<T>(32), static_cast<T>(64), static_cast<T>(128),
-                    static_cast<T>(256), static_cast<T>(512), static_cast<T>(1024), static_cast<T>(2048), static_cast<T>(4096), static_cast<T>(8192), static_cast<T>(16384), static_cast<T>(32768),
-                    static_cast<T>(65536), static_cast<T>(131072), static_cast<T>(262144), static_cast<T>(524288), static_cast<T>(1048576), static_cast<T>(2097152), static_cast<T>(4194304), static_cast<T>(8388608),
-                    static_cast<T>(16777216), static_cast<T>(33554432), static_cast<T>(67108864), static_cast<T>(134217728), static_cast<T>(268435456), static_cast<T>(536870912), static_cast<T>(1073741824), static_cast<T>(2147483648)
-                };
+			// If the base is 2, we can use the bit shift operator to calculate the power.
+			if (base == 2) { return 1 << exp; }
 
-                return lookup[exponent];
-            }
+			// This is pretty fast with smaller numbers, but is slower than the standard when dealing with large numbers.
+			// TODO: Find a way to optimize this for larger numbers.
+			T result = 1;
+			for (;;)
+			{
+				if (exp & 1) { result *= base; }
+				exp >>= 1;
+				if (!exp) { break; }
+				base *= base;
+			}
 
+			return result;
+		}
+	} // namespace internal::impl
 
-
-		} // namespace detail
-	}	  // namespace
+	template <typename T>
+	constexpr T pow(T x, T y) noexcept
+	{
+		if constexpr (std::is_integral_v<T> && std::is_unsigned_v<T>) { return internal::impl::pow_expo_by_sqr(x, y); }
+		return 0;
+	}
 
 } // namespace ccm

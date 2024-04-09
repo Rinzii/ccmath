@@ -5,7 +5,7 @@
  * This library is provided under the MIT License.
  * See LICENSE for more information.
  */
-
+// Values borrowed from gcc
 #pragma once
 
 #include <array>
@@ -13,8 +13,6 @@
 
 namespace ccm::internal
 {
-	// Values borrowed from glibc
-
 	// Float constants
 	constexpr std::size_t k_logTableBitsFlt = 4;
 	constexpr std::size_t k_logPolyOrderFlt = 4;

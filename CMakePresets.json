@@ -93,6 +93,11 @@
 			"configuration": "Release"
 		},
 		{
+			"name": "Release-clang",
+			"configurePreset": "ninja-clang",
+			"configuration": "Release"
+		},
+		{
 			"name": "RelWithDebInfo",
 			"configurePreset": "default",
 			"configuration": "RelWithDebInfo"
@@ -108,6 +113,12 @@
 		{
 			"name": "Release",
 			"configurePreset": "default",
+			"configuration": "Release",
+			"inheritConfigureEnvironment": true
+		},
+		{
+			"name": "Release-clang",
+			"configurePreset": "ninja-clang",
 			"configuration": "Release",
 			"inheritConfigureEnvironment": true
 		},

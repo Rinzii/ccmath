@@ -20,7 +20,7 @@ namespace ccm
 	 * @return True if the number is infinite, false otherwise.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	inline constexpr bool isinf(T x) noexcept
+	constexpr bool isinf(T x) noexcept
 	{
 		if constexpr (std::numeric_limits<T>::is_signed) { return x == -std::numeric_limits<T>::infinity() || x == std::numeric_limits<T>::infinity(); }
 		else { return x == std::numeric_limits<T>::infinity(); }
@@ -33,7 +33,7 @@ namespace ccm
 	 * @return True if the number is infinite, false otherwise.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	inline constexpr bool isinf(Integer /* x */) noexcept
+	constexpr bool isinf(Integer /* x */) noexcept
 	{
 		return false; // Integers cannot be infinite
 	}

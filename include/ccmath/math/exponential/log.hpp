@@ -22,7 +22,7 @@ namespace ccm
 	 * @warning ccm::log is currently only ensured to work on little-endian systems. There is currently no guarantee this it will work on big-endian systems.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	inline constexpr T log(const T num) noexcept
+	constexpr T log(const T num) noexcept
 	{
 		// If the number is 1, return +0.
 		if (num == static_cast<T>(1)) { return static_cast<T>(0); }
@@ -51,7 +51,7 @@ namespace ccm
 	 * @return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	inline constexpr double log(const Integer num) noexcept
+	constexpr double log(const Integer num) noexcept
 	{
 		return ccm::log(static_cast<double>(num));
 	}
@@ -61,7 +61,7 @@ namespace ccm
 	 * @param num A floating-point value to find the natural logarithm of.
 	 * @return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
 	 */
-	inline constexpr float logf(const float num) noexcept
+	constexpr float logf(const float num) noexcept
 	{
 		return ccm::log<float>(num);
 	}
@@ -71,7 +71,7 @@ namespace ccm
 	 * @param num A floating-point value to find the natural logarithm of.
 	 * @return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
 	 */
-	inline constexpr double logl(const double num) noexcept
+	constexpr double logl(const double num) noexcept
 	{
 		return ccm::log<double>(num);
 	}

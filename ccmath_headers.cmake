@@ -8,18 +8,19 @@ set(ccmath_internal_config_headers
 )
 
 set(ccmath_internal_helpers_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/digit_to_int.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/fpclassify_helper.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/exp_helpers.hpp
 )
 
 set(ccmath_internal_predef_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_warnings_and_errors_def.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_warnings_and_errors_undef.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_warnings_and_errors.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/has_attribute.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/likely.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/unlikely.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/no_debug.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/suppress.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/has_builtin.hpp
 )
 
 set(ccmath_internal_support_headers
@@ -29,11 +30,18 @@ set(ccmath_internal_support_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/is_constant_evaluated.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/meta_compare.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/unreachable.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/ctz.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_identity.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/always_false.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/limits.hpp
 )
 
 set(ccmath_internal_types_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/fp_types.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/int128.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/number_pair.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/sign.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/float128.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/big_int.hpp
 )
 
 
@@ -50,16 +58,18 @@ set(ccmath_internal_headers
 
 
 ##########################################
-# Detail headers
+# Math headers
 ##########################################
 
-set(ccmath_detail_basic_impl_headers
+set(ccmath_math_basic_impl_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/nan_float_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/nan_double_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/remquo_float_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/remquo_double_impl.hpp
 )
 
-set(ccmath_detail_basic_headers
-        ${ccmath_detail_basic_impl_headers}
+set(ccmath_math_basic_headers
+        ${ccmath_math_basic_impl_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/abs.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/fdim.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/fma.hpp
@@ -70,7 +80,7 @@ set(ccmath_detail_basic_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/remquo.hpp
 )
 
-set(ccmath_detail_compare_headers
+set(ccmath_math_compare_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/fpclassify.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/isfinite.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/isgreater.hpp
@@ -85,10 +95,11 @@ set(ccmath_detail_compare_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/signbit.hpp
 )
 
-set(ccmath_detail_exponential_impl_headers
+set(ccmath_math_exponential_impl_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/exp_float_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/exp_double_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/exp_data.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/exp2_data.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/log_float_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/log_double_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/log_data.hpp
@@ -97,8 +108,8 @@ set(ccmath_detail_exponential_impl_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/log2_data.hpp
 )
 
-set(ccmath_detail_exponential_headers
-        ${ccmath_detail_exponential_impl_headers}
+set(ccmath_math_exponential_headers
+        ${ccmath_math_exponential_impl_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/exp.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/exp2.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/expm1.hpp
@@ -108,7 +119,14 @@ set(ccmath_detail_exponential_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/log10.hpp
 )
 
-set(ccmath_detail_fmanip_headers
+set(ccmath_math_fmanip_impl_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/impl/scalbn_float_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/impl/scalbn_double_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/impl/scalbn_ldouble_impl.hpp
+)
+
+set(ccmath_math_fmanip_headers
+        ${ccmath_math_fmanip_impl_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/copysign.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/frexp.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/ilogb.hpp
@@ -119,7 +137,7 @@ set(ccmath_detail_fmanip_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/scalbn.hpp
 )
 
-set(ccmath_detail_hyperbolic_headers
+set(ccmath_math_hyperbolic_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/hyperbolic/acosh.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/hyperbolic/asinh.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/hyperbolic/atanh.hpp
@@ -137,14 +155,14 @@ set(ccmath_detail_nearest_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/nearest/trunc.hpp
 )
 
-set(ccmath_detail_power_headers
+set(ccmath_math_power_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/power/cbrt.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/power/hypot.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/power/pow.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/power/sqrt.hpp
 )
 
-set(ccmath_detail_special_headers
+set(ccmath_math_special_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/assoc_laguerre.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/assoc_legendre.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/beta.hpp
@@ -168,7 +186,7 @@ set(ccmath_detail_special_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/sph_neumann.hpp
 )
 
-set(ccmath_detail_trig_headers
+set(ccmath_math_trig_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/trig/acos.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/trig/asin.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/trig/atan.hpp
@@ -179,23 +197,23 @@ set(ccmath_detail_trig_headers
 )
 
 
-set(ccmath_detail_root_headers
+set(ccmath_math_root_headers
         # Functions without a specified category
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/gamma.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/lerp.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/lgamma.hpp
 )
 
-set(ccmath_detail_headers
-        ${ccmath_detail_basic_headers}
-        ${ccmath_detail_compare_headers}
-        ${ccmath_detail_exponential_headers}
-        ${ccmath_detail_fmanip_headers}
-        ${ccmath_detail_hyperbolic_headers}
-        ${ccmath_detail_nearest_headers}
-        ${ccmath_detail_power_headers}
-        ${ccmath_detail_trig_headers}
-        ${ccmath_detail_root_headers}
+set(ccmath_math_headers
+        ${ccmath_math_basic_headers}
+        ${ccmath_math_compare_headers}
+        ${ccmath_math_exponential_headers}
+        ${ccmath_math_fmanip_headers}
+        ${ccmath_math_hyperbolic_headers}
+        ${ccmath_math_nearest_headers}
+        ${ccmath_math_power_headers}
+        ${ccmath_math_trig_headers}
+        ${ccmath_math_root_headers}
 )
 
 
@@ -218,7 +236,7 @@ set(ccmath_root_headers
 )
 
 set(ccmath_headers
-        ${ccmath_detail_headers}
+        ${ccmath_math_headers}
         ${ccmath_internal_headers}
         ${ccmath_root_headers}
 )
