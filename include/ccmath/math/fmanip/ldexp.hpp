@@ -19,10 +19,10 @@ namespace ccm
 	inline constexpr T ldexp(T x, int32_t powerOf2) noexcept
 	{
 		if (!ccm::isfinite(x)) { return x; }
-		int32_t oldexp = ccm::helpers::get_exponent_of_floating_point<T>(x);
+		int32_t oldexp = ccm::support::get_exponent_of_floating_point<T>(x);
 
 		// if the mantissa is 0 and the original exponent is 0
-		if ((oldexp == 0) && ((ccm::helpers::bit_cast<ccm::helpers::float_bits_t<T>>(x) &
+		if ((oldexp == 0) && ((ccm::support::bit_cast<ccm::helpers::float_bits_t<T>>(x) &
 							   ccm::helpers::floating_point_traits<T>::normal_mantissa_mask) == 0))
 		{
 			return x;
@@ -44,7 +44,7 @@ namespace ccm
 		{
 			x *= ccm::helpers::floating_point_traits<T>::normalize_factor;
 			powerOf2 = -sizeof(T) * 8; //8 is bits in a byte
-			oldexp	 = ccm::helpers::get_exponent_of_floating_point<T>(x);
+			oldexp	 = ccm::support::get_exponent_of_floating_point<T>(x);
 		}
 
 		powerOf2 = oldexp + powerOf2;
@@ -55,11 +55,11 @@ namespace ccm
 		}
 		if (powerOf2 > 0)
 		{
-			return ccm::helpers::set_exponent_of_floating_point<T>(x, powerOf2);
+			return ccm::support::set_exponent_of_floating_point<T>(x, powerOf2);
 		}
 		// denormal, or underflow
 		powerOf2 += sizeof(T) * 8; //8 is bits in a byte
-		x = ccm::helpers::set_exponent_of_floating_point<T>(x, powerOf2);
+		x = ccm::support::set_exponent_of_floating_point<T>(x, powerOf2);
 		x /= ccm::helpers::floating_point_traits<T>::normalize_factor;
 		if (x == static_cast<T>(0))
 		{

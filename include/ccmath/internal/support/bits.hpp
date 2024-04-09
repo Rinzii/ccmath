@@ -78,7 +78,8 @@ namespace ccm::support
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	inline constexpr std::int32_t get_exponent_of_floating_point(T x) noexcept
 	{
-		const auto bits				= bit_cast<float_bits_t<T>>(x);
+		const auto bits = bit_cast<ccm::helpers::float_bits_t<T>>(x);
+		
 		const auto shifted_exponent = bits >> ccm::helpers::floating_point_traits<T>::exponent_shift;
 		const auto masked_exponent	= shifted_exponent & ccm::helpers::floating_point_traits<T>::exponent_mask;
 		return masked_exponent - ccm::helpers::floating_point_traits<T>::exponent_bias;
@@ -87,7 +88,7 @@ namespace ccm::support
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	inline constexpr T set_exponent_of_floating_point(T x, int exp) noexcept
 	{
-		const auto bit_casted			  = bit_cast<float_bits_t<T>>(x);
+		const auto bit_casted			   = bit_cast<ccm::helpers::float_bits_t<T>>(x);
 		const auto inverted_exponent_mask = ~ccm::helpers::floating_point_traits<T>::shifted_exponent_mask;
 		const auto masked_exponent = (exp + ccm::helpers::floating_point_traits<T>::exponent_bias) & ccm::helpers::floating_point_traits<T>::exponent_mask;
 		const auto shifted_masked_exponent = masked_exponent << ccm::helpers::floating_point_traits<T>::exponent_shift;
