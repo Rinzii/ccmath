@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 3.18)
 
 set(CCMATH_BUILD_VERSION 0.1.3)
-set(INTERNAL_PROJ_DEFAULT_NAME ccmath)
 
-project(${INTERNAL_PROJ_DEFAULT_NAME} VERSION ${CCMATH_BUILD_VERSION})
+project(ccmath VERSION ${CCMATH_BUILD_VERSION})
 
 set(is_root_project OFF) # Identifies if this is the root project
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
@@ -14,8 +13,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# TO THE IMPLEMENTOR: If CCMATH_BUILD_TEST is set to OFF then googletest can be deleted from the ext folder.
-option(CCMATH_BUILD_TEST "Build ccmath tests" ${is_root_project})
+# TO THE IMPLEMENTOR: If CCMATH_BUILD_TESTS is set to OFF then googletest can be deleted from the ext folder.
+option(CCMATH_BUILD_TESTS "Build ccmath tests" ${is_root_project})
 option(CCMATH_BUILD_EXAMPLES "Build ccmath examples" ${is_root_project})
 option(CCMATH_BUILD_BENCHMARKS "Build ccmath benchmarks" ${is_root_project})
 option(CCMATH_INSTALL "Setup install and package steps" ${is_root_project})
@@ -71,7 +70,7 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
 
 configure_file(cmake/version.hpp.in "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp" @ONLY)
 
-if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TEST)
+if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TESTS)
   add_subdirectory(thirdparty)
 endif()
 
@@ -83,7 +82,7 @@ if (CCMATH_BUILD_BENCHMARKS)
   add_subdirectory(benchmark)
 endif()
 
-if (CCMATH_BUILD_TEST)
+if (CCMATH_BUILD_TESTS)
   enable_testing()
   add_subdirectory(test)
 endif()

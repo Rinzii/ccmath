@@ -1,18 +1,14 @@
-if (NOT DEFINED INTERNAL_PROJ_DEFAULT_NAME)
-  message(FATAL_ERROR "INTERNAL_PROJ_DEFAULT_NAME is not defined. Did you somehow include this file directly without the main CMakeLists.txt being called first?")
-endif ()
-
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
-project(${INTERNAL_PROJ_DEFAULT_NAME}-test)
+project(ccmath-test)
 
-if(NOT TARGET ${INTERNAL_PROJ_DEFAULT_NAME})
-    find_package(${INTERNAL_PROJ_DEFAULT_NAME} CONFIG REQUIRED)
+if(NOT TARGET ccmath)
+    find_package(ccmath CONFIG REQUIRED)
 endif()
 
 
 add_library(${PROJECT_NAME} STATIC)
-add_library(${INTERNAL_PROJ_DEFAULT_NAME}::test ALIAS ${PROJECT_NAME})
+add_library(ccmath::test ALIAS ${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME} PUBLIC
         ccmath::ccmath
         gtest::gtest

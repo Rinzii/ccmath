@@ -1,17 +1,20 @@
-if (NOT DEFINED INTERNAL_PROJ_DEFAULT_NAME)
-  message(FATAL_ERROR "INTERNAL_PROJ_DEFAULT_NAME is not defined. Did you somehow include this file directly without the main CMakeLists.txt being called first?")
-endif ()
+
 
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
-project(${INTERNAL_PROJ_DEFAULT_NAME}-benchmark)
+project(ccmath-benchmark)
 
-if(NOT TARGET ${INTERNAL_PROJ_DEFAULT_NAME})
-  find_package(${INTERNAL_PROJ_DEFAULT_NAME} CONFIG REQUIRED)
+# Force cmake to use Release if debug is detected
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(CMAKE_BUILD_TYPE "Release" ON CACHE STRING "Build type" FORCE)
+endif()
+
+if(NOT TARGET ccmath)
+  find_package(ccmath CONFIG REQUIRED)
 endif()
 
 add_executable(${PROJECT_NAME})
-add_executable(${INTERNAL_PROJ_DEFAULT_NAME}::benchmark ALIAS ${PROJECT_NAME})
+add_executable(ccmath::benchmark ALIAS ${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME} PUBLIC
         ccmath::ccmath
         benchmark::benchmark
