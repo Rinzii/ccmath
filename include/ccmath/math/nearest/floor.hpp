@@ -40,7 +40,7 @@ namespace ccm
 
 	/**
 	 * @brief Computes the largest integer value not greater than num.
-	 * @param num A integer value.
+	 * @param num An integer value.
 	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
