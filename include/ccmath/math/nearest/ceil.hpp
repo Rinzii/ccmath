@@ -42,6 +42,9 @@ namespace ccm
 
         // if num is an integer, num is returned, unmodified
         if constexpr (std::is_integral_v<T>) { return num; }
+
+        // if num is not integral or floating-point, NaN is returned
+        return std::numeric_limits<T>::quiet_NaN();
     }
 
     /**
