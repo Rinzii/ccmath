@@ -34,10 +34,10 @@ namespace ccm
 			if (ccm::isinf(num) || num == static_cast<T>(0)) { return num; }
 
             // Compute the largest integer value not greater than num.
-            constexpr T num_floored = static_cast<T>(static_cast<long long int>(num));
+            T num_floored = static_cast<T>(static_cast<long long int>(num));
 
             // if num_floored is not equal to num, num_floored incremented is returned
-            if constexpr (num_floored != num) { return num_floored + 1; } 
+            if (num_floored != num) { return num_floored + 1; } 
 		}
 
         // if num is an integer, num is returned, unmodified
