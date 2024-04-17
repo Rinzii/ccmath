@@ -23,8 +23,8 @@ TEST(CcmathNearestTests, Ceil)
     EXPECT_EQ(ccm::ceil(std::numeric_limits<double>::infinity()), std::ceil(std::numeric_limits<double>::infinity()));
     EXPECT_EQ(ccm::ceil(-std::numeric_limits<double>::infinity()), std::ceil(-std::numeric_limits<double>::infinity()));
 
-    EXPECT_TRUE(std::isnan(ccm::ceil(std::nan(""))));
-    EXPECT_TRUE(std::isnan(ccm::ceil(-std::nan(""))));
+    EXPECT_TRUE(std::isnan(ccm::ceil(std::numeric_limits<double>::quiet_NaN())));
+    EXPECT_TRUE(std::isnan(ccm::ceil(-std::numeric_limits<double>::quiet_NaN())));
     EXPECT_EQ(ccm::ceil(0.0), std::ceil(0.0));
     EXPECT_EQ(ccm::ceil(-0.0), std::ceil(-0.0));
     EXPECT_EQ(ccm::ceil(0.5), std::ceil(0.5));
