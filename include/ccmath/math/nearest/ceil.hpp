@@ -22,29 +22,23 @@ namespace ccm
      * @param num A floating-point or integer value.
      * @return If no errors occur, the smallest integer value no lesser than num, that is ⌈num⌉, is returned.
      */
-    template <typename T>
+    template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
     constexpr T ceil(T num) noexcept 
     {
-        if constexpr (std::is_floating_point_v<T>)
-		{
-			// If num is NaN, NaN is returned.
-			if (ccm::isnan(num)) { return std::numeric_limits<T>::quiet_NaN(); }
+		// If num is NaN, NaN is returned.
+		if (ccm::isnan(num)) { return std::numeric_limits<T>::quiet_NaN(); }
 
-			// If num is ±∞ or ±0, num is returned, unmodified.
-			if (ccm::isinf(num) || num == static_cast<T>(0)) { return num; }
+		// If num is ±∞ or ±0, num is returned, unmodified.
+		if (ccm::isinf(num) || num == static_cast<T>(0)) { return num; }
 
-            // Compute the largest integer value not greater than num.
-            T num_floored = static_cast<T>(static_cast<long long int>(num));
+        // Compute the largest integer value not greater than num.
+        T num_floored = static_cast<T>(static_cast<long long int>(num));
 
-            // if num_floored is not equal to num, num_floored incremented is returned
-            if (num_floored != num) { return num_floored + 1; } 
-		}
+        // if num_floored is not equal to num, num_floored incremented is returned
+        if (num_floored != num) { return num_floored + 1; }
 
-        // if num is an integer, num is returned, unmodified
-        if constexpr (std::is_integral_v<T>) { return num; }
-
-        // if num is not integral or floating-point, NaN is returned
-        return std::numeric_limits<T>::quiet_NaN();
+        // of num_floored is equal to num, num_floored is returned
+        return num_floored;
     }
 
     /**
