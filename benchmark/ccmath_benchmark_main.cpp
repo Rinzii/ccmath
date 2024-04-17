@@ -13,13 +13,34 @@
 #include "ccmath/ccmath.hpp"
 #include <cmath>
 
-#include "helpers/randomizers.h"
-
 // NOLINTBEGIN
 
 namespace bm = benchmark;
 
-static auto randomizer = ccm::bench::Randomizer();
+// Global seed value for random number generator
+constexpr unsigned int DefaultSeed = 937162211; // Using a long prime number as our default seed
+
+// Generate a fixed set of random integers for benchmarking
+std::vector<int> generateRandomIntegers(size_t count, unsigned int seed) {
+	std::vector<int> randomIntegers;
+	std::mt19937 gen(seed);
+	std::uniform_int_distribution<int> dist(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+	for (size_t i = 0; i < count; ++i) {
+		randomIntegers.push_back(dist(gen));
+	}
+	return randomIntegers;
+}
+
+// Generate a fixed set of random integers for benchmarking
+std::vector<double> generateRandomDoubles(size_t count, unsigned int seed) {
+	std::vector<double> randomDouble;
+	std::mt19937 gen(seed);
+	std::uniform_real_distribution<double> dist(std::numeric_limits<double>::min(), std::numeric_limits<double>::max());
+	for (size_t i = 0; i < count; ++i) {
+		randomDouble.push_back(dist(gen));
+	}
+	return randomDouble;
+}
 
 /*
 
@@ -231,7 +252,7 @@ static void BM_ccm_fma(bm::State& state) {
 BENCHMARK(BM_ccm_fma)->Args({16, 16, 16})->Args({256, 256, 256})->Args({4096, 4096, 4096})->Args({65536, 65536, 65536})->Complexity();
 
 static void BM_std_fma_rand_double(bm::State& state) {
-    auto randomDoubles = randomizer.generateRandomDoubles(static_cast<size_t>(state.range(0)));
+    auto randomDoubles = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
     while (state.KeepRunning()) {
         for (auto x : randomDoubles) {
             bm::DoNotOptimize(std::fma(x, x, x));
@@ -242,7 +263,7 @@ static void BM_std_fma_rand_double(bm::State& state) {
 BENCHMARK(BM_std_fma_rand_double)->Range(8, 8<<10)->Complexity();
 
 static void BM_ccm_fma_rand_double(bm::State& state) {
-    auto randomDoubles = randomizer.generateRandomDoubles(static_cast<size_t>(state.range(0)));
+    auto randomDoubles = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
     while (state.KeepRunning()) {
         for (auto x : randomDoubles) {
             bm::DoNotOptimize(ccm::fma(x, x, x));
@@ -251,6 +272,7 @@ static void BM_ccm_fma_rand_double(bm::State& state) {
     state.SetComplexityN(state.range(0));
 }
 BENCHMARK(BM_ccm_fma_rand_double)->Range(8, 8<<10)->Complexity();
+
 
 
 BENCHMARK_MAIN();
