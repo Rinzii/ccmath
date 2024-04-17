@@ -33,5 +33,3 @@ ${BENCHMARK_EXE} --benchmark_format=csv > benchmark.csv
 echo "Creating graph now!"
 # Pass the csv file to the plot script to generate our graph
 python3 "${SCRIPTS_DIR}/plot.py" -f benchmark.csv
-
-# Run the benchmark and plot
