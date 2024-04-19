@@ -25,17 +25,17 @@ TEST(CcmathNearestTests, Ceil)
     EXPECT_EQ(ccm::ceil(-std::numeric_limits<double>::infinity()), std::ceil(-std::numeric_limits<double>::infinity()));
 
     // Check sign of NaN return
-    bool testCmmCeilThatNanReturnsNan = std::isnan(ccm::ceil(std::numeric_limits<double>::quiet_NaN()));
+    bool testCcmCeilThatNanReturnsNan = std::isnan(ccm::ceil(std::numeric_limits<double>::quiet_NaN()));
     bool testStdCeilThatNanReturnsNan = std::isnan(std::ceil(std::numeric_limits<double>::quiet_NaN()));
     EXPECT_EQ(testCmmCeilThatNanReturnsNan, testStdCeilThatNanReturnsNan);
 
-    bool testCmmCeilThatNanIsPositive = std::signbit(ccm::ceil(std::numeric_limits<double>::quiet_NaN()));
+    bool testCcmCeilThatNanIsPositive = std::signbit(ccm::ceil(std::numeric_limits<double>::quiet_NaN()));
     bool testStdCeilThatNanIsPositive = std::signbit(std::ceil(std::numeric_limits<double>::quiet_NaN()));
-    EXPECT_EQ(testCmmCeilThatNanIsPositive, testStdCeilThatNanIsPositive);
+    EXPECT_EQ(testCcmCeilThatNanIsPositive, testStdCeilThatNanIsPositive);
 
-    bool testCmmCeilThatNanIsNegative = std::signbit(ccm::ceil(-std::numeric_limits<double>::quiet_NaN()));
+    bool testCcmCeilThatNanIsNegative = std::signbit(ccm::ceil(-std::numeric_limits<double>::quiet_NaN()));
     bool testStdCeilThatNanIsNegative = std::signbit(std::ceil(-std::numeric_limits<double>::quiet_NaN));
-    EXPECT_EQ(testCemmCeilThatNanIsNegative, testStdCeilThatNanIsNegative);
+    EXPECT_EQ(testCcmCeilThatNanIsNegative, testStdCeilThatNanIsNegative);
 
     EXPECT_EQ(ccm::ceil(0.0), std::ceil(0.0));
     EXPECT_EQ(ccm::ceil(-0.0), std::ceil(-0.0));
@@ -71,23 +71,23 @@ TEST(CcmathNearestTests, Ceil)
     EXPECT_EQ(ccm::ceilf(30.508474576271183309f), std::ceilf(30.508474576271183309f)); 
 
     // Test with long double using std::ceill and ccm::ceill
-    static_assert(ccm::ceill(1.0l) == ccm::ceill(1.0l), "ccm::ceill not static_assertable");
-	EXPECT_EQ(ccm::ceill(1.0l), std::ceill(1.0l));
-    EXPECT_EQ(ccm::ceill(1.5l), std::ceill(1.5l));
-    EXPECT_EQ(ccm::ceill(1.9l), std::ceill(1.9l));
-    EXPECT_EQ(ccm::ceill(-1.0l), std::ceill(-1.0l));
-    EXPECT_EQ(ccm::ceill(-1.5l), std::ceill(-1.5l));
-    EXPECT_EQ(ccm::ceill(-1.9l), std::ceill(-1.9l));
+    static_assert(ccm::ceill(1.0) == ccm::ceill(1.0), "ccm::ceill not static_assertable");
+	EXPECT_EQ(ccm::ceill(1.0), std::ceill(1.0));
+    EXPECT_EQ(ccm::ceill(1.5), std::ceill(1.5));
+    EXPECT_EQ(ccm::ceill(1.9), std::ceill(1.9));
+    EXPECT_EQ(ccm::ceill(-1.0), std::ceill(-1.0));
+    EXPECT_EQ(ccm::ceill(-1.5), std::ceill(-1.5));
+    EXPECT_EQ(ccm::ceill(-1.9), std::ceill(-1.9));
     EXPECT_EQ(ccm::ceill(std::numeric_limits<long double>::infinity()), std::ceill(std::numeric_limits<long double>::infinity()));
     EXPECT_EQ(ccm::ceill(-std::numeric_limits<long double>::infinity()), std::ceill(-std::numeric_limits<long double>::infinity()));
     EXPECT_TRUE(std::isnan(ccm::ceill(std::nanl(""))));
     EXPECT_TRUE(std::isnan(ccm::ceill(-std::nanl(""))));
-    EXPECT_EQ(ccm::ceill(0.0l), std::ceill(0.0l));
-    EXPECT_EQ(ccm::ceill(-0.0l), std::ceill(-0.0l));
-    EXPECT_EQ(ccm::ceill(0.5l), std::ceill(0.5l));
-    EXPECT_EQ(ccm::ceill(-0.5l), std::ceill(-0.5l));
-    EXPECT_EQ(ccm::ceill(0.9l), std::ceill(0.9l));
-    EXPECT_EQ(ccm::ceill(-0.9l), std::ceill(-0.9l));
-    EXPECT_EQ(ccm::ceill(0.9999999999999999l), std::ceill(0.9999999999999999l));
-    EXPECT_EQ(ccm::ceill(-0.9999999999999999l), std::ceill(-0.9999999999999999l));
+    EXPECT_EQ(ccm::ceill(0.0), std::ceill(0.0));
+    EXPECT_EQ(ccm::ceill(-0.0), std::ceill(-0.0));
+    EXPECT_EQ(ccm::ceill(0.5), std::ceill(0.5));
+    EXPECT_EQ(ccm::ceill(-0.5), std::ceill(-0.5));
+    EXPECT_EQ(ccm::ceill(0.9), std::ceill(0.9));
+    EXPECT_EQ(ccm::ceill(-0.9), std::ceill(-0.9));
+    EXPECT_EQ(ccm::ceill(0.9999999999999999), std::ceill(0.9999999999999999));
+    EXPECT_EQ(ccm::ceill(-0.9999999999999999), std::ceill(-0.9999999999999999));
 }
