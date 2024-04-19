@@ -14,6 +14,7 @@
 
 TEST(CcmathNearestTests, Ceil)
 {
+    static_assert(ccm::ceil(1.0) == ccm::ceil(1.0), "ccm::ceil is not static_assertable");
     EXPECT_EQ(ccm::ceil(1.0), std::ceil(1.0));
     EXPECT_EQ(ccm::ceil(1.5), std::ceil(1.5));
     EXPECT_EQ(ccm::ceil(1.9), std::ceil(1.9));
@@ -48,6 +49,7 @@ TEST(CcmathNearestTests, Ceil)
     EXPECT_EQ(ccm::ceil(-1.0000000000000001), std::ceil(-1.0000000000000001));
     
     // Test with float using std::ceilf and ccm::ceilf
+    static_assert(ccm::ceilf(1.0f) == ccm::ceilf(1.0f), "ccm::ceilf not static_assertable");
 	EXPECT_EQ(ccm::ceilf(1.0f), std::ceilf(1.0f));
     EXPECT_EQ(ccm::ceilf(1.5f), std::ceilf(1.5f));
     EXPECT_EQ(ccm::ceilf(1.9f), std::ceilf(1.9f));
@@ -69,6 +71,7 @@ TEST(CcmathNearestTests, Ceil)
     EXPECT_EQ(ccm::ceilf(30.508474576271183309f), std::ceilf(30.508474576271183309f)); 
 
     // Test with long double using std::ceill and ccm::ceill
+    static_assert(ccm::ceill(1.0l) == ccm::ceill(1.0l), "ccm::ceill not static_assertable");
 	EXPECT_EQ(ccm::ceill(1.0l), std::ceill(1.0l));
     EXPECT_EQ(ccm::ceill(1.5l), std::ceill(1.5l));
     EXPECT_EQ(ccm::ceill(1.9l), std::ceill(1.9l));
