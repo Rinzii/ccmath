@@ -12,7 +12,7 @@
 
 namespace ccm::support
 {
-	/// @cond HIDDEN_SYMBOLS
+	/// @cond HIDDEN
 	namespace detail
 	{
 		// A variadic alias template that resolves to its first argument.
