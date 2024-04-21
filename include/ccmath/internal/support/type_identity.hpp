@@ -17,5 +17,5 @@ namespace ccm
 
 	template<class T>
 	using type_identity_t = typename type_identity<T>::type;
-}
+} // namespace ccm
 
