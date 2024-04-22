@@ -24,6 +24,12 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T log(const T num) noexcept
 	{
+#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
+		if constexpr (std::is_same_v<T, float>) { return __builtin_logf(num); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_log(num); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_logl(num); }
+		else { return __builtin_log(num); }
+#else
 		// If the number is 1, return +0.
 		if (num == static_cast<T>(1)) { return static_cast<T>(0); }
 
@@ -42,6 +48,7 @@ namespace ccm
 		// Select the correct implementation based on the type.
 		if constexpr (std::is_same_v<T, float>) { return ccm::internal::log_float(num); }
 		else { return ccm::internal::log_double(num); }
+#endif
 	}
 
 	/**
