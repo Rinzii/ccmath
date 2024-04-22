@@ -8,10 +8,9 @@
 
 #pragma once
 
-// #include "ccmath/internal/predef/unlikely.hpp"
-#include <type_traits>
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
+#include <type_traits>
 
 namespace ccm
 {
@@ -48,7 +47,7 @@ namespace ccm
 			return std::numeric_limits<T>::quiet_NaN();
 		}
 
-		// We have to hope the compiler optimizes this. Currently, there is no builtin fma that works with static_assert.
+		// If we don't have access to a builtin fma. Then just hope the compiler optimizes this.
 		return (x * y) + z;
 #endif
 	}
