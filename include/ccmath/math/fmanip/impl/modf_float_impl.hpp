@@ -8,11 +8,15 @@
 
 #pragma once
 
-namespace ccm
-{
-	template <typename T>
-	constexpr T modf(T x, T* iptr) noexcept
-	{
+#include "ccmath/internal/support/bits.hpp"
 
+namespace ccm::internal::impl
+{
+	constexpr double modf_float_impl(float x, float* iptr) noexcept
+	{
+		__float128 q = x;
+
+		return 0;
 	}
-} // namespace ccm
+
+} // namespace ccm::internal::impl
