@@ -1,8 +1,4 @@
-if (NOT DEFINED INTERNAL_PROJ_DEFAULT_NAME)
-  message(FATAL_ERROR "INTERNAL_PROJ_DEFAULT_NAME is not defined. Did you somehow include this file directly without the main CMakeLists.txt being called first?")
-endif ()
-
-project(${INTERNAL_PROJ_DEFAULT_NAME}-ext)
+project(ccmath-ext)
 
 include(FetchContent)
 
@@ -21,7 +17,7 @@ if (CCMATH_BUILD_BENCHMARKS)
   FetchContent_MakeAvailable(benchmark)
 endif ()
 
-if (CCMATH_BUILD_TEST)
+if (CCMATH_BUILD_TESTS)
   # Intel does implement the regex library but google test is unable to detect this.
   # Lets help them out and set the var ourselves.
   if (CCMATH_COMPILER_INTEL)
@@ -53,9 +49,9 @@ endif()
 
 
 add_library(${PROJECT_NAME} INTERFACE)
-add_library(${INTERNAL_PROJ_DEFAULT_NAME}::ext ALIAS ${PROJECT_NAME})
+add_library(ccmath::ext ALIAS ${PROJECT_NAME})
 
-if(CCMATH_BUILD_TEST)
+if(CCMATH_BUILD_TESTS)
   target_link_libraries(${PROJECT_NAME} INTERFACE
           gtest::gtest
           )

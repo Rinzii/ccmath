@@ -19,7 +19,7 @@ namespace ccm
 	/**
 	 * @brief Computes the absolute value of a number.
 	 * @tparam T Numeric type.
-	 * @param x Floating-point or integer value.
+	 * @param num Floating-point or integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T> && !std::is_unsigned_v<T>, bool> = true>
@@ -38,7 +38,7 @@ namespace ccm
 	/**
 	 * @brief Computes the absolute value of a number.
 	 * @tparam T Numeric type.
-	 * @param x Floating-point or integer value.
+	 * @param num Floating-point or integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_unsigned_v<T>, bool> = true>
@@ -51,7 +51,7 @@ namespace ccm
 	/**
 	 * @brief Computes the absolute value of a number.
 	 * @tparam T Unsigned numeric type.
-	 * @param x Floating-point or integer value.
+	 * @param num Floating-point or integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename T, std::enable_if_t<std::is_unsigned_v<T>, bool> = true>
@@ -72,7 +72,7 @@ namespace ccm
 	/**
 	 * @brief Computes the absolute value of a number.
 	 * @tparam T Floating-point type.
-	 * @param x Floating-point value.
+	 * @param num Floating-point value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
@@ -84,7 +84,7 @@ namespace ccm
 	/**
 	 * @brief Computes the absolute value of a number.
 	 * @tparam Integer Integer type.
-	 * @param x Integer value.
+	 * @param num Integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
@@ -95,7 +95,7 @@ namespace ccm
 
 	/**
 	 * @brief Computes the absolute value of a number.
-	 * @param x Floating-point value.
+	 * @param num Floating-point value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
 	constexpr float fabsf(float num) noexcept
@@ -105,7 +105,7 @@ namespace ccm
 
 	/**
 	 * @brief Computes the absolute value of a number.
-	 * @param x Floating-point value.
+	 * @param num Floating-point value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
 	constexpr long double fabsl(long double num) noexcept
@@ -115,7 +115,7 @@ namespace ccm
 
 	/**
 	 * @brief Computes the absolute value of a number.
-	 * @param x Integer value.
+	 * @param num Integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
 	constexpr long labs(long num) noexcept
@@ -125,7 +125,7 @@ namespace ccm
 
 	/**
 	 * @brief Computes the absolute value of a number.
-	 * @param x Integer value.
+	 * @param num Integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
 	constexpr long long llabs(long long num) noexcept

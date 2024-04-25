@@ -11,27 +11,33 @@
 #include <random>
 #include <vector>
 
-// Global seed value for random number generator
-constexpr unsigned int DefaultSeed = 937162211; // Using a long prime number as our default seed
+namespace ccm::bench
+{
+	struct Randomizer
+	{
+	public:
+		explicit Randomizer(std::uint_fast32_t seed = 937162211) : m_gen{seed} {}
 
-// Generate a fixed set of random integers for benchmarking
-std::vector<int> generateRandomIntegers(size_t count, unsigned int seed) {
-	std::vector<int> randomIntegers;
-	std::mt19937 gen(seed);
-	std::uniform_int_distribution dist(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
-	for (size_t i = 0; i < count; ++i) {
-		randomIntegers.push_back(dist(gen));
-	}
-	return randomIntegers;
-}
+		std::vector<int> generateRandomIntegers(std::size_t count, int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max())
+		{
+			std::vector<int> randomIntegers;
+			randomIntegers.reserve(count);
+			std::uniform_int_distribution dist(min, max);
+			for (std::size_t i = 0; i < count; ++i) { randomIntegers.push_back(dist(m_gen)); }
+			return randomIntegers;
+		}
 
-// Generate a fixed set of random integers for benchmarking
-std::vector<double> generateRandomDoubles(size_t count, unsigned int seed) {
-	std::vector<double> randomDouble;
-	std::mt19937 gen(seed);
-	std::uniform_real_distribution dist(std::numeric_limits<double>::min(), std::numeric_limits<double>::max());
-	for (size_t i = 0; i < count; ++i) {
-		randomDouble.push_back(dist(gen));
-	}
-	return randomDouble;
-}
+		std::vector<double> generateRandomDoubles(std::size_t count, double min = 0.0,
+												  double max = 1.0)
+		{
+			std::vector<double> randomDouble;
+			randomDouble.reserve(count);
+			std::uniform_real_distribution dist(min, max);
+			for (std::size_t i = 0; i < count; ++i) { randomDouble.push_back(dist(m_gen)); }
+			return randomDouble;
+		}
+
+	private:
+		std::mt19937 m_gen;
+	};
+} // namespace ccm::bench

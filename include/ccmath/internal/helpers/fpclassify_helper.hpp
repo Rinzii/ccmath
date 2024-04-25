@@ -19,6 +19,7 @@
 // - Nvidia HPC SDK
 
 #include "ccmath/internal/config/compiler.hpp" // Identify the compiler
+#include "ccmath/internal/support/always_false.hpp"
 
 namespace ccm::helpers
 {
@@ -49,7 +50,7 @@ namespace ccm::helpers
 		static constexpr int eFP_SUBNORMAL = 3;
 		static constexpr int eFP_NORMAL = 4;
 #else
-		static_assert(false, "FP_* macros are extremely implementation specific and are not defined for this compiler. Please add support for this compiler.")
+		static_assert(ccm::support::always_false<bool>, "FP_* macros are extremely implementation specific and are not defined for this compiler. Please add support for this compiler.");
 #endif
 	};
 } // namespace ccm::helpers
