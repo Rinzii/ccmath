@@ -71,13 +71,14 @@
 			"generator": "Visual Studio 17 2022"
 		},
 		{
-			"name": "pre-install",
-			"description": "Debug build using Ninja Multi-config and install prefix",
+			"name": "benchmark-default",
+			"description": "Benchmark build configuration using Ninja Multi-config",
 			"inherits": "default",
-			"binaryDir": "${sourceDir}/out/pre",
+			"binaryDir": "${sourceDir}/out/benchmark",
 			"cacheVariables": {
-				"CMAKE_PREFIX_PATH": "${sourceDir}/out/install",
-				"RR_PREINSTALLED": "ON"
+				"CCMATH_BUILD_BENCHMARKS": "ON",
+				"CCMATH_BUILD_TESTS": "OFF",
+				"CCMATH_BUILD_EXAMPLES": "OFF"
 			}
 		}
 	],
