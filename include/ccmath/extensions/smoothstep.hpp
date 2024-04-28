@@ -22,11 +22,11 @@ namespace ccm::ext
      * @return The interpolated value.
      */
     template<typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-    inline constexpr T smoothstep(T edge0, T edge1, T x)
+    constexpr T smoothstep(T edge0, T edge1, T x)
     {
 		// Scale, bias and saturate x to 0..1 range
         x = ccm::ext::clamp((x - edge0) / (edge1 - edge0));
         // Evaluate polynomial
         return x * x * (static_cast<T>(3) - static_cast<T>(2) * x);
     }
-}
+} // namespace ccm::ext
