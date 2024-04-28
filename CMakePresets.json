@@ -104,6 +104,11 @@
 			"configuration": "Release"
 		},
 		{
+			"name": "Release-gcc",
+			"configurePreset": "ninja-gcc",
+			"configuration": "Release"
+		},
+		{
 			"name": "Release-clang",
 			"configurePreset": "ninja-clang",
 			"configuration": "Release"
