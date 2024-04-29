@@ -42,7 +42,7 @@
 			"binaryDir": "${sourceDir}/out/intel",
 			"cacheVariables": {
 				"CMAKE_C_COMPILER": "icx",
-				"CMAKE_CXX_COMPILER": "icx"
+				"CMAKE_CXX_COMPILER": "icpx"
 			}
 		},
 		{
