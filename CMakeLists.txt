@@ -46,6 +46,13 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL MSVC)
   )
 endif()
 
+# Check for intel compiler
+if(CMAKE_CXX_COMPILER_ID STREQUAL IntelLLVM)
+  target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+          -Wno-tautological-constant-compare
+  )
+endif()
+
 include(ccmath_headers.cmake)
 
 add_library(${PROJECT_NAME} INTERFACE)
