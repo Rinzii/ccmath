@@ -23,7 +23,7 @@ namespace ccm::ext
      * @return The clamped value.
      */
     template<typename T>
-    inline constexpr T clamp(T v, T lo = T{0}, T hi = T{1})
+    constexpr T clamp(T v, T lo = T{0}, T hi = T{1})
     {
         return ccm::min(ccm::max(v, lo), hi);
     }
@@ -39,8 +39,8 @@ namespace ccm::ext
      * @return The clamped value.
      */
 	template<typename TVal, typename TLow, typename THigh>
-    inline constexpr std::common_type_t<TVal, TLow, THigh> clamp(TVal v, TLow lo = TLow{0}, THigh hi = THigh{1})
+    constexpr std::common_type_t<TVal, TLow, THigh> clamp(TVal v, TLow lo = TLow{0}, THigh hi = THigh{1})
     {
         return ccm::min(ccm::max(v, lo), hi);
     }
-}
+} // namespace ccm::ext

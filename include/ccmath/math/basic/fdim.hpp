@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include <limits>
 #include <type_traits>
@@ -28,7 +27,7 @@ namespace ccm
 		if (CCM_UNLIKELY(ccm::isnan(x))) { return x; }
 		if (CCM_UNLIKELY(ccm::isnan(y))) { return y; }
 		if (x <= y) { return static_cast<T>(+0.0); }
-		if ((y < static_cast<T>(0.0)) && (x > (std::numeric_limits<T>::max() + y))) { return std::numeric_limits<T>::infinity(); }
+		if (y < static_cast<T>(0.0) && x > std::numeric_limits<T>::max() + y) { return std::numeric_limits<T>::infinity(); }
 		return x - y;
 	}
 

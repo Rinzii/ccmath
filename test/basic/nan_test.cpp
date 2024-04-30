@@ -13,10 +13,6 @@
 #include <cstdint>
 #include <limits>
 
-constexpr double checkNan() noexcept
-{
-	return ccm::nan("");
-}
 
 TEST(CcmathBasicTests, NanStaticAssert)
 {
@@ -24,6 +20,18 @@ TEST(CcmathBasicTests, NanStaticAssert)
 	constexpr std::uint64_t stdNanBits = ccm::support::bit_cast<std::uint64_t>(std::numeric_limits<double>::quiet_NaN());
 
 	static_assert(ccmNanBits == stdNanBits, "ccm::nan() is NOT static assertable!");
+	static_assert(ccm::isnan(ccm::nan("")), "ccm::nan() is NOT static assertable!"); // Assume we have access to ccm::isnan
+
+	// now test nanf
+	constexpr std::uint32_t ccmNanfBits = ccm::support::bit_cast<std::uint32_t>(ccm::nanf(""));
+	constexpr std::uint32_t stdNanfBits = ccm::support::bit_cast<std::uint32_t>(std::numeric_limits<float>::quiet_NaN());
+
+	static_assert(ccmNanfBits == stdNanfBits, "ccm::nanf() is NOT static assertable!");
+	static_assert(ccm::isnan(ccm::nanf("")), "ccm::nanf() is NOT static assertable!"); // Assume we have access to ccm::isnan
+
+	// If your IDE is saying this is not an integral constant. It is wrong. The code will compile without issue.
+	static_assert(ccm::isnan(ccm::nanl("")), "ccm::nanl() is NOT static assertable!"); // Assume we have access to ccm::isnan
+
 }
 
 TEST(CcmathBasicTests, NanDouble)
