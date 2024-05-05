@@ -1,4 +1,4 @@
-name: build
+name: tests
 on:
   push:
     tags-ignore: v*.*
@@ -9,7 +9,7 @@ on:
       - '*'
 
 jobs:
-  build-linux:
+  test-linux:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
@@ -25,7 +25,7 @@ jobs:
       - name: build
         run: cmake --build build --config=${{matrix.target}}
 
-  build-windows:
+  test-windows:
     runs-on: windows-2022
     strategy:
       fail-fast: false
@@ -39,7 +39,7 @@ jobs:
       - name: build
         run: cmake --build build --config=${{matrix.target}}
 
-  build-macos:
+  test-macos:
     runs-on: macos-14
     strategy:
       fail-fast: false
