@@ -34,10 +34,14 @@ namespace ccm
         // Compute the largest integer value not greater than num.
         T num_floored = static_cast<T>(static_cast<long long int>(num));
 
-        // if num_floored is not equal to num, num_floored incremented is returned
-        if (num_floored != num) { return num_floored + 1; }
+        if (num_floored != num) {
+            // if num is positive return num_floored incremented by 1
+            if (num > 0) return num_floored + 1;    
+            // otherwise
+            return num_floored;
+        }
 
-        // of num_floored is equal to num, num_floored is returned
+        // if num_floored is equal to num, num_floored is returned
         return num_floored;
     }
 
