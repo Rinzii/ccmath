@@ -27,14 +27,14 @@ TEST(CcmathNearestTests, Ceil)
     // Check sign of NaN return
     bool testCcmCeilThatNanReturnsNan = std::isnan(ccm::ceil(std::numeric_limits<double>::quiet_NaN()));
     bool testStdCeilThatNanReturnsNan = std::isnan(std::ceil(std::numeric_limits<double>::quiet_NaN()));
-    EXPECT_EQ(testCmmCeilThatNanReturnsNan, testStdCeilThatNanReturnsNan);
+    EXPECT_EQ(testCcmCeilThatNanReturnsNan, testStdCeilThatNanReturnsNan);
 
     bool testCcmCeilThatNanIsPositive = std::signbit(ccm::ceil(std::numeric_limits<double>::quiet_NaN()));
     bool testStdCeilThatNanIsPositive = std::signbit(std::ceil(std::numeric_limits<double>::quiet_NaN()));
     EXPECT_EQ(testCcmCeilThatNanIsPositive, testStdCeilThatNanIsPositive);
 
     bool testCcmCeilThatNanIsNegative = std::signbit(ccm::ceil(-std::numeric_limits<double>::quiet_NaN()));
-    bool testStdCeilThatNanIsNegative = std::signbit(std::ceil(-std::numeric_limits<double>::quiet_NaN));
+    bool testStdCeilThatNanIsNegative = std::signbit(std::ceil(-std::numeric_limits<double>::quiet_NaN()));
     EXPECT_EQ(testCcmCeilThatNanIsNegative, testStdCeilThatNanIsNegative);
 
     EXPECT_EQ(ccm::ceil(0.0), std::ceil(0.0));
