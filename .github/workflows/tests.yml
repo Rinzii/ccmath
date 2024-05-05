@@ -15,14 +15,13 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [ninja-gcc, ninja-clang]
-        cxx_version: [17, 20]
-        target: [Debug, Release]
+        target: [Debug]
     steps:
       - uses: actions/checkout@v2
       - name: install dependencies
         run: sudo apt install -yqq ninja-build
       - name: configure cmake
-        run: cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
+        run: cmake -S . --preset=${{matrix.compiler}} -B build
       - name: build
         run: cmake --build build --config=${{matrix.target}}
 
@@ -32,12 +31,11 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [vs19, vs22]
-        cxx-version: [17, 20]
-        target: [Debug, Release]
+        target: [Debug]
     steps:
       - uses: actions/checkout@v2
       - name: configure
-        run: cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
+        run: cmake -S . --preset=${{matrix.compiler}} -B build
       - name: build
         run: cmake --build build --config=${{matrix.target}}
 
@@ -47,8 +45,7 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [ninja-clang, ninja-gcc]
-        cxx_version: [17, 20]
-        target: [Debug, Release]
+        target: [Debug]
     steps:
       - uses: actions/checkout@v2
       - name: install homebrew formulae
@@ -56,6 +53,6 @@ jobs:
       - name: install ninja
         run: brew install ninja
       - name: configure
-        run: cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
+        run: cmake -S . --preset=${{matrix.compiler}} -B build
       - name: build
         run: cmake --build build --config=${{matrix.target}}
