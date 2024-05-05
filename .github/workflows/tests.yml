@@ -30,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [vs19, vs22]
+        compiler: [vs22]
         target: [Debug]
     steps:
       - uses: actions/checkout@v2

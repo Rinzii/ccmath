@@ -31,7 +31,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [vs19, vs22]
+        compiler: [vs22]
         cxx-version: [17, 20]
         target: [Debug, Release]
     steps:
