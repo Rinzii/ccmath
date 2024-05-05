@@ -10,37 +10,40 @@
 #include <random>
 #include <vector>
 
-#include "ccmath/ccmath.hpp"
 #include <cmath>
+#include "ccmath/ccmath.hpp"
+#include "helpers/randomizers.hpp"
 
 // NOLINTBEGIN
 
 namespace bm = benchmark;
 
-// Global seed value for random number generator
-constexpr unsigned int DefaultSeed = 937162211; // Using a long prime number as our default seed
+static ccm::bench::Randomizer ran{};
 
-// Generate a fixed set of random integers for benchmarking
-std::vector<int> generateRandomIntegers(size_t count, unsigned int seed) {
-	std::vector<int> randomIntegers;
-	std::mt19937 gen(seed);
-	std::uniform_int_distribution<int> dist(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
-	for (size_t i = 0; i < count; ++i) {
-		randomIntegers.push_back(dist(gen));
+static void BM_basic_abs_ccm(benchmark::State& state) {
+	auto randomIntegers = ran.generateRandomIntegers(static_cast<size_t>(state.range(0)));
+	while (state.KeepRunning()) {
+		for (auto x : randomIntegers) {
+			benchmark::DoNotOptimize(std::abs(x));
+		}
 	}
-	return randomIntegers;
+	state.SetComplexityN(state.range(0));
 }
+BENCHMARK(BM_basic_abs_ccm)->Range(8, 8<<10)->Complexity();
 
-// Generate a fixed set of random integers for benchmarking
-std::vector<double> generateRandomDoubles(size_t count, unsigned int seed) {
-	std::vector<double> randomDouble;
-	std::mt19937 gen(seed);
-	std::uniform_real_distribution<double> dist(std::numeric_limits<double>::min(), std::numeric_limits<double>::max());
-	for (size_t i = 0; i < count; ++i) {
-		randomDouble.push_back(dist(gen));
+static void BM_basic_abs_std(benchmark::State& state) {
+	auto randomIntegers = ran.generateRandomIntegers(static_cast<size_t>(state.range(0)));
+	while (state.KeepRunning()) {
+		for (auto x : randomIntegers) {
+			benchmark::DoNotOptimize(ccm::abs(x));
+		}
 	}
-	return randomDouble;
+	state.SetComplexityN(state.range(0));
 }
+BENCHMARK(BM_basic_abs_std)->Range(8, 8<<10)->Complexity();
+
+
+
 
 /*
 

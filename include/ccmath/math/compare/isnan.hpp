@@ -38,7 +38,6 @@ namespace ccm
 	{
 		return false; // Integers can never be NaN.
 	}
-
 } // namespace ccm
 
 /// @ingroup compare

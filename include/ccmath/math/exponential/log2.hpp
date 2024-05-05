@@ -27,6 +27,12 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, int> = 0>
 	constexpr T log2(T num) noexcept
 	{
+#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
+		if constexpr (std::is_same_v<T, float>) { return __builtin_log2f(num); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_log2(num); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_log2l(num); }
+		else { return __builtin_log2(num); }
+#else
 		// If the argument is ±0, -∞ is returned
 		if (num == static_cast<T>(0)) { return -std::numeric_limits<T>::infinity(); }
 
@@ -50,6 +56,7 @@ namespace ccm
 		// with long double being platform-dependent with its bit size.
 		if constexpr (std::is_same_v<T, float>) { return ccm::internal::log2_float(num); }
 		else { return ccm::internal::log2_double(num); }
+#endif
 	}
 
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>

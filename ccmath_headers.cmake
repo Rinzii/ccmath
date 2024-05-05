@@ -34,6 +34,7 @@ set(ccmath_internal_support_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_identity.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/always_false.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/limits.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fp_bits.hpp
 )
 
 set(ccmath_internal_types_headers
@@ -41,6 +42,7 @@ set(ccmath_internal_types_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/number_pair.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/sign.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/float128.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/int128.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/big_int.hpp
 )
 
@@ -120,6 +122,8 @@ set(ccmath_math_exponential_headers
 )
 
 set(ccmath_math_fmanip_impl_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/impl/modf_float_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/impl/modf_double_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/impl/scalbn_float_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/impl/scalbn_double_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/impl/scalbn_ldouble_impl.hpp
