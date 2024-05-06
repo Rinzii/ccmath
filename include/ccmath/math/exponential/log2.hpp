@@ -9,6 +9,7 @@
 #pragma once
 
 #include "ccmath/math/compare/isnan.hpp"
+#include "ccmath/internal/config/compiler.hpp"
 #include "ccmath/math/compare/signbit.hpp"
 #include "ccmath/math/exponential/impl/log2_double_impl.hpp"
 #include "ccmath/math/exponential/impl/log2_float_impl.hpp"
@@ -40,7 +41,11 @@ namespace ccm
 		if (num == static_cast<T>(1)) { return 0; }
 
 		// If the argument is negative, -NaN is returned
+		#ifdef CCMATH_COMPILER_APPLE_CLANG // Apple clang for some reason returns positive NaN
+		if (ccm::signbit(num)) { return std::numeric_limits<T>::quiet_NaN(); }
+		#else
 		if (ccm::signbit(num)) { return -std::numeric_limits<T>::quiet_NaN(); }
+		#endif
 
 		// If the argument is +∞, +∞ is returned.
 		if (num == std::numeric_limits<T>::infinity()) { return std::numeric_limits<T>::infinity(); }
