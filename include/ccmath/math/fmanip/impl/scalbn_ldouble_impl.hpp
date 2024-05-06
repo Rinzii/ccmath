@@ -10,12 +10,12 @@
 
 #if LDBL_MANT_DIG == 53 && LDBL_MAX_EXP == 1024
 	#include "ccmath/math/fmanip/impl/scalbn_double_impl.hpp"
-#endif
-
-#if (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113) && LDBL_MAX_EXP == 16384
+#elif (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113) && LDBL_MAX_EXP == 16384
 	#include "ccmath/math/compare/isinf.hpp"
 	#include "ccmath/math/compare/isnan.hpp"
 	#include <limits>
+#else
+	#include "internal/support/always_false.hpp"
 #endif
 
 namespace ccm::internal::impl
@@ -64,6 +64,9 @@ namespace ccm::internal::impl
 			}
 		}
 		return arg;
+#else
+		static_assert(ccm::support::always_false<long double>, "ccmath does not support this long double configuration. Please report what system you are on to the issues!");
+		return 0;
 #endif
 	}
 } // namespace ccm::internal::impl
