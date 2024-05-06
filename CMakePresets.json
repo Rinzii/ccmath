@@ -65,6 +65,15 @@
 			}
 		},
 		{
+			"name": "clang-tidy",
+			"description": "UBSan build configuration using Ninja Multi-config",
+			"inherits": "default",
+			"binaryDir": "${sourceDir}/out/clang-tidy",
+			"cacheVariables": {
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "On"
+			}
+		},
+		{
 			"name": "vs19",
 			"description": "Build configuration using Visual Studio 16 (2019)",
 			"generator": "Visual Studio 16 2019",
