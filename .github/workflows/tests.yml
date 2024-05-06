@@ -9,7 +9,7 @@ on:
       - '*'
 
 jobs:
-  build-linux:
+  test-linux:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
@@ -28,7 +28,7 @@ jobs:
       - name: test
         run: cd build && ctest -C ${{matrix.target}} --output-on-failure
 
-  build-windows:
+  test-windows:
     runs-on: windows-2022
     strategy:
       fail-fast: false
@@ -45,7 +45,7 @@ jobs:
       - name: test
         run: cd build && ctest -C ${{matrix.target}} --output-on-failure
 
-  build-macos:
+  test-macos:
     runs-on: macos-14
     strategy:
       fail-fast: false
