@@ -30,9 +30,9 @@ namespace ccm
 	{
 #if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
 		if constexpr (std::is_same_v<T, float>) { return __builtin_log2f(num); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_log2(num); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_log2l(num); }
-		else { return __builtin_log2(num); }
+		if constexpr (std::is_same_v<T, double>) { return __builtin_log2(num); }
+		if constexpr (std::is_same_v<T, long double>) { return __builtin_log2l(num); }
+		return static_cast<T>(__builtin_log2l(num));
 #else
 		// If the argument is ±0, -∞ is returned
 		if (num == static_cast<T>(0)) { return -std::numeric_limits<T>::infinity(); }
@@ -41,8 +41,8 @@ namespace ccm
 		if (num == static_cast<T>(1)) { return 0; }
 
 		// If the argument is negative, -NaN is returned
-		#ifdef CCMATH_COMPILER_APPLE_CLANG // Apple clang returns ±NaN
-		if (ccm::signbit(num)) { return num; }
+		#ifdef CCMATH_COMPILER_APPLE_CLANG // Apple clang returns +NaN
+		if (ccm::signbit(num)) { return std::numeric_limits<T>::quiet_NaN(); }
 		#else
 		if (ccm::signbit(num)) { return -std::numeric_limits<T>::quiet_NaN(); }
 		#endif
@@ -53,8 +53,7 @@ namespace ccm
 		// If the argument is NaN, NaN is returned.
 		if (ccm::isnan(num))
 		{
-			if (ccm::signbit(num)) { return -std::numeric_limits<T>::quiet_NaN(); }
-			return std::numeric_limits<T>::quiet_NaN();
+			return num;
 		}
 
 		// We cannot handle long double at this time due to problems
