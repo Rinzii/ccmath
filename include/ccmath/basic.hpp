@@ -8,7 +8,6 @@
 
 #pragma once
 
-// NOLINTBEGING(misc-include-cleaner)
 #include "ccmath/math/basic/abs.hpp"
 #include "ccmath/math/basic/fdim.hpp"
 #include "ccmath/math/basic/fma.hpp"
@@ -18,4 +17,3 @@
 #include "ccmath/math/basic/nan.hpp"
 #include "ccmath/math/basic/remainder.hpp"
 #include "ccmath/math/basic/remquo.hpp"
-// NOLINTEND
