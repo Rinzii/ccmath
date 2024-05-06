@@ -40,6 +40,12 @@ namespace ccm
 		// If the argument is 1, +0 is returned.
 		if (num == static_cast<T>(1)) { return 0; }
 
+		// If the argument is NaN, NaN is returned.
+		if (ccm::isnan(num))
+		{
+			return num;
+		}
+
 		// If the argument is negative, -NaN is returned
 		#ifdef CCMATH_COMPILER_APPLE_CLANG // Apple clang returns +NaN
 		if (ccm::signbit(num)) { return std::numeric_limits<T>::quiet_NaN(); }
@@ -50,16 +56,10 @@ namespace ccm
 		// If the argument is +∞, +∞ is returned.
 		if (num == std::numeric_limits<T>::infinity()) { return std::numeric_limits<T>::infinity(); }
 
-		// If the argument is NaN, NaN is returned.
-		if (ccm::isnan(num))
-		{
-			return num;
-		}
-
 		// We cannot handle long double at this time due to problems
 		// with long double being platform-dependent with its bit size.
 		if constexpr (std::is_same_v<T, float>) { return ccm::internal::log2_float(num); }
-		else { return ccm::internal::log2_double(num); }
+		else { return internal::log2_double(num); }
 #endif
 	}
 
