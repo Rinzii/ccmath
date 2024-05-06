@@ -14,8 +14,6 @@
 	#include "ccmath/math/compare/isinf.hpp"
 	#include "ccmath/math/compare/isnan.hpp"
 	#include <limits>
-#else
-	#include "internal/support/always_false.hpp"
 #endif
 
 namespace ccm::internal::impl
@@ -65,7 +63,7 @@ namespace ccm::internal::impl
 		}
 		return arg;
 #else
-		static_assert(ccm::support::always_false<long double>, "ccmath does not support this long double configuration. Please report what system you are on to the issues!");
+		// This should never be called, but since we are not using templates here can can not static_assert it.
 		return 0;
 #endif
 	}
