@@ -19,6 +19,8 @@ CCMATH REQUIREMENTS:
  * Anything implemented by cmath that is already constexpr is allowed to be wrapped by ccmath and not implemented by ccmath.
  */
 
+// NOLINTBEGING(misc-include-cleaner)
+
 // Includes ccm::float_t and ccm::double_t
 #include "ccmath/internal/types/fp_types.hpp"
 
@@ -53,3 +55,5 @@ CCMATH REQUIREMENTS:
 #include "ccmath/math/gamma.hpp"
 #include "ccmath/math/lerp.hpp"
 #include "ccmath/math/lgamma.hpp"
+
+// NOLINTEND

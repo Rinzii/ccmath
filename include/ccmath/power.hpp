@@ -8,7 +8,9 @@
 
 #pragma once
 
+// NOLINTBEGING(misc-include-cleaner)
 #include "ccmath/math/power/cbrt.hpp"
 #include "ccmath/math/power/hypot.hpp"
 #include "ccmath/math/power/pow.hpp"
 #include "ccmath/math/power/sqrt.hpp"
+// NOLINTEND
