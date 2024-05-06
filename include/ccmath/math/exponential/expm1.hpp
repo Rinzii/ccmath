@@ -31,16 +31,16 @@ namespace ccm
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double expm1(Integer num)
 	{
-		return exp2<double>(static_cast<double>(num));
+		return ccm::expm1<double>(static_cast<double>(num));
 	}
 
 	constexpr float expm1(float num)
 	{
-		return ccm::exp2<float>(num);
+		return ccm::expm1<float>(num);
 	}
 
 	constexpr long double expm1(double num)
 	{
-		return ccm::exp2<double>(num);
+		return ccm::expm1<double>(num);
 	}
 } // namespace ccm
