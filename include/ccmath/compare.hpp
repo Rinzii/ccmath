@@ -8,7 +8,6 @@
 
 #pragma once
 
-// NOLINTBEGING(misc-include-cleaner)
 #include "ccmath/math/compare/fpclassify.hpp"
 #include "ccmath/math/compare/isfinite.hpp"
 #include "ccmath/math/compare/isgreater.hpp"
@@ -21,4 +20,3 @@
 #include "ccmath/math/compare/isnormal.hpp"
 #include "ccmath/math/compare/isunordered.hpp"
 #include "ccmath/math/compare/signbit.hpp"
-// NOLINTEND

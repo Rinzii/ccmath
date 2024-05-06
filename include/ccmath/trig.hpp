@@ -8,7 +8,6 @@
 
 #pragma once
 
-// NOLINTBEGING(misc-include-cleaner)
 #include "ccmath/math/trig/acos.hpp"
 #include "ccmath/math/trig/asin.hpp"
 #include "ccmath/math/trig/atan.hpp"
@@ -16,4 +15,3 @@
 #include "ccmath/math/trig/cos.hpp"
 #include "ccmath/math/trig/sin.hpp"
 #include "ccmath/math/trig/tan.hpp"
-// NOLINTEND
