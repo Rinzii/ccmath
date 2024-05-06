@@ -9,6 +9,7 @@
 #pragma once
 
 #include "ccmath/extensions/clamp.hpp"
+#include <type_traits>
 
 namespace ccm::ext
 {
