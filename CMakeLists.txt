@@ -18,7 +18,6 @@ option(CCMATH_BUILD_TESTS "Build ccmath tests" ${is_root_project})
 option(CCMATH_BUILD_EXAMPLES "Build ccmath examples" ${is_root_project})
 option(CCMATH_BUILD_BENCHMARKS "Build ccmath benchmarks" ${is_root_project})
 option(CCMATH_INSTALL "Setup install and package steps" ${is_root_project})
-option(CCMATH_USE_SIMD "Use SIMD instructions" OFF) # SIMD is not yet implemented.
 option(CCMATH_ENABLE_EXTENSIONS "Enable the extended ccmath library that adds helpful additional methods that are not defined by the standard" ON)
 
 # include the global configuration file
@@ -27,7 +26,7 @@ include(cmake/GlobalConfig.cmake)
 add_library(${PROJECT_NAME}-compile-options INTERFACE)
 add_library(${PROJECT_NAME}::${PROJECT_NAME}-compile-options ALIAS ${PROJECT_NAME}-compile-options)
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU)
+if(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU OR CMAKE_CXX_COMPILER_ID STREQUAL IntelLLVM)
   target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
           -Wall -Wextra -Wpedantic -Wconversion -Werror=return-type
   )
@@ -36,7 +35,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU)
   #       Some variables have been provided but are not currently being used, but it would not atm make sense to remove them.
   #       So to clean up the warnings we are just silencing these specific cases.
   target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
-          -Wno-unused-but-set-variable -Wno-unused-value
+          -Wno-unused-but-set-variable -Wno-unused-value -Wno-unused-parameter
   )
 endif()
 
@@ -46,7 +45,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL MSVC)
   )
 endif()
 
-# Check for intel compiler
+# Disable intel specific warnings that don't apply to us.
 if(CMAKE_CXX_COMPILER_ID STREQUAL IntelLLVM)
   target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
           -Wno-tautological-constant-compare
