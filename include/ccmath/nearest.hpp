@@ -8,9 +8,11 @@
 
 #pragma once
 
+// NOLINTBEGING(misc-include-cleaner)
 #include "ccmath/math/nearest/ceil.hpp"
 #include "ccmath/math/nearest/floor.hpp"
 #include "ccmath/math/nearest/nearbyint.hpp"
 #include "ccmath/math/nearest/rint.hpp"
 #include "ccmath/math/nearest/round.hpp"
 #include "ccmath/math/nearest/trunc.hpp"
+// NOLINTEND

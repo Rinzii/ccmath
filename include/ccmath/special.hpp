@@ -8,6 +8,7 @@
 
 #pragma once
 
+// NOLINTBEGING(misc-include-cleaner)
 #include "ccmath/math/special/assoc_laguerre.hpp"
 #include "ccmath/math/special/assoc_legendre.hpp"
 #include "ccmath/math/special/beta.hpp"
@@ -29,3 +30,4 @@
 #include "ccmath/math/special/sph_bessel.hpp"
 #include "ccmath/math/special/sph_legendre.hpp"
 #include "ccmath/math/special/sph_neumann.hpp"
+// NOLINTEND

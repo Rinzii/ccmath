@@ -8,6 +8,7 @@
 
 #pragma once
 
+// NOLINTBEGING(misc-include-cleaner)
 #include "ccmath/math/fmanip/copysign.hpp"
 #include "ccmath/math/fmanip/frexp.hpp"
 #include "ccmath/math/fmanip/ilogb.hpp"
@@ -16,3 +17,4 @@
 #include "ccmath/math/fmanip/modf.hpp"
 #include "ccmath/math/fmanip/nextafter.hpp"
 #include "ccmath/math/fmanip/scalbn.hpp"
+// NOLINTEND
