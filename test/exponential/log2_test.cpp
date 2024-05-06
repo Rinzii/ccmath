@@ -59,7 +59,10 @@ TEST(CcmathExponentialTests, Log2)
 
 	bool testCcmLog2ThatQuietNanReturnsNan = std::isnan(ccm::log2(std::numeric_limits<double>::quiet_NaN()));
 	bool testStdLog2ThatQuietNanReturnsNan = std::isnan(std::log2(std::numeric_limits<double>::quiet_NaN()));
+	bool testCcmLog2ThatPosQuietNanHasSameSing = std::signbit(ccm::log2(std::numeric_limits<double>::quiet_NaN()));
+	bool testStdLog2ThatPosQuietNanHasSameSign = std::signbit(std::log2(std::numeric_limits<double>::quiet_NaN()));
 	EXPECT_EQ(testCcmLog2ThatQuietNanReturnsNan, testStdLog2ThatQuietNanReturnsNan);
+	EXPECT_EQ(testCcmLog2ThatPosQuietNanHasSameSing, testStdLog2ThatPosQuietNanHasSameSign);
 
 	bool testCcmLog2ThatNegQuietNanReturnsNan = std::isnan(ccm::log2(-std::numeric_limits<double>::quiet_NaN()));
 	bool testStdLog2ThatNegQuietNanReturnsNan = std::isnan(std::log2(-std::numeric_limits<double>::quiet_NaN()));
