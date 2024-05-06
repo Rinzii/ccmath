@@ -10,6 +10,7 @@
 
 #include "ccmath/internal/helpers/exp_helpers.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
+#include "ccmath/math/exponential/impl/exp_data.hpp"
 #include <cstdint>
 #include <type_traits>
 
