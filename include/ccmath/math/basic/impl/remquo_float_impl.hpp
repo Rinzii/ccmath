@@ -21,7 +21,7 @@ namespace ccm::internal
 	namespace impl
 	{
 		// NOLINTNEXTLINE(readability-function-cognitive-complexity)
-		inline constexpr float remquo_float_impl(float x, float y, int * quo) noexcept
+		constexpr float remquo_float_impl(float x, float y, int * quo) noexcept
 		{
 			std::int32_t x_i32{};
 			std::int32_t y_i32{};
@@ -108,9 +108,8 @@ namespace ccm::internal
 		}
 	} // namespace impl
 
-	template <typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
-	inline constexpr T remquo_float(T x, T y, int * quo) noexcept
+	constexpr float remquo_float(float x, float y, int * quo) noexcept
 	{
-		return static_cast<T>(impl::remquo_float_impl(x, y, quo));
+		return impl::remquo_float_impl(x, y, quo);
 	}
 } // namespace ccm::internal
