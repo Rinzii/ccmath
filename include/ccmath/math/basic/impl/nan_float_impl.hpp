@@ -20,7 +20,7 @@ namespace ccm::internal::impl
 	{
 		if constexpr (!std::numeric_limits<float>::is_iec559)
 		{
-			return 0.0;
+			return 0.0F;
 		}
 
 #if defined(_MSC_VER) && !defined(__clang__)
