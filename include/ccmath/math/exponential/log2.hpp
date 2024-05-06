@@ -46,8 +46,12 @@ namespace ccm
 			return num;
 		}
 
-
+		// If the argument is negative, -NaN is returned
+		#ifdef CCMATH_COMPILER_APPLE_CLANG // Apple clang returns +NaN
+		if (ccm::signbit(num)) { return std::numeric_limits<T>::quiet_NaN(); }
+		#else
 		if (ccm::signbit(num)) { return -std::numeric_limits<T>::quiet_NaN(); }
+		#endif
 
 		// We cannot handle long double at this time due to problems
 		// with long double being platform-dependent with its bit size.
