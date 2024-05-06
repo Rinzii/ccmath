@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "ccmath/internal/support/bits.hpp"
 #include <type_traits>
 
 namespace ccm::ext
