@@ -41,8 +41,8 @@ namespace ccm
 		if (num == static_cast<T>(1)) { return 0; }
 
 		// If the argument is negative, -NaN is returned
-		#ifdef CCMATH_COMPILER_APPLE_CLANG // Apple clang for some reason returns positive NaN
-		if (ccm::signbit(num)) { return std::numeric_limits<T>::quiet_NaN(); }
+		#ifdef CCMATH_COMPILER_APPLE_CLANG // Apple clang returns ±NaN
+		if (ccm::signbit(num)) { return num; }
 		#else
 		if (ccm::signbit(num)) { return -std::numeric_limits<T>::quiet_NaN(); }
 		#endif
