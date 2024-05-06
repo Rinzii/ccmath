@@ -23,7 +23,7 @@ namespace ccm::internal
 	namespace impl
 	{
 		// NOLINTNEXTLINE(readability-function-cognitive-complexity)
-		inline constexpr double remquo_double_impl(double x, double y, int * quo) noexcept
+		constexpr double remquo_double_impl(double x, double y, int * quo) noexcept
 		{
 			std::int64_t x_i64{};
 			std::int64_t y_i64{};
@@ -48,12 +48,12 @@ namespace ccm::internal
 			// GCC and Clang do not like comparing signed and unsigned integers.
 			// The outcome of these comparisons is well-defined, so we can safely disable these warnings.
 			// clang-format off
-				CCM_DISABLE_GCC_WARNING(-Wsign-compare)
-				CCM_DISABLE_CLANG_WARNING(-Wsign-compare)
+			CCM_DISABLE_GCC_WARNING(-Wsign-compare)
+			CCM_DISABLE_CLANG_WARNING(-Wsign-compare)
 			// clang-format on
 
 			// If x is not finite or y is NaN.
-			if (CCM_UNLIKELY(x_i64 >= 0x7ff0000000000000ULL || y_i64 > 0x7ff0000000000000ULL))
+			if (CCM_UNLIKELY(x_i64 >= 0x7ff0000000000000ULL || y_i64 > 0x7ff0000000000000ULL)) // NOLINT(readability-simplify-boolean-expr)
 			{
 				return (x * y) / (x * y);
 			} // NOLINT(readability-simplify-boolean-expr)
@@ -129,9 +129,8 @@ namespace ccm::internal
 		}
 	} // namespace impl
 
-	template <typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
-	constexpr T remquo_double(T x, T y, int * quo) noexcept
+	constexpr double remquo_double(double x, double y, int * quo) noexcept
 	{
-		return static_cast<T>(impl::remquo_double_impl(x, y, quo));
+		return impl::remquo_double_impl(x, y, quo);
 	}
 } // namespace ccm::internal
