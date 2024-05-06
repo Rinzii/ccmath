@@ -60,7 +60,7 @@ namespace ccm
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double log(const Integer num) noexcept
 	{
-		return ccm::log(static_cast<double>(num));
+		return ccm::log<double>(static_cast<double>(num));
 	}
 
 	/**
