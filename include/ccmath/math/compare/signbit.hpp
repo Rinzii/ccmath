@@ -12,6 +12,7 @@
 #pragma once
 
 #include "ccmath/math/compare/isnan.hpp"
+#include "ccmath/internal/support/always_false.hpp"
 
 // Some compilers have __builtin_signbit which is constexpr for some compilers
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
@@ -48,7 +49,7 @@ namespace ccm
 	/**
 	 * @brief Detects the sign bit of zeroes, infinities, and NaNs.
 	 * @tparam T A floating-point type.
-	 * @param x A floating-point number.
+	 * @param num A floating-point number.
 	 * @return true if \p x is negative, false otherwise.
 	 *
 	 * @note This function has multiple implementations based on the compiler and the version of
@@ -65,58 +66,57 @@ namespace ccm
 	 * the dev team and we will try to bring support to your compiler ASAP if we are able to!
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
-	[[nodiscard]] constexpr bool signbit(T x) noexcept
+	[[nodiscard]] constexpr bool signbit(T num) noexcept
 	{
 #if defined(CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT)
-		return __builtin_signbit(x);
+		return __builtin_signbit(num);
 #elif defined(CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN)
 		// use __builtin_copysign to check for the sign of zero
-		if (x == static_cast<T>(0) || ccm::isnan(x))
+		if (num == static_cast<T>(0) || ccm::isnan(num))
 		{
 			// If constexpr only works with gcc 7.1+. Without if constexpr we work till GCC 5.1+
 			// This works with clang 5.0.0 no problem even with if constexpr
-			if constexpr (std::is_same_v<T, float>) { return __builtin_copysignf(1.0F, x) < 0; }
-			else if constexpr (std::is_same_v<T, double>) { return __builtin_copysign(1.0, x) < 0; }
-			else if constexpr (std::is_same_v<T, long double>) { return __builtin_copysignl(1.0L, x) < 0; }
+			if constexpr (std::is_same_v<T, float>) { return __builtin_copysignf(1.0F, num) < 0; }
+			else if constexpr (std::is_same_v<T, double>) { return __builtin_copysign(1.0, num) < 0; }
+			else if constexpr (std::is_same_v<T, long double>) { return __builtin_copysignl(1.0L, num) < 0; }
 
 			return false;
 		}
 
-		return x < static_cast<T>(0);
+		return num < static_cast<T>(0);
 #elif defined(CCMATH_HAS_BUILTIN_BIT_CAST)
 		// Check for the sign of +0.0 and -0.0 with __builtin_bit_cast
-		if (x == static_cast<T>(0) || ccm::isnan(x))
+		if (num == static_cast<T>(0) || ccm::isnan(num))
 		{
-			const auto bits = __builtin_bit_cast(helpers::float_bits_t<T>, x);
+			const auto bits = __builtin_bit_cast(helpers::float_bits_t<T>, num);
 			return (bits & helpers::sign_mask_v<T>) != 0;
 		}
 
-		return x < static_cast<T>(0);
+		return num < static_cast<T>(0);
 #else
-		static_assert(false, "ccm::signbit is not implemented for this compiler. Please report this issue to the dev!");
+		static_assert(ccm::support::always_false<T>, "ccm::signbit is not implemented for this compiler. Please report this issue to the dev!");
 		return false;
 #endif
 	}
 
 	/**
 	 * @brief Detects the sign bit of a number.
-	 * @tparam T An integral type.
-	 * @param x An integral number.
+	 * @tparam Integer An integral type.
+	 * @param num An integral number.
 	 * @return true if \p x is negative, false otherwise.
 	 *
 	 * @note This function is constexpr and will return the same values as std::signbit along with being static_assert-able.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer> && std::is_signed_v<Integer>, int> = 0>
-	[[nodiscard]] constexpr bool signbit(Integer x) noexcept
+	[[nodiscard]] constexpr bool signbit(Integer num) noexcept
 	{
 		// There is no concept of -0 for integers. So we can just check if the number is less than 0.
-		return x < 0;
+		return num < 0;
 	}
 
 	/**
 	 * @brief Detects the sign bit of a number.
-	 * @tparam T An integral type.
-	 * @param x An integral number.
+	 * @tparam Integer An integral type.
 	 * @return false as an unsigned number can't be negative.
 	 *
 	 * @note This function is constexpr and will return the same values as std::signbit along with being static_assert-able.
