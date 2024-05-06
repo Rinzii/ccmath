@@ -41,7 +41,7 @@ namespace ccm
 		if (num == static_cast<T>(1)) { return 0; }
 
 		// If the argument is NaN, NaN is returned.
-		if (ccm::isnan(num))
+		if (ccm::isnan(num) || num == std::numeric_limits<T>::infinity())
 		{
 			return num;
 		}
@@ -52,9 +52,6 @@ namespace ccm
 		#else
 		if (ccm::signbit(num)) { return -std::numeric_limits<T>::quiet_NaN(); }
 		#endif
-
-		// If the argument is +∞, +∞ is returned.
-		if (num == std::numeric_limits<T>::infinity()) { return std::numeric_limits<T>::infinity(); }
 
 		// We cannot handle long double at this time due to problems
 		// with long double being platform-dependent with its bit size.
