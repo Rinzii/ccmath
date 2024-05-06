@@ -9,50 +9,59 @@ on:
       - '*'
 
 jobs:
-  test-linux:
+  build-linux:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
         compiler: [ninja-gcc, ninja-clang]
-        target: [Debug]
+        cxx_version: [17, 20]
+        target: [Debug, Release]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: install dependencies
         run: sudo apt install -yqq ninja-build
       - name: configure cmake
-        run: cmake -S . --preset=${{matrix.compiler}} -B build
+        run: cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
       - name: build
         run: cmake --build build --config=${{matrix.target}}
+      - name: test
+        run: cd build && ctest -C ${{matrix.target}} --output-on-failure
 
-  test-windows:
+  build-windows:
     runs-on: windows-2022
     strategy:
       fail-fast: false
       matrix:
         compiler: [vs22]
-        target: [Debug]
+        cxx_version: [17, 20]
+        target: [Debug, Release]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: configure
-        run: cmake -S . --preset=${{matrix.compiler}} -B build
+        run: cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
       - name: build
         run: cmake --build build --config=${{matrix.target}}
+      - name: test
+        run: cd build && ctest -C ${{matrix.target}} --output-on-failure
 
-  test-macos:
+  build-macos:
     runs-on: macos-14
     strategy:
       fail-fast: false
       matrix:
         compiler: [ninja-clang, ninja-gcc]
-        target: [Debug]
+        cxx_version: [17, 20]
+        target: [Debug, Release]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: install homebrew formulae
         run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
       - name: install ninja
         run: brew install ninja
       - name: configure
-        run: cmake -S . --preset=${{matrix.compiler}} -B build
+        run: cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
       - name: build
         run: cmake --build build --config=${{matrix.target}}
+      - name: test
+        run: cd build && ctest -C ${{matrix.target}} --output-on-failure

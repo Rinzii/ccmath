@@ -18,7 +18,7 @@ jobs:
         cxx_version: [17, 20]
         target: [Debug, Release]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: install dependencies
         run: sudo apt install -yqq ninja-build
       - name: configure cmake
@@ -32,10 +32,10 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [vs22]
-        cxx-version: [17, 20]
+        cxx_version: [17, 20]
         target: [Debug, Release]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: configure
         run: cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
       - name: build
@@ -50,7 +50,7 @@ jobs:
         cxx_version: [17, 20]
         target: [Debug, Release]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: install homebrew formulae
         run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
       - name: install ninja
