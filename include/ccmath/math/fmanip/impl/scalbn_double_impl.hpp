@@ -10,11 +10,10 @@
 
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
-#include "ccmath/math/compare/isinf.hpp"
-#include "ccmath/math/compare/isnan.hpp"
+#include "ccmath/math/basic/max.hpp"
+#include "ccmath/math/basic/min.hpp"
 
 #include <cstdint>
-#include <limits>
 
 namespace ccm::internal::impl
 {
@@ -30,7 +29,7 @@ namespace ccm::internal::impl
 			{
 				tmp *= 0x1p1023;
 				exp -= 1023;
-				if (exp > 1023) { exp = 1023; }
+				exp = ccm::min(exp, 1023);
 			}
 		}
 		else if (exp < -1022)
@@ -41,7 +40,7 @@ namespace ccm::internal::impl
 			{
 				tmp *= 0x1p-1022 * 0x1p53;
 				exp += 1022 - 53;
-				if (exp < -1022) { exp = -1022; }
+				exp = ccm::max(exp, -1022);
 			}
 		}
 
