@@ -32,7 +32,7 @@ namespace ccm
 		if constexpr (std::is_same_v<T, float>) { return __builtin_fmaf(x, y, z); }
 		if constexpr (std::is_same_v<T, double>) { return __builtin_fma(x, y, z); }
 		if constexpr (std::is_same_v<T, long double>) { return __builtin_fmal(x, y, z); }
-		return static_cast<T>(__builtin_fma(x, y, z));
+		return static_cast<T>(__builtin_fmal(x, y, z));
 #else
 		// Handle infinity
 		if (CCM_UNLIKELY((x == static_cast<T>(0) && ccm::isinf(y)) || (y == T{0} && ccm::isinf(x)))) { return std::numeric_limits<T>::quiet_NaN(); }

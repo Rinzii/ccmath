@@ -19,7 +19,7 @@ namespace ccm
 		if constexpr (std::is_same_v<T, float>) { return __builtin_expm1f(num); }
 		if constexpr (std::is_same_v<T, double>) { return __builtin_expm1(num); }
 		if constexpr (std::is_same_v<T, long double>) { return __builtin_expm1l(num); }
-		return static_assert<T>(__builtin_expm1l(num));
+		return static_cast<T>(__builtin_expm1l(num));
 		#else
 		if constexpr (std::is_same_v<T, float>) { return 0; }
 		if constexpr (std::is_same_v<T, double>) { return 0; }
