@@ -21,7 +21,7 @@ namespace ccm::internal::impl
 	constexpr long double scalbn_ldouble_impl(long double arg, int exp) noexcept
 	{
 #if LDBL_MANT_DIG == 53 && LDBL_MAX_EXP == 1024 // If long double is the same as double
-		return ccm::internal::impl::scalbn_double_impl(arg, exp);
+		return static_cast<long double>(ccm::internal::impl::scalbn_double_impl(arg, exp));
 #elif (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113) && LDBL_MAX_EXP == 16384 // If long double is 80-bit or 128-bit large
 		// This is a generic implementation for long double scalbn that does not use bit manipulation.
 		// May be much slower than the double and float version.
