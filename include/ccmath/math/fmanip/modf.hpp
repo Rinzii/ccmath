@@ -13,6 +13,6 @@ namespace ccm
 	template <typename T>
 	constexpr T modf(T x, T* iptr) noexcept
 	{
-
+		return 0;
 	}
 } // namespace ccm

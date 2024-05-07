@@ -7,8 +7,8 @@
  */
 
 #include "ccmath/ccmath.hpp"
-#include "cmath"
-#include "iostream"
+#include <cmath>
+#include <iostream>
 
 void try_all_ccm_basic_funcs();
 void try_all_ccm_compare_funcs();

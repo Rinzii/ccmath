@@ -8,15 +8,13 @@
 
 #pragma once
 
-#include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/types/fp_types.hpp"
+#include "ccmath/math/exponential/impl/exp2_data.hpp"
+#include <cstdint>
+#include <limits>
 
 namespace ccm::internal::impl
 {
-	constexpr double modf_float_impl(float x, float* iptr) noexcept
-	{
-		//__float128 q = x;
 
-		return 0;
-	}
-
-} // namespace ccm::internal::impl
+}

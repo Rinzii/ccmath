@@ -20,7 +20,7 @@ namespace ccm::internal
 {
 	namespace impl
 	{
-		inline constexpr long double remquo_ldouble_impl(long double x, long double y, int * quo) noexcept
+		constexpr long double remquo_ldouble_impl(long double x, long double y, int * quo) noexcept
 		{
 			std::int32_t x_exponent{};
 			std::int32_t y_exponent{};

@@ -76,7 +76,7 @@ namespace ccm
 	 * @param y A floating-point value.
 	 * @return The floating-point remainder of the division operation x/y.
 	 */
-	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, int> = 0>
+	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, bool> = true>
 	constexpr Real fmod(Real x, Real y)
 	{
 		return internal::impl::fmod_impl_check(x, y);
@@ -89,7 +89,7 @@ namespace ccm
 	 * @param y An integral value.
 	 * @return The floating-point remainder of the division operation x/y.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double fmod(Integer x, Integer y)
 	{
 		return internal::impl::fmod_impl_type_check(x, y);

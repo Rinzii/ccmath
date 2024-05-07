@@ -67,7 +67,7 @@
 		{
 			"name": "clang-tidy",
 			"description": "UBSan build configuration using Ninja Multi-config",
-			"inherits": "default",
+			"inherits": "ninja-clang",
 			"binaryDir": "${sourceDir}/out/clang-tidy",
 			"cacheVariables": {
 				"CMAKE_EXPORT_COMPILE_COMMANDS": "On"

@@ -23,15 +23,15 @@ namespace ccm::internal
 {
 	namespace impl
 	{
-		constexpr ccm::internal::log2_data<double> internalLog2DataDbl = ccm::internal::log2_data<double>();
-		constexpr auto log2_tab_values_dbl							   = ccm::internal::log2_data<double, 0>::tab;
-		constexpr auto log2_tab2_values_dbl							   = ccm::internal::log2_data<double, 0>::tab2;
-		constexpr auto log2_poly_values_dbl							   = internalLog2DataDbl.poly;
-		constexpr auto log2_poly1_values_dbl						   = internalLog2DataDbl.poly1;
-		constexpr auto log2_inverse_ln2_high_value_dbl				   = internalLog2DataDbl.invln2hi;
-		constexpr auto log2_inverse_ln2_low_value_dbl				   = internalLog2DataDbl.invln2lo;
-		constexpr auto k_log2TableN_dbl								   = (1 << ccm::internal::k_log2TableBitsDbl);
-		constexpr auto k_log2TableOff_dbl							   = 0x3fe6000000000000;
+		constexpr auto internalLog2DataDbl			   = ccm::internal::log2_data<double>();
+		constexpr auto log2_tab_values_dbl			   = ccm::internal::log2_data<double, 0>::tab;
+		constexpr auto log2_tab2_values_dbl			   = ccm::internal::log2_data<double, 0>::tab2;
+		constexpr auto log2_poly_values_dbl			   = internalLog2DataDbl.poly;
+		constexpr auto log2_poly1_values_dbl		   = internalLog2DataDbl.poly1;
+		constexpr auto log2_inverse_ln2_high_value_dbl = internalLog2DataDbl.invln2hi;
+		constexpr auto log2_inverse_ln2_low_value_dbl  = internalLog2DataDbl.invln2lo;
+		constexpr auto k_log2TableN_dbl				   = (1 << ccm::internal::k_log2TableBitsDbl);
+		constexpr auto k_log2TableOff_dbl			   = 0x3fe6000000000000;
 
 		constexpr double log2_double_impl(double x)
 		{
@@ -57,8 +57,8 @@ namespace ccm::internal
 			std::int64_t expo{};
 			std::int64_t i{};
 
-			std::uint64_t intX = ccm::support::double_to_uint64(x);
-			std::uint32_t top  = ccm::support::top16_bits_of_double(x);
+			std::uint64_t intX = support::double_to_uint64(x);
+			std::uint32_t top  = support::top16_bits_of_double(x);
 
 			constexpr std::uint64_t low	 = ccm::support::double_to_uint64(1.0 - 0x1.5b51p-5);
 			constexpr std::uint64_t high = ccm::support::double_to_uint64(1.0 + 0x1.6ab2p-5);
@@ -147,9 +147,8 @@ namespace ccm::internal
 		}
 	} // namespace impl
 
-	template <typename T>
-	[[nodiscard]] constexpr T log2_double(T num) noexcept
+	constexpr double log2_double(double num) noexcept
 	{
-		return static_cast<T>(impl::log2_double_impl(static_cast<double>(num)));
+		return impl::log2_double_impl(num);
 	}
 } // namespace ccm::internal

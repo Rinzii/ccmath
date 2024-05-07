@@ -17,14 +17,14 @@ namespace ccm
 	{
 #if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
 		if constexpr (std::is_same_v<T, float>) { return __builtin_exp2f(num); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_exp2(num); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_exp2l(num); }
-		else { return __builtin_exp2(num); }
+		if constexpr (std::is_same_v<T, double>) { return __builtin_exp2(num); }
+		if constexpr (std::is_same_v<T, long double>) { return __builtin_exp2l(num); }
+		return static_cast<T>(__builtin_exp2l(num));
 #else
 		if constexpr (std::is_same_v<T, float>) { return 0; }
-		else if constexpr (std::is_same_v<T, double>) { return 0; }
-		else if constexpr (std::is_same_v<T, long double>) { return 0; }
-		else { return 0; }
+		if constexpr (std::is_same_v<T, double>) { return 0; }
+		if constexpr (std::is_same_v<T, long double>) { return 0; }
+		return 0;
 #endif
 	}
 

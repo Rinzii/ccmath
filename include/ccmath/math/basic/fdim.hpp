@@ -9,6 +9,7 @@
 #pragma once
 
 #include "ccmath/math/compare/isnan.hpp"
+#include "ccmath/internal/predef/unlikely.hpp"
 #include <limits>
 #include <type_traits>
 
@@ -21,7 +22,7 @@ namespace ccm
 	 * @param y A floating-point or integer values
 	 * @return If successful, returns the positive difference between x and y.
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T fdim(T x, T y)
 	{
 		if (CCM_UNLIKELY(ccm::isnan(x))) { return x; }
@@ -39,7 +40,7 @@ namespace ccm
 	 * @param y A floating-point value.
 	 * @return If successful, returns the positive difference between x and y.
 	 */
-	template <typename T, typename U, std::enable_if_t<std::is_floating_point_v<T> && std::is_floating_point_v<U>, int> = 0>
+	template <typename T, typename U, std::enable_if_t<std::is_floating_point_v<T> && std::is_floating_point_v<U>, bool> = true>
 	constexpr auto fdim(T x, U y)
 	{
 		// Find the common type of the two arguments
@@ -56,7 +57,7 @@ namespace ccm
 	 * @param y An integral value.
 	 * @return If successful, returns the positive difference between x and y.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double fdim(Integer x, Integer y)
 	{
 		return fdim<double>(static_cast<double>(x), static_cast<double>(y));
