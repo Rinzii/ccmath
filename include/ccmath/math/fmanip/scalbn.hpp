@@ -20,7 +20,7 @@ namespace ccm
 		if constexpr (std::is_same_v<T, float>) { return internal::impl::scalbn_float_impl(x, n); }
 		if constexpr (std::is_same_v<T, double>) { return internal::impl::scalbn_double_impl(x, n); }
 		if constexpr (std::is_same_v<T, long double>) { return internal::impl::scalbn_ldouble_impl(x, n); }
-		return internal::impl::scalbn_ldouble_impl(x, n);
+		return static_cast<T>(internal::impl::scalbn_ldouble_impl(x, n));
 	}
 
 } // namespace ccm

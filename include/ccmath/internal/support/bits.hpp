@@ -188,7 +188,8 @@ namespace ccm::support
 		return value != std::numeric_limits<T>::max() ? countr_zero(static_cast<T>(~value)) : std::numeric_limits<T>::digits;
 	}
 
-	template <typename T, std::enable_if_t<ccm::support::traits::is_unsigned_integer_v<T>, bool> = true>
+	template <typename T, std::enable_if_t<traits::is_unsigned_integer_v<T>, bool> = true>
+	// NOLINTNEXTLINE
 	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> countl_zero(T value)
 	{
 		if (value == 0) { return std::numeric_limits<T>::digits; }

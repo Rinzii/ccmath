@@ -17,4 +17,4 @@
 namespace ccm::internal::impl
 {
 
-}
+} // namespace ccm::internal::impl

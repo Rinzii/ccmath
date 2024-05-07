@@ -79,7 +79,6 @@ namespace ccm
 			if constexpr (std::is_same_v<T, float>) { return __builtin_copysignf(1.0F, num) < 0; }
 			if constexpr (std::is_same_v<T, double>) { return __builtin_copysign(1.0, num) < 0; }
 			if constexpr (std::is_same_v<T, long double>) { return __builtin_copysignl(1.0L, num) < 0; }
-
 			return false;
 		}
 
