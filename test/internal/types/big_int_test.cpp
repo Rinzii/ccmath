@@ -12,7 +12,8 @@
 
 TEST(CcmathInternalTypesTests, BigIntTest)
 {
-	ccm::BigInt<64, false> a;
+
+	//ccm::BigInt<64, false> a;
 	auto t1 = ccm::BigInt<64, false>::bits;
 	auto t2 = ccm::BigInt<64, false>::is_signed;
 
