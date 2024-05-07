@@ -17,14 +17,14 @@ namespace ccm
 	{
 		#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
 		if constexpr (std::is_same_v<T, float>) { return __builtin_expm1f(num); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_expm1(num); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_expm1l(num); }
-		else { return __builtin_expm1(num); }
+		if constexpr (std::is_same_v<T, double>) { return __builtin_expm1(num); }
+		if constexpr (std::is_same_v<T, long double>) { return __builtin_expm1l(num); }
+		return __builtin_expm1l(num);
 		#else
 		if constexpr (std::is_same_v<T, float>) { return 0; }
-		else if constexpr (std::is_same_v<T, double>) { return 0; }
-		else if constexpr (std::is_same_v<T, long double>) { return 0; }
-		else { return 0; }
+		if constexpr (std::is_same_v<T, double>) { return 0; }
+		if constexpr (std::is_same_v<T, long double>) { return 0; }
+		return 0;
 		#endif
 	}
 
@@ -34,12 +34,12 @@ namespace ccm
 		return ccm::expm1<double>(static_cast<double>(num));
 	}
 
-	constexpr float expm1(float num)
+	constexpr float expm1f(float num)
 	{
 		return ccm::expm1<float>(num);
 	}
 
-	constexpr long double expm1(double num)
+	constexpr long double expm1l(long double num)
 	{
 		return ccm::expm1<double>(num);
 	}

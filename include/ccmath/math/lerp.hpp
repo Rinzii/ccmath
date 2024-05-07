@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/math/basic/fma.hpp"
 
 namespace ccm
@@ -23,10 +22,10 @@ namespace ccm
 	}
 
 	template <typename T, typename U, typename V>
-	constexpr typename std::enable_if_t<std::is_arithmetic_v<T> && std::is_arithmetic_v<U> && std::is_arithmetic_v<V>, std::common_type_t<T, U, V>>
+	constexpr std::enable_if_t<std::is_arithmetic_v<T> && std::is_arithmetic_v<U> && std::is_arithmetic_v<V>, std::common_type_t<T, U, V>>
 	lerp(T a, U b, V t) noexcept
 	{
-		using result_type = typename std::common_type_t<T, U, V>;
+		using result_type = std::common_type_t<T, U, V>;
 		static_assert(!(std::is_same_v<T, result_type> && std::is_same_v<U, result_type> && std::is_same_v<V, result_type>));
 		return lerp(static_cast<result_type>(a), static_cast<result_type>(b), static_cast<result_type>(t));
 	}

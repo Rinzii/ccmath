@@ -86,9 +86,8 @@ namespace ccm::internal
 
 	} // namespace impl
 
-	template <typename T>
-	[[nodiscard]] constexpr T log_float(T num) noexcept
+	constexpr float log_float(float num) noexcept
 	{
-		return static_cast<T>(impl::log_float_impl(static_cast<float>(num)));
+		return impl::log_float_impl(num);
 	}
 } // namespace ccm::internal

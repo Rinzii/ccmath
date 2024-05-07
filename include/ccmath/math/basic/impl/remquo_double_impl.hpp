@@ -73,7 +73,7 @@ namespace ccm::internal
 			}
 
 			x				  = ccm::fabs(x);
-			y				  = ccm::support::int64_to_double(y_i64);
+			y				  = support::int64_to_double(y_i64);
 			computed_quotient = 0;
 
 			if (y_i64 <= 0x7fcfffffffffffffULL && x >= 4 * y)
@@ -103,7 +103,7 @@ namespace ccm::internal
 			}
 			else
 			{
-				double y_half = 0.5 * y;
+				const double y_half = 0.5 * y;
 				if (x > y_half)
 				{
 					x -= y;

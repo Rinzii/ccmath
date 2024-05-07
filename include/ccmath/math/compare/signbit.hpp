@@ -65,7 +65,7 @@ namespace ccm
 	 * if your compiler is not supported a static assertion will be triggered. If this happens to you please report it to
 	 * the dev team and we will try to bring support to your compiler ASAP if we are able to!
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] constexpr bool signbit(T num) noexcept
 	{
 #if defined(CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT)
@@ -77,8 +77,8 @@ namespace ccm
 			// If constexpr only works with gcc 7.1+. Without if constexpr we work till GCC 5.1+
 			// This works with clang 5.0.0 no problem even with if constexpr
 			if constexpr (std::is_same_v<T, float>) { return __builtin_copysignf(1.0F, num) < 0; }
-			else if constexpr (std::is_same_v<T, double>) { return __builtin_copysign(1.0, num) < 0; }
-			else if constexpr (std::is_same_v<T, long double>) { return __builtin_copysignl(1.0L, num) < 0; }
+			if constexpr (std::is_same_v<T, double>) { return __builtin_copysign(1.0, num) < 0; }
+			if constexpr (std::is_same_v<T, long double>) { return __builtin_copysignl(1.0L, num) < 0; }
 
 			return false;
 		}
@@ -94,7 +94,7 @@ namespace ccm
 
 		return num < static_cast<T>(0);
 #else
-		static_assert(ccm::support::always_false<T>, "ccm::signbit is not implemented for this compiler. Please report this issue to the dev!");
+		static_assert(ccm::support::always_false<T>, "ccm::signbit is not implemented for this compiler. Please report this issue to the ccmath dev team!");
 		return false;
 #endif
 	}
@@ -107,7 +107,7 @@ namespace ccm
 	 *
 	 * @note This function is constexpr and will return the same values as std::signbit along with being static_assert-able.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer> && std::is_signed_v<Integer>, int> = 0>
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer> && std::is_signed_v<Integer>, bool> = true>
 	[[nodiscard]] constexpr bool signbit(Integer num) noexcept
 	{
 		// There is no concept of -0 for integers. So we can just check if the number is less than 0.
@@ -121,8 +121,8 @@ namespace ccm
 	 *
 	 * @note This function is constexpr and will return the same values as std::signbit along with being static_assert-able.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer> && !std::is_signed_v<Integer>, int> = 0>
-	[[nodiscard]] constexpr bool signbit(Integer /* unused */) noexcept
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer> && !std::is_signed_v<Integer>, bool> = true>
+	[[nodiscard]] constexpr bool signbit(Integer /* num */) noexcept
 	{
 		// If the number is unsigned, then it can't be negative.
 		return false;
