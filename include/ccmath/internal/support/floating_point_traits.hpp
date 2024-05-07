@@ -89,5 +89,5 @@ namespace ccm::helpers
 		const auto bits = __builtin_bit_cast(uint_type, x);
 		return bits & ~traits::shifted_sign_mask;
     }
-}
+} // namespace ccm::helpers
 

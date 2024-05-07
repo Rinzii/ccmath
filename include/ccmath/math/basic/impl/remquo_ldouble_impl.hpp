@@ -22,6 +22,7 @@ namespace ccm::internal
 	{
 		constexpr long double remquo_ldouble_impl(long double x, long double y, int * quo) noexcept
 		{
+		/*
 			std::int32_t x_exponent{};
 			std::int32_t y_exponent{};
 			std::int32_t x_int32{};
@@ -33,7 +34,7 @@ namespace ccm::internal
 
 			int quotient_sign{};
 			int computed_quotient{};
-
+		 */
 			// TODO: For the time being this is mega on hold until we have access to
 			//       necessary implementations of int128_t. Without them extracting the
 			//       needed bits to perform the necessary operations would be extremely challenging
@@ -43,7 +44,7 @@ namespace ccm::internal
 		}
 	} // namespace impl
 
-	inline constexpr long double remquo_ldouble(long double x, long double y, int * quo) noexcept
+	constexpr long double remquo_ldouble(long double x, long double y, int * quo) noexcept
 	{
 		return impl::remquo_ldouble_impl(x, y, quo);
 	}

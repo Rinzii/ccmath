@@ -8,15 +8,13 @@
 
 #pragma once
 
-#include <cstdint>
-#include <limits>
-
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/predef/compiler_warnings_and_errors.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/math/basic/abs.hpp"
 #include "ccmath/math/basic/fmod.hpp"
 
-#include "ccmath/internal/predef/compiler_warnings_and_errors.hpp"
+#include <cstdint>
 
 namespace ccm::internal
 {
@@ -27,16 +25,14 @@ namespace ccm::internal
 		{
 			std::int64_t x_i64{};
 			std::int64_t y_i64{};
-			std::uint64_t x_sign{};
-			std::uint64_t quotient_sign{};
 			int computed_quotient{};
 
-			x_i64 = ccm::support::double_to_int64(x);
-			y_i64 = ccm::support::double_to_int64(y);
+			x_i64 = support::double_to_int64(x);
+			y_i64 = support::double_to_int64(y);
 
 			// Determine the signs of x and the quotient.
-			x_sign		  = static_cast<std::uint64_t>(x_i64) & 0x8000000000000000ULL;
-			quotient_sign = x_sign ^ (static_cast<std::uint64_t>(y_i64) & 0x8000000000000000ULL);
+			const std::uint64_t x_sign		  = static_cast<std::uint64_t>(x_i64) & 0x8000000000000000ULL;
+			const std::uint64_t quotient_sign = x_sign ^ (static_cast<std::uint64_t>(y_i64) & 0x8000000000000000ULL);
 
 			// Clear the sign bits from the int64_t representations of x and y.
 			x_i64 &= 0x7fffffffffffffffULL;

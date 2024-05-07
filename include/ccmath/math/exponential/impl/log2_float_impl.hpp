@@ -11,13 +11,10 @@
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
-#include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/exponential/impl/log2_data.hpp"
 
 #include <array>
 #include <cstdint>
-#include <limits>
-#include <type_traits>
 
 namespace ccm::internal
 {
@@ -29,9 +26,9 @@ namespace ccm::internal
 		constexpr auto k_log2TableN_flt		= (1 << ccm::internal::k_log2TableBitsFlt);
 		constexpr auto k_log2TableOff_flt	= 0x3f330000;
 
-		constexpr double log2_float_impl(float x)
+		constexpr float log2_float_impl(float x)
 		{
-			std::uint32_t intX = ccm::support::float_to_uint32(x);
+			std::uint32_t intX = support::float_to_uint32(x);
 
 			// If x == 1 then fix the result to 0 with downward rounding
 			if (CCM_UNLIKELY(intX == 0x3f800000)) { return 0; }
@@ -76,13 +73,12 @@ namespace ccm::internal
 			const ccm::double_t polynomialTerm = log2_poly_values_flt[3] * rem + result0;
 			result							   = result * remSqr + polynomialTerm;
 
-			return result;
+			return static_cast<float>(result);
 		}
 	} // namespace impl
 
-	template <typename T>
-	[[nodiscard]] constexpr T log2_float(T num) noexcept
+	constexpr float log2_float(float num) noexcept
 	{
-		return static_cast<T>(impl::log2_float_impl(static_cast<float>(num)));
+		return impl::log2_float_impl(num);
 	}
 } // namespace ccm::internal

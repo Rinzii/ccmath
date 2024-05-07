@@ -31,7 +31,7 @@ namespace ccm
 		if constexpr (std::is_same_v<T, float>) { return internal::impl::exp_float_impl(num); }
 		if constexpr (std::is_same_v<T, double>) { return internal::impl::exp_double_impl(num); }
 		if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::impl::exp_double_impl(static_cast<double>(num))); }
-		return internal::impl::exp_double_impl(static_cast<double>(num));
+		return static_cast<T>(internal::impl::exp_double_impl(static_cast<double>(num)));
 #endif
 	}
 

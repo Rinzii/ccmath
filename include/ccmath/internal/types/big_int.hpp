@@ -15,9 +15,10 @@
 #include <limits>
 #include <type_traits>
 
+// NOLINTBEGIN
+
 namespace ccm
 {
-
 	template <size_t Bits, bool Signed, typename WordType = std::uint64_t>
 	struct BigInt
 	{
@@ -92,3 +93,5 @@ namespace ccm
 
 	};
 } // namespace ccm
+
+//NOLINTEND
