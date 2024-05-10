@@ -21,8 +21,8 @@ namespace ccm::internal
 	namespace impl
 	{
 		constexpr auto internalLogDataDbl	= ccm::internal::log_data<double>();
-		constexpr auto log_tab_values_dbl	= ccm::internal::log_data<double, 0>::tab;
-		constexpr auto log_tab2_values_dbl	= ccm::internal::log_data<double, 0>::tab2;
+		constexpr auto log_tab_values_dbl	= log_data<double>::tab;
+		constexpr auto log_tab2_values_dbl	= log_data<double>::tab2;
 		constexpr auto log_poly_values_dbl	= internalLogDataDbl.poly;
 		constexpr auto log_poly1_values_dbl = internalLogDataDbl.poly1;
 		constexpr auto log_ln2hi_value_dbl	= internalLogDataDbl.ln2hi;

@@ -21,7 +21,7 @@ namespace ccm::internal
 	namespace impl
 	{
 		constexpr auto internalLog2DataFlt	= ccm::internal::log2_data<float>();
-		constexpr auto log2_tab_values_flt	= ccm::internal::log2_data<float, 0>::tab;
+		constexpr auto log2_tab_values_flt	= ccm::internal::log2_data<float>::tab;
 		constexpr auto log2_poly_values_flt = internalLog2DataFlt.poly;
 		constexpr auto k_log2TableN_flt		= (1 << ccm::internal::k_log2TableBitsFlt);
 		constexpr auto k_log2TableOff_flt	= 0x3f330000;

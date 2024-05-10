@@ -23,12 +23,12 @@ namespace ccm::internal
 {
 	namespace impl
 	{
-		constexpr ccm::internal::log_data<float> internalLogDataFlt = ccm::internal::log_data<float>();
-		constexpr auto log_tab_values_flt							= ccm::internal::log_data<float, 0>::tab;
-		constexpr auto log_poly_values_flt							= internalLogDataFlt.poly;
-		constexpr auto log_ln2_value_flt							= internalLogDataFlt.ln2;
-		constexpr auto k_logTableN_flt								= (1 << ccm::internal::k_logTableBitsFlt);
-		constexpr auto k_logTableOff_flt							= 0x3f330000;
+		constexpr auto internalLogDataFlt  = ccm::internal::log_data<float>();
+		constexpr auto log_tab_values_flt  = log_data<float>::tab;
+		constexpr auto log_poly_values_flt = internalLogDataFlt.poly;
+		constexpr auto log_ln2_value_flt   = internalLogDataFlt.ln2;
+		constexpr auto k_logTableN_flt	   = (1 << ccm::internal::k_logTableBitsFlt);
+		constexpr auto k_logTableOff_flt   = 0x3f330000;
 
 		constexpr float log_float_impl(float x)
 		{

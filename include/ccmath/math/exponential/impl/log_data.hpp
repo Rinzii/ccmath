@@ -22,7 +22,7 @@ namespace ccm::internal
 	constexpr std::size_t k_logPolyOrderDbl	 = 6;
 	constexpr std::size_t k_logPoly1OrderDbl = 12;
 
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	struct log_data;
 
 	template <>
