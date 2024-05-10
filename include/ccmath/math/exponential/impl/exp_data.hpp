@@ -24,7 +24,7 @@ namespace ccm::internal
 	constexpr std::size_t k_exp_table_bits_dbl = 7;
 	constexpr std::size_t k_exp_poly_order_dbl = 5;
 
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	struct exp_data;
 
 	template <>
