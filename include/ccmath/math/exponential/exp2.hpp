@@ -8,6 +8,9 @@
 
 #pragma once
 
+#include "ccmath/math/exponential/impl/exp2_double_impl.hpp"
+#include "ccmath/math/exponential/impl/exp2_float_impl.hpp"
+
 #include <type_traits>
 
 namespace ccm
@@ -21,10 +24,10 @@ namespace ccm
 		if constexpr (std::is_same_v<T, long double>) { return __builtin_exp2l(num); }
 		return static_cast<T>(__builtin_exp2l(num));
 #else
-		if constexpr (std::is_same_v<T, float>) { return 0; }
-		if constexpr (std::is_same_v<T, double>) { return 0; }
-		if constexpr (std::is_same_v<T, long double>) { return 0; }
-		return 0;
+		if constexpr (std::is_same_v<T, float>) { return internal::exp2_float(num); }
+		if constexpr (std::is_same_v<T, double>) { return internal::exp2_double(num); }
+		if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::exp2_double(static_cast<double>(num))); }
+		return static_cast<T>(internal::exp2_double(static_cast<double>(num)));
 #endif
 	}
 
@@ -39,8 +42,8 @@ namespace ccm
 		return ccm::exp2<float>(num);
 	}
 
-	constexpr long double exp2l(double num)
+	constexpr long double exp2l(long double num)
 	{
-		return ccm::exp2<double>(num);
+		return static_cast<long double>(ccm::exp2<double>(static_cast<double>(num)));
 	}
 } // namespace ccm
