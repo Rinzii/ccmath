@@ -26,8 +26,9 @@ namespace ccm
 		int32_t oldexp = ccm::support::get_exponent_of_floating_point<Floating_Point>(num);
 		
 		// if the mantissa is 0 and the original exponent is 0, or infinite, return num
-		if (CCM_UNLIKELY(!ccm::isfinite(num)) || 
-			((oldexp == 0) && 
+		if (CCM_UNLIKELY(!ccm::isfinite(num)) 
+			|| oldexp < ccm::helpers::floating_point_traits<Floating_Point>::minimum_binary_exponent
+			|| ((oldexp == 0) && 
 				((ccm::support::bit_cast<ccm::helpers::float_bits_t<Floating_Point>>(num) 
 				 & ccm::helpers::floating_point_traits<Floating_Point>::normal_mantissa_mask) == 0)))
 		{
