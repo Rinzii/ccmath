@@ -107,7 +107,8 @@ namespace ccm
 	 */
 	inline constexpr long double ldexpl(long double num, int exp) noexcept
 	{
-		return 0.0L;//ldexp<long double>(num, exp);
+		//long double isn't supported yet
+		return std::numeric_limits<long double>::signaling_NaN(); // ldexp<long double>(num, exp);
 	}
 
 } // namespace ccm
