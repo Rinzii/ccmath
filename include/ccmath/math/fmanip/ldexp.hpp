@@ -11,6 +11,8 @@
 #include <ccmath/internal/support/bits.hpp>
 #include "ccmath/internal/support/floating_point_traits.hpp"
 
+#include <cassert>
+
 namespace ccm
 {
 	/**
@@ -49,7 +51,7 @@ namespace ccm
 		if (oldexp == 0)
 		{
 			num *= ccm::helpers::floating_point_traits<Floating_Point>::normalize_factor;
-			exp	   = -sizeof(Floating_Point) * static_cast<size_t>(std::numeric_limits<unsigned char>::digits); // bits in a byte
+			exp	   = -static_cast<int32_t>(sizeof(Floating_Point)) * std::numeric_limits<unsigned char>::digits; // bits in a byte
 			oldexp = ccm::support::get_exponent_of_floating_point<Floating_Point>(num);
 		}
 
@@ -63,7 +65,8 @@ namespace ccm
 			return ccm::support::set_exponent_of_floating_point<Floating_Point>(num, exp);
 		}
 		// denormal, or underflow
-		exp += sizeof(Floating_Point) * static_cast<size_t>(std::numeric_limits<unsigned char>::digits); // bits in a byte
+		exp += static_cast<int32_t>(sizeof(Floating_Point)) * std::numeric_limits<unsigned char>::digits;
+		; // bits in a byte
 		num = ccm::support::set_exponent_of_floating_point<Floating_Point>(num, exp);
 		num /= ccm::helpers::floating_point_traits<Floating_Point>::normalize_factor;
 		//if (num == static_cast<Floating_Point>(0))
