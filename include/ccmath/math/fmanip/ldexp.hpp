@@ -49,7 +49,7 @@ namespace ccm
 		if (oldexp == 0)
 		{
 			num *= ccm::helpers::floating_point_traits<Floating_Point>::normalize_factor;
-			exp	   = -sizeof(Floating_Point) * std::numeric_limits<unsigned char>::digits; // bits in a byte
+			exp	   = -sizeof(Floating_Point) * static_cast<size_t>(std::numeric_limits<unsigned char>::digits); // bits in a byte
 			oldexp = ccm::support::get_exponent_of_floating_point<Floating_Point>(num);
 		}
 
@@ -63,7 +63,7 @@ namespace ccm
 			return ccm::support::set_exponent_of_floating_point<Floating_Point>(num, exp);
 		}
 		// denormal, or underflow
-		exp += sizeof(Floating_Point) * std::numeric_limits<unsigned char>::digits; // bits in a byte
+		exp += sizeof(Floating_Point) * static_cast<size_t>(std::numeric_limits<unsigned char>::digits); // bits in a byte
 		num = ccm::support::set_exponent_of_floating_point<Floating_Point>(num, exp);
 		num /= ccm::helpers::floating_point_traits<Floating_Point>::normalize_factor;
 		//if (num == static_cast<Floating_Point>(0))
@@ -107,7 +107,7 @@ namespace ccm
 	inline constexpr long double ldexpl(long double num, int exp) noexcept
 	{
 		assert(false && "long double support isn't implemented");
-		return ldexp<long double>(num, exp);
+		return 0.0L;//ldexp<long double>(num, exp);
 	}
 
 } // namespace ccm
