@@ -16,13 +16,14 @@ TEST(CcmathFmanipTests, Ldexp)
 {
 	static_assert(ccm::ldexp(1.0, 0) == 1.0, "ldexp has failed testing that it is static_assert-able!");
 
-	EXPECT_FLOAT_EQ(std::ldexp(5.0, 4), ccm::ldexp(5.0, 4));
-	EXPECT_FLOAT_EQ(std::ldexp(5.0, -4), ccm::ldexp(5.0, -4));
-	EXPECT_FLOAT_EQ(std::ldexp(-0.0, 1), ccm::ldexp(-0.0, 1));
-	EXPECT_FLOAT_EQ(std::ldexp(0.0, 1), ccm::ldexp(0.0, 1));
+	EXPECT_DOUBLE_EQ(std::ldexp(5.0, 4), ccm::ldexp(5.0, 4));
+
+	EXPECT_DOUBLE_EQ(std::ldexp(-0.0, 1), ccm::ldexp(-0.0, 1));
+	EXPECT_DOUBLE_EQ(std::ldexp(0.0, 1), ccm::ldexp(0.0, 1));
+	EXPECT_FLOAT_EQ(std::ldexp(5.f, -4), ccm::ldexp(5.f, -4));
 	EXPECT_FLOAT_EQ(std::ldexp(720.32f, 22), ccm::ldexp(720.32f, 22));
-	EXPECT_FLOAT_EQ(std::ldexp(1, -1074), ccm::ldexp(1, -1074));
-	EXPECT_FLOAT_EQ(std::ldexp(1, 1024), ccm::ldexp(1, 1024));
+	EXPECT_DOUBLE_EQ(std::ldexp(1, -1074), ccm::ldexp(1, -1074));
+	EXPECT_DOUBLE_EQ(std::ldexp(1, 1024), ccm::ldexp(1, 1024));
 
 	EXPECT_FLOAT_EQ(std::ldexp(std::numeric_limits<float>::max(), std::numeric_limits<int>::max()),
 					ccm::ldexp(std::numeric_limits<float>::max(), std::numeric_limits<int>::max()));
