@@ -9,11 +9,11 @@
 #pragma once
 
 #include "ccmath/internal/support/bits.hpp"
-#include "ccmath/math/compare/isinf.hpp"
-#include "ccmath/math/compare/isnan.hpp"
+#include "ccmath/internal/types/fp_types.hpp"
+#include "ccmath/math/basic/max.hpp"
+#include "ccmath/math/basic/min.hpp"
 
 #include <cstdint>
-#include <limits>
 
 namespace ccm::internal::impl
 {
@@ -29,7 +29,7 @@ namespace ccm::internal::impl
 			{
 				tmp *= 0x1p127F;
 				exp -= 127;
-				if (exp > 127) { exp = 127; }
+				exp = ccm::min(exp, 127);
 			}
 		}
 		else if (exp < -126)
@@ -40,7 +40,7 @@ namespace ccm::internal::impl
 			{
 				tmp *= 0x1p-126F * 0x1p24F;
 				exp += 126 - 24;
-				if (exp < -126) { exp = -126; }
+				exp = ccm::max(exp, -126);
 			}
 		}
 

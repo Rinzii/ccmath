@@ -19,6 +19,7 @@
  * - GCC
  */
 
+#pragma once
 
 /// MSVC
 #if defined(_MSC_VER) && !defined(__clang__) && !defined(CCMATH_COMPILER_MSVC)

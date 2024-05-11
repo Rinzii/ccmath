@@ -26,9 +26,9 @@ namespace ccm
 	{
 #if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
 		if constexpr (std::is_same_v<T, float>) { return __builtin_logf(num); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_log(num); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_logl(num); }
-		else { return __builtin_log(num); }
+		if constexpr (std::is_same_v<T, double>) { return __builtin_log(num); }
+		if constexpr (std::is_same_v<T, long double>) { return __builtin_logl(num); }
+		return static_cast<T>(__builtin_logl(num));
 #else
 		// If the number is 1, return +0.
 		if (num == static_cast<T>(1)) { return static_cast<T>(0); }
@@ -46,8 +46,10 @@ namespace ccm
 		if (CCM_UNLIKELY(ccm::isnan(num))) { return std::numeric_limits<T>::quiet_NaN(); }
 
 		// Select the correct implementation based on the type.
-		if constexpr (std::is_same_v<T, float>) { return ccm::internal::log_float(num); }
-		else { return ccm::internal::log_double(num); }
+		if constexpr (std::is_same_v<T, float>) { return internal::log_float(num); }
+		if constexpr (std::is_same_v<T, double>) { return internal::log_double(num); }
+		if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::log_double(static_cast<double>(num))); }
+		return static_cast<T>(internal::log_double(num));
 #endif
 	}
 
@@ -60,7 +62,7 @@ namespace ccm
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double log(const Integer num) noexcept
 	{
-		return ccm::log(static_cast<double>(num));
+		return ccm::log<double>(static_cast<double>(num));
 	}
 
 	/**

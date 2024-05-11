@@ -108,7 +108,7 @@ namespace ccm
 	 */
 	constexpr float floorf(float num) noexcept
 	{
-		return floor<float>(num);
+		return ccm::floor<float>(num);
 	}
 
 	/**
@@ -118,7 +118,7 @@ namespace ccm
 	 */
 	constexpr double floorl(double num) noexcept
 	{
-		return floor<double>(num);
+		return ccm::floor<double>(num);
 	}
 } // namespace ccm
 

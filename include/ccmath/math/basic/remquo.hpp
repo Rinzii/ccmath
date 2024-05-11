@@ -44,8 +44,8 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T remquo(T x, T y, int * quo)
 	{
-		if constexpr (std::is_same_v<T, float>) { return ccm::internal::remquo_float(x, y, quo); }
-		else { return ccm::internal::remquo_double(x, y, quo); }
+		if constexpr (std::is_same_v<T, float>) { return internal::remquo_float(x, y, quo); }
+		else { return internal::remquo_double(x, y, quo); }
 	}
 
 	/**

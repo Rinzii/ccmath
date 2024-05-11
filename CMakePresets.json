@@ -42,7 +42,7 @@
 			"binaryDir": "${sourceDir}/out/intel",
 			"cacheVariables": {
 				"CMAKE_C_COMPILER": "icx",
-				"CMAKE_CXX_COMPILER": "icx"
+				"CMAKE_CXX_COMPILER": "icpx"
 			}
 		},
 		{
@@ -62,6 +62,15 @@
 			"binaryDir": "${sourceDir}/out/ubsan",
 			"cacheVariables": {
 				"CMAKE_CXX_FLAGS": "-fsanitize=undefined"
+			}
+		},
+		{
+			"name": "clang-tidy",
+			"description": "UBSan build configuration using Ninja Multi-config",
+			"inherits": "ninja-clang",
+			"binaryDir": "${sourceDir}/out/clang-tidy",
+			"cacheVariables": {
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "On"
 			}
 		},
 		{
