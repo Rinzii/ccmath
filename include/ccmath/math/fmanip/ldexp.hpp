@@ -11,8 +11,6 @@
 #include <ccmath/internal/support/bits.hpp>
 #include "ccmath/internal/support/floating_point_traits.hpp"
 
-#include <cassert>
-
 namespace ccm
 {
 	/**
@@ -109,7 +107,6 @@ namespace ccm
 	 */
 	inline constexpr long double ldexpl(long double num, int exp) noexcept
 	{
-		assert(false && "long double support isn't implemented");
 		return 0.0L;//ldexp<long double>(num, exp);
 	}
 
