@@ -93,11 +93,6 @@ if (CCMATH_BUILD_TESTS)
   add_subdirectory(test)
 endif()
 
-if (CCMATH_USE_SIMD)
-  # TODO: Add a better way to handle enabling simd internally.
-  add_compile_definitions(INTERNAL_CCMATH_ENABLE_CHECK_FOR_SIMD)
-endif ()
-
 
 if(CCMATH_INSTALL)
   include(GNUInstallDirs)
