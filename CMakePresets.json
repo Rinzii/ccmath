@@ -126,7 +126,13 @@
 			"name": "RelWithDebInfo",
 			"configurePreset": "default",
 			"configuration": "RelWithDebInfo"
+		},
+		{
+			"name": "Benchmark",
+			"configurePreset": "benchmark-default",
+			"configuration": "Release"
 		}
+
 	],
 	"testPresets": [
 		{
