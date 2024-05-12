@@ -29,19 +29,11 @@ TEST(CcmathExponentialTests, Exp2_Double_ValidInput)
 	EXPECT_EQ(ccm::exp2(2048.0), std::exp2(2048.0));
 	EXPECT_EQ(ccm::exp2(4096.0), std::exp2(4096.0));
 
-	// Test Edge Cases
+	// Test that exp2 is mathematically the same as exp( X * log(2) )
+	EXPECT_DOUBLE_EQ(ccm::exp2(4.0), std::exp(4.0 * std::log(2.0)));
+	EXPECT_DOUBLE_EQ(ccm::exp2(4.0), ccm::exp(4.0 * ccm::log(2.0)));
 
-	EXPECT_EQ(ccm::exp2(0.0), std::exp2(0.0));
-	EXPECT_EQ(ccm::exp2(-0.0), std::exp2(-0.0));
-	EXPECT_EQ(ccm::exp2(std::numeric_limits<double>::infinity()), std::exp2(std::numeric_limits<double>::infinity()));
-	EXPECT_EQ(ccm::exp2(-std::numeric_limits<double>::infinity()), std::exp2(-std::numeric_limits<double>::infinity()));
 
-	bool testCcmExp2ThatNanReturnsNan = std::isnan(ccm::exp2(std::numeric_limits<double>::quiet_NaN()));
-	bool testStdExp2ThatNanReturnsNan = std::isnan(std::exp2(std::numeric_limits<double>::quiet_NaN()));
-	bool testCcmExp2ThatNanIsPositive = std::signbit(ccm::exp2(std::numeric_limits<double>::quiet_NaN()));
-	bool testStdExp2ThatNanIsPositive = std::signbit(std::exp2(std::numeric_limits<double>::quiet_NaN()));
-	EXPECT_EQ(testCcmExp2ThatNanReturnsNan, testStdExp2ThatNanReturnsNan);
-	EXPECT_EQ(testCcmExp2ThatNanIsPositive, testStdExp2ThatNanIsPositive);
 }
 
 TEST(CcmathExponentialTests, Exp2_Double_EdgeCases)
