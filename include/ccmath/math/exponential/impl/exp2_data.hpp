@@ -52,7 +52,7 @@ namespace ccm::internal
 		static constexpr std::size_t k_exp2_poly_order_dbl = 5;
 
 	private:
-		static constexpr std::size_t internal_table_size = (std::size_t)(2 * (1 << k_exp2_table_bits_dbl));
+		static constexpr std::size_t internal_table_size = static_cast<std::size_t>(2 * (1 << k_exp2_table_bits_dbl));
 
 	public:
 		double shift{0x1.8p52 / (1 << k_exp2_table_bits_dbl)};
