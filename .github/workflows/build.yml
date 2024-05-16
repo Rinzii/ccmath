@@ -14,13 +14,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [ninja-gcc, ninja-clang, ninja-clang-libcpp]
+        compiler: [ninja-gcc, ninja-clang, ninja-clang-libcpp, ninja-intel]
         cxx_version: [17, 20]
         target: [Debug, Release]
     steps:
       - uses: actions/checkout@v4
-      - name: install dependencies
-        run: sudo apt install -yqq ninja-build
+        run: |
+          wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB \
+          | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+          sudo apt install -yqq ninja-build intel-basekit
+          source /opt/intel/oneapi/setvars.sh
       - name: configure cmake
         run: cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
       - name: build
