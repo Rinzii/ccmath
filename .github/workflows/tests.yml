@@ -22,7 +22,7 @@ jobs:
       - name: install dependencies
         run: |
           sudo apt install -yqq ninja-build
-          wget -O- https://registrationcenter-download.intel.com/akdlm/IRC_NAS/2e562b6e-5d0f-4001-8121-350a828332fb/l_dpcpp-cpp-compiler_p_2024.1.0.468.sh | bash
+          sudo wget -O - https://registrationcenter-download.intel.com/akdlm/IRC_NAS/2e562b6e-5d0f-4001-8121-350a828332fb/l_dpcpp-cpp-compiler_p_2024.1.0.468.sh | bash
       - name: configure cmake
         run: |
           source /opt/intel/oneapi/setvars.sh
