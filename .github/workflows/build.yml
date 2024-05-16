@@ -26,11 +26,11 @@ jobs:
           sudo apt update
           sudo apt install -yqq ninja-build intel-basekit
       - name: configure cmake
-        run: cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
-      - name: build
         run: |
           source /opt/intel/oneapi/setvars.sh
-          cmake --build build --config=${{matrix.target}}
+          cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
+      - name: build
+        run: cmake --build build --config=${{matrix.target}}
 
   build-windows:
     runs-on: windows-2022
