@@ -25,11 +25,12 @@ jobs:
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
           sudo apt update
           sudo apt install -yqq ninja-build intel-basekit
-          source /opt/intel/oneapi/setvars.sh
       - name: configure cmake
         run: cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
       - name: build
-        run: cmake --build build --config=${{matrix.target}}
+        run: |
+          source /opt/intel/oneapi/setvars.sh
+          cmake --build build --config=${{matrix.target}}
 
   build-windows:
     runs-on: windows-2022
