@@ -13,6 +13,9 @@
 #include "ccmath/math/compare/isnan.hpp"
 #include <type_traits>
 
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
+#include "ccmath/math/compare/signbit.hpp"
+
 namespace ccm
 {
 	/**
@@ -28,27 +31,42 @@ namespace ccm
 	constexpr T fma(T x, T y, T z) noexcept
 	{
 		// Check for GCC 6.1 or later
-#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
+		#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
 		if constexpr (std::is_same_v<T, float>) { return __builtin_fmaf(x, y, z); }
 		if constexpr (std::is_same_v<T, double>) { return __builtin_fma(x, y, z); }
 		if constexpr (std::is_same_v<T, long double>) { return __builtin_fmal(x, y, z); }
 		return static_cast<T>(__builtin_fmal(x, y, z));
-#else
-		// Handle infinity
-		if (CCM_UNLIKELY((x == static_cast<T>(0) && ccm::isinf(y)) || (y == T{0} && ccm::isinf(x)))) { return std::numeric_limits<T>::quiet_NaN(); }
-		if (CCM_UNLIKELY(x * y == std::numeric_limits<T>::infinity() && z == -std::numeric_limits<T>::infinity()))
+		#else
+
+		// If x is zero and y is infinity, or if y is zero and x is infinity and...
+		if (CCM_UNLIKELY((x == static_cast<T>(0) && ccm::isinf(y)) || (y == T{0} && ccm::isinf(x))))
 		{
-			return std::numeric_limits<T>::infinity();
+			// ...z is NaN, return +NaN...
+			if (ccm::isnan(z))
+			{
+				return std::numeric_limits<T>::quiet_NaN();
+			}
+
+			// ...else return -NaN if Z is not NaN.
+			return -std::numeric_limits<T>::quiet_NaN();
 		}
 
-		// Handle NaN
+		// If x is zero and y is infinity, or if y is zero and x is infinity and Z is NaN, then the result is -NaN.
+		if (CCM_UNLIKELY(ccm::isinf(x * y) && ccm::isinf(z) && ccm::signbit(x * y) != ccm::signbit(z)))
+		{
+			return -std::numeric_limits<T>::quiet_NaN();
+		}
+
+		// If x or y are NaN, NaN is returned.
 		if (CCM_UNLIKELY(ccm::isnan(x) || ccm::isnan(y))) { return std::numeric_limits<T>::quiet_NaN(); }
+
+		// If z is NaN, and x * y is not 0 * Inf or Inf * 0, then +NaN is returned
 		if (CCM_UNLIKELY(ccm::isnan(z) && (x * y != 0 * std::numeric_limits<T>::infinity() || x * y != std::numeric_limits<T>::infinity() * 0)))
 		{
 			return std::numeric_limits<T>::quiet_NaN();
 		}
 
-		// If we don't have access to a builtin fma. Then just hope the compiler optimizes this.
+		// Hope the compiler optimizes this.
 		return (x * y) + z;
 #endif
 	}
