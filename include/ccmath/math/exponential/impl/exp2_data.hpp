@@ -15,10 +15,6 @@
 
 namespace ccm::internal
 {
-	// Float constants
-
-	// Double constants
-
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	struct exp2_data;
 
@@ -48,21 +44,24 @@ namespace ccm::internal
 	template <>
 	struct exp2_data<double>
 	{
-		static constexpr std::size_t k_exp2_table_bits_dbl = 7;
-		static constexpr std::size_t k_exp2_poly_order_dbl = 5;
+		static constexpr std::size_t table_bits = 7;
+		static constexpr std::size_t poly_order = 5;
+		static constexpr std::size_t shifted_table_bits = (1 << table_bits);
+
 
 	private:
-		static constexpr std::size_t internal_table_size = static_cast<std::size_t>(2 * (1 << k_exp2_table_bits_dbl));
+		static constexpr std::size_t internal_table_size = UINTMAX_C(2) * shifted_table_bits;
+
 
 	public:
-		double shift{0x1.8p52 / (1 << k_exp2_table_bits_dbl)};
+		double shift{0x1.8p52 / shifted_table_bits};
 
 		// exp2 polynomial coefficients
 		// abs error: 1.2195*2^-65
 		// ulp error: 0.511 without fma
 		// if |x| < 1/256
 		// abs error if |x| < 1/128: 1.9941*2^-56
-		std::array<double, k_exp2_poly_order_dbl> poly = {
+		std::array<double, poly_order> poly = {
 			0x1.62e42fefa39efp-1, 0x1.ebfbdff82c424p-3, 0x1.c6b08d70cf4b5p-5, 0x1.3b2abd24650ccp-7, 0x1.5d7e09b4e3a84p-10,
 		};
 
