@@ -11,10 +11,10 @@
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/math/compare/isnan.hpp"
-#include <type_traits>
-
-#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/compare/signbit.hpp"
+
+#include <limits>
+#include <type_traits>
 
 namespace ccm
 {
