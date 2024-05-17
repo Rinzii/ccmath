@@ -188,7 +188,7 @@ namespace ccm::fputil
 			static_assert(STORAGE_LEN >= TOTAL_LEN);
 
 			// The exponent bias. Always positive.
-			static constexpr int32_t EXP_BIAS = (1U << (EXP_LEN - 1U)) - 1U;
+			static constexpr std::int32_t EXP_BIAS = (1U << (EXP_LEN - 1U)) - 1U;
 			static_assert(EXP_BIAS > 0);
 
 			// The bit pattern that keeps only the *significand* part.
@@ -242,9 +242,9 @@ namespace ccm::fputil
 			// An opaque type to store a floating point exponent.
 			// We define special values but it is valid to create arbitrary values as long
 			// as they are in the range [min, max].
-			struct Exponent : public TypedInt<int32_t>
+			struct Exponent : TypedInt<std::int32_t>
 			{
-				using UP = TypedInt<int32_t>;
+				using UP = TypedInt<std::int32_t>;
 				using UP::UP;
 				static constexpr auto subnormal() { return Exponent(-EXP_BIAS); }
 				static constexpr auto min() { return Exponent(1 - EXP_BIAS); }
@@ -257,12 +257,12 @@ namespace ccm::fputil
 			// We define special values but it is valid to create arbitrary values as long
 			// as they are in the range [zero, bits_all_ones].
 			// Values greater than bits_all_ones are truncated.
-			struct BiasedExponent : public TypedInt<uint32_t>
+			struct BiasedExponent : TypedInt<std::uint32_t>
 			{
-				using UP = TypedInt<uint32_t>;
+				using UP = TypedInt<std::uint32_t>;
 				using UP::UP;
 
-				constexpr BiasedExponent(Exponent exp) : UP(static_cast<int32_t>(exp) + EXP_BIAS) {}
+				constexpr BiasedExponent(Exponent exp) : UP(static_cast<std::int32_t>(exp) + EXP_BIAS) {}
 
 				// Cast operator to get convert from BiasedExponent to Exponent.
 				constexpr operator Exponent() const { return Exponent(UP::value - EXP_BIAS); }
@@ -332,7 +332,7 @@ namespace ccm::fputil
 			constexpr StorageType exp_sig_bits() const { return bits & EXP_SIG_MASK; }
 
 			// Parts
-			constexpr BiasedExponent biased_exponent() const { return BiasedExponent(static_cast<uint32_t>(exp_bits() >> SIG_LEN)); }
+			constexpr BiasedExponent biased_exponent() const { return BiasedExponent(static_cast<std::uint32_t>(exp_bits() >> SIG_LEN)); }
 			constexpr void set_biased_exponent(BiasedExponent biased) { bits = merge(bits, encode(biased), EXP_MASK); }
 
 		public:
@@ -347,7 +347,7 @@ namespace ccm::fputil
 		// point type is encoded. It enables constructions, modification and observation
 		// of values manipulated as 'StorageType'.
 		template <FPType fp_type, typename RetT>
-		struct FPRepSem : public FPStorage<fp_type>
+		struct FPRepSem : FPStorage<fp_type>
 		{
 			using UP = FPStorage<fp_type>;
 			using typename UP::StorageType;
@@ -522,7 +522,7 @@ namespace ccm::fputil
 		// 'FPRep' and specify the 'FPType' directly.
 		// FPRep<FPType::IEEE754_Binary32:>::zero() // returns an FPRep<>
 		template <FPType fp_type, typename RetT>
-		struct FPRepImpl : public FPRepSem<fp_type, RetT>
+		struct FPRepImpl : FPRepSem<fp_type, RetT>
 		{
 			using UP		  = FPRepSem<fp_type, RetT>;
 			using StorageType = typename UP::StorageType;
@@ -591,11 +591,11 @@ namespace ccm::fputil
 			constexpr bool is_neg() const { return sign().is_neg(); }
 			constexpr bool is_pos() const { return sign().is_pos(); }
 
-			constexpr uint16_t get_biased_exponent() const { return static_cast<uint16_t>(static_cast<uint32_t>(UP::biased_exponent())); }
+			constexpr uint16_t get_biased_exponent() const { return static_cast<uint16_t>(static_cast<std::uint32_t>(UP::biased_exponent())); }
 
-			constexpr void set_biased_exponent(StorageType biased) { UP::set_biased_exponent(BiasedExponent((int32_t)biased)); }
+			constexpr void set_biased_exponent(StorageType biased) { UP::set_biased_exponent(BiasedExponent(static_cast<std::int32_t>(biased))); }
 
-			constexpr int get_exponent() const { return static_cast<int32_t>(Exponent(UP::biased_exponent())); }
+			constexpr int get_exponent() const { return static_cast<std::int32_t>(Exponent(UP::biased_exponent())); }
 
 			// If the number is subnormal, the exponent is treated as if it were the
 			// minimum exponent for a normal number. This is to keep continuity between
@@ -608,7 +608,7 @@ namespace ccm::fputil
 				Exponent exponent(UP::biased_exponent());
 				if (is_zero()) exponent = Exponent::zero();
 				if (exponent == Exponent::subnormal()) exponent = Exponent::min();
-				return static_cast<int32_t>(exponent);
+				return static_cast<std::int32_t>(exponent);
 			}
 
 			constexpr StorageType get_mantissa() const { return bits & FRACTION_MASK; }
@@ -627,7 +627,7 @@ namespace ccm::fputil
 			// FIXME: Use an uint32_t for 'biased_exp'.
 			static constexpr RetT create_value(Sign sign, StorageType biased_exp, StorageType mantissa)
 			{
-				return RetT(encode(sign, BiasedExponent(static_cast<uint32_t>(biased_exp)), Significand(mantissa)));
+				return RetT(encode(sign, BiasedExponent(static_cast<std::uint32_t>(biased_exp)), Significand(mantissa)));
 			}
 
 			// The function converts integer number and unbiased exponent to proper
