@@ -39,7 +39,7 @@ namespace ccm
 		#else
 
 		// If x is zero and y is infinity, or if y is zero and x is infinity and...
-		if (CCM_UNLIKELY((x == static_cast<T>(0) && ccm::isinf(y)) || (y == T{0} && ccm::isinf(x))))
+		if ((x == static_cast<T>(0) && ccm::isinf(y)) || (y == T{0} && ccm::isinf(x)))
 		{
 			// ...z is NaN, return +NaN...
 			if (ccm::isnan(z))
@@ -52,16 +52,16 @@ namespace ccm
 		}
 
 		// If x is zero and y is infinity, or if y is zero and x is infinity and Z is NaN, then the result is -NaN.
-		if (CCM_UNLIKELY(ccm::isinf(x * y) && ccm::isinf(z) && ccm::signbit(x * y) != ccm::signbit(z)))
+		if (ccm::isinf(x * y) && ccm::isinf(z) && ccm::signbit(x * y) != ccm::signbit(z))
 		{
 			return -std::numeric_limits<T>::quiet_NaN();
 		}
 
 		// If x or y are NaN, NaN is returned.
-		if (CCM_UNLIKELY(ccm::isnan(x) || ccm::isnan(y))) { return std::numeric_limits<T>::quiet_NaN(); }
+		if (ccm::isnan(x) || ccm::isnan(y)) { return std::numeric_limits<T>::quiet_NaN(); }
 
 		// If z is NaN, and x * y is not 0 * Inf or Inf * 0, then +NaN is returned
-		if (CCM_UNLIKELY(ccm::isnan(z) && (x * y != 0 * std::numeric_limits<T>::infinity() || x * y != std::numeric_limits<T>::infinity() * 0)))
+		if (ccm::isnan(z) && (x * y != 0 * std::numeric_limits<T>::infinity() || x * y != std::numeric_limits<T>::infinity() * 0))
 		{
 			return std::numeric_limits<T>::quiet_NaN();
 		}
