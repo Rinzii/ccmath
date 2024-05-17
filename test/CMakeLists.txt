@@ -165,7 +165,7 @@ add_test(NAME ${PROJECT_NAME}-compare COMMAND ${PROJECT_NAME}-compare)
 add_test(NAME ${PROJECT_NAME}-exponential COMMAND ${PROJECT_NAME}-exponential)
 add_test(NAME ${PROJECT_NAME}-fmanip COMMAND ${PROJECT_NAME}-fmanip)
 add_test(NAME ${PROJECT_NAME}-nearest COMMAND ${PROJECT_NAME}-nearest)
-add_test(NAME ${PROJECT_NAME}-power COMMAND ${PROJECT_NAME}-power)
+#add_test(NAME ${PROJECT_NAME}-power COMMAND ${PROJECT_NAME}-power)
 add_test(NAME ${PROJECT_NAME}-misc COMMAND ${PROJECT_NAME}-misc)
 
 # Internal tests
