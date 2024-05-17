@@ -223,7 +223,7 @@ namespace ccm::support
 
 #if CCM_HAS_BUILTIN(__builtin_popcountg)
 	template <typename T>
-	[[nodiscard]] LIBC_INLINE constexpr cpp::enable_if_t<cpp::is_unsigned_v<T>, int> popcount(T value)
+	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> popcount(T value)
 	{
 		return __builtin_popcountg(value);
 	}
