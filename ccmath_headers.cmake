@@ -71,6 +71,9 @@ set(ccmath_internal_headers
 ##########################################
 
 set(ccmath_math_basic_impl_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/fma_float_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/fma_double_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/fma_ldouble_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/nan_float_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/nan_double_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/remquo_float_impl.hpp
