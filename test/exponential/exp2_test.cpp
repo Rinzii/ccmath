@@ -43,6 +43,13 @@ TEST(CcmathExponentialTests, Exp2_Double_EdgeCases)
 	EXPECT_EQ(ccm::exp2(std::numeric_limits<double>::infinity()), std::exp2(std::numeric_limits<double>::infinity()));
 	EXPECT_EQ(ccm::exp2(-std::numeric_limits<double>::infinity()), std::exp2(-std::numeric_limits<double>::infinity()));
 
+	EXPECT_EQ(ccm::exp2(std::numeric_limits<double>::min()), std::exp2(std::numeric_limits<double>::min()));
+	EXPECT_EQ(ccm::exp2(-std::numeric_limits<double>::min()), std::exp2(-std::numeric_limits<double>::min()));
+	EXPECT_EQ(ccm::exp2(std::numeric_limits<double>::max()), std::exp2(std::numeric_limits<double>::max()));
+	EXPECT_EQ(ccm::exp2(-std::numeric_limits<double>::max()), std::exp2(-std::numeric_limits<double>::max()));
+	EXPECT_EQ(ccm::exp2(std::numeric_limits<double>::denorm_min()), std::exp2(std::numeric_limits<double>::denorm_min()));
+	EXPECT_EQ(ccm::exp2(-std::numeric_limits<double>::denorm_min()), std::exp2(-std::numeric_limits<double>::denorm_min()));
+
 	bool testCcmExp2ThatNanReturnsNan = std::isnan(ccm::exp2(std::numeric_limits<double>::quiet_NaN()));
 	bool testStdExp2ThatNanReturnsNan = std::isnan(std::exp2(std::numeric_limits<double>::quiet_NaN()));
 	bool testCcmExp2ThatNanIsPositive = std::signbit(ccm::exp2(std::numeric_limits<double>::quiet_NaN()));
