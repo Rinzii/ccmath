@@ -39,9 +39,6 @@ namespace ccm
 		if constexpr (std::is_same_v<T, long double>) { return __builtin_fmal(x, y, z); }
 		return static_cast<T>(__builtin_fmal(x, y, z));
 		#else
-
-		fputil::FPBits<double> test(10.0);
-
 		if (CCM_UNLIKELY(x == 0 || y == 0 || z == 0)) { return x * y + z; }
 
 		// If x is zero and y is infinity, or if y is zero and x is infinity and...
