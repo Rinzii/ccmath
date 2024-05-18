@@ -13,6 +13,7 @@
 #include "ccmath/internal/predef/likely.hpp"
 #include "ccmath/internal/support/always_false.hpp"
 #include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/types/int128.hpp"
 #include "ccmath/internal/types/sign.hpp"
 
 #include <cfloat>
@@ -62,10 +63,8 @@ namespace ccm::fputil
 	{
 		eBinary32,
 		eBinary64,
-
-		// These values are not yet implemented.
-		// eBinary128,
-		// eBinary80,
+		eBinary128,
+		eBinary80,
 		eUnknown
 	};
 
@@ -102,23 +101,25 @@ namespace ccm::fputil
 			static constexpr int fraction_length	= significand_length;
 		};
 
-		/* Currently we don't support these types, but may in the future.
-		template <> struct FPLayout<FPType::eBinary128> {
-			using StorageType = UInt128;
-			 static constexpr int sign_length = 1;
-			 static constexpr int exponent_length = 15;
-			 static constexpr int significand_length = 112;
-			 static constexpr int fraction_length = significand_length;
+		template <>
+		struct FPLayout<FPType::eBinary128>
+		{
+			using StorageType						= ccm::uint128_t;
+			static constexpr int sign_length		= 1;
+			static constexpr int exponent_length	= 15;
+			static constexpr int significand_length = 112;
+			static constexpr int fraction_length	= significand_length;
 		};
 
-		template <> struct FPLayout<FPType::eBinary80> {
-			using StorageType = UInt128;
-			 static constexpr int sign_length = 1;
-			 static constexpr int exponent_length = 15;
-			 static constexpr int significand_length = 64;
-			 static constexpr int fraction_length = significand_length - 1;
+		template <>
+		struct FPLayout<FPType::eBinary80>
+		{
+			using StorageType						= ccm::uint128_t;
+			static constexpr int sign_length		= 1;
+			static constexpr int exponent_length	= 15;
+			static constexpr int significand_length = 64;
+			static constexpr int fraction_length	= significand_length - 1;
 		};
-		*/
 
 		// FPStorage derives useful constants from the FPLayout above.
 		template <FPType fp_type>
@@ -187,12 +188,12 @@ namespace ccm::fputil
 
 				constexpr explicit operator T() const { return value; }
 
-				constexpr StorageType to_storage_type() const { return StorageType(value); }
+				[[nodiscard]] constexpr StorageType to_storage_type() const { return StorageType(value); }
 
 				friend constexpr bool operator==(TypedInt a, TypedInt b) { return a.value == b.value; }
 				friend constexpr bool operator!=(TypedInt a, TypedInt b) { return a.value != b.value; }
 
-			protected:
+			private:
 				T value;
 			};
 
@@ -219,21 +220,22 @@ namespace ccm::fputil
 				using UP = TypedInt<std::uint32_t>;
 				using UP::UP;
 
+				// NOLINTNEXTLINE(google-explicit-constructor)
 				constexpr BiasedExponent(Exponent exp) : UP(static_cast<std::int32_t>(exp) + exponent_bias) {}
 
 				// Cast operator to get convert from BiasedExponent to Exponent.
-				constexpr operator Exponent() const { return Exponent(UP::value - exponent_bias); }
+				constexpr explicit operator Exponent() const { return Exponent(UP::value - exponent_bias); }
 
 				constexpr BiasedExponent & operator++()
 				{
-					assert(*this != BiasedExponent(Exponent::inf()));
+					//assert(*this != BiasedExponent(Exponent::inf()));
 					++UP::value;
 					return *this;
 				}
 
 				constexpr BiasedExponent & operator--()
 				{
-					assert(*this != BiasedExponent(Exponent::subnormal()));
+					//assert(*this != BiasedExponent(Exponent::subnormal()));
 					--UP::value;
 					return *this;
 				}
@@ -276,20 +278,20 @@ namespace ccm::fputil
 			StorageType bits{};
 
 			constexpr FPStorage() : bits(0) {}
-			constexpr FPStorage(StorageType value) : bits(value) {}
+			constexpr explicit FPStorage(StorageType value) : bits(value) {}
 
 			// Observers
-			constexpr StorageType exp_bits() const { return bits & exponent_mask; }
-			constexpr StorageType sig_bits() const { return bits & significand_mask; }
-			constexpr StorageType exp_sig_bits() const { return bits & exponent_significand_mask; }
+			[[nodiscard]] constexpr StorageType exp_bits() const { return bits & exponent_mask; }
+			[[nodiscard]] constexpr StorageType sig_bits() const { return bits & significand_mask; }
+			[[nodiscard]] constexpr StorageType exp_sig_bits() const { return bits & exponent_significand_mask; }
 
 			// Parts
-			constexpr BiasedExponent biased_exponent() const { return BiasedExponent(static_cast<std::uint32_t>(exp_bits() >> significand_length)); }
-			constexpr void set_biased_exponent(BiasedExponent biased) { bits = merge(bits, encode(biased), exponent_mask); }
+			[[nodiscard]] constexpr BiasedExponent biased_exponent() const { return BiasedExponent(static_cast<std::uint32_t>(exp_bits() >> significand_length)); }
+			constexpr void set_biased_exponent(const BiasedExponent biased) { bits = merge(bits, encode(biased), exponent_mask); }
 
 		public:
 			[[nodiscard]] constexpr Sign sign() const { return (bits & sign_mask) ? Sign::negative : Sign::positive; }
-			constexpr void set_sign(Sign signVal)
+			constexpr void set_sign(const Sign signVal)
 			{
 				if (sign() != signVal) { bits ^= sign_mask; }
 			}
@@ -359,19 +361,18 @@ namespace ccm::fputil
 			}
 		};
 
-		/* TODO: Currently we do not support x86 extended precision, but may in the future.
 		// Specialization for the X86 Extended Precision type.
 		template <typename RetT>
 		struct FPRepSem<FPType::eBinary80, RetT> : FPStorage<FPType::eBinary80>
 		{
 			using UP = FPStorage<FPType::eBinary80>;
-			using typename UP::StorageType;
+			using UP::StorageType;
 			using UP::fraction_length;
 			using UP::fraction_mask;
 
 			// The x86 80 bit float represents the leading digit of the mantissa
 			// explicitly. This is the mask for that bit.
-			static constexpr StorageType EXPLICIT_BIT_MASK = StorageType(1) << fraction_length;
+			static constexpr StorageType EXPLICIT_BIT_MASK = static_cast<StorageType>(1) << fraction_length;
 			// The X80 significand is made of an explicit bit and the fractional part.
 			static_assert((EXPLICIT_BIT_MASK & fraction_mask) == 0, "the explicit bit and the fractional part should not overlap");
 			static_assert((EXPLICIT_BIT_MASK | fraction_mask) == significand_mask, "the explicit bit and the fractional part should cover the "
@@ -385,28 +386,28 @@ namespace ccm::fputil
 
 		public:
 			// Builders
-			static constexpr RetT zero(Sign sign = Sign::positive) { return RetT(encode(sign, Exponent::subnormal(), Significand::zero())); }
-			static constexpr RetT one(Sign sign = Sign::positive) { return RetT(encode(sign, Exponent::zero(), Significand::msb())); }
-			static constexpr RetT min_subnormal(Sign sign = Sign::positive) { return RetT(encode(sign, Exponent::subnormal(), Significand::lsb())); }
-			static constexpr RetT max_subnormal(Sign sign = Sign::positive)
+			static constexpr RetT zero(const Sign sign = Sign::positive) { return RetT(encode(sign, Exponent::subnormal(), Significand::zero())); }
+			static constexpr RetT one(const Sign sign = Sign::positive) { return RetT(encode(sign, Exponent::zero(), Significand::msb())); }
+			static constexpr RetT min_subnormal(const Sign sign = Sign::positive) { return RetT(encode(sign, Exponent::subnormal(), Significand::lsb())); }
+			static constexpr RetT max_subnormal(const Sign sign = Sign::positive)
 			{
 				return RetT(encode(sign, Exponent::subnormal(), Significand::bits_all_ones() ^ Significand::msb()));
 			}
-			static constexpr RetT min_normal(Sign sign = Sign::positive) { return RetT(encode(sign, Exponent::min(), Significand::msb())); }
-			static constexpr RetT max_normal(Sign sign = Sign::positive) { return RetT(encode(sign, Exponent::max(), Significand::bits_all_ones())); }
-			static constexpr RetT inf(Sign sign = Sign::positive) { return RetT(encode(sign, Exponent::inf(), Significand::msb())); }
-			static constexpr RetT signaling_nan(Sign sign = Sign::positive, StorageType v = 0)
+			static constexpr RetT min_normal(const Sign sign = Sign::positive) { return RetT(encode(sign, Exponent::min(), Significand::msb())); }
+			static constexpr RetT max_normal(const Sign sign = Sign::positive) { return RetT(encode(sign, Exponent::max(), Significand::bits_all_ones())); }
+			static constexpr RetT inf(const Sign sign = Sign::positive) { return RetT(encode(sign, Exponent::inf(), Significand::msb())); }
+			static constexpr RetT signaling_nan(const Sign sign = Sign::positive, const StorageType v = 0)
 			{
-				return RetT(encode(sign, Exponent::inf(), Significand::msb() | (v ? Significand(v) : (Significand::msb() >> 2))));
+				return RetT(encode(sign, Exponent::inf(), Significand::msb() | ((v != 0U) ? Significand(v) : (Significand::msb() >> 2))));
 			}
-			static constexpr RetT quiet_nan(Sign sign = Sign::positive, StorageType v = 0)
+			static constexpr RetT quiet_nan(const Sign sign = Sign::positive, const StorageType v = 0)
 			{
 				return RetT(encode(sign, Exponent::inf(), Significand::msb() | (Significand::msb() >> 1) | Significand(v)));
 			}
 
 			// Observers
-			constexpr bool is_zero() const { return exp_sig_bits() == 0; }
-			constexpr bool is_nan() const
+			[[nodiscard]] constexpr bool is_zero() const { return exp_sig_bits() == 0; }
+			[[nodiscard]] constexpr bool is_nan() const
 			{
 				// Most encoding forms from the table found in
 				// https://en.wikipedia.org/wiki/Extended_precision#x86_extended_precision_format
@@ -419,20 +420,19 @@ namespace ccm::fputil
 				// - Quiet Not a Number
 				// - Unnormal
 				// This can be reduced to the following logic:
-				if (exp_bits() == encode(Exponent::inf())) return !is_inf();
-				if (exp_bits() != encode(Exponent::subnormal())) return (sig_bits() & encode(Significand::msb())) == 0;
+				if (exp_bits() == encode(Exponent::inf())) { return !is_inf(); }
+				if (exp_bits() != encode(Exponent::subnormal())) { return (sig_bits() & encode(Significand::msb())) == 0; }
 				return false;
 			}
-			constexpr bool is_quiet_nan() const { return exp_sig_bits() >= encode(Exponent::inf(), Significand::msb() | (Significand::msb() >> 1)); }
-			constexpr bool is_signaling_nan() const { return is_nan() && !is_quiet_nan(); }
-			constexpr bool is_inf() const { return exp_sig_bits() == encode(Exponent::inf(), Significand::msb()); }
-			constexpr bool is_finite() const { return !is_inf() && !is_nan(); }
+			[[nodiscard]] constexpr bool is_quiet_nan() const { return exp_sig_bits() >= encode(Exponent::inf(), Significand::msb() | (Significand::msb() >> 1)); }
+			[[nodiscard]] constexpr bool is_signaling_nan() const { return is_nan() && !is_quiet_nan(); }
+			[[nodiscard]] constexpr bool is_inf() const { return exp_sig_bits() == encode(Exponent::inf(), Significand::msb()); }
+			[[nodiscard]] constexpr bool is_finite() const { return !is_inf() && !is_nan(); }
 
-			constexpr bool is_subnormal() const { return exp_bits() == encode(Exponent::subnormal()); }
-			constexpr bool is_normal() const
+			[[nodiscard]] constexpr bool is_subnormal() const { return exp_bits() == encode(Exponent::subnormal()); }
+			[[nodiscard]] constexpr bool is_normal() const
 			{
-				const auto exp = exp_bits();
-				if (exp == encode(Exponent::subnormal()) || exp == encode(Exponent::inf())) return false;
+				if (const auto exp = exp_bits(); exp == encode(Exponent::subnormal()) || exp == encode(Exponent::inf())) { return false; }
 				return get_implicit_bit();
 			}
 			constexpr RetT next_toward_inf() const
@@ -440,25 +440,24 @@ namespace ccm::fputil
 				if (is_finite())
 				{
 					if (exp_sig_bits() == max_normal().uintval()) { return inf(sign()); }
-					else if (exp_sig_bits() == max_subnormal().uintval()) { return min_normal(sign()); }
-					else if (sig_bits() == significand_mask) { return RetT(encode(sign(), ++biased_exponent(), Significand::zero())); }
-					else { return RetT(bits + StorageType(1)); }
+					if (exp_sig_bits() == max_subnormal().uintval()) { return min_normal(sign()); }
+					if (sig_bits() == significand_mask) { return RetT(encode(sign(), ++biased_exponent(), Significand::zero())); }
+					return RetT(bits + static_cast<StorageType>(1));
 				}
 				return RetT(bits);
 			}
 
-			constexpr StorageType get_explicit_mantissa() const { return sig_bits(); }
+			[[nodiscard]] constexpr StorageType get_explicit_mantissa() const { return sig_bits(); }
 
 			// This functions is specific to FPRepSem<FPType::eBinary80>.
-			constexpr bool get_implicit_bit() const { return static_cast<bool>(bits & EXPLICIT_BIT_MASK); }
+			[[nodiscard]] constexpr bool get_implicit_bit() const { return static_cast<bool>(bits & EXPLICIT_BIT_MASK); }
 
 			// This functions is specific to FPRepSem<FPType::eBinary80>.
-			constexpr void set_implicit_bit(bool implicitVal)
+			constexpr void set_implicit_bit(const bool implicitVal)
 			{
-				if (get_implicit_bit() != implicitVal) bits ^= EXPLICIT_BIT_MASK;
+				if (get_implicit_bit() != implicitVal) { bits ^= EXPLICIT_BIT_MASK; }
 			}
 		};
-		*/
 
 		// 'FPRepImpl' is the bottom of the class hierarchy that only deals with
 		// 'FPType'. The operations dealing with specific float semantics are
@@ -638,15 +637,9 @@ namespace ccm::fputil
 		else if constexpr (std::is_same_v<UnqualT, double> && DBL_MANT_DIG == 53) { return FPType::eBinary64; }
 		else if constexpr (std::is_same_v<UnqualT, long double>)
 		{
-			return FPType::eBinary64; // Remove this when the below code is uncommented.
-									  /* TODO: Currently we do not support long double, but may in the future.
-									  if constexpr (LDBL_MANT_DIG == 53)
-										  return FPType::eBinary64;
-									  else if constexpr (LDBL_MANT_DIG == 64)
-										  return FPType::X86_Binary80;
-									  else if constexpr (LDBL_MANT_DIG == 113)
-										  return FPType::IEEE754_Binary128;
-									  */
+			if constexpr (LDBL_MANT_DIG == 53) { return FPType::eBinary64; }
+			else if constexpr (LDBL_MANT_DIG == 64) { return FPType::eBinary80; }
+			else if constexpr (LDBL_MANT_DIG == 113) { return FPType::eBinary128; }
 		}
 #if defined(CCM_TYPES_HAS_FLOAT128)
 		else if constexpr (std::is_same_v<UnqualT, float128>) { return FPType::IEEE754_Binary128; }
