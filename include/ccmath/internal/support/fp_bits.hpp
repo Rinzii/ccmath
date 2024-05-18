@@ -12,10 +12,10 @@
 
 #include "ccmath/internal/types/sign.hpp"
 #include "ccmath/internal/predef/likely.hpp"
-#include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/always_false.hpp"
 #include "ccmath/internal/support/bits.hpp"
 
+#include <cfloat>
 #include <climits>
 #include <cstdint>
 #include <type_traits>
@@ -269,14 +269,14 @@ namespace ccm::fputil
 
 				constexpr BiasedExponent & operator++()
 				{
-					LIBC_ASSERT(*this != BiasedExponent(Exponent::inf()));
+					assert(*this != BiasedExponent(Exponent::inf()));
 					++UP::value;
 					return *this;
 				}
 
 				constexpr BiasedExponent & operator--()
 				{
-					LIBC_ASSERT(*this != BiasedExponent(Exponent::subnormal()));
+					assert(*this != BiasedExponent(Exponent::subnormal()));
 					--UP::value;
 					return *this;
 				}
@@ -678,9 +678,9 @@ namespace ccm::fputil
 	static constexpr FPType get_fp_type()
 	{
 		using UnqualT = std::remove_cv_t<T>;
-		if constexpr (std::is_same_v<UnqualT, float> && __FLT_MANT_DIG__ == 24)
+		if constexpr (std::is_same_v<UnqualT, float> && FLT_MANT_DIG == 24)
 			return FPType::IEEE754_Binary32;
-		else if constexpr (std::is_same_v<UnqualT, double> && __DBL_MANT_DIG__ == 53)
+		else if constexpr (std::is_same_v<UnqualT, double> && DBL_MANT_DIG == 53)
 			return FPType::IEEE754_Binary64;
 		else if constexpr (std::is_same_v<UnqualT, long double>)
 		{
