@@ -7,6 +7,7 @@
  */
 
 // Large parts of this file is directly copied from LLVM and modified to fit the needs of ccmath.
+// https://github.com/llvm/llvm-project/
 
 #pragma once
 
@@ -20,7 +21,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace ccm::fputil
+namespace ccm::support
 {
 
 	// Create a bitmask with the count right-most bits set to 1, and all other bits
@@ -556,8 +557,7 @@ namespace ccm::fputil
 			else if constexpr (std::is_same_v<Unqual, StorageType>) { UP::bits = x; }
 			else
 			{
-				// We don't want accidental type promotions/conversions, so we require
-				// exact type match.
+				// To avoid accidental type promotion or conversion we require exact type match.
 				static_assert(ccm::support::always_false<XType>);
 			}
 		}
@@ -566,4 +566,4 @@ namespace ccm::fputil
 		constexpr T get_val() const { return support::bit_cast<T>(UP::bits); }
 	};
 
-} // namespace ccm::fputil
+} // namespace ccm::support
