@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include "ccmath/internal/types/sign.hpp"
 #include "ccmath/internal/predef/likely.hpp"
 #include "ccmath/internal/support/always_false.hpp"
 #include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/types/sign.hpp"
 
 #include <cfloat>
 #include <climits>
@@ -60,58 +60,14 @@ namespace ccm::fputil
 	// The supported floating point types.
 	enum class FPType : std::uint8_t
 	{
-		IEEE754_Binary32,
-		IEEE754_Binary64,
+		eBinary32,
+		eBinary64,
 
 		// These values are not yet implemented.
-		// IEEE754_Binary128,
-		// X86_Binary80,
+		// eBinary128,
+		// eBinary80,
+		eUnknown
 	};
-
-	// The classes hierarchy is as follows:
-	//
-	//             ┌───────────────────┐
-	//             │ FPLayout<FPType>  │
-	//             └─────────▲─────────┘
-	//                       │
-	//             ┌─────────┴─────────┐
-	//             │ FPStorage<FPType> │
-	//             └─────────▲─────────┘
-	//                       │
-	//          ┌────────────┴─────────────┐
-	//          │                          │
-	// ┌────────┴─────────┐ ┌──────────────┴──────────────────┐
-	// │ FPRepSem<FPType> │ │  FPRepSem<FPType::X86_Binary80  │
-	// └────────▲─────────┘ └──────────────▲──────────────────┘
-	//          │                          │
-	//          └────────────┬─────────────┘
-	//                       │
-	//               ┌───────┴───────┐
-	//               │  FPRepImpl<T> │
-	//               └───────▲───────┘
-	//                       │
-	//              ┌────────┴────────┐
-	//        ┌─────┴─────┐     ┌─────┴─────┐
-	//        │  FPRep<T> │     │ FPBits<T> │
-	//        └───────────┘     └───────────┘
-	//
-	// - 'FPLayout' defines only a few constants, namely the 'StorageType' and
-	//   length of the sign, the exponent, fraction and significand parts.
-	// - 'FPStorage' builds more constants on top of those from 'FPLayout' like
-	//   exponent bias and masks. It also holds the bit representation of the
-	//   floating point as a 'StorageType' type and defines tools to assemble or
-	//   test these parts.
-	// - 'FPRepSem' defines functions to interact semantically with the floating
-	//   point representation. The default implementation is the one for 'IEEE754',
-	//   a specialization is provided for X86 Extended Precision.
-	// - 'FPRepImpl' derives from 'FPRepSem' and adds functions that are common to
-	//   all implementations or build on the ones in 'FPRepSem'.
-	// - 'FPRep' exposes all functions from 'FPRepImpl' and returns 'FPRep'
-	//   instances when using Builders (static functions to create values).
-	// - 'FPBits' exposes all the functions from 'FPRepImpl' but operates on the
-	//   native C++ floating point type instead of 'FPType'. An additional 'get_val'
-	//   function allows getting the C++ floating point type value back. Builders
-	//   called from 'FPBits' return 'FPBits' instances.
 
 	namespace internal
 	{
@@ -127,7 +83,7 @@ namespace ccm::fputil
 		};
 
 		template <>
-		struct FPLayout<FPType::IEEE754_Binary32>
+		struct FPLayout<FPType::eBinary32>
 		{
 			using StorageType				  = std::uint32_t;
 			static constexpr int SIGN_LEN	  = 1;
@@ -137,7 +93,7 @@ namespace ccm::fputil
 		};
 
 		template <>
-		struct FPLayout<FPType::IEEE754_Binary64>
+		struct FPLayout<FPType::eBinary64>
 		{
 			using StorageType				  = std::uint64_t;
 			static constexpr int SIGN_LEN	  = 1;
@@ -147,7 +103,7 @@ namespace ccm::fputil
 		};
 
 		/* Currently we don't support these types, but may in the future.
-		template <> struct FPLayout<FPType::IEEE754_Binary128> {
+		template <> struct FPLayout<FPType::eBinary128> {
 			using StorageType = UInt128;
 			 static constexpr int SIGN_LEN = 1;
 			 static constexpr int EXP_LEN = 15;
@@ -155,7 +111,7 @@ namespace ccm::fputil
 			 static constexpr int FRACTION_LEN = SIG_LEN;
 		};
 
-		template <> struct FPLayout<FPType::X86_Binary80> {
+		template <> struct FPLayout<FPType::eBinary80> {
 			using StorageType = UInt128;
 			 static constexpr int SIGN_LEN = 1;
 			 static constexpr int EXP_LEN = 15;
@@ -166,7 +122,7 @@ namespace ccm::fputil
 
 		// FPStorage derives useful constants from the FPLayout above.
 		template <FPType fp_type>
-		struct FPStorage : public FPLayout<fp_type>
+		struct FPStorage : FPLayout<fp_type>
 		{
 			using UP = FPLayout<fp_type>;
 
@@ -221,6 +177,7 @@ namespace ccm::fputil
 			// A stongly typed integer that prevents mixing and matching integers with
 			// different semantics.
 			template <typename T>
+			// NOLINTNEXTLINE(hicpp-special-member-functions,cppcoreguidelines-special-member-functions)
 			struct TypedInt
 			{
 				using value_type = T;
@@ -282,12 +239,7 @@ namespace ccm::fputil
 				}
 			};
 
-			// An opaque type to store a floating point significand.
-			// We define special values but it is valid to create arbitrary values as long
-			// as they are in the range [zero, bits_all_ones].
-			// Note that the semantics of the Significand are implementation dependent.
-			// Values greater than bits_all_ones are truncated.
-			struct Significand : public TypedInt<StorageType>
+			struct Significand : TypedInt<StorageType>
 			{
 				using UP = TypedInt<StorageType>;
 				using UP::UP;
@@ -316,7 +268,7 @@ namespace ccm::fputil
 
 			static constexpr StorageType encode(Sign sign, BiasedExponent exp, Significand sig)
 			{
-				if (sign.is_neg()) return SIGN_MASK | encode(exp, sig);
+				if (sign.is_neg()) { return SIGN_MASK | encode(exp, sig); }
 				return encode(exp, sig);
 			}
 
@@ -336,10 +288,10 @@ namespace ccm::fputil
 			constexpr void set_biased_exponent(BiasedExponent biased) { bits = merge(bits, encode(biased), EXP_MASK); }
 
 		public:
-			constexpr Sign sign() const { return (bits & SIGN_MASK) ? Sign::negative : Sign::positive; }
+			[[nodiscard]] constexpr Sign sign() const { return (bits & SIGN_MASK) ? Sign::negative : Sign::positive; }
 			constexpr void set_sign(Sign signVal)
 			{
-				if (sign() != signVal) bits ^= SIGN_MASK;
+				if (sign() != signVal) { bits ^= SIGN_MASK; }
 			}
 		};
 
@@ -383,18 +335,18 @@ namespace ccm::fputil
 			}
 
 			// Observers
-			constexpr bool is_zero() const { return exp_sig_bits() == 0; }
-			constexpr bool is_nan() const { return exp_sig_bits() > encode(Exponent::inf(), Significand::zero()); }
-			constexpr bool is_quiet_nan() const { return exp_sig_bits() >= encode(Exponent::inf(), Significand::msb()); }
-			constexpr bool is_signaling_nan() const { return is_nan() && !is_quiet_nan(); }
-			constexpr bool is_inf() const { return exp_sig_bits() == encode(Exponent::inf(), Significand::zero()); }
-			constexpr bool is_finite() const { return exp_bits() != encode(Exponent::inf()); }
+			[[nodiscard]] constexpr bool is_zero() const { return exp_sig_bits() == 0; }
+			[[nodiscard]] constexpr bool is_nan() const { return exp_sig_bits() > encode(Exponent::inf(), Significand::zero()); }
+			[[nodiscard]] constexpr bool is_quiet_nan() const { return exp_sig_bits() >= encode(Exponent::inf(), Significand::msb()); }
+			[[nodiscard]] constexpr bool is_signaling_nan() const { return is_nan() && !is_quiet_nan(); }
+			[[nodiscard]] constexpr bool is_inf() const { return exp_sig_bits() == encode(Exponent::inf(), Significand::zero()); }
+			[[nodiscard]] constexpr bool is_finite() const { return exp_bits() != encode(Exponent::inf()); }
 
-			constexpr bool is_subnormal() const { return exp_bits() == encode(Exponent::subnormal()); }
-			constexpr bool is_normal() const { return is_finite() && !is_subnormal(); }
+			[[nodiscard]] constexpr bool is_subnormal() const { return exp_bits() == encode(Exponent::subnormal()); }
+			[[nodiscard]] constexpr bool is_normal() const { return is_finite() && !is_subnormal(); }
 			constexpr RetT next_toward_inf() const
 			{
-				if (is_finite()) return RetT(bits + StorageType(1));
+				if (is_finite()) { return RetT(bits + StorageType(1)); }
 				return RetT(bits);
 			}
 
@@ -402,7 +354,7 @@ namespace ccm::fputil
 			// value is a valid normal number.
 			constexpr StorageType get_explicit_mantissa() const
 			{
-				if (is_subnormal()) return sig_bits();
+				if (is_subnormal()) { return sig_bits(); }
 				return (StorageType(1) << UP::SIG_LEN) | sig_bits();
 			}
 		};
@@ -410,9 +362,9 @@ namespace ccm::fputil
 		/* TODO: Currently we do not support x86 extended precision, but may in the future.
 		// Specialization for the X86 Extended Precision type.
 		template <typename RetT>
-		struct FPRepSem<FPType::X86_Binary80, RetT> : public FPStorage<FPType::X86_Binary80>
+		struct FPRepSem<FPType::eBinary80, RetT> : FPStorage<FPType::eBinary80>
 		{
-			using UP = FPStorage<FPType::X86_Binary80>;
+			using UP = FPStorage<FPType::eBinary80>;
 			using typename UP::StorageType;
 			using UP::FRACTION_LEN;
 			using UP::FRACTION_MASK;
@@ -497,10 +449,10 @@ namespace ccm::fputil
 
 			constexpr StorageType get_explicit_mantissa() const { return sig_bits(); }
 
-			// This functions is specific to FPRepSem<FPType::X86_Binary80>.
+			// This functions is specific to FPRepSem<FPType::eBinary80>.
 			constexpr bool get_implicit_bit() const { return static_cast<bool>(bits & EXPLICIT_BIT_MASK); }
 
-			// This functions is specific to FPRepSem<FPType::X86_Binary80>.
+			// This functions is specific to FPRepSem<FPType::eBinary80>.
 			constexpr void set_implicit_bit(bool implicitVal)
 			{
 				if (get_implicit_bit() != implicitVal) bits ^= EXPLICIT_BIT_MASK;
@@ -520,7 +472,7 @@ namespace ccm::fputil
 		//
 		// When we don't care about specific C++ floating point type we can use
 		// 'FPRep' and specify the 'FPType' directly.
-		// FPRep<FPType::IEEE754_Binary32:>::zero() // returns an FPRep<>
+		// FPRep<FPType::eBinary32:>::zero() // returns an FPRep<>
 		template <FPType fp_type, typename RetT>
 		struct FPRepImpl : FPRepSem<fp_type, RetT>
 		{
@@ -587,15 +539,18 @@ namespace ccm::fputil
 			using UP::is_zero;
 			using UP::next_toward_inf;
 			using UP::sign;
-			constexpr bool is_inf_or_nan() const { return !is_finite(); }
-			constexpr bool is_neg() const { return sign().is_neg(); }
-			constexpr bool is_pos() const { return sign().is_pos(); }
+			[[nodiscard]] constexpr bool is_inf_or_nan() const { return !is_finite(); }
+			[[nodiscard]] constexpr bool is_neg() const { return sign().is_neg(); }
+			[[nodiscard]] constexpr bool is_pos() const { return sign().is_pos(); }
 
-			constexpr uint16_t get_biased_exponent() const { return static_cast<uint16_t>(static_cast<std::uint32_t>(UP::biased_exponent())); }
+			[[nodiscard]] constexpr std::uint16_t get_biased_exponent() const
+			{
+				return static_cast<std::uint16_t>(static_cast<std::uint32_t>(UP::biased_exponent()));
+			}
 
 			constexpr void set_biased_exponent(StorageType biased) { UP::set_biased_exponent(BiasedExponent(static_cast<std::int32_t>(biased))); }
 
-			constexpr int get_exponent() const { return static_cast<std::int32_t>(Exponent(UP::biased_exponent())); }
+			[[nodiscard]] constexpr int get_exponent() const { return static_cast<std::int32_t>(Exponent(UP::biased_exponent())); }
 
 			// If the number is subnormal, the exponent is treated as if it were the
 			// minimum exponent for a normal number. This is to keep continuity between
@@ -603,11 +558,11 @@ namespace ccm::fputil
 			// values are calculated from the exponent, since just subtracting the bias
 			// will give a slightly incorrect result. Additionally, zero has an exponent
 			// of zero, and that should actually be treated as zero.
-			constexpr int get_explicit_exponent() const
+			[[nodiscard]] constexpr int get_explicit_exponent() const
 			{
 				Exponent exponent(UP::biased_exponent());
-				if (is_zero()) exponent = Exponent::zero();
-				if (exponent == Exponent::subnormal()) exponent = Exponent::min();
+				if (is_zero()) { exponent = Exponent::zero(); }
+				if (exponent == Exponent::subnormal()) { exponent = Exponent::min(); }
 				return static_cast<std::int32_t>(exponent);
 			}
 
@@ -662,7 +617,7 @@ namespace ccm::fputil
 		// A generic class to manipulate floating point formats.
 		// It derives its functionality to FPRepImpl above.
 		template <FPType fp_type>
-		struct FPRep : public FPRepImpl<fp_type, FPRep<fp_type>>
+		struct FPRep : FPRepImpl<fp_type, FPRep<fp_type>>
 		{
 			using UP		  = FPRepImpl<fp_type, FPRep<fp_type>>;
 			using StorageType = typename UP::StorageType;
@@ -678,59 +633,60 @@ namespace ccm::fputil
 	static constexpr FPType get_fp_type()
 	{
 		using UnqualT = std::remove_cv_t<T>;
-		if constexpr (std::is_same_v<UnqualT, float> && FLT_MANT_DIG == 24)
-			return FPType::IEEE754_Binary32;
-		else if constexpr (std::is_same_v<UnqualT, double> && DBL_MANT_DIG == 53)
-			return FPType::IEEE754_Binary64;
+		// NOLINTBEGIN(bugprone-branch-clone)
+		if constexpr (std::is_same_v<UnqualT, float> && FLT_MANT_DIG == 24) { return FPType::eBinary32; }
+		else if constexpr (std::is_same_v<UnqualT, double> && DBL_MANT_DIG == 53) { return FPType::eBinary64; }
 		else if constexpr (std::is_same_v<UnqualT, long double>)
 		{
-			return FPType::IEEE754_Binary64;
+			return FPType::eBinary64;
 			/* TODO: Currently we do not support long double, but may in the future.
-			if constexpr (__LDBL_MANT_DIG__ == 53)
-				return FPType::IEEE754_Binary64;
-			else if constexpr (__LDBL_MANT_DIG__ == 64)
+			if constexpr (LDBL_MANT_DIG == 53)
+				return FPType::eBinary64;
+			else if constexpr (LDBL_MANT_DIG == 64)
 				return FPType::X86_Binary80;
-			else if constexpr (__LDBL_MANT_DIG__ == 113)
+			else if constexpr (LDBL_MANT_DIG == 113)
 				return FPType::IEEE754_Binary128;
 			*/
 		}
 #if defined(CCM_TYPES_HAS_FLOAT128)
-		else if constexpr (std::is_same_v<UnqualT, float128>)
-			return FPType::IEEE754_Binary128;
+		else if constexpr (std::is_same_v<UnqualT, float128>) { return FPType::IEEE754_Binary128; }
 #endif
 		else
+		{
 			static_assert(ccm::support::always_false<UnqualT>, "Unsupported type");
+			return FPType::eUnknown;
+		}
+		// NOLINTEND(bugprone-branch-clone)
 	}
 
 	// A generic class to manipulate C++ floating point formats.
 	// It derives its functionality to FPRepImpl above.
 	template <typename T>
-	struct FPBits final : public internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>
+	struct FPBits final : internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>
 	{
 		static_assert(std::is_floating_point_v<T>, "FPBits instantiated with invalid type.");
 		using UP		  = internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>;
-  using StorageType = typename UP::StorageType;
+		using StorageType = typename UP::StorageType;
 
-  // Constructors.
-   constexpr FPBits() = default;
+		// Constructors.
+		constexpr FPBits() = default;
 
-  template <typename XType>  constexpr explicit FPBits(XType x) {
-    using Unqual = typename std::remove_cv_t<XType>;
-    if constexpr (std::is_same_v<Unqual, T>) {
-      UP::bits = support::bit_cast<StorageType>(x);
-    } else if constexpr (std::is_same_v<Unqual, StorageType>) {
-      UP::bits = x;
-    } else {
-      // We don't want accidental type promotions/conversions, so we require
-      // exact type match.
-      static_assert(ccm::support::always_false<XType>);
-    }
-  }
+		template <typename XType>
+		constexpr explicit FPBits(XType x)
+		{
+			using Unqual = std::remove_cv_t<XType>;
+			if constexpr (std::is_same_v<Unqual, T>) { UP::bits = support::bit_cast<StorageType>(x); }
+			else if constexpr (std::is_same_v<Unqual, StorageType>) { UP::bits = x; }
+			else
+			{
+				// We don't want accidental type promotions/conversions, so we require
+				// exact type match.
+				static_assert(ccm::support::always_false<XType>);
+			}
+		}
 
-  // Floating-point conversions.
-   constexpr T get_val() const { return support::bit_cast<T>(UP::bits); }
-};
+		// Floating-point conversions.
+		constexpr T get_val() const { return support::bit_cast<T>(UP::bits); }
+	};
 
 } // namespace ccm::fputil
-
-
