@@ -170,6 +170,11 @@ CCmath is an open-source project, and it needs your help to go on growing and im
 
 > Last Updated: May 11, 2024
 
+## Projects using CCMath!
+
+- [KittyOS](https://github.com/aomine001/kitty-os-cpp) - The kitty os but rewritten in C++ and better!
+
+_(Are you using CCMath in your project? Let us know!)_
 
 ## License
 

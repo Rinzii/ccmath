@@ -5,6 +5,7 @@
 set(ccmath_internal_config_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/compiler.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/builtin_support.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/type_support.hpp
 )
 
 set(ccmath_internal_helpers_headers
