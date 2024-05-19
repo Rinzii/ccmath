@@ -10,11 +10,12 @@
 
 #pragma once
 
-#include "ccmath/internal/support/ctz.hpp"
+#include "ccmath/internal/predef/has_attribute.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
+#include "ccmath/internal/support/ctz.hpp"
+#include "ccmath/internal/support/type_traits.hpp"
 
 #include <cstdint>
-#include <type_traits>
 
 namespace ccm::support::traits
 {
@@ -49,21 +50,24 @@ namespace ccm::support::traits
 namespace ccm::support
 {
 
-	/**
-	 * @brief
-	 * @tparam To
-	 * @tparam From
-	 * @param src
-	 * @return
-	 */
-	template <class To, class From>
-	std::enable_if_t<sizeof(To) == sizeof(From) && std::is_trivially_copyable_v<From> && std::is_trivially_copyable_v<To>, To> constexpr bit_cast(
-		const From & src) noexcept
+	template <typename To, typename From>
+	constexpr std::enable_if_t<
+		(sizeof(To) == sizeof(From)) && std::is_trivially_constructible_v<To> && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From>, To>
+	bit_cast(const From & from)
 	{
-		static_assert(std::is_trivially_constructible_v<To>, "This implementation additionally requires "
-															 "destination type to be trivially constructible");
-
-		return __builtin_bit_cast(To, src);
+#if CCM_HAS_BUILTIN(__builtin_bit_cast)
+		return __builtin_bit_cast(To, from);
+#else
+		To to;
+		char * dst		 = reinterpret_cast<char *>(&to);
+		const char * src = reinterpret_cast<const char *>(&from);
+	#if CCM_HAS_BUILTIN(__builtin_memcpy_inline)
+		__builtin_memcpy_inline(dst, src, sizeof(To));
+	#else
+		for (unsigned i = 0; i < sizeof(To); ++i) dst[i] = src[i];
+	#endif // CCM_HAS_BUILTIN(__builtin_memcpy_inline)
+		return to;
+#endif // CCM_HAS_BUILTIN(__builtin_bit_cast)
 	}
 
 	template <class T,
@@ -179,7 +183,7 @@ namespace ccm::support
 			ret += ulldigits;
 			value >>= ulldigits;
 		}
-		return ret + ccm::support::ctz(static_cast<unsigned long long>(value));
+		return ret + ctz(static_cast<unsigned long long>(value));
 	}
 
 	template <typename T>
@@ -190,7 +194,7 @@ namespace ccm::support
 
 	template <typename T, std::enable_if_t<traits::is_unsigned_integer_v<T>, bool> = true>
 	// NOLINTNEXTLINE
-	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> countl_zero(T value)
+	[[nodiscard]] constexpr std::enable_if_t<support::is_unsigned_v<T>, int> countl_zero(T value)
 	{
 		if (value == 0) { return std::numeric_limits<T>::digits; }
 

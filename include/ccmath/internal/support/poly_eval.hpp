@@ -51,4 +51,18 @@ namespace ccm::support
 	{
 		return multiply_add(x, polyeval(x, a...), a0);
 	}
+
+	struct fp_helpers
+	{
+
+	};
+
+
+
+
+
+
+
+
+
 } // namespace ccm::support
