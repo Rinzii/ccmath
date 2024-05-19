@@ -20,7 +20,6 @@
 #include "ccmath/internal/support/type_traits.hpp"
 #include "ccmath/internal/types/number_pair.hpp"
 
-
 #include <array>
 #include <climits>
 #include <cstddef>
@@ -45,18 +44,18 @@ namespace ccm::support
 		struct half_width<std::uint32_t> : ccm::support::traits::type_identity<uint16_t>
 		{
 		};
-		#ifdef CCM_TYPES_HAS_INT64
+#ifdef CCM_TYPES_HAS_INT64
 		template <>
 		struct half_width<std::uint64_t> : ccm::support::traits::type_identity<uint32_t>
 		{
 		};
-		#ifdef CCM_TYPES_HAS_INT128
+	#ifdef CCM_TYPES_HAS_INT128
 		template <>
 		struct half_width<__uint128_t> : ccm::support::traits::type_identity<uint64_t>
 		{
 		};
-		#endif // CCM_TYPES_HAS_INT128
-		#endif	   // CCM_TYPES_HAS_INT64
+	#endif // CCM_TYPES_HAS_INT128
+#endif	   // CCM_TYPES_HAS_INT64
 		template <typename T>
 		using half_width_t = typename half_width<T>::type;
 
@@ -107,14 +106,14 @@ namespace ccm::support
 		template <typename word>
 		constexpr DoubleWide<word> mul2(word a, word b)
 		{
-			if constexpr (ccm::support::traits::is_same_v<word, uint8_t>) { return split<uint16_t>(uint16_t(a) * uint16_t(b)); }
-			else if constexpr (ccm::support::traits::is_same_v<word, uint16_t>) { return split<uint32_t>(uint32_t(a) * uint32_t(b)); }
-			#ifdef CCM_TYPES_HAS_INT64
-			else if constexpr (ccm::support::traits::is_same_v<word, uint32_t>) { return split<uint64_t>(uint64_t(a) * uint64_t(b)); }
-			#endif
-			#ifdef CCM_TYPES_HAS_INT128
-			else if constexpr (ccm::support::traits::is_same_v<word, uint64_t>) { return split<__uint128_t>(__uint128_t(a) * __uint128_t(b)); }
-			#endif
+			if constexpr (ccm::support::traits::is_same_v<word, uint8_t>) { return split<std::uint16_t>(std::uint16_t(a) * std::uint16_t(b)); }
+			else if constexpr (ccm::support::traits::is_same_v<word, uint16_t>) { return split<std::uint32_t>(std::uint32_t(a) * std::uint32_t(b)); }
+#ifdef CCM_TYPES_HAS_INT64
+			else if constexpr (ccm::support::traits::is_same_v<word, uint32_t>) { return split<std::uint64_t>(std::uint64_t(a) * std::uint64_t(b)); }
+#endif
+#ifdef CCM_TYPES_HAS_INT128
+			else if constexpr (ccm::support::traits::is_same_v<word, std::uint64_t>) { return split<__uint128_t>(__uint128_t(a) * __uint128_t(b)); }
+#endif
 			else
 			{
 				using half_word	  = half_width_t<word>;
@@ -262,7 +261,7 @@ namespace ccm::support
 		template <typename word, size_t N>
 		constexpr bool is_negative(std::array<word, N> & array)
 		{
-			using signed_word = std::make_signed_t<word>;
+			using signed_word = traits::make_signed_t<word>;
 			return ccm::support::bit_cast<signed_word>(array.back()) < 0;
 		}
 
@@ -281,7 +280,7 @@ namespace ccm::support
 		{
 			static_assert(direction == LEFT || direction == RIGHT);
 			constexpr size_t WORD_BITS = std::numeric_limits<word>::digits;
-			#ifdef CCM_TYPES_HAS_INT128
+#ifdef CCM_TYPES_HAS_INT128
 			constexpr size_t TOTAL_BITS = N * WORD_BITS;
 			if constexpr (TOTAL_BITS == 128)
 			{
@@ -293,7 +292,7 @@ namespace ccm::support
 					tmp >>= offset;
 				return ccm::support::bit_cast<std::array<word, N>>(tmp);
 			}
-			#endif
+#endif
 			if (CCM_UNLIKELY(offset == 0)) return array;
 			const bool is_neg = is_signed && is_negative(array);
 			constexpr auto at = [](size_t index) -> int
@@ -312,9 +311,9 @@ namespace ccm::support
 			};
 			const size_t index_offset = offset / WORD_BITS;
 			const size_t bit_offset	  = offset % WORD_BITS;
-			#ifdef CCM_COMPILER_IS_CLANG
+#ifdef CCM_COMPILER_IS_CLANG
 			__builtin_assume(index_offset < N);
-			#endif
+#endif
 			std::array<word, N> out = {};
 			for (size_t index = 0; index < N; ++index)
 			{
@@ -331,19 +330,19 @@ namespace ccm::support
 			return out;
 		}
 
-		#define DECLARE_COUNTBIT(NAME, INDEX_EXPR)                                                                                                                     \
-				template <typename word, size_t N>                                                                                                                         \
-				constexpr int NAME(const std::array<word, N> & val)                                                                                                        \
-				{                                                                                                                                                          \
-				int bit_count = 0;                                                                                                                                     \
-				for (size_t i = 0; i < N; ++i)                                                                                                                         \
-				{                                                                                                                                                      \
-				const int word_count = ccm::support::NAME<word>(val[INDEX_EXPR]);                                                                                  \
-				bit_count += word_count;                                                                                                                           \
-				if (word_count != std::numeric_limits<word>::digits) break;                                                                                        \
-				}                                                                                                                                                      \
-				return bit_count;                                                                                                                                      \
-				}
+#define DECLARE_COUNTBIT(NAME, INDEX_EXPR)                                                                                                                     \
+	template <typename word, size_t N>                                                                                                                         \
+	constexpr int NAME(const std::array<word, N> & val)                                                                                                        \
+	{                                                                                                                                                          \
+		int bit_count = 0;                                                                                                                                     \
+		for (size_t i = 0; i < N; ++i)                                                                                                                         \
+		{                                                                                                                                                      \
+			const int word_count = ccm::support::NAME<word>(val[INDEX_EXPR]);                                                                                  \
+			bit_count += word_count;                                                                                                                           \
+			if (word_count != std::numeric_limits<word>::digits) break;                                                                                        \
+		}                                                                                                                                                      \
+		return bit_count;                                                                                                                                      \
+	}
 
 		DECLARE_COUNTBIT(countr_zero, i)		 // iterating forward
 		DECLARE_COUNTBIT(countr_one, i)			 // iterating forward
@@ -779,18 +778,18 @@ namespace ccm::support
 
 		constexpr BigInt operator>>(size_t s) const { return BigInt(multiword::shift<multiword::RIGHT, SIGNED>(val, s)); }
 
-		#define DEFINE_BINOP(OP)                                                                                                                                       \
-				friend constexpr BigInt operator OP(const BigInt & lhs, const BigInt & rhs)                                                                                \
-				{                                                                                                                                                          \
-				BigInt result;                                                                                                                                         \
-				for (size_t i = 0; i < WORD_COUNT; ++i) result[i] = lhs[i] OP rhs[i];                                                                                  \
-				return result;                                                                                                                                         \
-				}                                                                                                                                                          \
-				friend constexpr BigInt operator OP##=(BigInt & lhs, const BigInt & rhs)                                                                                   \
-				{                                                                                                                                                          \
-				for (size_t i = 0; i < WORD_COUNT; ++i) lhs[i] OP## = rhs[i];                                                                                          \
-				return lhs;                                                                                                                                            \
-				}
+#define DEFINE_BINOP(OP)                                                                                                                                       \
+	friend constexpr BigInt operator OP(const BigInt & lhs, const BigInt & rhs)                                                                                \
+	{                                                                                                                                                          \
+		BigInt result;                                                                                                                                         \
+		for (size_t i = 0; i < WORD_COUNT; ++i) result[i] = lhs[i] OP rhs[i];                                                                                  \
+		return result;                                                                                                                                         \
+	}                                                                                                                                                          \
+	friend constexpr BigInt operator OP##=(BigInt & lhs, const BigInt & rhs)                                                                                   \
+	{                                                                                                                                                          \
+		for (size_t i = 0; i < WORD_COUNT; ++i) lhs[i] OP## = rhs[i];                                                                                          \
+		return lhs;                                                                                                                                            \
+	}
 
 		DEFINE_BINOP(&) // & and &=
 		DEFINE_BINOP(|) // | and |=
@@ -982,7 +981,7 @@ namespace ccm::support
 
 	template <size_t Bits>
 	using Int = BigInt<Bits, true, internal::WordTypeSelectorT<Bits>>;
-}	 // namespace ccm::support
+} // namespace ccm::support
 
 namespace std
 {
@@ -1015,12 +1014,12 @@ namespace ccm::support
 
 	// type traits to determine whether a T is a BigInt.
 	template <typename T>
-	struct is_big_int : std::false_type
+	struct is_big_int : traits::false_type
 	{
 	};
 
 	template <size_t Bits, bool Signed, typename T>
-	struct is_big_int<BigInt<Bits, Signed, T>> : std::true_type
+	struct is_big_int<BigInt<Bits, Signed, T>> : traits::true_type
 	{
 	};
 
@@ -1031,7 +1030,7 @@ namespace ccm::support
 
 	// is_integral_or_big_int
 	template <typename T>
-	struct is_integral_or_big_int : std::bool_constant<(std::is_integral_v<T> || is_big_int_v<T>)>
+	struct is_integral_or_big_int : traits::bool_constant<(traits::is_integral_v<T> || is_big_int_v<T>)>
 	{
 	};
 
@@ -1067,12 +1066,12 @@ namespace ccm::support
 	struct make_integral_or_big_int_unsigned;
 
 	template <typename T>
-	struct make_integral_or_big_int_unsigned<T, std::enable_if_t<std::is_integral_v<T>>> : std::make_unsigned<T>
+	struct make_integral_or_big_int_unsigned<T, traits::enable_if_t<traits::is_integral_v<T>>> : traits::make_unsigned<T>
 	{
 	};
 
 	template <typename T>
-	struct make_integral_or_big_int_unsigned<T, std::enable_if_t<is_big_int_v<T>>> : make_big_int_unsigned<T>
+	struct make_integral_or_big_int_unsigned<T, traits::enable_if_t<is_big_int_v<T>>> : make_big_int_unsigned<T>
 	{
 	};
 
@@ -1084,12 +1083,12 @@ namespace ccm::support
 	struct make_integral_or_big_int_signed;
 
 	template <typename T>
-	struct make_integral_or_big_int_signed<T, std::enable_if_t<std::is_integral_v<T>>> : std::make_signed<T>
+	struct make_integral_or_big_int_signed<T, traits::enable_if_t<traits::is_integral_v<T>>> : traits::make_signed<T>
 	{
 	};
 
 	template <typename T>
-	struct make_integral_or_big_int_signed<T, std::enable_if_t<is_big_int_v<T>>> : make_big_int_signed<T>
+	struct make_integral_or_big_int_signed<T, traits::enable_if_t<is_big_int_v<T>>> : make_big_int_signed<T>
 	{
 	};
 
@@ -1102,7 +1101,7 @@ namespace ccm::support
 		// Specialization of ccm::support::bit_cast ('bits.hpp') from T to BigInt.
 		template <typename To, typename From>
 		constexpr traits::enable_if_t<
-			(sizeof(To) == sizeof(From)) && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From> && is_big_int<To>::value, To>
+			(sizeof(To) == sizeof(From)) && traits::is_trivially_copyable_v<To> && traits::is_trivially_copyable_v<From> && is_big_int<To>::value, To>
 		bit_cast(const From & from)
 		{
 			To out;
@@ -1113,9 +1112,9 @@ namespace ccm::support
 
 		// Specialization of ccm::support::bit_cast ('bits.hpp') from BigInt to T.
 		template <typename To, size_t Bits>
-		constexpr std::enable_if_t<sizeof(To) == sizeof(UInt<Bits>) && std::is_trivially_constructible_v<To> && std::is_trivially_copyable_v<To> &&
-									   std::is_trivially_copyable_v<UInt<Bits>>,
-								   To>
+		constexpr traits::enable_if_t<sizeof(To) == sizeof(UInt<Bits>) && traits::is_trivially_constructible_v<To> && traits::is_trivially_copyable_v<To> &&
+										  traits::is_trivially_copyable_v<UInt<Bits>>,
+									  To>
 		bit_cast(const UInt<Bits> & from)
 		{
 			return ccm::support::bit_cast<To>(from.val);
@@ -1123,7 +1122,7 @@ namespace ccm::support
 
 		// Specialization of ccm::support::popcount ('bits.hpp') for BigInt.
 		template <typename T>
-		[[nodiscard]] constexpr std::enable_if_t<is_big_int_v<T>, int> popcount(T value)
+		[[nodiscard]] constexpr traits::enable_if_t<is_big_int_v<T>, int> popcount(T value)
 		{
 			int bits = 0;
 			for (auto word : value.val)
@@ -1133,7 +1132,7 @@ namespace ccm::support
 
 		// Specialization of ccm::support::has_single_bit ('bits.hpp') for BigInt.
 		template <typename T>
-		[[nodiscard]] constexpr std::enable_if_t<is_big_int_v<T>, bool> has_single_bit(T value)
+		[[nodiscard]] constexpr traits::enable_if_t<is_big_int_v<T>, bool> has_single_bit(T value)
 		{
 			int bits = 0;
 			for (auto word : value.val)
@@ -1147,46 +1146,46 @@ namespace ccm::support
 
 		// Specialization of ccm::support::countr_zero ('bits.hpp') for BigInt.
 		template <typename T>
-		[[nodiscard]] constexpr std::enable_if_t<is_big_int_v<T>, int> countr_zero(const T & value)
+		[[nodiscard]] constexpr traits::enable_if_t<is_big_int_v<T>, int> countr_zero(const T & value)
 		{
 			return multiword::countr_zero(value.val);
 		}
 
 		// Specialization of ccm::support::countl_zero ('bits.hpp') for BigInt.
 		template <typename T>
-		[[nodiscard]] constexpr std::enable_if_t<is_big_int_v<T>, int> countl_zero(const T & value)
+		[[nodiscard]] constexpr traits::enable_if_t<is_big_int_v<T>, int> countl_zero(const T & value)
 		{
 			return multiword::countl_zero(value.val);
 		}
 
 		// Specialization of ccm::support::countl_one ('bits.hpp') for BigInt.
 		template <typename T>
-		[[nodiscard]] constexpr std::enable_if_t<is_big_int_v<T>, int> countl_one(T value)
+		[[nodiscard]] constexpr traits::enable_if_t<is_big_int_v<T>, int> countl_one(T value)
 		{
 			return multiword::countl_one(value.val);
 		}
 
 		// Specialization of ccm::support::countr_one ('bits.hpp') for BigInt.
 		template <typename T>
-		[[nodiscard]] constexpr std::enable_if_t<is_big_int_v<T>, int> countr_one(T value)
+		[[nodiscard]] constexpr traits::enable_if_t<is_big_int_v<T>, int> countr_one(T value)
 		{
 			return multiword::countr_one(value.val);
 		}
 
 		// Specialization of ccm::support::bit_width ('bits.hpp') for BigInt.
 		template <typename T>
-		[[nodiscard]] constexpr std::enable_if_t<is_big_int_v<T>, int> bit_width(T value)
+		[[nodiscard]] constexpr traits::enable_if_t<is_big_int_v<T>, int> bit_width(T value)
 		{
 			return std::numeric_limits<T>::digits - ccm::support::countl_zero(value);
 		}
 
 		// Forward-declare rotr so that rotl can use it.
 		template <typename T>
-		[[nodiscard]] constexpr std::enable_if_t<is_big_int_v<T>, T> rotr(T value, int rotate);
+		[[nodiscard]] constexpr traits::enable_if_t<is_big_int_v<T>, T> rotr(T value, int rotate);
 
 		// Specialization of ccm::support::rotl ('bit.h') for BigInt.
 		template <typename T>
-		[[nodiscard]] constexpr std::enable_if_t<is_big_int_v<T>, T> rotl(T value, int rotate)
+		[[nodiscard]] constexpr traits::enable_if_t<is_big_int_v<T>, T> rotl(T value, int rotate)
 		{
 			constexpr unsigned N = std::numeric_limits<T>::digits;
 			rotate				 = rotate % N;
@@ -1197,7 +1196,7 @@ namespace ccm::support
 
 		// Specialization of ccm::support::rotr ('bit.h') for BigInt.
 		template <typename T>
-		[[nodiscard]] constexpr std::enable_if_t<is_big_int_v<T>, T> rotr(T value, int rotate)
+		[[nodiscard]] constexpr traits::enable_if_t<is_big_int_v<T>, T> rotr(T value, int rotate)
 		{
 			constexpr unsigned N = std::numeric_limits<T>::digits;
 			rotate				 = rotate % N;
@@ -1210,7 +1209,7 @@ namespace ccm::support
 
 	// Specialization of mask_trailing_ones ('bit_helpers.hpp') for BigInt.
 	template <typename T, size_t count>
-	constexpr std::enable_if_t<is_big_int_v<T>, T> mask_trailing_ones()
+	constexpr traits::enable_if_t<is_big_int_v<T>, T> mask_trailing_ones()
 	{
 		static_assert(!T::SIGNED && count <= T::BITS);
 		if (count == T::BITS) return T::all_ones();
@@ -1223,7 +1222,7 @@ namespace ccm::support
 
 	// Specialization of mask_leading_ones ('bit_helpers.hpp') for BigInt.
 	template <typename T, size_t count>
-	constexpr std::enable_if_t<is_big_int_v<T>, T> mask_leading_ones()
+	constexpr traits::enable_if_t<is_big_int_v<T>, T> mask_leading_ones()
 	{
 		static_assert(!T::SIGNED && count <= T::BITS);
 		if (count == T::BITS) return T::all_ones();
@@ -1236,49 +1235,49 @@ namespace ccm::support
 
 	// Specialization of mask_trailing_zeros ('bit_helpers.hpp') for BigInt.
 	template <typename T, size_t count>
-	constexpr std::enable_if_t<is_big_int_v<T>, T> mask_trailing_zeros()
+	constexpr traits::enable_if_t<is_big_int_v<T>, T> mask_trailing_zeros()
 	{
 		return mask_leading_ones<T, T::BITS - count>();
 	}
 
 	// Specialization of mask_leading_zeros ('bit_helpers.hpp') for BigInt.
 	template <typename T, size_t count>
-	constexpr std::enable_if_t<is_big_int_v<T>, T> mask_leading_zeros()
+	constexpr traits::enable_if_t<is_big_int_v<T>, T> mask_leading_zeros()
 	{
 		return mask_trailing_ones<T, T::BITS - count>();
 	}
 
 	// Specialization of count_zeros ('bit_helpers.hpp') for BigInt.
 	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<is_big_int_v<T>, int> count_zeros(T value)
+	[[nodiscard]] constexpr traits::enable_if_t<is_big_int_v<T>, int> count_zeros(T value)
 	{
 		return ccm::support::popcount(~value);
 	}
 
 	// Specialization of first_leading_zero ('bit_helpers.hpp') for BigInt.
 	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<is_big_int_v<T>, int> first_leading_zero(T value)
+	[[nodiscard]] constexpr traits::enable_if_t<is_big_int_v<T>, int> first_leading_zero(T value)
 	{
 		return value == std::numeric_limits<T>::max() ? 0 : ccm::support::countl_one(value) + 1;
 	}
 
-	// Specialization of first_leading_one ('math_extras.h') for BigInt.
+	// Specialization of first_leading_one ('bit_helpers.hpp') for BigInt.
 	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<is_big_int_v<T>, int> first_leading_one(T value)
+	[[nodiscard]] constexpr traits::enable_if_t<is_big_int_v<T>, int> first_leading_one(T value)
 	{
 		return first_leading_zero(~value);
 	}
 
 	// Specialization of first_trailing_zero ('bit_helpers.hpp') for BigInt.
 	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<is_big_int_v<T>, int> first_trailing_zero(T value)
+	[[nodiscard]] constexpr traits::enable_if_t<is_big_int_v<T>, int> first_trailing_zero(T value)
 	{
 		return value == std::numeric_limits<T>::max() ? 0 : ccm::support::countr_zero(~value) + 1;
 	}
 
 	// Specialization of first_trailing_one ('bit_helpers.hpp') for BigInt.
 	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<is_big_int_v<T>, int> first_trailing_one(T value)
+	[[nodiscard]] constexpr traits::enable_if_t<is_big_int_v<T>, int> first_trailing_one(T value)
 	{
 		return value == std::numeric_limits<T>::max() ? 0 : ccm::support::countr_zero(value) + 1;
 	}

@@ -23,6 +23,8 @@
 #include "ccmath/internal/support/type_traits/is_trivially_constructible.hpp"
 #include "ccmath/internal/support/type_traits/is_trivially_copyable.hpp"
 #include "ccmath/internal/support/type_traits/is_unsigned.hpp"
+#include "ccmath/internal/support/type_traits/make_signed.hpp"
+#include "ccmath/internal/support/type_traits/make_unsigned.hpp"
 #include "ccmath/internal/support/type_traits/remove_cv.hpp"
 #include "ccmath/internal/support/type_traits/true_type.hpp"
 #include "ccmath/internal/support/type_traits/type_identity.hpp"
