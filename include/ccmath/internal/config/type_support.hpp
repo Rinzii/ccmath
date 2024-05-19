@@ -18,7 +18,7 @@
 // int128 / uint128 support
 #if defined(__SIZEOF_INT128__)
 	#ifndef CCM_TYPES_HAS_INT128
-		//#define CCM_TYPES_HAS_INT128
+		#define CCM_TYPES_HAS_INT128
 	#endif
 #endif // defined(__SIZEOF_INT128__)
 
