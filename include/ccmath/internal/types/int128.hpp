@@ -23,6 +23,6 @@ namespace ccm
 	// Currently this is assuming we are handling MSVC here.
 	// Until we have implemented big_ints, we will use int64_t.
 	using Int128 = ccm::support::Int<128>;
-	using Uint128 = ccm::support::Uint<128>;
+	using Uint128 = ccm::support::UInt<128>;
 #endif
 } // namespace ccm
