@@ -50,11 +50,12 @@ namespace ccm::support::traits
 namespace ccm::support
 {
 
-	template <typename To, typename From>
-	constexpr traits::enable_if_t<
-		(sizeof(To) == sizeof(From)) && ccm::support::traits::is_trivially_constructible_v<To> && ccm::support::traits::is_trivially_copyable_v<To> && ccm::support::traits::is_trivially_copyable_v<From>, To>
-	bit_cast(const From & from)
+	template <class To, class From>
+	traits::enable_if_t<sizeof(To) == sizeof(From) && traits::is_trivially_copyable_v<From> && traits::is_trivially_copyable_v<To>, To> constexpr bit_cast(
+		const From & from) noexcept
 	{
+		static_assert(traits::is_trivially_constructible_v<To>, "This implementation additionally requires "
+																"destination type to be trivially constructible");
 #if CCM_HAS_BUILTIN(__builtin_bit_cast)
 		return __builtin_bit_cast(To, from);
 #else
@@ -70,8 +71,9 @@ namespace ccm::support
 #endif	   // CCM_HAS_BUILTIN(__builtin_bit_cast)
 	}
 
-	template <class T,
-			  ccm::support::traits::enable_if_t<ccm::support::traits::is_integral_v<T> && ccm::support::traits::is_unsigned_v<T> && !ccm::support::traits::is_char_v<T> && !ccm::support::traits::is_same_v<T, bool>, bool> = true>
+	template <class T, ccm::support::traits::enable_if_t<ccm::support::traits::is_integral_v<T> && ccm::support::traits::is_unsigned_v<T> &&
+															 !ccm::support::traits::is_char_v<T> && !ccm::support::traits::is_same_v<T, bool>,
+														 bool> = true>
 	constexpr bool has_single_bit(T x) noexcept
 	{
 		return x && !(x & (x - 1));
