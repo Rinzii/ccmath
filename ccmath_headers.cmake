@@ -36,6 +36,8 @@ set(ccmath_internal_support_typetraits_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/is_arithmetic.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/is_signed.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/is_unsigned.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/make_signed.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/make_unsigned.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/remove_cv.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/type_identity.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/enable_if.hpp

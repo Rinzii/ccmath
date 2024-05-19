@@ -644,12 +644,12 @@ namespace ccm::support
 	template <typename T>
 	static constexpr FPType get_fp_type()
 	{
-		using UnqualT = std::remove_cv_t<T>;
-		if constexpr (std::is_same_v<UnqualT, float> && __FLT_MANT_DIG__ == 24) {
+		using UnqualT = traits::remove_cv_t<T>;
+		if constexpr (traits::is_same_v<UnqualT, float> && __FLT_MANT_DIG__ == 24) {
 			return FPType::eBinary32;
-		} else if constexpr (std::is_same_v<UnqualT, double> && __DBL_MANT_DIG__ == 53) {
+		} else if constexpr (traits::is_same_v<UnqualT, double> && __DBL_MANT_DIG__ == 53) {
 			return FPType::eBinary64;
-		} else if constexpr (std::is_same_v<UnqualT, long double>)
+		} else if constexpr (traits::is_same_v<UnqualT, long double>)
 		{
 			if constexpr (__LDBL_MANT_DIG__ == 53) {
 				return FPType::eBinary64;
@@ -660,7 +660,7 @@ namespace ccm::support
 }
 		}
 #if defined(CCM_TYPES_HAS_FLOAT128)
-		else if constexpr (std::is_same_v<UnqualT, float128>)
+		else if constexpr (traits::is_same_v<UnqualT, float128>)
 		{
 			return FPType::eBinary128;
 		}
@@ -673,7 +673,7 @@ namespace ccm::support
 	template <typename T>
 	struct FPBits final : internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>
 	{
-		static_assert(std::is_floating_point_v<T>, "FPBits instantiated with invalid type.");
+		static_assert(traits::is_floating_point_v<T>, "FPBits instantiated with invalid type.");
 		using UP		  = internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>;
 		using StorageType = typename UP::StorageType;
 
@@ -681,10 +681,10 @@ namespace ccm::support
   constexpr FPBits() = default;
 
   template <typename XType> constexpr explicit FPBits(XType x) {
-    using Unqual = typename std::remove_cv_t<XType>;
-    if constexpr (std::is_same_v<Unqual, T>) {
+    using Unqual = traits::remove_cv_t<XType>;
+    if constexpr (traits::is_same_v<Unqual, T>) {
       UP::bits = support::bit_cast<StorageType>(x);
-    } else if constexpr (std::is_same_v<Unqual, StorageType>) {
+    } else if constexpr (traits::is_same_v<Unqual, StorageType>) {
       UP::bits = x;
     } else {
       // We don't want accidental type promotions/conversions, so we require
