@@ -10,8 +10,10 @@
 
 namespace ccm::support::traits
 {
-	template <typename T, T v> struct integral_constant {
-		using value_type = T;
+	template <typename T, T v>
+	struct integral_constant
+	{
+		using value_type		 = T;
 		static constexpr T value = v;
 	};
 } // namespace ccm::support::traits

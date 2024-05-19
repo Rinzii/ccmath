@@ -51,7 +51,7 @@ namespace ccm::support
 {
 
 	template <typename To, typename From>
-	constexpr ccm::support::traits::enable_if_t<
+	constexpr traits::enable_if_t<
 		(sizeof(To) == sizeof(From)) && ccm::support::traits::is_trivially_constructible_v<To> && ccm::support::traits::is_trivially_copyable_v<To> && ccm::support::traits::is_trivially_copyable_v<From>, To>
 	bit_cast(const From & from)
 	{
@@ -233,7 +233,7 @@ namespace ccm::support
 	}
 #else  // !CCM_HAS_BUILTIN(__builtin_popcountg)
 	template <typename T>
-	[[nodiscard]] constexpr ccm::support::traits::enable_if_t<ccm::support::traits::is_unsigned_v<T>, int> popcount(T value)
+	[[nodiscard]] constexpr traits::enable_if_t<traits::is_unsigned_v<T>, int> popcount(T value)
 	{
 		int count = 0;
 		for (int i = 0; i != std::numeric_limits<T>::digits; ++i)
