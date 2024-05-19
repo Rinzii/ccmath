@@ -7,12 +7,15 @@
  */
 
 #pragma once
+
+#include "ccmath/internal/config/type_support.hpp"
+
 #include <cstdint>
 
 namespace ccm
 {
 	// __SIZEOF_INT128__ is generally defined when the compiler supports 128-bit integers.
-#ifdef __SIZEOF_INT128__
+#ifdef CCM_TYPES_HAS_INT128
 	using int128_t = __int128;
 	using uint128_t = unsigned __int128;
 #else

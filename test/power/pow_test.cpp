@@ -22,7 +22,9 @@ TEST(CcmathPowerTests, Pow_Unsigned_Integral)
 
 TEST(CcmathPowerTests, Pow_Double)
 {
-	//static_assert(ccm::pow(2.0, 2.0) == 4, "ccm::pow is not working with static_assert!");
+	static_assert(ccm::pow(2.0, 2.0) == 4, "ccm::pow is not working with static_assert!");
+
+	EXPECT_EQ(std::pow(14.0, 2.0), std::exp2(2.0 * std::log2(14.0)));
 
 
 	// Test for a base of 2

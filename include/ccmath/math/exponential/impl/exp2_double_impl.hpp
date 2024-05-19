@@ -126,12 +126,6 @@ namespace ccm::internal
 
 			const ccm::double_t remSqr = rem * rem;
 
-			/*
-			const ccm::double_t tmp = tail + rem * first_polynomial_coefficient +
-									  remSqr * (second_polynomial_coefficient + rem * third_polynomial_coefficient) +
-									  remSqr * remSqr * (fourth_polynomial_coefficient + rem * fifth_polynomial_coefficient);
-			*/
-
 			const ccm::double_t tmp = tail + rem * first_polynomial_coefficient +
 									  remSqr * (second_polynomial_coefficient + rem * third_polynomial_coefficient) +
 									  remSqr * remSqr * (fourth_polynomial_coefficient + rem * fifth_polynomial_coefficient);

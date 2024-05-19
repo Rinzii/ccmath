@@ -40,6 +40,8 @@ set(ccmath_internal_support_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/multiply_add.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/poly_eval.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/bit_mask.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/rounding_mode.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits.hpp
 
 )
 

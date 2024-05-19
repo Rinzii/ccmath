@@ -9,9 +9,7 @@
 #pragma once
 
 #ifndef CCM_LIKELY
-   #if defined(__cplusplus) && __cplusplus >= 202003L
-       #define CCM_LIKELY(x) [[likely]] (x)
-   #elif defined(__GNUC__) || defined(__clang__)
+   #if defined(__GNUC__) || defined(__clang__)
        #define CCM_LIKELY(x) __builtin_expect(!!(x), 1)
    #else
        #define CCM_LIKELY(x) (!!(x))
