@@ -9,9 +9,10 @@
 #pragma once
 
 #include "ccmath/internal/predef/has_builtin.hpp"
+#include "ccmath/internal/support/type_traits.hpp"
 
 #include <limits>
-#include <type_traits>
+
 
 namespace ccm::support
 {
@@ -19,7 +20,7 @@ namespace ccm::support
 	{
 		// Software implementation of ctz for unsigned integral types in the event that the compiler does not provide a builtin
 		// Mostly added for msvc support, as gcc and clang have builtins for this.
-		template <typename T, std::enable_if_t<std::is_integral_v<T> && std::is_unsigned_v<T> && !std::is_same_v<T, bool>, bool> = true>
+		template <typename T, traits::enable_if_t<traits::is_integral_v<T> && traits::is_unsigned_v<T> && !traits::is_same_v<T, bool>, bool> = true>
 		constexpr int generic_ctz(T x) noexcept
 		{
 			// If x is 0, the result is undefined.

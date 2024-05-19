@@ -12,54 +12,18 @@
 #pragma once
 
 #include "ccmath/internal/support/always_false.hpp"
+#include "ccmath/internal/predef/likely.hpp"
+#include "ccmath/internal/support/bit_helpers.hpp"
 #include "ccmath/internal/support/bits.hpp"
-#include "ccmath/internal/support/type_traits.hpp"
 #include "ccmath/internal/types/int128.hpp"
 #include "ccmath/internal/types/sign.hpp"
-
 
 #include <climits>
 #include <cstdint>
 
-#include "ccmath/internal/predef/likely.hpp"
 
 namespace ccm::support
 {
-
-	// Create a bitmask with the count right-most bits set to 1, and all other bits
-	// set to 0.  Only unsigned types are allowed.
-	template <typename T, std::size_t count>
-	static constexpr std::enable_if_t<support::is_unsigned_v<T>, T> mask_trailing_ones()
-	{
-		constexpr unsigned T_BITS = CHAR_BIT * sizeof(T);
-		static_assert(count <= T_BITS && "Invalid bit index");
-		return count == 0 ? 0 : (T(-1) >> (T_BITS - count));
-	}
-
-	// Create a bitmask with the count left-most bits set to 1, and all other bits
-	// set to 0.  Only unsigned types are allowed.
-	template <typename T, std::size_t count>
-	static constexpr std::enable_if_t<support::is_unsigned_v<T>, T> mask_leading_ones()
-	{
-		return T(~mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>());
-	}
-
-	// Create a bitmask with the count right-most bits set to 0, and all other bits
-	// set to 1.  Only unsigned types are allowed.
-	template <typename T, std::size_t count>
-	static constexpr std::enable_if_t<support::is_unsigned_v<T>, T> mask_trailing_zeros()
-	{
-		return mask_leading_ones<T, CHAR_BIT * sizeof(T) - count>();
-	}
-
-	// Create a bitmask with the count left-most bits set to 0, and all other bits
-	// set to 1.  Only unsigned types are allowed.
-	template <typename T, std::size_t count>
-	static constexpr std::enable_if_t<support::is_unsigned_v<T>, T> mask_leading_zeros()
-	{
-		return mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>();
-	}
-
 	// The supported floating point types.
 	enum class FPType
 	{
@@ -147,7 +111,7 @@ namespace ccm::support
 		};
 
 		template <> struct FPLayout<FPType::eBinary80> {
-		  using StorageType = ccm::uint128_t;
+		  using StorageType = Uint128;
 		  static constexpr int SIGN_LEN = 1;
 		  static constexpr int EXP_LEN = 15;
 		  static constexpr int SIG_LEN = 64;
@@ -155,7 +119,7 @@ namespace ccm::support
 		};
 
 		template <> struct FPLayout<FPType::eBinary128> {
-		  using StorageType = ccm::uint128_t;
+		  using StorageType = Uint128;
 		  static constexpr int SIGN_LEN = 1;
 		  static constexpr int EXP_LEN = 15;
 		  static constexpr int SIG_LEN = 112;
@@ -191,18 +155,18 @@ namespace ccm::support
 			static_assert(EXP_BIAS > 0);
 
 			// The bit pattern that keeps only the *significand* part.
-			inline static constexpr StorageType SIG_MASK = ccm::support::mask_trailing_ones<StorageType, SIG_LEN>();
+			static constexpr StorageType SIG_MASK = mask_trailing_ones<StorageType, SIG_LEN>();
 			// The bit pattern that keeps only the *exponent* part.
-			inline static constexpr StorageType EXP_MASK = ccm::support::mask_trailing_ones<StorageType, EXP_LEN>() << SIG_LEN;
+			static constexpr StorageType EXP_MASK = mask_trailing_ones<StorageType, EXP_LEN>() << SIG_LEN;
 			// The bit pattern that keeps only the *sign* part.
-			inline static constexpr StorageType SIGN_MASK = ccm::support::mask_trailing_ones<StorageType, SIGN_LEN>() << (EXP_LEN + SIG_LEN);
+			static constexpr StorageType SIGN_MASK = mask_trailing_ones<StorageType, SIGN_LEN>() << (EXP_LEN + SIG_LEN);
 			// The bit pattern that keeps only the *exponent + significand* part.
-			inline static constexpr StorageType EXP_SIG_MASK = ccm::support::mask_trailing_ones<StorageType, EXP_LEN + SIG_LEN>();
+			static constexpr StorageType EXP_SIG_MASK = mask_trailing_ones<StorageType, EXP_LEN + SIG_LEN>();
 			// The bit pattern that keeps only the *sign + exponent + significand* part.
-			inline static constexpr StorageType FP_MASK = ccm::support::mask_trailing_ones<StorageType, TOTAL_LEN>();
+			static constexpr StorageType FP_MASK = mask_trailing_ones<StorageType, TOTAL_LEN>();
 			// The bit pattern that keeps only the *fraction* part.
 			// i.e., the *significand* without the leading one.
-			inline static constexpr StorageType FRACTION_MASK = ccm::support::mask_trailing_ones<StorageType, FRACTION_LEN>();
+			static constexpr StorageType FRACTION_MASK = mask_trailing_ones<StorageType, FRACTION_LEN>();
 
 			static_assert((SIG_MASK & EXP_MASK & SIGN_MASK) == 0, "masks disjoint");
 			static_assert((SIG_MASK | EXP_MASK | SIGN_MASK) == FP_MASK, "masks cover");
