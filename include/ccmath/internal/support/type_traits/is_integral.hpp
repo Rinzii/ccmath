@@ -28,15 +28,17 @@ namespace ccm::support::traits
 		}
 
 	public:
-		static constexpr bool value = internal_is_unqualified_any_of<T,
+		static constexpr bool value =
+			internal_is_unqualified_any_of<T,
 #ifdef CCM_TYPES_HAS_INT128
-																	 __int128_t, __uint128_t,
+										   __int128_t, __uint128_t,
 #endif
 #ifdef __cpp_char8_t
-																	 std::char8_t,
+										   std::char8_t,
 #endif // defined(__cpp_char8_t)
-																	 char16_t, char32_t, wchar_t, char, signed char, unsigned char, short, unsigned short, int,
-																	 unsigned int, long, unsigned long, long long, unsigned long long, bool>();
+										   std::uint8_t, std::int8_t, std::uint16_t, std::int16_t, std::uint32_t, std::int32_t, std::uint64_t, std::int64_t,
+										   char16_t, char32_t, wchar_t, char, signed char, unsigned char, short, unsigned short, int, unsigned int, long,
+										   unsigned long, long long, unsigned long long, bool>();
 	};
 	template <typename T>
 	constexpr bool is_integral_v = is_integral<T>::value;
