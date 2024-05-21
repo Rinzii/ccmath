@@ -13,13 +13,28 @@
 
 namespace ccm::support::traits
 {
-	template <typename T>
-	struct is_unsigned : bool_constant<(is_arithmetic_v<T> && (T(-1) > T(0)))>
-	{
-		constexpr operator bool() const { return is_unsigned::value; }
-		constexpr bool operator()() const { return is_unsigned::value; }
+
+	template <class T, bool = is_integral_v<T>>
+	struct Internal_Sign_base {
+		using U = remove_cv_t<T>;
+
+		static constexpr bool Signed   = static_cast<U>(-1) < static_cast<U>(0);
+		static constexpr bool Unsigned = !Signed;
 	};
+
+	template <class T>
+	struct Internal_Sign_base<T, false>
+	{
+		static constexpr bool Signed	= is_floating_point_v<T>;
+		static constexpr bool Unsigned = false;
+	};
+
 	template <typename T>
-	constexpr bool is_unsigned_v = is_unsigned<T>::value;
+	struct is_unsigned : bool_constant<Internal_Sign_base<T>::Unsigned>
+	{
+	};
+
+	template <typename T>
+	constexpr bool is_unsigned_v = Internal_Sign_base<T>::Unsigned;
 
 } // namespace ccm::support::traits

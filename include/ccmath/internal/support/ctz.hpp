@@ -44,8 +44,12 @@ namespace ccm::support
 		}
 	} // namespace internal
 
-	template <typename T>
-	constexpr int ctz(T /* x */) noexcept;
+	template <typename T, traits::enable_if_t<traits::is_integral_v<T> && traits::is_unsigned_v<T> && !traits::is_same_v<T, bool>, bool> = true>
+	constexpr int ctz(T x ) noexcept
+	{
+
+		return internal::generic_ctz(x);
+	}
 
 	template <>
 	constexpr int ctz(unsigned short x) noexcept

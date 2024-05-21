@@ -113,7 +113,6 @@ namespace ccm
 
 				y = (y - one) | (static_cast<StorageType>(x_exp) << FPBits_t::FRACTION_LEN);
 
-				auto test = support::get_rounding_mode();
 				switch (support::get_rounding_mode())
 				{
 				case FE_TONEAREST:
