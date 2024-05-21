@@ -8,9 +8,10 @@
 
 #include <gtest/gtest.h>
 
+#include "ccmath/ccmath.hpp"
+
 #include <cmath>
 #include <limits>
-#include "ccmath/ccmath.hpp"
 
 // TODO: Find a way to test all of the different ways the function may behave internally to work based on the provided compiler.
 
@@ -53,46 +54,46 @@ TEST(CcmathNearestTests, Trunc)
     EXPECT_EQ(ccm::trunc(-1.0000000000000001), std::trunc(-1.0000000000000001));
 
 	// Test with float using std::truncf and ccm::truncf
-	EXPECT_EQ(ccm::truncf(1.0f), std::truncf(1.0f));
-    EXPECT_EQ(ccm::truncf(1.5f), std::truncf(1.5f));
-    EXPECT_EQ(ccm::truncf(1.9f), std::truncf(1.9f));
-    EXPECT_EQ(ccm::truncf(-1.0f), std::truncf(-1.0f));
-    EXPECT_EQ(ccm::truncf(-1.5f), std::truncf(-1.5f));
-    EXPECT_EQ(ccm::truncf(-1.9f), std::truncf(-1.9f));
+	EXPECT_EQ(ccm::truncf(1.0F), std::truncf(1.0F));
+    EXPECT_EQ(ccm::truncf(1.5F), std::truncf(1.5F));
+    EXPECT_EQ(ccm::truncf(1.9F), std::truncf(1.9F));
+    EXPECT_EQ(ccm::truncf(-1.0F), std::truncf(-1.0F));
+    EXPECT_EQ(ccm::truncf(-1.5F), std::truncf(-1.5F));
+    EXPECT_EQ(ccm::truncf(-1.9F), std::truncf(-1.9F));
     EXPECT_EQ(ccm::truncf(std::numeric_limits<float>::infinity()), std::truncf(std::numeric_limits<float>::infinity()));
     EXPECT_EQ(ccm::truncf(-std::numeric_limits<float>::infinity()), std::truncf(-std::numeric_limits<float>::infinity()));
     EXPECT_TRUE(std::isnan(ccm::truncf(std::nanf(""))));
     EXPECT_TRUE(std::isnan(ccm::truncf(-std::nanf(""))));
-    EXPECT_EQ(ccm::truncf(0.0f), std::truncf(0.0f));
-    EXPECT_EQ(ccm::truncf(-0.0f), std::truncf(-0.0f));
-    EXPECT_EQ(ccm::truncf(0.5f), std::truncf(0.5f));
-    EXPECT_EQ(ccm::truncf(-0.5f), std::truncf(-0.5f));
-    EXPECT_EQ(ccm::truncf(0.9f), std::truncf(0.9f));
-    EXPECT_EQ(ccm::truncf(-0.9f), std::truncf(-0.9f));
-    EXPECT_EQ(ccm::truncf(0.9999999999999999f), std::truncf(0.9999999999999999f));
-    EXPECT_EQ(ccm::truncf(-0.9999999999999999f), std::truncf(-0.9999999999999999f));
+    EXPECT_EQ(ccm::truncf(0.0F), std::truncf(0.0F));
+    EXPECT_EQ(ccm::truncf(-0.0F), std::truncf(-0.0F));
+    EXPECT_EQ(ccm::truncf(0.5F), std::truncf(0.5F));
+    EXPECT_EQ(ccm::truncf(-0.5F), std::truncf(-0.5F));
+    EXPECT_EQ(ccm::truncf(0.9F), std::truncf(0.9F));
+    EXPECT_EQ(ccm::truncf(-0.9F), std::truncf(-0.9F));
+    EXPECT_EQ(ccm::truncf(0.9999999999999999F), std::truncf(0.9999999999999999F));
+    EXPECT_EQ(ccm::truncf(-0.9999999999999999F), std::truncf(-0.9999999999999999F));
 
-	//EXPECT_FLOAT_EQ(ccm::fmod(30.508474576271183309f, 6.1016949152542370172f), std::fmod(30.508474576271183309f, 6.1016949152542370172f));
-	EXPECT_EQ(ccm::truncf(30.508474576271183309f), std::truncf(30.508474576271183309f));
+	//EXPECT_FLOAT_EQ(ccm::fmod(30.508474576271183309f, 6.1016949152542370172F), std::fmod(30.508474576271183309f, 6.1016949152542370172F));
+	EXPECT_EQ(ccm::truncf(30.508474576271183309F), std::truncf(30.508474576271183309F));
 
 
 	// Test with long double using std::truncl and ccm::truncl
-	EXPECT_EQ(ccm::truncl(1.0l), std::truncl(1.0l));
-    EXPECT_EQ(ccm::truncl(1.5l), std::truncl(1.5l));
-    EXPECT_EQ(ccm::truncl(1.9l), std::truncl(1.9l));
-    EXPECT_EQ(ccm::truncl(-1.0l), std::truncl(-1.0l));
-    EXPECT_EQ(ccm::truncl(-1.5l), std::truncl(-1.5l));
-    EXPECT_EQ(ccm::truncl(-1.9l), std::truncl(-1.9l));
+	EXPECT_EQ(ccm::truncl(1.0L), std::truncl(1.0L));
+    EXPECT_EQ(ccm::truncl(1.5L), std::truncl(1.5L));
+    EXPECT_EQ(ccm::truncl(1.9L), std::truncl(1.9L));
+    EXPECT_EQ(ccm::truncl(-1.0L), std::truncl(-1.0L));
+    EXPECT_EQ(ccm::truncl(-1.5L), std::truncl(-1.5L));
+    EXPECT_EQ(ccm::truncl(-1.9L), std::truncl(-1.9L));
     EXPECT_EQ(ccm::truncl(std::numeric_limits<long double>::infinity()), std::truncl(std::numeric_limits<long double>::infinity()));
     EXPECT_EQ(ccm::truncl(-std::numeric_limits<long double>::infinity()), std::truncl(-std::numeric_limits<long double>::infinity()));
     EXPECT_TRUE(std::isnan(ccm::truncl(std::nanl(""))));
     EXPECT_TRUE(std::isnan(ccm::truncl(-std::nanl(""))));
-    EXPECT_EQ(ccm::truncl(0.0l), std::truncl(0.0l));
-    EXPECT_EQ(ccm::truncl(-0.0l), std::truncl(-0.0l));
-    EXPECT_EQ(ccm::truncl(0.5l), std::truncl(0.5l));
-    EXPECT_EQ(ccm::truncl(-0.5l), std::truncl(-0.5l));
-    EXPECT_EQ(ccm::truncl(0.9l), std::truncl(0.9l));
-    EXPECT_EQ(ccm::truncl(-0.9l), std::truncl(-0.9l));
-    EXPECT_EQ(ccm::truncl(0.9999999999999999l), std::truncl(0.9999999999999999l));
-    EXPECT_EQ(ccm::truncl(-0.9999999999999999l), std::truncl(-0.9999999999999999l));
+    EXPECT_EQ(ccm::truncl(0.0L), std::truncl(0.0L));
+    EXPECT_EQ(ccm::truncl(-0.0L), std::truncl(-0.0L));
+    EXPECT_EQ(ccm::truncl(0.5L), std::truncl(0.5L));
+    EXPECT_EQ(ccm::truncl(-0.5L), std::truncl(-0.5L));
+    EXPECT_EQ(ccm::truncl(0.9L), std::truncl(0.9L));
+    EXPECT_EQ(ccm::truncl(-0.9L), std::truncl(-0.9L));
+    EXPECT_EQ(ccm::truncl(0.9999999999999999L), std::truncl(0.9999999999999999L));
+    EXPECT_EQ(ccm::truncl(-0.9999999999999999L), std::truncl(-0.9999999999999999L));
 }

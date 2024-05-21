@@ -21,6 +21,7 @@ namespace ccm
 {
 	/**
 	 * @brief Returns the base 2 logarithm of a number.
+	 * @tparam T The type of the number.
 	 * @param num The number to calculate the base 2 logarithm of.
 	 * @return The base 2 logarithm of the number.
 	 */
@@ -46,9 +47,9 @@ namespace ccm
 		}
 
 		// If the argument is negative, -NaN is returned
-		#ifdef CCMATH_COMPILER_APPLE_CLANG // Apple clang returns +NaN
+		#ifdef CCMATH_COMPILER_APPLE_CLANG // Apple clang returns +qNaN
 		if (ccm::signbit(num)) { return std::numeric_limits<T>::quiet_NaN(); }
-		#else
+		#else // All other major compilers return -qNaN
 		if (ccm::signbit(num)) { return -std::numeric_limits<T>::quiet_NaN(); }
 		#endif
 
@@ -61,17 +62,33 @@ namespace ccm
 #endif
 	}
 
+	/**
+	 * @brief Returns the base 2 logarithm of a number.
+	 * @tparam Integer The type of the integer.
+	 * @param num The number to calculate the base 2 logarithm of.
+	 * @return The base 2 logarithm of the number as a double.
+	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double log2(Integer num) noexcept
 	{
 		return ccm::log2<double>(static_cast<double>(num));
 	}
 
+	/**
+	 * @brief Returns the base 2 logarithm of a number.
+	 * @param num The number to calculate the base 2 logarithm of.
+	 * @return The base 2 logarithm of the number as a float.
+	 */
 	constexpr float log2f(float num)
 	{
 		return ccm::log2<float>(num);
 	}
 
+	/**
+	 * @brief Returns the base 2 logarithm of a number.
+	 * @param num The number to calculate the base 2 logarithm of.
+	 * @return The base 2 logarithm of the number as a double.
+	 */
 	constexpr long double log2l(long double num)
 	{
 		return ccm::log2<long double>(num);

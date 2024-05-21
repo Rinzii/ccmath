@@ -11,6 +11,7 @@
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
+
 #include <array>
 #include <limits>
 

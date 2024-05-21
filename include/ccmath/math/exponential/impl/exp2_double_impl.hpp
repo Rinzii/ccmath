@@ -10,8 +10,11 @@
 
 #include "ccmath/internal/helpers/exp_helpers.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/support/bit_mask.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
 #include "ccmath/math/exponential/impl/exp2_data.hpp"
+
+#include <ccmath/internal/support/poly_eval.hpp>
 
 #include <cstdint>
 #include <limits>
@@ -72,8 +75,8 @@ namespace ccm::internal
 			constexpr auto third_polynomial_coefficient	 = exp2_data_double.poly[2];
 			constexpr auto fourth_polynomial_coefficient = exp2_data_double.poly[3];
 			constexpr auto fifth_polynomial_coefficient	 = exp2_data_double.poly[4];
-			constexpr auto table_size					 = (1 << exp2_data<double>::k_exp2_table_bits_dbl);
-			constexpr auto table_bits					 = exp2_data<double>::k_exp2_table_bits_dbl;
+			constexpr auto table_size					 = (1 << exp2_data<double>::table_bits);
+			constexpr auto table_bits					 = exp2_data<double>::table_bits;
 
 			namespace sp = support;
 
@@ -85,7 +88,7 @@ namespace ccm::internal
 			{
 				// Avoid pointless underflow for tiny x.
 				// 0 Is a common input.
-				if (abs_top - sp::top12_bits_of_double(0x1p-54) >= 0x80000000) { return x + 1.0; }
+				if (abs_top - sp::top12_bits_of_double(0x1p-54) >= sp::bitmask_traits<float>::neg_zero) { return x + 1.0; }
 
 				if (abs_top >= sp::top12_bits_of_double(1024.0))
 				{
@@ -126,8 +129,7 @@ namespace ccm::internal
 			const ccm::double_t tmp = tail + rem * first_polynomial_coefficient +
 									  remSqr * (second_polynomial_coefficient + rem * third_polynomial_coefficient) +
 									  remSqr * remSqr * (fourth_polynomial_coefficient + rem * fifth_polynomial_coefficient);
-
-			if (CCM_UNLIKELY(abs_top == 0)) { return handle_special_cases(tmp, sign_bits, expo_int64); }
+			if (CCM_UNLIKELY(abs_top == 0.0)) { return handle_special_cases(tmp, sign_bits, expo_int64); }
 
 			const ccm::double_t scale = sp::uint64_to_double(sign_bits);
 
