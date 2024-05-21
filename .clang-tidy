@@ -17,6 +17,8 @@ readability-*,
 cppcoreguidelines-*,
 -cppcoreguidelines-avoid-magic-numbers,
 -cppcoreguidelines-macro-usage,
+-cppcoreguidelines-non-private-member-variables-in-classes,
+-cppcoreguidelines-special-member-functions,
 
 cert-dcl21-cpp,
 cert-dcl58-cpp,

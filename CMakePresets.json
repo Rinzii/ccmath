@@ -36,6 +36,18 @@
 			}
 		},
 		{
+			"name": "ninja-clang-libcpp",
+			"description": "Build configuration using Ninja Multi-config / clang",
+			"inherits": "default",
+			"binaryDir": "${sourceDir}/out/clang-libcpp",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "clang",
+				"CMAKE_CXX_COMPILER": "clang++",
+				"CMAKE_CXX_FLAGS": "-stdlib=libc++",
+				"CMAKE_EXE_LINKER_FLAGS": "-lc++abi"
+			}
+		},
+		{
 			"name": "ninja-intel",
 			"description": "Build configuration using Ninja Multi-config / intel",
 			"inherits": "default",
@@ -126,7 +138,13 @@
 			"name": "RelWithDebInfo",
 			"configurePreset": "default",
 			"configuration": "RelWithDebInfo"
+		},
+		{
+			"name": "Benchmark",
+			"configurePreset": "benchmark-default",
+			"configuration": "Release"
 		}
+
 	],
 	"testPresets": [
 		{
