@@ -31,6 +31,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU OR
           -Wall -Wextra -Wpedantic -Wconversion -Werror=return-type
   )
 
+
   # TODO: Remove this later.
   #       Some variables have been provided but are not currently being used, but it would not atm make sense to remove them.
   #       So to clean up the warnings we are just silencing these specific cases.
