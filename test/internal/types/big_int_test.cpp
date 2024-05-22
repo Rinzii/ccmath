@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-#include "ccmath/internal/types/big_int.hpp"
+#include "ccmath/internal/types/uint128.hpp"
 
 TEST(CcmathInternalTypesTests, BigIntTest)
 {

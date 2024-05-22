@@ -28,7 +28,7 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME}-compile-options ALIAS ${PROJECT_NAM
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU OR CMAKE_CXX_COMPILER_ID STREQUAL IntelLLVM)
   target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
-          -Wall -Wextra -Wpedantic -Wconversion -Werror=return-type
+          -Wall -Wextra -Wno-pedantic -Wconversion -Werror=return-type
   )
 
 
