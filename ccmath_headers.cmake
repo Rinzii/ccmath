@@ -25,7 +25,29 @@ set(ccmath_internal_predef_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/has_builtin.hpp
 )
 
+set(ccmath_internal_support_typetraits_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/integral_constant.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/bool_constant.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/false_type.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/true_type.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/is_same.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/is_integral.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/is_floating_point.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/is_arithmetic.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/is_signed.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/is_unsigned.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/make_signed.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/make_unsigned.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/remove_cv.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/type_identity.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/enable_if.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/conditional.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/is_trivially_constructible.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits/is_trivially_copyable.hpp
+)
+
 set(ccmath_internal_support_headers
+        ${ccmath_internal_support_typetraits_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/bits.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/endian.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/floating_point_traits.hpp
@@ -33,7 +55,6 @@ set(ccmath_internal_support_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/meta_compare.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/unreachable.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/ctz.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_identity.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/always_false.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/limits.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fp_bits.hpp
