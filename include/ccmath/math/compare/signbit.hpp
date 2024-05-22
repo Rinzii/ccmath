@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/internal/support/always_false.hpp"
 
 // Some compilers have __builtin_signbit which is constexpr for some compilers
@@ -31,6 +30,7 @@
 	// Clang 5.0.0 has constexpr __builtin_copysign that DOES allow static_assert
 	#if defined(__clang__) && (__clang_major__ >= 5)
 		#define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+		#include "ccmath/math/compare/isnan.hpp"
 	#endif
 #endif
 
@@ -38,6 +38,8 @@
 #if !defined(CCMATH_HAS_BUILTIN_BIT_CAST) && !defined(CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT) && !defined(CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN)
 	#if (defined(_MSC_VER) && _MSC_VER >= 1927)
 		#define CCMATH_HAS_BUILTIN_BIT_CAST
+		#include "ccmath/internal/support/bits.hpp"
+		#include "ccmath/math/compare/isnan.hpp"
 		#include "ccmath/internal/support/floating_point_traits.hpp"
 		#include <limits>  // for std::numeric_limits
 		#include <cstdint> // for std::uint64_t
@@ -87,8 +89,8 @@ namespace ccm
 		// Check for the sign of +0.0 and -0.0 with __builtin_bit_cast
 		if (num == static_cast<T>(0) || ccm::isnan(num))
 		{
-			const auto bits = __builtin_bit_cast(helpers::float_bits_t<T>, num);
-			return (bits & helpers::sign_mask_v<T>) != 0;
+			const auto bits = support::bit_cast<support::float_bits_t<T>>(num);
+			return (bits & support::sign_mask_v<T>) != 0;
 		}
 
 		return num < static_cast<T>(0);
