@@ -11,6 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/predef/has_attribute.hpp"
+#include "ccmath/internal/config/type_support.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/ctz.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
@@ -39,8 +40,8 @@ namespace ccm::support::traits
     template <> struct is_unsigned_integer<unsigned int> : std::true_type {};
     template <> struct is_unsigned_integer<unsigned long> : std::true_type {};
     template <> struct is_unsigned_integer<unsigned long long> : std::true_type {};
-#if defined(__SIZEOF_INT128__)
-    template <> struct is_unsigned_integer<__uint128_t> : std::true_type {};
+#if defined(CCM_TYPES_HAS_INT128)
+	template <> struct is_unsigned_integer<unsigned __int128_t> : std::true_type {};
 #endif
     template <typename T> constexpr bool is_unsigned_integer_v = is_unsigned_integer<T>::value;
 	// clang-format on
@@ -174,7 +175,7 @@ namespace ccm::support
 	{
 		if (value == 0) { return std::numeric_limits<T>::digits; }
 
-		if constexpr (ccm::support::traits::is_unsigned_integer_v<T>) { return ccm::support::ctz<T>(value); }
+		if constexpr (ccm::support::traits::is_unsigned_integer_v<T>) { return ccm::support::ctz(value); }
 
 		int ret						 = 0;
 		const unsigned int ulldigits = std::numeric_limits<unsigned long long>::digits;
@@ -198,7 +199,7 @@ namespace ccm::support
 	{
 		if (value == 0) { return std::numeric_limits<T>::digits; }
 
-		if constexpr (ccm::support::traits::is_unsigned_integer_v<T>) { return std::numeric_limits<T>::digits - ccm::support::ctz<T>(value); }
+		if constexpr (ccm::support::traits::is_unsigned_integer_v<T>) { return std::numeric_limits<T>::digits - ccm::support::ctz(value); }
 
 		int ret						 = 0;
 		int iter					 = 0;
