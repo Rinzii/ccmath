@@ -10,9 +10,12 @@
 
 #pragma once
 
-namespace ccm::support::traits
+namespace ccm
 {
-	template<typename T>
+	template<class T>
 	struct type_identity { using type = T; };
-} // namespace ccm::support::traits
+
+	template<class T>
+	using type_identity_t = typename type_identity<T>::type;
+} // namespace ccm
 

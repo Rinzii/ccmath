@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "ccmath/internal/support/type_traits.hpp"
+#include <type_traits>
 
 namespace ccm::type
 {
@@ -20,7 +20,7 @@ namespace ccm::type
 	};
 
 	template <typename T>
-	ccm::support::traits::enable_if_t<ccm::support::traits::is_integral_v<T> && ccm::support::traits::is_unsigned_v<T>, NumberPair<T>> split(T x)
+	std::enable_if_t<std::is_integral_v<T> && std::is_unsigned_v<T>, NumberPair<T>> split(T x)
 	{
 		constexpr std::size_t half_bits_width = sizeof(T) * 4;
 		constexpr T Low_mask				  = (T{1} << half_bits_width) - T{1};
