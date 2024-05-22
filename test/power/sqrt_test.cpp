@@ -49,3 +49,32 @@ TEST(CcmathPowerTests, Sqrt_Double_EdgeCases)
 
 	//EXPECT_EQ(ccm::sqrt(std::numeric_limits<double>::lowest()), std::sqrt(std::numeric_limits<double>::lowest()));
 }
+
+TEST(CcmathPowerTests, Sqrt_LDouble)
+{
+	// Test values that are 2^x
+	EXPECT_EQ(ccm::sqrt(0.0L), std::sqrt(0.0L));
+	EXPECT_EQ(ccm::sqrt(1.0L), std::sqrt(1.0L));
+	EXPECT_EQ(ccm::sqrt(2.0L), std::sqrt(2.0L));
+	EXPECT_EQ(ccm::sqrt(4.0L), std::sqrt(4.0L));
+	EXPECT_EQ(ccm::sqrt(8.0L), std::sqrt(8.0L));
+	EXPECT_EQ(ccm::sqrt(16.0L), std::sqrt(16.0L));
+	EXPECT_EQ(ccm::sqrt(32.0L), std::sqrt(32.0L));
+	EXPECT_EQ(ccm::sqrt(64.0L), std::sqrt(64.0L));
+	EXPECT_EQ(ccm::sqrt(128.0L), std::sqrt(128.0L));
+	EXPECT_EQ(ccm::sqrt(256.0L), std::sqrt(256.0L));
+
+	// Test decimal values
+	EXPECT_EQ(ccm::sqrt(0.1L), std::sqrt(0.1L));
+	EXPECT_EQ(ccm::sqrt(0.2L), std::sqrt(0.2L));
+	EXPECT_EQ(ccm::sqrt(0.3L), std::sqrt(0.3L));
+	EXPECT_EQ(ccm::sqrt(0.4L), std::sqrt(0.4L));
+	EXPECT_EQ(ccm::sqrt(0.5L), std::sqrt(0.5L));
+}
+
+TEST(CcmathPowerTests, Sqrt_LDouble_EdgeCases)
+{
+	// Test edge cases
+	EXPECT_EQ(ccm::sqrt(std::numeric_limits<long double>::min()), std::sqrt(std::numeric_limits<long double>::min()));
+	EXPECT_EQ(ccm::sqrt(std::numeric_limits<long double>::max()), std::sqrt(std::numeric_limits<long double>::max()));
+}
