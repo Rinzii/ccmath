@@ -13,7 +13,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace ccm::helpers
+namespace ccm::support
 {
 	template <class FloatingType>
 	struct floating_point_traits;
