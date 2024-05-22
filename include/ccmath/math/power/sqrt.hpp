@@ -18,6 +18,7 @@
 
 namespace ccm
 {
+	/* TODO: Bring this back once internal issues are resolved.
 	namespace internal
 	{
 		template <typename T>
@@ -160,6 +161,17 @@ namespace ccm
 			}
 		} // namespace impl
 	} // namespace internal
+*/
+
+	// TODO: Delete when above returns.
+	namespace internal::impl
+	{
+		template <typename T>
+		constexpr std::enable_if_t<std::is_floating_point_v<T>, T> sqrt_impl(T x) // NOLINT
+		{
+			return x;
+		}
+	} // namespace internal::impl
 
 	/**
 	 * @brief Calculates the square root of a number.
