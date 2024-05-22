@@ -14,12 +14,12 @@
 #include "ccmath/internal/support/always_false.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
-#include "ccmath/internal/types/int128.hpp"
+#include "ccmath/internal/types/int128_types.hpp"
 #include "ccmath/internal/types/sign.hpp"
 
+#include <cfloat>
 #include <climits>
 #include <cstdint>
-#include <cfloat>
 
 #include "ccmath/internal/predef/likely.hpp"
 
@@ -29,7 +29,7 @@ namespace ccm::support
 	// Create a bitmask with the count right-most bits set to 1, and all other bits
 	// set to 0.  Only unsigned types are allowed.
 	template <typename T, std::size_t count>
-	static constexpr std::enable_if_t<support::is_unsigned_v<T>, T> mask_trailing_ones()
+	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_trailing_ones()
 	{
 		constexpr unsigned T_BITS = CHAR_BIT * sizeof(T);
 		static_assert(count <= T_BITS && "Invalid bit index");
@@ -39,7 +39,7 @@ namespace ccm::support
 	// Create a bitmask with the count left-most bits set to 1, and all other bits
 	// set to 0.  Only unsigned types are allowed.
 	template <typename T, std::size_t count>
-	static constexpr std::enable_if_t<std::is_unsigned_v<T>, T> mask_leading_ones()
+	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_leading_ones()
 	{
 		return T(~mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>());
 	}
@@ -47,7 +47,7 @@ namespace ccm::support
 	// Create a bitmask with the count right-most bits set to 0, and all other bits
 	// set to 1.  Only unsigned types are allowed.
 	template <typename T, std::size_t count>
-	static constexpr std::enable_if_t<std::is_unsigned_v<T>, T> mask_trailing_zeros()
+	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_trailing_zeros()
 	{
 		return mask_leading_ones<T, CHAR_BIT * sizeof(T) - count>();
 	}
@@ -55,7 +55,7 @@ namespace ccm::support
 	// Create a bitmask with the count left-most bits set to 0, and all other bits
 	// set to 1.  Only unsigned types are allowed.
 	template <typename T, std::size_t count>
-	static constexpr std::enable_if_t<std::is_unsigned_v<T>, T> mask_leading_zeros()
+	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_leading_zeros()
 	{
 		return mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>();
 	}
@@ -149,7 +149,7 @@ namespace ccm::support
 		template <>
 		struct FPLayout<FPType::eBinary80>
 		{
-			using StorageType				  = ccm::uint128_t;
+			using StorageType				  = ccm::types::uint128_t;
 			static constexpr int SIGN_LEN	  = 1;
 			static constexpr int EXP_LEN	  = 15;
 			static constexpr int SIG_LEN	  = 64;
@@ -159,7 +159,7 @@ namespace ccm::support
 		template <>
 		struct FPLayout<FPType::eBinary128>
 		{
-			using StorageType				  = ccm::uint128_t;
+			using StorageType				  = ccm::types::uint128_t;
 			static constexpr int SIGN_LEN	  = 1;
 			static constexpr int EXP_LEN	  = 15;
 			static constexpr int SIG_LEN	  = 112;
@@ -190,17 +190,17 @@ namespace ccm::support
 			static_assert(STORAGE_LEN >= TOTAL_LEN);
 
 			// The exponent bias. Always positive.
-			static constexpr int32_t EXP_BIAS = (1U << (EXP_LEN - 1U)) - 1U;
+			static constexpr std::int32_t EXP_BIAS = (1U << (EXP_LEN - 1U)) - 1U;
 			static_assert(EXP_BIAS > 0);
 
 			// The bit pattern that keeps only the *significand* part.
-			static constexpr StorageType SIG_MASK = ccm::support::mask_trailing_ones<StorageType, SIG_LEN>();
+			static constexpr StorageType SIG_MASK = support::mask_trailing_ones<StorageType, SIG_LEN>();
 			// The bit pattern that keeps only the *exponent* part.
-			static constexpr StorageType EXP_MASK = ccm::support::mask_trailing_ones<StorageType, EXP_LEN>() << SIG_LEN;
+			static constexpr StorageType EXP_MASK = support::mask_trailing_ones<StorageType, EXP_LEN>() << SIG_LEN;
 			// The bit pattern that keeps only the *sign* part.
-			static constexpr StorageType SIGN_MASK = ccm::support::mask_trailing_ones<StorageType, SIGN_LEN>() << (EXP_LEN + SIG_LEN);
+			static constexpr StorageType SIGN_MASK = support::mask_trailing_ones<StorageType, SIGN_LEN>() << (EXP_LEN + SIG_LEN);
 			// The bit pattern that keeps only the *exponent + significand* part.
-			static constexpr StorageType EXP_SIG_MASK = ccm::support::mask_trailing_ones<StorageType, EXP_LEN + SIG_LEN>();
+			static constexpr StorageType EXP_SIG_MASK = support::mask_trailing_ones<StorageType, EXP_LEN + SIG_LEN>();
 			// The bit pattern that keeps only the *sign + exponent + significand* part.
 			static constexpr StorageType FP_MASK = ccm::support::mask_trailing_ones<StorageType, TOTAL_LEN>();
 			// The bit pattern that keeps only the *fraction* part.
@@ -244,9 +244,9 @@ namespace ccm::support
 			// An opaque type to store a floating point exponent.
 			// We define special values but it is valid to create arbitrary values as long
 			// as they are in the range [min, max].
-			struct Exponent : public TypedInt<int32_t>
+			struct Exponent : TypedInt<std::int32_t>
 			{
-				using UP = TypedInt<int32_t>;
+				using UP = TypedInt<std::int32_t>;
 				using UP::UP;
 				static constexpr auto subnormal() { return Exponent(-EXP_BIAS); }
 				static constexpr auto min() { return Exponent(1 - EXP_BIAS); }
@@ -259,15 +259,15 @@ namespace ccm::support
 			// We define special values but it is valid to create arbitrary values as long
 			// as they are in the range [zero, bits_all_ones].
 			// Values greater than bits_all_ones are truncated.
-			struct BiasedExponent : public TypedInt<std::uint32_t>
+			struct BiasedExponent : TypedInt<std::uint32_t>
 			{
 				using UP = TypedInt<std::uint32_t>;
 				using UP::UP;
 
-				constexpr BiasedExponent(Exponent exp) : UP(static_cast<int32_t>(exp) + EXP_BIAS) {}
+				constexpr BiasedExponent(Exponent exp) : UP(static_cast<std::int32_t>(exp) + EXP_BIAS) {}
 
 				// Cast operator to get convert from BiasedExponent to Exponent.
-				constexpr operator Exponent() const { return Exponent(UP::value - static_cast<std::uint32_t>(EXP_BIAS)); }
+				constexpr operator Exponent() const { return Exponent(UP::value - EXP_BIAS); }
 
 				constexpr BiasedExponent & operator++()
 				{
@@ -696,7 +696,7 @@ namespace ccm::support
 			else if constexpr (LDBL_MANT_DIG == 113) { return FPType::eBinary128; }
 		}
 #if defined(CCM_TYPES_HAS_FLOAT128)
-		else if constexpr (std::is_same_v<UnqualT, float128>) { return FPType::eBinary128; }
+		else if constexpr (std::is_same_v<UnqualT, types::float128>) { return FPType::eBinary128; }
 #endif
 		else { static_assert(support::always_false<UnqualT>, "Unsupported type"); }
 		return FPType::eBinary32;
