@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "ccmath/internal/predef/has_attribute.hpp"
 #include "ccmath/internal/config/type_support.hpp"
+#include "ccmath/internal/predef/has_attribute.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/ctz.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
@@ -42,24 +42,13 @@ namespace ccm::support::traits
 namespace ccm::support
 {
 
-	template <typename To, typename From>
-	constexpr std::enable_if_t<
-		(sizeof(To) == sizeof(From)) && std::is_trivially_constructible_v<To> && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From>, To>
-	bit_cast(const From & from)
+	template <class To, class From>
+	std::enable_if_t<sizeof(To) == sizeof(From) && std::is_trivially_copyable_v<From> && std::is_trivially_copyable_v<To>, To> constexpr bit_cast(
+		const From & from) noexcept
 	{
-#if CCM_HAS_BUILTIN(__builtin_bit_cast)
+		static_assert(std::is_trivially_constructible_v<To>, "This implementation additionally requires "
+															 "destination type to be trivially constructible");
 		return __builtin_bit_cast(To, from);
-#else
-		To to;
-		char * dst		 = reinterpret_cast<char *>(&to);
-		const char * src = reinterpret_cast<const char *>(&from);
-	#if CCM_HAS_BUILTIN(__builtin_memcpy_inline)
-		__builtin_memcpy_inline(dst, src, sizeof(To));
-	#else
-		for (unsigned i = 0; i < sizeof(To); ++i) dst[i] = src[i];
-	#endif // CCM_HAS_BUILTIN(__builtin_memcpy_inline)
-		return to;
-#endif // CCM_HAS_BUILTIN(__builtin_bit_cast)
 	}
 
 	template <class T,
