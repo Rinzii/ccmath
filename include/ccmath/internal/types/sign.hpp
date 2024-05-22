@@ -29,6 +29,6 @@ namespace ccm::types
 		bool is_negative;
 	};
 
-	constexpr Sign Sign::NEG = Sign(true);
-	constexpr Sign Sign::POS = Sign(false);
+	inline constexpr Sign Sign::NEG = Sign(true);
+	inline constexpr Sign Sign::POS = Sign(false);
 } // namespace ccm::types
