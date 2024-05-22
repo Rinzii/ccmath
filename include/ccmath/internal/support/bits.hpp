@@ -34,7 +34,7 @@ namespace ccm::support::traits
 	template <> struct is_char<unsigned char> : std::true_type {};
 	template <typename T> constexpr bool is_char_v = is_char<T>::value;
 
-    template <typename T> constexpr bool is_unsigned_integer = std::conjunction<std::is_integral<T>, std::is_unsigned<T>>::type;
+    template <typename T> constexpr bool is_unsigned_integer_v = std::conjunction_v<std::is_integral<T>, std::is_unsigned<T>>;
 	// clang-format on
 
 } // namespace ccm::support::traits
@@ -125,7 +125,7 @@ namespace ccm::support
 	template <class T>
 	constexpr T rotr(T t, int cnt) noexcept
 	{
-		static_assert(ccm::support::traits::is_unsigned_integer<T>, "rotr requires an unsigned integer type");
+		static_assert(ccm::support::traits::is_unsigned_integer_v<T>, "rotr requires an unsigned integer type");
 		const unsigned int dig = std::numeric_limits<T>::digits;
 		if ((static_cast<unsigned int>(cnt) % dig) == 0) { return t; }
 
@@ -155,7 +155,7 @@ namespace ccm::support
 	{
 		if (value == 0) { return std::numeric_limits<T>::digits; }
 
-		if constexpr (ccm::support::traits::is_unsigned_integer<T>) { return ccm::support::ctz(value); }
+		if constexpr (ccm::support::traits::is_unsigned_integer_v<T>) { return ccm::support::ctz(value); }
 
 		int ret						 = 0;
 		const unsigned int ulldigits = std::numeric_limits<unsigned long long>::digits;
@@ -173,13 +173,13 @@ namespace ccm::support
 		return value != std::numeric_limits<T>::max() ? countr_zero(static_cast<T>(~value)) : std::numeric_limits<T>::digits;
 	}
 
-	template <typename T, std::enable_if_t<traits::is_unsigned_integer<T>, bool> = true>
+	template <typename T, std::enable_if_t<traits::is_unsigned_integer_v<T>, bool> = true>
 	// NOLINTNEXTLINE
-	[[nodiscard]] constexpr std::enable_if_t<support::is_unsigned_v<T>, int> countl_zero(T value)
+	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> countl_zero(T value)
 	{
 		if (value == 0) { return std::numeric_limits<T>::digits; }
 
-		if constexpr (ccm::support::traits::is_unsigned_integer<T>) { return std::numeric_limits<T>::digits - ccm::support::ctz(value); }
+		if constexpr (ccm::support::traits::is_unsigned_integer_v<T>) { return std::numeric_limits<T>::digits - ccm::support::ctz(value); }
 
 		int ret						 = 0;
 		int iter					 = 0;
@@ -194,7 +194,7 @@ namespace ccm::support
 		return ret + iter;
 	}
 
-	template <typename T, std::enable_if_t<traits::is_unsigned_integer<T>, bool> = true>
+	template <typename T, std::enable_if_t<traits::is_unsigned_integer_v<T>, bool> = true>
 	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> countl_one(T value)
 	{
 		return value != std::numeric_limits<T>::max() ? countl_zero(static_cast<T>(~value)) : std::numeric_limits<T>::digits;
