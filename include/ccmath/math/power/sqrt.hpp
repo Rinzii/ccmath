@@ -26,17 +26,6 @@ namespace ccm
 			static constexpr bool value = false;
 		};
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
-		template <>
-		struct Is80BitLongDouble<long double>
-		{
-			static constexpr bool value = true;
-		};
-#endif
-
-		template <typename T>
-		constexpr bool Is80BitLongDouble_v = Is80BitLongDouble<T>::value;
-
 		template <typename T>
 		constexpr void normalize(int & exponent, typename support::FPBits<T>::StorageType & mantissa)
 		{
@@ -44,6 +33,23 @@ namespace ccm
 			exponent -= shift;
 			mantissa <<= shift;
 		}
+
+#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+		template <>
+		struct Is80BitLongDouble<long double>
+		{
+			static constexpr bool value = true;
+		};
+
+		template <>
+		constexpr void normalize<long double>(int & exponent, types::uint128_t & mantissa)
+		{
+			const auto shift = static_cast<unsigned int>(support::countl_zero(static_cast<uint64_t>(mantissa)) -
+														 (8 * sizeof(uint64_t) - 1 - support::FPBits<long double>::FRACTION_LEN));
+			exponent -= shift;
+			mantissa <<= shift;
+		}
+#endif
 
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
 		template <>
@@ -53,9 +59,91 @@ namespace ccm
 		}
 #endif
 
+		template <typename T>
+		constexpr bool Is80BitLongDouble_v = Is80BitLongDouble<T>::value;
+
 		namespace impl
 		{
-			// TODO: This likely does not work with 128 bit floats yet.
+			namespace bit80
+			{
+
+				constexpr long double sqrt_calc_bits(long double x)
+				{
+					using Bits				  = support::FPBits<long double>;
+					using StorageType		  = typename Bits::StorageType;
+					constexpr StorageType one = static_cast<StorageType>(1) << (Bits::FRACTION_LEN);
+					constexpr auto nan_type	  = Bits::quiet_nan().get_val();
+
+					Bits bits(x);
+
+					if (bits == Bits::inf(types::Sign::POS) || bits.is_zero() || bits.is_nan()) { return x; }
+					if (bits.is_neg()) { return nan_type; }
+
+					int x_exp		   = bits.get_explicit_exponent();
+					StorageType x_mant = bits.get_mantissa();
+
+					// If we have a denormal value, normalize it.
+					if (bits.get_implicit_bit()) { x_mant |= one; }
+					else if (bits.is_subnormal()) { normalize<long double>(x_exp, x_mant); }
+
+					// Ensure that the exponent is even.
+					if ((x_exp & 1) != 0)
+					{
+						--x_exp;
+						x_mant <<= 1;
+					}
+
+					StorageType y = one;
+					StorageType r = x_mant - one;
+
+					for (StorageType current_bit = one >> 1; current_bit != 0U; current_bit >>= 1)
+					{
+						r <<= 1;
+						if (const StorageType tmp = (y << 1) + current_bit; r >= tmp)
+						{
+							r -= tmp;
+							y += current_bit;
+						}
+					}
+
+					// We perform one more iteration to ensure that the result is correctly rounded.
+					const bool lsb = static_cast<bool>(y & 1);
+					bool round_bit = false;
+					r <<= 2;
+					if (const StorageType tmp = (y << 2) + 1; r >= tmp)
+					{
+						r -= tmp;
+						round_bit = true;
+					}
+
+					// Append the exponent field.
+					x_exp = ((x_exp >> 1) + Bits::EXP_BIAS);
+					y |= (static_cast<StorageType>(x_exp) << (Bits::FRACTION_LEN + 1));
+
+					switch (support::get_rounding_mode())
+					{
+					case FE_TONEAREST:
+						// Round to nearest, ties to even
+						if (round_bit && (lsb || (r != 0))) { ++y; }
+						break;
+					case FE_UPWARD:
+						if (round_bit || (r != 0)) { ++y; }
+						break;
+					default: break;
+					}
+
+					// Extract output
+					support::FPBits<long double> out(0.0L);
+					out.set_biased_exponent(x_exp);
+					out.set_implicit_bit(true);
+					out.set_mantissa((y & (one - 1)));
+
+					return out.get_val();
+
+					return 0;
+				}
+			} // namespace bit80
+
 			template <typename T>
 			constexpr std::enable_if_t<std::is_floating_point_v<T>, T> sqrt_calc_bits(support::FPBits<T> & bits)
 			{
@@ -133,12 +221,10 @@ namespace ccm
 			template <typename T>
 			constexpr std::enable_if_t<std::is_floating_point_v<T>, T> sqrt_impl(T x) // NOLINT
 			{
-				// TODO: Until we have implemented x86 long double support this will always be false.
-				if constexpr (Is80BitLongDouble_v<T> && false) // NOLINT
+				if constexpr (Is80BitLongDouble_v<T>) // NOLINT
 				{
-					// TODO: 80 bit long double sqrt implementation
-					static_assert(support::always_false<T>, "80 bit long double sqrt not implemented yet.");
-					return 0;
+
+					return bit80::sqrt_calc_bits(x);
 				}
 				else
 				{
@@ -160,7 +246,6 @@ namespace ccm
 			}
 		} // namespace impl
 	} // namespace internal
-
 
 	/**
 	 * @brief Calculates the square root of a number.
