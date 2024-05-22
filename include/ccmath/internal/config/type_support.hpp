@@ -8,25 +8,20 @@
 
 #pragma once
 
-#include <cfloat>  // LDBL_MANT_DIG
-#include <cstdint> // UINT64_MAX, __SIZEOF_INT128__
 
-#if defined(UINT64_MAX)
-	#define CCM_TYPES_HAS_INT64
-#endif // UINT64_MAX
+#include <cfloat> // LDBL_MANT_DIG
+#include <cstdint> // UINT64_MAX, __SIZEOF_INT128__
 
 // int128 / uint128 support
 #if defined(__SIZEOF_INT128__)
-	#ifndef CCM_TYPES_HAS_INT128
-		#define CCM_TYPES_HAS_INT128
-	#endif
+#define CCM_TYPES_HAS_INT128
 #endif // defined(__SIZEOF_INT128__)
 
 // 'long double' properties.
 #if (LDBL_MANT_DIG == 53)
-	#define CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
+#define CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
 #elif (LDBL_MANT_DIG == 64)
-	#define CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
+#define CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
 #elif (LDBL_MANT_DIG == 113)
-	#define CCM_TYPES_LONG_DOUBLE_IS_FLOAT128
+#define CCM_TYPES_LONG_DOUBLE_IS_FLOAT128
 #endif
