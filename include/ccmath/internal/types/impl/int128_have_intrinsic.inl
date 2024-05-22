@@ -7,10 +7,3 @@
  */
 
 #pragma once
-
-#include "ccmath/internal/support/type_traits/bool_constant.hpp"
-
-namespace ccm::support::traits
-{
-	using true_type = bool_constant<true>;
-} // namespace ccm::support::traits

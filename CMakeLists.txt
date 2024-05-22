@@ -28,8 +28,9 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME}-compile-options ALIAS ${PROJECT_NAM
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU OR CMAKE_CXX_COMPILER_ID STREQUAL IntelLLVM)
   target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
-          -Wall -Wextra -Wconversion -Werror=return-type
+          -Wall -Wextra -Wno-pedantic -Wconversion -Werror=return-type
   )
+
 
   # TODO: Remove this later.
   #       Some variables have been provided but are not currently being used, but it would not atm make sense to remove them.
@@ -41,7 +42,7 @@ endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL MSVC)
   target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
-          /W4 /Wall /WX /permissive- /Zc:__cplusplus /Zc:preprocessor
+          /W4 /Wall /WX /permissive- /Zc:__cplusplus
   )
 endif()
 

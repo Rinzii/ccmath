@@ -11,21 +11,57 @@
 
 #pragma once
 
-#include "ccmath/internal/predef/likely.hpp"
 #include "ccmath/internal/support/always_false.hpp"
-#include "ccmath/internal/support/bit_helpers.hpp"
 #include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/support/type_traits.hpp"
 #include "ccmath/internal/types/int128.hpp"
 #include "ccmath/internal/types/sign.hpp"
 
-#include <cfloat>
 #include <climits>
 #include <cstdint>
+#include <cfloat>
+
+#include "ccmath/internal/predef/likely.hpp"
 
 namespace ccm::support
 {
+
+	// Create a bitmask with the count right-most bits set to 1, and all other bits
+	// set to 0.  Only unsigned types are allowed.
+	template <typename T, std::size_t count>
+	static constexpr std::enable_if_t<support::is_unsigned_v<T>, T> mask_trailing_ones()
+	{
+		constexpr unsigned T_BITS = CHAR_BIT * sizeof(T);
+		static_assert(count <= T_BITS && "Invalid bit index");
+		return count == 0 ? 0 : (T(-1) >> (T_BITS - count));
+	}
+
+	// Create a bitmask with the count left-most bits set to 1, and all other bits
+	// set to 0.  Only unsigned types are allowed.
+	template <typename T, std::size_t count>
+	static constexpr std::enable_if_t<std::is_unsigned_v<T>, T> mask_leading_ones()
+	{
+		return T(~mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>());
+	}
+
+	// Create a bitmask with the count right-most bits set to 0, and all other bits
+	// set to 1.  Only unsigned types are allowed.
+	template <typename T, std::size_t count>
+	static constexpr std::enable_if_t<std::is_unsigned_v<T>, T> mask_trailing_zeros()
+	{
+		return mask_leading_ones<T, CHAR_BIT * sizeof(T) - count>();
+	}
+
+	// Create a bitmask with the count left-most bits set to 0, and all other bits
+	// set to 1.  Only unsigned types are allowed.
+	template <typename T, std::size_t count>
+	static constexpr std::enable_if_t<std::is_unsigned_v<T>, T> mask_leading_zeros()
+	{
+		return mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>();
+	}
+
 	// The supported floating point types.
-	enum class FPType : uint8_t
+	enum class FPType
 	{
 		eBinary32,
 		eBinary64,
@@ -113,7 +149,7 @@ namespace ccm::support
 		template <>
 		struct FPLayout<FPType::eBinary80>
 		{
-			using StorageType				  = Uint128;
+			using StorageType				  = ccm::uint128_t;
 			static constexpr int SIGN_LEN	  = 1;
 			static constexpr int EXP_LEN	  = 15;
 			static constexpr int SIG_LEN	  = 64;
@@ -123,7 +159,7 @@ namespace ccm::support
 		template <>
 		struct FPLayout<FPType::eBinary128>
 		{
-			using StorageType				  = Uint128;
+			using StorageType				  = ccm::uint128_t;
 			static constexpr int SIGN_LEN	  = 1;
 			static constexpr int EXP_LEN	  = 15;
 			static constexpr int SIG_LEN	  = 112;
@@ -158,18 +194,18 @@ namespace ccm::support
 			static_assert(EXP_BIAS > 0);
 
 			// The bit pattern that keeps only the *significand* part.
-			static constexpr StorageType SIG_MASK = mask_trailing_ones<StorageType, SIG_LEN>();
+			static constexpr StorageType SIG_MASK = ccm::support::mask_trailing_ones<StorageType, SIG_LEN>();
 			// The bit pattern that keeps only the *exponent* part.
-			static constexpr StorageType EXP_MASK = mask_trailing_ones<StorageType, EXP_LEN>() << SIG_LEN;
+			static constexpr StorageType EXP_MASK = ccm::support::mask_trailing_ones<StorageType, EXP_LEN>() << SIG_LEN;
 			// The bit pattern that keeps only the *sign* part.
-			static constexpr StorageType SIGN_MASK = mask_trailing_ones<StorageType, SIGN_LEN>() << (EXP_LEN + SIG_LEN);
+			static constexpr StorageType SIGN_MASK = ccm::support::mask_trailing_ones<StorageType, SIGN_LEN>() << (EXP_LEN + SIG_LEN);
 			// The bit pattern that keeps only the *exponent + significand* part.
-			static constexpr StorageType EXP_SIG_MASK = mask_trailing_ones<StorageType, EXP_LEN + SIG_LEN>();
+			static constexpr StorageType EXP_SIG_MASK = ccm::support::mask_trailing_ones<StorageType, EXP_LEN + SIG_LEN>();
 			// The bit pattern that keeps only the *sign + exponent + significand* part.
-			static constexpr StorageType FP_MASK = mask_trailing_ones<StorageType, TOTAL_LEN>();
+			static constexpr StorageType FP_MASK = ccm::support::mask_trailing_ones<StorageType, TOTAL_LEN>();
 			// The bit pattern that keeps only the *fraction* part.
 			// i.e., the *significand* without the leading one.
-			static constexpr StorageType FRACTION_MASK = mask_trailing_ones<StorageType, FRACTION_LEN>();
+			static constexpr StorageType FRACTION_MASK = ccm::support::mask_trailing_ones<StorageType, FRACTION_LEN>();
 
 			static_assert((SIG_MASK & EXP_MASK & SIGN_MASK) == 0, "masks disjoint");
 			static_assert((SIG_MASK | EXP_MASK | SIGN_MASK) == FP_MASK, "masks cover");
@@ -255,7 +291,7 @@ namespace ccm::support
 			// as they are in the range [zero, bits_all_ones].
 			// Note that the semantics of the Significand are implementation dependent.
 			// Values greater than bits_all_ones are truncated.
-			struct Significand : public TypedInt<StorageType>
+			struct Significand : TypedInt<StorageType>
 			{
 				using UP = TypedInt<StorageType>;
 				using UP::UP;
@@ -300,7 +336,7 @@ namespace ccm::support
 			[[nodiscard]] constexpr StorageType exp_sig_bits() const { return bits & EXP_SIG_MASK; }
 
 			// Parts
-			[[nodiscard]] constexpr BiasedExponent biased_exponent() const { return BiasedExponent(static_cast<uint32_t>(exp_bits() >> SIG_LEN)); }
+			[[nodiscard]] constexpr BiasedExponent biased_exponent() const { return BiasedExponent(static_cast<std::uint32_t>(exp_bits() >> SIG_LEN)); }
 			constexpr void set_biased_exponent(BiasedExponent biased) { bits = merge(bits, encode(biased), EXP_MASK); }
 
 		public:
@@ -379,12 +415,12 @@ namespace ccm::support
 
 		// Specialization for the X86 Extended Precision type.
 		template <typename RetT>
-		struct FPRepSem<FPType::eBinary80, RetT> : public FPStorage<FPType::eBinary80>
+		struct FPRepSem<FPType::eBinary80, RetT> : FPStorage<FPType::eBinary80>
 		{
-			using UP = FPStorage<FPType::eBinary80>;
-			using typename UP::StorageType;
+			using UP = FPStorage;
 			using UP::FRACTION_LEN;
 			using UP::FRACTION_MASK;
+			using UP::StorageType;
 
 			// The x86 80 bit float represents the leading digit of the mantissa
 			// explicitly. This is the mask for that bit.
@@ -395,8 +431,8 @@ namespace ccm::support
 																		   "whole significand");
 
 		protected:
-			using typename UP::Exponent;
-			using typename UP::Significand;
+			using UP::Exponent;
+			using UP::Significand;
 			using UP::encode;
 			using UP::UP;
 
@@ -451,7 +487,7 @@ namespace ccm::support
 			[[nodiscard]] constexpr bool is_normal() const
 			{
 				const auto exp = exp_bits();
-				if (exp == encode(Exponent::subnormal()) || exp == encode(Exponent::inf())) { return false; }
+				if (exp == encode(Exponent::subnormal()) || exp == encode(Exponent::inf())) return false;
 				return get_implicit_bit();
 			}
 			constexpr RetT next_toward_inf() const
@@ -650,19 +686,20 @@ namespace ccm::support
 	template <typename T>
 	static constexpr FPType get_fp_type()
 	{
-		using UnqualT = traits::remove_cv_t<T>;
-		if constexpr (traits::is_same_v<UnqualT, float> && FLT_MANT_DIG == 24) { return FPType::eBinary32; }
-		else if constexpr (traits::is_same_v<UnqualT, double> && DBL_MANT_DIG == 53) { return FPType::eBinary64; }
-		else if constexpr (traits::is_same_v<UnqualT, long double>)
+		using UnqualT = std::remove_cv_t<T>;
+		if constexpr (std::is_same_v<UnqualT, float> && FLT_MANT_DIG == 24) { return FPType::eBinary32; }
+		else if constexpr (std::is_same_v<UnqualT, double> && DBL_MANT_DIG == 53) { return FPType::eBinary64; }
+		else if constexpr (std::is_same_v<UnqualT, long double>)
 		{
 			if constexpr (LDBL_MANT_DIG == 53) { return FPType::eBinary64; }
 			else if constexpr (LDBL_MANT_DIG == 64) { return FPType::eBinary80; }
 			else if constexpr (LDBL_MANT_DIG == 113) { return FPType::eBinary128; }
 		}
 #if defined(CCM_TYPES_HAS_FLOAT128)
-		else if constexpr (traits::is_same_v<UnqualT, float128>) { return FPType::eBinary128; }
+		else if constexpr (std::is_same_v<UnqualT, float128>) { return FPType::eBinary128; }
 #endif
 		else { static_assert(support::always_false<UnqualT>, "Unsupported type"); }
+		return FPType::eBinary32;
 	}
 
 	// A generic class to manipulate C++ floating point formats.
@@ -670,7 +707,7 @@ namespace ccm::support
 	template <typename T>
 	struct FPBits final : internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>
 	{
-		static_assert(traits::is_floating_point_v<T>, "FPBits instantiated with invalid type.");
+		static_assert(std::is_floating_point_v<T>, "FPBits instantiated with invalid type.");
 		using UP		  = internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>;
 		using StorageType = typename UP::StorageType;
 
@@ -678,10 +715,10 @@ namespace ccm::support
   constexpr FPBits() = default;
 
   template <typename XType> constexpr explicit FPBits(XType x) {
-    using Unqual = traits::remove_cv_t<XType>;
-    if constexpr (traits::is_same_v<Unqual, T>) {
+    using Unqual = std::remove_cv_t<XType>;
+    if constexpr (std::is_same_v<Unqual, T>) {
       UP::bits = support::bit_cast<StorageType>(x);
-    } else if constexpr (traits::is_same_v<Unqual, StorageType>) {
+    } else if constexpr (std::is_same_v<Unqual, StorageType>) {
       UP::bits = x;
     } else {
       // We don't want accidental type promotions/conversions, so we require

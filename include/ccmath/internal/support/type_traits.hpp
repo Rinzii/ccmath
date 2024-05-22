@@ -6,27 +6,26 @@
  * See LICENSE for more information.
  */
 
- // Internal type traits for ccmath. Do not use these outside of ccmath.
+ // Wrapper for type_traits with additional specializations
 
 #pragma once
 
-#include "ccmath/internal/support/type_traits/bool_constant.hpp"
-#include "ccmath/internal/support/type_traits/conditional.hpp"
-#include "ccmath/internal/support/type_traits/enable_if.hpp"
-#include "ccmath/internal/support/type_traits/false_type.hpp"
-#include "ccmath/internal/support/type_traits/integral_constant.hpp"
-#include "ccmath/internal/support/type_traits/is_arithmetic.hpp"
-#include "ccmath/internal/support/type_traits/is_floating_point.hpp"
-#include "ccmath/internal/support/type_traits/is_integral.hpp"
-#include "ccmath/internal/support/type_traits/is_same.hpp"
-#include "ccmath/internal/support/type_traits/is_signed.hpp"
-#include "ccmath/internal/support/type_traits/is_trivially_constructible.hpp"
-#include "ccmath/internal/support/type_traits/is_trivially_copyable.hpp"
-#include "ccmath/internal/support/type_traits/is_unsigned.hpp"
-#include "ccmath/internal/support/type_traits/make_signed.hpp"
-#include "ccmath/internal/support/type_traits/make_unsigned.hpp"
-#include "ccmath/internal/support/type_traits/remove_cv.hpp"
-#include "ccmath/internal/support/type_traits/true_type.hpp"
-#include "ccmath/internal/support/type_traits/type_identity.hpp"
+#include "ccmath/internal/config/type_support.hpp"
+
+#include <type_traits>
+
+#include "ccmath/internal/types/int128.hpp"
+
+namespace ccm::support
+{
+	template <typename T>
+	struct is_unsigned : std::is_unsigned<T> {};
+
+	template <>
+	struct is_unsigned<ccm::uint128_t> : std::true_type {};
+
+	template <typename T>
+	constexpr bool is_unsigned_v = is_unsigned<T>::value;
 
 
+} // namespace ccm::support
