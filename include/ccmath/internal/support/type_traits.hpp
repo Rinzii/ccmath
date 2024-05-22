@@ -13,7 +13,6 @@
 #include "ccmath/internal/config/type_support.hpp"
 #include "ccmath/internal/support/meta_compare.hpp"
 #include "ccmath/internal/types/float128.hpp"
-#include "ccmath/internal/types/int128_types.hpp"
 
 #include <type_traits>
 
@@ -68,8 +67,8 @@ namespace ccm::support::traits
 	template<> struct internal_is_integral_helper<long long> : std::true_type {};
 	template<> struct internal_is_integral_helper<unsigned long long> : std::true_type {};
 	#ifdef CCM_TYPES_HAS_INT128
-	template<> struct internal_is_integral_helper<types::int128_t> : std::true_type {};
-	template<> struct internal_is_integral_helper<types::uint128_t> : std::true_type {};
+	template<> struct internal_is_integral_helper<__uint128_t> : std::true_type {};
+	template<> struct internal_is_integral_helper<__int128_t> : std::true_type {};
 	#endif
 	/// @endcond
 	
