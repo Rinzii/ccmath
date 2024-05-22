@@ -24,12 +24,11 @@
 
 #include "ccmath/internal/predef/likely.hpp"
 
-namespace ccm::fpsupport
+namespace ccm::support
 {
 
-
 	// The supported floating point types.
-	enum class FPType
+	enum class FPType : std::uint8_t
 	{
 		eBinary32,
 		eBinary64,
@@ -37,58 +36,8 @@ namespace ccm::fpsupport
 		eBinary128,
 	};
 
-	// The classes hierarchy is as follows:
-	//
-	//             ┌───────────────────┐
-	//             │ FPLayout<FPType>  │
-	//             └─────────▲─────────┘
-	//                       │
-	//             ┌─────────┴─────────┐
-	//             │ FPStorage<FPType> │
-	//             └─────────▲─────────┘
-	//                       │
-	//          ┌────────────┴─────────────┐
-	//          │                          │
-	// ┌────────┴─────────┐ ┌──────────────┴──────────────────┐
-	// │ FPRepSem<FPType> │ │  FPRepSem<FPType::X86_Binary80  │
-	// └────────▲─────────┘ └──────────────▲──────────────────┘
-	//          │                          │
-	//          └────────────┬─────────────┘
-	//                       │
-	//               ┌───────┴───────┐
-	//               │  FPRepImpl<T> │
-	//               └───────▲───────┘
-	//                       │
-	//              ┌────────┴────────┐
-	//        ┌─────┴─────┐     ┌─────┴─────┐
-	//        │  FPRep<T> │     │ FPBits<T> │
-	//        └───────────┘     └───────────┘
-	//
-	// - 'FPLayout' defines only a few constants, namely the 'StorageType' and
-	//   length of the sign, the exponent, fraction and significand parts.
-	// - 'FPStorage' builds more constants on top of those from 'FPLayout' like
-	//   exponent bias and masks. It also holds the bit representation of the
-	//   floating point as a 'StorageType' type and defines tools to assemble or
-	//   test these parts.
-	// - 'FPRepSem' defines functions to interact semantically with the floating
-	//   point representation. The default implementation is the one for 'IEEE754',
-	//   a specialization is provided for X86 Extended Precision.
-	// - 'FPRepImpl' derives from 'FPRepSem' and adds functions that are common to
-	//   all implementations or build on the ones in 'FPRepSem'.
-	// - 'FPRep' exposes all functions from 'FPRepImpl' and returns 'FPRep'
-	//   instances when using Builders (static functions to create values).
-	// - 'FPBits' exposes all the functions from 'FPRepImpl' but operates on the
-	//   native C++ floating point type instead of 'FPType'. An additional 'get_val'
-	//   function allows getting the C++ floating point type value back. Builders
-	//   called from 'FPBits' return 'FPBits' instances.
-
 	namespace internal
 	{
-		// Defines the layout (sign, exponent, significand) of a floating point type in
-		// memory. It also defines its associated StorageType, i.e., the unsigned
-		// integer type used to manipulate its representation.
-		// Additionally we provide the fractional part length, i.e., the number of bits
-		// after the decimal dot when the number is in normal form.
 		template <FPType>
 		struct FPLayout
 		{
@@ -455,7 +404,8 @@ namespace ccm::fpsupport
 			[[nodiscard]] constexpr bool is_normal() const
 			{
 				const auto exp = exp_bits();
-				if (exp == encode(Exponent::subnormal()) || exp == encode(Exponent::inf())) return false;
+				if (exp == encode(Exponent::subnormal()) || exp == encode(Exponent::inf())) { return false;
+}
 				return get_implicit_bit();
 			}
 			constexpr RetT next_toward_inf() const
