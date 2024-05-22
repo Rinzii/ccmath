@@ -21,26 +21,26 @@ namespace ccm::support::traits
 {
 	// TODO: Later add this into its own header.
 	// clang-format off
-	template <typename T> struct is_char : std::false_type {};
-	template <> struct is_char<char> : std::true_type {};
-	template <> struct is_char<wchar_t> : std::true_type {};
+	template <typename T> struct is_char : ccm::support::traits::false_type {};
+	template <> struct is_char<char> : ccm::support::traits::true_type {};
+	template <> struct is_char<wchar_t> : ccm::support::traits::true_type {};
 #if (__cplusplus >= 202002L) || defined(__cpp_char8_t) || defined(__cpp_lib_char8_t) // C++20 defines char8_t
-    template <> struct is_char<char8_t> : std::true_type {};
+    template <> struct is_char<char8_t> : ccm::support::traits::true_type {};
 #endif
-	template <> struct is_char<char16_t> : std::true_type {};
-	template <> struct is_char<char32_t> : std::true_type {};
-	template <> struct is_char<signed char> : std::true_type {};
-	template <> struct is_char<unsigned char> : std::true_type {};
+	template <> struct is_char<char16_t> : ccm::support::traits::true_type {};
+	template <> struct is_char<char32_t> : ccm::support::traits::true_type {};
+	template <> struct is_char<signed char> : ccm::support::traits::true_type {};
+	template <> struct is_char<unsigned char> : ccm::support::traits::true_type {};
 	template <typename T> constexpr bool is_char_v = is_char<T>::value;
 
-    template <typename T> struct is_unsigned_integer : std::false_type {};
-    template <> struct is_unsigned_integer<unsigned char> : std::true_type {};
-    template <> struct is_unsigned_integer<unsigned short> : std::true_type {};
-    template <> struct is_unsigned_integer<unsigned int> : std::true_type {};
-    template <> struct is_unsigned_integer<unsigned long> : std::true_type {};
-    template <> struct is_unsigned_integer<unsigned long long> : std::true_type {};
+    template <typename T> struct is_unsigned_integer : ccm::support::traits::false_type {};
+    template <> struct is_unsigned_integer<unsigned char> : ccm::support::traits::true_type {};
+    template <> struct is_unsigned_integer<unsigned short> : ccm::support::traits::true_type {};
+    template <> struct is_unsigned_integer<unsigned int> : ccm::support::traits::true_type {};
+    template <> struct is_unsigned_integer<unsigned long> : ccm::support::traits::true_type {};
+    template <> struct is_unsigned_integer<unsigned long long> : ccm::support::traits::true_type {};
 #if defined(__SIZEOF_INT128__)
-    template <> struct is_unsigned_integer<__uint128_t> : std::true_type {};
+    template <> struct is_unsigned_integer<__uint128_t> : ccm::support::traits::true_type {};
 #endif
     template <typename T> constexpr bool is_unsigned_integer_v = is_unsigned_integer<T>::value;
 	// clang-format on
@@ -50,28 +50,18 @@ namespace ccm::support::traits
 namespace ccm::support
 {
 
-	template <typename To, typename From>
-	constexpr std::enable_if_t<
-		(sizeof(To) == sizeof(From)) && std::is_trivially_constructible_v<To> && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From>, To>
-	bit_cast(const From & from)
+	template <class To, class From>
+	traits::enable_if_t<sizeof(To) == sizeof(From) && traits::is_trivially_copyable_v<From> && traits::is_trivially_copyable_v<To>, To> constexpr bit_cast(
+		const From & from) noexcept
 	{
-#if CCM_HAS_BUILTIN(__builtin_bit_cast)
+		static_assert(traits::is_trivially_constructible_v<To>, "This implementation additionally requires "
+																"destination type to be trivially constructible");
 		return __builtin_bit_cast(To, from);
-#else
-		To to;
-		char * dst		 = reinterpret_cast<char *>(&to);
-		const char * src = reinterpret_cast<const char *>(&from);
-	#if CCM_HAS_BUILTIN(__builtin_memcpy_inline)
-		__builtin_memcpy_inline(dst, src, sizeof(To));
-	#else
-		for (unsigned i = 0; i < sizeof(To); ++i) dst[i] = src[i];
-	#endif // CCM_HAS_BUILTIN(__builtin_memcpy_inline)
-		return to;
-#endif // CCM_HAS_BUILTIN(__builtin_bit_cast)
 	}
 
-	template <class T,
-			  std::enable_if_t<std::is_integral_v<T> && std::is_unsigned_v<T> && !ccm::support::traits::is_char_v<T> && !std::is_same_v<T, bool>, bool> = true>
+	template <class T, ccm::support::traits::enable_if_t<ccm::support::traits::is_integral_v<T> && ccm::support::traits::is_unsigned_v<T> &&
+															 !ccm::support::traits::is_char_v<T> && !ccm::support::traits::is_same_v<T, bool>,
+														 bool> = true>
 	constexpr bool has_single_bit(T x) noexcept
 	{
 		return x && !(x & (x - 1));
@@ -170,7 +160,7 @@ namespace ccm::support
 
 	// https://en.cppreference.com/w/cpp/numeric/countr_zero
 	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> countr_zero(T value)
+	[[nodiscard]] constexpr ccm::support::traits::enable_if_t<ccm::support::traits::is_unsigned_v<T>, int> countr_zero(T value)
 	{
 		if (value == 0) { return std::numeric_limits<T>::digits; }
 
@@ -187,14 +177,14 @@ namespace ccm::support
 	}
 
 	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> countr_one(T value)
+	[[nodiscard]] constexpr ccm::support::traits::enable_if_t<ccm::support::traits::is_unsigned_v<T>, int> countr_one(T value)
 	{
 		return value != std::numeric_limits<T>::max() ? countr_zero(static_cast<T>(~value)) : std::numeric_limits<T>::digits;
 	}
 
-	template <typename T, std::enable_if_t<traits::is_unsigned_integer_v<T>, bool> = true>
+	template <typename T, ccm::support::traits::enable_if_t<ccm::support::traits::is_unsigned_integer_v<T>, bool> = true>
 	// NOLINTNEXTLINE
-	[[nodiscard]] constexpr std::enable_if_t<support::is_unsigned_v<T>, int> countl_zero(T value)
+	[[nodiscard]] constexpr ccm::support::traits::enable_if_t<ccm::support::traits::is_unsigned_v<T>, int> countl_zero(T value)
 	{
 		if (value == 0) { return std::numeric_limits<T>::digits; }
 
@@ -213,27 +203,27 @@ namespace ccm::support
 		return ret + iter;
 	}
 
-	template <typename T, std::enable_if_t<ccm::support::traits::is_unsigned_integer_v<T>, bool> = true>
-	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> countl_one(T value)
+	template <typename T, ccm::support::traits::enable_if_t<ccm::support::traits::is_unsigned_integer_v<T>, bool> = true>
+	[[nodiscard]] constexpr ccm::support::traits::enable_if_t<ccm::support::traits::is_unsigned_v<T>, int> countl_one(T value)
 	{
 		return value != std::numeric_limits<T>::max() ? countl_zero(static_cast<T>(~value)) : std::numeric_limits<T>::digits;
 	}
 
 	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> bit_width(T value)
+	[[nodiscard]] constexpr ccm::support::traits::enable_if_t<ccm::support::traits::is_unsigned_v<T>, int> bit_width(T value)
 	{
 		return std::numeric_limits<T>::digits - countl_zero(value);
 	}
 
 #if CCM_HAS_BUILTIN(__builtin_popcountg)
 	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> popcount(T value)
+	[[nodiscard]] constexpr ccm::support::traits::enable_if_t<ccm::support::traits::is_unsigned_v<T>, int> popcount(T value)
 	{
 		return __builtin_popcountg(value);
 	}
 #else  // !CCM_HAS_BUILTIN(__builtin_popcountg)
 	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> popcount(T value)
+	[[nodiscard]] constexpr traits::enable_if_t<traits::is_unsigned_v<T>, int> popcount(T value)
 	{
 		int count = 0;
 		for (int i = 0; i != std::numeric_limits<T>::digits; ++i)

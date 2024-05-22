@@ -8,9 +8,11 @@
 
 #pragma once
 
+#include "ccmath/internal/support/type_traits.hpp"
+
 #include <cstdint>
 #include <limits>
-#include <type_traits>
+
 
 // Light weight wrapper around std::numeric_limits for handling special types not handled by std::numeric_limits
 // Still, prefer to use std::numeric_limits. Only use ccm::support::numeric_limits when you can't use std::numeric_limits.
@@ -26,7 +28,7 @@ namespace ccm::support
 		round_toward_neg_infinity = 3
 	};
 
-	template <class T, bool = std::is_arithmetic_v<T>>
+	template <class T, bool = traits::is_arithmetic_v<T>>
 	class numeric_limits
 	{
 	public:
