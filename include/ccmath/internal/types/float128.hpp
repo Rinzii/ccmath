@@ -32,4 +32,4 @@ namespace ccm::types
 	using float128 = long double;
 #endif
 
-} // namespace ccm
+} // namespace ccm::types

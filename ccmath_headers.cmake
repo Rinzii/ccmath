@@ -13,6 +13,7 @@ set(ccmath_internal_helpers_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/fpclassify_helper.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/exp_helpers.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/exp10.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/ccm_ldexp.hpp
 )
 
 set(ccmath_internal_predef_headers
@@ -33,7 +34,6 @@ set(ccmath_internal_support_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/meta_compare.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/unreachable.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/ctz.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_identity.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/always_false.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/limits.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fp_bits.hpp
@@ -42,6 +42,7 @@ set(ccmath_internal_support_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/bit_mask.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/rounding_mode.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/math_support.hpp
 
 )
 
@@ -54,6 +55,8 @@ set(ccmath_internal_types_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/int128.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/double_double.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/triple_double.hpp
+        #${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/dyadic_float.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/big_int.hpp
 )
 
 

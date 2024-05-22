@@ -9,7 +9,10 @@
 #pragma once
 
 #include "ccmath/internal/support/floating_point_traits.hpp"
-#include <ccmath/internal/support/bits.hpp>
+#include "ccmath/internal/support/bits.hpp"
+#include <ccmath/math/compare/isfinite.hpp>
+
+#include <limits>
 
 namespace ccm
 {
