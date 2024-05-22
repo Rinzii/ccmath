@@ -11,10 +11,10 @@
 #include "ccmath/internal/predef/has_builtin.hpp"
 
 #include <limits>
-#include <type_traits>
 
-#include "ccmath/internal/types/float128.hpp"
 #include "ccmath/internal/config/type_support.hpp"
+#include "ccmath/internal/support/type_traits.hpp"
+#include "ccmath/internal/types/float128.hpp"
 
 namespace ccm::support
 {
@@ -22,7 +22,7 @@ namespace ccm::support
 	{
 		// Software implementation of ctz for unsigned integral types in the event that the compiler does not provide a builtin
 		// Mostly added for msvc support, as gcc and clang have builtins for this.
-		template <typename T, std::enable_if_t<std::is_integral_v<T> && std::is_unsigned_v<T> && !std::is_same_v<T, bool>, bool> = true>
+		template <typename T, std::enable_if_t<traits::ccm_is_integral_v<T> && traits::ccm_is_unsigned_v<T> && !std::is_same_v<T, bool>, bool> = true>
 		constexpr int generic_ctz(T x) noexcept
 		{
 			// If x is 0, the result is undefined.
@@ -46,8 +46,11 @@ namespace ccm::support
 		}
 	} // namespace internal
 
-	template <typename T>
-	constexpr int ctz(T /* x */) noexcept;
+	template <typename T, std::enable_if_t<traits::ccm_is_integral_v<T> && traits::ccm_is_unsigned_v<T> && !std::is_same_v<T, bool>, bool> = true>
+	constexpr int ctz(T x) noexcept
+	{
+		return internal::generic_ctz(x);
+	}
 
 	template <>
 	constexpr int ctz(unsigned short x) noexcept
