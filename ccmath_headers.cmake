@@ -52,10 +52,8 @@ set(ccmath_internal_types_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/sign.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/float128.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/int128_types.hpp
-        #${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/int128.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/double_double.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/triple_double.hpp
-        #${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/dyadic_float.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/big_int.hpp
 )
 
