@@ -45,7 +45,13 @@ set(ccmath_internal_support_headers
 
 )
 
+set(ccmath_internal_types_impl_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/impl/int128_have_intrinsic.inl
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/impl/int128_no_intrinsic.inl
+)
+
 set(ccmath_internal_types_headers
+        ${ccmath_internal_types_impl_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/fp_types.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/number_pair.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/sign.hpp

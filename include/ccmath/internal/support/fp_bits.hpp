@@ -168,7 +168,7 @@ namespace ccm::support
 
 		// FPStorage derives useful constants from the FPLayout above.
 		template <FPType fp_type>
-		struct FPStorage : public FPLayout<fp_type>
+		struct FPStorage : FPLayout<fp_type>
 		{
 			using UP = FPLayout<fp_type>;
 
