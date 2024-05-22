@@ -14,7 +14,7 @@ namespace ccm
 {
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 constexpr T frexp(T x, int &exp) {
-		fpsupport::FPBits<T> bits(x);
+		support::FPBits<T> bits(x);
 		if (bits.is_inf_or_nan())
 			return x;
 		if (bits.is_zero()) {
