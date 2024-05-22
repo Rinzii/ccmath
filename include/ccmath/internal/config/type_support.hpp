@@ -11,6 +11,10 @@
 #include <cfloat>  // LDBL_MANT_DIG
 #include <cstdint> // UINT64_MAX, __SIZEOF_INT128__
 
+#if defined(UINT64_MAX)
+#define CCM_TYPES_HAS_INT64
+#endif // UINT64_MAX
+
 // Checks whether the __int128 compiler extension for a 128-bit integral type is
 // supported.
 //
