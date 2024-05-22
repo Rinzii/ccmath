@@ -25,19 +25,7 @@ namespace ccm::support
 		(sizeof(To) == sizeof(From)) && std::is_trivially_constructible_v<To> && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From>, To>
 	bit_cast(const From & from)
 	{
-#if CCM_HAS_BUILTIN(__builtin_bit_cast)
 		return __builtin_bit_cast(To, from);
-#else
-		To to;
-		char * dst		 = reinterpret_cast<char *>(&to);
-		const char * src = reinterpret_cast<const char *>(&from);
-	#if CCM_HAS_BUILTIN(__builtin_memcpy_inline)
-		__builtin_memcpy_inline(dst, src, sizeof(To));
-	#else
-		for (unsigned i = 0; i < sizeof(To); ++i) dst[i] = src[i];
-	#endif // __has_builtin(__builtin_memcpy_inline)
-		return to;
-#endif	   // __has_builtin(__builtin_bit_cast)
 	}
 
 	template <class T,
