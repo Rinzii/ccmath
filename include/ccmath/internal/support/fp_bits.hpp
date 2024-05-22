@@ -24,7 +24,7 @@
 
 #include "ccmath/internal/predef/likely.hpp"
 
-namespace ccm::support
+namespace ccm::fpsupport
 {
 
 
@@ -117,7 +117,7 @@ namespace ccm::support
 		template <>
 		struct FPLayout<FPType::eBinary80>
 		{
-			using StorageType				  = ccm::types::uint128_t;
+			using StorageType				  = types::uint128_t;
 			static constexpr int SIGN_LEN	  = 1;
 			static constexpr int EXP_LEN	  = 15;
 			static constexpr int SIG_LEN	  = 64;
@@ -127,7 +127,7 @@ namespace ccm::support
 		template <>
 		struct FPLayout<FPType::eBinary128>
 		{
-			using StorageType				  = ccm::types::uint128_t;
+			using StorageType				  = types::uint128_t;
 			static constexpr int SIGN_LEN	  = 1;
 			static constexpr int EXP_LEN	  = 15;
 			static constexpr int SIG_LEN	  = 112;
@@ -676,7 +676,7 @@ namespace ccm::support
 	struct FPBits final : internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>
 	{
 		static_assert(std::is_floating_point_v<T>, "FPBits instantiated with invalid type.");
-		using UP		  = internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>;
+		using UP		  = internal::FPRepImpl<get_fp_type<T>(), FPBits>;
 		using StorageType = typename UP::StorageType;
 
 		// Constructors.

@@ -16,6 +16,19 @@
 
 namespace ccm::support
 {
+
+	// Returns whether 'a + b' overflows, the result is stored in 'res'.
+	template <typename T>
+	[[nodiscard]] constexpr bool add_overflow(T a, T b, T &res) {
+		return __builtin_add_overflow(a, b, &res);
+	}
+
+	// Returns whether 'a - b' overflows, the result is stored in 'res'.
+	template <typename T>
+	[[nodiscard]] constexpr bool sub_overflow(T a, T b, T &res) {
+		return __builtin_sub_overflow(a, b, &res);
+	}
+
 #define RETURN_IF(TYPE, BUILTIN)                                               \
   if constexpr (std::is_same_v<T, TYPE>)                                       \
     return BUILTIN(a, b, carry_in, carry_out);
