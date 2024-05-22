@@ -13,6 +13,7 @@
 
 #include "ccmath/internal/support/always_false.hpp"
 #include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/support/math_support.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
 #include "ccmath/internal/types/int128_types.hpp"
 #include "ccmath/internal/types/sign.hpp"
@@ -26,39 +27,6 @@
 namespace ccm::support
 {
 
-	// Create a bitmask with the count right-most bits set to 1, and all other bits
-	// set to 0.  Only unsigned types are allowed.
-	template <typename T, std::size_t count>
-	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_trailing_ones()
-	{
-		constexpr unsigned T_BITS = CHAR_BIT * sizeof(T);
-		static_assert(count <= T_BITS && "Invalid bit index");
-		return count == 0 ? 0 : (T(-1) >> (T_BITS - count));
-	}
-
-	// Create a bitmask with the count left-most bits set to 1, and all other bits
-	// set to 0.  Only unsigned types are allowed.
-	template <typename T, std::size_t count>
-	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_leading_ones()
-	{
-		return T(~mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>());
-	}
-
-	// Create a bitmask with the count right-most bits set to 0, and all other bits
-	// set to 1.  Only unsigned types are allowed.
-	template <typename T, std::size_t count>
-	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_trailing_zeros()
-	{
-		return mask_leading_ones<T, CHAR_BIT * sizeof(T) - count>();
-	}
-
-	// Create a bitmask with the count left-most bits set to 0, and all other bits
-	// set to 1.  Only unsigned types are allowed.
-	template <typename T, std::size_t count>
-	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_leading_zeros()
-	{
-		return mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>();
-	}
 
 	// The supported floating point types.
 	enum class FPType
@@ -431,9 +399,9 @@ namespace ccm::support
 																		   "whole significand");
 
 		protected:
+			using UP::encode;
 			using UP::Exponent;
 			using UP::Significand;
-			using UP::encode;
 			using UP::UP;
 
 		public:

@@ -1,0 +1,1137 @@
+/*
+ * Copyright (c) 2024-Present Ian Pike
+ * Copyright (c) 2024-Present ccmath contributors
+ *
+ * This library is provided under the MIT License.
+ * See LICENSE for more information.
+ */
+
+#pragma once
+
+#include "ccmath/internal/config/compiler.hpp"
+#include "ccmath/internal/config/type_support.hpp"
+#include "ccmath/internal/predef/has_builtin.hpp"
+#include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/support/math_support.hpp"
+#include "ccmath/internal/support/type_traits.hpp"
+
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <limits>
+#include <optional>
+
+namespace ccm::types
+{
+	namespace multiword
+	{
+		template <typename T>
+		struct half_width;
+
+		template <>
+		struct half_width<uint16_t> : ccm::support::traits::type_identity<uint8_t>
+		{
+		};
+
+		template <>
+		struct half_width<uint32_t> : ccm::support::traits::type_identity<uint16_t>
+		{
+		};
+#ifdef CCM_TYPES_HAS_INT64
+		template <>
+		struct half_width<uint64_t> : ccm::support::traits::type_identity<uint32_t>
+		{
+		};
+	#ifdef CCM_TYPES_HAS_INT128
+		template <>
+		struct half_width<__uint128_t> : ccm::support::traits::type_identity<uint64_t>
+		{
+		};
+	#endif
+#endif
+		template <typename T>
+		using half_width_t = typename half_width<T>::type;
+
+		template <typename T>
+		struct DoubleWide final : std::array<T, 2>
+		{
+			using UP = std::array<T, 2>;
+			using UP::UP;
+
+			constexpr DoubleWide(T lo, T hi) : UP({lo, hi}) {}
+		};
+
+		template <typename T>
+		constexpr auto split(T value)
+		{
+			static_assert(ccm::support::traits::ccm_is_unsigned_v<T>);
+			using half_type = half_width_t<T>;
+			return DoubleWide<half_type>(half_type(value), half_type(value >> std::numeric_limits<half_type>::digits));
+		}
+
+		template <typename T>
+		constexpr T lo(const DoubleWide<T> & value)
+		{
+			return value[0];
+		}
+
+		template <typename T>
+		constexpr T hi(const DoubleWide<T> & value)
+		{
+			return value[1];
+		}
+
+		template <typename T>
+		constexpr half_width_t<T> lo(T value)
+		{
+			return lo(split(value));
+		}
+
+		template <typename T>
+		constexpr half_width_t<T> hi(T value)
+		{
+			return hi(split(value));
+		}
+
+		template <typename word>
+		constexpr DoubleWide<word> mul2(word a, word b)
+		{
+			if constexpr (std::is_same_v<word, uint8_t>) { return split<uint16_t>(uint16_t(a) * uint16_t(b)); }
+			else if constexpr (std::is_same_v<word, uint16_t>) { return split<uint32_t>(uint32_t(a) * uint32_t(b)); }
+#ifdef CCM_TYPES_HAS_INT64
+			else if constexpr (std::is_same_v<word, uint32_t>) { return split<uint64_t>(uint64_t(a) * uint64_t(b)); }
+#endif
+#ifdef CCM_TYPES_HAS_INT128
+			else if constexpr (std::is_same_v<word, uint64_t>) { return split<__uint128_t>(__uint128_t(a) * __uint128_t(b)); }
+#endif
+			else
+			{
+				using half_word	  = half_width_t<word>;
+				const auto shiftl = [](word value) -> word { return value << std::numeric_limits<half_word>::digits; };
+				const auto shiftr = [](word value) -> word { return value >> std::numeric_limits<half_word>::digits; };
+
+				const word a_lo		= lo(a);
+				const word b_lo		= lo(b);
+				const word a_hi		= hi(a);
+				const word b_hi		= hi(b);
+				const word step1	= b_lo * a_lo;
+				const word step2	= b_lo * a_hi;
+				const word step3	= b_hi * a_lo;
+				const word step4	= b_hi * a_hi;
+				word lo_digit		= step1;
+				word hi_digit		= step4;
+				const word no_carry = 0;
+				word carry;
+				word _;
+				lo_digit = ccm::support::add_with_carry<word>(lo_digit, shiftl(step2), no_carry, carry);
+				hi_digit = ccm::support::add_with_carry<word>(hi_digit, shiftr(step2), carry, _);
+				lo_digit = ccm::support::add_with_carry<word>(lo_digit, shiftl(step3), no_carry, carry);
+				hi_digit = ccm::support::add_with_carry<word>(hi_digit, shiftr(step3), carry, _);
+				return DoubleWide<word>(lo_digit, hi_digit);
+			}
+		}
+
+		template <typename Function, typename word, size_t N, size_t M>
+		constexpr word inplace_binop(Function op_with_carry, std::array<word, N> & dst, const std::array<word, M> & rhs)
+		{
+			static_assert(N >= M);
+			word carry_out = 0;
+			for (size_t i = 0; i < N; ++i)
+			{
+				const bool has_rhs_value = i < M;
+				const word rhs_value	 = has_rhs_value ? rhs[i] : 0;
+				const word carry_in		 = carry_out;
+				dst[i]					 = op_with_carry(dst[i], rhs_value, carry_in, carry_out);
+
+				if (!has_rhs_value && carry_out == 0) break;
+			}
+			return carry_out;
+		}
+
+		template <typename word, size_t N, size_t M>
+		constexpr word add_with_carry(std::array<word, N> & dst, const std::array<word, M> & rhs)
+		{
+			return inplace_binop(ccm::support::add_with_carry<word>, dst, rhs);
+		}
+
+		template <typename word, size_t N, size_t M>
+		constexpr word sub_with_borrow(std::array<word, N> & dst, const std::array<word, M> & rhs)
+		{
+			return inplace_binop(ccm::support::sub_with_borrow<word>, dst, rhs);
+		}
+
+		template <typename word, size_t N>
+		constexpr word mul_add_with_carry(std::array<word, N> & dst, word b, word c)
+		{
+			return add_with_carry(dst, mul2(b, c));
+		}
+
+		template <typename T>
+		struct Accumulator final : std::array<T, 2>
+		{
+			using UP = std::array<T, 2>;
+
+			constexpr Accumulator() : UP({0, 0}) {}
+
+			constexpr T advance(T carry_in)
+			{
+				auto result = UP::front();
+				UP::front() = UP::back();
+				UP::back()	= carry_in;
+				return result;
+			}
+
+			constexpr T sum() const { return UP::front(); }
+			constexpr T carry() const { return UP::back(); }
+		};
+
+		template <typename word, size_t N>
+		constexpr word scalar_multiply_with_carry(std::array<word, N> & dst, word x)
+		{
+			Accumulator<word> acc;
+			for (auto & val : dst)
+			{
+				const word carry = mul_add_with_carry(acc, val, x);
+				val				 = acc.advance(carry);
+			}
+			return acc.carry();
+		}
+
+		template <typename word, size_t O, size_t M, size_t N>
+		constexpr word multiply_with_carry(std::array<word, O> & dst, const std::array<word, M> & lhs, const std::array<word, N> & rhs)
+		{
+			static_assert(O >= M + N);
+			Accumulator<word> acc;
+			for (size_t i = 0; i < O; ++i)
+			{
+				const size_t lower_idx = i < N ? 0 : i - N + 1;
+				const size_t upper_idx = i < M ? i : M - 1;
+				word carry			   = 0;
+				for (size_t j = lower_idx; j <= upper_idx; ++j) carry += mul_add_with_carry(acc, lhs[j], rhs[i - j]);
+				dst[i] = acc.advance(carry);
+			}
+			return acc.carry();
+		}
+
+		template <typename word, size_t N>
+		constexpr void quick_mul_hi(std::array<word, N> & dst, const std::array<word, N> & lhs, const std::array<word, N> & rhs)
+		{
+			Accumulator<word> acc;
+			word carry = 0;
+
+			for (size_t i = 0; i < N; ++i) carry += mul_add_with_carry(acc, lhs[i], rhs[N - 1 - i]);
+			for (size_t i = N; i < 2 * N - 1; ++i)
+			{
+				acc.advance(carry);
+				carry = 0;
+				for (size_t j = i - N + 1; j < N; ++j) carry += mul_add_with_carry(acc, lhs[j], rhs[i - j]);
+				dst[i - N] = acc.sum();
+			}
+			dst.back() = acc.carry();
+		}
+
+		template <typename word, size_t N>
+		constexpr bool is_negative(std::array<word, N> & array)
+		{
+			using signed_word = std::make_signed_t<word>;
+			return ccm::support::bit_cast<signed_word>(array.back()) < 0;
+		}
+
+		enum Direction
+		{
+			LEFT,
+			RIGHT
+		};
+
+		template <Direction direction, bool is_signed, typename word, size_t N>
+		constexpr std::array<word, N> shift(std::array<word, N> array, size_t offset)
+		{
+			static_assert(direction == LEFT || direction == RIGHT);
+			constexpr size_t WORD_BITS = std::numeric_limits<word>::digits;
+#ifdef CCM_TYPES_HAS_INT128
+			constexpr size_t TOTAL_BITS = N * WORD_BITS;
+			if constexpr (TOTAL_BITS == 128)
+			{
+				using type = std::conditional_t<is_signed, __int128_t, __uint128_t>;
+				auto tmp   = ccm::support::bit_cast<type>(array);
+				if constexpr (direction == LEFT)
+					tmp <<= offset;
+				else
+					tmp >>= offset;
+				return ccm::support::bit_cast<std::array<word, N>>(tmp);
+			}
+#endif
+			if (CCM_UNLIKELY(offset == 0)) return array;
+			const bool is_neg = is_signed && is_negative(array);
+			constexpr auto at = [](size_t index) -> int
+			{
+				if constexpr (direction == LEFT) return int(N) - int(index) - 1;
+				return int(index);
+			};
+			const auto safe_get_at = [&](size_t index) -> word
+			{
+				const int i = at(index);
+				if (i < 0) return 0;
+				if (i >= int(N)) return is_neg ? -1 : 0;
+				return array[i];
+			};
+			const size_t index_offset = offset / WORD_BITS;
+			const size_t bit_offset	  = offset % WORD_BITS;
+#ifdef CCM_COMPILER_IS_CLANG
+			__builtin_assume(index_offset < N);
+#endif
+			std::array<word, N> out = {};
+			for (size_t index = 0; index < N; ++index)
+			{
+				const word part1 = safe_get_at(index + index_offset);
+				const word part2 = safe_get_at(index + index_offset + 1);
+				word & dst		 = out[at(index)];
+				if (bit_offset == 0)
+					dst = part1;
+				else if constexpr (direction == LEFT)
+					dst = (part1 << bit_offset) | (part2 >> (WORD_BITS - bit_offset));
+				else
+					dst = (part1 >> bit_offset) | (part2 << (WORD_BITS - bit_offset));
+			}
+			return out;
+		}
+
+#define DECLARE_COUNTBIT(NAME, INDEX_EXPR)                                                                                                                     \
+	template <typename word, size_t N>                                                                                                                         \
+	constexpr int NAME(const std::array<word, N> & val)                                                                                                        \
+	{                                                                                                                                                          \
+		int bit_count = 0;                                                                                                                                     \
+		for (size_t i = 0; i < N; ++i)                                                                                                                         \
+		{                                                                                                                                                      \
+			const int word_count = ccm::support::NAME<word>(val[INDEX_EXPR]);                                                                                  \
+			bit_count += word_count;                                                                                                                           \
+			if (word_count != std::numeric_limits<word>::digits) break;                                                                                        \
+		}                                                                                                                                                      \
+		return bit_count;                                                                                                                                      \
+	}
+
+		DECLARE_COUNTBIT(countr_zero, i)
+		DECLARE_COUNTBIT(countr_one, i)
+		DECLARE_COUNTBIT(countl_zero, N - i - 1)
+		DECLARE_COUNTBIT(countl_one, N - i - 1)
+	} // namespace multiword
+
+	template <size_t Bits, bool Signed, typename WordType = uint64_t>
+	struct BigInt
+	{
+	private:
+		static_assert(ccm::support::traits::ccm_is_integral_v<WordType> && ccm::support::traits::ccm_is_unsigned_v<WordType>,
+					  "WordType must be unsigned integer.");
+
+		struct Division
+		{
+			BigInt quotient;
+			BigInt remainder;
+		};
+
+	public:
+		using word_type		= WordType;
+		using unsigned_type = BigInt<Bits, false, word_type>;
+		using signed_type	= BigInt<Bits, true, word_type>;
+
+		static constexpr bool SIGNED	  = Signed;
+		static constexpr size_t BITS	  = Bits;
+		static constexpr size_t WORD_SIZE = sizeof(WordType) * CHAR_BIT;
+
+		static_assert(Bits > 0 && Bits % WORD_SIZE == 0, "Number of bits in BigInt should be a multiple of WORD_SIZE.");
+
+		static constexpr size_t WORD_COUNT = Bits / WORD_SIZE;
+
+		std::array<WordType, WORD_COUNT> val{};
+
+		constexpr BigInt() = default;
+
+		constexpr BigInt(const BigInt & other) = default;
+
+		template <size_t OtherBits, bool OtherSigned>
+		constexpr BigInt(const BigInt<OtherBits, OtherSigned, WordType> & other)
+		{
+			if (OtherBits >= Bits)
+			{
+				for (size_t i = 0; i < WORD_COUNT; ++i) val[i] = other[i];
+			}
+			else
+			{
+				size_t i = 0;
+				for (; i < OtherBits / WORD_SIZE; ++i) val[i] = other[i];
+				extend(i, Signed && other.is_neg());
+			}
+		}
+
+		template <size_t N>
+		constexpr BigInt(const WordType (&nums)[N])
+		{
+			static_assert(N == WORD_COUNT);
+			for (size_t i = 0; i < WORD_COUNT; ++i) val[i] = nums[i];
+		}
+
+		constexpr explicit BigInt(const std::array<WordType, WORD_COUNT> & words) { val = words; }
+
+		template <typename T, typename = std::enable_if_t<ccm::support::traits::ccm_is_integral_v<T>>>
+		constexpr BigInt(T v)
+		{
+			constexpr size_t T_SIZE = sizeof(T) * CHAR_BIT;
+			const bool is_neg		= Signed && (v < 0);
+			for (size_t i = 0; i < WORD_COUNT; ++i)
+			{
+				if (v == 0)
+				{
+					extend(i, is_neg);
+					return;
+				}
+				val[i] = static_cast<WordType>(v);
+				if constexpr (T_SIZE > WORD_SIZE)
+					v >>= WORD_SIZE;
+				else
+					v = 0;
+			}
+		}
+
+		constexpr BigInt & operator=(const BigInt & other) = default;
+
+		static constexpr BigInt zero() { return BigInt(); }
+		static constexpr BigInt one() { return BigInt(1); }
+		static constexpr BigInt all_ones() { return ~zero(); }
+
+		static constexpr BigInt min()
+		{
+			BigInt out;
+			if constexpr (SIGNED) out.set_msb();
+			return out;
+		}
+
+		static constexpr BigInt max()
+		{
+			BigInt out = all_ones();
+			if constexpr (SIGNED) out.clear_msb();
+			return out;
+		}
+
+		constexpr bool is_neg() const { return SIGNED && get_msb(); }
+
+		template <typename T>
+		constexpr explicit operator T() const
+		{
+			return to<T>();
+		}
+
+		template <typename T>
+		constexpr std::enable_if_t<ccm::support::traits::ccm_is_integral_v<T> && !std::is_same_v<T, bool>, T> to() const
+		{
+			constexpr size_t T_SIZE = sizeof(T) * CHAR_BIT;
+			T lo					= static_cast<T>(val[0]);
+			if constexpr (T_SIZE <= WORD_SIZE) return lo;
+			constexpr size_t MAX_COUNT = T_SIZE > Bits ? WORD_COUNT : T_SIZE / WORD_SIZE;
+			for (size_t i = 1; i < MAX_COUNT; ++i) lo += static_cast<T>(val[i]) << (WORD_SIZE * i);
+			if constexpr (Signed && (T_SIZE > Bits))
+			{
+				constexpr T MASK = (~T(0) << Bits);
+				if (is_neg()) lo |= MASK;
+			}
+			return lo;
+		}
+
+		constexpr explicit operator bool() const { return !is_zero(); }
+
+		constexpr bool is_zero() const
+		{
+			for (auto part : val)
+				if (part != 0) return false;
+			return true;
+		}
+
+		constexpr WordType add_overflow(const BigInt & rhs) { return multiword::add_with_carry(val, rhs.val); }
+
+		constexpr BigInt operator+(const BigInt & other) const
+		{
+			BigInt result = *this;
+			result.add_overflow(other);
+			return result;
+		}
+
+		constexpr BigInt operator+(BigInt && other) const
+		{
+			other.add_overflow(*this);
+			return other;
+		}
+
+		constexpr BigInt & operator+=(const BigInt & other)
+		{
+			add_overflow(other);
+			return *this;
+		}
+
+		constexpr WordType sub_overflow(const BigInt & rhs) { return multiword::sub_with_borrow(val, rhs.val); }
+
+		constexpr BigInt operator-(const BigInt & other) const
+		{
+			BigInt result = *this;
+			result.sub_overflow(other);
+			return result;
+		}
+
+		constexpr BigInt operator-(BigInt && other) const
+		{
+			BigInt result = *this;
+			result.sub_overflow(other);
+			return result;
+		}
+
+		constexpr BigInt & operator-=(const BigInt & other)
+		{
+			sub_overflow(other);
+			return *this;
+		}
+
+		constexpr WordType mul(WordType x) { return multiword::scalar_multiply_with_carry(val, x); }
+
+		template <size_t OtherBits>
+		constexpr auto ful_mul(const BigInt<OtherBits, Signed, WordType> & other) const
+		{
+			BigInt<Bits + OtherBits, Signed, WordType> result;
+			multiword::multiply_with_carry(result.val, val, other.val);
+			return result;
+		}
+
+		constexpr BigInt operator*(const BigInt & other) const { return BigInt(ful_mul(other)); }
+
+		constexpr BigInt quick_mul_hi(const BigInt & other) const
+		{
+			BigInt result;
+			multiword::quick_mul_hi(result.val, val, other.val);
+			return result;
+		}
+
+		constexpr void pow_n(uint64_t power)
+		{
+			static_assert(!Signed);
+			BigInt result	 = one();
+			BigInt cur_power = *this;
+			while (power > 0)
+			{
+				if ((power % 2) > 0) result *= cur_power;
+				power >>= 1;
+				cur_power *= cur_power;
+			}
+			*this = result;
+		}
+
+		constexpr std::optional<BigInt> div(const BigInt & divider)
+		{
+			if (CCM_UNLIKELY(divider.is_zero())) return std::nullopt;
+			if (CCM_UNLIKELY(divider == BigInt::one())) return BigInt::zero();
+			Division result;
+			if constexpr (SIGNED)
+				result = divide_signed(*this, divider);
+			else
+				result = divide_unsigned(*this, divider);
+			*this = result.quotient;
+			return result.remainder;
+		}
+
+		constexpr std::optional<BigInt> div_uint_half_times_pow_2(multiword::half_width_t<WordType> x, size_t e)
+		{
+			BigInt remainder;
+			if (x == 0) return std::nullopt;
+			if (e >= Bits)
+			{
+				remainder = *this;
+				*this	  = BigInt<Bits, false, WordType>();
+				return remainder;
+			}
+			BigInt quotient;
+			WordType x_word					= static_cast<WordType>(x);
+			constexpr size_t LOG2_WORD_SIZE = ccm::support::bit_width(WORD_SIZE) - 1;
+			constexpr size_t HALF_WORD_SIZE = WORD_SIZE >> 1;
+			constexpr WordType HALF_MASK	= ((WordType(1) << HALF_WORD_SIZE) - 1);
+
+			size_t lower = ((e >> LOG2_WORD_SIZE) + ((e & (WORD_SIZE - 1)) != 0)) << LOG2_WORD_SIZE;
+
+			size_t lower_pos = lower / WORD_SIZE;
+
+			WordType rem = 0;
+
+			size_t pos = WORD_COUNT;
+
+			for (size_t q_pos = WORD_COUNT - lower_pos; q_pos > 0; --q_pos)
+			{
+				rem <<= HALF_WORD_SIZE;
+				rem += val[--pos] >> HALF_WORD_SIZE;
+				WordType q_tmp = rem / x_word;
+				rem %= x_word;
+
+				rem <<= HALF_WORD_SIZE;
+				rem += val[pos] & HALF_MASK;
+				quotient.val[q_pos - 1] = (q_tmp << HALF_WORD_SIZE) + rem / x_word;
+				rem %= x_word;
+			}
+
+			size_t last_shift = lower - e;
+
+			if (last_shift > 0)
+			{
+				quotient <<= last_shift;
+				WordType q_tmp = 0;
+				WordType d	   = val[--pos];
+				if (last_shift >= HALF_WORD_SIZE)
+				{
+					rem <<= HALF_WORD_SIZE;
+					rem += d >> HALF_WORD_SIZE;
+					d &= HALF_MASK;
+					q_tmp = rem / x_word;
+					rem %= x_word;
+					last_shift -= HALF_WORD_SIZE;
+				}
+				else { d >>= HALF_WORD_SIZE; }
+
+				if (last_shift > 0)
+				{
+					rem <<= HALF_WORD_SIZE;
+					rem += d;
+					q_tmp <<= last_shift;
+					x_word <<= HALF_WORD_SIZE - last_shift;
+					q_tmp += rem / x_word;
+					rem %= x_word;
+				}
+
+				quotient.val[0] += q_tmp;
+
+				if (lower - e <= HALF_WORD_SIZE)
+				{
+					if (pos < WORD_COUNT - 1) { remainder[pos + 1] = rem >> HALF_WORD_SIZE; }
+					remainder[pos] = (rem << HALF_WORD_SIZE) + (val[pos] & HALF_MASK);
+				}
+				else { remainder[pos] = rem; }
+			}
+			else { remainder[pos] = rem; }
+
+			for (; pos > 0; --pos) { remainder[pos - 1] = val[pos - 1]; }
+
+			*this = quotient;
+			return remainder;
+		}
+
+		constexpr BigInt operator/(const BigInt & other) const
+		{
+			BigInt result(*this);
+			result.div(other);
+			return result;
+		}
+
+		constexpr BigInt & operator/=(const BigInt & other)
+		{
+			div(other);
+			return *this;
+		}
+
+		constexpr BigInt operator%(const BigInt & other) const
+		{
+			BigInt result(*this);
+			return *result.div(other);
+		}
+
+		constexpr BigInt & operator*=(const BigInt & other)
+		{
+			*this = *this * other;
+			return *this;
+		}
+
+		constexpr BigInt & operator<<=(size_t s)
+		{
+			val = multiword::shift<multiword::LEFT, SIGNED>(val, s);
+			return *this;
+		}
+
+		constexpr BigInt operator<<(size_t s) const { return BigInt(multiword::shift<multiword::LEFT, SIGNED>(val, s)); }
+
+		constexpr BigInt & operator>>=(size_t s)
+		{
+			val = multiword::shift<multiword::RIGHT, SIGNED>(val, s);
+			return *this;
+		}
+
+		constexpr BigInt operator>>(size_t s) const { return BigInt(multiword::shift<multiword::RIGHT, SIGNED>(val, s)); }
+
+#define DEFINE_BINOP(OP)                                                                                                                                       \
+	friend constexpr BigInt operator OP(const BigInt & lhs, const BigInt & rhs)                                                                                \
+	{                                                                                                                                                          \
+		BigInt result;                                                                                                                                         \
+		for (size_t i = 0; i < WORD_COUNT; ++i) result[i] = lhs[i] OP rhs[i];                                                                                  \
+		return result;                                                                                                                                         \
+	}                                                                                                                                                          \
+	friend constexpr BigInt operator OP##=(BigInt & lhs, const BigInt & rhs)                                                                                   \
+	{                                                                                                                                                          \
+		for (size_t i = 0; i < WORD_COUNT; ++i) lhs[i] OP## = rhs[i];                                                                                          \
+		return lhs;                                                                                                                                            \
+	}
+
+		DEFINE_BINOP(&)
+		DEFINE_BINOP(|)
+		DEFINE_BINOP(^)
+#undef DEFINE_BINOP
+
+		constexpr BigInt operator~() const
+		{
+			BigInt result;
+			for (size_t i = 0; i < WORD_COUNT; ++i) result[i] = ~val[i];
+			return result;
+		}
+
+		constexpr BigInt operator-() const
+		{
+			BigInt result(*this);
+			result.negate();
+			return result;
+		}
+
+		friend constexpr bool operator==(const BigInt & lhs, const BigInt & rhs)
+		{
+			for (size_t i = 0; i < WORD_COUNT; ++i)
+				if (lhs.val[i] != rhs.val[i]) return false;
+			return true;
+		}
+
+		friend constexpr bool operator!=(const BigInt & lhs, const BigInt & rhs) { return !(lhs == rhs); }
+
+		friend constexpr bool operator>(const BigInt & lhs, const BigInt & rhs) { return cmp(lhs, rhs) > 0; }
+
+		friend constexpr bool operator>=(const BigInt & lhs, const BigInt & rhs) { return cmp(lhs, rhs) >= 0; }
+
+		friend constexpr bool operator<(const BigInt & lhs, const BigInt & rhs) { return cmp(lhs, rhs) < 0; }
+
+		friend constexpr bool operator<=(const BigInt & lhs, const BigInt & rhs) { return cmp(lhs, rhs) <= 0; }
+
+		constexpr BigInt & operator++()
+		{
+			increment();
+			return *this;
+		}
+
+		constexpr BigInt operator++(int)
+		{
+			BigInt oldval(*this);
+			increment();
+			return oldval;
+		}
+
+		constexpr BigInt & operator--()
+		{
+			decrement();
+			return *this;
+		}
+
+		constexpr BigInt operator--(int)
+		{
+			BigInt oldval(*this);
+			decrement();
+			return oldval;
+		}
+
+		constexpr const WordType & operator[](size_t i) const { return val[i]; }
+
+		constexpr WordType & operator[](size_t i) { return val[i]; }
+
+	private:
+		friend constexpr int cmp(const BigInt & lhs, const BigInt & rhs)
+		{
+			constexpr auto compare = [](WordType a, WordType b) { return a == b ? 0 : a > b ? 1 : -1; };
+			if constexpr (Signed)
+			{
+				const bool lhs_is_neg = lhs.is_neg();
+				const bool rhs_is_neg = rhs.is_neg();
+				if (lhs_is_neg != rhs_is_neg) return rhs_is_neg ? 1 : -1;
+			}
+			for (size_t i = WORD_COUNT; i-- > 0;)
+				if (auto cmp = compare(lhs[i], rhs[i]); cmp != 0) return cmp;
+			return 0;
+		}
+
+		constexpr void bitwise_not()
+		{
+			for (auto & part : val) part = ~part;
+		}
+
+		constexpr void negate()
+		{
+			bitwise_not();
+			increment();
+		}
+
+		constexpr void increment() { multiword::add_with_carry(val, std::array<WordType, 1>{1}); }
+
+		constexpr void decrement() { multiword::add_with_carry(val, std::array<WordType, 1>{1}); }
+
+		constexpr void extend(size_t index, bool is_neg)
+		{
+			const WordType value = is_neg ? std::numeric_limits<WordType>::max() : std::numeric_limits<WordType>::min();
+			for (size_t i = index; i < WORD_COUNT; ++i) val[i] = value;
+		}
+
+		constexpr bool get_msb() const { return val.back() >> (WORD_SIZE - 1); }
+
+		constexpr void set_msb() { val.back() |= ccm::support::mask_leading_ones<WordType, 1>(); }
+
+		constexpr void clear_msb() { val.back() &= ccm::support::mask_trailing_ones<WordType, WORD_SIZE - 1>(); }
+
+		constexpr void set_bit(size_t i)
+		{
+			const size_t word_index = i / WORD_SIZE;
+			val[word_index] |= WordType(1) << (i % WORD_SIZE);
+		}
+
+		constexpr static Division divide_unsigned(const BigInt & dividend, const BigInt & divider)
+		{
+			BigInt remainder = dividend;
+			BigInt quotient;
+			if (remainder >= divider)
+			{
+				BigInt subtractor = divider;
+				int cur_bit		  = multiword::countl_zero(subtractor.val) - multiword::countl_zero(remainder.val);
+				subtractor <<= cur_bit;
+				for (; cur_bit >= 0 && remainder > 0; --cur_bit, subtractor >>= 1)
+				{
+					if (remainder < subtractor) continue;
+					remainder -= subtractor;
+					quotient.set_bit(cur_bit);
+				}
+			}
+			return Division{quotient, remainder};
+		}
+
+		constexpr static Division divide_signed(const BigInt & dividend, const BigInt & divider)
+		{
+			if (dividend == min() && divider == min()) return Division{one(), zero()};
+
+			unsigned_type udividend(dividend);
+			unsigned_type udivider(divider);
+
+			const bool dividend_is_neg = dividend.is_neg();
+			const bool divider_is_neg  = divider.is_neg();
+			if (dividend_is_neg) udividend.negate();
+			if (divider_is_neg) udivider.negate();
+
+			const auto unsigned_result = divide_unsigned(udividend, udivider);
+
+			Division result;
+			result.quotient	 = signed_type(unsigned_result.quotient);
+			result.remainder = signed_type(unsigned_result.remainder);
+
+			if (dividend_is_neg != divider_is_neg) result.quotient.negate();
+
+			if (dividend_is_neg) result.remainder.negate();
+			return result;
+		}
+
+		friend signed_type;
+		friend unsigned_type;
+	};
+
+	namespace internal
+	{
+		template <size_t Bits>
+		struct WordTypeSelector : ccm::support::traits::type_identity<
+#ifdef CCM_TYPES_HAS_INT64
+									  uint64_t
+#else
+									  uint32_t
+#endif
+									  >
+		{
+		};
+
+		template <>
+		struct WordTypeSelector<32> : ccm::support::traits::type_identity<uint32_t>
+		{
+		};
+
+		template <size_t Bits>
+		using WordTypeSelectorT = typename WordTypeSelector<Bits>::type;
+	} // namespace internal
+
+	template <size_t Bits>
+	using UInt = BigInt<Bits, false, internal::WordTypeSelectorT<Bits>>;
+
+	template <size_t Bits>
+	using Int = BigInt<Bits, true, internal::WordTypeSelectorT<Bits>>;
+} // namespace ccm::types
+
+namespace std
+{
+	template <>
+	struct numeric_limits<ccm::types::UInt<128>>
+	{
+	public:
+		static constexpr ccm::types::UInt<128> max() { return ccm::types::UInt<128>::max(); }
+		static constexpr ccm::types::UInt<128> min() { return ccm::types::UInt<128>::min(); }
+
+		static constexpr int digits = 128;
+	};
+
+	template <>
+	struct numeric_limits<ccm::types::Int<128>>
+	{
+	public:
+		static constexpr ccm::types::Int<128> max() { return ccm::types::Int<128>::max(); }
+		static constexpr ccm::types::Int<128> min() { return ccm::types::Int<128>::min(); }
+
+		static constexpr int digits = 128;
+	};
+} // namespace std
+
+namespace ccm::types
+{
+	template <typename T>
+	struct is_big_int : std::false_type
+	{
+	};
+
+	template <size_t Bits, bool Signed, typename T>
+	struct is_big_int<BigInt<Bits, Signed, T>> : std::true_type
+	{
+	};
+
+	template <class T>
+	constexpr bool is_big_int_v = is_big_int<T>::value;
+
+	template <typename T>
+	struct is_integral_or_big_int : std::bool_constant<(ccm::support::traits::ccm_is_integral_v<T> || is_big_int_v<T>)>
+	{
+	};
+
+	template <typename T>
+	constexpr bool is_integral_or_big_int_v = is_integral_or_big_int<T>::value;
+
+	template <typename T>
+	struct make_big_int_unsigned;
+
+	template <size_t Bits, bool Signed, typename T>
+	struct make_big_int_unsigned<BigInt<Bits, Signed, T>> : ccm::support::traits::type_identity<BigInt<Bits, false, T>>
+	{
+	};
+
+	template <typename T>
+	using make_big_int_unsigned_t = typename make_big_int_unsigned<T>::type;
+
+	template <typename T>
+	struct make_big_int_signed;
+
+	template <size_t Bits, bool Signed, typename T>
+	struct make_big_int_signed<BigInt<Bits, Signed, T>> : ccm::support::traits::type_identity<BigInt<Bits, true, T>>
+	{
+	};
+
+	template <typename T>
+	using make_big_int_signed_t = typename make_big_int_signed<T>::type;
+
+	template <typename T, class = void>
+	struct make_integral_or_big_int_unsigned;
+
+	template <typename T>
+	struct make_integral_or_big_int_unsigned<T, std::enable_if_t<ccm::support::traits::ccm_is_integral_v<T>>> : std::make_unsigned<T>
+	{
+	};
+
+	template <typename T>
+	struct make_integral_or_big_int_unsigned<T, std::enable_if_t<is_big_int_v<T>>> : make_big_int_unsigned<T>
+	{
+	};
+
+	template <typename T>
+	using make_integral_or_big_int_unsigned_t = typename make_integral_or_big_int_unsigned<T>::type;
+
+	template <typename T, class = void>
+	struct make_integral_or_big_int_signed;
+
+	template <typename T>
+	struct make_integral_or_big_int_signed<T, std::enable_if_t<ccm::support::traits::ccm_is_integral_v<T>>> : std::make_signed<T>
+	{
+	};
+
+	template <typename T>
+	struct make_integral_or_big_int_signed<T, std::enable_if_t<is_big_int_v<T>>> : make_big_int_signed<T>
+	{
+	};
+
+	template <typename T>
+	using make_integral_or_big_int_signed_t = typename make_integral_or_big_int_signed<T>::type;
+} // namespace ccm::types
+
+namespace ccm::support
+{
+	template <typename To, typename From>
+	constexpr std::enable_if_t<(sizeof(To) == sizeof(From)) && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From> &&
+								   ccm::types::is_big_int<To>::value,
+							   To>
+	bit_cast(const From & from)
+	{
+		To out;
+		using Storage = decltype(out.val);
+		out.val		  = ccm::support::bit_cast<Storage>(from);
+		return out;
+	}
+
+	template <typename To, size_t Bits>
+	constexpr std::enable_if_t<sizeof(To) == sizeof(ccm::types::UInt<Bits>) && std::is_trivially_constructible_v<To> &&
+								   std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<ccm::types::UInt<Bits>>,
+							   To>
+	bit_cast(const ccm::types::UInt<Bits> & from)
+	{
+		return ccm::support::bit_cast<To>(from.val);
+	}
+
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, int> popcount(T value)
+	{
+		int bits = 0;
+		for (auto word : value.val)
+			if (word) bits += popcount(word);
+		return bits;
+	}
+
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, bool> has_single_bit(T value)
+	{
+		int bits = 0;
+		for (auto word : value.val)
+		{
+			if (word == 0) continue;
+			bits += popcount(word);
+			if (bits > 1) return false;
+		}
+		return bits == 1;
+	}
+
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, int> countr_zero(const T & value)
+	{
+		return ccm::types::multiword::countr_zero(value.val);
+	}
+
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, int> countl_zero(const T & value)
+	{
+		return ccm::types::multiword::countl_zero(value.val);
+	}
+
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, int> countl_one(T value)
+	{
+		return ccm::types::multiword::countl_one(value.val);
+	}
+
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, int> countr_one(T value)
+	{
+		return ccm::types::multiword::countr_one(value.val);
+	}
+
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, int> bit_width(T value)
+	{
+		return std::numeric_limits<T>::digits - ccm::support::countl_zero(value);
+	}
+
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, T> rotr(T value, int rotate);
+
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, T> rotl(T value, int rotate)
+	{
+		constexpr unsigned N = std::numeric_limits<T>::digits;
+		rotate				 = rotate % N;
+		if (!rotate) return value;
+		if (rotate < 0) return ccm::support::rotr<T>(value, -rotate);
+		return (value << rotate) | (value >> (N - rotate));
+	}
+
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, T> rotr(T value, int rotate)
+	{
+		constexpr unsigned N = std::numeric_limits<T>::digits;
+		rotate				 = rotate % N;
+		if (!rotate) return value;
+		if (rotate < 0) return ccm::support::rotl<T>(value, -rotate);
+		return (value >> rotate) | (value << (N - rotate));
+	}
+
+	// Specialization of mask_trailing_ones ('math_extras.h') for BigInt.
+	template <typename T, size_t count>
+	constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, T> mask_trailing_ones()
+	{
+		static_assert(!T::SIGNED && count <= T::BITS);
+		if (count == T::BITS) return T::all_ones();
+		constexpr size_t QUOTIENT  = count / T::WORD_SIZE;
+		constexpr size_t REMAINDER = count % T::WORD_SIZE;
+		T out; // zero initialized
+		for (size_t i = 0; i <= QUOTIENT; ++i) out[i] = i < QUOTIENT ? -1 : mask_trailing_ones<typename T::word_type, REMAINDER>();
+		return out;
+	}
+
+	// Specialization of mask_leading_ones ('math_extras.h') for BigInt.
+	template <typename T, size_t count>
+	constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, T> mask_leading_ones()
+	{
+		static_assert(!T::SIGNED && count <= T::BITS);
+		if (count == T::BITS) return T::all_ones();
+		constexpr size_t QUOTIENT  = (T::BITS - count - 1U) / T::WORD_SIZE;
+		constexpr size_t REMAINDER = count % T::WORD_SIZE;
+		T out; // zero initialized
+		for (size_t i = QUOTIENT; i < T::WORD_COUNT; ++i) out[i] = i > QUOTIENT ? -1 : mask_leading_ones<typename T::word_type, REMAINDER>();
+		return out;
+	}
+
+	// Specialization of mask_trailing_zeros ('math_extras.h') for BigInt.
+	template <typename T, size_t count>
+	constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, T> mask_trailing_zeros()
+	{
+		return mask_leading_ones<T, T::BITS - count>();
+	}
+
+	// Specialization of mask_leading_zeros ('math_extras.h') for BigInt.
+	template <typename T, size_t count>
+	constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, T> mask_leading_zeros()
+	{
+		return mask_trailing_ones<T, T::BITS - count>();
+	}
+
+	// Specialization of count_zeros ('math_extras.h') for BigInt.
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, int> count_zeros(T value)
+	{
+		return ccm::support::popcount(~value);
+	}
+
+	// Specialization of first_leading_zero ('math_extras.h') for BigInt.
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, int> first_leading_zero(T value)
+	{
+		return value == std::numeric_limits<T>::max() ? 0 : ccm::support::countl_one(value) + 1;
+	}
+
+	// Specialization of first_leading_one ('math_extras.h') for BigInt.
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, int> first_leading_one(T value)
+	{
+		return first_leading_zero(~value);
+	}
+
+	// Specialization of first_trailing_zero ('math_extras.h') for BigInt.
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, int> first_trailing_zero(T value)
+	{
+		return value == std::numeric_limits<T>::max() ? 0 : ccm::support::countr_zero(~value) + 1;
+	}
+
+	// Specialization of first_trailing_one ('math_extras.h') for BigInt.
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, int> first_trailing_one(T value)
+	{
+		return value == std::numeric_limits<T>::max() ? 0 : ccm::support::countr_zero(value) + 1;
+	}
+} // namespace ccm::support
