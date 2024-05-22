@@ -10,7 +10,6 @@
 
 #include "ccmath/internal/support/type_traits.hpp"
 #include "ccmath/internal/support/bits.hpp"
-#include "ccmath/internal/types/int128.hpp"
 #include "ccmath/internal/types/int128_types.hpp"
 
 #include <cstdint>
@@ -117,7 +116,7 @@ struct floating_point_traits<long double>
 		static constexpr long double normalize_factor = 340282366920938463463374607431768211456.0L; // 2^128
 	};
 
-	#else
+	#else // long double is the same as double
 	template <>
 	struct floating_point_traits<long double> : floating_point_traits<double>
 	{
