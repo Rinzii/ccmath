@@ -26,10 +26,44 @@ include(cmake/GlobalConfig.cmake)
 add_library(${PROJECT_NAME}-compile-options INTERFACE)
 add_library(${PROJECT_NAME}::${PROJECT_NAME}-compile-options ALIAS ${PROJECT_NAME}-compile-options)
 
+
+##### ccmath specified compiler options
+
+# Generic clang/gcc compiler options
 if(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU OR CMAKE_CXX_COMPILER_ID STREQUAL IntelLLVM)
   target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
-          -Wall -Wextra -Wno-pedantic -Wconversion -Werror=return-type
+          -Wall
+          -Wextra
+          -Wconversion
+          -Werror=return-type
+
+          -Wno-pedantic
+
+          # Macros to define
+          -DNOMINMAX
   )
+
+
+  if(CMAKE_CXX_COMPILER_ID STREQUAL MSVC)
+    target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+            /W3
+            /WX
+            /permissive-
+
+            /Zc:__cplusplus
+
+            # Macros to define
+            /DNOMINMAX
+            /D_ENABLE_EXTENDED_ALIGNED_STORAGE
+    )
+  endif()
+
+  # Disable intel specific warnings that don't apply to us.
+  if(CMAKE_CXX_COMPILER_ID STREQUAL IntelLLVM)
+    target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+            -Wno-tautological-constant-compare
+    )
+  endif()
 
 
   # TODO: Remove this later.
@@ -37,19 +71,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU OR
   #       So to clean up the warnings we are just silencing these specific cases.
   target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
           -Wno-unused-but-set-variable -Wno-unused-value -Wno-unused-parameter
-  )
-endif()
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL MSVC)
-  target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
-          /W4 /Wall /WX /permissive- /Zc:__cplusplus
-  )
-endif()
-
-# Disable intel specific warnings that don't apply to us.
-if(CMAKE_CXX_COMPILER_ID STREQUAL IntelLLVM)
-  target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
-          -Wno-tautological-constant-compare
   )
 endif()
 
