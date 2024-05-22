@@ -38,9 +38,9 @@ namespace ccm
 		constexpr bool Is80BitLongDouble_v = Is80BitLongDouble<T>::value;
 
 		template <typename T>
-		constexpr void normalize(int & exponent, typename support::FPBits<T>::StorageType & mantissa)
+		constexpr void normalize(int & exponent, typename fpsupport::FPBits<T>::StorageType & mantissa)
 		{
-			const int shift = support::countl_zero(mantissa) - (8 * static_cast<int>(sizeof(mantissa)) - 1 - support::FPBits<T>::FRACTION_LEN);
+			const int shift = support::countl_zero(mantissa) - (8 * static_cast<int>(sizeof(mantissa)) - 1 - fpsupport::FPBits<T>::FRACTION_LEN);
 			exponent -= shift;
 			mantissa <<= shift;
 		}
@@ -57,9 +57,9 @@ namespace ccm
 		{
 			// TODO: This likely does not work with 128 bit floats yet.
 			template <typename T>
-			constexpr std::enable_if_t<std::is_floating_point_v<T>, T> sqrt_calc_bits(support::FPBits<T> & bits)
+			constexpr std::enable_if_t<std::is_floating_point_v<T>, T> sqrt_calc_bits(fpsupport::FPBits<T> & bits)
 			{
-				using FPBits_t			  = support::FPBits<T>;
+				using FPBits_t			  = fpsupport::FPBits<T>;
 				using StorageType		  = typename FPBits_t::StorageType;
 				constexpr StorageType one = StorageType(1) << FPBits_t::FRACTION_LEN;
 
@@ -143,7 +143,7 @@ namespace ccm
 				else
 				{
 					// IEEE floating points formats.
-					using FPBits_t		   = support::FPBits<T>;
+					using FPBits_t		   = fpsupport::FPBits<T>;
 					constexpr auto flt_nan = FPBits_t::quiet_nan().get_val();
 
 					FPBits_t bits(x);
@@ -183,7 +183,7 @@ namespace ccm
 	template <typename Integer, std::enable_if_t<!std::is_floating_point_v<Integer>, bool> = true>
 	constexpr double sqrt(Integer num)
 	{
-		return ccm::sqrt<double>(num);
+		return ccm::sqrt<double>(static_cast<double>(num));
 	}
 
 	/**

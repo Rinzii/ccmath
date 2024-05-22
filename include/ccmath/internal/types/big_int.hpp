@@ -15,6 +15,7 @@
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/math_support.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
+#include "ccmath/internal/config/type_support.hpp"
 
 #include <array>
 #include <cstddef>
@@ -1016,7 +1017,7 @@ namespace ccm::support
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<ccm::types::is_big_int_v<T>, int> countl_zero(const T & value)
 	{
-		return ccm::types::multiword::countl_zero(value.val);
+		return types::multiword::countl_zero(value.val);
 	}
 
 	template <typename T>
