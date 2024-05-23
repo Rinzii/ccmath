@@ -57,3 +57,6 @@ misc-use-anonymous-namespace,
 mpi-buffer-deref,
 mpi-type-mismatch,
 openmp-use-default-none'
+
+CheckOptions:
+  cppcoreguidelines-avoid-do-while.IgnoreMacros: 'true'
