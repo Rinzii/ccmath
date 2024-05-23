@@ -44,8 +44,8 @@ namespace ccm
 		template <>
 		constexpr void normalize<long double>(int & exponent, types::uint128_t & mantissa)
 		{
-			const auto shift = static_cast<unsigned int>(support::countl_zero(static_cast<uint64_t>(mantissa)) -
-														 (8 * sizeof(uint64_t) - 1 - support::FPBits<long double>::FRACTION_LEN));
+			const auto shift = static_cast<unsigned int>(static_cast<unsigned long>(support::countl_zero(static_cast<std::uint64_t>(mantissa))) -
+														 (8 * sizeof(std::uint64_t) - 1 - support::FPBits<long double>::FRACTION_LEN));
 			exponent -= shift;
 			mantissa <<= shift;
 		}
@@ -67,11 +67,11 @@ namespace ccm
 			namespace bit80
 			{
 
-				constexpr long double sqrt_calc_bits(long double x)
+				constexpr long double sqrt_calc_80bits(long double x)
 				{
 					using Bits				  = support::FPBits<long double>;
 					using StorageType		  = typename Bits::StorageType;
-					constexpr StorageType one = static_cast<StorageType>(1) << (Bits::FRACTION_LEN);
+					constexpr StorageType one = static_cast<StorageType>(1) << Bits::FRACTION_LEN;
 					constexpr auto nan_type	  = Bits::quiet_nan().get_val();
 
 					Bits bits(x);
@@ -107,7 +107,7 @@ namespace ccm
 					}
 
 					// We perform one more iteration to ensure that the result is correctly rounded.
-					const bool lsb = static_cast<bool>(y & 1);
+					const auto lsb = static_cast<bool>(y & 1);
 					bool round_bit = false;
 					r <<= 2;
 					if (const StorageType tmp = (y << 2) + 1; r >= tmp)
@@ -134,13 +134,11 @@ namespace ccm
 
 					// Extract output
 					support::FPBits<long double> out(0.0L);
-					out.set_biased_exponent(x_exp);
+					out.set_biased_exponent(static_cast<StorageType>(x_exp));
 					out.set_implicit_bit(true);
-					out.set_mantissa((y & (one - 1)));
+					out.set_mantissa(y & (one - 1));
 
 					return out.get_val();
-
-					return 0;
 				}
 			} // namespace bit80
 
@@ -224,7 +222,7 @@ namespace ccm
 				if constexpr (Is80BitLongDouble_v<T>) // NOLINT
 				{
 
-					return bit80::sqrt_calc_bits(x);
+					return bit80::sqrt_calc_80bits(x);
 				}
 				else
 				{

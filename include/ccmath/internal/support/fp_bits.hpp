@@ -184,7 +184,7 @@ namespace ccm::support
 				constexpr BiasedExponent(Exponent exp) : UP(static_cast<std::int32_t>(exp) + EXP_BIAS) {}
 
 				// Cast operator to get convert from BiasedExponent to Exponent.
-				constexpr operator Exponent() const { return Exponent(UP::value - EXP_BIAS); }
+				explicit constexpr operator Exponent() const { return Exponent(UP::value - EXP_BIAS); }
 
 				constexpr BiasedExponent & operator++()
 				{
@@ -245,7 +245,7 @@ namespace ccm::support
 			StorageType bits{};
 
 			constexpr FPStorage() : bits(0) {}
-			constexpr FPStorage(StorageType value) : bits(value) {}
+			explicit constexpr FPStorage(StorageType value) : bits(value) {}
 
 			// Observers
 			[[nodiscard]] constexpr StorageType exp_bits() const { return bits & EXP_MASK; }
@@ -403,9 +403,7 @@ namespace ccm::support
 			[[nodiscard]] constexpr bool is_subnormal() const { return exp_bits() == encode(Exponent::subnormal()); }
 			[[nodiscard]] constexpr bool is_normal() const
 			{
-				const auto exp = exp_bits();
-				if (exp == encode(Exponent::subnormal()) || exp == encode(Exponent::inf())) { return false;
-}
+				if (const auto exp = exp_bits(); exp == encode(Exponent::subnormal()) || exp == encode(Exponent::inf())) { return false; }
 				return get_implicit_bit();
 			}
 			constexpr RetT next_toward_inf() const
@@ -551,7 +549,6 @@ namespace ccm::support
 			// in the 'mantissa' by the caller.  This function will not check for its
 			// validity.
 			//
-			// FIXME: Use an uint32_t for 'biased_exp'.
 			static constexpr RetT create_value(types::Sign sign, StorageType biased_exp, StorageType mantissa)
 			{
 				return RetT(encode(sign, BiasedExponent(static_cast<std::uint32_t>(biased_exp)), Significand(mantissa)));
@@ -630,24 +627,24 @@ namespace ccm::support
 		using StorageType = typename UP::StorageType;
 
 		// Constructors.
-  constexpr FPBits() = default;
+		constexpr FPBits() = default;
 
-  template <typename XType> constexpr explicit FPBits(XType x) {
-    using Unqual = std::remove_cv_t<XType>;
-    if constexpr (std::is_same_v<Unqual, T>) {
-      UP::bits = support::bit_cast<StorageType>(x);
-    } else if constexpr (std::is_same_v<Unqual, StorageType>) {
-      UP::bits = x;
-    } else {
-      // We don't want accidental type promotions/conversions, so we require
-      // exact type match.
-      static_assert(support::always_false<XType>);
-    }
-  }
+		template <typename XType>
+		constexpr explicit FPBits(XType x)
+		{
+			using Unqual = std::remove_cv_t<XType>;
+			if constexpr (std::is_same_v<Unqual, T>) { UP::bits = support::bit_cast<StorageType>(x); }
+			else if constexpr (std::is_same_v<Unqual, StorageType>) { UP::bits = x; }
+			else
+			{
+				// We don't want accidental type promotions/conversions, so we require
+				// exact type match.
+				static_assert(support::always_false<XType>);
+			}
+		}
 
-  // Floating-point conversions.
-  constexpr T get_val() const { return support::bit_cast<T>(UP::bits); }
-};
+		// Floating-point conversions.
+		constexpr T get_val() const { return support::bit_cast<T>(UP::bits); }
+	};
 
 } // namespace ccm::support
-
