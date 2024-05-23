@@ -614,16 +614,16 @@ namespace ccm::support
 		else if constexpr (std::is_same_v<UnqualT, types::float128>) { return FPType::eBinary128; }
 #endif
 		else { static_assert(support::always_false<UnqualT>, "Unsupported type"); }
-		return FPType::eBinary32;
+		//return FPType::eBinary32;
 	}
 
 	// A generic class to manipulate C++ floating point formats.
 	// It derives its functionality to FPRepImpl above.
 	template <typename T>
-	struct FPBits final : internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>
+	struct FPBits final : public internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>
 	{
 		static_assert(std::is_floating_point_v<T>, "FPBits instantiated with invalid type.");
-		using UP		  = internal::FPRepImpl<get_fp_type<T>(), FPBits>;
+		using UP		  = internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>;
 		using StorageType = typename UP::StorageType;
 
 		// Constructors.
