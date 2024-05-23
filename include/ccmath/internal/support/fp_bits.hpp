@@ -6,8 +6,8 @@
  * See LICENSE for more information.
  */
 
-// Code borrowed from LLVM with modifications done for ccmath.
-// https://github.com/llvm/llvm-project/tree/main/
+// Code borrowed from LLVM with heavy modifications done for ccmath to allow cross platform and compiler support.
+// https://github.com/llvm/llvm-project/
 
 #pragma once
 
@@ -137,7 +137,7 @@ namespace ccm::support
 				return a ^ ((a ^ b) & mask);
 			}
 
-			// A stongly typed integer that prevents mixing and matching integers with
+			// A strongly typed integer that prevents mixing and matching integers with
 			// different semantics.
 			template <typename T>
 			struct TypedInt
