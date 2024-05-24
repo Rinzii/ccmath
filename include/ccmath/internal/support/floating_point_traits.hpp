@@ -22,13 +22,15 @@ namespace ccm::support
 	template <>
 	struct floating_point_traits<float>
 	{
-		static constexpr std::int32_t mantissa_bits			  = 24;	  // FLT_MANT_DIG
-		static constexpr std::int32_t exponent_bits			  = 8;	  // sizeof(float) * CHAR_BIT - FLT_MANT_DIG
-		static constexpr std::int32_t maximum_binary_exponent = 127;  // FLT_MAX_EXP - 1
-		static constexpr std::int32_t minimum_binary_exponent = -126; // FLT_MIN_EXP - 1
-		static constexpr std::int32_t exponent_bias			  = 127;
-		static constexpr std::int32_t sign_shift			  = 31; // exponent_bits + mantissa_bits - 1
-		static constexpr std::int32_t exponent_shift		  = 23; // mantissa_bits - 1
+		using int_type = std::int32_t;
+
+		static constexpr int_type mantissa_bits			  = 24;	  // FLT_MANT_DIG
+		static constexpr int_type exponent_bits			  = 8;	  // sizeof(float) * CHAR_BIT - FLT_MANT_DIG
+		static constexpr int_type maximum_binary_exponent = 127;  // FLT_MAX_EXP - 1
+		static constexpr int_type minimum_binary_exponent = -126; // FLT_MIN_EXP - 1
+		static constexpr int_type exponent_bias			  = 127;
+		static constexpr int_type sign_shift			  = 31; // exponent_bits + mantissa_bits - 1
+		static constexpr int_type exponent_shift		  = 23; // mantissa_bits - 1
 
 		using uint_type = std::uint32_t;
 
@@ -40,19 +42,21 @@ namespace ccm::support
 		static constexpr uint_type shifted_exponent_mask	 = 0x7F800000U; // exponent_mask << exponent_shift
 
 		// 0x7FFFFFFFFFFFFFFF bit representation
-		static constexpr float normalize_factor = 4294967296.f; // 2^32
+		static constexpr float normalize_factor = 4294967296.F; // 2^32
 	};
 
 	template <>
 	struct floating_point_traits<double>
 	{
-		static constexpr std::int32_t mantissa_bits			  = 53;	   // DBL_MANT_DIG
-		static constexpr std::int32_t exponent_bits			  = 11;	   // sizeof(double) * CHAR_BIT - DBL_MANT_DIG
-		static constexpr std::int32_t maximum_binary_exponent = 1023;  // DBL_MAX_EXP - 1
-		static constexpr std::int32_t minimum_binary_exponent = -1022; // DBL_MIN_EXP - 1
-		static constexpr std::int32_t exponent_bias			  = 1023;
-		static constexpr std::int32_t sign_shift			  = 63; // exponent_bits + mantissa_bits - 1
-		static constexpr std::int32_t exponent_shift		  = 52; // mantissa_bits - 1
+		using int_type = std::int64_t;
+
+		static constexpr int_type mantissa_bits			  = 53;	   // DBL_MANT_DIG
+		static constexpr int_type exponent_bits			  = 11;	   // sizeof(double) * CHAR_BIT - DBL_MANT_DIG
+		static constexpr int_type maximum_binary_exponent = 1023;  // DBL_MAX_EXP - 1
+		static constexpr int_type minimum_binary_exponent = -1022; // DBL_MIN_EXP - 1
+		static constexpr int_type exponent_bias			  = 1023;
+		static constexpr int_type sign_shift			  = 63; // exponent_bits + mantissa_bits - 1
+		static constexpr int_type exponent_shift		  = 52; // mantissa_bits - 1
 
 		using uint_type = std::uint64_t;
 
@@ -71,13 +75,15 @@ namespace ccm::support
 	template <>
 	struct floating_point_traits<long double>
 	{
-		static constexpr std::int32_t mantissa_bits			  = 112;	 // LDBL_MANT_DIG
-		static constexpr std::int32_t exponent_bits			  = 15;	 // sizeof(long double) * CHAR_BIT - LDBL_MANT_DIG
-		static constexpr std::int32_t maximum_binary_exponent = 16383; // LDBL_MAX_EXP - 1
-		static constexpr std::int32_t minimum_binary_exponent = -16382; // LDBL_MIN_EXP - 1
-		static constexpr std::int32_t exponent_bias			  = 16383;
-		static constexpr std::int32_t sign_shift			  = 79; // exponent_bits + mantissa_bits - 1
-		static constexpr std::int32_t exponent_shift		  = 63; // mantissa_bits - 1
+		using int_type = ccm::types::int128_t;
+
+		static constexpr int_type mantissa_bits			  = 112;	 // LDBL_MANT_DIG
+		static constexpr int_type exponent_bits			  = 15;	 // sizeof(long double) * CHAR_BIT - LDBL_MANT_DIG
+		static constexpr int_type maximum_binary_exponent = 16383; // LDBL_MAX_EXP - 1
+		static constexpr int_type minimum_binary_exponent = -16382; // LDBL_MIN_EXP - 1
+		static constexpr int_type exponent_bias			  = 16383;
+		static constexpr int_type sign_shift			  = 79; // exponent_bits + mantissa_bits - 1
+		static constexpr int_type exponent_shift		  = 63; // mantissa_bits - 1
 
 		using uint_type = ccm::types::uint128_t;
 
@@ -96,13 +102,15 @@ namespace ccm::support
 	template <>
 struct floating_point_traits<long double>
 	{
-		static constexpr std::int32_t mantissa_bits			  = 64;	 // LDBL_MANT_DIG
-		static constexpr std::int32_t exponent_bits			  = 15;	 // sizeof(long double) * CHAR_BIT - LDBL_MANT_DIG
-		static constexpr std::int32_t maximum_binary_exponent = 16383; // LDBL_MAX_EXP - 1
-		static constexpr std::int32_t minimum_binary_exponent = -16382; // LDBL_MIN_EXP - 1
-		static constexpr std::int32_t exponent_bias			  = 16383;
-		static constexpr std::int32_t sign_shift			  = 79; // exponent_bits + mantissa_bits - 1
-		static constexpr std::int32_t exponent_shift		  = 63; // mantissa_bits - 1
+		using int_type = ccm::types::int128_t;
+
+		static constexpr int_type mantissa_bits			  = 64;	 // LDBL_MANT_DIG
+		static constexpr int_type exponent_bits			  = 15;	 // sizeof(long double) * CHAR_BIT - LDBL_MANT_DIG
+		static constexpr int_type maximum_binary_exponent = 16383; // LDBL_MAX_EXP - 1
+		static constexpr int_type minimum_binary_exponent = -16382; // LDBL_MIN_EXP - 1
+		static constexpr int_type exponent_bias			  = 16383;
+		static constexpr int_type sign_shift			  = 79; // exponent_bits + mantissa_bits - 1
+		static constexpr int_type exponent_shift		  = 63; // mantissa_bits - 1
 
 		using uint_type = ccm::types::uint128_t;
 
@@ -113,6 +121,7 @@ struct floating_point_traits<long double>
 		static constexpr uint_type shifted_sign_mask		 = 0x8000000000000000U; // 1ULL << sign_shift
 		static constexpr uint_type shifted_exponent_mask	 = 0x7FFF000000000000U; // exponent_mask << exponent_shift
 
+		// TODO: Not 100% sure if the normalize factor should be 2^128 or 2^80. I think it should be 2^128, but I've not yet tested this.
 		static constexpr long double normalize_factor = 340282366920938463463374607431768211456.0L; // 2^128
 	};
 
@@ -128,6 +137,9 @@ struct floating_point_traits<long double>
 	using float_bits_t = typename floating_point_traits<T>::uint_type;
 
 	template <typename T>
+	using float_signed_bits_t = typename floating_point_traits<T>::int_type;
+
+	template <typename T>
 	inline constexpr typename floating_point_traits<T>::uint_type sign_mask_v = floating_point_traits<T>::shifted_sign_mask;
 
 
@@ -141,13 +153,13 @@ struct floating_point_traits<long double>
 	}
 
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr std::int32_t get_exponent_of_floating_point(T x) noexcept
+	constexpr float_signed_bits_t<T> get_exponent_of_floating_point(T x) noexcept
 	{
 		const auto bits = bit_cast<ccm::support::float_bits_t<T>>(x);
 
 		const auto shifted_exponent = bits >> ccm::support::floating_point_traits<T>::exponent_shift;
 		const auto masked_exponent	= shifted_exponent & ccm::support::floating_point_traits<T>::exponent_mask;
-		return masked_exponent - ccm::support::floating_point_traits<T>::exponent_bias;
+		return static_cast<float_signed_bits_t<T>>(masked_exponent) - ccm::support::floating_point_traits<T>::exponent_bias;
 	}
 
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
@@ -155,7 +167,7 @@ struct floating_point_traits<long double>
 	{
 		const auto bit_casted			  = ccm::support::bit_cast<ccm::support::float_bits_t<T>>(x);
 		const auto inverted_exponent_mask = ~ccm::support::floating_point_traits<T>::shifted_exponent_mask;
-		const auto masked_exponent = (exp + ccm::support::floating_point_traits<T>::exponent_bias) & ccm::support::floating_point_traits<T>::exponent_mask;
+		const auto masked_exponent = (static_cast<ccm::support::float_bits_t<T>>(exp + ccm::support::floating_point_traits<T>::exponent_bias)) & ccm::support::floating_point_traits<T>::exponent_mask;
 		const auto shifted_masked_exponent = masked_exponent << ccm::support::floating_point_traits<T>::exponent_shift;
 		const auto final_bits			   = (bit_casted & inverted_exponent_mask) | shifted_masked_exponent;
 

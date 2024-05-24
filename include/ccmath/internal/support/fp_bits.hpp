@@ -6,7 +6,7 @@
  * See LICENSE for more information.
  */
 
-// Code borrowed from LLVM with heavy modifications done for ccmath to allow cross platform and compiler support.
+// Code borrowed from LLVM with heavy modifications done for ccmath to allow for both cross-platform and cross-compiler support.
 // https://github.com/llvm/llvm-project/
 
 #pragma once
@@ -181,10 +181,10 @@ namespace ccm::support
 				using UP = TypedInt<std::uint32_t>;
 				using UP::UP;
 
-				constexpr BiasedExponent(Exponent exp) : UP(static_cast<std::int32_t>(exp) + EXP_BIAS) {}
+				constexpr BiasedExponent(Exponent exp) : UP(static_cast<std::uint32_t>(static_cast<std::int32_t>(exp) + EXP_BIAS)) {}
 
 				// Cast operator to get convert from BiasedExponent to Exponent.
-				explicit constexpr operator Exponent() const { return Exponent(UP::value - EXP_BIAS); }
+				explicit constexpr operator Exponent() const { return Exponent(static_cast<std::int32_t>(UP::value) - EXP_BIAS); }
 
 				constexpr BiasedExponent & operator++()
 				{
@@ -518,7 +518,7 @@ namespace ccm::support
 				return static_cast<std::uint16_t>(static_cast<std::uint32_t>(UP::biased_exponent()));
 			}
 
-			constexpr void set_biased_exponent(StorageType biased) { UP::set_biased_exponent(BiasedExponent(static_cast<std::int32_t>(biased))); }
+			constexpr void set_biased_exponent(StorageType biased) { UP::set_biased_exponent(BiasedExponent(static_cast<std::uint32_t>(static_cast<std::int32_t>(biased)))); }
 
 			[[nodiscard]] constexpr int get_exponent() const { return static_cast<std::int32_t>(Exponent(UP::biased_exponent())); }
 
