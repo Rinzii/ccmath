@@ -14,6 +14,16 @@
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 
+
+// TODO: Add support for other architectures at a later date.
+#if defined(CCM_TARGET_ARCH_AARCH64)
+	#if defined(__APPLE__) // Apple ARM
+		#include "ccmath/internal/support/fenv/aarch64/fenv_support_darwin.hpp"
+	#else // Generic ARM
+		#include "ccmath/internal/support/fenv/aarch64/fenv_support_generic.hpp"
+	#endif
+#else
+
 #include <cerrno>
 #include <cfenv>
 #include <cstdint>
@@ -94,6 +104,7 @@ namespace ccm::support::fenv::internal
 		return std::fesetenv(envp);
 	}
 } // namespace ccm::support::fenv::internal
+#endif // CCM_TARGET_ARCH_AARCH64
 
 namespace ccm::support::fenv
 {

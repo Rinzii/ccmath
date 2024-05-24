@@ -14,8 +14,6 @@
 #include "ccmath/internal/config/arch/targets/aarch64.hpp" // CCM_TARGET_ARCH_AARCH64
 
 #if defined(CCM_TARGET_ARCH_AARCH64) && defined(__APPLE__)
-
-
 #include "ccmath/internal/support/fp_bits.hpp"
 
 #include <arm_acle.h>
@@ -271,5 +269,4 @@ namespace ccm::support::fenv::internal
 		return 0;
 	}
 } // namespace ccm::support::fenv::internal
-
-#endif
+#endif // defined(CCM_TARGET_ARCH_AARCH64) && defined(__APPLE__)
