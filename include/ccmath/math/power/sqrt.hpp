@@ -11,8 +11,8 @@
 #include "ccmath/internal/config/type_support.hpp"
 #include "ccmath/internal/support/always_false.hpp"
 #include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/fp_bits.hpp"
-#include "ccmath/internal/support/rounding_mode.hpp"
 
 #include <type_traits>
 

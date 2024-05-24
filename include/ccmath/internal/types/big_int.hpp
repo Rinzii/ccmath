@@ -6,6 +6,9 @@
  * See LICENSE for more information.
  */
 
+// Code borrowed from LLVM with heavy modifications done for ccmath to allow for both cross-platform and cross-compiler support.
+// https://github.com/llvm/llvm-project/
+
 #pragma once
 
 #include "ccmath/internal/config/compiler.hpp"

@@ -2,10 +2,30 @@
 # Internal headers
 ##########################################
 
+set(ccmath_internal_config_arch_targets_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/arch/targets/x86_64.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/arch/targets/aarch64.hpp
+)
+
+set(ccmath_internal_config_arch_headers
+        ${ccmath_internal_config_arch_targets_headers}
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/arch/simd.hpp
+)
+
+set(ccmath_internal_config_platform_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/platform/android.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/platform/darwin.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/platform/linux.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/platform/windows.hpp
+)
+
 set(ccmath_internal_config_headers
+        ${ccmath_internal_config_arch_headers}
+        ${ccmath_internal_config_platform_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/compiler.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/builtin_support.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/type_support.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/runtime_detection.hpp
 )
 
 set(ccmath_internal_helpers_headers
@@ -16,14 +36,14 @@ set(ccmath_internal_helpers_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/ccm_ldexp.hpp
 )
 
-set(ccmath_internal_predef_compiler-support_headers
+set(ccmath_internal_predef_compiler_support_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_support/clang_compiler_suppression.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_support/gcc_compiler_suppression.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_support/msvc_compiler_suppression.hpp
 )
 
 set(ccmath_internal_predef_headers
-        ${ccmath_internal_predef_compiler-support_headers}
+        ${ccmath_internal_predef_compiler_support_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/has_attribute.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/likely.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/unlikely.hpp
@@ -33,7 +53,21 @@ set(ccmath_internal_predef_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/assume.hpp
 )
 
+set(ccmath_internal_support_fenv_aarch64_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fenv/aarch64/fenv_support_darwin.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fenv/aarch64/fenv_support_generic.hpp
+)
+
+set(ccmath_internal_support_fenv_headers
+        ${ccmath_internal_support_fenv_aarch64_headers}
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fenv/fenv_support.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fenv/rounding_mode.hpp
+
+
+)
+
 set(ccmath_internal_support_headers
+        ${ccmath_internal_support_fenv_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/bits.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/endian.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/floating_point_traits.hpp
@@ -47,7 +81,6 @@ set(ccmath_internal_support_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/multiply_add.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/poly_eval.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/bit_mask.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/rounding_mode.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/math_support.hpp
 
@@ -62,6 +95,7 @@ set(ccmath_internal_types_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/double_double.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/triple_double.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/big_int.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/dyadic_float.hpp
 )
 
 
