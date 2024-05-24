@@ -311,10 +311,10 @@
 		// This will disable a list of warning for MSVC.
 		// This macro allows for multiple warnings to be disabled per statement by using a space between warnings like so: CCM_DISABLE_MSVC_WARNING(4100 4101).
 		// Must be called before CCM_RESTORE_MSVC_WARNING().
-		#define CCM_DISABLE_VC_WARNING(w) __pragma(warning(push)) __pragma(warning(disable : w))
+		#define CCM_DISABLE_MSVC_WARNING(w) __pragma(warning(push)) __pragma(warning(disable : w))
 	#else
 	// If not on MSVC this macro does nothing.
-		#define CCM_DISABLE_VC_WARNING(w)
+		#define CCM_DISABLE_MSVC_WARNING(w)
 	#endif
 #endif
 
@@ -332,10 +332,10 @@
 	#if defined(_MSC_VER) && !defined(__clang__)
 		// This will restore all disabled warnings for MSVC in a single statement.
 		// Must be called after CCM_DISABLE_MSVC_WARNING(w).
-		#define CCM_RESTORE_VC_WARNING() __pragma(warning(pop))
+		#define CCM_RESTORE_MSVC_WARNING() __pragma(warning(pop))
 	#else
 	// If not on MSVC this macro does nothing.
-		#define CCM_RESTORE_VC_WARNING()
+		#define CCM_RESTORE_MSVC_WARNING()
 	#endif
 #endif
 
