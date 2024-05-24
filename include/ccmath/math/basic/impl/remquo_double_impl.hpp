@@ -8,8 +8,9 @@
 
 #pragma once
 
+#include "ccmath/internal/predef/compiler_support/clang_compiler_suppression.hpp"
+#include "ccmath/internal/predef/compiler_support/gcc_compiler_suppression.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
-#include "ccmath/internal/predef/compiler_warnings_and_errors.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/math/basic/abs.hpp"
 #include "ccmath/math/basic/fmod.hpp"
@@ -43,6 +44,7 @@ namespace ccm::internal
 
 			// GCC and Clang do not like comparing signed and unsigned integers.
 			// The outcome of these comparisons is well-defined, so we can safely disable these warnings.
+			// Must disable clang-form here as clang-format likes to add spaces between the hyphens for flags
 			// clang-format off
 			CCM_DISABLE_GCC_WARNING(-Wsign-compare)
 			CCM_DISABLE_CLANG_WARNING(-Wsign-compare)
