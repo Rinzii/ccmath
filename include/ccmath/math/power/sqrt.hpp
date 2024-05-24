@@ -40,7 +40,15 @@ namespace ccm
 		{
 			static constexpr bool value = true;
 		};
+#endif
 
+#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
+		template <>
+		constexpr void normalize<long double>(int & exponent, std::uint64_t & mantissa)
+		{
+			normalize<double>(exponent, mantissa);
+		}
+#elif defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
 		template <>
 		constexpr void normalize<long double>(int & exponent, types::uint128_t & mantissa)
 		{
@@ -51,14 +59,6 @@ namespace ccm
 		}
 #endif
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
-		template <>
-		constexpr void normalize<long double>(int & exponent, std::uint64_t & mantissa)
-		{
-			normalize<double>(exponent, mantissa);
-		}
-#endif
-
 		template <typename T>
 		constexpr bool Is80BitLongDouble_v = Is80BitLongDouble<T>::value;
 
@@ -66,7 +66,10 @@ namespace ccm
 		{
 			namespace bit80
 			{
+				// This has to be defined for sqrt_impl to work as it still needs to see that this function exists
+				constexpr long double sqrt_calc_80bits(long double x);
 
+#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
 				constexpr long double sqrt_calc_80bits(long double x)
 				{
 					using Bits				  = support::FPBits<long double>;
@@ -82,7 +85,7 @@ namespace ccm
 					int x_exp		   = bits.get_explicit_exponent();
 					StorageType x_mant = bits.get_mantissa();
 
-					// If we have a denormal value, normalize it.
+					// If we have denormal values, normalize it.
 					if (bits.get_implicit_bit()) { x_mant |= one; }
 					else if (bits.is_subnormal()) { normalize<long double>(x_exp, x_mant); }
 
@@ -140,6 +143,7 @@ namespace ccm
 
 					return out.get_val();
 				}
+#endif
 			} // namespace bit80
 
 			template <typename T>
@@ -152,7 +156,7 @@ namespace ccm
 				int x_exp		   = bits.get_exponent();
 				StorageType x_mant = bits.get_mantissa();
 
-				// If we have a denormal value, normalize it.
+				// If we have denormal values, normalize it.
 				if (bits.is_subnormal())
 				{
 					++x_exp; // ensure that x_exp is the correct exponent of one bit.
@@ -182,13 +186,12 @@ namespace ccm
 				}
 
 				// We perform one more iteration to ensure that the result is correctly rounded.
-				bool lsb	   = static_cast<bool>(y & 1); // Least significant bit
+				auto lsb	   = static_cast<bool>(y & 1); // Least significant bit
 				bool round_bit = false;
 
 				r <<= 2;
-				StorageType tmp = (y << 2) + 1;
 
-				if (r >= tmp)
+				if (StorageType tmp = (y << 2) + 1; r >= tmp)
 				{
 					r -= tmp;
 					round_bit = true;
@@ -221,7 +224,6 @@ namespace ccm
 			{
 				if constexpr (Is80BitLongDouble_v<T>) // NOLINT
 				{
-
 					return bit80::sqrt_calc_80bits(x);
 				}
 				else
