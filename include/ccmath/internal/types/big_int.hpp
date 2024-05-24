@@ -354,10 +354,19 @@ namespace ccm::types
 
 		constexpr BigInt() = default;
 
+		// TODO: Remove after verifying CI
 		constexpr BigInt(const BigInt & other) = default;
+		/*
+		constexpr BigInt(const BigInt & other)
+		{
+			for (std::size_t i = 0; i < WORD_COUNT; ++i) { val[i] = other[i]; }
+		}
+		*/
 
+		// TODO: Remove after verifying CI
+		/*
 		template <std::size_t OtherBits, bool OtherSigned>
-		constexpr explicit BigInt(const BigInt<OtherBits, OtherSigned, WordType> & other)
+		constexpr BigInt(BigInt<OtherBits, OtherSigned, WordType> && other) // NOLINT
 		{
 			if (OtherBits >= Bits)
 			{
@@ -370,6 +379,25 @@ namespace ccm::types
 				extend(i, Signed && other.is_neg());
 			}
 		}
+		*/
+
+		// NO
+		/*
+		template <std::size_t OtherBits, bool OtherSigned>
+		constexpr BigInt(const BigInt<OtherBits, OtherSigned, WordType> & other) // NOLINT
+		{
+			if (OtherBits >= Bits)
+			{
+				for (std::size_t i = 0; i < WORD_COUNT; ++i) { val[i] = other[i]; }
+			}
+			else
+			{
+				std::size_t i = 0;
+				for (; i < OtherBits / WORD_SIZE; ++i) { val[i] = other[i]; }
+				extend(i, Signed && other.is_neg());
+			}
+		}
+		*/
 
 		template <std::size_t N>
 		constexpr explicit BigInt(
@@ -400,6 +428,26 @@ namespace ccm::types
 		}
 
 		constexpr BigInt & operator=(const BigInt & other) = default;
+
+		// TODO: Remove after verifying CI
+		/*
+		constexpr BigInt & operator=(const BigInt & other)
+		{
+			for (std::size_t i = 0; i < WORD_COUNT; ++i) { val[i] = other[i]; }
+			return *this;
+		}
+		*/
+		// TODO: Remove after verifying CI
+		/*
+		template <typename T>
+		constexpr BigInt & operator=(T v)
+		{
+			*this = BigInt(v);
+			return *this;
+		}
+		*/
+
+
 
 		static constexpr BigInt zero() { return BigInt(); }
 		static constexpr BigInt one() { return BigInt(1); }
@@ -690,6 +738,9 @@ namespace ccm::types
 			return result;
 		}
 
+
+
+
 		friend constexpr bool operator==(const BigInt & lhs, const BigInt & rhs)
 		{
 			for (std::size_t i = 0; i < WORD_COUNT; ++i)
@@ -697,6 +748,12 @@ namespace ccm::types
 				if (lhs.val[i] != rhs.val[i]) { return false; }
 			}
 			return true;
+		}
+
+		template <typename T>
+		friend constexpr bool operator==(const BigInt & lhs, T rhs)
+		{
+			return lhs == BigInt(rhs);
 		}
 
 		friend constexpr bool operator!=(const BigInt & lhs, const BigInt & rhs) { return !(lhs == rhs); }
