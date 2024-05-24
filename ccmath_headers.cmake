@@ -16,8 +16,14 @@ set(ccmath_internal_helpers_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/ccm_ldexp.hpp
 )
 
+set(ccmath_internal_predef_compiler-support_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_support/clang_compiler_suppression.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_support/gcc_compiler_suppression.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_support/msvc_compiler_suppression.hpp
+)
+
 set(ccmath_internal_predef_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_warnings_and_errors.hpp
+        ${ccmath_internal_predef_compiler-support_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/has_attribute.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/likely.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/unlikely.hpp
