@@ -245,7 +245,7 @@ namespace ccm::support
 			StorageType bits{};
 
 			constexpr FPStorage() : bits(0) {}
-			explicit constexpr FPStorage(StorageType value) : bits(value) {}
+			constexpr FPStorage(StorageType value) : bits(value) {}
 
 			// Observers
 			[[nodiscard]] constexpr StorageType exp_bits() const { return bits & EXP_MASK; }
@@ -367,7 +367,7 @@ namespace ccm::support
 			static constexpr RetT inf(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::inf(), Significand::msb())); }
 			static constexpr RetT signaling_nan(types::Sign sign = types::Sign::POS, StorageType v = 0)
 			{
-				return RetT(encode(sign, Exponent::inf(), Significand::msb() | ((v != 0U) ? Significand(v) : (Significand::msb() >> 2))));
+				return RetT(encode(sign, Exponent::inf(), Significand::msb() | (v ? Significand(v) : (Significand::msb() >> 2))));
 			}
 			static constexpr RetT quiet_nan(types::Sign sign = types::Sign::POS, StorageType v = 0)
 			{
