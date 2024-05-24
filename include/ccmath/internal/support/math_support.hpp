@@ -11,6 +11,7 @@
 #include "ccmath/internal/support/type_traits.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
+#include "ccmath/internal/predef/compiler_warnings_and_errors.hpp"
 
 #include <climits>
 
@@ -90,6 +91,13 @@ namespace ccm::support
     }
 
 #undef RETURN_IF
+
+	// warning C4293: '>>': shift count negative or too big, undefined behavior
+	// Normally MSVC would be correct but in this instance we assume that we know for a fact this undefined behavior will never happen.
+	// Please be careful that UB is not introduced by using this function and that you know this
+	// function will never be called with a count that is too big.
+	CCM_DISABLE_MSVC_WARNING(4293)
+
 	// Create a bitmask with the count right-most bits set to 1, and all other bits
 	// set to 0.  Only unsigned types are allowed.
 	template <typename T, std::size_t count>
@@ -99,6 +107,8 @@ namespace ccm::support
 		static_assert(count <= T_BITS && "Invalid bit index");
 		return count == 0 ? 0 : (T(-1) >> (T_BITS - count));
 	}
+
+	CCM_RESTORE_MSVC_WARNING()
 
 	// Create a bitmask with the count left-most bits set to 1, and all other bits
 	// set to 0.  Only unsigned types are allowed.
