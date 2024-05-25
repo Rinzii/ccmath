@@ -87,7 +87,7 @@ namespace ccm
 		// TODO: This approach should work with long double perfectly, but is slow.
 		//		 at some consider adding a faster approach that is just as consistent.
 		if (num > 0) { return internal::impl::floor_pos_impl(num); }
-		return internal::impl::floor_neg_impl(num);
+		return ccm::internal::impl::floor_neg_impl(num);
 	}
 
 	/**

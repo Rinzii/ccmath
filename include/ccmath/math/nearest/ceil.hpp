@@ -15,7 +15,7 @@ namespace ccm
 	namespace internal::impl
 	{
 		template <typename T>
-		constexpr T ceil(T x) noexcept
+		constexpr T ceil_impl(T x) noexcept
 		{
 			const T result = ccm::floor(x);
 			return result + (x != result);
@@ -31,7 +31,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T ceil(T num) noexcept
 	{
-		return ccm::internal::impl::ceil<T>(num);
+		return ccm::internal::impl::ceil_impl<T>(num);
 	}
 
 	/**
@@ -52,7 +52,7 @@ namespace ccm
 	 */
 	constexpr float ceilf(float num) noexcept
 	{
-		return ceil<float>(num);
+		return ccm::ceil<float>(num);
 	}
 
 	/**
@@ -62,6 +62,6 @@ namespace ccm
 	 */
 	constexpr double ceill(double num) noexcept
 	{
-		return ceil<double>(num);
+		return ccm::ceil<double>(num);
 	}
 } // namespace ccm
