@@ -83,6 +83,7 @@ set(ccmath_internal_support_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/bit_mask.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/math_support.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/directional_round.hpp
 
 )
 
