@@ -16,7 +16,7 @@ namespace ccm
 {
 	namespace internal::impl
 	{
-		template <typename T, std::enable_if_t<std::floating_point_v<T>, bool> = true>
+		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 		constexpr T ceil_impl(T x) noexcept
 		{
 			const T result = ccm::floor(x);
