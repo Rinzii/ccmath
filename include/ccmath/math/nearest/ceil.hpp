@@ -10,11 +10,13 @@
 
 #include "ccmath/math/nearest/floor.hpp"
 
+#include <type_traits>
+
 namespace ccm
 {
 	namespace internal::impl
 	{
-		template <typename T>
+		template <typename T, std::enable_if_t<std::floating_point_v<T>, bool> = true>
 		constexpr T ceil_impl(T x) noexcept
 		{
 			const T result = ccm::floor(x);
@@ -31,7 +33,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T ceil(T num) noexcept
 	{
-		return ccm::internal::impl::ceil_impl<T>(num);
+		return ccm::internal::impl::ceil_impl(num);
 	}
 
 	/**

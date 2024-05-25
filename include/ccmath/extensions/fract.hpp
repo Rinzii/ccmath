@@ -9,6 +9,7 @@
 #pragma once
 
 #include "ccmath/internal/support/directional_round.hpp"
+
 #include <type_traits>
 
 namespace ccm::ext
