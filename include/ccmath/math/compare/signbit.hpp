@@ -18,8 +18,9 @@
 // By default we want constexpr signbit, but if that isn't available then we want constexpr copysign, and if that isn't available then we want bit_cast.
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
 	#undef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+	#undef CCMATH_HAS_BUILTIN_BIT_CAST
 #endif
-#if defined(CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT) || defined(CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN)
+#ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
 	#undef CCMATH_HAS_BUILTIN_BIT_CAST
 #endif
 
@@ -75,7 +76,7 @@ namespace ccm
 
 		return num < static_cast<T>(0);
 #elif defined(CCMATH_HAS_BUILTIN_BIT_CAST)
-		// Check for the sign of +0.0 and -0.0 with __builtin_bit_cast
+		// Check for the sign of +0.0 and -0.0 withbit_cast
 		if (num == static_cast<T>(0) || ccm::isnan(num))
 		{
 			const auto bits = support::bit_cast<support::float_bits_t<T>>(num);
