@@ -6,44 +6,33 @@
  * See LICENSE for more information.
  */
 
-// From Ian: Sorry for the macro gore. Kinda required to make this work in a constexpr context. :(
-// TODO: Move all the macro gore into two files. One to define the macros and another to undefine them.
-
 #pragma once
 
-#include "ccmath/internal/support/always_false.hpp"
+// Headers used to detect the compiler support for the different fallbacks.
+// The defined macros by these headers will be undefined excluding the selected fallback.
+#include "ccmath/internal/config/builtin/bit_cast_support.hpp"
+#include "ccmath/internal/config/builtin/copysign_support.hpp"
+#include "ccmath/internal/config/builtin/signbit_support.hpp"
 
-// Some compilers have __builtin_signbit which is constexpr for some compilers
-#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
-	// GCC 6.1+ has constexpr __builtin_signbit that DOES allow static_assert. Clang & MSVC do not.
-	#if defined(__GNUC__) && (__GNUC__ >= 6 && __GNUC_MINOR__ >= 1)
-		#define CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
-	#endif
+// We don't want to pollute the global namespace with these macros so we undefine them based on our desired fallbacks.
+// By default we want constexpr signbit, but if that isn't available then we want constexpr copysign, and if that isn't available then we want bit_cast.
+#ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
+	#undef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+#endif
+#if defined(CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT) || defined(CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN)
+	#undef CCMATH_HAS_BUILTIN_BIT_CAST
 #endif
 
-#if !defined(CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN) && !defined(CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT)
-	// GCC 6.1 has constexpr __builtin_copysign that DOES allow static_assert
-	#if defined(__GNUC__) && (__GNUC__ >= 6 && __GNUC_MINOR__ >= 1)
-		#define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-	#endif
-
-	// Clang 5.0.0 has constexpr __builtin_copysign that DOES allow static_assert
-	#if defined(__clang__) && (__clang_major__ >= 5)
-		#define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-		#include "ccmath/math/compare/isnan.hpp"
-	#endif
+// Include the necessary headers for each different fallback
+#ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+	#include "ccmath/math/compare/isnan.hpp"
 #endif
-
-// We only implement this for MSVC as that is the only manner to get constexpr signbit that is also static_assert-able
-#if !defined(CCMATH_HAS_BUILTIN_BIT_CAST) && !defined(CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT) && !defined(CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN)
-	#if (defined(_MSC_VER) && _MSC_VER >= 1927)
-		#define CCMATH_HAS_BUILTIN_BIT_CAST
-		#include "ccmath/internal/support/bits.hpp"
-		#include "ccmath/math/compare/isnan.hpp"
-		#include "ccmath/internal/support/floating_point_traits.hpp"
-		#include <limits>  // for std::numeric_limits
-		#include <cstdint> // for std::uint64_t
-	#endif
+#ifdef CCMATH_HAS_BUILTIN_BIT_CAST
+	#include "ccmath/internal/support/bits.hpp"
+	#include "ccmath/internal/support/floating_point_traits.hpp"
+#endif
+#if !defined(CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT) && !defined(CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN) && !defined(CCMATH_HAS_BUILTIN_BIT_CAST)
+	#include "ccmath/internal/support/always_false.hpp"
 #endif
 
 namespace ccm
@@ -130,20 +119,3 @@ namespace ccm
 	}
 
 } // namespace ccm
-
-// Clean up the global namespace
-#ifdef CCMATH_HAS_CONSTEXPR_SIGNBIT
-	#undef CCMATH_HAS_CONSTEXPR_SIGNBIT
-#endif
-
-#ifdef CCMATH_HAS_BUILTIN_BIT_CAST
-	#undef CCMATH_HAS_BUILTIN_BIT_CAST
-#endif
-
-#ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
-	#undef CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
-#endif
-
-#ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-	#undef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-#endif
