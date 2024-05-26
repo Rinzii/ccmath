@@ -1098,14 +1098,9 @@ namespace ccm::types
 
 		constexpr BigInt operator<<(std::size_t s) const { return BigInt(multiword::shift<multiword::Direction::eLEFT, SIGNED>(val, s)); }
 
-		template <typename T, std::enable_if<ccm::support::traits::ccm_is_integral_v<T>>>
+		template <typename T>
 		constexpr BigInt operator<<(T s) const
 		{
-			if (s < 0)
-			{
-				// static_assert(ccm::support::always_false<T>, "Shift amount must be non-negative.");
-			}
-
 			return BigInt(multiword::shift<multiword::Direction::eLEFT, SIGNED>(val, s));
 		}
 
