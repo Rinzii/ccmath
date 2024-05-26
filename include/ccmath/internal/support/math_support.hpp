@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "ccmath/internal/support/type_traits.hpp"
+#include "ccmath/internal/predef/compiler_support/msvc_compiler_suppression.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
-#include "ccmath/internal/predef/compiler_support/msvc_compiler_suppression.hpp"
+#include "ccmath/internal/support/type_traits.hpp"
 
 #include <climits>
 
@@ -20,75 +20,135 @@ namespace ccm::support
 
 	// Returns whether 'a + b' overflows, the result is stored in 'res'.
 	template <typename T>
-	[[nodiscard]] constexpr bool add_overflow(T a, T b, T &res) {
+	[[nodiscard]] constexpr bool add_overflow(T a, T b, T & res)
+	{
+#if CCM_HAS_BUILTIN(__builtin_add_overflow)
 		return __builtin_add_overflow(a, b, &res);
+#else
+		// This is a fallback implementation that should work on all compilers.
+		static_assert(std::is_integral_v<T>, "T must be an integral type");
+		static_assert(!std::is_same_v<T, bool>, "T must not be a boolean type");
+		static_assert(!std::is_enum_v<T>, "T must not be an enumerated type");
+
+		// Get the lergest integral type that can hold the sum of a and b
+		using LargerType = long long;
+		auto la			 = static_cast<LargerType>(a);
+		auto lb			 = static_cast<LargerType>(b);
+
+		// Perform the addition
+		LargerType const lres = la + lb;
+
+		// Check for overflow by comparing the signs
+		bool overflow = false;
+		if (std::is_signed_v<T>)
+		{
+			if ((a > 0 && b > 0 && lres < 0) || (a < 0 && b < 0 && lres > 0)) { overflow = true; }
+		}
+		else
+		{
+			if (lres < 0 || lres > std::numeric_limits<T>::max()) { overflow = true; }
+		}
+
+		// Store the result if no overflow
+		if (!overflow) { res = static_cast<T>(lres); }
+
+		return overflow;
+#endif
 	}
 
 	// Returns whether 'a - b' overflows, the result is stored in 'res'.
 	template <typename T>
-	[[nodiscard]] constexpr bool sub_overflow(T a, T b, T &res) {
+	[[nodiscard]] constexpr bool sub_overflow(T a, T b, T & res)
+	{
+#if CCM_HAS_BUILTIN(__builtin_sub_overflow)
 		return __builtin_sub_overflow(a, b, &res);
+#else
+		static_assert(std::is_integral_v<T>, "T must be an integral type");
+		static_assert(!std::is_same_v<T, bool>, "T must not be a boolean type");
+		static_assert(!std::is_enum_v<T>, "T must not be an enumerated type");
+
+		// Get the lergest integral type that can hold the sum of a and b
+		using LargerType = long long;
+		auto la			 = static_cast<LargerType>(a);
+		auto lb			 = static_cast<LargerType>(b);
+
+		// Perform the subtraction
+		LargerType const lres = la - lb;
+
+		// Check for overflow by comparing the signs
+		bool overflow = false;
+		if (std::is_signed_v<T>)
+		{
+			if ((b > 0 && a < std::numeric_limits<T>::min() + b) || (b < 0 && a > std::numeric_limits<T>::max() + b)) { overflow = true; }
+		}
+		else
+		{
+			if (a < b) { overflow = true; }
+		}
+
+		// Store the result if no overflow
+		if (!overflow) { res = static_cast<T>(lres); }
+
+		return overflow;
+#endif
 	}
 
-#define RETURN_IF(TYPE, BUILTIN)                                               \
-  if constexpr (std::is_same_v<T, TYPE>)                                       \
-    return BUILTIN(a, b, carry_in, carry_out);
+#define RETURN_IF(TYPE, BUILTIN)                                                                                                                               \
+	if constexpr (std::is_same_v<T, TYPE>) return BUILTIN(a, b, carry_in, carry_out);
 
-    // Returns the result of 'a + b' taking into account 'carry_in'.
-    // The carry out is stored in 'carry_out' it not 'nullptr', dropped otherwise.
-    // We keep the pass by pointer interface for consistency with the intrinsic.
-    template <typename T>
-    [[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T>
-    add_with_carry(T a, T b, T carry_in, T& carry_out)
-    {
-        if constexpr (!is_constant_evaluated())
-        {
+	// Returns the result of 'a + b' taking into account 'carry_in'.
+	// The carry out is stored in 'carry_out' it not 'nullptr', dropped otherwise.
+	// We keep the pass by pointer interface for consistency with the intrinsic.
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> add_with_carry(T a, T b, T carry_in, T & carry_out)
+	{
+		if constexpr (!is_constant_evaluated())
+		{
 #if CCM_HAS_BUILTIN(__builtin_addcb)
-    RETURN_IF(unsigned char, __builtin_addcb)
+			RETURN_IF(unsigned char, __builtin_addcb)
 #elif CCM_HAS_BUILTIN(__builtin_addcs)
-    RETURN_IF(unsigned short, __builtin_addcs)
+			RETURN_IF(unsigned short, __builtin_addcs)
 #elif CCM_HAS_BUILTIN(__builtin_addc)
-            RETURN_IF(unsigned int, __builtin_addc)
+			RETURN_IF(unsigned int, __builtin_addc)
 #elif CCM_HAS_BUILTIN(__builtin_addcl)
-    RETURN_IF(unsigned long, __builtin_addcl)
+			RETURN_IF(unsigned long, __builtin_addcl)
 #elif CCM_HAS_BUILTIN(__builtin_addcll)
-    RETURN_IF(unsigned long long, __builtin_addcll)
+			RETURN_IF(unsigned long long, __builtin_addcll)
 #endif
-        }
-        T sum = {};
-        T carry1 = add_overflow(a, b, sum);
-        T carry2 = add_overflow(sum, carry_in, sum);
-        carry_out = carry1 | carry2;
-        return sum;
-    }
+		}
+		T sum	  = {};
+		T carry1  = add_overflow(a, b, sum);
+		T carry2  = add_overflow(sum, carry_in, sum);
+		carry_out = carry1 | carry2;
+		return sum;
+	}
 
-    // Returns the result of 'a - b' taking into account 'carry_in'.
-    // The carry out is stored in 'carry_out' it not 'nullptr', dropped otherwise.
-    // We keep the pass by pointer interface for consistency with the intrinsic.
-    template <typename T>
-    [[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T>
-    sub_with_borrow(T a, T b, T carry_in, T& carry_out)
-    {
-        if constexpr (!is_constant_evaluated())
-        {
+	// Returns the result of 'a - b' taking into account 'carry_in'.
+	// The carry out is stored in 'carry_out' it not 'nullptr', dropped otherwise.
+	// We keep the pass by pointer interface for consistency with the intrinsic.
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> sub_with_borrow(T a, T b, T carry_in, T & carry_out)
+	{
+		if constexpr (!is_constant_evaluated())
+		{
 #if CCM_HAS_BUILTIN(__builtin_subcb)
-    RETURN_IF(unsigned char, __builtin_subcb)
+			RETURN_IF(unsigned char, __builtin_subcb)
 #elif CCM_HAS_BUILTIN(__builtin_subcs)
-    RETURN_IF(unsigned short, __builtin_subcs)
+			RETURN_IF(unsigned short, __builtin_subcs)
 #elif CCM_HAS_BUILTIN(__builtin_subc)
-            RETURN_IF(unsigned int, __builtin_subc)
+			RETURN_IF(unsigned int, __builtin_subc)
 #elif CCM_HAS_BUILTIN(__builtin_subcl)
-    RETURN_IF(unsigned long, __builtin_subcl)
+			RETURN_IF(unsigned long, __builtin_subcl)
 #elif CCM_HAS_BUILTIN(__builtin_subcll)
-    RETURN_IF(unsigned long long, __builtin_subcll)
+			RETURN_IF(unsigned long long, __builtin_subcll)
 #endif
-        }
-        T sub = {};
-        T carry1 = sub_overflow(a, b, sub);
-        T carry2 = sub_overflow(sub, carry_in, sub);
-        carry_out = carry1 | carry2;
-        return sub;
-    }
+		}
+		T sub	  = {};
+		T carry1  = sub_overflow(a, b, sub);
+		T carry2  = sub_overflow(sub, carry_in, sub);
+		carry_out = carry1 | carry2;
+		return sub;
+	}
 
 #undef RETURN_IF
 
