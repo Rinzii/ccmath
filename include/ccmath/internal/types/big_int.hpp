@@ -518,8 +518,8 @@ namespace ccm::types
 				// Return appropriate value for out-of-bound elements.
 				const int i = at(index);
 				if (i < 0) { return 0; }
-				if (i >= static_cast<int>(N)) { return is_neg ? -1 : 0; }
-				return array[i];
+				if (i >= static_cast<int>(N)) { return is_neg ? static_cast<word>(-1) : 0; }
+				return array[static_cast<std::size_t>(i)];
 			};
 			const std::size_t index_offset = offset / WORD_BITS;
 			const std::size_t bit_offset   = offset % WORD_BITS;
@@ -531,7 +531,7 @@ namespace ccm::types
 			{
 				const word part1 = safe_get_at(index + index_offset);
 				const word part2 = safe_get_at(index + index_offset + 1);
-				word & dst		 = out[at(index)];
+				word & dst		 = out[static_cast<std::size_t>(at(index))];
 				if (bit_offset == 0) { dst = part1; } // No crosstalk between parts.
 				else if constexpr (direction == Direction::eLEFT) { dst = (part1 << bit_offset) | (part2 >> (WORD_BITS - bit_offset)); }
 				else { dst = (part1 >> bit_offset) | (part2 << (WORD_BITS - bit_offset)); }

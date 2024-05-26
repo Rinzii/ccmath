@@ -20,7 +20,7 @@
 namespace ccm::helpers
 {
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
-	constexpr T ccm_ldexp(T x, int exp)
+	constexpr T internal_ldexp(T x, int exp)
 	{
 		support::FPBits<T> bits(x);
 		if (CCM_UNLIKELY((exp == 0) || bits.is_zero() || bits.is_inf_or_nan())) { return x; }

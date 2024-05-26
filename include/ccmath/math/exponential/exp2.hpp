@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "ccmath/internal/config/builtin/exp2_support.hpp"
+#include "ccmath/internal/predef/has_const_builtin.hpp"
 #include "ccmath/math/exponential/impl/exp2_double_impl.hpp"
 #include "ccmath/math/exponential/impl/exp2_float_impl.hpp"
 
@@ -24,7 +26,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T exp2(T num)
 	{
-#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
+#if defined(CCMATH_HAS_CONSTEXPR_BUILTIN_EXP2) || CCM_HAS_CONST_BUILTIN(__builtin_exp2)
 		if constexpr (std::is_same_v<T, float>) { return __builtin_exp2f(num); }
 		if constexpr (std::is_same_v<T, double>) { return __builtin_exp2(num); }
 		if constexpr (std::is_same_v<T, long double>) { return __builtin_exp2l(num); }
@@ -69,3 +71,4 @@ namespace ccm
 		return ccm::exp2<long double>(num);
 	}
 } // namespace ccm
+

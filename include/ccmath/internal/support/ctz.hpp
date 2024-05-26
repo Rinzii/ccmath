@@ -49,7 +49,11 @@ namespace ccm::support
 	template <typename T, std::enable_if_t<traits::ccm_is_integral_v<T> && traits::ccm_is_unsigned_v<T> && !std::is_same_v<T, bool>, bool> = true>
 	constexpr int ctz(T x) noexcept
 	{
+		#if CCM_HAS_BUILTIN(__builtin_ctzg)
+			return __builtin_ctzg(x);
+		#else
 		return internal::generic_ctz(x);
+		#endif
 	}
 
 	template <>
