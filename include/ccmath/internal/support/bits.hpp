@@ -14,9 +14,6 @@
 #include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/ctz.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
-#if !CCM_HAS_BUILTIN(__builtin_bit_cast) // always_false is only used if __builtin_bit_cast is not available.
-	#include "ccmath/internal/support/always_false.hpp"
-#endif
 
 #include <cstdint>
 
@@ -27,14 +24,7 @@ namespace ccm::support
 		sizeof(To) == sizeof(From) && std::is_trivially_constructible_v<To> && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From>, To>
 	bit_cast(const From & from)
 	{
-#if CCM_HAS_BUILTIN(__builtin_bit_cast)
 		return __builtin_bit_cast(To, from);
-#else
-		static_assert(
-			always_false<To>,
-			"ccmath requires __builtin_bit_cast support. You must use a more modern compiler to use ccmath! i.e. GCC 11.1+, Clang 9.0.0+, or MSVC 19.27+.");
-		return from;
-#endif
 	}
 
 	template <class T,

@@ -8,21 +8,10 @@
 
 #pragma once
 
-// Headers used to detect the compiler support for the different fallbacks.
-// The defined macros by these headers will be undefined excluding the selected fallback.
+
 #include "ccmath/internal/config/builtin/bit_cast_support.hpp"
 #include "ccmath/internal/config/builtin/copysign_support.hpp"
 #include "ccmath/internal/config/builtin/signbit_support.hpp"
-
-// We don't want to pollute the global namespace with these macros so we undefine them based on our desired fallbacks.
-// By default we want constexpr signbit, but if that isn't available then we want constexpr copysign, and if that isn't available then we want bit_cast.
-#ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
-	#undef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-	#undef CCMATH_HAS_BUILTIN_BIT_CAST
-#endif
-#ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-	#undef CCMATH_HAS_BUILTIN_BIT_CAST
-#endif
 
 // Include the necessary headers for each different fallback
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
