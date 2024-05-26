@@ -12,6 +12,13 @@ set(ccmath_internal_config_arch_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/arch/simd.hpp
 )
 
+set(ccmath_internal_config_builtin_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/builtin/fma_support.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/builtin/bit_cast_support.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/builtin/copysign_support.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/builtin/signbit_support.hpp
+)
+
 set(ccmath_internal_config_platform_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/platform/android.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/platform/darwin.hpp
@@ -21,9 +28,9 @@ set(ccmath_internal_config_platform_headers
 
 set(ccmath_internal_config_headers
         ${ccmath_internal_config_arch_headers}
+        ${ccmath_internal_config_builtin_headers}
         ${ccmath_internal_config_platform_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/compiler.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/builtin_support.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/type_support.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/runtime_detection.hpp
 )
