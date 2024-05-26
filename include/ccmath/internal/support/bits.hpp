@@ -14,6 +14,9 @@
 #include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/ctz.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
+#if !CCM_HAS_BUILTIN(__builtin_bit_cast) // always_false is only used if __builtin_bit_cast is not available.
+	#include "ccmath/internal/support/always_false.hpp"
+#endif
 
 #include <cstdint>
 
@@ -21,10 +24,17 @@ namespace ccm::support
 {
 	template <typename To, typename From>
 	constexpr std::enable_if_t<
-		(sizeof(To) == sizeof(From)) && std::is_trivially_constructible_v<To> && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From>, To>
+		sizeof(To) == sizeof(From) && std::is_trivially_constructible_v<To> && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From>, To>
 	bit_cast(const From & from)
 	{
+#if CCM_HAS_BUILTIN(__builtin_bit_cast)
 		return __builtin_bit_cast(To, from);
+#else
+		static_assert(
+			always_false<To>,
+			"ccmath requires __builtin_bit_cast support. You must use a more modern compiler to use ccmath! i.e. GCC 11.1+, Clang 9.0.0+, or MSVC 19.27+.");
+		return from;
+#endif
 	}
 
 	template <class T,
@@ -127,14 +137,15 @@ namespace ccm::support
 
 // Macro to allow simplified creation of specializations
 // NOLINTBEGIN(bugprone-macro-parentheses)
-#define INTERNAL_CCM_ADD_SPECIALIZATION(FUNC, TYPE, BUILTIN)                                                                                                   \
+#define INTERNAL_CCM_ADD_CTZ_SPECIALIZATION(FUNC, TYPE, BUILTIN)                                                                                               \
 	template <>                                                                                                                                                \
 	[[nodiscard]] constexpr int FUNC<TYPE>(TYPE value)                                                                                                         \
 	{                                                                                                                                                          \
 		static_assert(ccm::support::traits::ccm_is_unsigned_v<TYPE>);                                                                                          \
 		return value == 0 ? std::numeric_limits<TYPE>::digits : BUILTIN(value);                                                                                \
 	}
-// NOLINTEND(bugprone-macro-parentheses)
+	// NOLINTEND(bugprone-macro-parentheses)
+
 #if CCM_HAS_BUILTIN(__builtin_ctzg)
 	/**
 	 * @brief Returns the number of consecutive 0 bits in the value of x, starting from the least significant bit ("right").
@@ -174,16 +185,16 @@ namespace ccm::support
 #endif // CCM_HAS_BUILTIN(__builtin_ctzg)
 
 #if CCM_HAS_BUILTIN(__builtin_ctzs)
-	INTERNAL_CCM_ADD_SPECIALIZATION(countr_zero, unsigned short, __builtin_ctzs)
+	INTERNAL_CCM_ADD_CTZ_SPECIALIZATION(countr_zero, unsigned short, __builtin_ctzs)
 #endif // CCM_HAS_BUILTIN(__builtin_ctzs)
 #if CCM_HAS_BUILTIN(__builtin_ctz)
-	INTERNAL_CCM_ADD_SPECIALIZATION(countr_zero, unsigned int, __builtin_ctz)
+	INTERNAL_CCM_ADD_CTZ_SPECIALIZATION(countr_zero, unsigned int, __builtin_ctz)
 #endif // CCM_HAS_BUILTIN(__builtin_ctz)
 #if CCM_HAS_BUILTIN(__builtin_ctzl)
-	INTERNAL_CCM_ADD_SPECIALIZATION(countr_zero, unsigned long, __builtin_ctzl)
+	INTERNAL_CCM_ADD_CTZ_SPECIALIZATION(countr_zero, unsigned long, __builtin_ctzl)
 #endif // CCM_HAS_BUILTIN(__builtin_ctzl)
 #if CCM_HAS_BUILTIN(__builtin_ctzll)
-	INTERNAL_CCM_ADD_SPECIALIZATION(countr_zero, unsigned long long, __builtin_ctzll)
+	INTERNAL_CCM_ADD_CTZ_SPECIALIZATION(countr_zero, unsigned long long, __builtin_ctzll)
 #endif // CCM_HAS_BUILTIN(__builtin_ctzll)
 
 #if CCM_HAS_BUILTIN(__builtin_clzg)
@@ -210,19 +221,19 @@ namespace ccm::support
 #endif // CCM_HAS_BUILTIN(__builtin_clzg)
 
 #if CCM_HAS_BUILTIN(__builtin_clzs)
-	INTERNAL_CCM_ADD_SPECIALIZATION(countl_zero, unsigned short, __builtin_clzs)
+	INTERNAL_CCM_ADD_CTZ_SPECIALIZATION(countl_zero, unsigned short, __builtin_clzs)
 #endif // CCM_HAS_BUILTIN(__builtin_clzs)
 #if CCM_HAS_BUILTIN(__builtin_clz)
-	INTERNAL_CCM_ADD_SPECIALIZATION(countl_zero, unsigned int, __builtin_clz)
+	INTERNAL_CCM_ADD_CTZ_SPECIALIZATION(countl_zero, unsigned int, __builtin_clz)
 #endif // CCM_HAS_BUILTIN(__builtin_clz)
 #if CCM_HAS_BUILTIN(__builtin_clzl)
-	INTERNAL_CCM_ADD_SPECIALIZATION(countl_zero, unsigned long, __builtin_clzl)
+	INTERNAL_CCM_ADD_CTZ_SPECIALIZATION(countl_zero, unsigned long, __builtin_clzl)
 #endif // CCM_HAS_BUILTIN(__builtin_clzl)
 #if CCM_HAS_BUILTIN(__builtin_clzll)
-	INTERNAL_CCM_ADD_SPECIALIZATION(countl_zero, unsigned long long, __builtin_clzll)
+	INTERNAL_CCM_ADD_CTZ_SPECIALIZATION(countl_zero, unsigned long long, __builtin_clzll)
 #endif // CCM_HAS_BUILTIN(__builtin_clzll)
 
-#undef INTERNAL_CCM_ADD_SPECIALIZATION
+#undef INTERNAL_CCM_ADD_CTZ_SPECIALIZATION
 
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countr_one(T value)
@@ -261,41 +272,31 @@ namespace ccm::support
 	}
 #endif // CCM_HAS_BUILTIN(__builtin_popcountg)
 
-	// If the compiler has builtin's for popcount, the create specializations that use the builtin.
+// Macro to allow simplified creation of specializations
+// NOLINTBEGIN(bugprone-macro-parentheses)
+#define INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(FUNC, TYPE, BUILTIN)                                                                                          \
+	template <>                                                                                                                                                \
+	[[nodiscard]] constexpr int FUNC<TYPE>(TYPE value)                                                                                                         \
+	{                                                                                                                                                          \
+		static_assert(ccm::support::traits::ccm_is_unsigned_v<TYPE>);                                                                                          \
+		return BUILTIN(value);                                                                                                                                 \
+	}
+// NOLINTEND(bugprone-macro-parentheses)
+// If the compiler has builtin's for popcount, the create specializations that use the builtin.
 #if CCM_HAS_BUILTIN(__builtin_popcount)
-	template <>
-	[[nodiscard]] constexpr int popcount<unsigned char>(unsigned char value)
-	{
-		return __builtin_popcount(value);
-	}
-
-	template <>
-	[[nodiscard]] constexpr int popcount<unsigned short>(unsigned short value)
-	{
-		return __builtin_popcount(value);
-	}
-
-	template <>
-	[[nodiscard]] constexpr int popcount<unsigned>(unsigned value)
-	{
-		return __builtin_popcount(value);
-	}
+	INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(popcount, unsigned char, __builtin_popcount)
+	INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(popcount, unsigned short, __builtin_popcount)
+	INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(popcount, unsigned, __builtin_popcount)
 #endif // CCM_HAS_BUILTIN(__builtin_popcount)
 
 #if CCM_HAS_BUILTIN(__builtin_popcountl)
-	template <>
-	[[nodiscard]] constexpr int popcount<unsigned long>(unsigned long value)
-	{
-		return __builtin_popcountl(value);
-	}
+	INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(popcount, unsigned long, __builtin_popcountl)
 #endif // CCM_HAS_BUILTIN(__builtin_popcountl)
 
 #if CCM_HAS_BUILTIN(__builtin_popcountll)
-	template <>
-	[[nodiscard]] constexpr int popcount<unsigned long long>(unsigned long long value)
-	{
-		return __builtin_popcountll(value);
-	}
+	INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(popcount, unsigned long long, __builtin_popcountll)
 #endif // CCM_HAS_BUILTIN(__builtin_popcountll)
+
+#undef INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION
 
 } // namespace ccm::support
