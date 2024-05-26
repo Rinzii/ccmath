@@ -11,7 +11,6 @@
 #pragma once
 
 #include "ccmath/internal/config/type_support.hpp"
-#include "ccmath/internal/predef/has_attribute.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/ctz.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
@@ -126,48 +125,109 @@ namespace ccm::support
 		return rotr(t, -cnt);
 	}
 
-	// https://en.cppreference.com/w/cpp/numeric/countr_zero
+// Macro to allow simplified creation of specializations
+// NOLINTBEGIN(bugprone-macro-parentheses)
+#define INTERNAL_CCM_ADD_SPECIALIZATION(FUNC, TYPE, BUILTIN)                                                                                                   \
+	template <>                                                                                                                                                \
+	[[nodiscard]] constexpr int FUNC<TYPE>(TYPE value)                                                                                                         \
+	{                                                                                                                                                          \
+		static_assert(ccm::support::traits::ccm_is_unsigned_v<TYPE>);                                                                                          \
+		return value == 0 ? std::numeric_limits<TYPE>::digits : BUILTIN(value);                                                                                \
+	}
+// NOLINTEND(bugprone-macro-parentheses)
+#if CCM_HAS_BUILTIN(__builtin_ctzg)
+	/**
+	 * @brief Returns the number of consecutive 0 bits in the value of x, starting from the least significant bit ("right").
+	 * https://en.cppreference.com/w/cpp/numeric/countr_zero
+	 */
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<ccm::support::traits::ccm_is_unsigned_v<T>, int> countr_zero(T value)
+	{
+		return __builtin_ctzg(value, std::numeric_limits<T>::digits);
+	}
+#else  // !CCM_HAS_BUILTIN(__builtin_ctzg)
+	/**
+	 * @brief Returns the number of consecutive 0 bits in the value of x, starting from the least significant bit ("right").
+	 * https://en.cppreference.com/w/cpp/numeric/countr_zero
+	 */
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countr_zero(T value)
 	{
 		if (value == 0) { return std::numeric_limits<T>::digits; }
-
-		if constexpr (ccm::support::traits::is_unsigned_integer_v<T>) { return ccm::support::ctz(value); }
-
-		int ret						 = 0;
-		const unsigned int ulldigits = std::numeric_limits<unsigned long long>::digits;
-		while (static_cast<unsigned long long>(value) == 0ULL)
+		if (value & 0x1) { return 0; }
+		// Bisection method
+		unsigned zero_bits = 0;
+		unsigned shift	   = std::numeric_limits<T>::digits >> 1;
+		T mask			   = std::numeric_limits<T>::max() >> shift;
+		while (shift)
 		{
-			ret += ulldigits;
-			value >>= ulldigits;
+			if ((value & mask) == 0)
+			{
+				value >>= shift;
+				zero_bits |= shift;
+			}
+			shift >>= 1;
+			mask >>= shift;
 		}
-		return ret + ctz(static_cast<unsigned long long>(value));
+		return zero_bits;
 	}
+#endif // CCM_HAS_BUILTIN(__builtin_ctzg)
+
+#if CCM_HAS_BUILTIN(__builtin_ctzs)
+	INTERNAL_CCM_ADD_SPECIALIZATION(countr_zero, unsigned short, __builtin_ctzs)
+#endif // CCM_HAS_BUILTIN(__builtin_ctzs)
+#if CCM_HAS_BUILTIN(__builtin_ctz)
+	INTERNAL_CCM_ADD_SPECIALIZATION(countr_zero, unsigned int, __builtin_ctz)
+#endif // CCM_HAS_BUILTIN(__builtin_ctz)
+#if CCM_HAS_BUILTIN(__builtin_ctzl)
+	INTERNAL_CCM_ADD_SPECIALIZATION(countr_zero, unsigned long, __builtin_ctzl)
+#endif // CCM_HAS_BUILTIN(__builtin_ctzl)
+#if CCM_HAS_BUILTIN(__builtin_ctzll)
+	INTERNAL_CCM_ADD_SPECIALIZATION(countr_zero, unsigned long long, __builtin_ctzll)
+#endif // CCM_HAS_BUILTIN(__builtin_ctzll)
+
+#if CCM_HAS_BUILTIN(__builtin_clzg)
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countl_zero(T value)
+	{
+		return __builtin_clzg(value, std::numeric_limits<T>::digits);
+	}
+#else  // !CCM_HAS_BUILTIN(__builtin_clzg)
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countl_zero(T value)
+	{
+		if (value == 0) { return std::numeric_limits<T>::digits; }
+		// Bisection method
+		unsigned zero_bits = 0;
+		for (unsigned shift = std::numeric_limits<T>::digits >> 1; shift; shift >>= 1)
+		{
+			T tmp = value >> shift;
+			if (tmp) { value = tmp; }
+			else { zero_bits |= shift; }
+		}
+		return zero_bits;
+	}
+#endif // CCM_HAS_BUILTIN(__builtin_clzg)
+
+#if CCM_HAS_BUILTIN(__builtin_clzs)
+	INTERNAL_CCM_ADD_SPECIALIZATION(countl_zero, unsigned short, __builtin_clzs)
+#endif // CCM_HAS_BUILTIN(__builtin_clzs)
+#if CCM_HAS_BUILTIN(__builtin_clz)
+	INTERNAL_CCM_ADD_SPECIALIZATION(countl_zero, unsigned int, __builtin_clz)
+#endif // CCM_HAS_BUILTIN(__builtin_clz)
+#if CCM_HAS_BUILTIN(__builtin_clzl)
+	INTERNAL_CCM_ADD_SPECIALIZATION(countl_zero, unsigned long, __builtin_clzl)
+#endif // CCM_HAS_BUILTIN(__builtin_clzl)
+#if CCM_HAS_BUILTIN(__builtin_clzll)
+	INTERNAL_CCM_ADD_SPECIALIZATION(countl_zero, unsigned long long, __builtin_clzll)
+#endif // CCM_HAS_BUILTIN(__builtin_clzll)
+
+#undef INTERNAL_CCM_ADD_SPECIALIZATION
 
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countr_one(T value)
 	{
-		return value != std::numeric_limits<T>::max() ? countr_zero(static_cast<T>(~value)) : std::numeric_limits<T>::digits;
-	}
-
-	template <typename T, std::enable_if_t<traits::is_unsigned_integer_v<T>, bool> = true>
-	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countl_zero(T value) // NOLINT
-	{
-		if (value == 0) { return std::numeric_limits<T>::digits; }
-
-		if constexpr (ccm::support::traits::is_unsigned_integer_v<T>) { return std::numeric_limits<T>::digits - ccm::support::ctz(value); }
-
-		int ret						 = 0;
-		int iter					 = 0;
-		const unsigned int ulldigits = std::numeric_limits<unsigned long long>::digits;
-		while (true)
-		{
-			value = rotl(value, ulldigits);
-			if ((iter = countl_zero(static_cast<unsigned long long>(value))) != ulldigits) // NOLINT
-				break;
-			ret += iter;
-		}
-		return ret + iter;
+		return support::countr_zero<T>(~value);
 	}
 
 	template <typename T, std::enable_if_t<traits::is_unsigned_integer_v<T>, bool> = true>
@@ -201,7 +261,7 @@ namespace ccm::support
 	}
 #endif // CCM_HAS_BUILTIN(__builtin_popcountg)
 
-// If the compiler has builtin's for popcount, the create specializations that use the builtin.
+	// If the compiler has builtin's for popcount, the create specializations that use the builtin.
 #if CCM_HAS_BUILTIN(__builtin_popcount)
 	template <>
 	[[nodiscard]] constexpr int popcount<unsigned char>(unsigned char value)

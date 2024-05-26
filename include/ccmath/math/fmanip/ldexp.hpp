@@ -8,9 +8,11 @@
 
 #pragma once
 
-#include <ccmath/math/compare/isfinite.hpp>
+#include "ccmath/internal/helpers/ccm_ldexp.hpp"
 #include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "ccmath/internal/support/floating_point_traits.hpp"
+#include "ccmath/math/compare/isfinite.hpp"
 
 #include <limits>
 
@@ -28,51 +30,61 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T ldexp(T num, int exp) noexcept
 	{
-		ccm::support::float_signed_bits_t<T> old_exp = ccm::support::get_exponent_of_floating_point<T>(num);
+		support::float_signed_bits_t<T> old_exp = support::get_exponent_of_floating_point<T>(num);
 
 		// if the mantissa is 0 and the original exponent is 0, or infinite, return num
-		const auto bits = ccm::support::bit_cast<ccm::support::float_bits_t<T>>(num);
 
-		if (CCM_UNLIKELY(!ccm::isfinite(num)) || old_exp < ccm::support::floating_point_traits<T>::minimum_binary_exponent ||
-			((old_exp == 0) && ((bits & ccm::support::floating_point_traits<T>::normal_mantissa_mask) == 0)))
+		if (const auto bits = support::bit_cast<support::float_bits_t<T>>(num);
+			CCM_UNLIKELY(!ccm::isfinite(num)) || old_exp < support::floating_point_traits<T>::minimum_binary_exponent ||
+			((old_exp == 0) && ((bits & support::floating_point_traits<T>::normal_mantissa_mask) == 0)))
 		{
 			return num;
 		}
 
-		if (exp > ccm::support::floating_point_traits<T>::maximum_binary_exponent)
+		// An overflow will occur if the exponent is larger than the maximum exponent
+		if (exp > support::floating_point_traits<T>::maximum_binary_exponent)
 		{
-			// error == hugeval
+			// These functions do nothing at compile time, but at runtime will set errno and raise exceptions if required.
+			support::fenv::set_errno_if_required(ERANGE);
+			support::fenv::raise_except_if_required(FE_OVERFLOW);
+
 			return std::numeric_limits<T>::infinity();
 		}
 		// the reference source says -2 * exp_max
-		if (exp < ccm::support::floating_point_traits<T>::minimum_binary_exponent)
+		// An underflow has occurred if the exponent is less than the minimum exponent
+		if (exp < support::floating_point_traits<T>::minimum_binary_exponent)
 		{
-			// error == range
+			// These functions do nothing at compile time, but at runtime will set errno and raise exceptions if required.
+			support::fenv::set_errno_if_required(ERANGE);
+			support::fenv::raise_except_if_required(FE_UNDERFLOW);
+
 			return 0;
 		}
 		// normalizes an abnormal floating point
 		if (old_exp == 0)
 		{
-			num *= ccm::support::floating_point_traits<T>::normalize_factor;
+			num *= support::floating_point_traits<T>::normalize_factor;
 			exp		= -static_cast<std::int32_t>(sizeof(T)) * std::numeric_limits<unsigned char>::digits; // bits in a byte
-			old_exp = ccm::support::get_exponent_of_floating_point<T>(num);
+			old_exp = support::get_exponent_of_floating_point<T>(num);
 		}
 
 		exp += old_exp;
-		if (exp >= ccm::support::floating_point_traits<T>::maximum_binary_exponent)
+		// If we left maximum exponent, we need to return infinity and report overflow
+		if (exp >= support::floating_point_traits<T>::maximum_binary_exponent)
 		{
-			// overflow
+			// These functions do nothing at compile time, but at runtime will set errno and raise exceptions if required.
+			support::fenv::set_errno_if_required(ERANGE);
+			support::fenv::raise_except_if_required(FE_OVERFLOW);
+
 			return std::numeric_limits<T>::infinity();
 		}
-		if (exp > 0) { return ccm::support::set_exponent_of_floating_point<T>(num, exp); }
+		if (exp > 0) { return support::set_exponent_of_floating_point<T>(num, exp); }
 		// denormal, or underflow
 		exp += static_cast<std::int32_t>(sizeof(T)) * std::numeric_limits<unsigned char>::digits; // bits in a byte
-		num = ccm::support::set_exponent_of_floating_point<T>(num, exp);
-		num /= ccm::support::floating_point_traits<T>::normalize_factor;
-		// if (num == static_cast<T>(0))
-		//{
-		//  underflow report not currently being handled
-		//}
+		num = support::set_exponent_of_floating_point<T>(num, exp);
+		num /= support::floating_point_traits<T>::normalize_factor;
+
+
 		return num;
 	}
 

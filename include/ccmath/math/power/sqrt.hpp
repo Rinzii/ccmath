@@ -177,7 +177,7 @@ namespace ccm
 				for (StorageType current_bit = one >> 1; current_bit; current_bit >>= 1)
 				{
 					r <<= 1;
-					StorageType tmp = (y << 1) + current_bit; // 2*y(n - 1) + 2^(-n-1)
+					StorageType const tmp = (y << 1) + current_bit; // 2*y(n - 1) + 2^(-n-1)
 					if (r >= tmp)
 					{
 						r -= tmp;
@@ -191,7 +191,7 @@ namespace ccm
 
 				r <<= 2;
 
-				if (StorageType tmp = (y << 2) + 1; r >= tmp)
+				if (StorageType const tmp = (y << 2) + 1; r >= tmp)
 				{
 					r -= tmp;
 					round_bit = true;
