@@ -14,58 +14,58 @@
 /// Compilers with Support:
 /// - GCC 11.1+
 /// - Clang 9.0.0+
-/// - Clang-CL 9.0.0+ (This is a guess based on Clang support. Needs verification!)
 /// - Apple Clang 9.0.0+ (This is a guess based on Clang support. Needs verification!)
+/// - Clang-CL 9.0.0+ (This is a guess based on Clang support. Needs verification!)
 /// - DPC++ 2021.1.2+ (Maybe lower? This is as low as I can test currently)
 /// - NVIDIA HPC 22.7+ (Maybe lower? This is as low as I can test currently)
 /// - MSVC 19.27+
 
 // GCC 11.1+ has __builtin_bit_cast
-#if defined(CCMATH_COMPILER_GCC) && CCMATH_COMPILER_GCC_VER_MAJOR >= 11 && CCMATH_COMPILER_GCC_VER_MINOR >= 1
+#if defined(__GNUC__) && (__GNUC__ > 11 || (__GNUC__ == 11 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER) && !defined(__NVCOMPILER_LLVM__) && !defined(__CUDACC__)
     #ifndef CCMATH_HAS_BUILTIN_BIT_CAST
         #define CCMATH_HAS_BUILTIN_BIT_CAST
     #endif
 #endif
 
 // Clang 9.0.0+ has __builtin_bit_cast
-#if defined(CCMATH_COMPILER_CLANG) && CCMATH_COMPILER_CLANG_VER_MAJOR >= 9
+#if defined(__clang__) && !defined(__apple_build_version__)  && __clang_major__ >= 9
     #ifndef CCMATH_HAS_BUILTIN_BIT_CAST
         #define CCMATH_HAS_BUILTIN_BIT_CAST
     #endif
 #endif
 
-// Clang-CL 9.0.0+ has __builtin_bit_cast
-// NOTE: This is a guess based on Clang support. Needs verification!
-#if defined(CCMATH_COMPILER_CLANG_CL) && CCMATH_COMPILER_CLANG_CL_VER_MAJOR >= 9
+// Apple Clang 9.0.0+ has __builtin_bit_cast
+// TODO: Verify Apple Clang shares functionality with Clang for all builtin support
+#if defined(__clang__) && defined(__apple_build_version__) && (__clang_major__ >= 9)
 	#ifndef CCMATH_HAS_BUILTIN_BIT_CAST
 		#define CCMATH_HAS_BUILTIN_BIT_CAST
 	#endif
 #endif
 
-// Apple Clang 9.0.0+ has __builtin_bit_cast
-// TODO: Verify Apple Clang shares functionality with Clang for all builtin support
-#if defined(CCMATH_COMPILER_APPLE_CLANG) && CCMATH_COMPILER_APPLE_CLANG_VER_MAJOR >= 9
+// Clang-CL 9.0.0+ has __builtin_bit_cast
+// TODO: This is a guess based on Clang support. Needs verification!
+#if defined(__clang__) && defined(_MSC_VER) && (__clang_major__ >= 9)
 	#ifndef CCMATH_HAS_BUILTIN_BIT_CAST
 		#define CCMATH_HAS_BUILTIN_BIT_CAST
 	#endif
 #endif
 
 // DPC++ 2021.1.2+ has __builtin_bit_cast
-#if defined(CCMATH_COMPILER_INTEL) && CCMATH_COMPILER_INTEL_VER >= 20210102
+#if (defined(SYCL_LANGUAGE_VERSION) || defined(__INTEL_LLVM_COMPILER))  && (__INTEL_LLVM_COMPILER >= 20210102)
     #ifndef CCMATH_HAS_BUILTIN_BIT_CAST
         #define CCMATH_HAS_BUILTIN_BIT_CAST
     #endif
 #endif
 
 // NVIDIA HPC 22.7+ has __builtin_bit_cast (Maybe lower? This is as low as I can test currently)
-#if defined(CCMATH_COMPILER_NVIDIA) && CCMATH_COMPILER_NVIDIA_VER_MAJOR >= 22 && CCMATH_COMPILER_NVIDIA_VER_MINOR >= 7
+#if (defined(__NVCOMPILER) || defined(__NVCOMPILER_LLVM__)) && (__NVCOMPILER_MAJOR__ >= 22 && __NVCOMPILER_MINOR__ >= 7)
 	#ifndef CCMATH_HAS_BUILTIN_BIT_CAST
 		#define CCMATH_HAS_BUILTIN_BIT_CAST
 	#endif
 #endif
 
 // MSVC 19.27+ has __builtin_bit_cast
-#if (defined(CCMATH_COMPILER_MSVC) && CCMATH_COMPILER_MSVC_VER >= 1927)
+#if defined(_MSC_VER) && !defined(__clang__) && (_MSC_VER >= 1927)
     #ifndef CCMATH_HAS_BUILTIN_BIT_CAST
         #define CCMATH_HAS_BUILTIN_BIT_CAST
     #endif
