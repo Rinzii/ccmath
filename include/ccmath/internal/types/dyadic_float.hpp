@@ -6,6 +6,9 @@
  * See LICENSE for more information.
  */
 
+// Code borrowed from LLVM with heavy modifications done for ccmath to allow for both cross-platform and cross-compiler support.
+// https://github.com/llvm/llvm-project/
+
 #pragma once
 
 #include "ccmath/internal/support/fp_bits.hpp"
@@ -18,21 +21,41 @@
 namespace ccm::types
 {
 
+	/**
+	 * @brief A class for high precision floating point computations using dyadic format.
+	 *
+	 * This class represents high precision floating point values in dyadic format, consisting of three fields:
+	 * - sign: A boolean value where false indicates positive and true indicates negative.
+	 * - exponent: The exponent value of the least significant bit of the mantissa.
+	 * - mantissa: An unsigned integer of length `Bits`.
+	 *
+	 * The stored value is calculated as:
+	 *   real value = (-1)^sign * 2^exponent * (mantissa as unsigned integer)
+	 *
+	 * The data is considered normalized if, for a non-zero mantissa, the leading bit is 1.
+	 * Constructors and most functions ensure that the outputs are normalized. To simplify and improve efficiency,
+	 * many functions assume that the inputs are already normalized.
+	 *
+	 * @tparam Bits The length of the mantissa in bits.
+	 */
 	template <size_t Bits>
 	struct DyadicFloat
 	{
-		using MantissaType = ccm::types::UInt<Bits>;
+		using MantissaType = UInt<Bits>;
 
 		Sign sign				= Sign::POS;
 		int exponent			= 0;
 		MantissaType mantissa	= MantissaType(0);
 		constexpr DyadicFloat() = default;
 
-		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+		template <typename T, std::enable_if_t<support::traits::ccm_is_floating_point_v<T>, bool> = true>
 		constexpr DyadicFloat(T x)
 		{
 			static_assert(support::FPBits<T>::FRACTION_LEN < Bits);
 			support::FPBits<T> x_bits(x);
+
+			assert(x == x_bits.get_val());
+
 			sign	 = x_bits.sign();
 			exponent = x_bits.get_explicit_exponent() - support::FPBits<T>::FRACTION_LEN;
 			mantissa = MantissaType(x_bits.get_explicit_mantissa());
@@ -41,7 +64,14 @@ namespace ccm::types
 
 		constexpr DyadicFloat(Sign s, int e, MantissaType m) : sign(s), exponent(e), mantissa(m) { normalize(); }
 
-		// Normalizing the mantissa, bringing the leading 1 bit to the most significant bit.
+		/**
+		 * @brief Normalizes the mantissa, bringing the leading 1 bit to the most significant bit.
+		 *
+		 * This function shifts the mantissa so that the leading 1 bit is in the most significant bit position.
+		 * It adjusts the exponent accordingly.
+		 *
+		 * @return A reference to the normalized DyadicFloat.
+		 */
 		constexpr DyadicFloat & normalize()
 		{
 			if (!mantissa.is_zero())
@@ -53,7 +83,15 @@ namespace ccm::types
 			return *this;
 		}
 
-		// Used for aligning exponents.  Output might not be normalized.
+		/**
+		 * @brief Shifts the mantissa left to align exponents. Output might not be normalized.
+		 *
+		 * This function shifts the mantissa left by the specified number of bits to help align exponents.
+		 * The exponent is adjusted accordingly. The result may not be normalized.
+		 *
+		 * @param shift_length The number of bits to shift left.
+		 * @return A reference to the DyadicFloat after shifting.
+		 */
 		constexpr DyadicFloat & shift_left(int shift_length)
 		{
 			exponent -= shift_length;
@@ -61,7 +99,15 @@ namespace ccm::types
 			return *this;
 		}
 
-		// Used for aligning exponents.  Output might not be normalized.
+		/**
+		 * @brief Shifts the mantissa right to align exponents. Output might not be normalized.
+		 *
+		 * This function shifts the mantissa right by the specified number of bits to help align exponents.
+		 * The exponent is adjusted accordingly. The result may not be normalized.
+		 *
+		 * @param shift_length The number of bits to shift right.
+		 * @return A reference to the DyadicFloat after shifting.
+		 */
 		constexpr DyadicFloat & shift_right(int shift_length)
 		{
 			exponent += shift_length;
@@ -69,17 +115,28 @@ namespace ccm::types
 			return *this;
 		}
 
-		// Assume that it is already normalized.  Output the unbiased exponent.
+		/**
+		 * @brief Returns the unbiased exponent, assuming normalization.
+		 *
+		 * @return The unbiased exponent.
+		 */
 		[[nodiscard]] constexpr int get_unbiased_exponent() const { return exponent + (Bits - 1); }
 
-		// Assume that it is already normalized.
-		// Output is rounded correctly with respect to the current rounding mode.
-		template <typename T, typename = std::enable_if_t<std::is_floating_point_v<T> && (support::FPBits<T>::FRACTION_LEN < Bits), void>>
+		/**
+		 * @brief Converts the DyadicFloat to a floating-point type T, assuming normalization and rounding the result.
+		 *
+		 * This function converts the DyadicFloat to the specified floating-point type T. The conversion assumes that the
+		 * value is already normalized and outputs a normalized result, correctly rounded according to the current rounding mode.
+		 *
+		 * @tparam T The target floating-point type.
+		 * @return The floating-point representation of the DyadicFloat.
+		 */
+		template <typename T, typename = std::enable_if_t<ccm::support::traits::ccm_is_floating_point_v<T> && (support::FPBits<T>::FRACTION_LEN < Bits), void>>
 		explicit constexpr operator T() const
 		{
 			if (CCM_UNLIKELY(mantissa.is_zero())) { return support::FPBits<T>::zero(sign).get_val(); }
 
-			// Assume that it is normalized, and output is also normal.
+			// Assume normalized input and output.
 			constexpr uint32_t PRECISION		  = support::FPBits<T>::FRACTION_LEN + 1;
 			using output_bits_t					  = typename support::FPBits<T>::StorageType;
 			constexpr output_bits_t IMPLICIT_MASK = support::FPBits<T>::SIG_MASK - support::FPBits<T>::FRACTION_MASK;
@@ -106,12 +163,14 @@ namespace ccm::types
 
 			int exp_lo = exp_hi - static_cast<int>(PRECISION) - 1;
 
-			MantissaType m_hi = shift >= MantissaType::BITS ? MantissaType(0) : mantissa >> shift;
+			std::size_t const mantissa_len = MantissaType::BITS;
+
+			MantissaType m_hi = shift >= mantissa_len ? MantissaType(0) : mantissa >> shift;
 
 			T d_hi =
 				support::FPBits<T>::create_value(sign, exp_hi, (static_cast<output_bits_t>(m_hi) & support::FPBits<T>::SIG_MASK) | IMPLICIT_MASK).get_val();
 
-			MantissaType round_mask	 = shift > MantissaType::BITS ? 0 : MantissaType(1) << (shift - 1);
+			MantissaType round_mask	 = shift > mantissa_len ? 0 : MantissaType(1) << (shift - 1);
 			MantissaType sticky_mask = round_mask - MantissaType(1);
 
 			bool round_bit		 = !(mantissa & round_mask).is_zero();
@@ -129,24 +188,22 @@ namespace ccm::types
 
 				d_lo = support::FPBits<T>::create_value(sign, exp_lo + scale_up_exponent, IMPLICIT_MASK).get_val();
 
-				return multiply_add(d_lo, T(round_and_sticky), d_hi * scale_up_factor) * scale_down_factor;
+				return support::multiply_add(d_lo, T(round_and_sticky), d_hi * scale_up_factor) * scale_down_factor;
 			}
 
 			d_lo = support::FPBits<T>::create_value(sign, exp_lo, IMPLICIT_MASK).get_val();
 
 			// Still correct without FMA instructions if `d_lo` is not underflow.
-			T r = multiply_add(d_lo, T(round_and_sticky), d_hi);
+			T r = support::multiply_add(d_lo, T(round_and_sticky), d_hi);
 
 			if (CCM_UNLIKELY(denorm))
 			{
-				// Exponent before rounding is in denormal range, simply clear the
-				// exponent field.
+				// Exponent before rounding is in denormal range, simply clear the exponent field.
 				output_bits_t clear_exp = (output_bits_t(exp_hi) << support::FPBits<T>::SIG_LEN);
 				output_bits_t r_bits	= support::FPBits<T>(r).uintval() - clear_exp;
 				if (!(r_bits & support::FPBits<T>::EXP_MASK))
 				{
-					// Output is denormal after rounding, clear the implicit bit for 80-bit
-					// long double.
+					// Output is denormal after rounding, clear the implicit bit for 80-bit long double.
 					r_bits -= IMPLICIT_MASK;
 				}
 

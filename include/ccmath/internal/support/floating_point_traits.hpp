@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "ccmath/internal/support/type_traits.hpp"
 #include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/support/type_traits.hpp"
 #include "ccmath/internal/types/int128_types.hpp"
 
 #include <cstdint>
