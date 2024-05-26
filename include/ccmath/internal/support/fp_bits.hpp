@@ -131,7 +131,7 @@ namespace ccm::support
 			/**
 			 * @brief The exponent bias for the floating point type that should always be positive.
 			 */
-			static constexpr std::int32_t EXP_BIAS = (1U << EXP_LEN - 1U) - 1U;
+			static constexpr std::int32_t EXP_BIAS = (1U << (EXP_LEN - 1U)) - 1U;
 			static_assert(EXP_BIAS > 0, "ccmath - FPBits: The exponent bias should always be positive. This should never happen!");
 
 			/**
@@ -157,12 +157,12 @@ namespace ccm::support
 			/**
 			 * @brief The bit mask that keeps the entire bit pattern. (sign + exponent + significand)
 			 */
-			static constexpr StorageType FP_MASK = ccm::support::mask_trailing_ones<StorageType, TOTAL_LEN>();
+			static constexpr StorageType FP_MASK = support::mask_trailing_ones<StorageType, TOTAL_LEN>();
 
 			/**
 			 * @brief The bit mask that keeps only the fraction part. (i.e., the significand without the leading one)
 			 */
-			static constexpr StorageType FRACTION_MASK = ccm::support::mask_trailing_ones<StorageType, FRACTION_LEN>();
+			static constexpr StorageType FRACTION_MASK = support::mask_trailing_ones<StorageType, FRACTION_LEN>();
 
 			static_assert((SIG_MASK & EXP_MASK & SIGN_MASK) == 0, "Bitmasks overlap! SIG_MASK, EXP_MASK, and SIGN_MASK must be disjoint");
 			static_assert((SIG_MASK | EXP_MASK | SIGN_MASK) == FP_MASK, "Bitmasks do not fully cover the floating-point mask");

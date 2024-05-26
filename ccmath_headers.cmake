@@ -17,6 +17,8 @@ set(ccmath_internal_config_builtin_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/builtin/bit_cast_support.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/builtin/copysign_support.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/builtin/signbit_support.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/builtin/exp2_support.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/builtin/ldexp_support.hpp
 )
 
 set(ccmath_internal_config_platform_headers
@@ -40,7 +42,7 @@ set(ccmath_internal_helpers_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/fpclassify_helper.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/exp_helpers.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/exp10.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/ccm_ldexp.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/internal_ldexp.hpp
 )
 
 set(ccmath_internal_predef_compiler_support_headers
@@ -57,7 +59,9 @@ set(ccmath_internal_predef_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/no_debug.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/suppress.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/has_builtin.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/has_const_builtin.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/assume.hpp
+
 )
 
 set(ccmath_internal_support_fenv_aarch64_headers

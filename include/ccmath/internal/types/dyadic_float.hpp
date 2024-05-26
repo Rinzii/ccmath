@@ -16,6 +16,7 @@
 #include "ccmath/internal/support/type_traits.hpp"
 #include "ccmath/internal/types/big_int.hpp"
 
+#include <cassert>
 #include <cstddef>
 
 namespace ccm::types
@@ -46,10 +47,11 @@ namespace ccm::types
 		Sign sign				= Sign::POS;
 		int exponent			= 0;
 		MantissaType mantissa	= MantissaType(0);
+
 		constexpr DyadicFloat() = default;
 
 		template <typename T, std::enable_if_t<support::traits::ccm_is_floating_point_v<T>, bool> = true>
-		constexpr DyadicFloat(T x)
+		constexpr explicit DyadicFloat(T x)
 		{
 			static_assert(support::FPBits<T>::FRACTION_LEN < Bits);
 			support::FPBits<T> x_bits(x);
@@ -78,7 +80,7 @@ namespace ccm::types
 			{
 				int shift_length = support::countl_zero(mantissa);
 				exponent -= shift_length;
-				mantissa <<= static_cast<size_t>(shift_length);
+				mantissa <<= static_cast<std::size_t>(shift_length);
 			}
 			return *this;
 		}
@@ -95,7 +97,7 @@ namespace ccm::types
 		constexpr DyadicFloat & shift_left(int shift_length)
 		{
 			exponent -= shift_length;
-			mantissa <<= static_cast<size_t>(shift_length);
+			mantissa <<= static_cast<std::size_t>(shift_length);
 			return *this;
 		}
 
@@ -111,7 +113,7 @@ namespace ccm::types
 		constexpr DyadicFloat & shift_right(int shift_length)
 		{
 			exponent += shift_length;
-			mantissa >>= static_cast<size_t>(shift_length);
+			mantissa >>= static_cast<std::size_t>(shift_length);
 			return *this;
 		}
 
@@ -168,7 +170,7 @@ namespace ccm::types
 			MantissaType m_hi = shift >= mantissa_len ? MantissaType(0) : mantissa >> shift;
 
 			T d_hi =
-				support::FPBits<T>::create_value(sign, exp_hi, (static_cast<output_bits_t>(m_hi) & support::FPBits<T>::SIG_MASK) | IMPLICIT_MASK).get_val();
+				support::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_hi), (static_cast<output_bits_t>(m_hi) & support::FPBits<T>::SIG_MASK) | IMPLICIT_MASK).get_val();
 
 			MantissaType round_mask	 = shift > mantissa_len ? 0 : MantissaType(1) << (shift - 1);
 			MantissaType sticky_mask = round_mask - MantissaType(1);
@@ -183,15 +185,15 @@ namespace ccm::types
 			{
 				// d_lo is denormal, but the output is normal.
 				int scale_up_exponent = 2 * PRECISION;
-				T scale_up_factor	  = support::FPBits<T>::create_value(sign, support::FPBits<T>::EXP_BIAS + scale_up_exponent, IMPLICIT_MASK).get_val();
-				T scale_down_factor	  = support::FPBits<T>::create_value(sign, support::FPBits<T>::EXP_BIAS - scale_up_exponent, IMPLICIT_MASK).get_val();
+				T scale_up_factor	  = support::FPBits<T>::create_value(sign, support::FPBits<T>::EXP_BIAS + static_cast<output_bits_t>(scale_up_exponent), IMPLICIT_MASK).get_val();
+				T scale_down_factor	  = support::FPBits<T>::create_value(sign, support::FPBits<T>::EXP_BIAS - static_cast<output_bits_t>(scale_up_exponent), IMPLICIT_MASK).get_val();
 
-				d_lo = support::FPBits<T>::create_value(sign, exp_lo + scale_up_exponent, IMPLICIT_MASK).get_val();
+				d_lo = support::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_lo + scale_up_exponent), IMPLICIT_MASK).get_val();
 
 				return support::multiply_add(d_lo, T(round_and_sticky), d_hi * scale_up_factor) * scale_down_factor;
 			}
 
-			d_lo = support::FPBits<T>::create_value(sign, exp_lo, IMPLICIT_MASK).get_val();
+			d_lo = support::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_lo), IMPLICIT_MASK).get_val();
 
 			// Still correct without FMA instructions if `d_lo` is not underflow.
 			T r = support::multiply_add(d_lo, T(round_and_sticky), d_hi);

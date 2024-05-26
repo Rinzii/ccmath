@@ -8,13 +8,18 @@
 
 #pragma once
 
-#include "ccmath/internal/helpers/ccm_ldexp.hpp"
+#include "ccmath/internal/config/builtin/ldexp_support.hpp"
+#include "ccmath/internal/predef/has_const_builtin.hpp"
+#if defined(CCMATH_HAS_CONSTEXPR_BUILTIN_LDEXP) && CCM_HAS_CONST_BUILTIN(__builtin_bit_cast) // Include nothing
+#elif CCM_HAS_BUILTIN(__builtin_bit_cast)
+#include "ccmath/internal/helpers/internal_ldexp.hpp"
+#else
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "ccmath/internal/support/floating_point_traits.hpp"
 #include "ccmath/math/compare/isfinite.hpp"
-
 #include <limits>
+#endif
 
 namespace ccm
 {
@@ -30,7 +35,16 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T ldexp(T num, int exp) noexcept
 	{
-		support::float_signed_bits_t<T> old_exp = support::get_exponent_of_floating_point<T>(num);
+		#if defined(CCMATH_HAS_CONSTEXPR_BUILTIN_LDEXP) || CCM_HAS_CONST_BUILTIN(__builtin_bit_cast)
+		if constexpr (std::is_same_v<T, float>) { return __builtin_ldexpf(num, exp); }
+		if constexpr (std::is_same_v<T, double>) { return __builtin_ldexp(num, exp); }
+		if constexpr (std::is_same_v<T, long double>) { return __builtin_ldexpl(num, exp); }
+		return static_cast<T>(__builtin_ldexpl(num, exp));
+		#elif CCM_HAS_BUILTIN(__builtin_bit_cast)
+		return helpers::internal_ldexp(num, exp);
+		#else
+		// Fallback option. Does not give perfect results, but generally good enough.
+		int old_exp = static_cast<int>(support::get_exponent_of_floating_point<T>(num));
 
 		// if the mantissa is 0 and the original exponent is 0, or infinite, return num
 
@@ -65,7 +79,7 @@ namespace ccm
 		{
 			num *= support::floating_point_traits<T>::normalize_factor;
 			exp		= -static_cast<std::int32_t>(sizeof(T)) * std::numeric_limits<unsigned char>::digits; // bits in a byte
-			old_exp = support::get_exponent_of_floating_point<T>(num);
+			old_exp = static_cast<int>(support::get_exponent_of_floating_point<T>(num));
 		}
 
 		exp += old_exp;
@@ -78,7 +92,7 @@ namespace ccm
 
 			return std::numeric_limits<T>::infinity();
 		}
-		if (exp > 0) { return support::set_exponent_of_floating_point<T>(num, exp); }
+		if (exp > 0) { return static_cast<int>(support::set_exponent_of_floating_point<T>(num, exp)); }
 		// denormal, or underflow
 		exp += static_cast<std::int32_t>(sizeof(T)) * std::numeric_limits<unsigned char>::digits; // bits in a byte
 		num = support::set_exponent_of_floating_point<T>(num, exp);
@@ -86,6 +100,7 @@ namespace ccm
 
 
 		return num;
+		#endif
 	}
 
 	/**
@@ -100,7 +115,7 @@ namespace ccm
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double ldexp(Integer num, int exp) noexcept
 	{
-		return ldexp<double>(static_cast<double>(num), exp);
+		return ccm::ldexp<double>(static_cast<double>(num), exp);
 	}
 	/**
 	 * @brief Returns the floating-point remainder of the division operation x/y.
@@ -111,7 +126,7 @@ namespace ccm
 	 */
 	constexpr float ldexpf(float num, int exp) noexcept
 	{
-		return ldexp<float>(num, exp);
+		return ccm::ldexp<float>(num, exp);
 	}
 	/**
 	 * @brief Returns the floating-point remainder of the division operation x/y.
@@ -123,7 +138,7 @@ namespace ccm
 	constexpr long double ldexpl(long double num, int exp) noexcept
 	{
 		// long double isn't supported yet
-		return ldexp<double>(static_cast<double>(num), exp);
+		return ccm::ldexp<double>(static_cast<double>(num), exp);
 	}
 
 } // namespace ccm
