@@ -64,13 +64,7 @@ set(ccmath_internal_predef_headers
 
 )
 
-set(ccmath_internal_support_fenv_aarch64_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fenv/aarch64/fenv_support_darwin.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fenv/aarch64/fenv_support_generic.hpp
-)
-
 set(ccmath_internal_support_fenv_headers
-        ${ccmath_internal_support_fenv_aarch64_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fenv/fenv_support.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fenv/rounding_mode.hpp
 
@@ -228,8 +222,7 @@ set(ccmath_detail_nearest_headers
 )
 
 set(ccmath_math_power_impl_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/power/impl/pow_float_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/power/impl/pow_double_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/power/impl/pow_impl.hpp
 
 )
 

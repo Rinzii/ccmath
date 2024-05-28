@@ -30,7 +30,7 @@ namespace ccm::support
 		static_assert(!std::is_same_v<T, bool>, "T must not be a boolean type");
 		static_assert(!std::is_enum_v<T>, "T must not be an enumerated type");
 
-		// Get the lergest integral type that can hold the sum of a and b
+		// Get the largest integral type that can hold the sum of a and b
 		using LargerType = long long;
 		auto la			 = static_cast<LargerType>(a);
 		auto lb			 = static_cast<LargerType>(b);
@@ -67,7 +67,7 @@ namespace ccm::support
 		static_assert(!std::is_same_v<T, bool>, "T must not be a boolean type");
 		static_assert(!std::is_enum_v<T>, "T must not be an enumerated type");
 
-		// Get the lergest integral type that can hold the sum of a and b
+		// Get the largest integral type that can hold the sum of a and b
 		using LargerType = long long;
 		auto la			 = static_cast<LargerType>(a);
 		auto lb			 = static_cast<LargerType>(b);
@@ -192,6 +192,60 @@ namespace ccm::support
 	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_leading_zeros()
 	{
 		return mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>();
+	}
+
+	/**
+	 * @brief Add a + b, such that &hi + &lo approximates a + b.
+	 *
+	 * Add a + b, such that *hi + *lo approximates a + b.
+	 *  Assumes |a| >= |b|.
+	 *  For rounding to nearest we have hi + lo = a + b exactly.
+	 *  For directed rounding, we have
+	 *  (a) hi + lo = a + b exactly when the exponent difference between a and b is at most 53 (the binary64 precision)
+	 *  (b) otherwise |(a + b) - (hi + lo)| <= 2^-105 min(|a + b|, |hi|)
+	 *
+	 *  We also have |lo| < ulp(hi).
+	 *
+	 *	Algorithm Reference:
+	 *	- https://hal.inria.fr/hal-03798376
+	 *
+	 * @param hi
+	 * @param lo
+	 * @param a
+	 * @param b
+	 */
+
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+	static constexpr void fast_two_sum(T & hi, T & lo, T a, T b)
+	{
+		hi		  = a + b;
+		T const e = hi - a; // exact
+		lo		  = b - e;	// exact
+	}
+
+	/* Algorithm 2 from https://hal.science/hal-01351529 */
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+	static constexpr void two_sum(T & s, T & t, T a, T b)
+	{
+		s				= a + b;
+		T const a_prime = s - b;
+		T const b_prime = s - a_prime;
+		T const delta_a = a - a_prime;
+		T const delta_b = b - b_prime;
+		t				= delta_a + delta_b;
+	}
+
+	// Veltkamp's splitting: split x into xh + xl such that x = xh + xl exactly
+	// xh fits in 32 bits and |xh| <= 2^e if 2^(e-1) <= |x| < 2^e
+	// xl fits in 32 bits and |xl| < 2^(e-32)
+	// See reference [1].
+	static constexpr void veltkamp_split(long double & xh, long double & xl, long double x)
+	{
+		constexpr long double C = 0x1.00000001p+32L;
+		long double const gamma = C * x;
+		long double const delta = x - gamma;
+		xh						= gamma + delta;
+		xl						= x - xh;
 	}
 
 } // namespace ccm::support

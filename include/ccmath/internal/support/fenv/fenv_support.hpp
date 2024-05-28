@@ -14,16 +14,6 @@
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 
-
-// TODO: Add support for other architectures at a later date.
-#if defined(CCM_TARGET_ARCH_AARCH64)
-	#if defined(__APPLE__) // Apple ARM
-		#include "ccmath/internal/support/fenv/aarch64/fenv_support_darwin.hpp"
-	#else // Generic ARM
-		#include "ccmath/internal/support/fenv/aarch64/fenv_support_generic.hpp"
-	#endif
-#else
-
 #include <cerrno>
 #include <cfenv>
 #include <cstdint>
@@ -104,45 +94,50 @@ namespace ccm::support::fenv::internal
 		return std::fesetenv(envp);
 	}
 } // namespace ccm::support::fenv::internal
-#endif // CCM_TARGET_ARCH_AARCH64
 
 namespace ccm::support::fenv
 {
-	enum ccm_math_err_mode : std::uint8_t
+	enum class ccm_math_err_mode : std::uint8_t
 	{
 		eErrno		 = 1,
 		eErrnoExcept = 2,
 	};
+
+	// Helper function to convert the enum class to an integer to enable bitwise operations.
+	constexpr int get_mode(ccm_math_err_mode mode)
+	{
+		return static_cast<int>(mode);
+	}
 
 	constexpr int ccm_math_err_handling()
 	{
 #if defined(__FAST_MATH__) || defined(CCM_DISABLE_ERRNO)
 		return 0;
 #elif defined(__NO_MATH_ERRNO__)
-		return (ccm_math_err_mode::eErrnoExcept);
+		return get_mode(ccm_math_err_mode::eErrnoExcept);
 #elif defined(__NVPTX__) || defined(__AMDGPU__)
-		return (ccm_math_err_mode::eErrno);
+		return get_mode(ccm_math_err_mode::eErrno);
 #else
-		return (ccm_math_err_mode::eErrno | ccm_math_err_mode::eErrnoExcept);
+		return get_mode(ccm_math_err_mode::eErrno) | get_mode(ccm_math_err_mode::eErrnoExcept);
 #endif
 	}
 
 	constexpr int set_except_if_required(int excepts)
 	{
-		if constexpr (ccm::support::is_constant_evaluated()) { return 0; } // We cannot raise fenv exceptions in a constexpr context. So we return.
+		if constexpr (is_constant_evaluated()) { return 0; } // We cannot raise fenv exceptions in a constexpr context. So we return.
 		else
 		{
-			if ((ccm_math_err_handling() & ccm_math_err_mode::eErrnoExcept) != 0) { return internal::set_except(excepts); }
+			if ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { return internal::set_except(excepts); }
 			return 0;
 		}
 	}
 
 	constexpr int raise_except_if_required(int excepts)
 	{
-		if constexpr (ccm::support::is_constant_evaluated()) { return 0; } // We cannot raise fenv exceptions in a constexpr context. So we return.
+		if constexpr (is_constant_evaluated()) { return 0; } // We cannot raise fenv exceptions in a constexpr context. So we return.
 		else
 		{
-			if ((ccm_math_err_handling() & ccm_math_err_mode::eErrnoExcept) != 0) { return internal::raise_except(excepts); }
+			if ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { return internal::raise_except(excepts); }
 			return 0;
 		}
 	}
@@ -150,13 +145,13 @@ namespace ccm::support::fenv
 	constexpr void set_errno_if_required(int err)
 	{
 		// NOLINTNEXTLINE(bugprone-branch-clone)
-		if constexpr (ccm::support::is_constant_evaluated()) // We cannot raise fenv exceptions in a constexpr context. So we return.
+		if constexpr (is_constant_evaluated()) // We cannot raise fenv exceptions in a constexpr context. So we return.
 		{
 			// Do nothing
 		}
 		else
 		{
-			if ((ccm_math_err_handling() & ccm_math_err_mode::eErrnoExcept) != 0) { errno = err; }
+			if ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { errno = err; }
 		}
 	}
 } // namespace ccm::support::fenv

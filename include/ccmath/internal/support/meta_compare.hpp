@@ -21,13 +21,13 @@ namespace ccm::support
 
 		// These are deliberately not defined.
 		template <typename... Bn>
-		auto or_fn(int) -> first_t<std::false_type, std::enable_if_t<!bool(Bn::value)>...>;
+		auto or_fn(int) -> first_t<std::false_type, std::enable_if_t<!static_cast<bool>(Bn::value)>...>;
 
 		template <typename... Bn>
 		auto or_fn(...) -> std::true_type;
 
 		template <typename... Bn>
-		auto and_fn(int) -> first_t<std::true_type, std::enable_if_t<bool(Bn::value)>...>;
+		auto and_fn(int) -> first_t<std::true_type, std::enable_if_t<static_cast<bool>(Bn::value)>...>;
 
 		template <typename... Bn>
 		auto and_fn(...) -> std::false_type;
@@ -44,7 +44,7 @@ namespace ccm::support
 	};
 
 	template <typename Pp>
-	struct not_ : std::bool_constant<!bool(Pp::value)>
+	struct not_ : std::bool_constant<!static_cast<bool>(Pp::value)>
 	{
 	};
 	/// @endcond
