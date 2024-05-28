@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
 #include "ccmath/internal/types/int128_types.hpp"
 
@@ -143,34 +142,37 @@ struct floating_point_traits<long double>
 	inline constexpr typename floating_point_traits<T>::uint_type sign_mask_v = floating_point_traits<T>::shifted_sign_mask;
 
 
+	// TODO: Possible remove these functions from floating_point_traits as they are more so there own things and not really traits.
+	// All functions below that use bit_cast have to use the __builtin_bit_cast as bit_cast itself includes floating_point_traits.hpp
+
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 	[[nodiscard]] constexpr T floating_point_abs_bits(const T & x) noexcept
 	{
 		using traits	= floating_point_traits<T>;
 		using uint_type = typename traits::uint_type;
-		const auto bits = bit_cast<uint_type>(x);
+		const auto bits = __builtin_bit_cast(uint_type, x);
 		return bits & ~traits::shifted_sign_mask;
 	}
 
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr float_signed_bits_t<T> get_exponent_of_floating_point(T x) noexcept
 	{
-		const auto bits = bit_cast<ccm::support::float_bits_t<T>>(x);
+		const auto bits = __builtin_bit_cast(ccm::support::float_bits_t<T>, x);
 
-		const auto shifted_exponent = bits >> ccm::support::floating_point_traits<T>::exponent_shift;
-		const auto masked_exponent	= shifted_exponent & ccm::support::floating_point_traits<T>::exponent_mask;
-		return static_cast<float_signed_bits_t<T>>(masked_exponent) - ccm::support::floating_point_traits<T>::exponent_bias;
+		const auto shifted_exponent = bits >> floating_point_traits<T>::exponent_shift;
+		const auto masked_exponent	= shifted_exponent & floating_point_traits<T>::exponent_mask;
+		return static_cast<float_signed_bits_t<T>>(masked_exponent) - floating_point_traits<T>::exponent_bias;
 	}
 
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T set_exponent_of_floating_point(T x, int exp) noexcept
 	{
-		const auto bit_casted			  = ccm::support::bit_cast<ccm::support::float_bits_t<T>>(x);
-		const auto inverted_exponent_mask = ~ccm::support::floating_point_traits<T>::shifted_exponent_mask;
-		const auto masked_exponent = (static_cast<ccm::support::float_bits_t<T>>(exp + ccm::support::floating_point_traits<T>::exponent_bias)) & ccm::support::floating_point_traits<T>::exponent_mask;
-		const auto shifted_masked_exponent = masked_exponent << ccm::support::floating_point_traits<T>::exponent_shift;
+		const auto bit_casted			  = __builtin_bit_cast(ccm::support::float_bits_t<T>, x);
+		const auto inverted_exponent_mask = ~floating_point_traits<T>::shifted_exponent_mask;
+		const auto masked_exponent = (static_cast<float_bits_t<T>>(exp + floating_point_traits<T>::exponent_bias)) & floating_point_traits<T>::exponent_mask;
+		const auto shifted_masked_exponent = masked_exponent << floating_point_traits<T>::exponent_shift;
 		const auto final_bits			   = (bit_casted & inverted_exponent_mask) | shifted_masked_exponent;
 
-		return bit_cast<T>(final_bits);
+		return __builtin_bit_cast(T, final_bits);
 	}
 } // namespace ccm::support
