@@ -53,6 +53,7 @@ set(ccmath_internal_predef_compiler_support_headers
 
 set(ccmath_internal_predef_headers
         ${ccmath_internal_predef_compiler_support_headers}
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/expects_bool_condition.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/has_attribute.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/likely.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/unlikely.hpp
