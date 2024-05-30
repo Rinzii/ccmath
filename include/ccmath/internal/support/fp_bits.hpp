@@ -49,123 +49,124 @@ namespace ccm::support
 		template <>
 		struct FPLayout<FPType::eBinary32>
 		{
-			using StorageType				  = std::uint32_t;
-			static constexpr int SIGN_LEN	  = 1;
-			static constexpr int EXP_LEN	  = 8;
-			static constexpr int SIG_LEN	  = 23;
-			static constexpr int FRACTION_LEN = SIG_LEN;
+			using storage_type						= std::uint32_t;
+			static constexpr int sign_length		= 1;
+			static constexpr int exponent_length	= 8;
+			static constexpr int significand_length = 23;
+			static constexpr int fraction_length	= significand_length;
 		};
 
 		template <>
 		struct FPLayout<FPType::eBinary64>
 		{
-			using StorageType				  = std::uint64_t;
-			static constexpr int SIGN_LEN	  = 1;
-			static constexpr int EXP_LEN	  = 11;
-			static constexpr int SIG_LEN	  = 52;
-			static constexpr int FRACTION_LEN = SIG_LEN;
+			using storage_type						= std::uint64_t;
+			static constexpr int sign_length		= 1;
+			static constexpr int exponent_length	= 11;
+			static constexpr int significand_length = 52;
+			static constexpr int fraction_length	= significand_length;
 		};
 
 		template <>
 		struct FPLayout<FPType::eBinary80>
 		{
-			using StorageType				  = types::uint128_t;
-			static constexpr int SIGN_LEN	  = 1;
-			static constexpr int EXP_LEN	  = 15;
-			static constexpr int SIG_LEN	  = 64;
-			static constexpr int FRACTION_LEN = SIG_LEN - 1;
+			using storage_type						= types::uint128_t;
+			static constexpr int sign_length		= 1;
+			static constexpr int exponent_length	= 15;
+			static constexpr int significand_length = 64;
+			static constexpr int fraction_length	= significand_length - 1;
 		};
 
 		template <>
 		struct FPLayout<FPType::eBinary128>
 		{
-			using StorageType				  = types::uint128_t;
-			static constexpr int SIGN_LEN	  = 1;
-			static constexpr int EXP_LEN	  = 15;
-			static constexpr int SIG_LEN	  = 112;
-			static constexpr int FRACTION_LEN = SIG_LEN;
+			using storage_type						= types::uint128_t;
+			static constexpr int sign_length		= 1;
+			static constexpr int exponent_length	= 15;
+			static constexpr int significand_length = 112;
+			static constexpr int fraction_length	= significand_length;
 		};
 
 		template <FPType fp_type>
 		struct FPStorage : FPLayout<fp_type>
 		{
-			using UP = FPLayout<fp_type>;
+			using BASE = FPLayout<fp_type>;
 
 			/**
 			 * @brief The number of bits in the exponent part.
 			 */
-			using UP::EXP_LEN;
+			using BASE::exponent_length;
 
 			/**
 			 * @brief The number of bits in the significand part.
 			 */
-			using UP::SIG_LEN;
+			using BASE::significand_length;
 
 			/**
 			 * @brief The number of bits in the sign part.
 			 */
-			using UP::SIGN_LEN;
+			using BASE::sign_length;
 
 			/**
 			 * @brief The total number of bits in the floating point number. Provided as a convenience.
 			 */
-			static constexpr int TOTAL_LEN = SIGN_LEN + EXP_LEN + SIG_LEN;
+			static constexpr int total_length = sign_length + exponent_length + significand_length;
 
 			/**
 			 * @brief The number of bits after the decimal dot when the number is in normal form.
 			 */
-			using UP::FRACTION_LEN;
+			using BASE::fraction_length;
 
 			/**
-			 * @brief The storage type for the floating point number repersented as an unsigned integer wide enough to contain all of the floating point bits.
+			 * @brief The storage type for the floating point number represented as an unsigned integer wide enough to contain all of the floating point bits.
 			 */
-			using StorageType = typename UP::StorageType;
+			using storage_type = typename BASE::storage_type;
 
 			/**
 			 * @brief The number of bits in the storage type.
 			 */
-			static constexpr int STORAGE_LEN = sizeof(StorageType) * CHAR_BIT;
-			static_assert(STORAGE_LEN >= TOTAL_LEN,
+			static constexpr int storage_length = sizeof(storage_type) * CHAR_BIT;
+			static_assert(storage_length >= total_length,
 						  "ccmath - FPBits: Some how the storage is not able to hold the entire floating point number. This should never happen!");
 
 			/**
 			 * @brief The exponent bias for the floating point type that should always be positive.
 			 */
-			static constexpr std::int32_t EXP_BIAS = (1U << (EXP_LEN - 1U)) - 1U;
-			static_assert(EXP_BIAS > 0, "ccmath - FPBits: The exponent bias should always be positive. This should never happen!");
+			static constexpr std::int32_t exponent_bias = (1U << (exponent_length - 1U)) - 1U;
+			static_assert(exponent_bias > 0, "ccmath - FPBits: The exponent bias should always be positive. This should never happen!");
 
 			/**
 			 * @brief The bit mask that keeps only the significand part.
 			 */
-			static constexpr StorageType SIG_MASK = support::mask_trailing_ones<StorageType, SIG_LEN>();
+			static constexpr storage_type significand_mask = support::mask_trailing_ones<storage_type, significand_length>();
 
 			/**
 			 * @brief The bit mask that keeps only the exponent part.
 			 */
-			static constexpr StorageType EXP_MASK = support::mask_trailing_ones<StorageType, EXP_LEN>() << SIG_LEN;
+			static constexpr storage_type exponent_mask = support::mask_trailing_ones<storage_type, exponent_length>() << significand_length;
 
 			/**
 			 * @brief The bit mask that keeps only the sign part.
 			 */
-			static constexpr StorageType SIGN_MASK = support::mask_trailing_ones<StorageType, SIGN_LEN>() << (EXP_LEN + SIG_LEN);
+			static constexpr storage_type sign_mask = support::mask_trailing_ones<storage_type, sign_length>() << (exponent_length + significand_length);
 
 			/**
 			 * @brief The bit mask that keeps only the exponent and significand parts.
 			 */
-			static constexpr StorageType EXP_SIG_MASK = support::mask_trailing_ones<StorageType, EXP_LEN + SIG_LEN>();
+			static constexpr storage_type exponent_significand_mask = support::mask_trailing_ones<storage_type, exponent_length + significand_length>();
 
 			/**
 			 * @brief The bit mask that keeps the entire bit pattern. (sign + exponent + significand)
 			 */
-			static constexpr StorageType FP_MASK = support::mask_trailing_ones<StorageType, TOTAL_LEN>();
+			static constexpr storage_type fp_bits_mask = support::mask_trailing_ones<storage_type, total_length>();
 
 			/**
 			 * @brief The bit mask that keeps only the fraction part. (i.e., the significand without the leading one)
 			 */
-			static constexpr StorageType FRACTION_MASK = support::mask_trailing_ones<StorageType, FRACTION_LEN>();
+			static constexpr storage_type FRACTION_MASK = support::mask_trailing_ones<storage_type, fraction_length>();
 
-			static_assert((SIG_MASK & EXP_MASK & SIGN_MASK) == 0, "Bitmasks overlap! SIG_MASK, EXP_MASK, and SIGN_MASK must be disjoint");
-			static_assert((SIG_MASK | EXP_MASK | SIGN_MASK) == FP_MASK, "Bitmasks do not fully cover the floating-point mask");
+			static_assert((significand_mask & exponent_mask & sign_mask) == 0,
+						  "Bitmasks overlap! significand_mask, exponent_mask, and sign_mask must be disjoint");
+			static_assert((significand_mask | exponent_mask | sign_mask) == fp_bits_mask, "Bitmasks do not fully cover the floating-point mask");
 
 		protected:
 			/**
@@ -175,7 +176,7 @@ namespace ccm::support
 			 * @param mask Mask that uses 'a' bits when corresponding 'mask' bits are zeroes and 'b' bits when corresponding bits are ones.
 			 * @return Merged bits from 'a' and 'b' according to 'mask'.
 			 */
-			static constexpr StorageType merge(StorageType a, StorageType b, StorageType mask)
+			static constexpr storage_type merge(storage_type a, storage_type b, storage_type mask)
 			{
 				// Algorithm taken from here. All algorithms from here are public domain.
 				// https://graphics.stanford.edu/~seander/bithacks.html#MaskedMerge
@@ -196,7 +197,7 @@ namespace ccm::support
 
 				constexpr explicit operator T() const { return value; }
 
-				[[nodiscard]] constexpr StorageType to_storage_type() const { return StorageType(value); }
+				[[nodiscard]] constexpr storage_type to_storage_type() const { return storage_type(value); }
 
 				friend constexpr bool operator==(TypedInt a, TypedInt b) { return a.value == b.value; }
 				friend constexpr bool operator!=(TypedInt a, TypedInt b) { return a.value != b.value; }
@@ -213,13 +214,18 @@ namespace ccm::support
 			 */
 			struct Exponent : TypedInt<std::int32_t>
 			{
-				using UP = TypedInt<std::int32_t>;
-				using UP::UP;
-				static constexpr auto subnormal() { return Exponent(-EXP_BIAS); }
-				static constexpr auto min() { return Exponent(1 - EXP_BIAS); }
+				using BASE = TypedInt<std::int32_t>;
+				using BASE::BASE;
+
+				static constexpr auto subnormal() { return Exponent(-exponent_bias); }
+
+				static constexpr auto min() { return Exponent(1 - exponent_bias); }
+
 				static constexpr auto zero() { return Exponent(0); }
-				static constexpr auto max() { return Exponent(EXP_BIAS); }
-				static constexpr auto inf() { return Exponent(EXP_BIAS + 1); }
+
+				static constexpr auto max() { return Exponent(exponent_bias); }
+
+				static constexpr auto inf() { return Exponent(exponent_bias + 1); }
 			};
 
 			/**
@@ -231,28 +237,28 @@ namespace ccm::support
 			 */
 			struct BiasedExponent : TypedInt<std::uint32_t>
 			{
-				using UP = TypedInt<std::uint32_t>;
-				using UP::UP;
+				using BASE = TypedInt<std::uint32_t>;
+				using BASE::BASE;
 
-				// NOLINTNEXTLINE(google-explicit-constructor)
-				constexpr BiasedExponent(Exponent exp) : UP(static_cast<std::uint32_t>(static_cast<std::int32_t>(exp) + EXP_BIAS)) {}
+				// NOLINTNEXTLINE(google-explicit-constructor) - This constructor CANNOT be explicit.
+				constexpr BiasedExponent(Exponent exp) : BASE(static_cast<std::uint32_t>(static_cast<std::int32_t>(exp) + exponent_bias)) {}
 
 				/**
 				 * @brief Cast operator to convert from BiasedExponent to Exponent.
 				 */
-				explicit constexpr operator Exponent() const { return Exponent(static_cast<std::int32_t>(UP::value) - EXP_BIAS); }
+				explicit constexpr operator Exponent() const { return Exponent(static_cast<std::int32_t>(BASE::value) - exponent_bias); }
 
 				constexpr BiasedExponent & operator++()
 				{
 					assert(*this != BiasedExponent(Exponent::inf())); // Legal in C++14 and above
-					++UP::value;
+					++BASE::value;
 					return *this;
 				}
 
 				constexpr BiasedExponent & operator--()
 				{
 					assert(*this != BiasedExponent(Exponent::subnormal())); // Legal in C++14 and above
-					--UP::value;
+					--BASE::value;
 					return *this;
 				}
 			};
@@ -260,7 +266,7 @@ namespace ccm::support
 			/**
 			 * @brief An opaque type for storing a floating point significand.
 			 *
-			 * Inherits from TypedInt<StorageType> and allows storage of significand values.
+			 * Inherits from TypedInt<storage_type> and allows storage of significand values.
 			 * Provides operators for bitwise OR, XOR, and right shift.
 			 * Defines special values like zero, lsb (least significant bit), msb (most significant bit),
 			 * and all bits set to one. Arbitrary values are valid within the range [zero, bits_all_ones].
@@ -268,92 +274,103 @@ namespace ccm::support
 			 *
 			 * @attention The semantics of the Significand are implementation dependent.
 			 */
-			struct Significand : TypedInt<StorageType>
+			struct Significand : TypedInt<storage_type>
 			{
-				using UP = TypedInt<StorageType>;
-				using UP::UP;
+				using BASE = TypedInt<storage_type>;
+				using BASE::BASE;
 
 				friend constexpr Significand operator|(const Significand a, const Significand b)
 				{
-					return Significand(StorageType(a.to_storage_type() | b.to_storage_type()));
+					return Significand(storage_type(a.to_storage_type() | b.to_storage_type()));
 				}
+
 				friend constexpr Significand operator^(const Significand a, const Significand b)
 				{
-					return Significand(StorageType(a.to_storage_type() ^ b.to_storage_type()));
+					return Significand(storage_type(a.to_storage_type() ^ b.to_storage_type()));
 				}
-				friend constexpr Significand operator>>(const Significand a, int shift) { return Significand(StorageType(a.to_storage_type() >> shift)); }
 
-				static constexpr auto zero() { return Significand(StorageType(0)); }
-				static constexpr auto lsb() { return Significand(StorageType(1)); }
-				static constexpr auto msb() { return Significand(StorageType(1) << (SIG_LEN - 1)); }
-				static constexpr auto bits_all_ones() { return Significand(SIG_MASK); }
+				friend constexpr Significand operator>>(const Significand a, int shift) { return Significand(storage_type(a.to_storage_type() >> shift)); }
+
+				static constexpr auto zero() { return Significand(storage_type(0)); }
+
+				static constexpr auto lsb() { return Significand(storage_type(1)); }
+
+				static constexpr auto msb() { return Significand(storage_type(1) << (significand_length - 1)); }
+
+				static constexpr auto bits_all_ones() { return Significand(significand_mask); }
 			};
 
-			static constexpr StorageType encode(BiasedExponent exp) { return (exp.to_storage_type() << SIG_LEN) & EXP_MASK; }
+			static constexpr storage_type encode(BiasedExponent exp) { return (exp.to_storage_type() << significand_length) & exponent_mask; }
 
-			static constexpr StorageType encode(Significand value) { return value.to_storage_type() & SIG_MASK; }
+			static constexpr storage_type encode(Significand value) { return value.to_storage_type() & significand_mask; }
 
-			static constexpr StorageType encode(BiasedExponent exp, Significand sig) { return encode(exp) | encode(sig); }
+			static constexpr storage_type encode(BiasedExponent exp, Significand sig) { return encode(exp) | encode(sig); }
 
-			static constexpr StorageType encode(types::Sign sign, BiasedExponent exp, Significand sig)
+			static constexpr storage_type encode(types::Sign sign, BiasedExponent exp, Significand sig)
 			{
-				if (sign.is_neg()) { return SIGN_MASK | encode(exp, sig); }
+				if (sign.is_neg()) { return sign_mask | encode(exp, sig); }
 				return encode(exp, sig);
 			}
 
 			constexpr FPStorage() : bits(0) {}
 
-			constexpr FPStorage(StorageType value) : bits(value) {}
+			constexpr FPStorage(storage_type value) : bits(value) {}
 
-			/// Observers
+			/// Observer Functions
 
-			[[nodiscard]] constexpr StorageType exp_bits() const { return bits & EXP_MASK; }
-			[[nodiscard]] constexpr StorageType sig_bits() const { return bits & SIG_MASK; }
-			[[nodiscard]] constexpr StorageType exp_sig_bits() const { return bits & EXP_SIG_MASK; }
+			[[nodiscard]] constexpr storage_type exp_bits() const { return bits & exponent_mask; }
 
-			/// Parts
+			[[nodiscard]] constexpr storage_type sig_bits() const { return bits & significand_mask; }
 
-			[[nodiscard]] constexpr BiasedExponent biased_exponent() const { return BiasedExponent(static_cast<std::uint32_t>(exp_bits() >> SIG_LEN)); }
-			constexpr void set_biased_exponent(BiasedExponent biased) { bits = merge(bits, encode(biased), EXP_MASK); }
+			[[nodiscard]] constexpr storage_type exp_sig_bits() const { return bits & exponent_significand_mask; }
+
+			/// Parts of the floating point number
+
+			[[nodiscard]] constexpr BiasedExponent biased_exponent() const
+			{
+				return BiasedExponent(static_cast<std::uint32_t>(exp_bits() >> significand_length));
+			}
+
+			constexpr void set_biased_exponent(BiasedExponent biased) { bits = merge(bits, encode(biased), exponent_mask); }
 
 			/**
-			 * @brief The bits of the floating point number reperesented as an unsigned integer.
+			 * @brief The bits of the floating point number represented as an unsigned integer.
 			 */
-			StorageType bits{};
+			storage_type bits{};
 
 		public:
-			[[nodiscard]] constexpr types::Sign sign() const { return (bits & SIGN_MASK) ? types::Sign::NEG : types::Sign::POS; }
+			[[nodiscard]] constexpr types::Sign sign() const { return (bits & sign_mask) ? types::Sign::NEG : types::Sign::POS; }
 			constexpr void set_sign(types::Sign signVal)
 			{
-				if (sign() != signVal) { bits ^= SIGN_MASK; }
+				if (sign() != signVal) { bits ^= sign_mask; }
 			}
 		};
 
 		/**
 		 * @brief This layer defines all functions related to the encoding of the floating point type.
 		 *
-		 * It facilitates the construction, modification, and observation of values manipulated as 'StorageType'.
+		 * It facilitates the construction, modification, and observation of values manipulated as 'storage_type'.
 		 */
 		template <FPType fp_type, typename RetT>
 		struct FPRepSem : FPStorage<fp_type>
 		{
-			using UP = FPStorage<fp_type>;
-			using typename UP::StorageType;
-			using UP::FRACTION_LEN;
-			using UP::FRACTION_MASK;
+			using BASE = FPStorage<fp_type>;
+			using BASE::fraction_length;
+			using BASE::FRACTION_MASK;
+			using typename BASE::storage_type;
 
 		protected:
-			using typename UP::Exponent;
-			using typename UP::Significand;
-			using UP::bits;
-			using UP::encode;
-			using UP::exp_bits;
-			using UP::exp_sig_bits;
-			using UP::sig_bits;
-			using UP::UP;
+			using BASE::BASE;
+			using BASE::bits;
+			using BASE::encode;
+			using BASE::exp_bits;
+			using BASE::exp_sig_bits;
+			using BASE::sig_bits;
+			using typename BASE::Exponent;
+			using typename BASE::Significand;
 
 		public:
-			/// Builders
+			/// Builder Functions
 
 			static constexpr RetT zero(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::subnormal(), Significand::zero())); }
 			static constexpr RetT one(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::zero(), Significand::zero())); }
@@ -365,16 +382,16 @@ namespace ccm::support
 			static constexpr RetT min_normal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::min(), Significand::zero())); }
 			static constexpr RetT max_normal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::max(), Significand::bits_all_ones())); }
 			static constexpr RetT inf(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::inf(), Significand::zero())); }
-			static constexpr RetT signaling_nan(types::Sign sign = types::Sign::POS, StorageType v = 0)
+			static constexpr RetT signaling_nan(types::Sign sign = types::Sign::POS, storage_type v = 0)
 			{
 				return RetT(encode(sign, Exponent::inf(), (v ? Significand(v) : (Significand::msb() >> 1))));
 			}
-			static constexpr RetT quiet_nan(types::Sign sign = types::Sign::POS, StorageType v = 0)
+			static constexpr RetT quiet_nan(types::Sign sign = types::Sign::POS, storage_type v = 0)
 			{
 				return RetT(encode(sign, Exponent::inf(), Significand::msb() | Significand(v)));
 			}
 
-			/// Observers
+			/// Observer Functions
 
 			[[nodiscard]] constexpr bool is_zero() const { return exp_sig_bits() == 0; }
 			[[nodiscard]] constexpr bool is_nan() const { return exp_sig_bits() > encode(Exponent::inf(), Significand::zero()); }
@@ -386,21 +403,21 @@ namespace ccm::support
 			[[nodiscard]] constexpr bool is_normal() const { return is_finite() && !is_subnormal(); }
 			constexpr RetT next_toward_inf() const
 			{
-				if (is_finite()) { return RetT(bits + StorageType(1)); }
+				if (is_finite()) { return RetT(bits + storage_type(1)); }
 				return RetT(bits);
 			}
 
 			/**
 			 * @brief Returns the mantissa with the implicit bit set if the current value is a valid normal number.
-			 * @return The explicit mantissa as a StorageType.
+			 * @return The explicit mantissa as a storage_type.
 			 *
 			 * This function checks if the current value is subnormal. If it is, it returns the significand bits.
 			 * Otherwise, it returns the mantissa with the implicit bit set.
 			 */
-			constexpr StorageType get_explicit_mantissa() const
+			constexpr storage_type get_explicit_mantissa() const
 			{
 				if (is_subnormal()) { return sig_bits(); }
-				return (StorageType(1) << UP::SIG_LEN) | sig_bits();
+				return (storage_type(1) << BASE::significand_length) | sig_bits();
 			}
 		};
 
@@ -410,10 +427,10 @@ namespace ccm::support
 		template <typename RetT>
 		struct FPRepSem<FPType::eBinary80, RetT> : FPStorage<FPType::eBinary80>
 		{
-			using UP = FPStorage;
-			using UP::FRACTION_LEN;
-			using UP::FRACTION_MASK;
-			using UP::StorageType;
+			using BASE = FPStorage;
+			using BASE::fraction_length;
+			using BASE::FRACTION_MASK;
+			using BASE::storage_type;
 
 			/**
 			 * @brief Mask for the leading digit of the mantissa in the x86 80-bit float.
@@ -421,20 +438,20 @@ namespace ccm::support
 			 * The x86 80-bit float represents the leading digit of the mantissa explicitly.
 			 * This constant defines the mask for that bit.
 			 */
-			static constexpr StorageType EXPLICIT_BIT_MASK = static_cast<StorageType>(1) << FRACTION_LEN;
+			static constexpr storage_type EXPLICIT_BIT_MASK = static_cast<storage_type>(1) << fraction_length;
 
 			// The X80 significand includes an explicit bit and the fractional part.
 			static_assert((EXPLICIT_BIT_MASK & FRACTION_MASK) == 0, "Explicit bit and fractional part must not overlap.");
-			static_assert((EXPLICIT_BIT_MASK | FRACTION_MASK) == SIG_MASK, "Explicit bit and fractional part must cover the entire significand.");
+			static_assert((EXPLICIT_BIT_MASK | FRACTION_MASK) == significand_mask, "Explicit bit and fractional part must cover the entire significand.");
 
 		protected:
-			using UP::encode;
-			using UP::Exponent;
-			using UP::Significand;
-			using UP::UP;
+			using BASE::BASE;
+			using BASE::encode;
+			using BASE::Exponent;
+			using BASE::Significand;
 
 		public:
-			/// Builders
+			/// Builder Functions
 
 			static constexpr RetT zero(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::subnormal(), Significand::zero())); }
 			static constexpr RetT one(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::zero(), Significand::msb())); }
@@ -446,11 +463,11 @@ namespace ccm::support
 			static constexpr RetT min_normal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::min(), Significand::msb())); }
 			static constexpr RetT max_normal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::max(), Significand::bits_all_ones())); }
 			static constexpr RetT inf(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::inf(), Significand::msb())); }
-			static constexpr RetT signaling_nan(types::Sign sign = types::Sign::POS, StorageType v = 0)
+			static constexpr RetT signaling_nan(types::Sign sign = types::Sign::POS, storage_type v = 0)
 			{
 				return RetT(encode(sign, Exponent::inf(), Significand::msb() | (v ? Significand(v) : (Significand::msb() >> 2))));
 			}
-			static constexpr RetT quiet_nan(types::Sign sign = types::Sign::POS, StorageType v = 0)
+			static constexpr RetT quiet_nan(types::Sign sign = types::Sign::POS, storage_type v = 0)
 			{
 				return RetT(encode(sign, Exponent::inf(), Significand::msb() | (Significand::msb() >> 1) | Significand(v)));
 			}
@@ -505,13 +522,13 @@ namespace ccm::support
 				{
 					if (exp_sig_bits() == max_normal().uintval()) { return inf(sign()); }
 					if (exp_sig_bits() == max_subnormal().uintval()) { return min_normal(sign()); }
-					if (sig_bits() == SIG_MASK) { return RetT(encode(sign(), ++biased_exponent(), Significand::zero())); }
-					return RetT(bits + static_cast<StorageType>(1));
+					if (sig_bits() == significand_mask) { return RetT(encode(sign(), ++biased_exponent(), Significand::zero())); }
+					return RetT(bits + static_cast<storage_type>(1));
 				}
 				return RetT(bits);
 			}
 
-			[[nodiscard]] constexpr StorageType get_explicit_mantissa() const { return sig_bits(); }
+			[[nodiscard]] constexpr storage_type get_explicit_mantissa() const { return sig_bits(); }
 
 			/**
 			 * @brief Checks if the implicit bit is set.
@@ -555,36 +572,36 @@ namespace ccm::support
 		template <FPType fp_type, typename RetT>
 		struct FPRepImpl : FPRepSem<fp_type, RetT>
 		{
-			using UP		  = FPRepSem<fp_type, RetT>;
-			using StorageType = typename UP::StorageType;
+			using BASE		   = FPRepSem<fp_type, RetT>;
+			using storage_type = typename BASE::storage_type;
 
 		protected:
-			using UP::bits;
-			using UP::encode;
-			using UP::exp_bits;
-			using UP::exp_sig_bits;
+			using BASE::bits;
+			using BASE::encode;
+			using BASE::exp_bits;
+			using BASE::exp_sig_bits;
 
-			using typename UP::BiasedExponent;
-			using typename UP::Exponent;
-			using typename UP::Significand;
+			using typename BASE::BiasedExponent;
+			using typename BASE::Exponent;
+			using typename BASE::Significand;
 
-			using UP::FP_MASK;
+			using BASE::fp_bits_mask;
 
 		public:
 			/// Constants
 
-			using UP::EXP_BIAS;
-			using UP::EXP_MASK;
-			using UP::FRACTION_MASK;
-			using UP::SIG_LEN;
-			using UP::SIG_MASK;
-			using UP::SIGN_MASK;
-			static constexpr int MAX_BIASED_EXPONENT = (1 << UP::EXP_LEN) - 1;
+			using BASE::exponent_bias;
+			using BASE::exponent_mask;
+			using BASE::FRACTION_MASK;
+			using BASE::sign_mask;
+			using BASE::significand_length;
+			using BASE::significand_mask;
+			static constexpr int MAX_BIASED_EXPONENT = (1 << BASE::exponent_length) - 1;
 
 			/// Constructors
 
 			constexpr FPRepImpl() = default;
-			constexpr explicit FPRepImpl(StorageType x) : UP(x) {}
+			constexpr explicit FPRepImpl(storage_type x) : BASE(x) {}
 
 			/// Comparison Operators
 
@@ -592,53 +609,56 @@ namespace ccm::support
 			constexpr friend bool operator!=(FPRepImpl a, FPRepImpl b) { return a.uintval() != b.uintval(); }
 
 			// Representation
-			constexpr StorageType uintval() const { return bits & FP_MASK; }
-			constexpr void set_uintval(StorageType value) { bits = (value & FP_MASK); }
+			constexpr storage_type uintval() const { return bits & fp_bits_mask; }
+			constexpr void set_uintval(storage_type value) { bits = (value & fp_bits_mask); }
 
-			/// Builders
+			/// Builder  Functions
 
-			using UP::inf;
-			using UP::max_normal;
-			using UP::max_subnormal;
-			using UP::min_normal;
-			using UP::min_subnormal;
-			using UP::one;
-			using UP::quiet_nan;
-			using UP::signaling_nan;
-			using UP::zero;
+			using BASE::inf;
+			using BASE::max_normal;
+			using BASE::max_subnormal;
+			using BASE::min_normal;
+			using BASE::min_subnormal;
+			using BASE::one;
+			using BASE::quiet_nan;
+			using BASE::signaling_nan;
+			using BASE::zero;
 
-			/// Modifiers
+			/// Modifier Functions
 
-			constexpr RetT abs() const { return RetT(bits & UP::EXP_SIG_MASK); }
+			constexpr RetT abs() const { return RetT(bits & BASE::exponent_significand_mask); }
 
-			/// Observers
+			/// Observer Functions
 
-			using UP::get_explicit_mantissa;
-			using UP::is_finite;
-			using UP::is_inf;
-			using UP::is_nan;
-			using UP::is_normal;
-			using UP::is_quiet_nan;
-			using UP::is_signaling_nan;
-			using UP::is_subnormal;
-			using UP::is_zero;
-			using UP::next_toward_inf;
-			using UP::sign;
+			using BASE::get_explicit_mantissa;
+			using BASE::is_finite;
+			using BASE::is_inf;
+			using BASE::is_nan;
+			using BASE::is_normal;
+			using BASE::is_quiet_nan;
+			using BASE::is_signaling_nan;
+			using BASE::is_subnormal;
+			using BASE::is_zero;
+			using BASE::next_toward_inf;
+			using BASE::sign;
+
 			[[nodiscard]] constexpr bool is_inf_or_nan() const { return !is_finite(); }
+
 			[[nodiscard]] constexpr bool is_neg() const { return sign().is_neg(); }
+
 			[[nodiscard]] constexpr bool is_pos() const { return sign().is_pos(); }
 
 			[[nodiscard]] constexpr std::uint16_t get_biased_exponent() const
 			{
-				return static_cast<std::uint16_t>(static_cast<std::uint32_t>(UP::biased_exponent()));
+				return static_cast<std::uint16_t>(static_cast<std::uint32_t>(BASE::biased_exponent()));
 			}
 
-			constexpr void set_biased_exponent(StorageType biased)
+			constexpr void set_biased_exponent(storage_type biased)
 			{
-				UP::set_biased_exponent(BiasedExponent(static_cast<std::uint32_t>(static_cast<std::int32_t>(biased))));
+				BASE::set_biased_exponent(BiasedExponent(static_cast<std::uint32_t>(static_cast<std::int32_t>(biased))));
 			}
 
-			[[nodiscard]] constexpr int get_exponent() const { return static_cast<std::int32_t>(Exponent(UP::biased_exponent())); }
+			[[nodiscard]] constexpr int get_exponent() const { return static_cast<std::int32_t>(Exponent(BASE::biased_exponent())); }
 
 			/**
 			 * @brief Retrieves the explicit exponent value, adjusted for subnormal and zero values.
@@ -652,25 +672,25 @@ namespace ccm::support
 			 */
 			[[nodiscard]] constexpr int get_explicit_exponent() const
 			{
-				Exponent exponent(UP::biased_exponent());
+				Exponent exponent(BASE::biased_exponent());
 				if (is_zero()) { exponent = Exponent::zero(); }
 				if (exponent == Exponent::subnormal()) { exponent = Exponent::min(); }
 				return static_cast<std::int32_t>(exponent);
 			}
 
-			constexpr StorageType get_mantissa() const { return bits & FRACTION_MASK; }
+			constexpr storage_type get_mantissa() const { return bits & FRACTION_MASK; }
 
 			/**
 			 * @brief Sets the mantissa value of the internal bits.
 			 * @param mantVal The mantissa value to set.
 			 */
-			constexpr void set_mantissa(StorageType mantVal) { bits = UP::merge(bits, mantVal, FRACTION_MASK); }
+			constexpr void set_mantissa(storage_type mantVal) { bits = BASE::merge(bits, mantVal, FRACTION_MASK); }
 
 			/**
-			 * @brief Sets the significand value of the inernal bits.
+			 * @brief Sets the significand value of the internal bits.
 			 * @param sigVal The significand value to set.
 			 */
-			constexpr void set_significand(StorageType sigVal) { bits = UP::merge(bits, sigVal, SIG_MASK); }
+			constexpr void set_significand(storage_type sigVal) { bits = BASE::merge(bits, sigVal, significand_mask); }
 
 			/**
 			 * @brief Unsafe function that creates a floating point representation that simply packs the sign, biased exponent, and mantissa values without
@@ -683,7 +703,7 @@ namespace ccm::support
 			 * @warning For Binary80 Extended Precision, implicit bit needs to be set correctly in the 'mantissa' by the caller.
 			 *			This function will not check for its validity and assumes the caller has set it correctly.
 			 */
-			static constexpr RetT create_value(types::Sign sign, StorageType biased_exp, StorageType mantissa)
+			static constexpr RetT create_value(types::Sign sign, storage_type biased_exp, storage_type mantissa)
 			{
 				return RetT(encode(sign, BiasedExponent(static_cast<std::uint32_t>(biased_exp)), Significand(mantissa)));
 			}
@@ -701,18 +721,18 @@ namespace ccm::support
 			 *				4) "number" zero value is not processed correctly.
 			 *				5) Number is unsigned, so the result can be only positive.
 			 */
-			static constexpr RetT make_value(StorageType number, int expo)
+			static constexpr RetT make_value(storage_type number, int expo)
 			{
 				// Result = number * 2^(expo + 1 - exponent_bias)
 				FPRepImpl result(0);
-				int lz = UP::FRACTION_LEN + 1 - (UP::STORAGE_LEN - support::countl_zero(number));
+				int lz = BASE::fraction_length + 1 - (BASE::storage_length - support::countl_zero(number));
 
 				number <<= lz;
 				expo -= lz;
 
 				if (CCM_LIKELY(expo >= 0))
 				{
-					// Implicit number bit will be removed by mask
+					// Mask will remove implicit number bit
 					result.set_significand(number);
 					result.set_biased_exponent(expo + 1);
 				}
@@ -728,11 +748,11 @@ namespace ccm::support
 		template <FPType fp_type>
 		struct FPRep : FPRepImpl<fp_type, FPRep<fp_type>>
 		{
-			using UP		  = FPRepImpl<fp_type, FPRep<fp_type>>;
-			using StorageType = typename UP::StorageType;
-			using UP::UP;
+			using BASE		   = FPRepImpl<fp_type, FPRep<fp_type>>;
+			using storage_type = typename BASE::storage_type;
+			using BASE::BASE;
 
-			constexpr explicit operator StorageType() const { return UP::uintval(); }
+			constexpr explicit operator storage_type() const { return BASE::uintval(); }
 		};
 
 	} // namespace internal
@@ -750,7 +770,7 @@ namespace ccm::support
 		else if constexpr (std::is_same_v<UnqualT, double> && DBL_MANT_DIG == 53) { return FPType::eBinary64; }
 		else if constexpr (std::is_same_v<UnqualT, long double>)
 		{
-			if constexpr (LDBL_MANT_DIG == 53) { return FPType::eBinary64; }		// long double is same as double
+			if constexpr (LDBL_MANT_DIG == 53) { return FPType::eBinary64; }		// long double is the same as double
 			else if constexpr (LDBL_MANT_DIG == 64) { return FPType::eBinary80; }	// long double is 80-bits
 			else if constexpr (LDBL_MANT_DIG == 113) { return FPType::eBinary128; } // long double is 128-bits
 		}
@@ -769,8 +789,8 @@ namespace ccm::support
 	struct FPBits final : internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>
 	{
 		static_assert(std::is_floating_point_v<T>, "FPBits instantiated with invalid type.");
-		using UP		  = internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>;
-		using StorageType = typename UP::StorageType;
+		using BASE		   = internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>;
+		using storage_type = typename BASE::storage_type;
 
 		constexpr FPBits() = default;
 
@@ -778,8 +798,8 @@ namespace ccm::support
 		constexpr explicit FPBits(XType x)
 		{
 			using Unqual = std::remove_cv_t<XType>;
-			if constexpr (std::is_same_v<Unqual, T>) { UP::bits = support::bit_cast<StorageType>(x); }
-			else if constexpr (std::is_same_v<Unqual, StorageType>) { UP::bits = x; }
+			if constexpr (std::is_same_v<Unqual, T>) { BASE::bits = support::bit_cast<storage_type>(x); }
+			else if constexpr (std::is_same_v<Unqual, storage_type>) { BASE::bits = x; }
 			else
 			{
 				// Prevent accidental type promotion or conversion form being able to happen. Exact types only.
@@ -791,7 +811,6 @@ namespace ccm::support
 		 * @brief Converts the stored bits to a floating-point value.
 		 * @return The floating-point value of type T.
 		 */
-		constexpr T get_val() const { return support::bit_cast<T>(UP::bits); }
+		constexpr T get_val() const { return support::bit_cast<T>(BASE::bits); }
 	};
-
 } // namespace ccm::support
