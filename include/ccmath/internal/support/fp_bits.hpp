@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "ccmath/internal/predef/likely.hpp"
 #include "ccmath/internal/support/always_false.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/math_support.hpp"
@@ -22,12 +23,9 @@
 #include <climits>
 #include <cstdint>
 
-#include "ccmath/internal/predef/likely.hpp"
-
 namespace ccm::support
 {
-
-	// All supported floating point types
+	/// All supported floating point types
 	enum class FPType : std::uint8_t
 	{
 		eBinary32,
@@ -373,27 +371,27 @@ namespace ccm::support
 			/// Builder Functions
 
 			static constexpr RetT zero(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::subnormal(), Significand::zero())); }
-			
+
 			static constexpr RetT one(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::zero(), Significand::zero())); }
-			
+
 			static constexpr RetT min_subnormal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::subnormal(), Significand::lsb())); }
-			
+
 			static constexpr RetT max_subnormal(types::Sign sign = types::Sign::POS)
 			{
 				return RetT(encode(sign, Exponent::subnormal(), Significand::bits_all_ones()));
 			}
-			
+
 			static constexpr RetT min_normal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::min(), Significand::zero())); }
-			
+
 			static constexpr RetT max_normal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::max(), Significand::bits_all_ones())); }
-			
+
 			static constexpr RetT inf(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::inf(), Significand::zero())); }
-			
+
 			static constexpr RetT signaling_nan(types::Sign sign = types::Sign::POS, storage_type v = 0)
 			{
 				return RetT(encode(sign, Exponent::inf(), (v ? Significand(v) : (Significand::msb() >> 1))));
 			}
-			
+
 			static constexpr RetT quiet_nan(types::Sign sign = types::Sign::POS, storage_type v = 0)
 			{
 				return RetT(encode(sign, Exponent::inf(), Significand::msb() | Significand(v)));
@@ -402,21 +400,21 @@ namespace ccm::support
 			/// Observer Functions
 
 			[[nodiscard]] constexpr bool is_zero() const { return exp_sig_bits() == 0; }
-			
+
 			[[nodiscard]] constexpr bool is_nan() const { return exp_sig_bits() > encode(Exponent::inf(), Significand::zero()); }
-			
+
 			[[nodiscard]] constexpr bool is_quiet_nan() const { return exp_sig_bits() >= encode(Exponent::inf(), Significand::msb()); }
-			
+
 			[[nodiscard]] constexpr bool is_signaling_nan() const { return is_nan() && !is_quiet_nan(); }
-			
+
 			[[nodiscard]] constexpr bool is_inf() const { return exp_sig_bits() == encode(Exponent::inf(), Significand::zero()); }
-			
+
 			[[nodiscard]] constexpr bool is_finite() const { return exp_bits() != encode(Exponent::inf()); }
-			
+
 			[[nodiscard]] constexpr bool is_subnormal() const { return exp_bits() == encode(Exponent::subnormal()); }
-			
+
 			[[nodiscard]] constexpr bool is_normal() const { return is_finite() && !is_subnormal(); }
-			
+
 			constexpr RetT next_toward_inf() const
 			{
 				if (is_finite()) { return RetT(bits + storage_type(1)); }
@@ -456,7 +454,7 @@ namespace ccm::support
 			 */
 			static constexpr storage_type EXPLICIT_BIT_MASK = static_cast<storage_type>(1) << fraction_length;
 
-			// The X80 significand includes an explicit bit and the fractional part.
+			/// The X80 significand includes an explicit bit and the fractional part.
 			static_assert((EXPLICIT_BIT_MASK & fraction_mask) == 0, "Explicit bit and fractional part must not overlap.");
 			static_assert((EXPLICIT_BIT_MASK | fraction_mask) == significand_mask, "Explicit bit and fractional part must cover the entire significand.");
 
@@ -500,7 +498,7 @@ namespace ccm::support
 			/// Observer Functions
 
 			[[nodiscard]] constexpr bool is_zero() const { return exp_sig_bits() == 0; }
-			
+
 			[[nodiscard]] constexpr bool is_nan() const
 			{
 				/**
@@ -529,26 +527,26 @@ namespace ccm::support
 				if (exp_bits() != encode(Exponent::subnormal())) { return (sig_bits() & encode(Significand::msb())) == 0; }
 				return false;
 			}
-			
+
 			[[nodiscard]] constexpr bool is_quiet_nan() const
 			{
 				return exp_sig_bits() >= encode(Exponent::inf(), Significand::msb() | (Significand::msb() >> 1));
 			}
 
 			[[nodiscard]] constexpr bool is_signaling_nan() const { return is_nan() && !is_quiet_nan(); }
-			
+
 			[[nodiscard]] constexpr bool is_inf() const { return exp_sig_bits() == encode(Exponent::inf(), Significand::msb()); }
-			
+
 			[[nodiscard]] constexpr bool is_finite() const { return !is_inf() && !is_nan(); }
-			
+
 			[[nodiscard]] constexpr bool is_subnormal() const { return exp_bits() == encode(Exponent::subnormal()); }
-			
+
 			[[nodiscard]] constexpr bool is_normal() const
 			{
 				if (const auto exp = exp_bits(); exp == encode(Exponent::subnormal()) || exp == encode(Exponent::inf())) { return false; }
 				return get_implicit_bit();
 			}
-			
+
 			constexpr RetT next_toward_inf() const
 			{
 				if (is_finite())
