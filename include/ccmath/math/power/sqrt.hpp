@@ -27,9 +27,9 @@ namespace ccm
 		};
 
 		template <typename T>
-		constexpr void normalize(int & exponent, typename support::FPBits<T>::StorageType & mantissa)
+		constexpr void normalize(int & exponent, typename support::FPBits<T>::storage_type & mantissa)
 		{
-			const int shift = support::countl_zero(mantissa) - (8 * static_cast<int>(sizeof(mantissa)) - 1 - support::FPBits<T>::FRACTION_LEN);
+			const int shift = support::countl_zero(mantissa) - (8 * static_cast<int>(sizeof(mantissa)) - 1 - support::FPBits<T>::fraction_length);
 			exponent -= shift;
 			mantissa <<= shift;
 		}
@@ -53,7 +53,7 @@ namespace ccm
 		constexpr void normalize<long double>(int & exponent, types::uint128_t & mantissa)
 		{
 			const auto shift = static_cast<unsigned int>(static_cast<unsigned long>(support::countl_zero(static_cast<std::uint64_t>(mantissa))) -
-														 (8 * sizeof(std::uint64_t) - 1 - support::FPBits<long double>::FRACTION_LEN));
+														 (8 * sizeof(std::uint64_t) - 1 - support::FPBits<long double>::fraction_length));
 			exponent -= shift;
 			mantissa <<= shift;
 		}
@@ -73,8 +73,8 @@ namespace ccm
 				constexpr long double sqrt_calc_80bits(long double x)
 				{
 					using Bits				  = support::FPBits<long double>;
-					using StorageType		  = typename Bits::StorageType;
-					constexpr StorageType one = static_cast<StorageType>(1) << Bits::FRACTION_LEN;
+					using storage_type		  = typename Bits::storage_type;
+					constexpr storage_type one = static_cast<storage_type>(1) << Bits::fraction_length;
 					constexpr auto nan_type	  = Bits::quiet_nan().get_val();
 
 					Bits bits(x);
@@ -83,7 +83,7 @@ namespace ccm
 					if (bits.is_neg()) { return nan_type; }
 
 					int x_exp		   = bits.get_explicit_exponent();
-					StorageType x_mant = bits.get_mantissa();
+					storage_type x_mant = bits.get_mantissa();
 
 					// If we have denormal values, normalize it.
 					if (bits.get_implicit_bit()) { x_mant |= one; }
@@ -96,13 +96,13 @@ namespace ccm
 						x_mant <<= 1;
 					}
 
-					StorageType y = one;
-					StorageType r = x_mant - one;
+					storage_type y = one;
+					storage_type r = x_mant - one;
 
-					for (StorageType current_bit = one >> 1; current_bit != 0U; current_bit >>= 1)
+					for (storage_type current_bit = one >> 1; current_bit != 0U; current_bit >>= 1)
 					{
 						r <<= 1;
-						if (const StorageType tmp = (y << 1) + current_bit; r >= tmp)
+						if (const storage_type tmp = (y << 1) + current_bit; r >= tmp)
 						{
 							r -= tmp;
 							y += current_bit;
@@ -113,15 +113,15 @@ namespace ccm
 					const auto lsb = static_cast<bool>(y & 1);
 					bool round_bit = false;
 					r <<= 2;
-					if (const StorageType tmp = (y << 2) + 1; r >= tmp)
+					if (const storage_type tmp = (y << 2) + 1; r >= tmp)
 					{
 						r -= tmp;
 						round_bit = true;
 					}
 
 					// Append the exponent field.
-					x_exp = ((x_exp >> 1) + Bits::EXP_BIAS);
-					y |= (static_cast<StorageType>(x_exp) << (Bits::FRACTION_LEN + 1));
+					x_exp = ((x_exp >> 1) + Bits::exponent_bias);
+					y |= (static_cast<storage_type>(x_exp) << (Bits::fraction_length + 1));
 
 					switch (support::get_rounding_mode())
 					{
@@ -137,7 +137,7 @@ namespace ccm
 
 					// Extract output
 					support::FPBits<long double> out(0.0L);
-					out.set_biased_exponent(static_cast<StorageType>(x_exp));
+					out.set_biased_exponent(static_cast<storage_type>(x_exp));
 					out.set_implicit_bit(true);
 					out.set_mantissa(y & (one - 1));
 
@@ -150,11 +150,11 @@ namespace ccm
 			constexpr std::enable_if_t<std::is_floating_point_v<T>, T> sqrt_calc_bits(support::FPBits<T> & bits)
 			{
 				using FPBits_t			  = support::FPBits<T>;
-				using StorageType		  = typename FPBits_t::StorageType;
-				constexpr StorageType one = StorageType(1) << FPBits_t::FRACTION_LEN;
+				using storage_type		  = typename FPBits_t::storage_type;
+				constexpr storage_type one = storage_type(1) << FPBits_t::fraction_length;
 
 				int x_exp		   = bits.get_exponent();
-				StorageType x_mant = bits.get_mantissa();
+				storage_type x_mant = bits.get_mantissa();
 
 				// If we have denormal values, normalize it.
 				if (bits.is_subnormal())
@@ -171,13 +171,13 @@ namespace ccm
 					x_mant <<= 1;
 				}
 
-				StorageType y = one;
-				StorageType r = x_mant - one;
+				storage_type y = one;
+				storage_type r = x_mant - one;
 
-				for (StorageType current_bit = one >> 1; current_bit; current_bit >>= 1)
+				for (storage_type current_bit = one >> 1; current_bit; current_bit >>= 1)
 				{
 					r <<= 1;
-					StorageType const tmp = (y << 1) + current_bit; // 2*y(n - 1) + 2^(-n-1)
+					storage_type const tmp = (y << 1) + current_bit; // 2*y(n - 1) + 2^(-n-1)
 					if (r >= tmp)
 					{
 						r -= tmp;
@@ -191,16 +191,16 @@ namespace ccm
 
 				r <<= 2;
 
-				if (StorageType const tmp = (y << 2) + 1; r >= tmp)
+				if (storage_type const tmp = (y << 2) + 1; r >= tmp)
 				{
 					r -= tmp;
 					round_bit = true;
 				}
 
 				// Remove the hidden bit and append the exponent field.
-				x_exp = ((x_exp >> 1) + FPBits_t::EXP_BIAS);
+				x_exp = ((x_exp >> 1) + FPBits_t::exponent_bias);
 
-				y = (y - one) | (static_cast<StorageType>(x_exp) << FPBits_t::FRACTION_LEN);
+				y = (y - one) | (static_cast<storage_type>(x_exp) << FPBits_t::fraction_length);
 
 				switch (support::get_rounding_mode())
 				{

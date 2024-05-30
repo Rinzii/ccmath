@@ -25,7 +25,7 @@ namespace ccm::helpers
 		support::FPBits<T> bits(x);
 		if (CCM_UNLIKELY((exp == 0) || bits.is_zero() || bits.is_inf_or_nan())) { return x; }
 
-		constexpr int EXP_LIMIT = support::FPBits<T>::MAX_BIASED_EXPONENT + support::FPBits<T>::FRACTION_LEN + 1;
+		constexpr int EXP_LIMIT = support::FPBits<T>::MAX_BIASED_EXPONENT + support::FPBits<T>::fraction_length + 1;
 		if (CCM_UNLIKELY(exp > EXP_LIMIT))
 		{
 			int const rounding_mode = support::get_rounding_mode();
@@ -62,7 +62,7 @@ namespace ccm::helpers
 		}
 
 		// For all other values, NormalFloat to T conversion handles it the right way.
-		types::DyadicFloat<support::FPBits<T>::STORAGE_LEN> normal(bits.get_val());
+		types::DyadicFloat<support::FPBits<T>::storage_length> normal(bits.get_val());
 		normal.exponent += exp;
 		return static_cast<T>(normal);
 	}
