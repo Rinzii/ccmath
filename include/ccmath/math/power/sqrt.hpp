@@ -54,7 +54,7 @@ namespace ccm
 		{
 			const auto shift = static_cast<unsigned int>(static_cast<unsigned long>(support::countl_zero(static_cast<std::uint64_t>(mantissa))) -
 														 (8 * sizeof(std::uint64_t) - 1 - support::FPBits<long double>::fraction_length));
-			exponent -= shift;
+			exponent -= shift; // NOLINT(cppcoreguidelines-narrowing-conversions, bugprone-narrowing-conversions)
 			mantissa <<= shift;
 		}
 #endif

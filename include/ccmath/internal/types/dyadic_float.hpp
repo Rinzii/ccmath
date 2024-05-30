@@ -42,11 +42,11 @@ namespace ccm::types
 	template <size_t Bits>
 	struct DyadicFloat
 	{
-		using MantissaType = UInt<Bits>;
+		using mantissa_type = UInt<Bits>;
 
 		Sign sign				= Sign::POS;
 		int exponent			= 0;
-		MantissaType mantissa	= MantissaType(0);
+		mantissa_type mantissa	= mantissa_type(0);
 
 		constexpr DyadicFloat() = default;
 
@@ -60,11 +60,11 @@ namespace ccm::types
 
 			sign	 = x_bits.sign();
 			exponent = x_bits.get_explicit_exponent() - support::FPBits<T>::fraction_length;
-			mantissa = MantissaType(x_bits.get_explicit_mantissa());
+			mantissa = mantissa_type(x_bits.get_explicit_mantissa());
 			normalize();
 		}
 
-		constexpr DyadicFloat(Sign s, int e, MantissaType m) : sign(s), exponent(e), mantissa(m) { normalize(); }
+		constexpr DyadicFloat(Sign s, int e, mantissa_type m) : sign(s), exponent(e), mantissa(m) { normalize(); }
 
 		/**
 		 * @brief Normalizes the mantissa, bringing the leading 1 bit to the most significant bit.
@@ -139,41 +139,41 @@ namespace ccm::types
 			if (CCM_UNLIKELY(mantissa.is_zero())) { return support::FPBits<T>::zero(sign).get_val(); }
 
 			// Assume normalized input and output.
-			constexpr uint32_t PRECISION		  = support::FPBits<T>::fraction_length + 1;
+			constexpr uint32_t desired_precision		  = support::FPBits<T>::fraction_length + 1;
 			using output_bits_t					  = typename support::FPBits<T>::storage_type;
-			constexpr output_bits_t IMPLICIT_MASK = support::FPBits<T>::significand_mask - support::FPBits<T>::FRACTION_MASK;
+			constexpr output_bits_t implicit_mask = support::FPBits<T>::significand_mask - support::FPBits<T>::fraction_mask;
 
 			int exp_hi = exponent + static_cast<int>((Bits - 1) + support::FPBits<T>::exponent_bias);
 
 			if (CCM_UNLIKELY(exp_hi > 2 * support::FPBits<T>::exponent_bias))
 			{
 				// Results overflow.
-				T d_hi = support::FPBits<T>::create_value(sign, 2 * support::FPBits<T>::exponent_bias, IMPLICIT_MASK).get_val();
+				T d_hi = support::FPBits<T>::create_value(sign, 2 * support::FPBits<T>::exponent_bias, implicit_mask).get_val();
 				return T(2) * d_hi;
 			}
 
 			bool denorm	   = false;
-			uint32_t shift = Bits - PRECISION;
+			uint32_t shift = Bits - desired_precision;
 			if (CCM_UNLIKELY(exp_hi <= 0))
 			{
 				// Output is denormal.
 				denorm = true;
-				shift  = (Bits - PRECISION) + static_cast<uint32_t>(1 - exp_hi);
+				shift  = (Bits - desired_precision) + static_cast<uint32_t>(1 - exp_hi);
 
 				exp_hi = support::FPBits<T>::exponent_bias;
 			}
 
-			int exp_lo = exp_hi - static_cast<int>(PRECISION) - 1;
+			int exp_lo = exp_hi - static_cast<int>(desired_precision) - 1;
 
-			std::size_t const mantissa_len = MantissaType::BITS;
+			std::size_t const mantissa_len = mantissa_type::BITS;
 
-			MantissaType m_hi = shift >= mantissa_len ? MantissaType(0) : mantissa >> shift;
+			mantissa_type m_hi = shift >= mantissa_len ? mantissa_type(0) : mantissa >> shift;
 
 			T d_hi =
-				support::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_hi), (static_cast<output_bits_t>(m_hi) & support::FPBits<T>::significand_mask) | IMPLICIT_MASK).get_val();
+				support::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_hi), (static_cast<output_bits_t>(m_hi) & support::FPBits<T>::significand_mask) | implicit_mask).get_val();
 
-			MantissaType round_mask	 = shift > mantissa_len ? 0 : MantissaType(1) << (shift - 1);
-			MantissaType sticky_mask = round_mask - MantissaType(1);
+			mantissa_type round_mask	 = shift > mantissa_len ? 0 : mantissa_type(1) << (shift - 1);
+			mantissa_type sticky_mask = round_mask - mantissa_type(1);
 
 			bool round_bit		 = !(mantissa & round_mask).is_zero();
 			bool sticky_bit		 = !(mantissa & sticky_mask).is_zero();
@@ -184,16 +184,16 @@ namespace ccm::types
 			if (CCM_UNLIKELY(exp_lo <= 0))
 			{
 				// d_lo is denormal, but the output is normal.
-				int scale_up_exponent = 2 * PRECISION;
-				T scale_up_factor	  = support::FPBits<T>::create_value(sign, support::FPBits<T>::exponent_bias + static_cast<output_bits_t>(scale_up_exponent), IMPLICIT_MASK).get_val();
-				T scale_down_factor	  = support::FPBits<T>::create_value(sign, support::FPBits<T>::exponent_bias - static_cast<output_bits_t>(scale_up_exponent), IMPLICIT_MASK).get_val();
+				int scale_up_exponent = 2 * desired_precision;
+				T scale_up_factor	  = support::FPBits<T>::create_value(sign, support::FPBits<T>::exponent_bias + static_cast<output_bits_t>(scale_up_exponent), implicit_mask).get_val();
+				T scale_down_factor	  = support::FPBits<T>::create_value(sign, support::FPBits<T>::exponent_bias - static_cast<output_bits_t>(scale_up_exponent), implicit_mask).get_val();
 
-				d_lo = support::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_lo + scale_up_exponent), IMPLICIT_MASK).get_val();
+				d_lo = support::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_lo + scale_up_exponent), implicit_mask).get_val();
 
 				return support::multiply_add(d_lo, T(round_and_sticky), d_hi * scale_up_factor) * scale_down_factor;
 			}
 
-			d_lo = support::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_lo), IMPLICIT_MASK).get_val();
+			d_lo = support::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_lo), implicit_mask).get_val();
 
 			// Still correct without FMA instructions if `d_lo` is not underflow.
 			T r = support::multiply_add(d_lo, T(round_and_sticky), d_hi);
@@ -206,7 +206,7 @@ namespace ccm::types
 				if (!(r_bits & support::FPBits<T>::exponent_mask))
 				{
 					// Output is denormal after rounding, clear the implicit bit for 80-bit long double.
-					r_bits -= IMPLICIT_MASK;
+					r_bits -= implicit_mask;
 				}
 
 				return support::FPBits<T>(r_bits).get_val();
@@ -215,11 +215,11 @@ namespace ccm::types
 			return r;
 		}
 
-		explicit constexpr operator MantissaType() const
+		explicit constexpr operator mantissa_type() const
 		{
 			if (mantissa.is_zero()) { return 0; }
 
-			MantissaType new_mant = mantissa;
+			mantissa_type new_mant = mantissa;
 			if (exponent > 0) { new_mant <<= exponent; }
 			else { new_mant >>= (-exponent); }
 
@@ -263,7 +263,7 @@ namespace ccm::types
 			{
 				// Mantissa addition overflow.
 				result.shift_right(1);
-				result.mantissa.val[DyadicFloat<Bits>::MantissaType::WORD_COUNT - 1] |= (static_cast<uint64_t>(1) << 63);
+				result.mantissa.val[DyadicFloat<Bits>::mantissa_type::WORD_COUNT - 1] |= (static_cast<uint64_t>(1) << 63);
 			}
 			// Result is already normalized.
 			return result;
@@ -308,9 +308,9 @@ namespace ccm::types
 			result.mantissa = a.mantissa.quick_mul_hi(b.mantissa);
 			// Check the leading bit directly, should be faster than using clz in
 			// normalize().
-			if (result.mantissa.val[DyadicFloat<Bits>::MantissaType::WORD_COUNT - 1] >> 63 == 0) { result.shift_left(1); }
+			if (result.mantissa.val[DyadicFloat<Bits>::mantissa_type::WORD_COUNT - 1] >> 63 == 0) { result.shift_left(1); }
 		}
-		else { result.mantissa = static_cast<typename DyadicFloat<Bits>::MantissaType>(0); }
+		else { result.mantissa = static_cast<typename DyadicFloat<Bits>::mantissa_type>(0); }
 		return result;
 	}
 

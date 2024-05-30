@@ -162,7 +162,7 @@ namespace ccm::support
 			/**
 			 * @brief The bit mask that keeps only the fraction part. (i.e., the significand without the leading one)
 			 */
-			static constexpr storage_type FRACTION_MASK = support::mask_trailing_ones<storage_type, fraction_length>();
+			static constexpr storage_type fraction_mask = support::mask_trailing_ones<storage_type, fraction_length>();
 
 			static_assert((significand_mask & exponent_mask & sign_mask) == 0,
 						  "Bitmasks overlap! significand_mask, exponent_mask, and sign_mask must be disjoint");
@@ -356,7 +356,7 @@ namespace ccm::support
 		{
 			using BASE = FPStorage<fp_type>;
 			using BASE::fraction_length;
-			using BASE::FRACTION_MASK;
+			using BASE::fraction_mask;
 			using typename BASE::storage_type;
 
 		protected:
@@ -373,19 +373,27 @@ namespace ccm::support
 			/// Builder Functions
 
 			static constexpr RetT zero(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::subnormal(), Significand::zero())); }
+			
 			static constexpr RetT one(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::zero(), Significand::zero())); }
+			
 			static constexpr RetT min_subnormal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::subnormal(), Significand::lsb())); }
+			
 			static constexpr RetT max_subnormal(types::Sign sign = types::Sign::POS)
 			{
 				return RetT(encode(sign, Exponent::subnormal(), Significand::bits_all_ones()));
 			}
+			
 			static constexpr RetT min_normal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::min(), Significand::zero())); }
+			
 			static constexpr RetT max_normal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::max(), Significand::bits_all_ones())); }
+			
 			static constexpr RetT inf(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::inf(), Significand::zero())); }
+			
 			static constexpr RetT signaling_nan(types::Sign sign = types::Sign::POS, storage_type v = 0)
 			{
 				return RetT(encode(sign, Exponent::inf(), (v ? Significand(v) : (Significand::msb() >> 1))));
 			}
+			
 			static constexpr RetT quiet_nan(types::Sign sign = types::Sign::POS, storage_type v = 0)
 			{
 				return RetT(encode(sign, Exponent::inf(), Significand::msb() | Significand(v)));
@@ -394,13 +402,21 @@ namespace ccm::support
 			/// Observer Functions
 
 			[[nodiscard]] constexpr bool is_zero() const { return exp_sig_bits() == 0; }
+			
 			[[nodiscard]] constexpr bool is_nan() const { return exp_sig_bits() > encode(Exponent::inf(), Significand::zero()); }
+			
 			[[nodiscard]] constexpr bool is_quiet_nan() const { return exp_sig_bits() >= encode(Exponent::inf(), Significand::msb()); }
+			
 			[[nodiscard]] constexpr bool is_signaling_nan() const { return is_nan() && !is_quiet_nan(); }
+			
 			[[nodiscard]] constexpr bool is_inf() const { return exp_sig_bits() == encode(Exponent::inf(), Significand::zero()); }
+			
 			[[nodiscard]] constexpr bool is_finite() const { return exp_bits() != encode(Exponent::inf()); }
+			
 			[[nodiscard]] constexpr bool is_subnormal() const { return exp_bits() == encode(Exponent::subnormal()); }
+			
 			[[nodiscard]] constexpr bool is_normal() const { return is_finite() && !is_subnormal(); }
+			
 			constexpr RetT next_toward_inf() const
 			{
 				if (is_finite()) { return RetT(bits + storage_type(1)); }
@@ -429,7 +445,7 @@ namespace ccm::support
 		{
 			using BASE = FPStorage;
 			using BASE::fraction_length;
-			using BASE::FRACTION_MASK;
+			using BASE::fraction_mask;
 			using BASE::storage_type;
 
 			/**
@@ -441,8 +457,8 @@ namespace ccm::support
 			static constexpr storage_type EXPLICIT_BIT_MASK = static_cast<storage_type>(1) << fraction_length;
 
 			// The X80 significand includes an explicit bit and the fractional part.
-			static_assert((EXPLICIT_BIT_MASK & FRACTION_MASK) == 0, "Explicit bit and fractional part must not overlap.");
-			static_assert((EXPLICIT_BIT_MASK | FRACTION_MASK) == significand_mask, "Explicit bit and fractional part must cover the entire significand.");
+			static_assert((EXPLICIT_BIT_MASK & fraction_mask) == 0, "Explicit bit and fractional part must not overlap.");
+			static_assert((EXPLICIT_BIT_MASK | fraction_mask) == significand_mask, "Explicit bit and fractional part must cover the entire significand.");
 
 		protected:
 			using BASE::BASE;
@@ -454,27 +470,36 @@ namespace ccm::support
 			/// Builder Functions
 
 			static constexpr RetT zero(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::subnormal(), Significand::zero())); }
+
 			static constexpr RetT one(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::zero(), Significand::msb())); }
+
 			static constexpr RetT min_subnormal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::subnormal(), Significand::lsb())); }
+
 			static constexpr RetT max_subnormal(types::Sign sign = types::Sign::POS)
 			{
 				return RetT(encode(sign, Exponent::subnormal(), Significand::bits_all_ones() ^ Significand::msb()));
 			}
+
 			static constexpr RetT min_normal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::min(), Significand::msb())); }
+
 			static constexpr RetT max_normal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::max(), Significand::bits_all_ones())); }
+
 			static constexpr RetT inf(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::inf(), Significand::msb())); }
+
 			static constexpr RetT signaling_nan(types::Sign sign = types::Sign::POS, storage_type v = 0)
 			{
 				return RetT(encode(sign, Exponent::inf(), Significand::msb() | (v ? Significand(v) : (Significand::msb() >> 2))));
 			}
+
 			static constexpr RetT quiet_nan(types::Sign sign = types::Sign::POS, storage_type v = 0)
 			{
 				return RetT(encode(sign, Exponent::inf(), Significand::msb() | (Significand::msb() >> 1) | Significand(v)));
 			}
 
-			/// Observers
+			/// Observer Functions
 
 			[[nodiscard]] constexpr bool is_zero() const { return exp_sig_bits() == 0; }
+			
 			[[nodiscard]] constexpr bool is_nan() const
 			{
 				/**
@@ -503,19 +528,26 @@ namespace ccm::support
 				if (exp_bits() != encode(Exponent::subnormal())) { return (sig_bits() & encode(Significand::msb())) == 0; }
 				return false;
 			}
+			
 			[[nodiscard]] constexpr bool is_quiet_nan() const
 			{
 				return exp_sig_bits() >= encode(Exponent::inf(), Significand::msb() | (Significand::msb() >> 1));
 			}
+
 			[[nodiscard]] constexpr bool is_signaling_nan() const { return is_nan() && !is_quiet_nan(); }
+			
 			[[nodiscard]] constexpr bool is_inf() const { return exp_sig_bits() == encode(Exponent::inf(), Significand::msb()); }
+			
 			[[nodiscard]] constexpr bool is_finite() const { return !is_inf() && !is_nan(); }
+			
 			[[nodiscard]] constexpr bool is_subnormal() const { return exp_bits() == encode(Exponent::subnormal()); }
+			
 			[[nodiscard]] constexpr bool is_normal() const
 			{
 				if (const auto exp = exp_bits(); exp == encode(Exponent::subnormal()) || exp == encode(Exponent::inf())) { return false; }
 				return get_implicit_bit();
 			}
+			
 			constexpr RetT next_toward_inf() const
 			{
 				if (is_finite())
@@ -592,7 +624,7 @@ namespace ccm::support
 
 			using BASE::exponent_bias;
 			using BASE::exponent_mask;
-			using BASE::FRACTION_MASK;
+			using BASE::fraction_mask;
 			using BASE::sign_mask;
 			using BASE::significand_length;
 			using BASE::significand_mask;
@@ -678,13 +710,13 @@ namespace ccm::support
 				return static_cast<std::int32_t>(exponent);
 			}
 
-			constexpr storage_type get_mantissa() const { return bits & FRACTION_MASK; }
+			constexpr storage_type get_mantissa() const { return bits & fraction_mask; }
 
 			/**
 			 * @brief Sets the mantissa value of the internal bits.
 			 * @param mantVal The mantissa value to set.
 			 */
-			constexpr void set_mantissa(storage_type mantVal) { bits = BASE::merge(bits, mantVal, FRACTION_MASK); }
+			constexpr void set_mantissa(storage_type mantVal) { bits = BASE::merge(bits, mantVal, fraction_mask); }
 
 			/**
 			 * @brief Sets the significand value of the internal bits.
