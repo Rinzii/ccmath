@@ -8,8 +8,9 @@
 
 #pragma once
 
-#include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/math/compare/isnan.hpp"
+
 #include <limits>
 #include <type_traits>
 
@@ -47,7 +48,7 @@ namespace ccm
 		using shared_type = std::common_type_t<T, U>;
 
 		// Convert the arguments to the common type
-		return fdim<shared_type>(static_cast<shared_type>(x), static_cast<shared_type>(y));
+		return ccm::fdim<shared_type>(static_cast<shared_type>(x), static_cast<shared_type>(y));
 	}
 
 	/**
@@ -60,7 +61,7 @@ namespace ccm
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double fdim(Integer x, Integer y)
 	{
-		return fdim<double>(static_cast<double>(x), static_cast<double>(y));
+		return ccm::fdim<double>(static_cast<double>(x), static_cast<double>(y));
 	}
 
 	/**
@@ -71,7 +72,7 @@ namespace ccm
 	 */
 	constexpr float fdimf(float x, float y)
 	{
-		return fdim<float>(x, y);
+		return ccm::fdim<float>(x, y);
 	}
 
 	/**
@@ -82,7 +83,7 @@ namespace ccm
 	 */
 	constexpr long double fdiml(long double x, long double y)
 	{
-		return fdim<long double>(x, y);
+		return ccm::fdim<long double>(x, y);
 	}
 } // namespace ccm
 
