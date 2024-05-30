@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "ccmath/internal/predef/compiler_support/clang_compiler_suppression.hpp"
-#include "ccmath/internal/predef/compiler_support/gcc_compiler_suppression.hpp"
+#include "ccmath/internal/predef/compiler_suppression/clang_compiler_suppression.hpp"
+#include "ccmath/internal/predef/compiler_suppression/gcc_compiler_suppression.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/math/basic/abs.hpp"

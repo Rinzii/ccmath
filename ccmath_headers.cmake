@@ -45,14 +45,14 @@ set(ccmath_internal_helpers_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/internal_ldexp.hpp
 )
 
-set(ccmath_internal_predef_compiler_support_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_support/clang_compiler_suppression.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_support/gcc_compiler_suppression.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_support/msvc_compiler_suppression.hpp
+set(ccmath_internal_predef_compiler_suppression_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_suppression/clang_compiler_suppression.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_suppression/gcc_compiler_suppression.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp
 )
 
 set(ccmath_internal_predef_headers
-        ${ccmath_internal_predef_compiler_support_headers}
+        ${ccmath_internal_predef_compiler_suppression_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/expects_bool_condition.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/has_attribute.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/likely.hpp
