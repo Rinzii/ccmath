@@ -314,7 +314,7 @@ namespace ccm::support
 
 			constexpr FPStorage() : bits(0) {}
 
-			constexpr FPStorage(storage_type value) : bits(value) {}
+			constexpr explicit FPStorage(storage_type value) : bits(value) {}
 
 			/// Observer Functions
 
@@ -488,6 +488,7 @@ namespace ccm::support
 
 			static constexpr RetT signaling_nan(types::Sign sign = types::Sign::POS, storage_type v = 0)
 			{
+				// NOLINTNEXTLINE(readability-implicit-bool-conversion) - We want v to implicitly convert to bool as if we don't sometimes MSVC breaks.
 				return RetT(encode(sign, Exponent::inf(), Significand::msb() | (v ? Significand(v) : (Significand::msb() >> 2))));
 			}
 
