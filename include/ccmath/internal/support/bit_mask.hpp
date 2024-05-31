@@ -8,14 +8,12 @@
 
 #pragma once
 
-#include <type_traits>
 #include <cstdint>
 #include <limits>
+#include <type_traits>
 
 namespace ccm::support
 {
-
-
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	struct bitmask_traits
 	{
