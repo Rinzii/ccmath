@@ -10,6 +10,8 @@
 
 #include "ccmath/internal/support/type_traits.hpp"
 #include "ccmath/internal/types/int128_types.hpp"
+#include "ccmath/internal/types/float128.hpp"
+#include "ccmath/internal/types/dyadic_float.hpp"
 
 #include <cstdint>
 
@@ -21,6 +23,8 @@ namespace ccm::support
 	template <>
 	struct floating_point_traits<float>
 	{
+		using upgraded_floating_type = double;
+
 		using int_type = std::int32_t;
 
 		static constexpr int_type mantissa_bits			  = 24;	  // FLT_MANT_DIG
@@ -42,11 +46,24 @@ namespace ccm::support
 
 		// 0x7FFFFFFFFFFFFFFF bit representation
 		static constexpr float normalize_factor = 4294967296.F; // 2^32
+
+		// 0x1p+24
+		static constexpr float max_safe_integer = 0x1p+24; // 16777216.0 (2^24)
 	};
 
 	template <>
 	struct floating_point_traits<double>
 	{
+#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT128)
+		using upgraded_floating_type = long double
+#elif defined(CCM_TYPES_HAS_FLOAT128)
+		using upgraded_floating_type = ccm::types::float128;
+#elif defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+		using upgraded_floating_type = ccm::types::DyadicFloat<128>;
+#else
+		using upgraded_floating_type = long double;
+#endif
+
 		using int_type = std::int64_t;
 
 		static constexpr int_type mantissa_bits			  = 53;	   // DBL_MANT_DIG
@@ -68,12 +85,17 @@ namespace ccm::support
 
 		// 0x43F0000000000000 bit representation
 		static constexpr double normalize_factor = 18446744073709551616.0; // 2^64
+
+		// 0x1p+53
+		static constexpr double max_safe_integer = 0x1p+53; // 9007199254740992.0 (2^53)
 	};
 
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT128)
 	template <>
 	struct floating_point_traits<long double>
 	{
+		using upgraded_floating_type = ccm::types::DyadicFloat<256>;
+
 		using int_type = ccm::types::int128_t;
 
 		static constexpr int_type mantissa_bits			  = 112;	 // LDBL_MANT_DIG
@@ -95,12 +117,16 @@ namespace ccm::support
 
 		static constexpr long double normalize_factor = 340282366920938463463374607431768211456.0L; // 2^128
 
+		static constexpr long double max_safe_integer = 0x1p+112; // 5192296858534827628530496329220096.0L (2^112)
+
 
 	};
 #elif defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
 	template <>
 struct floating_point_traits<long double>
 	{
+		using upgraded_floating_type = ccm::types::DyadicFloat<256>;
+
 		using int_type = ccm::types::int128_t;
 
 		static constexpr int_type mantissa_bits			  = 64;	 // LDBL_MANT_DIG
@@ -122,6 +148,8 @@ struct floating_point_traits<long double>
 
 		// TODO: Not 100% sure if the normalize factor should be 2^128 or 2^80. I think it should be 2^128, but I've not yet tested this.
 		static constexpr long double normalize_factor = 340282366920938463463374607431768211456.0L; // 2^128
+
+		static constexpr long double max_safe_integer = 0x1p+64; // 18446744073709551616.0L (2^64)
 	};
 
 	#else // long double is the same as double
@@ -137,6 +165,9 @@ struct floating_point_traits<long double>
 
 	template <typename T>
 	using float_signed_bits_t = typename floating_point_traits<T>::int_type;
+
+	template <typename T>
+	using float_upgraded_t = typename floating_point_traits<T>::upgraded_floating_type;
 
 	template <typename T>
 	inline constexpr typename floating_point_traits<T>::uint_type sign_mask_v = floating_point_traits<T>::shifted_sign_mask;

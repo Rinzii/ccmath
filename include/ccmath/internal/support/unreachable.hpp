@@ -12,7 +12,7 @@
 	#include <utility>
 #endif
 
-namespace ccm
+namespace ccm::support
 {
 	[[noreturn]] inline void unreachable()
 	{
@@ -31,4 +31,4 @@ namespace ccm
 #endif
 	}
 
-} // namespace ccm
+} // namespace ccm::support
