@@ -11,5 +11,5 @@
 #include "ccmath/internal/predef/expects_bool_condition.hpp"
 
 #ifndef CCM_LIKELY
-	#define CCM_LIKELY(x) ccm::predef::internal::expects_bool_condition(!!(x), true)
+	#define CCM_LIKELY(x) ccm::predef::internal::expects_bool_condition((x), true)
 #endif // CCM_LIKELY

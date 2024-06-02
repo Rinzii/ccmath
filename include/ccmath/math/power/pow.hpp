@@ -13,6 +13,8 @@
 #include "ccmath/math/exponential/exp2.hpp"
 #include "ccmath/math/exponential/log2.hpp"
 
+#include "ccmath/math/power/impl/pow_impl.hpp"
+
 
 namespace ccm
 {

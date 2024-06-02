@@ -11,5 +11,5 @@
 #include "ccmath/internal/predef/expects_bool_condition.hpp"
 
 #ifndef CCM_UNLIKELY
-	#define CCM_UNLIKELY(x) ccm::predef::internal::expects_bool_condition(!!(x), false)
+	#define CCM_UNLIKELY(x) ccm::predef::internal::expects_bool_condition((x), false)
 #endif // CCM_UNLIKELY

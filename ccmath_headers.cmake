@@ -68,12 +68,20 @@ set(ccmath_internal_predef_headers
 set(ccmath_internal_support_fenv_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fenv/fenv_support.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fenv/rounding_mode.hpp
-
-
 )
+
+set(ccmath_internal_support_fp_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fp/directional_rounding_utils.hpp
+)
+
+set(ccmath_internal_support_math_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/math/internal_sqrt.hpp
+)
+
 
 set(ccmath_internal_support_headers
         ${ccmath_internal_support_fenv_headers}
+        ${ccmath_internal_support_fp_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/bits.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/endian.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/floating_point_traits.hpp
@@ -89,6 +97,7 @@ set(ccmath_internal_support_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/bit_mask.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/math_support.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/integer_literals.hpp
 
 )
 
