@@ -90,8 +90,6 @@ endif()
 target_include_directories(${PROJECT_NAME} INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>)
 target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)
 
-target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_17)
-
 target_link_libraries(${PROJECT_NAME} INTERFACE
         ${PROJECT_NAME}::${PROJECT_NAME}-compile-options
 )
