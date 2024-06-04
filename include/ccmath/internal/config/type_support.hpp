@@ -43,6 +43,12 @@
 	#endif	   // defined(__CUDACC__)
 #endif		   // CCM_TYPES_HAS_INT128
 
+// TODO: MSVC v19.34 has added support for int128 internally.
+// These should work with constexpr and should use intrinsics to speed up when its able to.
+// std::_Unsigned128
+// std::_Signed128
+// #include __msvc_int128.hpp
+
 
 // 'long double' properties.
 #if (LDBL_MANT_DIG == 53)
