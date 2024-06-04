@@ -8,12 +8,7 @@
 
 #pragma once
 
-#ifndef CCM_HAS_BUILTIN
-	#undef CCM_HAS_BUILTIN
-#endif // CCM_HAS_BUILTIN
-
-#if defined(__has_builtin)
-	#define CCM_HAS_BUILTIN(builtin) __has_builtin(builtin)
-#else
-	#define CCM_HAS_BUILTIN(builtin) (0)
+#if defined(CCM_VERSION_ENCODE)
+	#undef CCM_VERSION_ENCODE
 #endif
+#define CCM_VERSION_ENCODE(major, minor, revision) (((major) * 1000000) + ((minor) * 1000) + (revision))

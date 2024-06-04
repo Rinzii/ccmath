@@ -15,10 +15,11 @@
 	#endif
 #endif
 
-// If we don't have access to the standard implementation of assume then try to check for compiler intrinsics/attributes
+// If we don't have access to the standard implementation of [[assume()]] then try to check for compiler intrinsics/attributes
 #ifndef CCM_ASSUME
 // Be aware that CLion Nova's C++ Engine does not recognize __builtin_assume as a valid symbol.
-// It is incorrect and this is a know bug that is fixed in CLion 2024.2. The code will work fine ignore the warning it may emit.
+// It is incorrect and this is a known bug that is fixed in CLion 2024.2.
+// The code will work fine, so ignore the warning it may emit.
 	#if defined(__clang__)
 		#define CCM_ASSUME(...)                                                                                                                                \
 			do {                                                                                                                                               \
@@ -36,7 +37,7 @@
 	#endif
 #endif
 
-// If none of the above options are available then just define assume as empty
+// If none of the above options are available, then just define CCM_ASSUME as empty
 #ifndef CCM_ASSUME
 	#define CCM_ASSUME(...)
 #endif

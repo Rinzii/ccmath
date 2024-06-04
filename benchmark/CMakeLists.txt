@@ -6,6 +6,7 @@ project(ccmath-benchmark)
 
 option(CCM_BENCH_BASIC "Enable basic benchmarks" OFF)
 option(CCM_BENCH_COMPARE "Enable comparison benchmarks" OFF)
+option(CCM_BENCH_POWER "Enable power benchmarks" ON)
 
 option(CCM_BENCH_ALL "Enable all benchmarks" OFF)
 
@@ -30,4 +31,8 @@ if(CCM_BENCH_BASIC)
   add_benchmark(abs benchmarks/basic/abs.bench.cpp benchmarks/basic/abs.bench.hpp)
   add_benchmark(fdim benchmarks/basic/fdim.bench.cpp benchmarks/basic/fdim.bench.hpp)
   add_benchmark(fma benchmarks/basic/fma.bench.cpp benchmarks/basic/fma.bench.hpp)
+endif ()
+
+if(CCM_BENCH_POWER)
+  add_benchmark(sqrt benchmarks/power/sqrt.bench.cpp benchmarks/power/sqrt.bench.hpp)
 endif ()
