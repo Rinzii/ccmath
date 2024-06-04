@@ -101,7 +101,12 @@ if(CCMATH_INSTALL)
           ${PROJECT_NAME}
           ${PROJECT_NAME}-compile-options
           EXPORT ${PROJECT_NAME}-targets
-          FILE_SET HEADERS
+          )
+
+  install(DIRECTORY
+          "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+          DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+          FILES_MATCHING PATTERN "*.hpp"
           )
 
   install(FILES
@@ -115,11 +120,11 @@ if(CCMATH_INSTALL)
           DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
           )
 
-    configure_package_config_file(
+  configure_package_config_file(
             cmake/${PROJECT_NAME}-config.cmake.in
             "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
             INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-    )
+  )
 
   install(FILES
           "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
