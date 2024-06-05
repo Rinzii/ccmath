@@ -16,41 +16,42 @@
 #include "ccmath/internal/runtime/simd/types.hpp"
 #include "ccmath/internal/support/always_false.hpp"
 
-
 #include <type_traits>
 
 namespace ccm::rt::simd
 {
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+	[[nodiscard]] inline T sqrt_simd(T num) noexcept;
+
+#ifdef CCMATH_HAS_SIMD
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool>>
 	[[nodiscard]] inline T sqrt_simd(T num) noexcept
 	{
-#ifdef CCMATH_HAS_SIMD
 		if constexpr (std::is_same_v<T, float>)
 		{
-			simd_float_t num_m		= mm_set_ss(num);
+			simd_float_t num_m		  = mm_set_ss(num);
 			simd_float_t const sqrt_m = mm_sqrt_ss(num_m);
 			return mm_cvtss(sqrt_m);
 		}
 		if constexpr (std::is_same_v<T, double>)
 		{
-			simd_double_t num_m		 = mm_set_ss(num);
+			simd_double_t num_m		   = mm_set_ss(num);
 			simd_double_t const sqrt_m = mm_sqrt_ss(num_m);
 			return mm_cvtss(sqrt_m);
 		}
 	#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
 		if constexpr (std::is_same_v<T, long double>)
 		{
-			simd_long_double_t num_m		 = mm_set_ss(static_cast<double>(num));
-			simd_long_double_t const sqrt_m = mm_sqrt_ss(num_m;
+			simd_long_double_t num_m		= mm_set_ss(static_cast<double>(num));
+			simd_long_double_t const sqrt_m = mm_sqrt_ss(num_m);
 			return static_cast<long double>(mm_cvtss(sqrt_m));
 		}
 	#else // If long double is not 64-bits, then we must use our generic sqrt function.
-		return -1; // This should never be reached
+
+	simd_double_t num_m		= mm_set_ss(static_cast<double>(num));
+	simd_double_t const sqrt_m = mm_sqrt_ss(num_m);
+	return static_cast<T>(mm_cvtss(sqrt_m));
 	#endif
-#else
-		static_assert(ccm::support::always_false<T>,
-					  "Called a SIMD function without SIMD being guarded or supported! Make sure this is guarded with CCMATH_HAS_SIMD.");
-		return num;
-#endif
 	}
+#endif
 } // namespace ccm::rt::simd

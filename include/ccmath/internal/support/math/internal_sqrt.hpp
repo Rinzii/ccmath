@@ -18,7 +18,6 @@
 
 #include <type_traits>
 
-
 namespace ccm::support::math
 {
 	namespace internal
@@ -255,24 +254,22 @@ namespace ccm::support::math
 		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 		inline T internal_sqrt_rt(T num)
 		{
-#ifdef CCM_CONFIG_USE_RT_SIMD
+#if CCM_HAS_BUILTIN(__builtin_sqrt) || defined(__builtin_sqrt) // If the compiler has a built-in sqrt function, use it.
+			if constexpr (std::is_same_v<T, float>) { return __builtin_sqrt(num); }
+			if constexpr (std::is_same_v<T, double>) { return __builtin_sqrt(num); }
+			if constexpr (std::is_same_v<T, long double>) { return __builtin_sqrtl(num); }
 
+#elif defined(CCM_CONFIG_USE_RT_SIMD) // If we don't have a built-in sqrt function, use SIMD if available.
 
 			// The internal SIMD functions expect the default rounding mode. If the rounding mode is not the default, we must use the generic implementation.
 			if (CCM_UNLIKELY(get_rounding_mode() != FE_TONEAREST)) { return internal::impl::sqrt_impl(num); }
 
-			if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>)
-			{
-				return ccm::rt::simd::sqrt_simd(num);
-			}
+			if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>) { return ccm::rt::simd::sqrt_simd(num); }
 	#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
-			if constexpr (std::is_same_v<T, long double>)
-			{
-				return ccm::rt::simd::sqrt_simd(num);
-			}
+			if constexpr (std::is_same_v<T, long double>) { return ccm::rt::simd::sqrt_simd(num); }
 	#endif
 			return internal::impl::sqrt_impl(num); // Generic fallback
-#else
+#else // If we don't have SIMD or a builtin, use the generic implementation.
 			return internal::impl::sqrt_impl(num); // Generic fallback
 #endif
 		}
@@ -281,16 +278,8 @@ namespace ccm::support::math
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T internal_sqrt(T num)
 	{
-		if constexpr (ccm::support::is_constant_evaluated())
-		{
-			return internal::impl::sqrt_impl(num);
-		} else
-		{
-			return rt::internal_sqrt_rt(num);
-		}
+		if constexpr (ccm::support::is_constant_evaluated()) { return internal::impl::sqrt_impl(num); }
+		else { return rt::internal_sqrt_rt(num); }
 	}
-
-
-
 
 } // namespace ccm::support::math
