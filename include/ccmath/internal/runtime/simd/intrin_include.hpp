@@ -27,6 +27,4 @@
 #elif defined(CCMATH_HAS_SIMD_SSE2)
 	#include <emmintrin.h>
 	#include <xmmintrin.h>
-#elif defined(CCMATH_HAS_SIMD_NEON)
-	#include <arm_neon.h>
 #endif

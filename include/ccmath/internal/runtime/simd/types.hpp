@@ -44,17 +44,6 @@ namespace ccm::rt::simd
 	#endif
 		using generic_int32_type = __m128i;
 		using generic_int64_type = __m128i;
-
-#elif defined(CCMATH_HAS_SIMD_NEON)
-		using generic_float_type  = float32x4_t;
-		using generic_double_type = float64x4_t;
-	#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
-		using generic_long_double_type = float64x4_t;
-	#else
-		using generic_long_double_type = float64x4_t;
-	#endif
-		using generic_int32_type = std::int32_t;
-		using generic_int64_type = std::int64_t;
 #else
 		using generic_float_type	   = float;
 		using generic_double_type	   = double;

@@ -20,11 +20,19 @@
 
 namespace ccm::rt::simd
 {
+#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+#else
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T> && !std::is_same_v<T, long double>, bool> = true>
+#endif
 	[[nodiscard]] inline T sqrt_simd(T num) noexcept;
 
 #ifdef CCMATH_HAS_SIMD
+	#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool>>
+	#else
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T> && !std::is_same_v<T, long double>, bool>>
+	#endif
 	[[nodiscard]] inline T sqrt_simd(T num) noexcept
 	{
 		if constexpr (std::is_same_v<T, float>)

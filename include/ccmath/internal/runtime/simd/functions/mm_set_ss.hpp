@@ -10,6 +10,7 @@
 
 #include "ccmath/internal/config/type_support.hpp"
 #include "ccmath/internal/runtime/simd/intrin_include.hpp"
+#include "ccmath/internal/runtime/simd/types.hpp"
 #include "ccmath/internal/support/always_false.hpp"
 
 #include <type_traits>
@@ -31,8 +32,6 @@ namespace ccm::rt::simd
 		return _mm256_set1_ps(num);
 	#elif defined(CCMATH_HAS_SIMD_SSE2)
 		return _mm_set_ss(num);
-	#elif defined(CCMATH_HAS_SIMD_NEON)
-		return vsetq_lane_f32(num, vdupq_n_f32(0.0f), 0)
 	#else
 		return num; // This should never be reached.
 	#endif
@@ -44,8 +43,6 @@ namespace ccm::rt::simd
 		return _mm256_set1_pd(num);
 	#elif defined(CCMATH_HAS_SIMD_SSE2)
 		return _mm_set_sd(num);
-	#elif defined(CCMATH_HAS_SIMD_NEON)
-		return vsetq_lane_f64(num, vdupq_n_f64(0.0), 0);
 	#else
 		return num; // This should never be reached.
 	#endif
@@ -58,8 +55,6 @@ namespace ccm::rt::simd
 		return _mm256_set1_pd(static_assert<double>(num));
 		#elif defined(CCMATH_HAS_SIMD_SSE2)
 		return _mm_set_sd(static_assert<double>(num));
-		#elif defined(CCMATH_HAS_SIMD_NEON)
-		return vsetq_lane_f64(static_assert<double>(num), vdupq_n_f64(0.0), 0);
 		#else
 		return num; // This should never be reached.
 		#endif
