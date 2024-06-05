@@ -130,7 +130,7 @@ namespace ccm::support
 	};
 #else // long double is the same as double
 	template <>
-	struct floating_point_traits<long double>
+	struct bitmask_traits<long double>
 	{
 		using MaskType = std::uint64_t;
 
