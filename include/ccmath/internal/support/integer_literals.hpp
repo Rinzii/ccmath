@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "ccmath/internal/support/unreachable.hpp"
 #include "ccmath/internal/types/big_int.hpp"
 #include "ccmath/internal/types/int128_types.hpp"
 
@@ -75,8 +76,7 @@ namespace ccm::support
 
 			constexpr DigitBuffer(const char * str)
 			{
-				for (; *str != '\0'; ++str) { push(*str);
-}
+				for (; *str != '\0'; ++str) { push(*str); }
 			}
 
 			// Returns the digit for a particular character.
@@ -86,17 +86,18 @@ namespace ccm::support
 				const auto to_lower = [](char c) { return c | 32; };
 				const auto is_digit = [](char c) { return c >= '0' && c <= '9'; };
 				const auto is_alpha = [](char c) { return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z'); };
-				if (is_digit(c)) { return static_cast<uint8_t>(c - '0');
-}
-				if (base > 10 && is_alpha(c)) { return static_cast<uint8_t>(to_lower(c) - 'a' + 10);
-}
+				if (is_digit(c)) { return static_cast<uint8_t>(c - '0'); }
+				if (base > 10 && is_alpha(c)) { return static_cast<uint8_t>(to_lower(c) - 'a' + 10); }
 				return INVALID_DIGIT;
 			}
 
 			// Adds a single character to this buffer.
 			constexpr void push(char c)
 			{
-				if (c == '\'') return; // ' is valid but not taken into account.
+				if (c == '\'')
+				{
+					return; // ' is valid but not taken into account.
+				}
 				const uint8_t value = get_digit_value(c);
 				if (value == INVALID_DIGIT || size >= MAX_DIGITS)
 				{
@@ -104,7 +105,7 @@ namespace ccm::support
 					// compiler as it is not executable. This is preferable over `assert` that
 					// will only trigger in debug mode. Also we can't use `static_assert`
 					// because `value` and `size` are not constant.
-					__builtin_unreachable(); // invalid or too many characters.
+					ccm::support::unreachable(); // invalid or too many characters.
 				}
 				digits[size] = value;
 				++size;
@@ -169,7 +170,7 @@ namespace ccm::support
 		constexpr T parse_with_prefix(const char * ptr)
 		{
 			using P = Parser<T>;
-			if (ptr == nullptr) return T();
+			if (ptr == nullptr) { return T(); }
 			if (ptr[0] == '0')
 			{
 				if (ptr[1] == 'b') return P::template parse<2>(ptr + 2);
@@ -193,7 +194,7 @@ namespace ccm::support
 	template <typename T>
 	constexpr T parse_bigint(const char * ptr)
 	{
-		if (ptr == nullptr) return T();
+		if (ptr == nullptr) { return T(); }
 		if (ptr[0] == '-' || ptr[0] == '+')
 		{
 			auto positive = internal::parse_with_prefix<T>(ptr + 1);
