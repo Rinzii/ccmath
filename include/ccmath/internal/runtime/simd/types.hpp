@@ -29,7 +29,7 @@ namespace ccm::rt::simd
 	#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
 		using generic_long_double_type = __m128d;
 	#else
-		using generic_long_double_type = double;
+		using generic_long_double_type = __m256d;
 	#endif
 		using generic_int32_type = __m256i;
 		using generic_int64_type = __m256i;
@@ -40,7 +40,7 @@ namespace ccm::rt::simd
 	#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
 		using generic_long_double_type = __m128d;
 	#else
-		using generic_long_double_type = double;
+		using generic_long_double_type = __m128d;
 	#endif
 		using generic_int32_type = __m128i;
 		using generic_int64_type = __m128i;
@@ -51,7 +51,7 @@ namespace ccm::rt::simd
 	#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
 		using generic_long_double_type = float64x4_t;
 	#else
-		using generic_long_double_type = double;
+		using generic_long_double_type = float64x4_t;
 	#endif
 		using generic_int32_type = std::int32_t;
 		using generic_int64_type = std::int64_t;
@@ -65,9 +65,15 @@ namespace ccm::rt::simd
 
 		[[nodiscard]] static constexpr bool is_supported_type()
 		{
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
 			return static_cast<bool>(std::is_same_v<T, generic_float_type> || std::is_same_v<T, generic_double_type> ||
 									 std::is_same_v<T, generic_long_double_type> || std::is_same_v<T, generic_int32_type> ||
 									 std::is_same_v<T, generic_int64_type>);
+
+#else
+			return static_cast<bool>(std::is_same_v<T, generic_float_type> || std::is_same_v<T, generic_double_type> ||
+									 std::is_same_v<T, generic_int32_type> || std::is_same_v<T, generic_int64_type>);
+#endif
 		}
 	};
 
