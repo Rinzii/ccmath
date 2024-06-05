@@ -58,7 +58,7 @@ namespace ccm::rt::simd
 #else
 		using generic_float_type	   = float;
 		using generic_double_type	   = double;
-		using generic_long_double_type = double;
+		using generic_long_double_type = long double;
 		using generic_int32_type	   = std::int32_t;
 		using generic_int64_type	   = std::int64_t;
 #endif
