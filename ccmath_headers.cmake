@@ -2,6 +2,8 @@
 # Internal headers
 ##########################################
 
+## Config headers
+
 set(ccmath_internal_config_arch_targets_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/arch/targets/x86_64.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/arch/targets/aarch64.hpp
@@ -9,7 +11,8 @@ set(ccmath_internal_config_arch_targets_headers
 
 set(ccmath_internal_config_arch_headers
         ${ccmath_internal_config_arch_targets_headers}
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/arch/simd.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/arch/check_arch_support.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/arch/check_simd_support.hpp
 )
 
 set(ccmath_internal_config_builtin_headers
@@ -37,6 +40,9 @@ set(ccmath_internal_config_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/config/runtime_detection.hpp
 )
 
+
+## Helpers headers
+
 set(ccmath_internal_helpers_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/digit_to_int.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/fpclassify_helper.hpp
@@ -45,14 +51,33 @@ set(ccmath_internal_helpers_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/helpers/internal_ldexp.hpp
 )
 
+
+## Predef headers
+
+set(ccmath_internal_predef_attributes_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/attributes/optnone.hpp
+)
+
 set(ccmath_internal_predef_compiler_suppression_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_suppression/clang_compiler_suppression.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_suppression/gcc_compiler_suppression.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp
 )
 
+set(ccmath_internal_predef_versioning_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/versioning/arm_version.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/versioning/clang_version.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/versioning/gcc_version.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/versioning/msvc_version.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/versioning/msvc_version.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/versioning/version_encode.hpp
+)
+
+
 set(ccmath_internal_predef_headers
+        ${ccmath_internal_predef_attributes_headers}
         ${ccmath_internal_predef_compiler_suppression_headers}
+        ${ccmath_internal_predef_versioning_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/expects_bool_condition.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/has_attribute.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/likely.hpp
@@ -64,6 +89,51 @@ set(ccmath_internal_predef_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/assume.hpp
 
 )
+
+
+## Runtime headers
+
+set(ccmath_internal_runtime_functions_power_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/functions/power/sqrt_rt.hpp
+)
+
+set(ccmath_internal_runtime_functions_headers
+        ${ccmath_internal_runtime_functions_power_headers}
+)
+
+set(ccmath_internal_runtime_generic_headers
+
+)
+
+set(ccmath_internal_runtime_simd_functions_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/functions/mm_cvtss.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/functions/mm_set_ss.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/functions/mm_sqrt_ss.hpp
+
+)
+
+set(ccmath_internal_runtime_simd_math_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/math/sqrt_simd.hpp
+)
+
+set(ccmath_internal_runtime_simd_headers
+        ${ccmath_internal_runtime_simd_functions_headers}
+        ${ccmath_internal_runtime_simd_math_headers}
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/common.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/has_simd.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/intrin_include.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/types.hpp
+
+)
+
+set(ccmath_internal_runtime_headers
+        ${ccmath_internal_runtime_functions_headers}
+        ${ccmath_internal_runtime_generic_headers}
+        ${ccmath_internal_runtime_simd_headers}
+)
+
+
+## Support headers
 
 set(ccmath_internal_support_fenv_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fenv/fenv_support.hpp
@@ -101,6 +171,9 @@ set(ccmath_internal_support_headers
 
 )
 
+
+## Types headers
+
 set(ccmath_internal_types_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/fp_types.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/types/number_pair.hpp
@@ -117,9 +190,10 @@ set(ccmath_internal_types_headers
 
 
 set(ccmath_internal_headers
+        ${ccmath_internal_config_headers}
         ${ccmath_internal_helpers_headers}
         ${ccmath_internal_predef_headers}
-        ${ccmath_internal_config_headers}
+        ${ccmath_internal_runtime_headers}
         ${ccmath_internal_support_headers}
         ${ccmath_internal_types_headers}
 
@@ -131,6 +205,9 @@ set(ccmath_internal_headers
 ##########################################
 # Math headers
 ##########################################
+
+
+## Basic headers
 
 set(ccmath_math_basic_impl_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/fma_float_impl.hpp
@@ -154,6 +231,9 @@ set(ccmath_math_basic_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/remquo.hpp
 )
 
+
+## Compare headers
+
 set(ccmath_math_compare_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/fpclassify.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/isfinite.hpp
@@ -168,6 +248,9 @@ set(ccmath_math_compare_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/isunordered.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/compare/signbit.hpp
 )
+
+
+## Exponential headers
 
 set(ccmath_math_exponential_impl_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/impl/exp_float_impl.hpp
@@ -195,6 +278,9 @@ set(ccmath_math_exponential_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/exponential/log10.hpp
 )
 
+
+## Fmanip headers
+
 set(ccmath_math_fmanip_impl_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/impl/modf_float_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/impl/modf_double_impl.hpp
@@ -215,6 +301,9 @@ set(ccmath_math_fmanip_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/scalbn.hpp
 )
 
+
+## Hyperbolic headers
+
 set(ccmath_math_hyperbolic_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/hyperbolic/acosh.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/hyperbolic/asinh.hpp
@@ -224,6 +313,9 @@ set(ccmath_math_hyperbolic_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/hyperbolic/tanh.hpp
 )
 
+
+## Nearest headers
+
 set(ccmath_detail_nearest_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/nearest/ceil.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/nearest/floor.hpp
@@ -232,6 +324,9 @@ set(ccmath_detail_nearest_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/nearest/round.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/nearest/trunc.hpp
 )
+
+
+## Power headers
 
 set(ccmath_math_power_impl_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/power/impl/pow_impl.hpp
@@ -245,6 +340,9 @@ set(ccmath_math_power_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/power/pow.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/power/sqrt.hpp
 )
+
+
+## Special headers
 
 set(ccmath_math_special_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/assoc_laguerre.hpp
@@ -270,6 +368,9 @@ set(ccmath_math_special_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/special/sph_neumann.hpp
 )
 
+
+## Trig headers
+
 set(ccmath_math_trig_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/trig/acos.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/trig/asin.hpp
@@ -280,6 +381,8 @@ set(ccmath_math_trig_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/trig/tan.hpp
 )
 
+
+## Root headers
 
 set(ccmath_math_root_headers
         # Functions without a specified category

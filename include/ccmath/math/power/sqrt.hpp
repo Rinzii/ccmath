@@ -24,7 +24,14 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T sqrt(T num)
 	{
+#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) // GCC 6.1+ has constexpr sqrt builtins.
+		if constexpr (std::is_same_v<T, float>) { return __builtin_sqrtf(num); }
+		if constexpr (std::is_same_v<T, double>) { return __builtin_sqrt(num); }
+		if constexpr (std::is_same_v<T, long double>) { return __builtin_sqrtl(num); }
+		return static_cast<T>(__builtin_sqrtl(num));
+#else
 		return support::math::internal_sqrt(num);
+#endif
 	}
 
 	/**
