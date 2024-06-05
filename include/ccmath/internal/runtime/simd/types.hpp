@@ -14,7 +14,6 @@
 #include "ccmath/internal/runtime/simd/intrin_include.hpp"
 #include "ccmath/internal/types/int128_types.hpp"
 
-#include <array>
 #include <cstdint>
 
 namespace ccm::rt::simd
@@ -30,7 +29,7 @@ namespace ccm::rt::simd
 	#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
 		using generic_long_double_type = __m128d;
 	#else
-		using generic_long_double_type = std::array<double, 2>;;
+		using generic_long_double_type = double;
 	#endif
 		using generic_int32_type = __m256i;
 		using generic_int64_type = __m256i;
@@ -41,7 +40,7 @@ namespace ccm::rt::simd
 	#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
 		using generic_long_double_type = __m128d;
 	#else
-		using generic_long_double_type = std::array<double, 2>;
+		using generic_long_double_type = double;
 	#endif
 		using generic_int32_type = __m128i;
 		using generic_int64_type = __m128i;
@@ -52,23 +51,23 @@ namespace ccm::rt::simd
 	#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
 		using generic_long_double_type = float64_t;
 	#else
-		using generic_long_double_type = std::array<double, 2>;;
+		using generic_long_double_type = double;
 	#endif
 		using generic_int32_type = std::int32_t;
 		using generic_int64_type = std::int64_t;
 #else
-		using generic_float_type	   = std::array<float, 2>;;
-		using generic_double_type	   = std::array<double, 2>;;
-		using generic_long_double_type = std::array<double, 2>;;
-		using generic_int32_type	   = std::array<std::int32_t, 2>;
-		using generic_int64_type	   = std::array<std::int64_t, 2>;
+		using generic_float_type	   = float;
+		using generic_double_type	   = double;
+		using generic_long_double_type = double;
+		using generic_int32_type	   = std::int32_t;
+		using generic_int64_type	   = std::int64_t;
 #endif
 
 		[[nodiscard]] static constexpr bool is_supported_type()
 		{
 			return static_cast<bool>(std::is_same_v<T, generic_float_type> || std::is_same_v<T, generic_double_type> ||
-						  std::is_same_v<T, generic_long_double_type> || std::is_same_v<T, generic_int32_type> ||
-						  std::is_same_v<T, generic_int64_type>);
+									 std::is_same_v<T, generic_long_double_type> || std::is_same_v<T, generic_int32_type> ||
+									 std::is_same_v<T, generic_int64_type>);
 		}
 	};
 
