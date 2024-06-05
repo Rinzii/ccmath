@@ -9,6 +9,7 @@
 #pragma once
 
 #include "ccmath/internal/config/type_support.hpp"
+#include "ccmath/internal/runtime/simd/math/sqrt_simd.hpp"
 #include "ccmath/internal/support/always_false.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
@@ -17,11 +18,6 @@
 
 #include <type_traits>
 
-#ifdef CCM_CONFIG_USE_RT_SIMD
-	#include "ccmath/internal/config/arch/simd.hpp"
-
-#endif
-#include <emmintrin.h>
 
 namespace ccm::support::math
 {
@@ -84,7 +80,7 @@ namespace ccm::support::math
 					constexpr storage_type one = static_cast<storage_type>(1) << Bits::fraction_length;
 					constexpr auto nan_type	   = Bits::quiet_nan().get_val();
 
-					Bits bits(x);
+					Bits const bits(x);
 
 					if (bits == Bits::inf(types::Sign::POS) || bits.is_zero() || bits.is_nan()) { return x; }
 					if (bits.is_neg()) { return nan_type; }
@@ -252,92 +248,49 @@ namespace ccm::support::math
 				}
 			}
 		} // namespace impl
-
-		namespace rt
-		{
-			namespace simd
-			{
-				// TODO: Change this to instead use SIMDe library for SIMD operations or implement our own generic simd functions.
-				// SIMD version of the sqrt function.
-				template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-				inline T sqrt_impl_simd(T num)
-				{
-#ifdef CCM_CONFIG_USE_RT_SIMD
-#if defined(CCM_HAS_SIMD_SSE)
-	#elif defined(CCM_HAS_SIMD_AVX)
-					if constexpr (std::is_same_v<T, float>)
-					{
-						__m128 num_m		= _mm_set_ss(num);
-						__m128 const sqrt_m = _mm_sqrt_ss(num_m);
-						return _mm_cvtss_f32(sqrt_m);
-					}
-					if constexpr (std::is_same_v<T, double>)
-					{
-						__m128d num_m		 = _mm_set_sd(num);
-						__m128d const sqrt_m = _mm_sqrt_sd(num_m, num_m);
-						return _mm_cvtsd_f64(sqrt_m);
-					}
-		#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
-					if constexpr (std::is_same_v<T, long double>)
-					{
-						__m128d num_m		 = _mm_set_sd(static_cast<double>(num));
-						__m128d const sqrt_m = _mm_sqrt_sd(num_m, num_m);
-						return static_cast<long double>(_mm_cvtsd_f64(sqrt_m));
-					}
-		#else // If long double is not 64-bits, then we must use our generic sqrt function.
-					return impl::sqrt_impl(num);
-		#endif
-	#else
-					return impl::sqrt_impl(num);
-	#endif
-				}
-
-				template <typename Integer, std::enable_if_t<!std::is_floating_point_v<Integer>, bool> = true>
-				inline double sqrt_impl_simd(Integer num)
-				{
-					return sqrt_impl_simd(static_cast<double>(num));
-				}
-#endif
-			} // namespace simd
-
-			// Runtime version of the sqrt function.
-			template <typename T>
-			T sqrt_impl_rt(T num)
-			{
-#if CCM_HAS_BUILTIN(__builtin_sqrt) ||                                                                                                                         \
-	defined(__builtin_sqrt) // If we have access to the builtin sqrt function, use it. Builtins will generally use hardware instructions.
-				if constexpr (std::is_same_v<T, float>) { return __builtin_sqrtf(num); }
-				if constexpr (std::is_same_v<T, double>) { return __builtin_sqrt(num); }
-				if constexpr (std::is_same_v<T, long double>) { return __builtin_sqrtl(num); }
-				return static_cast<T>(__builtin_sqrtl(num));
-#elif defined(CCM_CONFIG_USE_RT_SIMD)
-					return simd::sqrt_impl_simd(num);
-#else
-					return impl::sqrt_impl(num); // No builtin? Then handle it in software instead like normal.
-#endif
-			}
-		} // namespace rt
 	} // namespace internal
+
+	namespace rt
+	{
+		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+		inline T internal_sqrt_rt(T num)
+		{
+#ifdef CCM_CONFIG_USE_RT_SIMD
+
+
+			// The internal SIMD functions expect the default rounding mode. If the rounding mode is not the default, we must use the generic implementation.
+			if (CCM_UNLIKELY(get_rounding_mode() != FE_TONEAREST)) { return internal::impl::sqrt_impl(num); }
+
+			if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>)
+			{
+				return ccm::rt::simd::sqrt_simd(num);
+			}
+	#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
+			if constexpr (std::is_same_v<T, long double>)
+			{
+				return ccm::rt::simd::sqrt_simd(num);
+			}
+	#endif
+			return internal::impl::sqrt_impl(num); // Generic fallback
+#else
+			return internal::impl::sqrt_impl(num); // Generic fallback
+#endif
+		}
+	} // namespace rt
 
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T internal_sqrt(T num)
 	{
-#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) // GCC 6.1+ has constexpr sqrt builtins.
-		if constexpr (std::is_same_v<T, float>) { return __builtin_sqrtf(num); }
-		if constexpr (std::is_same_v<T, double>) { return __builtin_sqrt(num); }
-		if constexpr (std::is_same_v<T, long double>) { return __builtin_sqrtl(num); }
-		return static_cast<T>(__builtin_sqrtl(num));
-#else
-			if constexpr (ccm::support::is_constant_evaluated()) { return internal::impl::sqrt_impl(num); }
-			else { return internal::impl::sqrt_impl(num); }
-			// else { return internal::rt::sqrt_impl_rt(num); }
-
-#endif
+		if constexpr (ccm::support::is_constant_evaluated())
+		{
+			return internal::impl::sqrt_impl(num);
+		} else
+		{
+			return rt::internal_sqrt_rt(num);
+		}
 	}
 
-	template <typename Integer, std::enable_if_t<!std::is_floating_point_v<Integer>, bool> = true>
-	constexpr double internal_sqrt(Integer num)
-	{
-		return internal_sqrt(static_cast<double>(num));
-	}
+
+
+
 } // namespace ccm::support::math

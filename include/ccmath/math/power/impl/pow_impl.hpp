@@ -91,7 +91,7 @@ namespace ccm::internal::impl
 																							  T & y) noexcept
 	{
 		using FPbits_t	= support::FPBits<T>;
-		using Storage_t = typename support::FPBits<T>::storage_type;
+		using Storage_t = typename FPbits_t::storage_type;
 		Storage_t x_u	= x_bits.uintval();
 		Storage_t x_abs = x_bits.abs().uintval();
 		Storage_t y_u	= y_bits.uintval();
