@@ -9,9 +9,9 @@
 #pragma once
 
 #include "ccmath/internal/support/type_traits.hpp"
-#include "ccmath/internal/types/int128_types.hpp"
-#include "ccmath/internal/types/float128.hpp"
 #include "ccmath/internal/types/dyadic_float.hpp"
+#include "ccmath/internal/types/float128.hpp"
+#include "ccmath/internal/types/int128_types.hpp"
 
 #include <cstdint>
 
@@ -61,7 +61,7 @@ namespace ccm::support
 #elif defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
 		using upgraded_floating_type = ccm::types::DyadicFloat<128>;
 #else
-		using upgraded_floating_type = long double;
+		using upgraded_floating_type = ccm::types::DyadicFloat<128>;
 #endif
 
 		using int_type = std::int64_t;
@@ -154,9 +154,42 @@ struct floating_point_traits<long double>
 
 	#else // long double is the same as double
 	template <>
-	struct floating_point_traits<long double> : floating_point_traits<double>
+	struct floating_point_traits<long double>
 	{
+	#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT128)
+		using upgraded_floating_type = long double
+	#elif defined(CCM_TYPES_HAS_FLOAT128)
+		using upgraded_floating_type = ccm::types::float128;
+	#elif defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+		using upgraded_floating_type = ccm::types::DyadicFloat<128>;
+	#else
+		using upgraded_floating_type = ccm::types::DyadicFloat<128>;
+	#endif
 
+			using int_type = std::int64_t;
+
+		static constexpr int_type mantissa_bits			  = 53;	   // DBL_MANT_DIG
+		static constexpr int_type exponent_bits			  = 11;	   // sizeof(double) * CHAR_BIT - DBL_MANT_DIG
+		static constexpr int_type maximum_binary_exponent = 1023;  // DBL_MAX_EXP - 1
+		static constexpr int_type minimum_binary_exponent = -1022; // DBL_MIN_EXP - 1
+		static constexpr int_type exponent_bias			  = 1023;
+		static constexpr int_type sign_shift			  = 63; // exponent_bits + mantissa_bits - 1
+		static constexpr int_type exponent_shift		  = 52; // mantissa_bits - 1
+
+		using uint_type = std::uint64_t;
+
+		static constexpr uint_type exponent_mask			 = 0x00000000000007FFU; // (1ULL << exponent_bits) - 1
+		static constexpr uint_type normal_mantissa_mask		 = 0x001FFFFFFFFFFFFFU; // (1ULL << mantissa_bits) - 1
+		static constexpr uint_type denormal_mantissa_mask	 = 0x000FFFFFFFFFFFFFU; // (1ULL << (mantissa_bits - 1)) - 1
+		static constexpr uint_type special_nan_mantissa_mask = 0x0008000000000000U; // 1ULL << (mantissa_bits - 2)
+		static constexpr uint_type shifted_sign_mask		 = 0x8000000000000000U; // 1ULL << sign_shift
+		static constexpr uint_type shifted_exponent_mask	 = 0x7FF0000000000000U; // exponent_mask << exponent_shift
+
+		// 0x43F0000000000000 bit representation
+		static constexpr double normalize_factor = 18446744073709551616.0; // 2^64
+
+		// 0x1p+53
+		static constexpr double max_safe_integer = 0x1p+53; // 9007199254740992.0 (2^53)
 	};
 #endif
 
