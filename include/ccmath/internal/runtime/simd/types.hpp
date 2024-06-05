@@ -66,13 +66,24 @@ namespace ccm::rt::simd
 		[[nodiscard]] static constexpr bool is_supported_type()
 		{
 #ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
-			return static_cast<bool>(std::is_same_v<T, generic_float_type> || std::is_same_v<T, generic_double_type> ||
+			if constexpr(std::is_same_v<T, generic_float_type> || std::is_same_v<T, generic_double_type> ||
 									 std::is_same_v<T, generic_long_double_type> || std::is_same_v<T, generic_int32_type> ||
-									 std::is_same_v<T, generic_int64_type>);
+									 std::is_same_v<T, generic_int64_type>)
+			{
+				return true;
+			}
 
+			return false;
 #else
-			return static_cast<bool>(std::is_same_v<T, generic_float_type> || std::is_same_v<T, generic_double_type> ||
-									 std::is_same_v<T, generic_int32_type> || std::is_same_v<T, generic_int64_type>);
+			if constexpr(std::is_same_v<T, generic_float_type> || std::is_same_v<T, generic_double_type> ||
+									 std::is_same_v<T, generic_int32_type> || std::is_same_v<T, generic_int64_type>)
+			{
+				return true;
+			}
+
+			return false;
+
+
 #endif
 		}
 	};
