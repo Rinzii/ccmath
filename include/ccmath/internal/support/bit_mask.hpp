@@ -130,8 +130,24 @@ namespace ccm::support
 	};
 #else // long double is the same as double
 	template <>
-	struct floating_point_traits<long double> : floating_point_traits<double>
+	struct floating_point_traits<long double>
 	{
+		using MaskType = std::uint64_t;
+
+		static constexpr MaskType pos_zero		  = 0x0000000000000000;
+		static constexpr MaskType neg_zero		  = 0x8000000000000000;
+		static constexpr MaskType half_one		  = 0x3FE0000000000000;
+		static constexpr MaskType neg_half_one	  = 0xBFE0000000000000;
+		static constexpr MaskType one			  = 0x3FF0000000000000;
+		static constexpr MaskType two			  = 0x4000000000000000;
+		static constexpr MaskType max_norm		  = 0x7FEFFFFFFFFFFFFF;
+		static constexpr MaskType min_pos_norm	  = 0x0010000000000000;
+		static constexpr MaskType max_subnorm	  = 0x000FFFFFFFFFFFFF;
+		static constexpr MaskType min_pos_subnorm = 0x0000000000000001;
+		static constexpr MaskType pos_inf		  = 0x7FF0000000000000;
+		static constexpr MaskType neg_inf		  = 0xFFF0000000000000;
+		static constexpr MaskType pos_nan		  = 0x7FF8000000000000;
+		static constexpr MaskType neg_nan		  = 0xFFF8000000000000;
 	};
 #endif
 
