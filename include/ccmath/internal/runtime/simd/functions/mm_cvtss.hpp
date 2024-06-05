@@ -31,8 +31,6 @@ namespace ccm::rt::simd
 		return _mm256_cvtss_f32(num);
 	#elif defined(CCMATH_HAS_SIMD_SSE2)
 		return _mm_cvtss_f32(num);
-	#elif defined(CCMATH_HAS_SIMD_NEON)
-		return vgetq_lane_f32(num, 0)
 	#else
 		ccm::support::unreachable(); // This should never be reached.
 		return num;
@@ -45,8 +43,6 @@ namespace ccm::rt::simd
 		return _mm256_cvtsd_f64(num);
 	#elif defined(CCMATH_HAS_SIMD_SSE2)
 		return _mm_cvtsd_f64(num);
-	#elif defined(CCMATH_HAS_SIMD_NEON)
-		return vgetq_lane_f64(num, 0);
 	#else
 		ccm::support::unreachable(); // This should never be reached.
 		return num;
@@ -60,8 +56,6 @@ namespace ccm::rt::simd
 		return _mm256_cvtsd_f64(static_assert<simd_long_double_t>(num));
 		#elif defined(CCMATH_HAS_SIMD_SSE2)
 		return _mm_cvtsd_f64(static_assert<simd_long_double_t>(num));
-		#elif defined(CCMATH_HAS_SIMD_NEON)
-		return vgetq_lane_f64(static_assert<simd_long_double_t>(num), 0);
 		#else
 		ccm::support::unreachable(); // This should never be reached.
 		return num;

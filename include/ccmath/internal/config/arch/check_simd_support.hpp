@@ -13,20 +13,19 @@
  * 			- AVX
  *
  * 		ARM:
- * 			- NEON
+ * 			- NEON (TODO)
  */
 
 #pragma once
 
 #ifdef CCM_CONFIG_USE_RT_SIMD
 
+// TODO: Add support for ARM NEON
 
 	#if defined(__AVX__)
 		#define CCMATH_HAS_SIMD_AVX 1
 	#elif (defined(__SSE__) || (defined(_M_IX86_FP) && _M_IX86_FP >= 1)) && (defined(__SSE2__) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2))
 		#define CCMATH_HAS_SIMD_SSE2 1
-	#elif defined(__ARM_NEON) || defined(__ARM_NEON__)
-		#define CCMATH_HAS_SIMD_NEON 1
 	#endif
 
 	// If we have any simd instructions, then we define CCMATH_HAS_SIMD so that we can use it in our code.

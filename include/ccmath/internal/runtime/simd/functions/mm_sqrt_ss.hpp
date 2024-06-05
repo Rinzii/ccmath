@@ -31,8 +31,6 @@ namespace ccm::rt::simd
 		return _mm256_sqrt_ps(num);
 	#elif defined(CCMATH_HAS_SIMD_SSE2)
 		return _mm_sqrt_ss(num);
-	#elif defined(CCMATH_HAS_SIMD_NEON)
-		return vrsqrteq_f32(num);
 	#else
 		return num; // This should never be reached.
 	#endif
@@ -44,8 +42,6 @@ namespace ccm::rt::simd
 		return _mm256_sqrt_pd(num);
 	#elif defined(CCMATH_HAS_SIMD_SSE2)
 		return _mm_sqrt_sd(num, num);
-	#elif defined(CCMATH_HAS_SIMD_NEON)
-		return vrsqrteq_f64(num);
 	#else
 		return num; // This should never be reached.
 	#endif
@@ -58,8 +54,6 @@ namespace ccm::rt::simd
 		return _mm256_sqrt_pd(num);
 		#elif defined(CCMATH_HAS_SIMD_SSE2)
 		return _mm_sqrt_sd(num, num);
-		#elif defined(CCMATH_HAS_SIMD_NEON)
-		return vrsqrteq_f64(num);
 		#else
 		return num; // This should never be reached.
 		#endif
