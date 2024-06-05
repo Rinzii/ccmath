@@ -17,7 +17,8 @@
 namespace ccm::support::fp
 {
 
-	enum class rounding_mode : std::uint16_t
+	// NOLINTNEXTLINE
+	enum class rounding_mode
 	{
 		eFE_TONEAREST  = FE_TONEAREST,
 		eFE_DOWNWARD   = FE_DOWNWARD,
