@@ -66,14 +66,9 @@ namespace ccm::rt::simd
 
 		[[nodiscard]] static constexpr bool is_supported_type()
 		{
-			if constexpr (std::is_same_v<T, generic_float_type> || std::is_same_v<T, generic_double_type> ||
+			return static_cast<bool>(std::is_same_v<T, generic_float_type> || std::is_same_v<T, generic_double_type> ||
 						  std::is_same_v<T, generic_long_double_type> || std::is_same_v<T, generic_int32_type> ||
-						  std::is_same_v<T, generic_int64_type>)
-			{
-				return true;
-			}
-
-			return false;
+						  std::is_same_v<T, generic_int64_type>);
 		}
 	};
 
