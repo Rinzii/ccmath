@@ -259,7 +259,7 @@ namespace ccm::support::math
 			if constexpr (std::is_same_v<T, double>) { return __builtin_sqrt(num); }
 			if constexpr (std::is_same_v<T, long double>) { return __builtin_sqrtl(num); }
 
-#elif defined(CCM_CONFIG_USE_RT_SIMD) // If we don't have a built-in sqrt function, use SIMD if available.
+#elif defined(CCMATH_HAS_SIMD) // If we don't have a built-in sqrt function, use SIMD if available.
 
 			// The internal SIMD functions expect the default rounding mode. If the rounding mode is not the default, we must use the generic implementation.
 			if (CCM_UNLIKELY(get_rounding_mode() != FE_TONEAREST)) { return internal::impl::sqrt_impl(num); }
