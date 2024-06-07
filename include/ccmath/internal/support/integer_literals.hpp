@@ -80,7 +80,6 @@ namespace ccm::support
 			static constexpr std::size_t MAX_DIGITS		= sizeof(T) * CHAR_BIT / BITS_PER_DIGIT;
 			static constexpr std::uint8_t INVALID_DIGIT = 255;
 
-			// std::uint8_t digits[MAX_DIGITS] = {};
 			std::array<std::uint8_t, MAX_DIGITS> digits = {};
 			std::size_t size							= 0;
 
