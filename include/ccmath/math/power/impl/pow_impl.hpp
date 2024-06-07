@@ -90,16 +90,9 @@ namespace ccm::internal::impl
 	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> pow_impl_handle_special_cases(support::FPBits<T> & x_bits, support::FPBits<T> & y_bits, T & x,
 																							  T & y) noexcept
 	{
-		using FPbits_t	= support::FPBits<T>;
-		using Storage_t = typename FPbits_t::storage_type;
-		Storage_t x_u	= x_bits.uintval();
-		Storage_t x_abs = x_bits.abs().uintval();
-		Storage_t y_u	= y_bits.uintval();
-		Storage_t y_abs = y_bits.abs().uintval();
 
 		if (x_bits.is_nan())
 		{
-			Storage_t neg_zero = support::bitmask_traits<T>::neg_zero;
 			// IEEE 754-2019: pow(x, ±0) = 1 if x is not a signaling NaN
 			if (y == 0.0 && !x_bits.is_signaling_nan()) { return 1.0; }
 
