@@ -103,7 +103,7 @@ target_link_libraries(${PROJECT_NAME}-nearest PRIVATE
 
 add_executable(${PROJECT_NAME}-power)
 target_sources(${PROJECT_NAME}-power PRIVATE
-        #power/pow_test.cpp
+        power/pow_test.cpp
         power/sqrt_test.cpp
 )
 target_link_libraries(${PROJECT_NAME}-power PRIVATE
