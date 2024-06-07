@@ -7,3 +7,13 @@
  */
 
 #pragma once
+
+namespace ccm::internal::impl
+{
+	// TODO: Implement this using fp_bits
+	constexpr long double nan_ldouble_impl(const char * /*arg*/) noexcept
+	{
+		return 0.0;
+	}
+	static_assert(nan_ldouble_impl("") == 0.0, "temp");
+} // namespace ccm::internal::impl
