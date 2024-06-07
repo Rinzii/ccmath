@@ -25,6 +25,5 @@
 #if defined(CCMATH_HAS_SIMD_AVX)
 	#include <immintrin.h>
 #elif defined(CCMATH_HAS_SIMD_SSE2)
-	#include <emmintrin.h>
-	#include <xmmintrin.h>
+	#include <immintrin.h>
 #endif

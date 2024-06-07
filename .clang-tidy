@@ -6,6 +6,7 @@ bugprone-*,
 modernize-*,
 -modernize-use-trailing-return-type,
 -modernize-use-constraints,
+-modernize-avoid-c-arrays,
 
 performance-*,
 -performance-avoid-endl,
@@ -56,7 +57,10 @@ misc-uniqueptr-reset-release,
 misc-use-anonymous-namespace,
 mpi-buffer-deref,
 mpi-type-mismatch,
-openmp-use-default-none'
+openmp-use-default-none,
+
+-hicpp-avoid-c-arrays
+'
 
 CheckOptions:
   cppcoreguidelines-avoid-do-while.IgnoreMacros: 'true'

@@ -9,7 +9,7 @@
 #pragma once
 
 #include "ccmath/internal/support/math/internal_sqrt.hpp"
-#include "ccmath/internal/runtime/simd/
+//#include "ccmath/internal/runtime/simd/
 
 template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 T sqrt_rt(T num)

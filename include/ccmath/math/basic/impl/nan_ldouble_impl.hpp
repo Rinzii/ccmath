@@ -7,6 +7,3 @@
  */
 
 #pragma once
-
-#include "ccmath/internal/config/arch/check_simd_support.hpp"
-#include "ccmath/internal/config/arch/check_arch_support.hpp"

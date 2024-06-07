@@ -56,7 +56,7 @@ namespace ccm::internal
 				lo	   = scale - result + scale * tmp;
 				hi	   = 1.0 + result;
 				lo	   = 1.0 - hi + result + lo;
-				result = helpers::narrow_eval(hi + lo) - 1.0;
+				result = (hi + lo) - 1.0;
 
 				// Avoid -0.0 with downward rounding.
 				if (result == 0.0) { result = 0.0; }
@@ -111,7 +111,7 @@ namespace ccm::internal
 
 			// exp2(x) = 2^(k/N) * 2^r, with 2^r in [2^(-1/2N),2^(1/2N)].
 			// x = k/N + r, with int k and r in [-1/2N, 1/2N].
-			expo						   = helpers::narrow_eval(x + shift_for_index_calculation);
+			expo						   = x + shift_for_index_calculation;
 			const std::uint64_t expo_int64 = sp::double_to_uint64(expo); // This is k.
 			expo -= shift_for_index_calculation;						 // This is k/N for int k
 			const ccm::double_t rem = x - expo;

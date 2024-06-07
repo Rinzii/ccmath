@@ -9,6 +9,7 @@
 #pragma once
 
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
 #include "ccmath/math/exponential/impl/exp2_data.hpp"
 
@@ -54,7 +55,7 @@ namespace ccm::internal
 			}
 
 			// x = k/N + r with r in [-1/(2N), 1/(2N)] and int k.
-			corrected_input_double			 = helpers::narrow_eval(static_cast<double>(input_as_double + shift_scaled));
+			corrected_input_double			 = static_cast<double>(input_as_double + shift_scaled);
 			const std::uint64_t lookup_index = sp::double_to_uint64(corrected_input_double);
 			corrected_input_double -= shift_scaled; // This is k/N for int k
 			const ccm::double_t rem = input_as_double - corrected_input_double;

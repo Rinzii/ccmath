@@ -40,6 +40,9 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU OR
 
           -Wno-pedantic
 
+          # Allow FMA instructions
+          -ffp-contract=fast
+
           # Macros to define
           -DNOMINMAX
   )
