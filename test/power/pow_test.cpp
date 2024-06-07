@@ -14,7 +14,8 @@
 #include <limits>
 
 namespace {
-	bool IsEqualOrNan(double a, double b) {
+	// Equivelant to EXPECT_EQ but allows for NaN values to be equal.
+	bool IsNanOrEquivalent(double a, double b) {
 		return (std::isnan(a) && std::isnan(b)) || (a == b);
 	}
 }
@@ -30,9 +31,12 @@ TEST(CcmathPowerTests, Pow_Double_SpecialCases)
 
 	// When handling signaling NaN, the result is supposed to be NaN as dictated by IEEE-754 2019, but
 	// GCC based compilers are not conforming in this reguard so we allow for NaN or equal values.
+	// Also Clang will change its return type based on the optimization level.
+	// Expected values here would be either NaN or 1.0
 	auto ccm_x_snan_y_zero = ccm::internal::impl::pow_impl(std::numeric_limits<double>::signaling_NaN(), 0.0);
 	auto std_x_snan_y_zero = std::pow(std::numeric_limits<double>::signaling_NaN(), 0.0);
-	EXPECT_PRED2(IsEqualOrNan, ccm_x_snan_y_zero, std_x_snan_y_zero);
+	//EXPECT_EQ(ccm_x_snan_y_zero, std_x_snan_y_zero);
+	EXPECT_PRED2(IsNanOrEquivalent, ccm_x_snan_y_zero, std_x_snan_y_zero);
 
 	bool ccm_is_nan_x_and_y_one_nan = std::isnan(ccm::internal::impl::pow_impl(std::numeric_limits<double>::quiet_NaN(), 1.0));
 	bool std_is_nan_x_and_y_one_nan = std::isnan(std::pow(std::numeric_limits<double>::quiet_NaN(), 1.0));
