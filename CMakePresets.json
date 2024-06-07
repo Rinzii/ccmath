@@ -26,6 +26,17 @@
 			}
 		},
 		{
+			"name": "ninja-gcc-minsize",
+			"description": "Build configuration using Ninja Multi-config / gcc",
+			"inherits": "ninja-gcc",
+			"binaryDir": "${sourceDir}/out/gcc-minsize",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "gcc",
+				"CMAKE_CXX_COMPILER": "g++",
+				"CMAKE_CXX_FLAGS": "-Os"
+			}
+		},
+		{
 			"name": "ninja-clang",
 			"description": "Build configuration using Ninja Multi-config / clang",
 			"inherits": "default",
@@ -33,6 +44,17 @@
 			"cacheVariables": {
 				"CMAKE_C_COMPILER": "clang",
 				"CMAKE_CXX_COMPILER": "clang++"
+			}
+		},
+		{
+			"name": "ninja-clang-minsize",
+			"description": "Build configuration using Ninja Multi-config / clang",
+			"inherits": "ninja-clang",
+			"binaryDir": "${sourceDir}/out/clang-minsize",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "clang",
+				"CMAKE_CXX_COMPILER": "clang++",
+				"CMAKE_CXX_FLAGS": "-Os"
 			}
 		},
 		{
@@ -120,6 +142,16 @@
 			"configuration": "Debug"
 		},
 		{
+			"name": "Debug-gcc",
+			"configurePreset": "ninja-gcc",
+			"configuration": "Debug"
+		},
+		{
+			"name": "Debug-clang",
+			"configurePreset": "ninja-clang",
+			"configuration": "Debug"
+		},
+		{
 			"name": "Release",
 			"configurePreset": "default",
 			"configuration": "Release"
@@ -137,6 +169,16 @@
 		{
 			"name": "RelWithDebInfo",
 			"configurePreset": "default",
+			"configuration": "RelWithDebInfo"
+		},
+		{
+			"name": "RelWithDebInfo-gcc",
+			"configurePreset": "ninja-gcc",
+			"configuration": "RelWithDebInfo"
+		},
+		{
+			"name": "RelWithDebInfo-clang",
+			"configurePreset": "ninja-clang",
 			"configuration": "RelWithDebInfo"
 		},
 		{
