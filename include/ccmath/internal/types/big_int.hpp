@@ -192,8 +192,8 @@ namespace ccm::types
 #endif
 			else
 			{
-				// When dealing with an unknow type this section performs a single-digit multiplication with 'lhs' and 'rhs' of type 'word'.
-				// It splits 'lhs' and 'rhs' into half words and executes a classic long multiplication,
+				// When dealing with an unknown type, this section performs a single-digit multiplication with 'lhs' and 'rhs' of type 'word'.
+				// It splits 'lhs' and 'rhs' into half-words and executes a classic long multiplication,
 				// treating 'lhs' and 'rhs' as two-digit numbers.
 				//
 				//    lhs      lhs_hi lhs_lo
@@ -219,7 +219,7 @@ namespace ccm::types
 				word hi_digit		= step4;
 				const word no_carry = 0;
 				word carry;
-				word _; // Dummy variable for add_with_carry
+				word _; // Placeholder variable for add_with_carry
 				lo_digit = ccm::support::add_with_carry<word>(lo_digit, shiftl(step2), no_carry, carry);
 				hi_digit = ccm::support::add_with_carry<word>(hi_digit, shiftr(step2), carry, _);
 				lo_digit = ccm::support::add_with_carry<word>(lo_digit, shiftl(step3), no_carry, carry);
@@ -509,7 +509,7 @@ namespace ccm::types
 			const bool is_neg = is_signed && is_negative(array);
 			constexpr auto at = [](std::size_t index) -> int
 			{
-				// Reverse iteration when direction is LEFT.
+				// Reverse iteration when the direction is LEFT.
 				if constexpr (direction == Direction::eLEFT) { return static_cast<int>(N) - static_cast<int>(index) - 1; }
 				return static_cast<int>(index);
 			};
@@ -1026,7 +1026,7 @@ namespace ccm::types
 				WordType d	   = val[--pos];
 				if (last_shift >= HALF_WORD_SIZE)
 				{
-					// When performing the shifting of (rem * 2^(lower - e)) we might overflow our word type.
+					// When performing the shifting of (rem * 2^(lower - e)), we might overflow our word type.
 					// Due to this, we perform a half-word shift to avoid overflow.
 					rem <<= HALF_WORD_SIZE;
 					rem += d >> HALF_WORD_SIZE;
