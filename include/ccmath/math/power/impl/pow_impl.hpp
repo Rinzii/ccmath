@@ -98,8 +98,7 @@ namespace ccm::internal::impl
 
 			// For GCC based compilers, they do not account for signaling nan and just return 1.0
 			// For clang, it will return 1.0 if the optimization flag is set.
-			// Apple always returns 1 no matter the optimization level.
-			// TODO: Check if this behavior is shared in MSVC.
+			// AppleClang always returns 1 no matter the optimization level.
 #if (defined(__GNUC__) && !defined(__clang__)) || (defined(__clang__) && defined(__OPTIMIZE__)) || (defined(__clang__) && defined(__APPLE__)) ||               \
 	(defined(__clang__) && defined(CCM_CONFIG_AGGRESSIVELY_OPTIMIZE))
 			if (y == 0.0 && x_bits.is_signaling_nan()) { return 1.0; }
@@ -115,8 +114,8 @@ namespace ccm::internal::impl
 
 			// For GCC based compilers, they do not account for signaling nan and just return 1.0
 			// For clang, it will return 1.0 if the optimization flag is set.
-// TODO: Check if this behavior is shared in MSVC.
-#if defined(__GNUC__) && !defined(__clang__) || (defined(__clang__) && defined(__OPTIMIZE__)) || (defined(__clang__) && defined(__APPLE__)) ||                 \
+			// AppleClang always returns 1 no matter the optimization level.
+#if (defined(__GNUC__) && !defined(__clang__)) || (defined(__clang__) && defined(__OPTIMIZE__)) || (defined(__clang__) && defined(__APPLE__)) ||               \
 	(defined(__clang__) && defined(CCM_CONFIG_AGGRESSIVELY_OPTIMIZE))
 			if (x == 1.0 && y_bits.is_signaling_nan()) { return 1.0; }
 #endif
