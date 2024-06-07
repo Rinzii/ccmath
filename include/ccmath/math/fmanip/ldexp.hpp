@@ -10,18 +10,17 @@
 
 #include "ccmath/internal/config/builtin/bit_cast_support.hpp"
 #include "ccmath/internal/config/builtin/ldexp_support.hpp"
+#include "ccmath/internal/helpers/internal_ldexp.hpp"
 #include "ccmath/internal/predef/has_const_builtin.hpp"
-#if defined(CCMATH_HAS_CONSTEXPR_BUILTIN_LDEXP) || CCM_HAS_CONST_BUILTIN(__builtin_ldexp) // Include nothing
-#elif CCM_HAS_BUILTIN(__builtin_bit_cast) || defined(CCMATH_HAS_BUILTIN_BIT_CAST)
-	#include "ccmath/internal/helpers/internal_ldexp.hpp"
-#else
+
+/* TODO: Move, remove, or change this to not use bit_cast.
 	#include "ccmath/internal/support/bits.hpp"
 	#include "ccmath/internal/support/fenv/fenv_support.hpp"
 	#include "ccmath/internal/support/floating_point_traits.hpp"
 	#include "ccmath/math/compare/isfinite.hpp"
 
 	#include <limits>
-#endif
+*/
 
 namespace ccm
 {
@@ -42,9 +41,9 @@ namespace ccm
 		if constexpr (std::is_same_v<T, double>) { return __builtin_ldexp(num, exp); }
 		if constexpr (std::is_same_v<T, long double>) { return __builtin_ldexpl(num, exp); }
 		return static_cast<T>(__builtin_ldexpl(num, exp));
-#elif CCM_HAS_BUILTIN(__builtin_bit_cast) || defined(CCMATH_HAS_BUILTIN_BIT_CAST)
-		return helpers::internal_ldexp(num, exp);
 #else
+		return helpers::internal_ldexp(num, exp);
+		/* TODO: Move, remove, or change this to not use bit_cast.
 		// Fallback option. Does not give perfect results, but generally good enough.
 		int old_exp = static_cast<int>(support::get_exponent_of_floating_point<T>(num));
 
@@ -101,6 +100,7 @@ namespace ccm
 		num /= support::floating_point_traits<T>::normalize_factor;
 
 		return num;
+		 */
 #endif
 	}
 

@@ -18,28 +18,29 @@
 #include <climits>
 #include <cstddef>
 #include <cstdint>
+#include <string_view>
 
 namespace ccm::support
 {
 
-	constexpr uint8_t operator""_u8(unsigned long long value)
+	constexpr std::uint8_t operator""_u8(unsigned long long value)
 	{
-		return static_cast<uint8_t>(value);
+		return static_cast<std::uint8_t>(value);
 	}
 
-	constexpr uint16_t operator""_u16(unsigned long long value)
+	constexpr std::uint16_t operator""_u16(unsigned long long value)
 	{
-		return static_cast<uint16_t>(value);
+		return static_cast<std::uint16_t>(value);
 	}
 
-	constexpr uint32_t operator""_u32(unsigned long long value)
+	constexpr std::uint32_t operator""_u32(unsigned long long value)
 	{
-		return static_cast<uint32_t>(value);
+		return static_cast<std::uint32_t>(value);
 	}
 
-	constexpr uint64_t operator""_u64(unsigned long long value)
+	constexpr std::uint64_t operator""_u64(unsigned long long value)
 	{
-		return static_cast<uint64_t>(value);
+		return static_cast<std::uint64_t>(value);
 	}
 
 	namespace internal
@@ -50,10 +51,10 @@ namespace ccm::support
 		constexpr T accumulate(int base, const uint8_t * digits, size_t size)
 		{
 			T value{};
-			for (; size; ++digits, --size) // NOLINT
+			for (size_t i = 0; i < size; ++i)
 			{
-				value *= base;
-				value += *digits;
+				value *= static_cast<T>(base);
+				value += digits[i]; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 			}
 			return value;
 		}
@@ -66,28 +67,37 @@ namespace ccm::support
 			// One character provides log2(base) bits.
 			// Base 2 and 16 provide exactly one and four bits per character respectively.
 			// For base 10, a character provides log2(10) ≈ 3.32... which we round to 3
-			// for the purpose of buffer allocation.
-			static constexpr size_t BITS_PER_DIGIT = base == 2 ? 1 : base == 10 ? 3 : base == 16 ? 4 : 0;
-			static constexpr size_t MAX_DIGITS	   = sizeof(T) * CHAR_BIT / BITS_PER_DIGIT;
-			static constexpr uint8_t INVALID_DIGIT = 255;
-
-			uint8_t digits[MAX_DIGITS] = {};
-			size_t size				   = 0;
-
-			constexpr DigitBuffer(const char * str)
+			// for buffer allocation.
+			static constexpr std::size_t calculate_bits_per_digit()
 			{
-				for (; *str != '\0'; ++str) { push(*str); }
+				if (base == 2) { return 1; }
+				if (base == 10) { return 3; }
+				if (base == 16) { return 4; }
+				return 0;
+			}
+
+			static constexpr std::size_t BITS_PER_DIGIT = calculate_bits_per_digit();
+			static constexpr std::size_t MAX_DIGITS		= sizeof(T) * CHAR_BIT / BITS_PER_DIGIT;
+			static constexpr std::uint8_t INVALID_DIGIT = 255;
+
+			// std::uint8_t digits[MAX_DIGITS] = {};
+			std::array<std::uint8_t, MAX_DIGITS> digits = {};
+			std::size_t size							= 0;
+
+			constexpr explicit DigitBuffer(std::string_view str)
+			{
+				for (char const ch : str) { push(ch); }
 			}
 
 			// Returns the digit for a particular character.
 			// Returns INVALID_DIGIT if the character is invalid.
 			static constexpr uint8_t get_digit_value(const char c)
 			{
-				const auto to_lower = [](char c) { return c | 32; };
-				const auto is_digit = [](char c) { return c >= '0' && c <= '9'; };
-				const auto is_alpha = [](char c) { return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z'); };
-				if (is_digit(c)) { return static_cast<uint8_t>(c - '0'); }
-				if (base > 10 && is_alpha(c)) { return static_cast<uint8_t>(to_lower(c) - 'a' + 10); }
+				const auto to_lower = [](char ch) { return static_cast<char>(std::byte(ch) | std::byte(32)); };
+				const auto is_digit = [](char ch) { return ch >= '0' && ch <= '9'; };
+				const auto is_alpha = [](char ch) { return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z'); };
+				if (is_digit(c)) { return static_cast<std::uint8_t>(c - '0'); }
+				if (base > 10 && is_alpha(c)) { return static_cast<std::uint8_t>(to_lower(c) - 'a' + 10); }
 				return INVALID_DIGIT;
 			}
 
@@ -96,18 +106,18 @@ namespace ccm::support
 			{
 				if (c == '\'')
 				{
-					return; // ' is valid but not taken into account.
+					return; // The character ' is valid but not taken into account.
 				}
-				const uint8_t value = get_digit_value(c);
+				const std::uint8_t value = get_digit_value(c);
 				if (value == INVALID_DIGIT || size >= MAX_DIGITS)
 				{
-					// During constant evaluation `__builtin_unreachable` will halt the
+					// During constant evaluation `ccm::support::unreachable()` will halt the
 					// compiler as it is not executable. This is preferable over `assert` that
-					// will only trigger in debug mode. Also we can't use `static_assert`
+					// will only trigger in debug mode. Also, we can't use `static_assert`
 					// because `value` and `size` are not constant.
 					ccm::support::unreachable(); // invalid or too many characters.
 				}
-				digits[size] = value;
+				digits.at(size) = value;
 				++size;
 			}
 		};
@@ -118,10 +128,10 @@ namespace ccm::support
 		struct Parser
 		{
 			template <int base>
-			static constexpr T parse(const char * str)
+			static constexpr T parse(std::string_view str)
 			{
 				const DigitBuffer<T, base> buffer(str);
-				return accumulate<T>(base, buffer.digits, buffer.size);
+				return accumulate<T>(base, buffer.digits.data(), buffer.size);
 			}
 		};
 
@@ -134,31 +144,33 @@ namespace ccm::support
 		struct Parser<ccm::types::UInt<N>>
 		{
 			using UIntT = ccm::types::UInt<N>;
+
 			template <int base>
-			static constexpr UIntT parse(const char * str)
+			static constexpr UIntT parse(std::string_view str)
 			{
 				const DigitBuffer<UIntT, base> buffer(str);
 				if constexpr (base == 10)
 				{
 					// Slow path, we sum and multiply BigInt for each digit.
-					return accumulate<UIntT>(base, buffer.digits, buffer.size);
+					return accumulate<UIntT>(base, buffer.digits.data(), buffer.size);
 				}
 				else
 				{
-					// Fast path, we consume blocks of WordType and creates the BigInt's
+					// Fast path, we consume blocks of WordType and create the BigInt's
 					// internal representation directly.
-					using WordArrayT		  = decltype(UIntT::val);
-					using WordType			  = typename WordArrayT::value_type;
-					WordArrayT array		  = {};
-					size_t size				  = buffer.size;
-					const uint8_t * digit_ptr = buffer.digits + size;
+					using WordArrayT	= decltype(UIntT::val);
+					using WordType		= typename WordArrayT::value_type;
+					WordArrayT array	= {};
+					size_t size			= buffer.size;
+					const auto & digits = buffer.digits;
+
 					for (size_t i = 0; i < array.size(); ++i)
 					{
 						constexpr size_t DIGITS = DigitBuffer<WordType, base>::MAX_DIGITS;
 						const size_t chunk		= size > DIGITS ? DIGITS : size;
-						digit_ptr -= chunk;
+						size_t const start		= size - chunk;
+						array.at(i)				= accumulate<WordType>(base, &digits.at(start), chunk);
 						size -= chunk;
-						array[i] = accumulate<WordType>(base, digit_ptr, chunk);
 					}
 					return UIntT(array);
 				}
@@ -167,16 +179,22 @@ namespace ccm::support
 
 		// Detects the base of the number and dispatches to the right implementation.
 		template <typename T>
-		constexpr T parse_with_prefix(const char * ptr)
+		constexpr T parse_with_prefix_internal(std::string_view view)
 		{
 			using P = Parser<T>;
+
+			if (view.size() >= 2 && view[0] == '0' && view[1] == 'b') { return P::template parse<2>(view.substr(2).data()); }
+			if (view.size() >= 2 && view[0] == '0' && view[1] == 'x') { return P::template parse<16>(view.substr(2).data()); }
+
+			return P::template parse<10>(view.data());
+		}
+
+		template <typename T>
+		constexpr T parse_with_prefix(const char * ptr)
+		{
 			if (ptr == nullptr) { return T(); }
-			if (ptr[0] == '0')
-			{
-				if (ptr[1] == 'b') return P::template parse<2>(ptr + 2);
-				if (ptr[1] == 'x') return P::template parse<16>(ptr + 2);
-			}
-			return P::template parse<10>(ptr);
+
+			return parse_with_prefix_internal<T>(std::string_view(ptr));
 		}
 
 	} // namespace internal
@@ -192,15 +210,22 @@ namespace ccm::support
 	}
 
 	template <typename T>
+	constexpr T parse_bigint_internal(std::string_view view)
+	{
+		if (view[0] == '-' || view[0] == '+')
+		{
+			auto positive = internal::parse_with_prefix<T>(view.substr(1).data());
+			return view[0] == '-' ? -positive : positive;
+		}
+		return internal::parse_with_prefix<T>(view);
+	}
+
+	template <typename T>
 	constexpr T parse_bigint(const char * ptr)
 	{
 		if (ptr == nullptr) { return T(); }
-		if (ptr[0] == '-' || ptr[0] == '+')
-		{
-			auto positive = internal::parse_with_prefix<T>(ptr + 1);
-			return ptr[0] == '-' ? -positive : positive;
-		}
-		return internal::parse_with_prefix<T>(ptr);
+
+		return parse_bigint_internal<T>(std::string_view(ptr));
 	}
 
 } // namespace ccm::support

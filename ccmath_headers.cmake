@@ -133,7 +133,9 @@ set(ccmath_internal_runtime_headers
 )
 
 
-## Support headers
+#######################################
+### Support headers
+#######################################
 
 set(ccmath_internal_support_fenv_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fenv/fenv_support.hpp
@@ -148,10 +150,10 @@ set(ccmath_internal_support_math_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/math/internal_sqrt.hpp
 )
 
-
 set(ccmath_internal_support_headers
         ${ccmath_internal_support_fenv_headers}
         ${ccmath_internal_support_fp_headers}
+        ${ccmath_internal_support_math_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/bits.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/endian.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/floating_point_traits.hpp
@@ -210,9 +212,6 @@ set(ccmath_internal_headers
 ## Basic headers
 
 set(ccmath_math_basic_impl_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/fma_float_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/fma_double_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/fma_ldouble_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/nan_float_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/nan_double_impl.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/basic/impl/remquo_float_impl.hpp

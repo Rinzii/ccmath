@@ -15,6 +15,7 @@
 #include "ccmath/internal/types/int128_types.hpp"
 
 #include <cstdint>
+#include <type_traits>
 
 namespace ccm::rt::simd
 {
