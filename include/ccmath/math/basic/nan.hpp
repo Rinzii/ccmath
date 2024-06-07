@@ -20,11 +20,7 @@ namespace ccm
 	 */
 	constexpr double nan(const char * arg) noexcept
 	{
-#if defined(_MSC_VER) && !defined(__clang__) // MSVC has constexpr support for __builtin_nan
-		return __builtin_nan(arg);
-#else
 		return internal::impl::nan_double_impl(arg);
-#endif
 	}
 
 	/**
@@ -34,11 +30,7 @@ namespace ccm
 	 */
 	constexpr float nanf(const char * arg) noexcept
 	{
-#if defined(_MSC_VER) && !defined(__clang__) // MSVC has constexpr support for __builtin_nanf
-		return __builtin_nanf(arg);
-#else
 		return internal::impl::nan_float_impl(arg);
-#endif
 	}
 
 	/**
@@ -48,7 +40,6 @@ namespace ccm
 	 */
 	constexpr long double nanl(const char * /* arg */) noexcept
 	{
-		// TODO: Implement nanl.
 		if constexpr (!std::numeric_limits<long double>::is_iec559)
 		{
 			return 0.0;
