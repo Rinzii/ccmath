@@ -604,7 +604,7 @@ namespace ccm::types
 		 * @param other The source BigInt to construct from.
 		 */
 		template <size_t OtherBits, bool OtherSigned>
-		constexpr BigInt(const BigInt<OtherBits, OtherSigned, WordType> & other)
+		constexpr explicit BigInt(const BigInt<OtherBits, OtherSigned, WordType> & other)
 		{
 			if (OtherBits >= Bits)
 			{
@@ -626,8 +626,8 @@ namespace ccm::types
 		 * @param nums The input array of WordType values.
 		 */
 		template <std::size_t N>
-		constexpr BigInt(
-			const WordType (&nums)[N]) // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays) - We are intentionally using C-style arrays here.
+		constexpr explicit BigInt(
+			const WordType (&nums)[N]) // NOLINT(cppcoreguidelines-avoid-c-arrays) - We are intentionally using C-style arrays here.
 		{
 			static_assert(N == WORD_COUNT);
 			for (std::size_t i = 0; i < WORD_COUNT; ++i) { val[i] = nums[i]; }
@@ -649,6 +649,7 @@ namespace ccm::types
 		 * @param v The integral value to initialize the BigInt with.
 		 */
 		template <typename T, typename = std::enable_if_t<support::traits::ccm_is_integral_v<T>>>
+		// NOLINTNEXTLINE(google-explicit-constructor) - Cannot be marked explicit.
 		constexpr BigInt(T v)
 		{
 			constexpr std::size_t T_SIZE = sizeof(T) * CHAR_BIT;
@@ -806,8 +807,9 @@ namespace ccm::types
 		 * @param other The BigInt to add.
 		 * @return The result of the addition.
 		 */
-		constexpr BigInt operator+([[maybe_unused]] BigInt && other) const
+		constexpr BigInt operator+(BigInt && other) const
 		{
+			std::move(other); // We ignore the moved value here.
 			other.add_overflow(*this); // We ignore the returned carry value here.
 			return other;
 		}
@@ -841,7 +843,7 @@ namespace ccm::types
 
 		constexpr BigInt & operator-=(const BigInt & other)
 		{
-			if (sub_overflow(other)) // Perform subtraction and if the returned carry is true, we have an overflow.
+			if (sub_overflow(other)) // Perform subtraction, and if the returned carry is true, we have an overflow.
 			{
 				// Attempt to set errno to ERANGE and raise FE_OVERFLOW if we are able to.
 				support::fenv::set_errno_if_required(ERANGE);
@@ -979,10 +981,10 @@ namespace ccm::types
 			constexpr std::size_t HALF_WORD_SIZE = WORD_SIZE >> 1;
 			constexpr WordType HALF_MASK		 = ((WordType(1) << HALF_WORD_SIZE) - 1);
 
-			// "lower" is equal to smallest multiple of WORD_SIZE that is >= e.
+			// "lower" is equal to the smallest multiple of WORD_SIZE that is >= e.
 			std::size_t lower = ((e >> LOG2_WORD_SIZE) + static_cast<std::size_t>((e & (WORD_SIZE - 1)) != 0)) << LOG2_WORD_SIZE;
 
-			// "lower_pos" is the index of the closest WORD_SIZEpbit  chunk >= 2^e.
+			// "lower_pos" is the index of the closest WORD_SIZE bit chunk >= 2^e.
 			std::size_t lower_pos = lower / WORD_SIZE;
 
 			WordType rem = 0; // Track the current remainder of mod x * 2^(32*i)
@@ -1024,8 +1026,8 @@ namespace ccm::types
 				WordType d	   = val[--pos];
 				if (last_shift >= HALF_WORD_SIZE)
 				{
-					// When performing the shifting of (rem * 2^(lower - e)) we might overlflow our word type.
-					// Due to this we perform a half-word shift to avoid overflow.
+					// When performing the shifting of (rem * 2^(lower - e)) we might overflow our word type.
+					// Due to this, we perform a half-word shift to avoid overflow.
 					rem <<= HALF_WORD_SIZE;
 					rem += d >> HALF_WORD_SIZE;
 					d &= HALF_MASK;
@@ -1049,8 +1051,8 @@ namespace ccm::types
 
 				if (lower - e <= HALF_WORD_SIZE)
 				{
-					// IF we have the remainder rem * 2^(lower - e) it might overflow to a higher word type chunk.
-					// Due to this we will adjust remainder to defend against overflow.
+					// IF we have the remainder rem * 2^(lower - e), it might overflow to a higher word type chunk.
+					// Due to this, we will adjust the remainder to defend against overflow.
 					if (pos < WORD_COUNT - 1) { remainder[pos + 1] = rem >> HALF_WORD_SIZE; }
 					remainder[pos] = (rem << HALF_WORD_SIZE) + (val[pos] & HALF_MASK);
 				}
@@ -1261,11 +1263,16 @@ namespace ccm::types
 				BigInt subtractor = divider;
 				int cur_bit		  = multiword::countl_zero(subtractor.val) - multiword::countl_zero(remainder.val);
 				subtractor <<= cur_bit;
-				for (; cur_bit >= 0 && remainder > 0; --cur_bit, subtractor >>= 1)
+
+				while (cur_bit >= 0 && remainder > 0)
 				{
-					if (remainder < subtractor) { continue; }
-					remainder -= subtractor;
-					quotient.set_bit(cur_bit);
+					if (remainder >= subtractor)
+					{
+						remainder -= subtractor;
+						quotient.set_bit(cur_bit);
+					}
+					--cur_bit;
+					subtractor >>= 1;
 				}
 			}
 			return Division{quotient, remainder};
