@@ -1,6 +1,7 @@
 
 
 set(ccmath_extensions_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/align.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/clamp.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/cubic.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/degrees.hpp
@@ -13,5 +14,6 @@ set(ccmath_extensions_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/radians.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/rcp.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/smoothstep.hpp
+
 
 )
