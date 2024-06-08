@@ -86,7 +86,7 @@ namespace ccm::internal::impl
 	}
 
 	template <typename T>
-	// NOLINTNEXTLINE(readability-function-cognitive-complexity) - Has a natural complexity of around 50+. To avoid fracturing, we allow this.
+	// NOLINTNEXTLINE(readability-function-cognitive-complexity) - Has a naturally high complexity. To avoid fracturing, we allow this.
 	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> pow_impl_handle_special_cases(support::FPBits<T> & x_bits, support::FPBits<T> & y_bits, T & x,
 																							 T & y) noexcept
 	{
