@@ -21,6 +21,7 @@ option(CCMATH_INSTALL "Setup install and package steps" ${is_root_project})
 option(CCMATH_ENABLE_EXTENSIONS "Enable the extended ccmath library that adds helpful additional methods that are not defined by the standard" ON)
 option(CCMATH_ENABLE_RUNTIME_SIMD "Enable SIMD optimization for runtime evaluation (does not effect compile time)" ON)
 option(CCMATH_ENABLE_USER_DEFINED_OPTIMIZATION_MACROS "Enable user defined optimization macros instead of having ccmath define its own internal ones in cmake" ON)
+option(CCMATH_DISABLE_ERRNO "Disable the use of errno in ccmath during runtime" OFF)
 
 # include the global configuration file
 include(cmake/GlobalConfig.cmake)
@@ -112,6 +113,10 @@ if (NOT CCMATH_ENABLE_USER_DEFINED_OPTIMIZATION_MACROS)
             $<$<CONFIG:Release>:CCM_CONFIG_AGGRESSIVELY_OPTIMIZE> # -O3
             $<$<CONFIG:MinSizeRel>:CCM_CONFIG_MINSIZE> # -Os
     )
+endif ()
+
+if (CCMATH_DISABLE_ERRNO)
+    target_compile_definitions(${PROJECT_NAME} INTERFACE CCM_CONFIG_DISABLE_ERRNO)
 endif ()
 
 configure_file(cmake/version.hpp.in "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp" @ONLY)

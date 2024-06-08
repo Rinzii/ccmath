@@ -111,7 +111,7 @@ namespace ccm::support::fenv
 
 	constexpr int ccm_math_err_handling()
 	{
-#if defined(__FAST_MATH__) || defined(CCM_DISABLE_ERRNO)
+#if defined(__FAST_MATH__) || defined(CCM_CONFIG_DISABLE_ERRNO)
 		return 0;
 #elif defined(__NO_MATH_ERRNO__)
 		return get_mode(ccm_math_err_mode::eErrnoExcept);
