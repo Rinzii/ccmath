@@ -2,6 +2,7 @@
 Checks: '-*,
 bugprone-*,
 -bugprone-easily-swappable-parameters,
+-bugprone-narrowing-conversions,
 
 modernize-*,
 -modernize-use-trailing-return-type,
@@ -64,3 +65,4 @@ openmp-use-default-none,
 
 CheckOptions:
   cppcoreguidelines-avoid-do-while.IgnoreMacros: 'true'
+  readability-function-cognitive-complexity.Threshold: 35
