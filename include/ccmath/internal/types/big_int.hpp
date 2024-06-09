@@ -604,7 +604,7 @@ namespace ccm::types
 		 * @param other The source BigInt to construct from.
 		 */
 		template <size_t OtherBits, bool OtherSigned>
-		constexpr explicit BigInt(const BigInt<OtherBits, OtherSigned, WordType> & other)
+		constexpr BigInt(const BigInt<OtherBits, OtherSigned, WordType> & other)
 		{
 			if (OtherBits >= Bits)
 			{
@@ -626,7 +626,7 @@ namespace ccm::types
 		 * @param nums The input array of WordType values.
 		 */
 		template <std::size_t N>
-		constexpr explicit BigInt(
+		constexpr BigInt(
 			const WordType (&nums)[N]) // NOLINT(cppcoreguidelines-avoid-c-arrays) - We are intentionally using C-style arrays here.
 		{
 			static_assert(N == WORD_COUNT);
@@ -1422,7 +1422,7 @@ namespace ccm::types
 	struct make_integral_or_big_int_unsigned;
 
 	template <typename T>
-	struct make_integral_or_big_int_unsigned<T, std::enable_if_t<support::traits::ccm_is_integral_v<T>>> : std::make_unsigned<T>
+	struct make_integral_or_big_int_unsigned<T, std::enable_if_t<support::traits::ccm_is_integral_v<T>>> : support::traits::ccm_make_unsigned<T>
 	{
 	};
 
@@ -1438,7 +1438,7 @@ namespace ccm::types
 	struct make_integral_or_big_int_signed;
 
 	template <typename T>
-	struct make_integral_or_big_int_signed<T, std::enable_if_t<ccm::support::traits::ccm_is_integral_v<T>>> : std::make_signed<T>
+	struct make_integral_or_big_int_signed<T, std::enable_if_t<ccm::support::traits::ccm_is_integral_v<T>>> : support::traits::ccm_make_signed<T>
 	{
 	};
 
