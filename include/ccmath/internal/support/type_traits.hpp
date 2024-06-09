@@ -133,6 +133,44 @@ namespace ccm::support::traits
 
 	template <typename T> constexpr bool is_unsigned_integer_v = std::conjunction_v<ccm_is_integral<T>, ccm_is_unsigned<T>>;
 
+	template <typename T> struct ccm_make_unsigned;
+
+	template <> struct ccm_make_unsigned<char> : type_identity<unsigned char> {};
+	template <> struct ccm_make_unsigned<signed char> : type_identity<unsigned char> {};
+	template <> struct ccm_make_unsigned<short> : type_identity<unsigned short> {};
+	template <> struct ccm_make_unsigned<int> : type_identity<unsigned int> {};
+	template <> struct ccm_make_unsigned<long> : type_identity<unsigned long> {};
+	template <> struct ccm_make_unsigned<long long> : type_identity<unsigned long long> {};
+	template <> struct ccm_make_unsigned<unsigned char> : type_identity<unsigned char> {};
+	template <> struct ccm_make_unsigned<unsigned short> : type_identity<unsigned short> {};
+	template <> struct ccm_make_unsigned<unsigned int> : type_identity<unsigned int> {};
+	template <> struct ccm_make_unsigned<unsigned long> : type_identity<unsigned long> {};
+	template <> struct ccm_make_unsigned<unsigned long long> : type_identity<unsigned long long> {};
+#ifdef CCM_TYPES_HAS_INT128
+	template <> struct ccm_make_unsigned<__int128_t> : type_identity<__uint128_t> {};
+	template <> struct ccm_make_unsigned<__uint128_t> : type_identity<__uint128_t> {};
+#endif
+	template <typename T> using ccm_make_unsigned_t = typename ccm_make_unsigned<T>::type;
+
+template <typename Ta> struct ccm_make_signed;
+template <>	struct ccm_make_signed<char> : type_identity<char> {};
+template <>	struct ccm_make_signed<signed char> : type_identity<char> {};
+template <>	struct ccm_make_signed<short> : type_identity<short> {};
+template <>	struct ccm_make_signed<int> : type_identity<int> {};
+template <>	struct ccm_make_signed<long> : type_identity<long> {};
+template <>	struct ccm_make_signed<long long> : type_identity<long long> {};
+template <>	struct ccm_make_signed<unsigned char> : type_identity<char> {};
+template <>	struct ccm_make_signed<unsigned short> : type_identity<short> {};
+template <>	struct ccm_make_signed<unsigned int> : type_identity<int> {};
+template <>	struct ccm_make_signed<unsigned long> : type_identity<long>	{};
+template <>	struct ccm_make_signed<unsigned long long> : type_identity<long long> {};
+#ifdef CCM_TYPES_HAS_INT128
+template <>	struct ccm_make_signed<__int128_t> : type_identity<__int128_t> {};
+template <>	struct ccm_make_signed<__uint128_t> : type_identity<__int128_t> {};
+#endif
+template <typename T> using ccm_make_signed_t = typename ccm_make_signed<T>::type;
+	
+
 	// clang-format on
 
 
