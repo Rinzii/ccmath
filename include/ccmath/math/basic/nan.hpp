@@ -42,7 +42,7 @@ namespace ccm
 	constexpr long double nanl(const char * arg) noexcept
 	{
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
-		return internal::impl::nan_double_impl(arg);
+		return static_cast<long double>(ccm::nan(arg));
 #else
 		return internal::impl::nan_ldouble_impl(arg);
 #endif
