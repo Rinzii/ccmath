@@ -18,10 +18,13 @@
 
 namespace ccm::internal::impl
 {
+	constexpr long double nan_ldouble_impl(const char * arg) noexcept;
+
+#ifndef CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
 	constexpr long double nan_ldouble_impl(const char * arg) noexcept
 	{
 
-		if constexpr (!std::numeric_limits<double>::is_iec559)
+		if constexpr (!std::numeric_limits<long double>::is_iec559)
 		{
 			return 0.0;
 		}
@@ -103,4 +106,5 @@ namespace ccm::internal::impl
 		// Convert the uint128_t tag into a double NaN
 		return ccm::support::bit_cast<long double>(dbl_bits);
 	}
+#endif
 } // namespace ccm::internal::impl
