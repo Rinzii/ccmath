@@ -55,7 +55,7 @@ namespace ccm::support
 	struct floating_point_traits<double>
 	{
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT128)
-		using upgraded_floating_type = long double
+		using upgraded_floating_type = long double;
 #elif defined(CCM_TYPES_HAS_FLOAT128)
 		using upgraded_floating_type = ccm::types::float128;
 #elif defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
