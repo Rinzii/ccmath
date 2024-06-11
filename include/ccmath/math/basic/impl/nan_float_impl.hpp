@@ -20,7 +20,7 @@ namespace ccm::internal::impl
 	{
 		if constexpr (!std::numeric_limits<float>::is_iec559)
 		{
-			return 0.0;
+			return 0.0F;
 		}
 
 #if defined(_MSC_VER) && !defined(__clang__)
@@ -46,7 +46,7 @@ namespace ccm::internal::impl
 
 		if (!has_hex_been_detected)
 		{
-			// Check that all of are characters are numbers. If we detect a non-number, return the default NaN.
+			// Check that all of are the characters are numbers. If we detect a non-number, return the default NaN.
 			for (std::size_t i = 0; arg[i] != '\0'; ++i) // NOLINT
 			{
 				if (arg[i] < '0' || arg[i] > '9')
@@ -62,10 +62,10 @@ namespace ccm::internal::impl
 			for (std::size_t i = 0; arg[i] != '\0'; ++i)
 			{
 				flt_bits *= 16;
-				flt_bits += static_cast<uint8_t>(ccm::helpers::digit_to_int(arg[i])); // Convert ASCII to numeric value
+				flt_bits += static_cast<std::uint8_t>(ccm::helpers::digit_to_int(arg[i])); // Convert ASCII to numeric value
 				if (i >= 7)
 				{
-					flt_bits %= static_cast<uint32_t>(1e8); // Wrap around for numbers larger than 8 digits
+					flt_bits %= static_cast<std::uint32_t>(1e8); // Wrap around for numbers larger than 8 digits
 				}
 			}
 		}
@@ -75,10 +75,10 @@ namespace ccm::internal::impl
 			for (std::size_t i = 0; arg[i] != '\0'; ++i)
 			{
 				flt_bits *= 10;
-				flt_bits += static_cast<uint8_t>(ccm::helpers::digit_to_int(arg[i])); // Convert ASCII to numeric value
+				flt_bits += static_cast<std::uint8_t>(ccm::helpers::digit_to_int(arg[i])); // Convert ASCII to numeric value
 				if (i >= 7)
 				{
-					flt_bits %= static_cast<uint32_t>(1e8); // Wrap around for numbers larger than 8 digits
+					flt_bits %= static_cast<std::uint32_t>(1e8); // Wrap around for numbers larger than 8 digits
 				}
 			}
 		}
@@ -86,7 +86,6 @@ namespace ccm::internal::impl
 		// NOLINTEND
 
 		// Set the tag bits for NaN
-		// flt_bits |= UINT32_C(0x7F800000);
 		flt_bits |= ccm::support::bit_cast<std::uint32_t>(std::numeric_limits<float>::quiet_NaN());
 
 		// Convert the bits to a float

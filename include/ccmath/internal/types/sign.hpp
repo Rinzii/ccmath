@@ -8,24 +8,27 @@
 
 #pragma once
 
-// A helper type meant to interact with signed arithmetic types.
-struct Sign
+namespace ccm::types
 {
-	[[nodiscard]] inline constexpr bool is_pos() const { return !is_negative; }
-	[[nodiscard]] inline constexpr bool is_neg() const { return is_negative; }
+	// A type to interact with signed arithmetic types.
+	struct Sign
+	{
+		[[nodiscard]] constexpr bool is_pos() const { return !m_is_negative_val; }
+		[[nodiscard]] constexpr bool is_neg() const { return m_is_negative_val; }
 
-	inline friend constexpr bool operator==(Sign a, Sign b) { return a.is_negative == b.is_negative; }
+		friend constexpr bool operator==(Sign a, Sign b) { return a.m_is_negative_val == b.m_is_negative_val; }
 
-	inline friend constexpr bool operator!=(Sign a, Sign b) { return !(a == b); }
+		friend constexpr bool operator!=(Sign a, Sign b) { return !(a == b); }
 
-	static const Sign positive;
-	static const Sign negative;
+		static const Sign POS;
+		static const Sign NEG;
 
-private:
-	inline constexpr explicit Sign(bool is_negative) : is_negative(is_negative) {}
+	private:
+		constexpr explicit Sign(bool is_negative) : m_is_negative_val(is_negative) {}
 
-	bool is_negative;
-};
+		bool m_is_negative_val;
+	};
 
-inline constexpr Sign Sign::negative = Sign(true);
-inline constexpr Sign Sign::positive = Sign(false);
+	inline constexpr Sign Sign::NEG = Sign(true);
+	inline constexpr Sign Sign::POS = Sign(false);
+} // namespace ccm::types

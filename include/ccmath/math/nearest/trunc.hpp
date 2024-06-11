@@ -8,66 +8,77 @@
 
 #pragma once
 
-#include "ccmath/math/basic/abs.hpp"
-#include "ccmath/math/compare/signbit.hpp"
+#include "ccmath/internal/support/fp_bits.hpp"
+#include "ccmath/internal/predef/unlikely.hpp"
 
 namespace ccm
 {
 	/**
 	 * @brief Returns the integral value nearest to x with the magnitude of the integral value always less than or equal to x.
 	 * @tparam T The type of the input.
-	 * @param x The value to truncate.
+	 * @param num The value to truncate.
 	 * @return Returns a truncated value.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, int> = 0>
-	constexpr T trunc(T x) noexcept
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
+	constexpr T trunc(T num) noexcept
 	{
-		// If x is NaN then return Positive NaN or Negative NaN depending on the sign of x
-		if (ccm::isnan(x))
-		{
-			if (ccm::signbit<T>(x)) { return -std::numeric_limits<T>::quiet_NaN(); }
-			return std::numeric_limits<T>::quiet_NaN();
-		}
+		using FPBits_t	= ccm::support::FPBits<T>;
+		using Storage_t = typename FPBits_t::storage_type;
 
-		// If x == ±∞ then return x
-		if (x == std::numeric_limits<T>::infinity() || x == -std::numeric_limits<T>::infinity()) { return x; }
+		FPBits_t bits(num);
 
-		// If x == ±0 then return x
-		if (x == static_cast<T>(0.0)) { return x; }
+		// If x == ±∞ then return num
+		// If x == ±NaN then return num
+		if (CCM_UNLIKELY(bits.is_inf_or_nan())) { return num; }
 
-		return static_cast<T>(static_cast<long long>(x));
+		// If x == ±0 then return num
+		if (CCM_UNLIKELY(num == 0.0)) { return num; }
+
+		const int exponent = bits.get_exponent();
+
+		// If the exponent is greater than or equal to the fraction length, then we will return the number as is since it is already an integer.
+		if (exponent >= FPBits_t::fraction_length) { return num; }
+
+		// If our exponent is set up such that the abs(x) is less than 1 we will instead return 0.
+		if (exponent <= -1) { return FPBits_t::zero(bits.sign()).get_val(); }
+
+		// Perform the truncation
+		const int trimming_size = FPBits_t::fraction_length - exponent;
+		const auto truncated_mantissa = static_cast<Storage_t>((bits.get_mantissa() >> trimming_size) << trimming_size);
+		bits.set_mantissa(truncated_mantissa);
+		return bits.get_val();
 	}
 
 	/**
 	 * @brief Returns the integral value nearest to x with the magnitude of the integral value always less than or equal to x.
 	 * @tparam Integer The type of the input.
-	 * @param x The value to truncate.
+	 * @param num The value to truncate.
 	 * @return Returns a truncated value.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>
-	constexpr double trunc(Integer x) noexcept
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
+	constexpr double trunc(Integer num) noexcept
 	{
-		return static_cast<double>(x);
+		return static_cast<double>(num);
 	}
 
 	/**
 	 * @brief Specialization for float that returns the integral value nearest to x with the magnitude of the integral value always less than or equal to x.
-	 * @param x The float to truncate.
+	 * @param num The float to truncate.
 	 * @return Returns a truncated float.
 	 */
-	constexpr float truncf(float x) noexcept
+	constexpr float truncf(float num) noexcept
 	{
-		return trunc<float>(x);
+		return ccm::trunc<float>(num);
 	}
 
 	/**
 	 * @brief Specialization for long double that returns the integral value nearest to x with the magnitude of the integral value always less than or equal to
 	 * x.
-	 * @param x The long double to truncate.
+	 * @param num The long double to truncate.
 	 * @return Returns a truncated long double.
 	 */
-	constexpr long double truncl(long double x) noexcept
+	constexpr long double truncl(long double num) noexcept
 	{
-		return trunc<long double>(x);
+		return ccm::trunc<long double>(num);
 	}
 } // namespace ccm

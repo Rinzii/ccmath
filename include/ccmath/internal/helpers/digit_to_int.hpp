@@ -26,4 +26,4 @@ namespace ccm::helpers
 		}
 		return 0;
 	}
-}
+} // namespace ccm::helpers

@@ -38,4 +38,4 @@ namespace ccm
 # else
 	#  error "Unknown CCM_FLT_EVAL_METHOD"
 # endif
-}
+} // namespace ccm

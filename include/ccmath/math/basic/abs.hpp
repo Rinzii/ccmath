@@ -11,7 +11,7 @@
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
-#include <array>
+
 #include <limits>
 
 namespace ccm
@@ -65,7 +65,7 @@ namespace ccm
 		else
 		{
 			static_assert(sizeof(T) == 0, "Taking the absolute value of an unsigned type that cannot be converted to int by integral promotion is ill-formed.");
-			return T(0);
+			return static_cast<T>(0);
 		}
 	}
 
@@ -78,7 +78,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T fabs(T num) noexcept
 	{
-		return abs<T>(num);
+		return ccm::abs<T>(num);
 	}
 
 	/**
@@ -90,7 +90,7 @@ namespace ccm
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double fabs(Integer num) noexcept
 	{
-		return abs<double>(static_cast<double>(num));
+		return ccm::abs<double>(static_cast<double>(num));
 	}
 
 	/**
@@ -100,7 +100,7 @@ namespace ccm
 	 */
 	constexpr float fabsf(float num) noexcept
 	{
-		return abs<float>(num);
+		return ccm::abs<float>(num);
 	}
 
 	/**
@@ -110,7 +110,7 @@ namespace ccm
 	 */
 	constexpr long double fabsl(long double num) noexcept
 	{
-		return abs<long double>(num);
+		return ccm::abs<long double>(num);
 	}
 
 	/**
@@ -120,7 +120,7 @@ namespace ccm
 	 */
 	constexpr long labs(long num) noexcept
 	{
-		return abs<long>(num);
+		return ccm::abs<long>(num);
 	}
 
 	/**
@@ -130,7 +130,7 @@ namespace ccm
 	 */
 	constexpr long long llabs(long long num) noexcept
 	{
-		return abs<long long>(num);
+		return ccm::abs<long long>(num);
 	}
 } // namespace ccm
 

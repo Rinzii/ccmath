@@ -30,7 +30,7 @@ namespace ccm::helpers
 	{
 #if FLT_EVAL_METHOD == 0
 		return x;
-#else
+#else // TODO: Not sure if this works correctly on non-FLT_EVAL_METHOD == 0 systems. Needs testing.
 		T math_narrow_eval_tmp = x;
 		if constexpr (check_excess_precision<T>)
 		{
