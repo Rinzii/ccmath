@@ -20,19 +20,6 @@
 // TODO: The nan functions are quite brittle and the test cases are extremely forgiving to the functions.
 // 		 At some point we should improve these test cases and the nan functions to handle all edge cases.
 
-namespace ccm::test
-{
-	template <std::size_t N>
-	void internalRemovePaddingBits(std::array<std::byte, N> & byteArray)
-	{
-		// If the array has 10 or fewer elements, there's nothing to zero out
-		if (N <= 10) { return; }
-
-		// Zero out everything after the 10th element
-		for (std::size_t i = 10; i < N; ++i) { byteArray.at(i) = std::byte{0}; }
-	}
-} // namespace ccm::test
-
 TEST(CcmathBasicTests, NanStaticAssert)
 {
 	// Assume we have access to ccm::isnan
@@ -184,7 +171,11 @@ TEST(CcmathBasicTests, Nan_LDouble64bit)
 template <std::size_t N>
 void removePaddingBits(std::array<std::byte, N> & byteArray)
 {
-	ccm::test::internalRemovePaddingBits(byteArray);
+	// If the array has 10 or fewer elements, there's nothing to zero out
+	if (N <= 10) { return; }
+
+	// Zero out everything after the 10th element
+	for (std::size_t i = 10; i < N; ++i) { byteArray.at(i) = std::byte{0}; }
 }
 
 template <std::size_t N>
