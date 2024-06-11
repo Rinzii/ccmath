@@ -8,9 +8,8 @@
 
 #pragma once
 
-#include "ccmath/math/basic/abs.hpp"
-#include "ccmath/math/compare/isinf.hpp"
-#include "ccmath/math/compare/signbit.hpp"
+#include "ccmath/internal/support/fp_bits.hpp"
+#include "ccmath/internal/predef/unlikely.hpp"
 
 namespace ccm
 {
@@ -23,18 +22,31 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T trunc(T num) noexcept
 	{
-		// If x is NaN then return Positive NaN or Negative NaN depending on the sign of x
-		if (ccm::isnan(num))
-		{
-			if (ccm::signbit<T>(num)) { return -std::numeric_limits<T>::quiet_NaN(); }
-			return std::numeric_limits<T>::quiet_NaN();
-		}
+		using FPBits_t	= ccm::support::FPBits<T>;
+		using Storage_t = typename FPBits_t::storage_type;
 
-		// If x == ±∞ then return x
-		// If x == ±0 then return x
-		if (ccm::isinf(num) || num == static_cast<T>(0.0)) { return num; }
+		FPBits_t bits(num);
 
-		return static_cast<T>(static_cast<long long>(num));
+		// If x == ±∞ then return num
+		// If x == ±NaN then return num
+		if (CCM_UNLIKELY(bits.is_inf_or_nan())) { return num; }
+
+		// If x == ±0 then return num
+		if (num == 0.0) { return num; }
+
+		const int exponent = bits.get_exponent();
+
+		// If the exponent is greater than or equal to the fraction length, then we will return the number as is since it is already an integer.
+		if (exponent >= FPBits_t::fraction_length) { return num; }
+
+		// If our exponent is set up such that the abs(x) is less than 1 we will instead return 0.
+		if (exponent <= -1) { return FPBits_t::zero(bits.sign()).get_val(); }
+
+		// Perform the truncation
+		const int trimming_size = FPBits_t::fraction_length - exponent;
+		const auto truncated_mantissa = static_cast<Storage_t>((bits.get_mantissa() >> trimming_size) << trimming_size);
+		bits.set_mantissa(truncated_mantissa);
+		return bits.get_val();
 	}
 
 	/**
