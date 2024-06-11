@@ -92,7 +92,7 @@ namespace ccm
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double fmax(Integer x, Integer y) noexcept
 	{
 		return max<double>(static_cast<double>(x), static_cast<double>(y));

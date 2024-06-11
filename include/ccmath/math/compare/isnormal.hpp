@@ -17,7 +17,7 @@ namespace ccm
 	/**
 	 * @brief Checks if the given number has a normal value.
 	 * @tparam T The type of the number.
-	 * @param x A floating-point or integer value
+	 * @param num A floating-point or integer value
 	 * @return true if the number has a normal value, false otherwise.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
@@ -29,7 +29,7 @@ namespace ccm
 	/**
 	 * @brief Checks if the given number has a normal value.
 	 * @tparam Integer The type of the integer.
-	 * @param x A integer value to check.
+	 * @param num A integer value to check.
 	 * @return true if the number has a normal value, false otherwise.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>

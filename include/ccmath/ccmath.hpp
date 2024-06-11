@@ -8,20 +8,6 @@
 
 #pragma once
 
-/*
-CCMATH REQUIREMENTS:
- * The entire library mandates everything MUST be constexpr. If it is not constexpr, it is not part of the library.
- * We do not allow exceptions.
- * We do allow static_asserts.
- * We must mimic the api of the standard cmath library.
- * Anything that could be considered UB is strictly forbidden.
- * Performance is are primary concern. Everything must be as fast as possible.
- * Anything implemented by cmath that is already constexpr is allowed to be wrapped by ccmath and not implemented by ccmath.
- */
-
-// Includes ccm::float_t and ccm::double_t
-#include "ccmath/internal/types/fp_types.hpp"
-
 /// Basic math functions
 #include "ccmath/basic.hpp"
 

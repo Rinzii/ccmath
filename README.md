@@ -42,7 +42,7 @@ include(FetchContent)
 FetchContent_Declare(
         ccmath
         GIT_REPOSITORY https://github.com/Rinzii/ccmath.git
-        GIT_TAG v0.1.0 # Replace with the version you want to use
+        GIT_TAG v0.2.0 # Replace with the version you want to use
 )
 FetchContent_MakeAvailable(ccmath)
 
@@ -65,20 +65,21 @@ target_link_libraries(main PRIVATE ccmath::ccmath)
 CCmath is an open-source project, and it needs your help to go on growing and improving. If you want to get involved and suggest some additional features, file a bug report or submit a patch, please have a look at the [contribution guidelines](CONTRIBUTING.md)!
 
 ## Implementation Progress (Modules)
-| Module             | % done | In Progress? | Notes? | Planned Completion Version |
-|--------------------|--------|--------------|--------|----------------------------|
-| Basic              | 100    |              |        | v0.1.0 (Released)          |
-| Compare            | 100    |              |        | v0.2.0                     |
-| Exponential        | 33     | ✓            |        | v0.2.0                     |              
-| Float Manipulation | 20     |              |        |
-| Hyperbolic         | 0      |              |        |
-| Nearest            | 33     |              |        |
-| Power              | 5      |              |        |
-| Special Functions  | 0      |              |        |
-| Trigonometric      | 0      |              |        |
-| Misc Functions     | 30     |              |        |
+| Module                   | % done | In Progress? | Notes? | Planned Completion Version |
+|--------------------------|--------|--------------|--------|----------------------------|
+| Basic                    | 100    |              |        | v0.1.0 (Released)          |
+| Compare                  | 100    |              |        | v0.2.0 (Released)          |
+| Exponential              | 57     |              |        | v0.3.0                     |              
+| Float Manipulation       | 25     |              |        |                            |
+| Hyperbolic               | 0      |              |        |                            |
+| Nearest                  | 33     |              |        |                            |
+| Power                    | 5      | ✓            |        | v0.3.0                     |
+| Special Functions        | 0      |              |        |                            |
+| Trigonometric            | 0      |              |        |                            |
+| Misc Functions           | 30     |              |        |                            |
+| Total Library Completion | 37     |              |        |                            |
 
-> Last Updated: Apr 2, 2024
+> Last Updated: May 11, 2024
 
 ## Implementation Progress (Functions)
 
@@ -104,12 +105,12 @@ CCmath is an open-source project, and it needs your help to go on growing and im
 | isnormal       | 100    |                                                                                       |
 | isunordered    | 100    |                                                                                       |
 | signbit        | 100    | Desire to find a manner of implementing signbit on lower versions of MSVC.            |
-| exp            | 90     | Nearly finished. Just need some minor adjustments and better test coverage.           |
-| exp2           | 0      | Implement function                                                                    |
+| exp            | 100    |                                                                                       |
+| exp2           | 100    |                                                                                       |
 | expm1          | 0      | Implement function                                                                    |
-| log            | 100    | Functional, but fallbacks without requiring recent compiler versions is desired.      |
+| log            | 100    |                                                                                       |
 | log1p          | 0      | Implement function                                                                    |
-| log2           | 100    | Functional, but fallbacks without requiring recent compiler versions is desired.      |
+| log2           | 100    |                                                                                       |
 | log10          | 0      | Implement function                                                                    |
 | copysign       | 100    |                                                                                       |
 | frexp          | 0      | Implement function                                                                    |
@@ -118,7 +119,7 @@ CCmath is an open-source project, and it needs your help to go on growing and im
 | logb           | 0      | Implement function                                                                    |
 | modf           | 0      | Implement function                                                                    |
 | nextafter      | 0      | Implement function                                                                    |
-| scalbn         | 80     | Still need to implement the long double version of scalbn.                            |
+| scalbn         | 100    | Long double implementation is slow, but functional.                                   |
 | acosh          | 0      | Implement function                                                                    |
 | asinh          | 0      | Implement function                                                                    |
 | atanh          | 0      | Implement function                                                                    |
@@ -167,8 +168,13 @@ CCmath is an open-source project, and it needs your help to go on growing and im
 | lerp           | 90     | Nearly finished, just need to test the function further and validate full compliance. |
 | lgamma         | 0      | Implement function                                                                    |
 
-> Last Updated: Apr 2, 2024
+> Last Updated: May 11, 2024
 
+## Projects using CCMath!
+
+- [KittyOS](https://github.com/aomine001/kitty-os-cpp) - The kitty os but rewritten in C++ and better!
+
+_(Are you using CCMath in your project? Let us know!)_
 
 ## License
 
@@ -179,4 +185,4 @@ CCMath is distributed under the MIT License. See the LICENSE file for more infor
 
 Thanks a lot to LLVM, GCC,
 and LibM for a lot of insights and inspiration for many different tough issues
-encountered through out the development of ccmath!
+encountered throughout the development of ccmath!

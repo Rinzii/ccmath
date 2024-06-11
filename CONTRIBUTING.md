@@ -21,6 +21,11 @@ All types of contributions are encouraged and valued. See the [Table of Contents
 - [I Have a Question](#i-have-a-question)
 - [I Want To Contribute](#i-want-to-contribute)
 - [Your First Code Contribution](#your-first-code-contribution)
+- [How to manually build CCMath with the command line](#how-to-manually-build-ccmath-with-the-command-line)
+  - [Prerequisites](#prerequisites)
+  - [How to clone project from GitHub](#how-to-clone-project-from-github)
+  - [How to build the project](#how-to-build-the-project)
+  - [How to run tests](#how-to-run-tests)
 
 
 ## I Have a Question
@@ -61,5 +66,60 @@ We will then take care of the issue as soon as possible.
 <!-- TODO
 Add instructions for setting up your env, ide, and building the project
 -->
-
 WIP
+
+## How to manually build CCMath with the command line
+
+### Prerequisites
+- [CMake 3.18+](https://cmake.org/download/)
+- [Git](https://git-scm.com/)
+- [Ninja](https://ninja-build.org/) (for Linux & macOS
+- [Clang](https://clang.llvm.org/) or [GCC](https://gcc.gnu.org/) (for Linux & macOS)
+- [Visual Studio 22](https://visualstudio.microsoft.com/) (for Windows)
+
+### How to clone project from GitHub
+
+Step 1: Clone the repository
+```bash
+git clone https://github.com/Rinzii/ccmath.git
+```
+
+Step 2: (recommended) Check out the dev branch
+```bash
+git checkout dev
+```
+
+### How to build the project
+
+For Linux & macOS:
+```bash
+# Run commands in the project root directory
+
+# Configure cmake to use default compiler
+# Preset can alternatively be set to ninja-gcc or ninja-clang for use with gcc or clang
+cmake -S . --preset=default -B build
+
+# Build the project
+# --config= can be set to Debug, Release, or RelWithDebInfo
+cmake --build build --config=Debug
+```
+
+For Windows:
+```bash
+# Run commands in the project root directory
+
+# Configure cmake to use Visual Studio
+cmake -S . --preset=vs22 -B build
+
+# Build the project
+# --config= can be set to Debug, Release, or RelWithDebInfo
+cmake --build build --config=Debug
+```
+
+### How to run tests
+```bash
+# Run commands from the project root directory
+# Must have built the project before running tests
+cd build
+ctest -C Debug
+```

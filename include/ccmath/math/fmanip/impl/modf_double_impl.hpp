@@ -14,32 +14,29 @@ namespace ccm::internal::impl
 {
 	constexpr double modf_double_impl(double x, double* iptr) noexcept
 	{
-		std::int64_t i0{};
-		std::int32_t j0{};
-
-		i0 = ccm::support::double_to_int64(x);
+		const std::int64_t integerValue = support::double_to_int64(x);
 		// NOLINTNEXTLINE
-		j0 = ((i0 >> 52) & 0x7ff) - 0x3ff; // Get exponent of x
-		if (j0 < 52)
+		const std::int32_t exponent = ((integerValue >> 52) & 0x7ff) - 0x3ff; // Get exponent of x
+		if (exponent < 52)
 		{
-			if (j0 < 0)
+			if (exponent < 0)
 			{
 				// *iptr is equal to ±0
-				*iptr = ccm::support::int64_to_double(static_cast<std::int64_t>(static_cast<unsigned long>(i0) & UINT64_C(0x8000000000000000)));
+				*iptr = support::int64_to_double(static_cast<std::int64_t>(static_cast<unsigned long>(integerValue) & UINT64_C(0x8000000000000000)));
 				return x;
 			}
 
-			std::uint64_t i = UINT64_C(0x000fffffffffffff) >> j0;
+			const std::uint64_t i = UINT64_C(0x000fffffffffffff) >> exponent;
 			// x is an integral value
-			if ((static_cast<std::uint64_t>(i0) & i) == 0)
+			if ((static_cast<std::uint64_t>(integerValue) & i) == 0)
 			{
 				*iptr = x;
 				// return ±0
-				x = ccm::support::int64_to_double(static_cast<std::int64_t>(static_cast<unsigned long>(i0) & UINT64_C(0x8000000000000000)));
+				x = support::int64_to_double(static_cast<std::int64_t>(static_cast<unsigned long>(integerValue) & UINT64_C(0x8000000000000000)));
 				return x;
 			}
 
-			*iptr = ccm::support::int64_to_double(static_cast<std::int64_t>(static_cast<std::uint64_t>(i0) & (~i)));
+			*iptr = support::int64_to_double(static_cast<std::int64_t>(static_cast<std::uint64_t>(integerValue) & (~i)));
 			return x - *iptr;
 		}
 
@@ -47,13 +44,13 @@ namespace ccm::internal::impl
 		*iptr = x * 1.0;
 
 		// Handle the NaN's separately
-		if (j0 == 0x400 && ((static_cast<unsigned long>(i0) & UINT64_C(0xfffffffffffff)) != 0U))
+		if (exponent == 0x400 && ((static_cast<unsigned long>(integerValue) & UINT64_C(0xfffffffffffff)) != 0U))
 		{
 			return x * 1.0;
 		}
 
 		// Return ±0
-		x = ccm::support::int64_to_double(static_cast<std::int64_t>(static_cast<unsigned long>(i0) & UINT64_C(0x8000000000000000)));
+		x = support::int64_to_double(static_cast<std::int64_t>(static_cast<unsigned long>(integerValue) & UINT64_C(0x8000000000000000)));
 
 		return x;
 	}

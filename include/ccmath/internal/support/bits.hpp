@@ -10,64 +10,25 @@
 
 #pragma once
 
-#include "ccmath/internal/support/ctz.hpp"
+#include "ccmath/internal/config/type_support.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
+#include "ccmath/internal/support/ctz.hpp"
+#include "ccmath/internal/support/type_traits.hpp"
 
 #include <cstdint>
-#include <type_traits>
-
-namespace ccm::support::traits
-{
-	// TODO: Later add this into its own header.
-	// clang-format off
-	template <typename T> struct is_char : std::false_type {};
-	template <> struct is_char<char> : std::true_type {};
-	template <> struct is_char<wchar_t> : std::true_type {};
-#if (__cplusplus >= 202002L) || defined(__cpp_char8_t) || defined(__cpp_lib_char8_t) // C++20 defines char8_t
-    template <> struct is_char<char8_t> : std::true_type {};
-#endif
-	template <> struct is_char<char16_t> : std::true_type {};
-	template <> struct is_char<char32_t> : std::true_type {};
-	template <> struct is_char<signed char> : std::true_type {};
-	template <> struct is_char<unsigned char> : std::true_type {};
-	template <typename T> constexpr bool is_char_v = is_char<T>::value;
-
-    template <typename T> struct is_unsigned_integer : std::false_type {};
-    template <> struct is_unsigned_integer<unsigned char> : std::true_type {};
-    template <> struct is_unsigned_integer<unsigned short> : std::true_type {};
-    template <> struct is_unsigned_integer<unsigned int> : std::true_type {};
-    template <> struct is_unsigned_integer<unsigned long> : std::true_type {};
-    template <> struct is_unsigned_integer<unsigned long long> : std::true_type {};
-#if defined(__SIZEOF_INT128__)
-    template <> struct is_unsigned_integer<__uint128_t> : std::true_type {};
-#endif
-    template <typename T> constexpr bool is_unsigned_integer_v = is_unsigned_integer<T>::value;
-	// clang-format on
-
-} // namespace ccm::support::traits
 
 namespace ccm::support
 {
-
-	/**
-	 * @brief
-	 * @tparam To
-	 * @tparam From
-	 * @param src
-	 * @return
-	 */
-	template <class To, class From>
-	std::enable_if_t<sizeof(To) == sizeof(From) && std::is_trivially_copyable_v<From> && std::is_trivially_copyable_v<To>, To> constexpr bit_cast(
-		const From & src) noexcept
+	template <typename To, typename From>
+	constexpr std::enable_if_t<
+		sizeof(To) == sizeof(From) && std::is_trivially_constructible_v<To> && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From>, To>
+	bit_cast(const From & from)
 	{
-		static_assert(std::is_trivially_constructible_v<To>, "This implementation additionally requires "
-															 "destination type to be trivially constructible");
-
-		return __builtin_bit_cast(To, src);
+		return __builtin_bit_cast(To, from);
 	}
 
 	template <class T,
-			  std::enable_if_t<std::is_integral_v<T> && std::is_unsigned_v<T> && !ccm::support::traits::is_char_v<T> && !std::is_same_v<T, bool>, bool> = true>
+			  std::enable_if_t<traits::ccm_is_integral_v<T> && traits::ccm_is_unsigned_v<T> && !traits::is_char_v<T> && !std::is_same_v<T, bool>, bool> = true>
 	constexpr bool has_single_bit(T x) noexcept
 	{
 		return x && !(x & (x - 1));
@@ -164,71 +125,133 @@ namespace ccm::support
 		return rotr(t, -cnt);
 	}
 
-	// https://en.cppreference.com/w/cpp/numeric/countr_zero
+// Macro to allow simplified creation of specializations
+// NOLINTBEGIN(bugprone-macro-parentheses)
+#define INTERNAL_CCM_ADD_CTZ_SPECIALIZATION(FUNC, TYPE, BUILTIN)                                                                                               \
+	template <>                                                                                                                                                \
+	[[nodiscard]] constexpr int FUNC<TYPE>(TYPE value)                                                                                                         \
+	{                                                                                                                                                          \
+		static_assert(ccm::support::traits::ccm_is_unsigned_v<TYPE>);                                                                                          \
+		return value == 0 ? std::numeric_limits<TYPE>::digits : BUILTIN(value);                                                                                \
+	}
+	// NOLINTEND(bugprone-macro-parentheses)
+
+#if CCM_HAS_BUILTIN(__builtin_ctzg)
+	/**
+	 * @brief Returns the number of consecutive 0 bits in the value of x, starting from the least significant bit ("right").
+	 * https://en.cppreference.com/w/cpp/numeric/countr_zero
+	 */
 	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> countr_zero(T value)
+	[[nodiscard]] constexpr std::enable_if_t<ccm::support::traits::ccm_is_unsigned_v<T>, int> countr_zero(T value)
+	{
+		return __builtin_ctzg(value, std::numeric_limits<T>::digits);
+	}
+#else  // !CCM_HAS_BUILTIN(__builtin_ctzg)
+	/**
+	 * @brief Returns the number of consecutive 0 bits in the value of x, starting from the least significant bit ("right").
+	 * https://en.cppreference.com/w/cpp/numeric/countr_zero
+	 */
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countr_zero(T value)
 	{
 		if (value == 0) { return std::numeric_limits<T>::digits; }
-
-		if constexpr (ccm::support::traits::is_unsigned_integer_v<T>) { return ccm::support::ctz<T>(value); }
-
-		int ret						 = 0;
-		const unsigned int ulldigits = std::numeric_limits<unsigned long long>::digits;
-		while (static_cast<unsigned long long>(value) == 0ULL)
+		if (value & 0x1) { return 0; }
+		// Bisection method
+		unsigned zero_bits = 0;
+		unsigned shift	   = std::numeric_limits<T>::digits >> 1;
+		T mask			   = std::numeric_limits<T>::max() >> shift;
+		while (shift)
 		{
-			ret += ulldigits;
-			value >>= ulldigits;
+			if ((value & mask) == 0)
+			{
+				value >>= shift;
+				zero_bits |= shift;
+			}
+			shift >>= 1;
+			mask >>= shift;
 		}
-		return ret + ccm::support::ctz(static_cast<unsigned long long>(value));
+		return zero_bits;
 	}
+#endif // CCM_HAS_BUILTIN(__builtin_ctzg)
 
+#if CCM_HAS_BUILTIN(__builtin_ctzs)
+	INTERNAL_CCM_ADD_CTZ_SPECIALIZATION(countr_zero, unsigned short, __builtin_ctzs)
+#endif // CCM_HAS_BUILTIN(__builtin_ctzs)
+#if CCM_HAS_BUILTIN(__builtin_ctz)
+	INTERNAL_CCM_ADD_CTZ_SPECIALIZATION(countr_zero, unsigned int, __builtin_ctz)
+#endif // CCM_HAS_BUILTIN(__builtin_ctz)
+#if CCM_HAS_BUILTIN(__builtin_ctzl)
+	INTERNAL_CCM_ADD_CTZ_SPECIALIZATION(countr_zero, unsigned long, __builtin_ctzl)
+#endif // CCM_HAS_BUILTIN(__builtin_ctzl)
+#if CCM_HAS_BUILTIN(__builtin_ctzll)
+	INTERNAL_CCM_ADD_CTZ_SPECIALIZATION(countr_zero, unsigned long long, __builtin_ctzll)
+#endif // CCM_HAS_BUILTIN(__builtin_ctzll)
+
+#if CCM_HAS_BUILTIN(__builtin_clzg)
 	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> countr_one(T value)
+	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countl_zero(T value)
 	{
-		return value != std::numeric_limits<T>::max() ? countr_zero(static_cast<T>(~value)) : std::numeric_limits<T>::digits;
+		return __builtin_clzg(value, std::numeric_limits<T>::digits);
 	}
-
-	template <typename T, std::enable_if_t<ccm::support::traits::is_unsigned_integer_v<T>, bool> = true>
-	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> countl_zero(T value)
+#else  // !CCM_HAS_BUILTIN(__builtin_clzg)
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countl_zero(T value)
 	{
 		if (value == 0) { return std::numeric_limits<T>::digits; }
-
-		if constexpr (ccm::support::traits::is_unsigned_integer_v<T>) { return std::numeric_limits<T>::digits - ccm::support::ctz<T>(value); }
-
-		int ret						 = 0;
-		int iter					 = 0;
-		const unsigned int ulldigits = std::numeric_limits<unsigned long long>::digits;
-		while (true)
+		// Bisection method
+		unsigned zero_bits = 0;
+		for (unsigned shift = std::numeric_limits<T>::digits >> 1; shift; shift >>= 1)
 		{
-			value = rotl(value, ulldigits);
-			if ((iter = countl_zero(static_cast<unsigned long long>(value))) != ulldigits) // NOLINT
-				break;
-			ret += iter;
+			T tmp = value >> shift;
+			if (tmp) { value = tmp; }
+			else { zero_bits |= shift; }
 		}
-		return ret + iter;
+		return zero_bits;
+	}
+#endif // CCM_HAS_BUILTIN(__builtin_clzg)
+
+#if CCM_HAS_BUILTIN(__builtin_clzs)
+	INTERNAL_CCM_ADD_CTZ_SPECIALIZATION(countl_zero, unsigned short, __builtin_clzs)
+#endif // CCM_HAS_BUILTIN(__builtin_clzs)
+#if CCM_HAS_BUILTIN(__builtin_clz)
+	INTERNAL_CCM_ADD_CTZ_SPECIALIZATION(countl_zero, unsigned int, __builtin_clz)
+#endif // CCM_HAS_BUILTIN(__builtin_clz)
+#if CCM_HAS_BUILTIN(__builtin_clzl)
+	INTERNAL_CCM_ADD_CTZ_SPECIALIZATION(countl_zero, unsigned long, __builtin_clzl)
+#endif // CCM_HAS_BUILTIN(__builtin_clzl)
+#if CCM_HAS_BUILTIN(__builtin_clzll)
+	INTERNAL_CCM_ADD_CTZ_SPECIALIZATION(countl_zero, unsigned long long, __builtin_clzll)
+#endif // CCM_HAS_BUILTIN(__builtin_clzll)
+
+#undef INTERNAL_CCM_ADD_CTZ_SPECIALIZATION
+
+	template <typename T>
+	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countr_one(T value)
+	{
+		return support::countr_zero<T>(~value);
 	}
 
-	template <typename T, std::enable_if_t<ccm::support::traits::is_unsigned_integer_v<T>, bool> = true>
-	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> countl_one(T value)
+	template <typename T, std::enable_if_t<traits::is_unsigned_integer_v<T>, bool> = true>
+	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countl_one(T value)
 	{
 		return value != std::numeric_limits<T>::max() ? countl_zero(static_cast<T>(~value)) : std::numeric_limits<T>::digits;
 	}
 
 	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> bit_width(T value)
+	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> bit_width(T value)
 	{
 		return std::numeric_limits<T>::digits - countl_zero(value);
 	}
 
 #if CCM_HAS_BUILTIN(__builtin_popcountg)
 	template <typename T>
-	[[nodiscard]] LIBC_INLINE constexpr cpp::enable_if_t<cpp::is_unsigned_v<T>, int> popcount(T value)
+	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> popcount(T value)
 	{
 		return __builtin_popcountg(value);
 	}
 #else  // !CCM_HAS_BUILTIN(__builtin_popcountg)
 	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> popcount(T value)
+	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> popcount(T value)
 	{
 		int count = 0;
 		for (int i = 0; i != std::numeric_limits<T>::digits; ++i)
@@ -239,41 +262,31 @@ namespace ccm::support
 	}
 #endif // CCM_HAS_BUILTIN(__builtin_popcountg)
 
+// Macro to allow simplified creation of specializations
+// NOLINTBEGIN(bugprone-macro-parentheses)
+#define INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(FUNC, TYPE, BUILTIN)                                                                                          \
+	template <>                                                                                                                                                \
+	[[nodiscard]] constexpr int FUNC<TYPE>(TYPE value)                                                                                                         \
+	{                                                                                                                                                          \
+		static_assert(ccm::support::traits::ccm_is_unsigned_v<TYPE>);                                                                                          \
+		return BUILTIN(value);                                                                                                                                 \
+	}
+// NOLINTEND(bugprone-macro-parentheses)
 // If the compiler has builtin's for popcount, the create specializations that use the builtin.
 #if CCM_HAS_BUILTIN(__builtin_popcount)
-	template <>
-	[[nodiscard]] constexpr int popcount<unsigned char>(unsigned char value)
-	{
-		return __builtin_popcount(value);
-	}
-
-	template <>
-	[[nodiscard]] constexpr int popcount<unsigned short>(unsigned short value)
-	{
-		return __builtin_popcount(value);
-	}
-
-	template <>
-	[[nodiscard]] constexpr int popcount<unsigned>(unsigned value)
-	{
-		return __builtin_popcount(value);
-	}
+	INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(popcount, unsigned char, __builtin_popcount)
+	INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(popcount, unsigned short, __builtin_popcount)
+	INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(popcount, unsigned, __builtin_popcount)
 #endif // CCM_HAS_BUILTIN(__builtin_popcount)
 
 #if CCM_HAS_BUILTIN(__builtin_popcountl)
-	template <>
-	[[nodiscard]] constexpr int popcount<unsigned long>(unsigned long value)
-	{
-		return __builtin_popcountl(value);
-	}
+	INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(popcount, unsigned long, __builtin_popcountl)
 #endif // CCM_HAS_BUILTIN(__builtin_popcountl)
 
 #if CCM_HAS_BUILTIN(__builtin_popcountll)
-	template <>
-	[[nodiscard]] constexpr int popcount<unsigned long long>(unsigned long long value)
-	{
-		return __builtin_popcountll(value);
-	}
+	INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(popcount, unsigned long long, __builtin_popcountll)
 #endif // CCM_HAS_BUILTIN(__builtin_popcountll)
+
+#undef INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION
 
 } // namespace ccm::support

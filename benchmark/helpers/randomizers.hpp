@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <cassert>
 #include <random>
 #include <vector>
 
@@ -18,22 +19,24 @@ namespace ccm::bench
 	public:
 		explicit Randomizer(std::uint_fast32_t seed = 937162211) : m_gen{seed} {}
 
-		std::vector<int> generateRandomIntegers(std::size_t count, int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max())
+		std::vector<int> generateRandomIntegers(std::int64_t count, int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max())
 		{
+			assert(count > 0);
 			std::vector<int> randomIntegers;
-			randomIntegers.reserve(count);
+			randomIntegers.reserve(static_cast<unsigned long>(count));
 			std::uniform_int_distribution dist(min, max);
-			for (std::size_t i = 0; i < count; ++i) { randomIntegers.push_back(dist(m_gen)); }
+			for (std::int64_t i = 0; i < count; ++i) { randomIntegers.push_back(dist(m_gen)); }
 			return randomIntegers;
 		}
 
-		std::vector<double> generateRandomDoubles(std::size_t count, double min = 0.0,
+		std::vector<double> generateRandomDoubles(std::int64_t count, double min = 0.0,
 												  double max = 1.0)
 		{
+			assert(count > 0);
 			std::vector<double> randomDouble;
-			randomDouble.reserve(count);
+			randomDouble.reserve(static_cast<unsigned long>(count));
 			std::uniform_real_distribution dist(min, max);
-			for (std::size_t i = 0; i < count; ++i) { randomDouble.push_back(dist(m_gen)); }
+			for (std::int64_t i = 0; i < count; ++i) { randomDouble.push_back(dist(m_gen)); }
 			return randomDouble;
 		}
 

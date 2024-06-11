@@ -2,10 +2,12 @@
 Checks: '-*,
 bugprone-*,
 -bugprone-easily-swappable-parameters,
+-bugprone-narrowing-conversions,
 
 modernize-*,
 -modernize-use-trailing-return-type,
 -modernize-use-constraints,
+-modernize-avoid-c-arrays,
 
 performance-*,
 -performance-avoid-endl,
@@ -16,6 +18,9 @@ readability-*,
 
 cppcoreguidelines-*,
 -cppcoreguidelines-avoid-magic-numbers,
+-cppcoreguidelines-macro-usage,
+-cppcoreguidelines-non-private-member-variables-in-classes,
+-cppcoreguidelines-special-member-functions,
 
 cert-dcl21-cpp,
 cert-dcl58-cpp,
@@ -39,7 +44,9 @@ hicpp-no-assembler,
 misc-const-correctness,
 misc-definitions-in-headers,
 misc-header-include-cycle,
-misc-include-cleaner,
+
+-misc-include-cleaner,
+
 misc-misplaced-const,
 misc-new-delete-overloads,
 misc-no-recursion,
@@ -51,4 +58,11 @@ misc-uniqueptr-reset-release,
 misc-use-anonymous-namespace,
 mpi-buffer-deref,
 mpi-type-mismatch,
-openmp-use-default-none'
+openmp-use-default-none,
+
+-hicpp-avoid-c-arrays
+'
+
+CheckOptions:
+  cppcoreguidelines-avoid-do-while.IgnoreMacros: 'true'
+  readability-function-cognitive-complexity.Threshold: 35

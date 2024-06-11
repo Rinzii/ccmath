@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <type_traits>
 #include "ccmath/math/compare/isnan.hpp"
+#include <type_traits>
 
 namespace ccm
 {
@@ -29,8 +29,6 @@ namespace ccm
 	/**
 	 * @brief Checks if the given number is unordered, that is, one or both are NaN and thus cannot be meaningfully compared with each other.
 	 * @tparam Integer The type of the integer.
-	 * @param x A integer value to check.
-	 * @param y A integer value to check.
 	 * @return false, as all integers are ordered.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>

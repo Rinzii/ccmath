@@ -21,20 +21,18 @@ namespace ccm::internal
 	namespace impl
 	{
 		// NOLINTNEXTLINE(readability-function-cognitive-complexity)
-		inline constexpr float remquo_float_impl(float x, float y, int * quo) noexcept
+		constexpr float remquo_float_impl(float x, float y, int * quo) noexcept
 		{
 			std::int32_t x_i32{};
 			std::int32_t y_i32{};
-			std::uint32_t x_sign{};
-			int quotient_sign{};
 			int computed_quotient{};
 
-			x_i32 = ccm::support::float_to_int32(x);
-			y_i32 = ccm::support::float_to_int32(y);
+			x_i32 = support::float_to_int32(x);
+			y_i32 = support::float_to_int32(y);
 
 			// Determine the signs of x and the quotient.
-			x_sign		  = static_cast<std::uint32_t>(x_i32) & 0x80000000;
-			quotient_sign = static_cast<int>(x_sign ^ (static_cast<std::uint32_t>(y_i32) & 0x80000000));
+			const std::uint32_t x_sign = static_cast<std::uint32_t>(x_i32) & 0x80000000;
+			const int quotient_sign	   = static_cast<int>(x_sign ^ (static_cast<std::uint32_t>(y_i32) & 0x80000000));
 
 			// Clear the sign bits from the int32_t representations of x and y.
 			x_i32 &= 0x7fffffff;
@@ -86,7 +84,7 @@ namespace ccm::internal
 			}
 			else
 			{
-				float y_half = 0.5F * y;
+				const float y_half = 0.5F * y;
 				if (x > y_half)
 				{
 					x -= y;
@@ -108,9 +106,8 @@ namespace ccm::internal
 		}
 	} // namespace impl
 
-	template <typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
-	inline constexpr T remquo_float(T x, T y, int * quo) noexcept
+	constexpr float remquo_float(float x, float y, int * quo) noexcept
 	{
-		return static_cast<T>(impl::remquo_float_impl(x, y, quo));
+		return impl::remquo_float_impl(x, y, quo);
 	}
 } // namespace ccm::internal

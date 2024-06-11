@@ -16,6 +16,27 @@
 			}
 		},
 		{
+			"name": "ninja-gcc",
+			"description": "Build configuration using Ninja Multi-config / gcc",
+			"inherits": "default",
+			"binaryDir": "${sourceDir}/out/gcc",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "gcc",
+				"CMAKE_CXX_COMPILER": "g++"
+			}
+		},
+		{
+			"name": "ninja-gcc-minsize",
+			"description": "Build configuration using Ninja Multi-config / gcc",
+			"inherits": "ninja-gcc",
+			"binaryDir": "${sourceDir}/out/gcc-minsize",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "gcc",
+				"CMAKE_CXX_COMPILER": "g++",
+				"CMAKE_CXX_FLAGS": "-Os"
+			}
+		},
+		{
 			"name": "ninja-clang",
 			"description": "Build configuration using Ninja Multi-config / clang",
 			"inherits": "default",
@@ -26,18 +47,41 @@
 			}
 		},
 		{
-			"name": "ninja-intel",
+			"name": "ninja-clang-minsize",
 			"description": "Build configuration using Ninja Multi-config / clang",
+			"inherits": "ninja-clang",
+			"binaryDir": "${sourceDir}/out/clang-minsize",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "clang",
+				"CMAKE_CXX_COMPILER": "clang++",
+				"CMAKE_CXX_FLAGS": "-Os"
+			}
+		},
+		{
+			"name": "ninja-clang-libcpp",
+			"description": "Build configuration using Ninja Multi-config / clang",
+			"inherits": "default",
+			"binaryDir": "${sourceDir}/out/clang-libcpp",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "clang",
+				"CMAKE_CXX_COMPILER": "clang++",
+				"CMAKE_CXX_FLAGS": "-stdlib=libc++",
+				"CMAKE_EXE_LINKER_FLAGS": "-lc++abi"
+			}
+		},
+		{
+			"name": "ninja-intel",
+			"description": "Build configuration using Ninja Multi-config / intel",
 			"inherits": "default",
 			"binaryDir": "${sourceDir}/out/intel",
 			"cacheVariables": {
 				"CMAKE_C_COMPILER": "icx",
-				"CMAKE_CXX_COMPILER": "icx"
+				"CMAKE_CXX_COMPILER": "icpx"
 			}
 		},
 		{
 			"name": "ninja-nvidia-hpc",
-			"description": "Build configuration using Ninja Multi-config / clang",
+			"description": "Build configuration using Ninja Multi-config / nvidia-hpc",
 			"inherits": "default",
 			"binaryDir": "${sourceDir}/out/nvidia-hpc",
 			"cacheVariables": {
@@ -52,6 +96,15 @@
 			"binaryDir": "${sourceDir}/out/ubsan",
 			"cacheVariables": {
 				"CMAKE_CXX_FLAGS": "-fsanitize=undefined"
+			}
+		},
+		{
+			"name": "clang-tidy",
+			"description": "UBSan build configuration using Ninja Multi-config",
+			"inherits": "ninja-clang",
+			"binaryDir": "${sourceDir}/out/clang-tidy",
+			"cacheVariables": {
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "On"
 			}
 		},
 		{
@@ -89,8 +142,23 @@
 			"configuration": "Debug"
 		},
 		{
+			"name": "Debug-gcc",
+			"configurePreset": "ninja-gcc",
+			"configuration": "Debug"
+		},
+		{
+			"name": "Debug-clang",
+			"configurePreset": "ninja-clang",
+			"configuration": "Debug"
+		},
+		{
 			"name": "Release",
 			"configurePreset": "default",
+			"configuration": "Release"
+		},
+		{
+			"name": "Release-gcc",
+			"configurePreset": "ninja-gcc",
 			"configuration": "Release"
 		},
 		{
@@ -102,7 +170,23 @@
 			"name": "RelWithDebInfo",
 			"configurePreset": "default",
 			"configuration": "RelWithDebInfo"
+		},
+		{
+			"name": "RelWithDebInfo-gcc",
+			"configurePreset": "ninja-gcc",
+			"configuration": "RelWithDebInfo"
+		},
+		{
+			"name": "RelWithDebInfo-clang",
+			"configurePreset": "ninja-clang",
+			"configuration": "RelWithDebInfo"
+		},
+		{
+			"name": "Benchmark",
+			"configurePreset": "benchmark-default",
+			"configuration": "Release"
 		}
+
 	],
 	"testPresets": [
 		{

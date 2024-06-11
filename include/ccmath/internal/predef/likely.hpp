@@ -8,12 +8,8 @@
 
 #pragma once
 
+#include "ccmath/internal/predef/expects_bool_condition.hpp"
+
 #ifndef CCM_LIKELY
-   #if defined(__cplusplus) && __cplusplus >= 202003L
-       #define CCM_LIKELY(x) [[likely]] (x)
-   #elif defined(__GNUC__) || defined(__clang__)
-       #define CCM_LIKELY(x) __builtin_expect(!!(x), 1)
-   #else
-       #define CCM_LIKELY(x) (!!(x))
-   #endif // defined(__cplusplus) && __cplusplus >= 202003L
+	#define CCM_LIKELY(x) ccm::predef::internal::expects_bool_condition((x), true)
 #endif // CCM_LIKELY

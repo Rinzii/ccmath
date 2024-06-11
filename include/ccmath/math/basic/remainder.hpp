@@ -22,7 +22,7 @@ namespace ccm
 	 * @param y Divisor.
 	 * @return The remainder of the division of x by y.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, int> = 0>
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T remainder(T x, T y)
 	{
 		// If x is ±∞ and y is not NaN, NaN is returned.
@@ -44,7 +44,7 @@ namespace ccm
 	 * @param y Divisor.
 	 * @return The remainder of the division of x by y as a double.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double remainder(Integer x, Integer y)
 	{
 		return remainder<double>(static_cast<double>(x), static_cast<double>(y));

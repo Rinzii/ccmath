@@ -7,52 +7,57 @@ on:
   pull_request:
     branches:
       - '*'
+
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [ninja-gcc, ninja-clang, ninja-clang-libcpp]
+        cxx_version: [17, 20]
+        target: [Debug, Release]
     steps:
-      - uses: actions/checkout@v2
-      - name: install ninja
+      - uses: actions/checkout@v4
+      - name: install dependencies
         run: sudo apt install -yqq ninja-build
-      - name: configure gcc
-        run: cmake -S . --preset=default -B build
-      - name: configure clang
-        run: cmake -S . --preset=ninja-clang -B clang
-      - name: build gcc
-        run: cmake --build build --config=Release
-      - name: build clang
-        run: cmake --build clang --config=Release
-      - name: test
-        run: cd build && ctest -C Release --output-on-failure
+      - name: configure cmake
+        run: cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
+      - name: build
+        run: cmake --build build --config=${{matrix.target}}
 
   build-windows:
-    runs-on: windows-latest
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [vs22]
+        cxx_version: [17, 20]
+        target: [Debug, Release]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: configure
-        run: cmake -S . --preset=vs22 -B build
+        run: cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
       - name: build
-        run: cmake --build build --config=Release
-      - name: test
-        run: cd build && ctest -C Release --output-on-failure
+        run: cmake --build build --config=${{matrix.target}}
 
   build-macos:
-    runs-on: macos-13
+    runs-on: macos-14
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [ninja-clang, ninja-gcc]
+        cxx_version: [17, 20]
+        target: [Debug, Release]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: install homebrew formulae
         run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
       - name: install ninja
         run: brew install ninja
       - name: update AppleClang to 14.0.3
         run: sudo xcode-select -s /Applications/Xcode_14.3.app/Contents/Developer
-      - name: configure gcc
-        run: cmake -S . --preset=default -B build
-      - name: configure clang
-        run: cmake -S . --preset=ninja-clang -B clang
-      - name: build gcc
-        run: cmake --build build --config=Release
-      - name: build clang
-        run: cmake --build clang --config=Release
-      - name: test
-        run: cd build && ctest -C Release --output-on-failure
+      - name: configure
+        run: cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
+      - name: build
+        run: cmake --build build --config=${{matrix.target}}

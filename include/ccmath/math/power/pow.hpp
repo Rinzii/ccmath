@@ -8,11 +8,13 @@
 
 #pragma once
 
-#include <limits>
 #include <type_traits>
-#include "ccmath/ccmath.hpp"
-#include "ccmath/math/exponential/exp.hpp"
-#include "ccmath/math/exponential/log.hpp"
+
+#include "ccmath/math/exponential/exp2.hpp"
+#include "ccmath/math/exponential/log2.hpp"
+
+#include "ccmath/math/power/impl/pow_impl.hpp"
+
 
 namespace ccm
 {
@@ -44,13 +46,21 @@ namespace ccm
 
 			return result;
 		}
+
+		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+		constexpr T pow_generic(T base, T exp) noexcept
+		{
+			// This should work on all x86 platforms but may not work with other architectures.
+			// For now this is more of a hold over till I have time to implement a better generic version.
+			return ccm::exp2(exp * ccm::log2(base));
+		}
 	} // namespace internal::impl
 
 	template <typename T>
-	constexpr T pow(T x, T y) noexcept
+	constexpr T pow(T base, T exp) noexcept
 	{
-		if constexpr (std::is_integral_v<T> && std::is_unsigned_v<T>) { return internal::impl::pow_expo_by_sqr(x, y); }
-		return 0;
+		if constexpr (std::is_integral_v<T> && std::is_unsigned_v<T>) { return internal::impl::pow_expo_by_sqr(base, exp); }
+		return internal::impl::pow_generic(base, exp);
 	}
 
 } // namespace ccm

@@ -14,7 +14,7 @@ namespace ccm::internal::impl
 {
 	constexpr double modf_float_impl(float x, float* iptr) noexcept
 	{
-		__float128 q = x;
+		//__float128 q = x;
 
 		return 0;
 	}
