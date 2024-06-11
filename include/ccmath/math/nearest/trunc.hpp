@@ -32,7 +32,7 @@ namespace ccm
 		if (CCM_UNLIKELY(bits.is_inf_or_nan())) { return num; }
 
 		// If x == ±0 then return num
-		if (num == 0.0) { return num; }
+		if (CCM_UNLIKELY(num == 0.0)) { return num; }
 
 		const int exponent = bits.get_exponent();
 
