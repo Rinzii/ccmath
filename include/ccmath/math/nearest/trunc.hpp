@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "ccmath/internal/support/fp_bits.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/support/fp_bits.hpp"
 
 namespace ccm
 {
