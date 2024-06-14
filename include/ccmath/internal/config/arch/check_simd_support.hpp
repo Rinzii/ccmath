@@ -105,8 +105,6 @@
 		#undef CCMATH_SIMD
 	#endif
 	#define CCMATH_SIMD 1
-#else
-		#undef CCMATH_SIMD
 #endif
 
 #endif // CCM_CONFIG_USE_RT_SIMD
