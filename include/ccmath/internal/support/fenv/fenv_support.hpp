@@ -124,28 +124,23 @@ namespace ccm::support::fenv
 
 	constexpr int set_except_if_required(int excepts)
 	{
-		if constexpr (is_constant_evaluated()) { return 0; } // We cannot raise fenv exceptions in a constexpr context. So we return.
-		else
-		{
-			if ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { return internal::set_except(excepts); }
-			return 0;
-		}
+		if (is_constant_evaluated()) { return 0; } // We cannot raise fenv exceptions in a constexpr context. So we return.
+		if ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { return internal::set_except(excepts); }
+		return 0;
 	}
 
 	constexpr int raise_except_if_required(int excepts)
 	{
-		if constexpr (is_constant_evaluated()) { return 0; } // We cannot raise fenv exceptions in a constexpr context. So we return.
-		else
-		{
-			if ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { return internal::raise_except(excepts); }
-			return 0;
-		}
+		if (is_constant_evaluated()) { return 0; } // We cannot raise fenv exceptions in a constexpr context. So we return.
+
+		if ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { return internal::raise_except(excepts); }
+		return 0;
 	}
 
 	constexpr void set_errno_if_required(int err)
 	{
 		// NOLINTNEXTLINE(bugprone-branch-clone)
-		if constexpr (is_constant_evaluated()) // We cannot raise fenv exceptions in a constexpr context. So we return.
+		if (is_constant_evaluated()) // We cannot raise fenv exceptions in a constexpr context. So we return.
 		{
 			// Do nothing
 		}
