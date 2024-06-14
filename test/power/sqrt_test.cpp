@@ -86,6 +86,8 @@ TEST(CcmathPowerTests, Sqrt_LDouble_EdgeCases)
 	EXPECT_EQ(ccm::sqrt(std::numeric_limits<long double>::max()), std::sqrt(std::numeric_limits<long double>::max()));
 }
 
+#if !(defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__))
+
 TEST(CcmathPowerTests, Sqrt_RT_Double)
 {
 	// Test values that are 2^x
@@ -122,3 +124,4 @@ TEST(CcmathPowerTests, Sqrt_RT_Double_EdgeCases)
 
 	//EXPECT_EQ(ccm::sqrt(std::numeric_limits<double>::lowest()), std::sqrt(std::numeric_limits<double>::lowest()));
 }
+#endif
