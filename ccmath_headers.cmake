@@ -197,11 +197,11 @@ set(ccmath_internal_support_fenv_headers
 
 set(ccmath_internal_support_fp_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fp/directional_rounding_utils.hpp
-)
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fp/bit_mask_traits.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fp/fp_bits.hpp
 
-#set(ccmath_internal_support_math_headers
-#        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/math/internal_sqrt.hpp
-#)
+
+)
 
 set(ccmath_internal_support_headers
         ${ccmath_internal_support_fenv_headers}
@@ -215,10 +215,8 @@ set(ccmath_internal_support_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/ctz.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/always_false.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/limits.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fp_bits.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/multiply_add.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/poly_eval.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/bit_mask.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/type_traits.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/math_support.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/integer_literals.hpp
