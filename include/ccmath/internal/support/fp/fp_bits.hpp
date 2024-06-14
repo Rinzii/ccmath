@@ -48,30 +48,30 @@ namespace ccm::support
 		struct FPLayout<FPType::eBinary32>
 		{
 			using storage_type						= std::uint32_t;
-			static constexpr int sign_length		= 1;
-			static constexpr int exponent_length	= 8;
-			static constexpr int significand_length = 23;
-			static constexpr int fraction_length	= significand_length;
+			static constexpr std::int_fast32_t sign_length		= 1;
+			static constexpr std::int_fast32_t exponent_length	= 8;
+			static constexpr std::int_fast32_t significand_length = 23;
+			static constexpr std::int_fast32_t fraction_length	= significand_length;
 		};
 
 		template <>
 		struct FPLayout<FPType::eBinary64>
 		{
 			using storage_type						= std::uint64_t;
-			static constexpr int sign_length		= 1;
-			static constexpr int exponent_length	= 11;
-			static constexpr int significand_length = 52;
-			static constexpr int fraction_length	= significand_length;
+			static constexpr std::int_fast32_t sign_length		= 1;
+			static constexpr std::int_fast32_t exponent_length	= 11;
+			static constexpr std::int_fast32_t significand_length = 52;
+			static constexpr std::int_fast32_t fraction_length	= significand_length;
 		};
 
 		template <>
 		struct FPLayout<FPType::eBinary80>
 		{
 			using storage_type						= types::uint128_t;
-			static constexpr int sign_length		= 1;
-			static constexpr int exponent_length	= 15;
-			static constexpr int significand_length = 64;
-			static constexpr int fraction_length	= significand_length - 1;
+			static constexpr std::int_fast32_t sign_length		= 1;
+			static constexpr std::int_fast32_t exponent_length	= 15;
+			static constexpr std::int_fast32_t significand_length = 64;
+			static constexpr std::int_fast32_t fraction_length	= significand_length - 1;
 		};
 
 		template <>
