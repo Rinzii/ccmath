@@ -87,6 +87,7 @@ namespace ccm::simd
 		CCM_ALWAYS_INLINE inline void copy_from(float const * ptr, element_aligned_tag) { m_value = vld1q_f32(ptr); }
 		CCM_ALWAYS_INLINE inline void copy_to(float * ptr, element_aligned_tag) const { vst1q_f32(ptr, m_value); }
 		[[nodiscard]] CCM_ALWAYS_INLINE inline constexpr float32x4_t get() const { return m_value; }
+		[[nodiscard]] CCM_ALWAYS_INLINE inline float convert() const { return vgetq_lane_f32(m_value, 0); }
 		CCM_ALWAYS_INLINE simd_mask<float, abi::neon> operator<(simd const & other) const
 		{
 			return simd_mask<float, abi::neon>(vcltq_f32(m_value, other.m_value));
@@ -117,7 +118,6 @@ namespace ccm::simd
 		static constexpr int size() { return 4; }
 		CCM_ALWAYS_INLINE inline constexpr simd_mask(uint64x2_t const & value_in) : m_value(value_in) {}
 		[[nodiscard]] CCM_ALWAYS_INLINE inline constexpr uint64x2_t get() const { return m_value; }
-		[[nodiscard]] CCM_ALWAYS_INLINE inline float convert() const { return vgetq_lane_f64(vreinterpretq_f64_u64(m_value), 0); }
 		CCM_ALWAYS_INLINE inline simd_mask operator||(simd_mask const & other) const { return simd_mask(vorrq_u64(m_value, other.m_value)); }
 		CCM_ALWAYS_INLINE inline simd_mask operator&&(simd_mask const & other) const { return simd_mask(vandq_u64(m_value, other.m_value)); }
 		CCM_ALWAYS_INLINE inline simd_mask operator!() const { return simd_mask(vreinterpretq_u64_u32(vmvnq_u32(vreinterpretq_u32_u64(m_value)))); }
