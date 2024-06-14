@@ -276,14 +276,19 @@ namespace ccm::rt
 	T sqrt_rt(T num)
 	{
 #if defined(CCMATH_SIMD)
+	#if !defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64) // If long double is not 64-bits, use the generic implementation
+		if constexpr (std::is_same_v<T, long double>) { return internal::impl::sqrt_impl_rt(num); }
+		else { return simd_impl::sqrt_simd(num); }
+	#else
 		return simd_impl::sqrt_simd(num);
+	#endif
 #else
 	#if CCCM_HAS_BUILTIN(__builtin_sqrt) || defined(__builtin_sqrt) // Check if builtin is available
 		if constexpr (std::is_same_v<T, float>) { return __builtin_sqrtf(num); }
 		if constexpr (std::is_same_v<T, double>) { return __builtin_sqrt(num); }
 		if constexpr (std::is_same_v<T, long double>) { return __builtin_sqrtl(num); }
 		return static_cast<T>(__builtin_sqrtl(num));
-	#else // If no builtin is available, use the generic runtime implementation
+	#else															// If no builtin is available, use the generic runtime implementation
 		return internal::impl::sqrt_impl_rt(num);
 	#endif
 #endif
