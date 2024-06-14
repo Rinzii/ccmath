@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "ccmath/internal/support/fp_bits.hpp"
+#include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/multiply_add.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
 #include "ccmath/internal/types/big_int.hpp"

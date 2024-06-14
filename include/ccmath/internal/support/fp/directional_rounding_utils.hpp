@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "ccmath/internal/support/fp_bits.hpp"
+#include "fp_bits.hpp"
 
 #include <cfenv>
 #include <cstdint>
