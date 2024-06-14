@@ -278,7 +278,14 @@ namespace ccm::rt
 #if defined(CCMATH_SIMD)
 		return simd_impl::sqrt_simd(num);
 #else
+	#if CCCM_HAS_BUILTIN(__builtin_sqrt) || defined(__builtin_sqrt) // Check if builtin is available
+		if constexpr (std::is_same_v<T, float>) { return __builtin_sqrtf(num); }
+		if constexpr (std::is_same_v<T, double>) { return __builtin_sqrt(num); }
+		if constexpr (std::is_same_v<T, long double>) { return __builtin_sqrtl(num); }
+		return static_cast<T>(__builtin_sqrtl(num));
+	#else // If no builtin is available, use the generic runtime implementation
 		return internal::impl::sqrt_impl_rt(num);
+	#endif
 #endif
 	}
 } // namespace ccm::rt

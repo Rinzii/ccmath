@@ -2,6 +2,10 @@
 # Internal headers
 ##########################################
 
+set(ccmath_internal_compiletime_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/compiletime/functions/power/sqrt_ct.hpp
+)
+
 ## Config headers
 
 set(ccmath_internal_config_arch_targets_headers
@@ -94,8 +98,11 @@ set(ccmath_internal_predef_headers
 
 )
 
+#######################################
+# Runtime headers
+#######################################
 
-## Runtime headers
+## Functions headers
 
 set(ccmath_internal_runtime_functions_power_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/functions/power/sqrt_rt.hpp
@@ -192,14 +199,13 @@ set(ccmath_internal_support_fp_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/fp/directional_rounding_utils.hpp
 )
 
-set(ccmath_internal_support_math_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/math/internal_sqrt.hpp
-)
+#set(ccmath_internal_support_math_headers
+#        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/math/internal_sqrt.hpp
+#)
 
 set(ccmath_internal_support_headers
         ${ccmath_internal_support_fenv_headers}
         ${ccmath_internal_support_fp_headers}
-        ${ccmath_internal_support_math_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/bits.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/endian.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/support/floating_point_traits.hpp
@@ -238,6 +244,7 @@ set(ccmath_internal_types_headers
 
 
 set(ccmath_internal_headers
+        ${ccmath_internal_compiletime_headers}
         ${ccmath_internal_config_headers}
         ${ccmath_internal_helpers_headers}
         ${ccmath_internal_predef_headers}
