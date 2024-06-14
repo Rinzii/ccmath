@@ -55,7 +55,14 @@ set(ccmath_internal_helpers_headers
 ## Predef headers
 
 set(ccmath_internal_predef_attributes_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/attributes/always_inline.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/attributes/never_inline.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/attributes/no_debug.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/attributes/optnone.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/attributes/gsl_suppress.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/attributes/gpu_device.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/attributes/gpu_host_device.hpp
+
 )
 
 set(ccmath_internal_predef_compiler_suppression_headers
@@ -81,9 +88,6 @@ set(ccmath_internal_predef_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/expects_bool_condition.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/has_attribute.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/likely.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/unlikely.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/no_debug.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/suppress.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/has_builtin.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/has_const_builtin.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/predef/assume.hpp
@@ -105,26 +109,68 @@ set(ccmath_internal_runtime_generic_headers
 
 )
 
-set(ccmath_internal_runtime_simd_functions_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/functions/mm_cvtss.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/functions/mm_set_ss.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/functions/mm_sqrt_ss.hpp
+### Simd headers
+
+## Impl headers
+set(ccmath_internal_runtime_simd_functions_impl_avx_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/functions/impl/avx/sqrt.hpp
+)
+
+set(ccmath_internal_runtime_simd_functions_impl_avx512_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/functions/impl/avx512/sqrt.hpp
 
 )
 
-set(ccmath_internal_runtime_simd_math_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/math/sqrt_simd.hpp
+set(ccmath_internal_runtime_simd_functions_impl_neon_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/functions/impl/neon/sqrt.hpp
+
+)
+
+set(ccmath_internal_runtime_simd_functions_impl_scalar_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/functions/impl/scalar/sqrt.hpp
+
+)
+
+set(ccmath_internal_runtime_simd_functions_impl_sse2_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/functions/impl/sse2/sqrt.hpp
+)
+
+set(ccmath_internal_runtime_simd_functions_impl_vector_size_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/functions/impl/vector_size/sqrt.hpp
+)
+
+set(ccmath_internal_runtime_simd_functions_headers
+        ${ccmath_internal_runtime_simd_functions_impl_avx_headers}
+        ${ccmath_internal_runtime_simd_functions_impl_avx512_headers}
+        ${ccmath_internal_runtime_simd_functions_impl_neon_headers}
+        ${ccmath_internal_runtime_simd_functions_impl_scalar_headers}
+        ${ccmath_internal_runtime_simd_functions_impl_sse2_headers}
+        ${ccmath_internal_runtime_simd_functions_impl_vector_size_headers}
+
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/functions/sqrt.hpp
+)
+
+
+set(ccmath_internal_runtime_simd_instructions_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/instructions/avx.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/instructions/avx512.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/instructions/neon.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/instructions/sse2.hpp
+
 )
 
 set(ccmath_internal_runtime_simd_headers
         ${ccmath_internal_runtime_simd_functions_headers}
-        ${ccmath_internal_runtime_simd_math_headers}
+        ${ccmath_internal_runtime_simd_instructions_headers}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/common.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/has_simd.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/intrin_include.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/types.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/scalar.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/pack.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/simd_vectorize.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/vector_size.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/runtime/simd/simd.hpp
 
 )
+
 
 set(ccmath_internal_runtime_headers
         ${ccmath_internal_runtime_functions_headers}
