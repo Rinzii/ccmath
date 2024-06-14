@@ -58,7 +58,7 @@ static void BM_power_sqrt_rand_double_std(benchmark::State& state) {
    auto randomDoubles = ran.generateRandomDoubles(state.range(0));
    while (state.KeepRunning()) {
 	   for (auto x : randomDoubles) {
-		   benchmark::DoNotOptimize(std::sqrt(static_cast<double>(x)));
+		   benchmark::DoNotOptimize(std::sqrt(x));
 	   }
    }
    state.SetComplexityN(state.range(0));
@@ -69,7 +69,7 @@ static void BM_power_sqrt_rand_double_ccm(benchmark::State& state) {
    auto randomDoubles = ran.generateRandomDoubles(state.range(0));
    while (state.KeepRunning()) {
 	   for (auto x : randomDoubles) {
-		   benchmark::DoNotOptimize(temp::sqrt_rt(static_cast<double>(x)));
+		   benchmark::DoNotOptimize(temp::sqrt_rt(x));
 	   }
    }
    state.SetComplexityN(state.range(0));
