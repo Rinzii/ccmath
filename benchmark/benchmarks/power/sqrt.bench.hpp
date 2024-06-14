@@ -74,5 +74,69 @@ static void BM_power_sqrt_rand_double_ccm(benchmark::State& state) {
    state.SetComplexityN(state.range(0));
 }
 
+// Runtime evaluation
+
+#if !(defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)) // GCC 6.1+ has constexpr sqrt builtins.
+
+static void BM_power_sqrt_std_rt(benchmark::State& state) {
+	for ([[maybe_unused]] auto _ : state) {
+		benchmark::DoNotOptimize(std::sqrt(static_cast<double>(state.range(0))));
+	}
+	state.SetComplexityN(state.range(0));
+}
+
+static void BM_power_sqrt_ccm_rt(benchmark::State& state) {
+	for ([[maybe_unused]] auto _ : state) {
+		benchmark::DoNotOptimize(ccm::rt::sqrt_rt(static_cast<double>(state.range(0))));
+	}
+	state.SetComplexityN(state.range(0));
+}
+
+static void BM_power_sqrt_rand_int_std_rt(benchmark::State& state) {
+	ccm::bench::Randomizer ran;
+	auto randomIntegers = ran.generateRandomIntegers(state.range(0));
+	while (state.KeepRunning()) {
+		for (auto x : randomIntegers) {
+			benchmark::DoNotOptimize(std::sqrt(static_cast<double>(x)));
+		}
+	}
+	state.SetComplexityN(state.range(0));
+}
+//
+static void BM_power_sqrt_rand_int_ccm_rt(benchmark::State& state) {
+	ccm::bench::Randomizer ran;
+	auto randomIntegers = ran.generateRandomIntegers(state.range(0));
+	while (state.KeepRunning()) {
+		for (auto x : randomIntegers) {
+			benchmark::DoNotOptimize(ccm::rt::sqrt_rt(static_cast<double>(x)));
+		}
+	}
+	state.SetComplexityN(state.range(0));
+}
+
+static void BM_power_sqrt_rand_double_std_rt(benchmark::State& state) {
+	ccm::bench::Randomizer ran;
+	auto randomDoubles = ran.generateRandomDoubles(state.range(0));
+	while (state.KeepRunning()) {
+		for (auto x : randomDoubles) {
+			benchmark::DoNotOptimize(std::sqrt(x));
+		}
+	}
+	state.SetComplexityN(state.range(0));
+}
+
+static void BM_power_sqrt_rand_double_ccm_rt(benchmark::State& state) {
+	ccm::bench::Randomizer ran;
+	auto randomDoubles = ran.generateRandomDoubles(state.range(0));
+	while (state.KeepRunning()) {
+		for (auto x : randomDoubles) {
+			benchmark::DoNotOptimize(ccm::rt::sqrt_rt(x));
+		}
+	}
+	state.SetComplexityN(state.range(0));
+}
+
+#endif
+
 
 // NOLINTEND
