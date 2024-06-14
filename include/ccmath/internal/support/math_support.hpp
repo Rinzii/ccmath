@@ -103,7 +103,7 @@ namespace ccm::support
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> add_with_carry(T a, T b, T carry_in, T & carry_out)
 	{
-		if constexpr (!is_constant_evaluated())
+		if (!is_constant_evaluated())
 		{
 #if CCM_HAS_BUILTIN(__builtin_addcb)
 			RETURN_IF(unsigned char, __builtin_addcb)
@@ -130,7 +130,7 @@ namespace ccm::support
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> sub_with_borrow(T a, T b, T carry_in, T & carry_out)
 	{
-		if constexpr (!is_constant_evaluated())
+		if (!is_constant_evaluated())
 		{
 #if CCM_HAS_BUILTIN(__builtin_subcb)
 			RETURN_IF(unsigned char, __builtin_subcb)

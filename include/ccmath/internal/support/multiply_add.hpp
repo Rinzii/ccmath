@@ -28,16 +28,14 @@ namespace ccm::support
 
 		return static_cast<T>(__builtin_fmal(x, y, z));
 #elif CCM_HAS_BUILTIN(__builtin_fma) // If we don't have constexpr FMA, but we have a non-constexpr FMA, use that when not in constexpr context.
-		if constexpr (is_constant_evaluated())
+		if (is_constant_evaluated())
 		{
 			return x * y + z; // We can only hope the compiler optimizes this.
 		}
-		else
-		{
-			if constexpr (std::is_same_v<T, float>) { return __builtin_fmaf(x, y, z); }
-			if constexpr (std::is_same_v<T, double>) { return __builtin_fma(x, y, z); }
-			if constexpr (std::is_same_v<T, long double>) { return __builtin_fmal(x, y, z); }
-		}
+
+		if constexpr (std::is_same_v<T, float>) { return __builtin_fmaf(x, y, z); }
+		if constexpr (std::is_same_v<T, double>) { return __builtin_fma(x, y, z); }
+		if constexpr (std::is_same_v<T, long double>) { return __builtin_fmal(x, y, z); }
 
 #else
 		return x * y + z; // If we don't have FMA, just do the multiply and add and hope the compiler optimizes it.
@@ -54,16 +52,15 @@ namespace ccm::support
 
 		return static_cast<T>(__builtin_fmal(x, y, z));
 #elif CCM_HAS_BUILTIN(__builtin_fma) // If we don't have constexpr FMA, but we have a non-constexpr FMA, use that when not in constexpr context.
-		if constexpr (is_constant_evaluated())
+		if (is_constant_evaluated())
 		{
 			return x * y + z; // We can only hope the compiler optimizes this.
 		}
-		else
-		{
-			if constexpr (std::is_same_v<T, float>) { return __builtin_fmaf(x, y, z); }
-			if constexpr (std::is_same_v<T, double>) { return __builtin_fma(x, y, z); }
-			if constexpr (std::is_same_v<T, long double>) { return __builtin_fmal(x, y, z); }
-		}
+
+		if constexpr (std::is_same_v<T, float>) { return __builtin_fmaf(x, y, z); }
+		if constexpr (std::is_same_v<T, double>) { return __builtin_fma(x, y, z); }
+		if constexpr (std::is_same_v<T, long double>) { return __builtin_fmal(x, y, z); }
+
 #else
 		return x * y + z;
 #endif
