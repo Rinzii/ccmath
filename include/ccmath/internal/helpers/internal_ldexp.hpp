@@ -28,7 +28,7 @@ namespace ccm::helpers
 		constexpr int EXP_LIMIT = support::FPBits<T>::MAX_BIASED_EXPONENT + support::FPBits<T>::fraction_length + 1;
 		if (CCM_UNLIKELY(exp > EXP_LIMIT))
 		{
-			int const rounding_mode = support::get_rounding_mode();
+			int const rounding_mode = support::fenv::get_rounding_mode();
 			types::Sign sign		= bits.sign();
 
 			if ((sign == types::Sign::POS && rounding_mode == FE_DOWNWARD) || (sign == types::Sign::NEG && rounding_mode == FE_UPWARD) ||
@@ -46,7 +46,7 @@ namespace ccm::helpers
 
 		if (CCM_UNLIKELY(exp < -EXP_LIMIT))
 		{
-			int const rounding_mode = support::get_rounding_mode();
+			int const rounding_mode = support::fenv::get_rounding_mode();
 			types::Sign sign		= bits.sign();
 
 			if ((sign == types::Sign::POS && rounding_mode == FE_UPWARD) || (sign == types::Sign::NEG && rounding_mode == FE_DOWNWARD))

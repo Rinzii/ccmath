@@ -124,7 +124,7 @@ namespace ccm::rt::internal
 				x_exp = ((x_exp >> 1) + Bits::exponent_bias);
 				y |= (static_cast<storage_type>(x_exp) << (Bits::fraction_length + 1));
 
-				switch (support::get_rounding_mode())
+				switch (support::fenv::get_rounding_mode())
 				{
 				case FE_TONEAREST:
 					// Round to nearest, ties to even
@@ -203,7 +203,7 @@ namespace ccm::rt::internal
 
 			y = (y - one) | (static_cast<storage_type>(x_exp) << FPBits_t::fraction_length);
 
-			switch (support::get_rounding_mode())
+			switch (support::fenv::get_rounding_mode())
 			{
 			case FE_TONEAREST:
 				// Round to nearest, ties to even
@@ -276,11 +276,14 @@ namespace ccm::rt
 	T sqrt_rt(T num)
 	{
 #if defined(CCMATH_SIMD)
+		// In the unlikely event, the rounding mode is not the default, use the runtime implementation instead.
+		if (CCM_UNLIKELY(ccm::support::fenv::get_rounding_mode() != FE_TONEAREST)) { return internal::impl::sqrt_impl_rt(num); }
 	#if !defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64) // If long double is not 64-bits, use the generic implementation
 		if constexpr (std::is_same_v<T, long double>) { return internal::impl::sqrt_impl_rt(num); }
 		else { return simd_impl::sqrt_simd(num); }
-	#else
-		return simd_impl::sqrt_simd(num);
+	#else // If long double is the same as double we can use the SIMD implementation instead.
+		if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(simd_impl::sqrt_simd(static_cast<double>(num))); }
+		else { return simd_impl::sqrt_simd(num); }
 	#endif
 #else
 	#if CCCM_HAS_BUILTIN(__builtin_sqrt) || defined(__builtin_sqrt) // Check if builtin is available
