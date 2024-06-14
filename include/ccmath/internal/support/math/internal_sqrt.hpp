@@ -9,7 +9,8 @@
 #pragma once
 
 #include "ccmath/internal/config/type_support.hpp"
-#include "ccmath/internal/runtime/simd/math/sqrt_simd.hpp"
+#include "ccmath/internal/runtime/functions/power/sqrt_rt.hpp"
+
 #include "ccmath/internal/support/always_false.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
@@ -224,7 +225,7 @@ namespace ccm::support::math
 			template <typename T>
 			constexpr std::enable_if_t<std::is_floating_point_v<T>, T> sqrt_impl(T x) // NOLINT
 			{
-				if constexpr (Is80BitLongDouble_v<T>) // NOLINT
+				if constexpr (Is80BitLongDouble_v<T>)
 				{
 					return bit80::sqrt_calc_80bits(x);
 				}
@@ -249,37 +250,11 @@ namespace ccm::support::math
 		} // namespace impl
 	} // namespace internal
 
-	namespace rt
-	{
-		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-		inline T internal_sqrt_rt(T num)
-		{
-#if CCM_HAS_BUILTIN(__builtin_sqrt) || defined(__builtin_sqrt) // If the compiler has a built-in sqrt function, use it.
-			if constexpr (std::is_same_v<T, float>) { return __builtin_sqrt(num); }
-			if constexpr (std::is_same_v<T, double>) { return __builtin_sqrt(num); }
-			if constexpr (std::is_same_v<T, long double>) { return __builtin_sqrtl(num); }
-
-#elif defined(CCMATH_HAS_SIMD) // If we don't have a built-in sqrt function, use SIMD if available.
-
-			// The internal SIMD functions expect the default rounding mode. If the rounding mode is not the default, we must use the generic implementation.
-			if (CCM_UNLIKELY(get_rounding_mode() != FE_TONEAREST)) { return internal::impl::sqrt_impl(num); }
-
-			if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>) { return ccm::rt::simd::sqrt_simd(num); }
-	#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
-			if constexpr (std::is_same_v<T, long double>) { return ccm::rt::simd::sqrt_simd(num); }
-	#endif
-			return internal::impl::sqrt_impl(num); // Generic fallback
-#else // If we don't have SIMD or a builtin, use the generic implementation.
-			return internal::impl::sqrt_impl(num); // Generic fallback
-#endif
-		}
-	} // namespace rt
-
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T internal_sqrt(T num)
 	{
 		if constexpr (ccm::support::is_constant_evaluated()) { return internal::impl::sqrt_impl(num); }
-		else { return rt::internal_sqrt_rt(num); }
+		else { return rt::sqrt_rt(num); }
 	}
 
 } // namespace ccm::support::math
