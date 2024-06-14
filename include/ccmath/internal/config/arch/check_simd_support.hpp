@@ -106,7 +106,7 @@
 	#endif
 	#define CCMATH_SIMD 1
 #else
-	#error "CCMATH_SIMD defined but no valid simd instruction sets detected"
+		#undef CCMATH_SIMD
 #endif
 
 #endif // CCM_CONFIG_USE_RT_SIMD
