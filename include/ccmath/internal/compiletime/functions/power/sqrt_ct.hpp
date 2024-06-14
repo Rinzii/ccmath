@@ -124,7 +124,7 @@ namespace ccm::ct
 				   x_exp = ((x_exp >> 1) + Bits::exponent_bias);
 				   y |= (static_cast<storage_type>(x_exp) << (Bits::fraction_length + 1));
 
-				   switch (support::get_rounding_mode())
+				   switch (support::fenv::get_rounding_mode())
 				   {
 				   case FE_TONEAREST:
 					   // Round to nearest, ties to even
@@ -203,7 +203,7 @@ namespace ccm::ct
 
 			   y = (y - one) | (static_cast<storage_type>(x_exp) << FPBits_t::fraction_length);
 
-			   switch (support::get_rounding_mode())
+			   switch (support::fenv::get_rounding_mode())
 			   {
 			   case FE_TONEAREST:
 				   // Round to nearest, ties to even

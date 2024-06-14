@@ -76,7 +76,7 @@ namespace ccm::support::fenv::internal
 
 	inline int get_round()
 	{
-		return ccm::support::get_rounding_mode();
+		return ccm::support::fenv::get_rounding_mode();
 	}
 
 	inline int set_round(int rounding_mode)

@@ -20,6 +20,10 @@
 #include "ccmath/internal/support/math_support.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
 
+#include "ccmath/internal/runtime/simd/simd_vectorize.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
+
+
 #include <algorithm>
 #include <array>
 #include <cstddef>

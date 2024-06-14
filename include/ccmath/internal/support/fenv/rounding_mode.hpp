@@ -13,7 +13,7 @@
 #include <cfenv>
 #include <limits>
 
-namespace ccm::support
+namespace ccm::support::fenv
 {
 	namespace internal
 	{
@@ -114,4 +114,4 @@ namespace ccm::support
 		}
 		else { return internal::rt_get_rounding_mode(); }
 	}
-} // namespace ccm::support
+} // namespace ccm::support::fenv
