@@ -78,10 +78,10 @@ namespace ccm::support
 		struct FPLayout<FPType::eBinary128>
 		{
 			using storage_type						= types::uint128_t;
-			static constexpr int sign_length		= 1;
-			static constexpr int exponent_length	= 15;
-			static constexpr int significand_length = 112;
-			static constexpr int fraction_length	= significand_length;
+			static constexpr std::int_fast32_t sign_length		= 1;
+			static constexpr std::int_fast32_t exponent_length	= 15;
+			static constexpr std::int_fast32_t significand_length = 112;
+			static constexpr std::int_fast32_t fraction_length	= significand_length;
 		};
 
 		template <FPType fp_type>
@@ -107,7 +107,7 @@ namespace ccm::support
 			/**
 			 * @brief The total number of bits in the floating point number. Provided as a convenience.
 			 */
-			static constexpr int total_length = sign_length + exponent_length + significand_length;
+			static constexpr std::int_fast32_t total_length = sign_length + exponent_length + significand_length;
 
 			/**
 			 * @brief The number of bits after the decimal dot when the number is in normal form.
@@ -122,7 +122,7 @@ namespace ccm::support
 			/**
 			 * @brief The number of bits in the storage type.
 			 */
-			static constexpr int storage_length = sizeof(storage_type) * CHAR_BIT;
+			static constexpr std::int_fast32_t storage_length = sizeof(storage_type) * CHAR_BIT;
 			static_assert(storage_length >= total_length,
 						  "ccmath - FPBits: Some how the storage is not able to hold the entire floating point number. This should never happen!");
 
@@ -627,7 +627,7 @@ namespace ccm::support
 			using BASE::sign_mask;
 			using BASE::significand_length;
 			using BASE::significand_mask;
-			static constexpr int MAX_BIASED_EXPONENT = (1 << BASE::exponent_length) - 1;
+			static constexpr std::int_fast32_t MAX_BIASED_EXPONENT = (1 << BASE::exponent_length) - 1;
 
 			/// Constructors
 
@@ -689,7 +689,7 @@ namespace ccm::support
 				BASE::set_biased_exponent(BiasedExponent(static_cast<std::uint32_t>(static_cast<std::int32_t>(biased))));
 			}
 
-			[[nodiscard]] constexpr int get_exponent() const { return static_cast<std::int32_t>(Exponent(BASE::biased_exponent())); }
+			[[nodiscard]] constexpr std::int_fast32_t get_exponent() const { return static_cast<std::int32_t>(Exponent(BASE::biased_exponent())); }
 
 			/**
 			 * @brief Retrieves the explicit exponent value, adjusted for subnormal and zero values.
@@ -701,7 +701,7 @@ namespace ccm::support
 			 * inaccuracies when calculating values directly from the exponent by simply subtracting the bias.
 			 * Additionally, zero has an exponent of zero, which should be treated as zero.
 			 */
-			[[nodiscard]] constexpr int get_explicit_exponent() const
+			[[nodiscard]] constexpr std::int_fast32_t get_explicit_exponent() const
 			{
 				Exponent exponent(BASE::biased_exponent());
 				if (is_zero()) { exponent = Exponent::zero(); }
