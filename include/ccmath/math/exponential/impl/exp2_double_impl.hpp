@@ -10,7 +10,7 @@
 
 #include "ccmath/internal/helpers/exp_helpers.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
-#include "ccmath/internal/support/bit_mask.hpp"
+#include "ccmath/internal/support/fp/bit_mask_traits.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
 #include "ccmath/math/exponential/impl/exp2_data.hpp"
 

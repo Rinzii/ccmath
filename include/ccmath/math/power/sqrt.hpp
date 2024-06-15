@@ -8,7 +8,11 @@
 
 #pragma once
 
-#include "ccmath/internal/support/math/internal_sqrt.hpp"
+#if !(defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__))
+	#include "ccmath/internal/compiletime/functions/power/sqrt_ct.hpp"
+	#include "ccmath/internal/runtime/functions/power/sqrt_rt.hpp"
+	#include "ccmath/internal/support/is_constant_evaluated.hpp"
+#endif
 
 #include <type_traits>
 
@@ -30,7 +34,8 @@ namespace ccm
 		if constexpr (std::is_same_v<T, long double>) { return __builtin_sqrtl(num); }
 		return static_cast<T>(__builtin_sqrtl(num));
 #else
-		return support::math::internal_sqrt(num);
+		if (ccm::support::is_constant_evaluated()) { return ccm::ct::sqrt_ct<T>(num); }
+		return ccm::rt::sqrt_rt<T>(num);
 #endif
 	}
 
