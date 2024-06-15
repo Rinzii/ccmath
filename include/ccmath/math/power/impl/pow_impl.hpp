@@ -87,10 +87,9 @@ namespace ccm::internal::impl
 
 	template <typename T>
 	// NOLINTNEXTLINE(readability-function-cognitive-complexity) - Has a naturally high complexity. To avoid fracturing, we allow this.
-	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> pow_impl_handle_special_cases(support::fp::FPBits<T> & x_bits, support::fp::FPBits<T> & y_bits, T & x,
-																							 T & y) noexcept
+	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> pow_impl_handle_special_cases(support::fp::FPBits<T> & x_bits, support::fp::FPBits<T> & y_bits,
+																							 T & x, T & y) noexcept
 	{
-
 		if (x_bits.is_nan())
 		{
 			// IEEE 754-2019: pow(x, ±0) = 1 if x is not a signaling NaN
@@ -100,7 +99,7 @@ namespace ccm::internal::impl
 			// For clang, it will return 1.0 if the optimization flag is set.
 			// AppleClang always returns 1 no matter the optimization level.
 #if (defined(__GNUC__) && !defined(__clang__)) || (defined(__clang__) && defined(__OPTIMIZE__)) || (defined(__clang__) && defined(__APPLE__)) ||               \
-	(defined(__clang__) && defined(CCM_CONFIG_AGGRESSIVELY_OPTIMIZE))
+	(defined(__clang__) && defined(CCM_CONFIG_AGGRESSIVELY_OPTIMIZE)) || defined(__INTEL_LLVM_COMPILER)
 			if (y == 0.0 && x_bits.is_signaling_nan()) { return 1.0; }
 #endif
 
@@ -116,7 +115,7 @@ namespace ccm::internal::impl
 			// For clang, it will return 1.0 if the optimization flag is set.
 			// AppleClang always returns 1 no matter the optimization level.
 #if (defined(__GNUC__) && !defined(__clang__)) || (defined(__clang__) && defined(__OPTIMIZE__)) || (defined(__clang__) && defined(__APPLE__)) ||               \
-	(defined(__clang__) && defined(CCM_CONFIG_AGGRESSIVELY_OPTIMIZE))
+	(defined(__clang__) && defined(CCM_CONFIG_AGGRESSIVELY_OPTIMIZE)) || defined(__INTEL_LLVM_COMPILER)
 			if (x == 1.0 && y_bits.is_signaling_nan()) { return 1.0; }
 #endif
 
@@ -249,7 +248,7 @@ namespace ccm::internal::impl
 
 		// set sign to 1 for even y and -1 for odd y
 		int y_parity = ccm::abs<T>(y) >= support::floating_point_traits<T>::max_safe_integer ? 0 : static_cast<support::float_signed_bits_t<T>>(y) & 0x1;
-		current_sign_of_result = copy_sign.at(y_parity);
+		current_sign_of_result = copy_sign.at(static_cast<std::size_t>(y_parity));
 
 		// Set x to the absolute value of x for the remainder of the function
 		x = -x;
