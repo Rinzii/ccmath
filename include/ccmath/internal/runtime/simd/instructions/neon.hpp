@@ -15,7 +15,7 @@
 	#ifdef CCMATH_SIMD_NEON
 		#include <arm_neon.h>
 
-namespace ccm::simd
+namespace ccm::intrin
 {
 	namespace abi
 	{
@@ -191,6 +191,6 @@ namespace ccm::simd
 	{
 		return simd<double, abi::neon>(vreinterpretq_f64_u64(vbslq_u64(a.get(), vreinterpretq_u64_f64(b.get()), vreinterpretq_u64_f64(c.get()))));
 	}
-} // namespace ccm::simd
+} // namespace ccm::intrin
 	#endif // CCMATH_SIMD_NEON
 #endif	   // CCM_CONFIG_USE_RT_SIMD

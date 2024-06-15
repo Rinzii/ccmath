@@ -33,7 +33,7 @@
 		#endif
 #endif
 
-namespace ccm::simd
+namespace ccm::intrin
 {
 	namespace abi
 	{
@@ -63,4 +63,4 @@ namespace ccm::simd
 
 	template <class T>
 	using native_simd = simd<T, abi::native>;
-} // namespace ccm::simd
+} // namespace ccm::intrin

@@ -16,7 +16,7 @@
 
 		#include <immintrin.h>
 
-namespace ccm::simd
+namespace ccm::intrin
 {
 	namespace abi
 	{
@@ -211,7 +211,7 @@ namespace ccm::simd
 		return simd<double, abi::avx512>(_mm512_mask_blend_pd(a.get(), c.get(), b.get()));
 	}
 
-} // namespace ccm::simd
+} // namespace ccm::intrin
 
 	#endif // CCMATH_SIMD_AVX512F
 #endif	   // CCM_CONFIG_USE_RT_SIMD

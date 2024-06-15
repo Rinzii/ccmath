@@ -12,7 +12,7 @@
 
 #ifdef CCMATH_SIMD
 	#ifdef CCMATH_SIMD_NEON
-namespace ccm::simd
+namespace ccm::intrin
 {
 	CCM_ALWAYS_INLINE inline simd<float, abi::neon> sqrt(simd<float, abi::neon> const & a)
 	{
@@ -25,7 +25,7 @@ namespace ccm::simd
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
 		return simd<double, abi::neon>(vsqrtq_f64(a.get()));
 	}
-} // namespace ccm::simd
+} // namespace ccm::intrin
 
 	#endif // CCMATH_SIMD_NEON
 #endif	   // CCM_CONFIG_USE_RT_SIMD

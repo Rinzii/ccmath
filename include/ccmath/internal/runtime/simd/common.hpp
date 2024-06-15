@@ -14,7 +14,7 @@
 #include <array>
 #include <cstdint>
 
-namespace ccm::simd
+namespace ccm::intrin
 {
 	template <typename T, typename Abi>
 	struct simd;
@@ -153,4 +153,4 @@ namespace ccm::simd
 		static constexpr int value = simd<T, Abi>::size();
 	};
 
-} // namespace ccm::simd
+} // namespace ccm::intrin
