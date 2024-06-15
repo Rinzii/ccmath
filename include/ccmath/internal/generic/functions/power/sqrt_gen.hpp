@@ -31,9 +31,9 @@ namespace ccm::gen
 		};
 
 		template <typename T>
-		constexpr void normalize(int & exponent, typename support::FPBits<T>::storage_type & mantissa)
+		constexpr void normalize(int & exponent, typename support::fp::FPBits<T>::storage_type & mantissa)
 		{
-			const int shift = support::countl_zero(mantissa) - (8 * static_cast<int>(sizeof(mantissa)) - 1 - support::FPBits<T>::fraction_length);
+			const int shift = support::countl_zero(mantissa) - (8 * static_cast<int>(sizeof(mantissa)) - 1 - support::fp::FPBits<T>::fraction_length);
 			exponent -= shift;
 			mantissa <<= shift;
 		}
@@ -57,7 +57,7 @@ namespace ccm::gen
 		constexpr void normalize<long double>(int & exponent, types::uint128_t & mantissa)
 		{
 			const auto shift = static_cast<unsigned int>(static_cast<unsigned long>(support::countl_zero(static_cast<std::uint64_t>(mantissa))) -
-														 (8 * sizeof(std::uint64_t) - 1 - support::FPBits<long double>::fraction_length));
+														 (8 * sizeof(std::uint64_t) - 1 - support::fp::FPBits<long double>::fraction_length));
 			exponent -= shift; // NOLINT(cppcoreguidelines-narrowing-conversions, bugprone-narrowing-conversions)
 			mantissa <<= shift;
 		}
@@ -76,7 +76,7 @@ namespace ccm::gen
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
 				constexpr long double sqrt_calc_80bits(long double x)
 				{
-					using Bits				   = support::FPBits<long double>;
+					using Bits				   = support::fp::FPBits<long double>;
 					using storage_type		   = typename Bits::storage_type;
 					constexpr storage_type one = static_cast<storage_type>(1) << Bits::fraction_length;
 					constexpr auto nan_type	   = Bits::quiet_nan().get_val();
@@ -155,7 +155,7 @@ namespace ccm::gen
 					}
 
 					// Extract output
-					support::FPBits<long double> out(0.0L);
+					support::fp::FPBits<long double> out(0.0L);
 					out.set_biased_exponent(static_cast<storage_type>(x_exp));
 					out.set_implicit_bit(true);
 					out.set_mantissa(y & (one - 1));
@@ -166,9 +166,9 @@ namespace ccm::gen
 			} // namespace bit80
 
 			template <typename T>
-			static constexpr std::enable_if_t<std::is_floating_point_v<T>, T> sqrt_calc_bits(const support::FPBits<T> & bits)
+			static constexpr std::enable_if_t<std::is_floating_point_v<T>, T> sqrt_calc_bits(const support::fp::FPBits<T> & bits)
 			{
-				using FPBits_t			   = support::FPBits<T>;
+				using FPBits_t			   = support::fp::FPBits<T>;
 				using storage_type		   = typename FPBits_t::storage_type;
 				constexpr storage_type one = storage_type(1) << FPBits_t::fraction_length;
 
@@ -261,7 +261,7 @@ namespace ccm::gen
 				else
 				{
 					// IEEE floating points formats.
-					using FPBits_t		   = support::FPBits<T>;
+					using FPBits_t		   = support::fp::FPBits<T>;
 					constexpr auto flt_nan = FPBits_t::quiet_nan().get_val();
 
 					const FPBits_t bits(x);

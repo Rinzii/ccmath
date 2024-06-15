@@ -46,7 +46,7 @@ namespace ccm::internal::impl
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr auto convert_fp_to_uint(T x) noexcept
 	{
-		using FPbits_t	= support::FPBits<T>;
+		using FPbits_t	= support::fp::FPBits<T>;
 		using Storage_t = typename FPbits_t::storage_type;
 		FPbits_t x_bits(x);
 		Storage_t x_abs = x_bits.abs().uintval();
@@ -62,7 +62,7 @@ namespace ccm::internal::impl
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr bool is_odd_integer(T x)
 	{
-		using FPBits_t				 = typename support::FPBits<T>;
+		using FPBits_t				 = typename support::fp::FPBits<T>;
 		using Storage_t				 = typename FPBits_t::storage_type;
 		using SignedStorage_t		 = support::float_signed_bits_t<T>;
 		auto x_u					 = support::bit_cast<Storage_t>(x);
@@ -75,7 +75,7 @@ namespace ccm::internal::impl
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr bool is_integer(T x)
 	{
-		using FPBits_t							= typename support::FPBits<T>;
+		using FPBits_t							= typename support::fp::FPBits<T>;
 		using Storage_t							= typename FPBits_t::storage_type;
 		using SignedStorage_t					= support::float_signed_bits_t<T>;
 		Storage_t x_u							= support::bit_cast<Storage_t>(x);
@@ -87,7 +87,7 @@ namespace ccm::internal::impl
 
 	template <typename T>
 	// NOLINTNEXTLINE(readability-function-cognitive-complexity) - Has a naturally high complexity. To avoid fracturing, we allow this.
-	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> pow_impl_handle_special_cases(support::FPBits<T> & x_bits, support::FPBits<T> & y_bits, T & x,
+	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> pow_impl_handle_special_cases(support::fp::FPBits<T> & x_bits, support::fp::FPBits<T> & y_bits, T & x,
 																							 T & y) noexcept
 	{
 
@@ -184,7 +184,7 @@ namespace ccm::internal::impl
 	}
 
 	template <typename T>
-	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> pow_impl_handle_zero_or_less(support::FPBits<T> & x_bits, T & x, T & y,
+	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> pow_impl_handle_zero_or_less(support::fp::FPBits<T> & x_bits, T & x, T & y,
 																							T & current_sign_of_result) noexcept
 	{
 		const bool is_x_zero	   = x_bits.is_zero();
@@ -260,9 +260,9 @@ namespace ccm::internal::impl
 		return std::numeric_limits<T>::min();
 	}
 
-	// make sure TStorage is of the type support::FPBits<T>::storage_type
-	template <typename T, typename TStorage, std::enable_if_t<std::is_same_v<TStorage, typename support::FPBits<T>::storage_type>, bool> = true>
-	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> pow_check_over_under_flow(support::FPBits<T> & x_bits, support::FPBits<T> & y_bits,
+	// make sure TStorage is of the type support::fp::FPBits<T>::storage_type
+	template <typename T, typename TStorage, std::enable_if_t<std::is_same_v<TStorage, typename support::fp::FPBits<T>::storage_type>, bool> = true>
+	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> pow_check_over_under_flow(support::fp::FPBits<T> & x_bits, support::fp::FPBits<T> & y_bits,
 																						 TStorage & x_abs, TStorage & y_abs) noexcept
 	{
 
@@ -272,8 +272,8 @@ namespace ccm::internal::impl
 	template <typename T>
 	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> pow_impl(T x, T y) noexcept
 	{
-		support::FPBits<T> x_bits(x);
-		support::FPBits<T> y_bits(y);
+		support::fp::FPBits<T> x_bits(x);
+		support::fp::FPBits<T> y_bits(y);
 		double sign_of_result = 1.0;
 
 		// Handle edge cases when x or y is a non-finite value

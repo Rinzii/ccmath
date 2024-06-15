@@ -22,7 +22,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T trunc(T num) noexcept
 	{
-		using FPBits_t	= ccm::support::FPBits<T>;
+		using FPBits_t	= ccm::support::fp::FPBits<T>;
 		using Storage_t = typename FPBits_t::storage_type;
 
 		FPBits_t bits(num);
