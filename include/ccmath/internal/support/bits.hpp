@@ -10,12 +10,18 @@
 
 #pragma once
 
+#include "ccmath/internal/config/arch/check_arch_support.hpp"
 #include "ccmath/internal/config/type_support.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/ctz.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
 
 #include <cstdint>
+
+#if defined(_MSC_VER) && !defined(__clang__)
+	#include <cstdlib>
+#endif
 
 namespace ccm::support
 {
@@ -33,6 +39,9 @@ namespace ccm::support
 	{
 		return x && !(x & (x - 1));
 	}
+
+
+	// TODO: Remove all of these top bits functions and replace them with a generic version.
 
 	/**
 	 * @brief Helper function to get the top 16-bits of a double.
@@ -98,11 +107,20 @@ namespace ccm::support
 	 * @brief Rotates unsigned integer bits to the right.
 	 * https://en.cppreference.com/w/cpp/numeric/rotr
 	 */
-	template <class T>
+	template <class T, std::enable_if_t<traits::ccm_is_unsigned_v<T>, bool> = true>
 	constexpr T rotr(T t, int cnt) noexcept
 	{
-		static_assert(ccm::support::traits::is_unsigned_integer_v<T>, "rotr requires an unsigned integer type");
+#if defined(_MSC_VER) && !defined(__clang__)
+		// Allow for the use of compiler intrinsics if we are not being evaluated at compile time in msvc.
+		if (!is_constant_evaluated())
+		{
+			// These functions are not constexpr in msvc.
+			if constexpr (std::is_same_v<T, unsigned int>) { return _rotr(t, cnt); }
+			else if constexpr (std::is_same_v<T, std::uint64_t>) { return _rotr64(t, cnt); }
+		}
+#endif
 		const unsigned int dig = std::numeric_limits<T>::digits;
+
 		if ((static_cast<unsigned int>(cnt) % dig) == 0) { return t; }
 
 		if (cnt < 0)
@@ -119,9 +137,18 @@ namespace ccm::support
 	 * @brief Rotates unsigned integer bits to the left.
 	 * https://en.cppreference.com/w/cpp/numeric/rotl
 	 */
-	template <class T>
+	template <class T, std::enable_if_t<traits::ccm_is_unsigned_v<T>, bool> = true>
 	constexpr T rotl(T t, int cnt) noexcept
 	{
+#if defined(_MSC_VER) && !defined(__clang__)
+		// Allow for the use of compiler intrinsics if we are not being evaluated at compile time in msvc.
+		if (!is_constant_evaluated())
+		{
+			// These functions are not constexpr in msvc.
+			if constexpr (std::is_same_v<T, unsigned int>) { return _rotl(t, cnt); }
+			else if constexpr (std::is_same_v<T, std::uint64_t>) { return _rotl64(t, cnt); }
+		}
+#endif
 		return rotr(t, -cnt);
 	}
 
@@ -272,7 +299,7 @@ namespace ccm::support
 		return BUILTIN(value);                                                                                                                                 \
 	}
 // NOLINTEND(bugprone-macro-parentheses)
-// If the compiler has builtin's for popcount, the create specializations that use the builtin.
+// If the compiler has builtins for popcount, then create specializations that use the builtins.
 #if CCM_HAS_BUILTIN(__builtin_popcount)
 	INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(popcount, unsigned char, __builtin_popcount)
 	INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(popcount, unsigned short, __builtin_popcount)

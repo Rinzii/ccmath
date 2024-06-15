@@ -41,7 +41,7 @@ namespace ccm::support
 
 		// Check for overflow by comparing the signs
 		bool overflow = false;
-		if (std::is_signed_v<T>)
+		if constexpr (std::is_signed_v<T>)
 		{
 			if ((a > 0 && b > 0 && lres < 0) || (a < 0 && b < 0 && lres > 0)) { overflow = true; }
 		}
@@ -78,7 +78,7 @@ namespace ccm::support
 
 		// Check for overflow by comparing the signs
 		bool overflow = false;
-		if (std::is_signed_v<T>)
+		if constexpr (std::is_signed_v<T>)
 		{
 			if ((b > 0 && a < std::numeric_limits<T>::min() + b) || (b < 0 && a > std::numeric_limits<T>::max() + b)) { overflow = true; }
 		}

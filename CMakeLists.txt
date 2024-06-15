@@ -47,6 +47,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU O
 
             # Macros to define
             -DNOMINMAX
+            -mavx
     )
 
 

@@ -19,6 +19,11 @@ if(NOT TARGET ccmath)
   find_package(ccmath CONFIG REQUIRED)
 endif()
 
+#if (CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU OR CMAKE_CXX_COMPILER_ID STREQUAL IntelLLVM)
+#  target_compile_options(ccm_benchmark_${function_name} INTERFACE
+#          -S
+#  )
+#endif()
 
 function(add_benchmark function_name source_files)
   add_executable(ccm_benchmark_${function_name} helpers/randomizers.hpp ${source_files})

@@ -3,7 +3,7 @@
 ##########################################
 
 set(ccmath_internal_compiletime_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/compiletime/functions/power/sqrt_ct.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/generic/functions/power/sqrt_gen.hpp
 )
 
 ## Config headers
