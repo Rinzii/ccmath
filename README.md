@@ -31,7 +31,7 @@ Here's a basic example:
 #include <iostream> // For std::cout
 
 int main() {
-    constexpr double x = ccmath::sqrt(25.0);  // Compile-time evaluation of square root
+    constexpr double x = ccm::sqrt(25.0);  // Compile-time evaluation of square root
     std::cout << "Square root of 25: " << x << std::endl;
     return 0;
 }
