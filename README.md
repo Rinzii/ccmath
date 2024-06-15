@@ -12,7 +12,13 @@ improving performance and allows for more efficient code in scenarios where cons
 
 - **Performance Optimization**: Besides all the functions being able to be evaluated at compile time, CCMath was also built with speed in mind. We strive to have speeds nearly as fast as the standard implementation.
 
+- **Optimized Runtime Evaluation**: In all instances where a function cannot be evaluated at compile time, CCMath has been optimized to provide the fastest runtime evaluation possible and aims to be as fast as the standard library.
+
+- **Cross-Platform Compatibility**: CCMath is designed to work on all major platforms and compilers. It has been tested on Windows, macOS, and Linux with compilers such as GCC, Clang, and MSVC.
+
 - **No External Dependencies**: CCMath has no external dependencies and only requires a modern C++17-compliant compiler.
+
+- **Header-Only Library**: CCMath is a header-only library, making it easy to integrate into your projects.
 
 ## Usage
 
