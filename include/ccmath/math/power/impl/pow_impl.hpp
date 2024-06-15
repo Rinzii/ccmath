@@ -11,15 +11,15 @@
 // turn on fenv access
 // #pragma STDC FENV_ACCESS ON
 
-#include "ccmath/internal/support/bit_mask.hpp"
 #include "ccmath/internal/support/floating_point_traits.hpp"
+#include "ccmath/internal/support/fp/bit_mask_traits.hpp"
 #include "ccmath/internal/support/fp/directional_rounding_utils.hpp"
-#include "ccmath/internal/support/fp_bits.hpp"
-#include "ccmath/internal/support/math/internal_sqrt.hpp"
+#include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/unreachable.hpp"
 #include "ccmath/internal/types/big_int.hpp"
 #include "ccmath/math/basic/abs.hpp"
 #include "ccmath/math/compare/isnan.hpp"
+#include "ccmath/math/power/sqrt.hpp"
 
 #include <limits>
 

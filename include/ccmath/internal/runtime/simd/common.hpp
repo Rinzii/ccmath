@@ -6,88 +6,151 @@
  * See LICENSE for more information.
  */
 
-/**
- * Conventions followed:
- * - All macros with the name CCMATH_* are allowed to be defined internally and can be handled by the implementors.
- * - Macros that have the name CCM_CONFIG_* can NOT be defined by the user. These should be handled by our cmake script itself and never defined by us internally.
- */
-
 #pragma once
 
-#include "ccmath/internal/predef/has_attribute.hpp"
-#include "ccmath/internal/predef/versioning/gcc_version.hpp"
+#include "ccmath/internal/predef/attributes/always_inline.hpp"
+#include "ccmath/internal/predef/attributes/gpu_host_device.hpp"
 
-#if !defined(CCMATH_FAST_MATH) && !defined(CCM_CONFIG_NO_FAST_MATH) && defined(__FAST_MATH__)
-#define CCMATH_FAST_MATH
-#endif
+#include <array>
+#include <cstdint>
 
-#if !defined(CCMATH_FAST_MATH) && !defined(CCM_CONFIG_NO_FAST_NANS)
-	#if defined(CCMATH_FAST_MATH)
-		#define CCMATH_FAST_NANS
-	#elif defined(__FINITE_MATH_ONLY__)
-		#if __FINITE_MATH_ONLY__
-			#define CCMATH_FAST_NANS
-		#endif
-	#endif
-#endif
+namespace ccm::simd
+{
+	template <typename T, typename Abi>
+	struct simd;
 
-#if (CCM_HAS_ATTR(may_alias) && (!defined(__SUNPRO_C) && !defined(__SUNPRO_CC))) || CCM_GCC_VERSION_CHECK(3,3,0)
-	#define CCM_ATTR_MAY_ALIAS __attribute__((__may_alias__))
-#else
-	#define CCM_ATTR_MAY_ALIAS
-#endif
+	template <class T, class Abi>
+	struct simd_mask;
 
+	struct element_aligned_tag
+	{
+	};
 
-#if CCM_GCC_VERSION_CHECK(4,8,0)
-	#define CCM_VECTOR(size) __attribute__((__vector_size__(size)))
-	#define CCMATH_VECTOR_OPS
-	#define CCMATH_VECTOR_NEGATE
-	#define CCMATH_VECTOR_SCALAR
-	#define CCMATH_VECTOR_SUBSCRIPT
-#else
-	#define CCM_VECTOR(size)
-#endif
+	template <class T>
+	CCM_GPU_HOST_DEVICE constexpr T const & choose(bool a, T const & b, T const & c)
+	{
+		return a ? b : c;
+	}
 
-/*
+	template <class T, class Abi>
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> & operator+=(simd<T, Abi> & a, simd<T, Abi> const & b)
+	{
+		a = a + b;
+		return a;
+	}
 
-#if \
-  (HEDLEY_HAS_ATTRIBUTE(may_alias) && !defined(HEDLEY_SUNPRO_VERSION)) || \
-  HEDLEY_GCC_VERSION_CHECK(3,3,0) || \
-  HEDLEY_INTEL_VERSION_CHECK(13,0,0) || \
-  HEDLEY_IBM_VERSION_CHECK(13,1,0)
-	#  define SIMDE_MAY_ALIAS __attribute__((__may_alias__))
-#else
-	#  define SIMDE_MAY_ALIAS
-#endif
+	template <class T, class Abi>
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> & operator-=(simd<T, Abi> & a, simd<T, Abi> const & b)
+	{
+		a = a - b;
+		return a;
+	}
 
-#if !defined(SIMDE_NO_VECTOR)
-	#  if \
-    HEDLEY_GCC_VERSION_CHECK(4,8,0)
-		#    define SIMDE_VECTOR(size) __attribute__((__vector_size__(size)))
-		#    define SIMDE_VECTOR_OPS
-		#    define SIMDE_VECTOR_NEGATE
-		#    define SIMDE_VECTOR_SCALAR
-		#    define SIMDE_VECTOR_SUBSCRIPT
-	#  elif HEDLEY_INTEL_VERSION_CHECK(16,0,0)
-		#    define SIMDE_VECTOR(size) __attribute__((__vector_size__(size)))
-		#    define SIMDE_VECTOR_OPS
-		#    define SIMDE_VECTOR_NEGATE
-		#    define SIMDE_VECTOR_SUBSCRIPT
-	#  elif \
-    HEDLEY_GCC_VERSION_CHECK(4,1,0) || \
-    HEDLEY_INTEL_VERSION_CHECK(13,0,0) || \
-    HEDLEY_MCST_LCC_VERSION_CHECK(1,25,10)
-		#    define SIMDE_VECTOR(size) __attribute__((__vector_size__(size)))
-		#    define SIMDE_VECTOR_OPS
-	#  elif HEDLEY_SUNPRO_VERSION_CHECK(5,12,0)
-		#    define SIMDE_VECTOR(size) __attribute__((__vector_size__(size)))
-	#  elif HEDLEY_HAS_ATTRIBUTE(vector_size)
-		#    define SIMDE_VECTOR(size) __attribute__((__vector_size__(size)))
-		#    define SIMDE_VECTOR_OPS
-		#    define SIMDE_VECTOR_NEGATE
-		#    define SIMDE_VECTOR_SUBSCRIPT
-		#    if SIMDE_DETECT_CLANG_VERSION_CHECK(5,0,0)
-			#      define SIMDE_VECTOR_SCALAR
-		#    endif
-	#  endif
- */
+	template <class T, class Abi>
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> & operator*=(simd<T, Abi> & a, simd<T, Abi> const & b)
+	{
+		a = a * b;
+		return a;
+	}
+
+	template <class T, class Abi>
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> & operator/=(simd<T, Abi> & a, simd<T, Abi> const & b)
+	{
+		a = a / b;
+		return a;
+	}
+
+	template <class T, class Abi>
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> operator+(T const & a, simd<T, Abi> const & b)
+	{
+		return simd<T, Abi>(a) + b;
+	}
+
+	template <class T, class Abi>
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> operator+(simd<T, Abi> const & a, T const & b)
+	{
+		return a + simd<T, Abi>(b);
+	}
+
+	template <class T, class Abi>
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> operator-(T const & a, simd<T, Abi> const & b)
+	{
+		return simd<T, Abi>(a) - b;
+	}
+
+	template <class T, class Abi>
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> operator-(simd<T, Abi> const & a, T const & b)
+	{
+		return a - simd<T, Abi>(b);
+	}
+
+	template <class T, class Abi>
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> operator*(T const & a, simd<T, Abi> const & b)
+	{
+		return simd<T, Abi>(a) * b;
+	}
+
+	template <class T, class Abi>
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> operator*(simd<T, Abi> const & a, T const & b)
+	{
+		return a * simd<T, Abi>(b);
+	}
+
+	template <class T, class Abi>
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> operator/(T const & a, simd<T, Abi> const & b)
+	{
+		return simd<T, Abi>(a) / b;
+	}
+
+	template <class T, class Abi>
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> operator/(simd<T, Abi> const & a, T const & b)
+	{
+		return a / simd<T, Abi>(b);
+	}
+
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline bool all_of(bool a)
+	{
+		return a;
+	}
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline bool any_of(bool a)
+	{
+		return a;
+	}
+
+	template <class T, class Abi>
+	struct simd_storage
+	{
+		using value_type						= T;
+		using simd_type							= simd<T, Abi>;
+
+		CCM_ALWAYS_INLINE inline simd_storage() = default;
+		static constexpr int size() { return simd<T, Abi>::size(); }
+		CCM_ALWAYS_INLINE explicit inline simd_storage(simd<T, Abi> const & value) { value.copy_to(m_value, element_aligned_tag()); }
+		CCM_ALWAYS_INLINE explicit inline simd_storage(T value) : simd_storage(simd<T, Abi>(value)) {}
+		CCM_ALWAYS_INLINE inline simd_storage & operator=(simd<T, Abi> const & value)
+		{
+			value.copy_to(m_value, element_aligned_tag());
+			return *this;
+		}
+		CCM_ALWAYS_INLINE inline T const * data() const { return m_value.data(); }
+		CCM_ALWAYS_INLINE inline T * data() { return m_value; }
+		CCM_ALWAYS_INLINE inline T const & operator[](int i) const { return m_value[i]; }
+		CCM_ALWAYS_INLINE inline T & operator[](int i) { return m_value[i]; }
+
+	private:
+		std::array<T, simd<T, Abi>::size()> m_value;
+	};
+
+	template <class T>
+	struct simd_size
+	{
+		static constexpr int value = 1;
+	};
+
+	template <class T, class Abi>
+	struct simd_size<simd<T, Abi>>
+	{
+		static constexpr int value = simd<T, Abi>::size();
+	};
+
+} // namespace ccm::simd

@@ -13,7 +13,7 @@
 #include <cfenv>
 #include <limits>
 
-namespace ccm::support
+namespace ccm::support::fenv
 {
 	namespace internal
 	{
@@ -62,8 +62,8 @@ namespace ccm::support
 	 */
 	constexpr bool rounding_mode_is_round_up()
 	{
-		if constexpr (is_constant_evaluated()) { return std::numeric_limits<float>::round_style == std::float_round_style::round_toward_infinity; }
-		else { return internal::rt_rounding_mode_is_round_up(); }
+		if (is_constant_evaluated()) { return std::numeric_limits<float>::round_style == std::float_round_style::round_toward_infinity; }
+		return internal::rt_rounding_mode_is_round_up();
 	}
 
 	/**
@@ -72,8 +72,8 @@ namespace ccm::support
 	 */
 	constexpr bool rounding_mode_is_round_down()
 	{
-		if constexpr (is_constant_evaluated()) { return std::numeric_limits<float>::round_style == std::float_round_style::round_toward_neg_infinity; }
-		else { return internal::rt_rounding_mode_is_round_down(); }
+		if (is_constant_evaluated()) { return std::numeric_limits<float>::round_style == std::float_round_style::round_toward_neg_infinity; }
+		return internal::rt_rounding_mode_is_round_down();
 	}
 
 	/**
@@ -82,8 +82,8 @@ namespace ccm::support
 	 */
 	constexpr bool rounding_mode_is_round_to_nearest()
 	{
-		if constexpr (is_constant_evaluated()) { return std::numeric_limits<float>::round_style == std::float_round_style::round_to_nearest; }
-		else { return internal::rt_rounding_mode_is_round_to_nearest(); }
+		if (is_constant_evaluated()) { return std::numeric_limits<float>::round_style == std::float_round_style::round_to_nearest; }
+		return internal::rt_rounding_mode_is_round_to_nearest();
 	}
 
 	/**
@@ -92,8 +92,8 @@ namespace ccm::support
 	 */
 	constexpr bool rounding_mode_is_round_to_zero()
 	{
-		if constexpr (is_constant_evaluated()) { return std::numeric_limits<float>::round_style == std::float_round_style::round_toward_zero; }
-		else { return internal::rt_rounding_mode_is_round_to_zero(); }
+		if (is_constant_evaluated()) { return std::numeric_limits<float>::round_style == std::float_round_style::round_toward_zero; }
+		return internal::rt_rounding_mode_is_round_to_zero();
 	}
 
 	/**
@@ -102,7 +102,7 @@ namespace ccm::support
 	 */
 	constexpr int get_rounding_mode()
 	{
-		if constexpr (is_constant_evaluated())
+		if (is_constant_evaluated())
 		{
 			switch (std::numeric_limits<float>::round_style)
 			{
@@ -114,4 +114,4 @@ namespace ccm::support
 		}
 		else { return internal::rt_get_rounding_mode(); }
 	}
-} // namespace ccm::support
+} // namespace ccm::support::fenv
