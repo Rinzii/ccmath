@@ -53,13 +53,13 @@ namespace ccm::types
 		template <typename T, std::enable_if_t<support::traits::ccm_is_floating_point_v<T>, bool> = true>
 		constexpr explicit DyadicFloat(T x)
 		{
-			static_assert(support::FPBits<T>::fraction_length < Bits);
-			support::FPBits<T> x_bits(x);
+			static_assert(support::fp::FPBits<T>::fraction_length < Bits);
+			support::fp::FPBits<T> x_bits(x);
 
 			assert(x == x_bits.get_val());
 
 			sign	 = x_bits.sign();
-			exponent = x_bits.get_explicit_exponent() - support::FPBits<T>::fraction_length;
+			exponent = x_bits.get_explicit_exponent() - support::fp::FPBits<T>::fraction_length;
 			mantissa = mantissa_type(x_bits.get_explicit_mantissa());
 			normalize();
 		}
@@ -133,22 +133,22 @@ namespace ccm::types
 		 * @tparam T The target floating-point type.
 		 * @return The floating-point representation of the DyadicFloat.
 		 */
-		template <typename T, typename = std::enable_if_t<ccm::support::traits::ccm_is_floating_point_v<T> && (support::FPBits<T>::fraction_length < Bits), void>>
+		template <typename T, typename = std::enable_if_t<ccm::support::traits::ccm_is_floating_point_v<T> && (support::fp::FPBits<T>::fraction_length < Bits), void>>
 		explicit constexpr operator T() const
 		{
-			if (CCM_UNLIKELY(mantissa.is_zero())) { return support::FPBits<T>::zero(sign).get_val(); }
+			if (CCM_UNLIKELY(mantissa.is_zero())) { return support::fp::FPBits<T>::zero(sign).get_val(); }
 
 			// Assume normalized input and output.
-			constexpr uint32_t desired_precision		  = support::FPBits<T>::fraction_length + 1;
-			using output_bits_t					  = typename support::FPBits<T>::storage_type;
-			constexpr output_bits_t implicit_mask = support::FPBits<T>::significand_mask - support::FPBits<T>::fraction_mask;
+			constexpr uint32_t desired_precision		  = support::fp::FPBits<T>::fraction_length + 1;
+			using output_bits_t					  = typename support::fp::FPBits<T>::storage_type;
+			constexpr output_bits_t implicit_mask = support::fp::FPBits<T>::significand_mask - support::fp::FPBits<T>::fraction_mask;
 
-			int exp_hi = exponent + static_cast<int>((Bits - 1) + support::FPBits<T>::exponent_bias);
+			int exp_hi = exponent + static_cast<int>((Bits - 1) + support::fp::FPBits<T>::exponent_bias);
 
-			if (CCM_UNLIKELY(exp_hi > 2 * support::FPBits<T>::exponent_bias))
+			if (CCM_UNLIKELY(exp_hi > 2 * support::fp::FPBits<T>::exponent_bias))
 			{
 				// Results overflow.
-				T d_hi = support::FPBits<T>::create_value(sign, 2 * support::FPBits<T>::exponent_bias, implicit_mask).get_val();
+				T d_hi = support::fp::FPBits<T>::create_value(sign, 2 * support::fp::FPBits<T>::exponent_bias, implicit_mask).get_val();
 				return T(2) * d_hi;
 			}
 
@@ -160,7 +160,7 @@ namespace ccm::types
 				denorm = true;
 				shift  = (Bits - desired_precision) + static_cast<uint32_t>(1 - exp_hi);
 
-				exp_hi = support::FPBits<T>::exponent_bias;
+				exp_hi = support::fp::FPBits<T>::exponent_bias;
 			}
 
 			int exp_lo = exp_hi - static_cast<int>(desired_precision) - 1;
@@ -170,7 +170,7 @@ namespace ccm::types
 			mantissa_type m_hi = shift >= mantissa_len ? mantissa_type(0) : mantissa >> shift;
 
 			T d_hi =
-				support::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_hi), (static_cast<output_bits_t>(m_hi) & support::FPBits<T>::significand_mask) | implicit_mask).get_val();
+				support::fp::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_hi), (static_cast<output_bits_t>(m_hi) & support::fp::FPBits<T>::significand_mask) | implicit_mask).get_val();
 
 			mantissa_type round_mask	 = shift > mantissa_len ? 0 : mantissa_type(1) << (shift - 1);
 			mantissa_type sticky_mask = round_mask - mantissa_type(1);
@@ -185,15 +185,15 @@ namespace ccm::types
 			{
 				// d_lo is denormal, but the output is normal.
 				int scale_up_exponent = 2 * desired_precision;
-				T scale_up_factor	  = support::FPBits<T>::create_value(sign, support::FPBits<T>::exponent_bias + static_cast<output_bits_t>(scale_up_exponent), implicit_mask).get_val();
-				T scale_down_factor	  = support::FPBits<T>::create_value(sign, support::FPBits<T>::exponent_bias - static_cast<output_bits_t>(scale_up_exponent), implicit_mask).get_val();
+				T scale_up_factor	  = support::fp::FPBits<T>::create_value(sign, support::fp::FPBits<T>::exponent_bias + static_cast<output_bits_t>(scale_up_exponent), implicit_mask).get_val();
+				T scale_down_factor	  = support::fp::FPBits<T>::create_value(sign, support::fp::FPBits<T>::exponent_bias - static_cast<output_bits_t>(scale_up_exponent), implicit_mask).get_val();
 
-				d_lo = support::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_lo + scale_up_exponent), implicit_mask).get_val();
+				d_lo = support::fp::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_lo + scale_up_exponent), implicit_mask).get_val();
 
 				return support::multiply_add(d_lo, T(round_and_sticky), d_hi * scale_up_factor) * scale_down_factor;
 			}
 
-			d_lo = support::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_lo), implicit_mask).get_val();
+			d_lo = support::fp::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_lo), implicit_mask).get_val();
 
 			// Still correct without FMA instructions if `d_lo` is not underflow.
 			T r = support::multiply_add(d_lo, T(round_and_sticky), d_hi);
@@ -201,15 +201,15 @@ namespace ccm::types
 			if (CCM_UNLIKELY(denorm))
 			{
 				// Exponent before rounding is in denormal range, clear the exponent field.
-				output_bits_t clear_exp = (output_bits_t(exp_hi) << support::FPBits<T>::significand_length);
-				output_bits_t r_bits	= support::FPBits<T>(r).uintval() - clear_exp;
-				if (!(r_bits & support::FPBits<T>::exponent_mask))
+				output_bits_t clear_exp = (output_bits_t(exp_hi) << support::fp::FPBits<T>::significand_length);
+				output_bits_t r_bits	= support::fp::FPBits<T>(r).uintval() - clear_exp;
+				if (!(r_bits & support::fp::FPBits<T>::exponent_mask))
 				{
 					// Output is denormal after rounding, clear the implicit bit for 80-bit long double.
 					r_bits -= implicit_mask;
 				}
 
-				return support::FPBits<T>(r_bits).get_val();
+				return support::fp::FPBits<T>(r_bits).get_val();
 			}
 
 			return r;

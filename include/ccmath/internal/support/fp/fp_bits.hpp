@@ -23,7 +23,7 @@
 #include <climits>
 #include <cstdint>
 
-namespace ccm::support
+namespace ccm::support::fp
 {
 	/// All supported floating point types
 	enum class FPType : std::uint8_t
@@ -844,4 +844,4 @@ namespace ccm::support
 		 */
 		constexpr T get_val() const { return support::bit_cast<T>(BASE::bits); }
 	};
-} // namespace ccm::support
+} // namespace ccm::support::fp
