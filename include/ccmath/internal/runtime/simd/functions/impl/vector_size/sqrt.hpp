@@ -13,7 +13,7 @@
 #ifdef CCMATH_SIMD
 	#ifdef CCMATH_SIMD_ENABLE_VECTOR_SIZE
 
-namespace ccm::simd
+namespace ccm::intrin
 {
 
 	template <class T, int N>
@@ -30,7 +30,7 @@ namespace ccm::simd
 		return result;
 	}
 
-} // namespace ccm::simd
+} // namespace ccm::intrin
 
 	#endif // CCMATH_SIMD_ENABLE_VECTOR_SIZE
 #endif	   // CCM_CONFIG_USE_RT_SIMD

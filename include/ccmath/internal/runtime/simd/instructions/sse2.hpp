@@ -23,7 +23,7 @@
 
 	#ifdef CCMATH_SIMD_SSE2
 
-namespace ccm::simd
+namespace ccm::intrin
 {
 
 	namespace abi
@@ -200,7 +200,7 @@ namespace ccm::simd
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
 		return simd<double, abi::sse2>(_mm_add_pd(_mm_and_pd(a.get(), b.get()), _mm_andnot_pd(a.get(), c.get())));
 	}
-} // namespace ccm::simd
+} // namespace ccm::intrin
 
 	#endif // CCMATH_SIMD_SSE2
 #endif	   // CCM_CONFIG_USE_RT_SIMD

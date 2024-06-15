@@ -15,7 +15,7 @@
 	#ifdef CCMATH_SIMD_AVX
 		#include <immintrin.h>
 
-namespace ccm::simd
+namespace ccm::intrin
 {
 	namespace abi
 	{

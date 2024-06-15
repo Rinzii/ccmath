@@ -36,8 +36,8 @@ namespace ccm::rt::simd_impl
 	#endif
 	[[nodiscard]] inline T sqrt_simd_impl(T num) noexcept
 	{
-		simd::simd<T, simd::abi::native> const num_m(num);
-		simd::simd<T, simd::abi::native> const sqrt_m = simd::sqrt(num_m);
+		intrin::simd<T, intrin::abi::native> const num_m(num);
+		intrin::simd<T, intrin::abi::native> const sqrt_m = intrin::sqrt(num_m);
 		return sqrt_m.convert();
 	}
 #endif
