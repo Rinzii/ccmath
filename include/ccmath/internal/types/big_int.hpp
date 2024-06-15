@@ -23,7 +23,6 @@
 #include "ccmath/internal/runtime/simd/simd_vectorize.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 
-
 #include <algorithm>
 #include <array>
 #include <cstddef>
@@ -252,15 +251,31 @@ namespace ccm::types
 		{
 			static_assert(N >= M);
 			word carry_out = 0;
-			for (std::size_t i = 0; i < N; ++i)
+			if (ccm::support::is_constant_evaluated())
 			{
-				const bool has_rhs_value = i < M;
-				const word rhs_value	 = has_rhs_value ? rhs[i] : 0;
-				const word carry_in		 = carry_out;
-				dst[i]					 = op_with_carry(dst[i], rhs_value, carry_in, carry_out);
+				for (std::size_t i = 0; i < N; ++i)
+				{
+					const bool has_rhs_value = i < M;
+					const word rhs_value	 = has_rhs_value ? rhs[i] : 0;
+					const word carry_in		 = carry_out;
+					dst[i]					 = op_with_carry(dst[i], rhs_value, carry_in, carry_out);
 
-				// Stop early if 'rhs' is exhausted and no carry remains to be propagated.
-				if (!has_rhs_value && carry_out == 0) { break; }
+					// Stop early if 'rhs' is exhausted and no carry remains to be propagated.
+					if (!has_rhs_value && carry_out == 0) { break; }
+				}
+			}
+			else
+			{
+				CCM_SIMD_VECTORIZE for (std::size_t i = 0; i < N; ++i)
+				{
+					const bool has_rhs_value = i < M;
+					const word rhs_value	 = has_rhs_value ? rhs[i] : 0;
+					const word carry_in		 = carry_out;
+					dst[i]					 = op_with_carry(dst[i], rhs_value, carry_in, carry_out);
+
+					// Stop early if 'rhs' is exhausted and no carry remains to be propagated.
+					if (!has_rhs_value && carry_out == 0) { break; }
+				}
 			}
 			return carry_out;
 		}
@@ -385,11 +400,23 @@ namespace ccm::types
 		constexpr word scalar_multiply_with_carry(std::array<word, N> & dst, word x)
 		{
 			Accumulator<word> acc;
-			for (auto & val : dst)
+			if (ccm::support::is_constant_evaluated())
 			{
-				const word carry = mul_add_with_carry(acc, val, x);
-				val				 = acc.advance(carry);
+				for (auto & val : dst)
+				{
+					const word carry = mul_add_with_carry(acc, val, x);
+					val				 = acc.advance(carry);
+				}
 			}
+			else
+			{
+				CCM_SIMD_VECTORIZE for (auto & val : dst)
+				{
+					const word carry = mul_add_with_carry(acc, val, x);
+					val				 = acc.advance(carry);
+				}
+			}
+
 			return acc.carry();
 		}
 
@@ -415,14 +442,32 @@ namespace ccm::types
 		{
 			static_assert(O >= M + N);
 			Accumulator<word> acc;
-			for (std::size_t i = 0; i < O; ++i)
+			if (ccm::support::is_constant_evaluated())
 			{
-				const std::size_t lower_idx = i < N ? 0 : i - N + 1;
-				const std::size_t upper_idx = i < M ? i : M - 1;
-				word carry					= 0;
-				for (std::size_t j = lower_idx; j <= upper_idx; ++j) { carry += mul_add_with_carry(acc, lhs[j], rhs[i - j]); }
-				dst[i] = acc.advance(carry);
+				for (std::size_t i = 0; i < O; ++i)
+				{
+					const std::size_t lower_idx = i < N ? 0 : i - N + 1;
+					const std::size_t upper_idx = i < M ? i : M - 1;
+					word carry					= 0;
+					for (std::size_t j = lower_idx; j <= upper_idx; ++j) { carry += mul_add_with_carry(acc, lhs[j], rhs[i - j]); }
+					dst[i] = acc.advance(carry);
+				}
 			}
+			else
+			{
+				CCM_SIMD_VECTORIZE for (std::size_t i = 0; i < O; ++i)
+				{
+					const std::size_t lower_idx = i < N ? 0 : i - N + 1;
+					const std::size_t upper_idx = i < M ? i : M - 1;
+					word carry					= 0;
+					CCM_SIMD_VECTORIZE for (std::size_t j = lower_idx; j <= upper_idx; ++j)
+					{
+						carry += mul_add_with_carry(acc, lhs[j], rhs[i - j]);
+					}
+					dst[i] = acc.advance(carry);
+				}
+			}
+
 			return acc.carry();
 		}
 
@@ -443,16 +488,37 @@ namespace ccm::types
 			Accumulator<word> acc;
 			word carry = 0;
 
-			// Initial accumulation for elements at N - 1 in the full product.
-			for (std::size_t i = 0; i < N; ++i) { carry += mul_add_with_carry(acc, lhs[i], rhs[N - 1 - i]); }
-
-			// Accumulate and propagate carry for the remaining elements.
-			for (std::size_t i = N; i < 2 * N - 1; ++i)
+			if (ccm::support::is_constant_evaluated())
 			{
-				acc.advance(carry);
-				carry = 0;
-				for (std::size_t j = i - N + 1; j < N; ++j) { carry += mul_add_with_carry(acc, lhs[j], rhs[i - j]); }
-				dst[i - N] = acc.sum();
+				// Initial accumulation for elements at N - 1 in the full product.
+				for (std::size_t i = 0; i < N; ++i) { carry += mul_add_with_carry(acc, lhs[i], rhs[N - 1 - i]); }
+
+				// Accumulate and propagate carry for the remaining elements.
+				for (std::size_t i = N; i < 2 * N - 1; ++i)
+				{
+					acc.advance(carry);
+					carry = 0;
+					for (std::size_t j = i - N + 1; j < N; ++j) { carry += mul_add_with_carry(acc, lhs[j], rhs[i - j]); }
+					dst[i - N] = acc.sum();
+				}
+			}
+			else
+			{
+				CCM_SIMD_VECTORIZE for (std::size_t i = 0; i < N; ++i)
+				{
+					carry += mul_add_with_carry(acc, lhs[i], rhs[N - 1 - i]);
+				}
+
+				CCM_SIMD_VECTORIZE for (std::size_t i = N; i < 2 * N - 1; ++i)
+				{
+					acc.advance(carry);
+					carry = 0;
+					CCM_SIMD_VECTORIZE for (std::size_t j = i - N + 1; j < N; ++j)
+					{
+						carry += mul_add_with_carry(acc, lhs[j], rhs[i - j]);
+					}
+					dst[i - N] = acc.sum();
+				}
 			}
 			dst.back() = acc.carry();
 		}
@@ -610,17 +676,41 @@ namespace ccm::types
 		template <size_t OtherBits, bool OtherSigned>
 		constexpr BigInt(const BigInt<OtherBits, OtherSigned, WordType> & other)
 		{
-			if (OtherBits >= Bits)
+			if (ccm::support::is_constant_evaluated())
 			{
-				// Truncate the extra bits
-				for (size_t i = 0; i < WORD_COUNT; ++i) { val[i] = other[i]; }
+				if constexpr (OtherBits >= Bits)
+				{
+					// Truncate the extra bits
+					for (size_t i = 0; i < WORD_COUNT; ++i) { val[i] = other[i]; }
+				}
+				else
+				{
+					// Zero or sign extend based on the signedness
+					size_t i = 0;
+					for (; i < OtherBits / WORD_SIZE; ++i) { val[i] = other[i]; }
+					extend(i, Signed && other.is_neg());
+				}
 			}
 			else
 			{
-				// Zero or sign extend based on the signedness
-				size_t i = 0;
-				for (; i < OtherBits / WORD_SIZE; ++i) { val[i] = other[i]; }
-				extend(i, Signed && other.is_neg());
+				if constexpr (OtherBits >= Bits)
+				{
+					// Truncate the extra bits
+					CCM_SIMD_VECTORIZE for (size_t i = 0; i < WORD_COUNT; ++i)
+					{
+						val[i] = other[i];
+					}
+				}
+				else
+				{
+					// Zero or sign extend based on the signedness
+					size_t i = 0;
+					CCM_SIMD_VECTORIZE for (; i < OtherBits / WORD_SIZE; ++i)
+					{
+						val[i] = other[i];
+					}
+					extend(i, Signed && other.is_neg());
+				}
 			}
 		}
 
@@ -630,8 +720,7 @@ namespace ccm::types
 		 * @param nums The input array of WordType values.
 		 */
 		template <std::size_t N>
-		constexpr BigInt(
-			const WordType (&nums)[N]) // NOLINT(cppcoreguidelines-avoid-c-arrays) - We are intentionally using C-style arrays here.
+		constexpr BigInt(const WordType (&nums)[N]) // NOLINT(cppcoreguidelines-avoid-c-arrays) - We are intentionally using C-style arrays here.
 		{
 			static_assert(N == WORD_COUNT);
 			for (std::size_t i = 0; i < WORD_COUNT; ++i) { val[i] = nums[i]; }
@@ -658,16 +747,33 @@ namespace ccm::types
 		{
 			constexpr std::size_t T_SIZE = sizeof(T) * CHAR_BIT;
 			const bool is_neg			 = Signed && (v < 0);
-			for (std::size_t i = 0; i < WORD_COUNT; ++i)
+			if (ccm::support::is_constant_evaluated())
 			{
-				if (v == 0)
+				for (std::size_t i = 0; i < WORD_COUNT; ++i)
 				{
-					extend(i, is_neg);
-					return;
+					if (v == 0)
+					{
+						extend(i, is_neg);
+						return;
+					}
+					val[i] = static_cast<WordType>(v);
+					if constexpr (T_SIZE > WORD_SIZE) { v >>= WORD_SIZE; }
+					else { v = 0; }
 				}
-				val[i] = static_cast<WordType>(v);
-				if constexpr (T_SIZE > WORD_SIZE) { v >>= WORD_SIZE; }
-				else { v = 0; }
+			}
+			else
+			{
+				CCM_SIMD_VECTORIZE for (std::size_t i = 0; i < WORD_COUNT; ++i)
+				{
+					if (v == 0)
+					{
+						extend(i, is_neg);
+						return;
+					}
+					val[i] = static_cast<WordType>(v);
+					if constexpr (T_SIZE > WORD_SIZE) { v >>= WORD_SIZE; }
+					else { v = 0; }
+				}
 			}
 		}
 
@@ -700,7 +806,7 @@ namespace ccm::types
 		 */
 		static constexpr BigInt min()
 		{
-			BigInt out; // NOLINT(misc-const-correctness)
+			BigInt out; // NOLINT(misc-const-correctness) - This cannot be const. It will break things.
 			if constexpr (SIGNED) { out.set_msb(); }
 			return out;
 		}
@@ -710,7 +816,7 @@ namespace ccm::types
 		 */
 		static constexpr BigInt max()
 		{
-			BigInt out = all_ones(); // NOLINT(misc-const-correctness)
+			BigInt out = all_ones(); // NOLINT(misc-const-correctness) - This cannot be const. It will break things.
 			if constexpr (SIGNED) { out.clear_msb(); }
 			return out;
 		}
@@ -813,7 +919,7 @@ namespace ccm::types
 		 */
 		constexpr BigInt operator+(BigInt && other) const
 		{
-			std::move(other); // We ignore the moved value here.
+			std::move(other);		   // We ignore the moved value here.
 			other.add_overflow(*this); // We ignore the returned carry value here.
 			return other;
 		}
@@ -996,25 +1102,51 @@ namespace ccm::types
 			// pos represents the current index of the current 64-bit chunk that we are currently processing.
 			std::size_t pos = WORD_COUNT;
 
-			// Process each WORD_SIZE-bit chunk.
-			for (std::size_t q_pos = WORD_COUNT - lower_pos; q_pos > 0; --q_pos)
+			if (ccm::support::is_constant_evaluated())
 			{
-				// q_pos is the index of the current WORD_SIZE-bit chunk of the quotient being processed, plus 1.
-				// Perform division and modulus with the divisor:
-				//   x * 2^(WORD_SIZE * q_pos - WORD_SIZE / 2),
-				// This uses the upper half (WORD_SIZE / 2) bits of the current WORD_SIZE-bit chunk.
-				rem <<= HALF_WORD_SIZE;
-				rem += val[--pos] >> HALF_WORD_SIZE;
-				WordType q_tmp = rem / x_word;
-				rem %= x_word;
+				// Process each WORD_SIZE-bit chunk.
+				for (std::size_t q_pos = WORD_COUNT - lower_pos; q_pos > 0; --q_pos)
+				{
+					// q_pos is the index of the current WORD_SIZE-bit chunk of the quotient being processed, plus 1.
+					// Perform division and modulus with the divisor:
+					//   x * 2^(WORD_SIZE * q_pos - WORD_SIZE / 2),
+					// This uses the upper half (WORD_SIZE / 2) bits of the current WORD_SIZE-bit chunk.
+					rem <<= HALF_WORD_SIZE;
+					rem += val[--pos] >> HALF_WORD_SIZE;
+					WordType q_tmp = rem / x_word;
+					rem %= x_word;
 
-				/// Perform division and modulus with the divisor:
-				//   x * 2^(WORD_SIZE * (q_pos - 1)),
-				// This uses the lower half (WORD_SIZE / 2) bits of the current WORD_SIZE-bit chunk.
-				rem <<= HALF_WORD_SIZE;
-				rem += val[pos] & HALF_MASK;
-				quotient.val[q_pos - 1] = (q_tmp << HALF_WORD_SIZE) + rem / x_word;
-				rem %= x_word;
+					/// Perform division and modulus with the divisor:
+					//   x * 2^(WORD_SIZE * (q_pos - 1)),
+					// This uses the lower half (WORD_SIZE / 2) bits of the current WORD_SIZE-bit chunk.
+					rem <<= HALF_WORD_SIZE;
+					rem += val[pos] & HALF_MASK;
+					quotient.val[q_pos - 1] = (q_tmp << HALF_WORD_SIZE) + rem / x_word;
+					rem %= x_word;
+				}
+			}
+			else
+			{
+				// Process each WORD_SIZE-bit chunk.
+				CCM_SIMD_VECTORIZE for (std::size_t q_pos = WORD_COUNT - lower_pos; q_pos > 0; --q_pos)
+				{
+					// q_pos is the index of the current WORD_SIZE-bit chunk of the quotient being processed, plus 1.
+					// Perform division and modulus with the divisor:
+					//   x * 2^(WORD_SIZE * q_pos - WORD_SIZE / 2),
+					// This uses the upper half (WORD_SIZE / 2) bits of the current WORD_SIZE-bit chunk.
+					rem <<= HALF_WORD_SIZE;
+					rem += val[--pos] >> HALF_WORD_SIZE;
+					WordType q_tmp = rem / x_word;
+					rem %= x_word;
+
+					/// Perform division and modulus with the divisor:
+					//   x * 2^(WORD_SIZE * (q_pos - 1)),
+					// This uses the lower half (WORD_SIZE / 2) bits of the current WORD_SIZE-bit chunk.
+					rem <<= HALF_WORD_SIZE;
+					rem += val[pos] & HALF_MASK;
+					quotient.val[q_pos - 1] = (q_tmp << HALF_WORD_SIZE) + rem / x_word;
+					rem %= x_word;
+				}
 			}
 
 			// At this point, we have:
@@ -1218,16 +1350,36 @@ namespace ccm::types
 				const bool lhs_is_neg = lhs.is_neg();
 				if (const bool rhs_is_neg = rhs.is_neg(); lhs_is_neg != rhs_is_neg) { return rhs_is_neg ? 1 : -1; }
 			}
-			for (std::size_t i = WORD_COUNT; i-- > 0;)
+			if (ccm::support::is_constant_evaluated())
 			{
-				if (auto cmp = compare(lhs[i], rhs[i]); cmp != 0) { return cmp; }
+				for (std::size_t i = WORD_COUNT; i-- > 0;)
+				{
+					if (auto cmp = compare(lhs[i], rhs[i]); cmp != 0) { return cmp; }
+				}
+			}
+			else
+			{
+				CCM_SIMD_VECTORIZE for (std::size_t i = WORD_COUNT; i-- > 0;)
+				{
+					if (auto cmp = compare(lhs[i], rhs[i]); cmp != 0) { return cmp; }
+				}
 			}
 			return 0;
 		}
 
 		constexpr void bitwise_not()
 		{
-			for (auto & part : val) { part = ~part; }
+			if (ccm::support::is_constant_evaluated())
+			{
+				for (auto & part : val) { part = ~part; }
+			}
+			else
+			{
+				CCM_SIMD_VECTORIZE for (auto & part : val)
+				{
+					part = ~part;
+				}
+			}
 		}
 
 		constexpr void negate()
@@ -1243,7 +1395,17 @@ namespace ccm::types
 		constexpr void extend(std::size_t index, bool is_neg)
 		{
 			const WordType value = is_neg ? std::numeric_limits<WordType>::max() : std::numeric_limits<WordType>::min();
-			for (std::size_t i = index; i < WORD_COUNT; ++i) { val[i] = value; }
+			if (ccm::support::is_constant_evaluated())
+			{
+				for (std::size_t i = index; i < WORD_COUNT; ++i) { val[i] = value; }
+			}
+			else
+			{
+				CCM_SIMD_VECTORIZE for (std::size_t i = index; i < WORD_COUNT; ++i)
+				{
+					val[i] = value;
+				}
+			}
 		}
 
 		[[nodiscard]] constexpr bool get_msb() const { return val.back() >> (WORD_SIZE - 1); }
