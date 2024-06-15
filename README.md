@@ -87,7 +87,7 @@ CCmath is an open-source project, and it needs your help to go on growing and im
 |----------------|--------|---------------------------------------------------------------------------------------|
 | abs            | 100    |                                                                                       |
 | fdim           | 100    |                                                                                       |
-| fma            | 100    | Functional. Faster implementations desired.                                           |
+| fma            | 100    | Functional. Need to add proper runtime specific speed up.                             |
 | (f)max         | 100    |                                                                                       |
 | (f)min         | 100    |                                                                                       |
 | remainder      | 100    |                                                                                       |
@@ -115,7 +115,7 @@ CCmath is an open-source project, and it needs your help to go on growing and im
 | copysign       | 100    |                                                                                       |
 | frexp          | 0      | Implement function                                                                    |
 | ilogb          | 0      | Implement function                                                                    |
-| ldexp          | 0      | Implement function                                                                    |
+| ldexp          | 100    |                                                                                       |
 | logb           | 0      | Implement function                                                                    |
 | modf           | 0      | Implement function                                                                    |
 | nextafter      | 0      | Implement function                                                                    |
@@ -134,8 +134,8 @@ CCmath is an open-source project, and it needs your help to go on growing and im
 | trunc          | 100    |                                                                                       |
 | cbrt           | 0      | Implement function                                                                    |
 | hypot          | 0      | Implement function                                                                    |
-| pow            | 20     | Continue implementation process and add documentation and tests                       |
-| sqrt           | 0      | Implement function                                                                    |
+| pow            | 30     | Continue implementation process and add documentation and tests                       |
+| sqrt           | 100    |                                                                                       |
 | assoc_laguerre | 0      | Implement function                                                                    |
 | assoc_legendre | 0      | Implement function                                                                    |
 | beta           | 0      | Implement function                                                                    |
@@ -168,7 +168,7 @@ CCmath is an open-source project, and it needs your help to go on growing and im
 | lerp           | 90     | Nearly finished, just need to test the function further and validate full compliance. |
 | lgamma         | 0      | Implement function                                                                    |
 
-> Last Updated: May 11, 2024
+> Last Updated: Jun 14, 2024
 
 ## Projects using CCMath!
 
