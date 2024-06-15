@@ -90,9 +90,9 @@ namespace ccm::intrin
 		CCM_ALWAYS_INLINE inline simd operator/(simd const & other) const { return simd(_mm_div_ps(m_value, other.m_value)); }
 		CCM_ALWAYS_INLINE inline simd operator+(simd const & other) const { return simd(_mm_add_ps(m_value, other.m_value)); }
 		CCM_ALWAYS_INLINE inline simd operator-(simd const & other) const { return simd(_mm_sub_ps(m_value, other.m_value)); }
-		CCM_ALWAYS_INLINE inline simd operator-() const { return simd(_mm_sub_ps(_mm_set1_ps(0.0), m_value)); }
-		CCM_ALWAYS_INLINE void copy_from(float const * ptr, element_aligned_tag) { m_value = _mm_loadu_ps(ptr); }
-		CCM_ALWAYS_INLINE void copy_to(float * ptr, element_aligned_tag) const { _mm_storeu_ps(ptr, m_value); }
+		CCM_ALWAYS_INLINE inline simd operator-() const { return simd(_mm_sub_ps(_mm_set1_ps(0.0F), m_value)); }
+		CCM_ALWAYS_INLINE void copy_from(float const * ptr, element_aligned_tag /*unused*/) { m_value = _mm_loadu_ps(ptr); }
+		CCM_ALWAYS_INLINE void copy_to(float * ptr, element_aligned_tag /*unused*/) const { _mm_storeu_ps(ptr, m_value); }
 		[[nodiscard]] CCM_ALWAYS_INLINE constexpr __m128 get() const { return m_value; }
 		[[nodiscard]] CCM_ALWAYS_INLINE float convert() const { return _mm_cvtss_f32(m_value); }
 		CCM_ALWAYS_INLINE simd_mask<float, abi::sse2> operator<(simd const & other) const
@@ -122,7 +122,7 @@ namespace ccm::intrin
 		using simd_type						 = simd<double, abi::sse2>;
 		using abi_type						 = abi::sse2;
 		CCM_ALWAYS_INLINE inline simd_mask() = default;
-		CCM_ALWAYS_INLINE inline explicit simd_mask(bool value) : m_value(_mm_castsi128_pd(_mm_set1_epi64x(-std::int64_t(value)))) {}
+		CCM_ALWAYS_INLINE inline explicit simd_mask(bool value) : m_value(_mm_castsi128_pd(_mm_set1_epi64x(-static_cast<std::int64_t>(value)))) {}
 		static constexpr int size() { return 4; }
 		constexpr explicit simd_mask(__m128d const & value_in) : m_value(value_in) {}
 		[[nodiscard]] constexpr __m128d get() const { return m_value; }
