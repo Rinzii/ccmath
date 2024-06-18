@@ -32,7 +32,7 @@ namespace ccm::intrin
 		using simd_type						 = simd<float, abi::avx512>;
 		using abi_type						 = abi::avx512;
 		CCM_ALWAYS_INLINE inline simd_mask() = default;
-		CCM_ALWAYS_INLINE inline simd_mask(bool value) : m_value(-std::int16_t(value)) {}
+		CCM_ALWAYS_INLINE inline simd_mask(bool value) : m_value(-static_cast<std::int16_t>(value)) {}
 		CCM_ALWAYS_INLINE inline static constexpr int size() { return 16; }
 		CCM_ALWAYS_INLINE inline constexpr simd_mask(__mmask16 const & value_in) : m_value(value_in) {}
 		[[nodiscard]] CCM_ALWAYS_INLINE inline constexpr __mmask16 get() const { return m_value; }

@@ -85,11 +85,11 @@ namespace ccm::intrin
 		}
 		CCM_ALWAYS_INLINE inline simd(float const * ptr, int stride) : simd(ptr[0], ptr[stride], ptr[2 * stride], ptr[3 * stride]) {}
 		CCM_ALWAYS_INLINE inline constexpr simd(__m128 const & value_in) : m_value(value_in) {}
-		CCM_ALWAYS_INLINE inline simd operator*(simd const & other) const { return simd(_mm_mul_ps(m_value, other.m_value)); }
-		CCM_ALWAYS_INLINE inline simd operator/(simd const & other) const { return simd(_mm_div_ps(m_value, other.m_value)); }
-		CCM_ALWAYS_INLINE inline simd operator+(simd const & other) const { return simd(_mm_add_ps(m_value, other.m_value)); }
-		CCM_ALWAYS_INLINE inline simd operator-(simd const & other) const { return simd(_mm_sub_ps(m_value, other.m_value)); }
-		CCM_ALWAYS_INLINE inline simd operator-() const { return simd(_mm_sub_ps(_mm_set1_ps(0.0F), m_value)); }
+		CCM_ALWAYS_INLINE inline simd operator*(simd const & other) const { return {_mm_mul_ps(m_value, other.m_value)}; }
+		CCM_ALWAYS_INLINE inline simd operator/(simd const & other) const { return {_mm_div_ps(m_value, other.m_value)}; }
+		CCM_ALWAYS_INLINE inline simd operator+(simd const & other) const { return {_mm_add_ps(m_value, other.m_value)}; }
+		CCM_ALWAYS_INLINE inline simd operator-(simd const & other) const { return {_mm_sub_ps(m_value, other.m_value)}; }
+		CCM_ALWAYS_INLINE inline simd operator-() const { return {_mm_sub_ps(_mm_set1_ps(0.0F), m_value)}; }
 		CCM_ALWAYS_INLINE void copy_from(float const * ptr, element_aligned_tag /*unused*/) { m_value = _mm_loadu_ps(ptr); }
 		CCM_ALWAYS_INLINE void copy_to(float * ptr, element_aligned_tag /*unused*/) const { _mm_storeu_ps(ptr, m_value); }
 		[[nodiscard]] CCM_ALWAYS_INLINE constexpr __m128 get() const { return m_value; }
@@ -108,7 +108,7 @@ namespace ccm::intrin
 	};
 
 	CCM_ALWAYS_INLINE inline simd<float, abi::ssse3> choose(simd_mask<float, abi::ssse3> const & a, simd<float, abi::ssse3> const & b,
-														   simd<float, abi::ssse3> const & c)
+															simd<float, abi::ssse3> const & c)
 	{
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
 		return simd<float, abi::ssse3>(_mm_add_ps(_mm_and_ps(a.get(), b.get()), _mm_andnot_ps(a.get(), c.get())));
@@ -170,11 +170,11 @@ namespace ccm::intrin
 		}
 		CCM_ALWAYS_INLINE inline simd(double const * ptr, int stride) : simd(ptr[0], ptr[stride]) {}
 		CCM_ALWAYS_INLINE inline constexpr simd(__m128d const & value_in) : m_value(value_in) {}
-		CCM_ALWAYS_INLINE inline simd operator*(simd const & other) const { return simd(_mm_mul_pd(m_value, other.m_value)); }
-		CCM_ALWAYS_INLINE inline simd operator/(simd const & other) const { return simd(_mm_div_pd(m_value, other.m_value)); }
-		CCM_ALWAYS_INLINE inline simd operator+(simd const & other) const { return simd(_mm_add_pd(m_value, other.m_value)); }
-		CCM_ALWAYS_INLINE inline simd operator-(simd const & other) const { return simd(_mm_sub_pd(m_value, other.m_value)); }
-		CCM_ALWAYS_INLINE inline simd operator-() const { return simd(_mm_sub_pd(_mm_set1_pd(0.0), m_value)); }
+		CCM_ALWAYS_INLINE inline simd operator*(simd const & other) const { return {_mm_mul_pd(m_value, other.m_value)}; }
+		CCM_ALWAYS_INLINE inline simd operator/(simd const & other) const { return {_mm_div_pd(m_value, other.m_value)}; }
+		CCM_ALWAYS_INLINE inline simd operator+(simd const & other) const { return {_mm_add_pd(m_value, other.m_value)}; }
+		CCM_ALWAYS_INLINE inline simd operator-(simd const & other) const { return {_mm_sub_pd(m_value, other.m_value)}; }
+		CCM_ALWAYS_INLINE inline simd operator-() const { return {_mm_sub_pd(_mm_set1_pd(0.0), m_value)}; }
 		CCM_ALWAYS_INLINE inline void copy_from(double const * ptr, element_aligned_tag /*unused*/) { m_value = _mm_loadu_pd(ptr); }
 		CCM_ALWAYS_INLINE inline void copy_to(double * ptr, element_aligned_tag /*unused*/) const { _mm_storeu_pd(ptr, m_value); }
 		[[nodiscard]] constexpr __m128d get() const { return m_value; }
@@ -194,7 +194,7 @@ namespace ccm::intrin
 	};
 
 	CCM_ALWAYS_INLINE inline simd<double, abi::ssse3> choose(simd_mask<double, abi::ssse3> const & a, simd<double, abi::ssse3> const & b,
-															simd<double, abi::ssse3> const & c)
+															 simd<double, abi::ssse3> const & c)
 	{
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
 		return simd<double, abi::ssse3>(_mm_add_pd(_mm_and_pd(a.get(), b.get()), _mm_andnot_pd(a.get(), c.get())));
