@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-set(CCMATH_BUILD_VERSION 0.2.0)
+set(CCMATH_BUILD_VERSION 0.1.5)
 
 project(ccmath VERSION ${CCMATH_BUILD_VERSION})
 
