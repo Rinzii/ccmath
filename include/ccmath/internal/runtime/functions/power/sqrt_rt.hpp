@@ -28,7 +28,7 @@ namespace ccm::rt::simd_impl
 #endif
 	[[nodiscard]] inline T sqrt_simd_impl(T num) noexcept;
 
-#ifdef CCMATH_SIMD
+#ifdef CCMATH_HAS_SIMD
 	#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool>>
 	#else
@@ -53,7 +53,7 @@ namespace ccm::rt
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_sqrt(num); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_sqrtl(num); }
 		else { return static_cast<T>(__builtin_sqrtl(static_cast<long double>(num))); }
-#elif defined(CCMATH_SIMD)
+#elif defined(CCMATH_HAS_SIMD)
 		// In the unlikely event, the rounding mode is not the default, use the runtime implementation instead.
 		if (CCM_UNLIKELY(ccm::support::fenv::get_rounding_mode() != FE_TONEAREST)) { return ccm::ct::sqrt_ct<T>(num); }
 	#if !defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64) // If long double is different from double, use the generic implementation instead.

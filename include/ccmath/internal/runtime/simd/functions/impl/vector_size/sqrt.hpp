@@ -10,8 +10,8 @@
 
 #include "ccmath/internal/runtime/simd/simd.hpp"
 
-#ifdef CCMATH_SIMD
-	#ifdef CCMATH_SIMD_ENABLE_VECTOR_SIZE
+#ifdef CCMATH_HAS_SIMD
+	#ifdef CCMATH_HAS_SIMD_ENABLE_VECTOR_SIZE
 
 namespace ccm::intrin
 {
@@ -32,5 +32,5 @@ namespace ccm::intrin
 
 } // namespace ccm::intrin
 
-	#endif // CCMATH_SIMD_ENABLE_VECTOR_SIZE
+	#endif // CCMATH_HAS_SIMD_ENABLE_VECTOR_SIZE
 #endif	   // CCM_CONFIG_USE_RT_SIMD
