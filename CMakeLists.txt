@@ -16,11 +16,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # TO THE IMPLEMENTOR: If CCMATH_BUILD_TESTS is set to OFF then googletest can be deleted from the ext folder.
 option(CCMATH_BUILD_TESTS "Build ccmath tests" ${is_root_project})
 option(CCMATH_BUILD_EXAMPLES "Build ccmath examples" ${is_root_project})
-option(CCMATH_BUILD_BENCHMARKS "Build ccmath benchmarks" ON)
+option(CCMATH_BUILD_BENCHMARKS "Build ccmath benchmarks" ${is_root_project})
 option(CCMATH_INSTALL "Setup install and package steps" ${is_root_project})
-option(CCMATH_ENABLE_EXTENSIONS "Enable the extended ccmath library that adds helpful additional methods that are not defined by the standard" ON)
+option(CCMATH_ENABLE_EXTENSIONS "Enable the extended ccmath library that adds helpful additional methods that are not defined by the standard" ${is_root_project})
 option(CCMATH_ENABLE_RUNTIME_SIMD "Enable SIMD optimization for runtime evaluation (does not effect compile time)" ON)
-option(CCMATH_ENABLE_USER_DEFINED_OPTIMIZATION_MACROS "Enable user defined optimization macros instead of having ccmath define its own internal ones in cmake" ON)
+option(CCMATH_ENABLE_USER_DEFINED_OPTIMIZATION_MACROS "Enable user defined optimization macros instead of having ccmath define its own internal ones in cmake" OFF)
 option(CCMATH_DISABLE_ERRNO "Disable the use of errno in ccmath during runtime" OFF)
 
 # include the global configuration file
@@ -47,7 +47,6 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU O
 
             # Macros to define
             -DNOMINMAX
-            -mavx
     )
 
 
