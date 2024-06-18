@@ -8,8 +8,9 @@
 
 #pragma once
 
+// If we don't have constexpr sqrt builtins, include the generic and runtime implementations.
 #if !(defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__))
-	#include "ccmath/internal/compiletime/functions/power/sqrt_ct.hpp"
+	#include "ccmath/internal/generic/functions/power/sqrt_gen.hpp"
 	#include "ccmath/internal/runtime/functions/power/sqrt_rt.hpp"
 	#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #endif
@@ -30,11 +31,11 @@ namespace ccm
 	{
 #if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) // GCC 6.1+ has constexpr sqrt builtins.
 		if constexpr (std::is_same_v<T, float>) { return __builtin_sqrtf(num); }
-		if constexpr (std::is_same_v<T, double>) { return __builtin_sqrt(num); }
-		if constexpr (std::is_same_v<T, long double>) { return __builtin_sqrtl(num); }
-		return static_cast<T>(__builtin_sqrtl(num));
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_sqrt(num); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_sqrtl(num); }
+		else { return static_cast<T>(__builtin_sqrtl(static_cast<long double>(num))); }
 #else
-		if (ccm::support::is_constant_evaluated()) { return ccm::ct::sqrt_ct<T>(num); }
+		if (ccm::support::is_constant_evaluated()) { return ccm::gen::sqrt_gen<T>(num); }
 		return ccm::rt::sqrt_rt<T>(num);
 #endif
 	}

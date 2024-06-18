@@ -48,7 +48,7 @@ namespace ccm::support
 		static constexpr float normalize_factor = 4294967296.F; // 2^32
 
 		// 0x1p+24
-		static constexpr float max_safe_integer = 0x1p+24; // 16777216.0 (2^24)
+		static constexpr float max_safe_integer = 0x1p+24F; // 16777216.0 (2^24)
 	};
 
 	template <>
@@ -149,7 +149,7 @@ struct floating_point_traits<long double>
 		// TODO: Not 100% sure if the normalize factor should be 2^128 or 2^80. I think it should be 2^128, but I've not yet tested this.
 		static constexpr long double normalize_factor = 340282366920938463463374607431768211456.0L; // 2^128
 
-		static constexpr long double max_safe_integer = 0x1p+64; // 18446744073709551616.0L (2^64)
+		static constexpr long double max_safe_integer = 0x1p+64L; // 18446744073709551616.0L (2^64)
 	};
 
 	#else // long double is the same as double

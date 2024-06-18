@@ -11,34 +11,38 @@
 // NOLINTBEGIN
 
 // Regular
+#ifndef CCM_BM_CONFIG_NO_CT
 
-BENCHMARK(BM_power_sqrt_std)->RangeMultiplier(2)->Range(8, 8<<10)->Complexity();
+BENCHMARK(BM_power_sqrt_std)->RangeMultiplier(2)->Range(8, 8 << 10)->Complexity();
 
-BENCHMARK(BM_power_sqrt_ccm)->RangeMultiplier(2)->Range(8, 8<<10)->Complexity();
+BENCHMARK(BM_power_sqrt_ccm)->RangeMultiplier(2)->Range(8, 8 << 10)->Complexity();
 
-BENCHMARK(BM_power_sqrt_rand_int_std)->RangeMultiplier(2)->Range(8, 8<<10)->Complexity();
+BENCHMARK(BM_power_sqrt_rand_int_std)->RangeMultiplier(2)->Range(8, 8 << 10)->Complexity();
 
-BENCHMARK(BM_power_sqrt_rand_int_ccm)->RangeMultiplier(2)->Range(8, 8<<10)->Complexity();
+BENCHMARK(BM_power_sqrt_rand_int_ccm)->RangeMultiplier(2)->Range(8, 8 << 10)->Complexity();
 
-BENCHMARK(BM_power_sqrt_rand_double_std)->RangeMultiplier(2)->Range(8, 8<<10)->Complexity();
+BENCHMARK(BM_power_sqrt_rand_double_std)->RangeMultiplier(2)->Range(8, 8 << 10)->Complexity();
 
-BENCHMARK(BM_power_sqrt_rand_double_ccm)->RangeMultiplier(2)->Range(8, 8<<10)->Complexity();
+BENCHMARK(BM_power_sqrt_rand_double_ccm)->RangeMultiplier(2)->Range(8, 8 << 10)->Complexity();
+#endif
 
-// Runtime
-#if !(defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)) // GCC 6.1+ has constexpr sqrt builtins.
+#ifndef CCM_BM_CONFIG_NO_CT
+	// Runtime
+	#if !(defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)) // GCC 6.1+ has constexpr sqrt builtins.
 
-BENCHMARK(BM_power_sqrt_std_rt)->RangeMultiplier(2)->Range(8, 8<<10)->Complexity();
+BENCHMARK(BM_power_sqrt_std_rt)->RangeMultiplier(2)->Range(8, 8 << 10)->Complexity();
 
-BENCHMARK(BM_power_sqrt_ccm_rt)->RangeMultiplier(2)->Range(8, 8<<10)->Complexity();
+BENCHMARK(BM_power_sqrt_ccm_rt)->RangeMultiplier(2)->Range(8, 8 << 10)->Complexity();
 
-BENCHMARK(BM_power_sqrt_rand_int_std_rt)->RangeMultiplier(2)->Range(8, 8<<10)->Complexity();
+BENCHMARK(BM_power_sqrt_rand_int_std_rt)->RangeMultiplier(2)->Range(8, 8 << 10)->Complexity();
 
-BENCHMARK(BM_power_sqrt_rand_int_ccm_rt)->RangeMultiplier(2)->Range(8, 8<<10)->Complexity();
+BENCHMARK(BM_power_sqrt_rand_int_ccm_rt)->RangeMultiplier(2)->Range(8, 8 << 10)->Complexity();
 
-BENCHMARK(BM_power_sqrt_rand_double_std_rt)->RangeMultiplier(2)->Range(8, 8<<10)->Complexity();
+BENCHMARK(BM_power_sqrt_rand_double_std_rt)->RangeMultiplier(2)->Range(8, 8 << 10)->Complexity();
 
-BENCHMARK(BM_power_sqrt_rand_double_ccm_rt)->RangeMultiplier(2)->Range(8, 8<<10)->Complexity();
+BENCHMARK(BM_power_sqrt_rand_double_ccm_rt)->RangeMultiplier(2)->Range(8, 8 << 10)->Complexity();
 
+	#endif
 #endif
 
 BENCHMARK_MAIN();

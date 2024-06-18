@@ -10,9 +10,9 @@
 
 #include "ccmath/internal/runtime/simd/simd.hpp"
 
-#ifdef CCMATH_SIMD
-	#ifdef CCMATH_SIMD_SSE2
-namespace ccm::simd
+#ifdef CCMATH_HAS_SIMD
+	#ifdef CCMATH_HAS_SIMD_SSE2
+namespace ccm::intrin
 {
 	CCM_ALWAYS_INLINE inline simd<float, abi::sse2> sqrt(simd<float, abi::sse2> const & a)
 	{
@@ -25,7 +25,7 @@ namespace ccm::simd
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
 		return simd<double, abi::sse2>(_mm_sqrt_pd(a.get()));
 	}
-} // namespace ccm::simd
+} // namespace ccm::intrin
 
-	#endif // CCMATH_SIMD_SSE2
+	#endif // CCMATH_HAS_SIMD_SSE2
 #endif	   // CCM_CONFIG_USE_RT_SIMD

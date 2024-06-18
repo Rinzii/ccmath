@@ -11,7 +11,7 @@
 #include "common.hpp"
 #include "simd_vectorize.hpp"
 
-namespace ccm::simd
+namespace ccm::intrin
 {
 
 	namespace abi
@@ -265,4 +265,4 @@ namespace ccm::simd
 		return result;
 	}
 
-} // namespace ccm::simd
+} // namespace ccm::intrin

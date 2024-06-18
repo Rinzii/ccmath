@@ -14,7 +14,7 @@
 #include <array>
 #include <cstdint>
 
-namespace ccm::simd
+namespace ccm::intrin
 {
 	template <typename T, typename Abi>
 	struct simd;
@@ -120,8 +120,8 @@ namespace ccm::simd
 	template <class T, class Abi>
 	struct simd_storage
 	{
-		using value_type						= T;
-		using simd_type							= simd<T, Abi>;
+		using value_type = T;
+		using simd_type	 = simd<T, Abi>;
 
 		CCM_ALWAYS_INLINE inline simd_storage() = default;
 		static constexpr int size() { return simd<T, Abi>::size(); }
@@ -153,4 +153,4 @@ namespace ccm::simd
 		static constexpr int value = simd<T, Abi>::size();
 	};
 
-} // namespace ccm::simd
+} // namespace ccm::intrin

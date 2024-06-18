@@ -11,12 +11,12 @@
 #include "ccmath/internal/config/arch/check_simd_support.hpp"
 #include "ccmath/internal/runtime/simd/common.hpp"
 
-#ifdef CCMATH_SIMD
-	#ifdef CCMATH_SIMD_AVX512F
+#ifdef CCMATH_HAS_SIMD
+	#ifdef CCMATH_HAS_SIMD_AVX512F
 
 		#include <immintrin.h>
 
-namespace ccm::simd
+namespace ccm::intrin
 {
 	namespace abi
 	{
@@ -32,7 +32,7 @@ namespace ccm::simd
 		using simd_type						 = simd<float, abi::avx512>;
 		using abi_type						 = abi::avx512;
 		CCM_ALWAYS_INLINE inline simd_mask() = default;
-		CCM_ALWAYS_INLINE inline simd_mask(bool value) : m_value(-std::int16_t(value)) {}
+		CCM_ALWAYS_INLINE inline simd_mask(bool value) : m_value(-static_cast<std::int16_t>(value)) {}
 		CCM_ALWAYS_INLINE inline static constexpr int size() { return 16; }
 		CCM_ALWAYS_INLINE inline constexpr simd_mask(__mmask16 const & value_in) : m_value(value_in) {}
 		[[nodiscard]] CCM_ALWAYS_INLINE inline constexpr __mmask16 get() const { return m_value; }
@@ -211,7 +211,7 @@ namespace ccm::simd
 		return simd<double, abi::avx512>(_mm512_mask_blend_pd(a.get(), c.get(), b.get()));
 	}
 
-} // namespace ccm::simd
+} // namespace ccm::intrin
 
-	#endif // CCMATH_SIMD_AVX512F
+	#endif // CCMATH_HAS_SIMD_AVX512F
 #endif	   // CCM_CONFIG_USE_RT_SIMD
