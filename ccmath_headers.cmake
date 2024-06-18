@@ -648,8 +648,9 @@ set(ccmath_root_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/power.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/special.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/trig.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/ccmath.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/numbers.hpp
+
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/ccmath.hpp
 )
 
 
