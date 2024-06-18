@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "common.hpp"
+#include "ccmath/internal/runtime/simd/common.hpp"
 
-namespace ccm::simd
+namespace ccm::intrin
 {
 	namespace abi
 	{
@@ -135,4 +135,4 @@ namespace ccm::simd
 	{
 		return simd<T, abi::scalar>(choose(a.get(), b.get(), c.get()));
 	}
-} // namespace ccm::simd
+} // namespace ccm::intrin

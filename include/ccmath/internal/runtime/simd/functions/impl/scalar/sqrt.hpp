@@ -8,14 +8,14 @@
 
 #pragma once
 
+#include "ccmath/internal/generic/functions/power/sqrt_gen.hpp"
 #include "ccmath/internal/runtime/simd/simd.hpp"
 
-namespace ccm::simd
+namespace ccm::intrin
 {
 	template <class T>
 	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, abi::scalar> sqrt(simd<T, abi::scalar> const& a)
 	{
-		// TODO: Implement a runtime scalar sqrt that is optimized for runtime.
-		return simd<T, abi::scalar>(a.get());
+		return simd<T, abi::scalar>(ccm::gen::sqrt_gen(a.get()));
 	}
-} // namespace ccm::simd
+} // namespace ccm::intrin

@@ -31,7 +31,7 @@ namespace ccm::support::fp
 	// NOLINTNEXTLINE(readability-function-cognitive-complexity) - Has a natural complexity of around 60+. To avoid fracturing, we allow this.
 	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> directional_round(T val, int desired_rounding_mode) noexcept
 	{
-		using FPBits_t	= ccm::support::FPBits<T>;
+		using FPBits_t	= ccm::support::fp::FPBits<T>;
 		using Storage_t = typename FPBits_t::storage_type;
 
 		FPBits_t bits(val);

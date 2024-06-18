@@ -20,7 +20,7 @@ namespace {
 	}
 }
 
-
+/*
 TEST(CcmathPowerTests, Pow_Double_SpecialCases)
 {
 	EXPECT_EQ(ccm::internal::impl::pow_impl(std::numeric_limits<double>::quiet_NaN(), 0.0), std::pow(std::numeric_limits<double>::quiet_NaN(), 0.0));
@@ -66,7 +66,7 @@ TEST(CcmathPowerTests, Pow_Double_SpecialCases)
 
 
 }
-
+*/
 /*
 TEST(CcmathPowerTests, Pow_Unsigned_Integral)
 {

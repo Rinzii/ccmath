@@ -17,7 +17,7 @@
 		#define CCMATH_SIMD_ENABLE_VECTOR_SIZE
 	#endif
 
-namespace ccm::simd
+namespace ccm::intrin
 {
 	namespace abi
 	{
@@ -191,6 +191,6 @@ namespace ccm::simd
 		return choose(a < b, a, b);
 	}
 
-} // namespace ccm::simd
+} // namespace ccm::intrin
 
 #endif
