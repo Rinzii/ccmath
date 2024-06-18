@@ -13,6 +13,7 @@
 #include "ccmath/internal/config/arch/check_arch_support.hpp"
 #include "ccmath/internal/config/type_support.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
+#include "ccmath/internal/runtime/simd/simd_vectorize.hpp"
 #include "ccmath/internal/support/ctz.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
@@ -39,7 +40,6 @@ namespace ccm::support
 	{
 		return x && !(x & (x - 1));
 	}
-
 
 	// TODO: Remove all of these top bits functions and replace them with a generic version.
 
@@ -227,11 +227,23 @@ namespace ccm::support
 		if (value == 0) { return std::numeric_limits<T>::digits; }
 		// Bisection method
 		unsigned zero_bits = 0;
-		for (unsigned shift = std::numeric_limits<T>::digits >> 1; shift; shift >>= 1)
+		if (is_constant_evaluated())
 		{
-			T tmp = value >> shift;
-			if (tmp) { value = tmp; }
-			else { zero_bits |= shift; }
+			for (unsigned shift = std::numeric_limits<T>::digits >> 1; shift; shift >>= 1)
+			{
+				T tmp = value >> shift;
+				if (tmp) { value = tmp; }
+				else { zero_bits |= shift; }
+			}
+		}
+		else
+		{
+			CCM_SIMD_VECTORIZE for (unsigned shift = std::numeric_limits<T>::digits >> 1; shift; shift >>= 1)
+			{
+				T tmp = value >> shift;
+				if (tmp) { value = tmp; }
+				else { zero_bits |= shift; }
+			}
 		}
 		return zero_bits;
 	}
@@ -281,9 +293,19 @@ namespace ccm::support
 	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> popcount(T value)
 	{
 		int count = 0;
-		for (int i = 0; i != std::numeric_limits<T>::digits; ++i)
+		if (is_constant_evaluated())
 		{
-			if ((value >> i) & 0x1) { ++count; }
+			for (int i = 0; i != std::numeric_limits<T>::digits; ++i)
+			{
+				if ((value >> i) & 0x1) { ++count; }
+			}
+		}
+		else
+		{
+			CCM_SIMD_VECTORIZE for (int i = 0; i != std::numeric_limits<T>::digits; ++i)
+			{
+				if ((value >> i) & 0x1) { ++count; }
+			}
 		}
 		return count;
 	}
