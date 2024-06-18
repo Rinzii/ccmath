@@ -41,7 +41,21 @@ namespace ccm::support
 		return x && !(x & (x - 1));
 	}
 
-	// TODO: Remove all of these top bits functions and replace them with a generic version.
+	// TODO: Have the below function replace all other top_bits functions.
+
+	template <typename T, std::size_t TopBitsToTake, std::enable_if_t<std::is_floating_point_v<T> && !std::is_same_v<T, long double>, bool> = true>
+	constexpr std::uint32_t top_bits(T x) noexcept
+	{
+		// This function does not work with long double. May support it later though.
+		if constexpr (std::is_same_v<T, double>)
+		{
+			return static_cast<std::uint32_t>(bit_cast<std::uint64_t>(x) >> (std::numeric_limits<std::uint64_t>::digits - TopBitsToTake));
+		}
+		else
+		{
+			return bit_cast<std::uint32_t>(x) >> (std::numeric_limits<std::uint32_t>::digits - TopBitsToTake);
+		}
+	}
 
 	/**
 	 * @brief Helper function to get the top 16-bits of a double.
