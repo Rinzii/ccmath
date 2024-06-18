@@ -11,8 +11,8 @@
 #include "ccmath/internal/config/arch/check_simd_support.hpp"
 #include "ccmath/internal/runtime/simd/common.hpp"
 
-#ifdef CCMATH_SIMD
-	#ifdef CCMATH_SIMD_NEON
+#ifdef CCMATH_HAS_SIMD
+	#ifdef CCMATH_HAS_SIMD_NEON
 		#include <arm_neon.h>
 
 namespace ccm::intrin
@@ -192,5 +192,5 @@ namespace ccm::intrin
 		return simd<double, abi::neon>(vreinterpretq_f64_u64(vbslq_u64(a.get(), vreinterpretq_u64_f64(b.get()), vreinterpretq_u64_f64(c.get()))));
 	}
 } // namespace ccm::intrin
-	#endif // CCMATH_SIMD_NEON
+	#endif // CCMATH_HAS_SIMD_NEON
 #endif	   // CCM_CONFIG_USE_RT_SIMD

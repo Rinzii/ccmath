@@ -11,8 +11,8 @@
 #include "ccmath/internal/config/arch/check_simd_support.hpp"
 #include "ccmath/internal/runtime/simd/common.hpp"
 
-#ifdef CCMATH_HAS_SIMD
-	#ifdef CCMATH_HAS_SIMD_AVX
+#ifdef CCMATH_SIMD
+	#ifdef CCMATH_SIMD_AVX2
 		#include <immintrin.h>
 
 namespace ccm::intrin
@@ -20,19 +20,19 @@ namespace ccm::intrin
 	namespace abi
 	{
 
-		struct avx
+		struct avx2
 		{
 		};
 
 	} // namespace abi
 
 	template <>
-	struct simd_mask<float, abi::avx>
+	struct simd_mask<float, abi::avx2>
 	{
 
 		using value_type					 = bool;
-		using simd_type						 = simd<float, abi::avx>;
-		using abi_type						 = abi::avx;
+		using simd_type						 = simd<float, abi::avx2>;
+		using abi_type						 = abi::avx2;
 		CCM_ALWAYS_INLINE inline simd_mask() = default;
 		CCM_ALWAYS_INLINE inline simd_mask(bool value) { m_value = _mm256_castsi256_ps(_mm256_set1_epi32(-static_cast<int>(value))); }
 		static constexpr int size() { return 8; }
@@ -46,22 +46,22 @@ namespace ccm::intrin
 		__m256 m_value;
 	};
 
-	CCM_ALWAYS_INLINE inline bool all_of(simd_mask<float, abi::avx> const & a)
+	CCM_ALWAYS_INLINE inline bool all_of(simd_mask<float, abi::avx2> const & a)
 	{
-		return _mm256_testc_ps(a.get(), simd_mask<float, abi::avx>(true).get());
+		return _mm256_testc_ps(a.get(), simd_mask<float, abi::avx2>(true).get());
 	}
 
-	CCM_ALWAYS_INLINE inline bool any_of(simd_mask<float, abi::avx> const & a)
+	CCM_ALWAYS_INLINE inline bool any_of(simd_mask<float, abi::avx2> const & a)
 	{
-		return !_mm256_testc_ps(simd_mask<float, abi::avx>(false).get(), a.get());
+		return !_mm256_testc_ps(simd_mask<float, abi::avx2>(false).get(), a.get());
 	}
 
 	template <>
-	struct simd<float, abi::avx>
+	struct simd<float, abi::avx2>
 	{
 
 		using value_type				= float;
-		using abi_type					= abi::avx;
+		using abi_type					= abi::avx2;
 		using mask_type					= simd_mask<float, abi_type>;
 		using storage_type				= simd_storage<float, abi_type>;
 		CCM_ALWAYS_INLINE inline simd() = default;
@@ -94,31 +94,31 @@ namespace ccm::intrin
 		CCM_ALWAYS_INLINE inline void copy_to(float * ptr, element_aligned_tag /*unused*/) const { _mm256_storeu_ps(ptr, m_value); }
 		[[nodiscard]] constexpr __m256 get() const { return m_value; }
 		[[nodiscard]] CCM_ALWAYS_INLINE inline float convert() const { return _mm256_cvtss_f32(m_value); }
-		CCM_ALWAYS_INLINE inline simd_mask<float, abi::avx> operator<(simd const & other) const
+		CCM_ALWAYS_INLINE inline simd_mask<float, abi::avx2> operator<(simd const & other) const
 		{
-			return simd_mask<float, abi::avx>(_mm256_cmp_ps(m_value, other.m_value, _CMP_LT_OS));
+			return simd_mask<float, abi::avx2>(_mm256_cmp_ps(m_value, other.m_value, _CMP_LT_OS));
 		}
-		CCM_ALWAYS_INLINE inline simd_mask<float, abi::avx> operator==(simd const & other) const
+		CCM_ALWAYS_INLINE inline simd_mask<float, abi::avx2> operator==(simd const & other) const
 		{
-			return simd_mask<float, abi::avx>(_mm256_cmp_ps(m_value, other.m_value, _CMP_EQ_OS));
+			return simd_mask<float, abi::avx2>(_mm256_cmp_ps(m_value, other.m_value, _CMP_EQ_OS));
 		}
 
 	private:
 		__m256 m_value;
 	};
 
-	CCM_ALWAYS_INLINE inline simd<float, abi::avx> choose(simd_mask<float, abi::avx> const & a, simd<float, abi::avx> const & b,
-														  simd<float, abi::avx> const & c)
+	CCM_ALWAYS_INLINE inline simd<float, abi::avx2> choose(simd_mask<float, abi::avx2> const & a, simd<float, abi::avx2> const & b,
+														  simd<float, abi::avx2> const & c)
 	{
-		return simd<float, abi::avx>(_mm256_blendv_ps(c.get(), b.get(), a.get()));
+		return simd<float, abi::avx2>(_mm256_blendv_ps(c.get(), b.get(), a.get()));
 	}
 
 	template <>
-	struct simd_mask<double, abi::avx>
+	struct simd_mask<double, abi::avx2>
 	{
 		using value_type					 = bool;
-		using simd_type						 = simd<double, abi::avx>;
-		using abi_type						 = abi::avx;
+		using simd_type						 = simd<double, abi::avx2>;
+		using abi_type						 = abi::avx2;
 		CCM_ALWAYS_INLINE inline simd_mask() = default;
 		CCM_ALWAYS_INLINE inline simd_mask(bool value) { m_value = _mm256_castsi256_pd(_mm256_set1_epi64x(-static_cast<std::int64_t>(value))); }
 		CCM_ALWAYS_INLINE inline static constexpr int size() { return 4; }
@@ -132,23 +132,23 @@ namespace ccm::intrin
 		__m256d m_value;
 	};
 
-	CCM_ALWAYS_INLINE inline bool all_of(simd_mask<double, abi::avx> const & a)
+	CCM_ALWAYS_INLINE inline bool all_of(simd_mask<double, abi::avx2> const & a)
 	{
-		return _mm256_testc_pd(a.get(), simd_mask<double, abi::avx>(true).get()) != 0;
+		return _mm256_testc_pd(a.get(), simd_mask<double, abi::avx2>(true).get()) != 0;
 	}
 
-	CCM_ALWAYS_INLINE inline bool any_of(simd_mask<double, abi::avx> const & a)
+	CCM_ALWAYS_INLINE inline bool any_of(simd_mask<double, abi::avx2> const & a)
 	{
-		return _mm256_testc_pd(simd_mask<double, abi::avx>(false).get(), a.get()) == 0;
+		return _mm256_testc_pd(simd_mask<double, abi::avx2>(false).get(), a.get()) == 0;
 	}
 
 	template <>
-	struct simd<double, abi::avx>
+	struct simd<double, abi::avx2>
 	{
 
 	public:
 		using value_type										= double;
-		using abi_type											= abi::avx;
+		using abi_type											= abi::avx2;
 		using mask_type											= simd_mask<double, abi_type>;
 		using storage_type										= simd_storage<double, abi_type>;
 		CCM_ALWAYS_INLINE inline simd()							= default;
@@ -180,25 +180,25 @@ namespace ccm::intrin
 		CCM_ALWAYS_INLINE inline void copy_to(double * ptr, element_aligned_tag /*unused*/) const { _mm256_storeu_pd(ptr, m_value); }
 		[[nodiscard]] CCM_ALWAYS_INLINE inline constexpr __m256d get() const { return m_value; }
 		[[nodiscard]] CCM_ALWAYS_INLINE inline double convert() const { return _mm256_cvtsd_f64(m_value); }
-		CCM_ALWAYS_INLINE inline simd_mask<double, abi::avx> operator<(simd const & other) const
+		CCM_ALWAYS_INLINE inline simd_mask<double, abi::avx2> operator<(simd const & other) const
 		{
-			return simd_mask<double, abi::avx>(_mm256_cmp_pd(m_value, other.m_value, _CMP_LT_OS));
+			return simd_mask<double, abi::avx2>(_mm256_cmp_pd(m_value, other.m_value, _CMP_LT_OS));
 		}
-		CCM_ALWAYS_INLINE inline simd_mask<double, abi::avx> operator==(simd const & other) const
+		CCM_ALWAYS_INLINE inline simd_mask<double, abi::avx2> operator==(simd const & other) const
 		{
-			return simd_mask<double, abi::avx>(_mm256_cmp_pd(m_value, other.m_value, _CMP_EQ_OS));
+			return simd_mask<double, abi::avx2>(_mm256_cmp_pd(m_value, other.m_value, _CMP_EQ_OS));
 		}
 
 	private:
 		__m256d m_value;
 	};
 
-	CCM_ALWAYS_INLINE inline simd<double, abi::avx> choose(simd_mask<double, abi::avx> const & a, simd<double, abi::avx> const & b,
-														   simd<double, abi::avx> const & c)
+	CCM_ALWAYS_INLINE inline simd<double, abi::avx2> choose(simd_mask<double, abi::avx2> const & a, simd<double, abi::avx2> const & b,
+														   simd<double, abi::avx2> const & c)
 	{
-		return simd<double, abi::avx>(_mm256_blendv_pd(c.get(), b.get(), a.get()));
+		return simd<double, abi::avx2>(_mm256_blendv_pd(c.get(), b.get(), a.get()));
 	}
 } // namespace ccm::intrin
 
-	#endif // CCMATH_HAS_SIMD_AVX
+	#endif // CCMATH_SIMD_AVX
 #endif	   // CCM_CONFIG_USE_RT_SIMD

@@ -11,8 +11,8 @@
 #include "ccmath/internal/config/arch/check_simd_support.hpp"
 #include "ccmath/internal/runtime/simd/common.hpp"
 
-#ifdef CCMATH_SIMD
-	#ifdef CCMATH_SIMD_AVX512F
+#ifdef CCMATH_HAS_SIMD
+	#ifdef CCMATH_HAS_SIMD_AVX512F
 
 		#include <immintrin.h>
 
@@ -213,5 +213,5 @@ namespace ccm::intrin
 
 } // namespace ccm::intrin
 
-	#endif // CCMATH_SIMD_AVX512F
+	#endif // CCMATH_HAS_SIMD_AVX512F
 #endif	   // CCM_CONFIG_USE_RT_SIMD

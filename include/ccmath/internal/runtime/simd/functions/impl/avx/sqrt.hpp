@@ -10,8 +10,8 @@
 
 #include "ccmath/internal/runtime/simd/simd.hpp"
 
-#ifdef CCMATH_SIMD
-	#ifdef CCMATH_SIMD_AVX
+#ifdef CCMATH_HAS_SIMD
+	#ifdef CCMATH_HAS_SIMD_AVX
 namespace ccm::intrin
 {
 
@@ -29,5 +29,5 @@ namespace ccm::intrin
 
 } // namespace ccm::intrin
 
-	#endif // CCMATH_SIMD_SSE2
+	#endif // CCMATH_HAS_SIMD_SSE2
 #endif	   // CCM_CONFIG_USE_RT_SIMD

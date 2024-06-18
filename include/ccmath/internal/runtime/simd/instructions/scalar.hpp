@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "common.hpp"
+#include "ccmath/internal/runtime/simd/common.hpp"
 
 namespace ccm::intrin
 {
