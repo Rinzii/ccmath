@@ -120,8 +120,8 @@ namespace ccm::intrin
 	template <class T, class Abi>
 	struct simd_storage
 	{
-		using value_type						= T;
-		using simd_type							= simd<T, Abi>;
+		using value_type = T;
+		using simd_type	 = simd<T, Abi>;
 
 		CCM_ALWAYS_INLINE inline simd_storage() = default;
 		static constexpr int size() { return simd<T, Abi>::size(); }
