@@ -9,7 +9,8 @@
 #pragma once
 
 #include "ccmath/internal/predef/unlikely.hpp"
-#include "ccmath/math/compare/isnan.hpp"
+#include "ccmath/internal/support/fp/fp_bits.hpp"
+
 #include <limits>
 #include <type_traits>
 
@@ -27,11 +28,18 @@ namespace ccm
 	{
 		if constexpr (std::is_floating_point_v<T>)
 		{
-			if (CCM_UNLIKELY(ccm::isnan(x) && ccm::isnan(y))) { return std::numeric_limits<T>::quiet_NaN(); }
+			using FPBits_t = typename ccm::support::fp::FPBits<T>;
+			const FPBits_t x_bits(x);
+			const FPBits_t y_bits(y);
 
-			if (CCM_UNLIKELY(ccm::isnan(x))) { return y; }
+			const bool x_is_nan = x_bits.is_nan();
+			const bool y_is_nan = y_bits.is_nan();
 
-			if (CCM_UNLIKELY(ccm::isnan(y))) { return x; }
+			if (CCM_UNLIKELY(x_is_nan && y_is_nan)) { return std::numeric_limits<T>::quiet_NaN(); }
+
+			if (CCM_UNLIKELY(x_is_nan)) { return y; }
+
+			if (CCM_UNLIKELY(y_is_nan)) { return x; }
 		}
 
 		return (x > y) ? x : y;
