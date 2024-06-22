@@ -52,7 +52,7 @@ namespace ccm
 			return -std::numeric_limits<T>::quiet_NaN();
 		}
 
-		// If x is zero and y is infinity, or if y is zero and x is infinity and Z is NaN, then the result is -NaN.
+		// If x is a zero and y is an infinity, or if y is zero and x is an infinity and Z is NaN, then the result is -NaN.
 		if (ccm::isinf(x * y) && ccm::isinf(z) && ccm::signbit(x * y) != ccm::signbit(z))
 		{
 			return -std::numeric_limits<T>::quiet_NaN();

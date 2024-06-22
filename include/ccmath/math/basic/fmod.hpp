@@ -9,16 +9,14 @@
 #pragma once
 
 #include "ccmath/internal/predef/unlikely.hpp"
-#include "ccmath/math/compare/isfinite.hpp"
-#include "ccmath/math/compare/isinf.hpp"
-#include "ccmath/math/compare/isnan.hpp"
-#include "ccmath/math/compare/signbit.hpp"
+#include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/math/nearest/trunc.hpp"
+
 #include <limits>
 
 namespace ccm
 {
-	/// @cond MATH_DETAIL
+	/// @cond CCMATH_INTERNAL
 	namespace internal::impl
 	{
 		template <typename T>
@@ -27,28 +25,33 @@ namespace ccm
 			// Special edge cases for floating-point types.
 			if constexpr (std::numeric_limits<T>::is_iec559)
 			{
+				using FPBits_t = typename ccm::support::fp::FPBits<T>;
+				const FPBits_t x_bits(x);
+				const FPBits_t y_bits(y);
+
 				// If x is ±0 and y is not zero, ±0 is returned.
-				if (x == static_cast<T>(0.0) && (y != static_cast<T>(0.0)))
+				if (CCM_UNLIKELY(x_bits.is_zero() && !y_bits.is_zero()))
 				{
 					// The standard specifies that plus or minus 0 is returned depending on the sign of x.
-					if (ccm::signbit(x)) { return -static_cast<T>(0.0); }
-					return static_cast<T>(0.0);
+					return x;
 				}
 
 				// If x is ±∞ and y is not NaN OR if y is ±0 and x is not NaN, -NaN is returned
-				if (CCM_UNLIKELY(((ccm::isinf(x) && !ccm::isnan(y)) || (y == static_cast<T>(0.0) && !ccm::isnan(x)))))
+				if (CCM_UNLIKELY((x_bits.is_inf() && !y_bits.is_nan()) || (y_bits.is_zero() && !x_bits.is_nan())))
 				{
-					// For some reason, all the major compilers return a negative NaN even though I can't find anywhere
-					// in the standard that specifies this. I'm going to follow suit and return a negative NaN for now.
-					// Overall, this has little effect on checking for NaN. We only really care for conformance with the standard.
+					// For some reason, all the major compilers return a negative NaN
+					// even though I can't find anywhere in the standard that specifies this.
+					// I'm going to follow suit and return a negative NaN for now.
+					// Overall, this has little effect on checking for NaN.
+					// We only really care for conformance with the standard.
 					return -std::numeric_limits<T>::quiet_NaN();
 				}
 
 				// If y is ±∞ and x is finite, x is returned.
-				if (CCM_UNLIKELY(ccm::isinf(y) && ccm::isfinite(x))) { return x; }
+				if (CCM_UNLIKELY(y_bits.is_inf() && x_bits.is_finite())) { return x; }
 
 				// If either argument is NaN, NaN is returned.
-				if (CCM_UNLIKELY(ccm::isnan(x) || ccm::isnan(y)))
+				if (CCM_UNLIKELY(x_bits.is_nan() || y_bits.is_nan()))
 				{
 					// Same problem as before, but this time all major compilers return a positive NaN.
 					return std::numeric_limits<T>::quiet_NaN();
@@ -56,7 +59,7 @@ namespace ccm
 			}
 
 			// Calculate the remainder of the division of x by y.
-			// static_cast is required to prevent the compiler from complaining about narrowing with integer types.
+			// Static_cast is required to prevent the compiler from complaining about narrowing with integer types.
 			return static_cast<T>(x - (ccm::trunc<T>(x / y) * y));
 		}
 

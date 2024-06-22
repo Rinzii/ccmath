@@ -9,8 +9,7 @@
 #pragma once
 
 #include "ccmath/internal/predef/unlikely.hpp"
-#include "ccmath/math/compare/isinf.hpp"
-#include "ccmath/math/compare/isnan.hpp"
+#include "ccmath/internal/support/fp/fp_bits.hpp"
 
 #include <limits>
 
@@ -25,11 +24,14 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T> && !std::is_unsigned_v<T>, bool> = true>
 	constexpr T abs(T num) noexcept
 	{
+		using FPBits_t = typename ccm::support::fp::FPBits<T>;
+		const FPBits_t num_bits(num);
+
 		// If num is NaN, return a quiet NaN.
-		if (CCM_UNLIKELY(ccm::isnan<T>(num))) { return std::numeric_limits<T>::quiet_NaN(); }
+		if (CCM_UNLIKELY(num_bits.is_nan())) { return std::numeric_limits<T>::quiet_NaN(); }
 
 		// If num is equal to ±zero, return +zero.
-		if (static_cast<T>(0) == num) { return static_cast<T>(0); }
+		if (num_bits.is_zero()) { return static_cast<T>(0); }
 
 		// If num is less than zero, return -num, otherwise return num.
 		return num < 0 ? -num : num;
@@ -61,7 +63,7 @@ namespace ccm
 		// if X cannot be converted to int by integral promotion, the program is ill-formed.
 		// See: http://eel.is/c++draft/c.math.abs#3
 		// See: ISO/IEC 9899:2018, 7.12.7.2, 7.22.6.1
-		if constexpr (std::is_convertible_v<T, int>) { return abs<int>(static_cast<int>(num)); }
+		if constexpr (std::is_convertible_v<T, int>) { return ccm::abs<int>(static_cast<int>(num)); }
 		else
 		{
 			static_assert(sizeof(T) == 0, "Taking the absolute value of an unsigned type that cannot be converted to int by integral promotion is ill-formed.");
