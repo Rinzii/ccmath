@@ -15,4 +15,5 @@
 #include "ccmath/math/fmanip/logb.hpp"
 #include "ccmath/math/fmanip/modf.hpp"
 #include "ccmath/math/fmanip/nextafter.hpp"
+#include "ccmath/math/fmanip/nexttoward.hpp"
 #include "ccmath/math/fmanip/scalbn.hpp"

@@ -67,6 +67,13 @@ set(ccmath_internal_generic_functions_expo_headers
 )
 
 
+### Generic/Functions/Fmanip headers
+##########################################
+set(ccmath_internal_generic_functions_fmanip_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/generic/functions/fmanip/nextafter_gen.hpp
+)
+
+
 ### Generic/Functions/Power headers
 ##########################################
 set(ccmath_internal_generic_functions_power_headers
@@ -80,7 +87,10 @@ set(ccmath_internal_generic_functions_power_headers
 ##########################################
 set(ccmath_internal_generic_functions_headers
         ${ccmath_internal_generic_functions_expo_headers}
+        ${ccmath_internal_generic_functions_fmanip_headers}
         ${ccmath_internal_generic_functions_power_headers}
+
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/generic/functions/common_constants.hpp
 )
 
 
@@ -502,6 +512,7 @@ set(ccmath_math_fmanip_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/logb.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/modf.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/nextafter.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/nexttoward.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/fmanip/scalbn.hpp
 )
 
