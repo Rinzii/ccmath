@@ -108,4 +108,18 @@ namespace ccm::support::fp
 			else { return truncated_value; }
 		}
 	}
+
+	// Helper functions to set results for exceptional cases.
+	template <typename T> constexpr T round_result_slightly_down(T value_rn) {
+		volatile T tmp = value_rn;
+		tmp -= FPBits<T>::min_normal().get_val();
+		return tmp;
+	}
+
+	template <typename T> constexpr T round_result_slightly_up(T value_rn) {
+		volatile T tmp = value_rn;
+		tmp += FPBits<T>::min_normal().get_val();
+		return tmp;
+	}
+
 } // namespace ccm::support::fp
