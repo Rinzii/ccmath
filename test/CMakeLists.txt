@@ -83,6 +83,7 @@ target_sources(${PROJECT_NAME}-fmanip PRIVATE
         fmanip/logb_test.cpp
         fmanip/modf_test.cpp
         fmanip/nextafter_test.cpp
+        fmanip/nexttoward_test.cpp
         fmanip/scalbn_test.cpp
 )
 target_link_libraries(${PROJECT_NAME}-fmanip PRIVATE
