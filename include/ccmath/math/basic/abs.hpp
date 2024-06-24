@@ -21,7 +21,7 @@ namespace ccm
 	 * @param num Floating-point or integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T> && !std::is_unsigned_v<T>, bool> = true>
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T> && std::is_signed_v<T>, bool> = true>
 	constexpr T abs(T num) noexcept
 	{
 		using FPBits_t = typename ccm::support::fp::FPBits<T>;
@@ -43,7 +43,7 @@ namespace ccm
 	 * @param num Floating-point or integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_unsigned_v<T>, bool> = true>
+	template <typename T, std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>, bool> = true>
 	constexpr T abs(T num) noexcept
 	{
 		// If num is less than zero, return -num, otherwise return num.
@@ -77,7 +77,7 @@ namespace ccm
 	 * @param num Floating-point value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T fabs(T num) noexcept
 	{
 		return ccm::abs<T>(num);

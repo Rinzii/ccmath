@@ -24,7 +24,9 @@ namespace ccm
 #if defined(__GNUC__) || defined(__clang__)
 		return __builtin_isnan(num); // GCC and Clang implement this as constexpr
 #else							   // If we can't use the builtin, fallback to this comparison and hope for the best.
-		return num != num; // NOLINT
+		using FPBits_t = typename ccm::support::fp::FPBits<T>;
+		const FPBits_t num_bits(num);
+		return num_bits.is_nan();
 #endif
 	}
 
