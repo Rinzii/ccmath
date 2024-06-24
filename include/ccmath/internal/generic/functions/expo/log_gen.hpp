@@ -24,13 +24,33 @@ namespace ccm::gen
 {
 	namespace internal::impl
 	{
-
-		template <typename T>
-		constexpr std::enable_if_t<std::is_floating_point_v<T>, T> log_impl(T x, T y) noexcept
+		constexpr float log_impl(float num) noexcept
 		{
+			//constexpr double ln2 = 0x1.62e42fefa39efp-1;
+			//using FPBits_t = typename support::fp::FPBits<float>;
+
+			//FPBits_t num_bits(num);
+
+			//std::uint32_t num_bits_storage = num_bits.uintval();
+
+			//int m = -FPBits_t::exponent_bias;
+
+
 
 			return 0;
 		}
+
+		constexpr double log_impl(double num) noexcept
+		{
+			return 0;
+		}
+
+		constexpr long double log_impl(long double num) noexcept
+		{
+			return 0;
+		}
+
+
 	} // namespace internal::impl
 
 	template <typename T>
