@@ -33,86 +33,86 @@ namespace ccm::intrin
 	}
 
 	template <class T, class Abi>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> & operator+=(simd<T, Abi> & a, simd<T, Abi> const & b)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> & operator+=(simd<T, Abi> & a, simd<T, Abi> const & b)
 	{
 		a = a + b;
 		return a;
 	}
 
 	template <class T, class Abi>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> & operator-=(simd<T, Abi> & a, simd<T, Abi> const & b)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> & operator-=(simd<T, Abi> & a, simd<T, Abi> const & b)
 	{
 		a = a - b;
 		return a;
 	}
 
 	template <class T, class Abi>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> & operator*=(simd<T, Abi> & a, simd<T, Abi> const & b)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> & operator*=(simd<T, Abi> & a, simd<T, Abi> const & b)
 	{
 		a = a * b;
 		return a;
 	}
 
 	template <class T, class Abi>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> & operator/=(simd<T, Abi> & a, simd<T, Abi> const & b)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> & operator/=(simd<T, Abi> & a, simd<T, Abi> const & b)
 	{
 		a = a / b;
 		return a;
 	}
 
 	template <class T, class Abi>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> operator+(T const & a, simd<T, Abi> const & b)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> operator+(T const & a, simd<T, Abi> const & b)
 	{
 		return simd<T, Abi>(a) + b;
 	}
 
 	template <class T, class Abi>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> operator+(simd<T, Abi> const & a, T const & b)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> operator+(simd<T, Abi> const & a, T const & b)
 	{
 		return a + simd<T, Abi>(b);
 	}
 
 	template <class T, class Abi>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> operator-(T const & a, simd<T, Abi> const & b)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> operator-(T const & a, simd<T, Abi> const & b)
 	{
 		return simd<T, Abi>(a) - b;
 	}
 
 	template <class T, class Abi>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> operator-(simd<T, Abi> const & a, T const & b)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> operator-(simd<T, Abi> const & a, T const & b)
 	{
 		return a - simd<T, Abi>(b);
 	}
 
 	template <class T, class Abi>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> operator*(T const & a, simd<T, Abi> const & b)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> operator*(T const & a, simd<T, Abi> const & b)
 	{
 		return simd<T, Abi>(a) * b;
 	}
 
 	template <class T, class Abi>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> operator*(simd<T, Abi> const & a, T const & b)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> operator*(simd<T, Abi> const & a, T const & b)
 	{
 		return a * simd<T, Abi>(b);
 	}
 
 	template <class T, class Abi>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> operator/(T const & a, simd<T, Abi> const & b)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> operator/(T const & a, simd<T, Abi> const & b)
 	{
 		return simd<T, Abi>(a) / b;
 	}
 
 	template <class T, class Abi>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, Abi> operator/(simd<T, Abi> const & a, T const & b)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> operator/(simd<T, Abi> const & a, T const & b)
 	{
 		return a / simd<T, Abi>(b);
 	}
 
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline bool all_of(bool a)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE bool all_of(bool a)
 	{
 		return a;
 	}
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline bool any_of(bool a)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE bool any_of(bool a)
 	{
 		return a;
 	}
@@ -123,19 +123,19 @@ namespace ccm::intrin
 		using value_type = T;
 		using simd_type	 = simd<T, Abi>;
 
-		CCM_ALWAYS_INLINE inline simd_storage() = default;
+		CCM_ALWAYS_INLINE simd_storage() = default;
 		static constexpr int size() { return simd<T, Abi>::size(); }
-		CCM_ALWAYS_INLINE explicit inline simd_storage(simd<T, Abi> const & value) { value.copy_to(m_value, element_aligned_tag()); }
-		CCM_ALWAYS_INLINE explicit inline simd_storage(T value) : simd_storage(simd<T, Abi>(value)) {}
-		CCM_ALWAYS_INLINE inline simd_storage & operator=(simd<T, Abi> const & value)
+		CCM_ALWAYS_INLINE explicit simd_storage(simd<T, Abi> const & value) { value.copy_to(m_value, element_aligned_tag()); }
+		CCM_ALWAYS_INLINE explicit simd_storage(T value) : simd_storage(simd<T, Abi>(value)) {}
+		CCM_ALWAYS_INLINE simd_storage & operator=(simd<T, Abi> const & value)
 		{
 			value.copy_to(m_value, element_aligned_tag());
 			return *this;
 		}
-		CCM_ALWAYS_INLINE inline T const * data() const { return m_value.data(); }
-		CCM_ALWAYS_INLINE inline T * data() { return m_value; }
-		CCM_ALWAYS_INLINE inline T const & operator[](int i) const { return m_value[i]; }
-		CCM_ALWAYS_INLINE inline T & operator[](int i) { return m_value[i]; }
+		CCM_ALWAYS_INLINE T const * data() const { return m_value.data(); }
+		CCM_ALWAYS_INLINE T * data() { return m_value; }
+		CCM_ALWAYS_INLINE T const & operator[](int i) const { return m_value[i]; }
+		CCM_ALWAYS_INLINE T & operator[](int i) { return m_value[i]; }
 
 	private:
 		std::array<T, simd<T, Abi>::size()> m_value;

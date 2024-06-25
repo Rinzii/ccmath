@@ -15,13 +15,13 @@
 namespace ccm::intrin
 {
 
-	CCM_ALWAYS_INLINE inline simd<float, abi::avx> sqrt(simd<float, abi::avx> const & a)
+	CCM_ALWAYS_INLINE simd<float, abi::avx> sqrt(simd<float, abi::avx> const & a)
 	{
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
 		return simd<float, abi::avx>(_mm256_sqrt_ps(a.get()));
 	}
 
-	CCM_ALWAYS_INLINE inline simd<double, abi::avx> sqrt(simd<double, abi::avx> const & a)
+	CCM_ALWAYS_INLINE simd<double, abi::avx> sqrt(simd<double, abi::avx> const & a)
 	{
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
 		return simd<double, abi::avx>(_mm256_sqrt_pd(a.get()));

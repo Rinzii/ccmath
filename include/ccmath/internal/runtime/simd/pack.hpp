@@ -27,9 +27,9 @@ namespace ccm::intrin
 		using value_type					 = bool;
 		using simd_type						 = simd<float, abi::pack<N>>;
 		using abi_type						 = abi::pack<N>;
-		CCM_ALWAYS_INLINE inline simd_mask() = default;
+		CCM_ALWAYS_INLINE simd_mask() = default;
 		[[nodiscard]] static constexpr int size() { return N; }
-		CCM_ALWAYS_INLINE inline explicit simd_mask(bool value)
+		CCM_ALWAYS_INLINE explicit simd_mask(bool value)
 		{
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
 			{
@@ -37,8 +37,8 @@ namespace ccm::intrin
 			}
 		}
 		constexpr bool operator[](int i) const { return m_value[i]; }
-		CCM_ALWAYS_INLINE inline int & operator[](int i) { return m_value[i]; }
-		CCM_ALWAYS_INLINE inline simd_mask operator||(simd_mask const & other) const
+		CCM_ALWAYS_INLINE int & operator[](int i) { return m_value[i]; }
+		CCM_ALWAYS_INLINE simd_mask operator||(simd_mask const & other) const
 		{
 			simd_mask result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
@@ -47,7 +47,7 @@ namespace ccm::intrin
 			}
 			return result;
 		}
-		CCM_ALWAYS_INLINE inline simd_mask operator&&(simd_mask const & other) const
+		CCM_ALWAYS_INLINE simd_mask operator&&(simd_mask const & other) const
 		{
 			simd_mask result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
@@ -56,7 +56,7 @@ namespace ccm::intrin
 			}
 			return result;
 		}
-		CCM_ALWAYS_INLINE inline simd_mask operator!() const
+		CCM_ALWAYS_INLINE simd_mask operator!() const
 		{
 			simd_mask result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
@@ -76,9 +76,9 @@ namespace ccm::intrin
 		using value_type					 = bool;
 		using simd_type						 = simd<double, abi::pack<N>>;
 		using abi_type						 = abi::pack<N>;
-		CCM_ALWAYS_INLINE inline simd_mask() = default;
+		CCM_ALWAYS_INLINE simd_mask() = default;
 		[[nodiscard]] static constexpr int size() { return N; }
-		CCM_ALWAYS_INLINE inline explicit simd_mask(bool value)
+		CCM_ALWAYS_INLINE explicit simd_mask(bool value)
 		{
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
 			{
@@ -86,8 +86,8 @@ namespace ccm::intrin
 			}
 		}
 		constexpr bool operator[](int i) const { return m_value[i]; }
-		CCM_ALWAYS_INLINE inline std::int64_t & operator[](int i) { return m_value[i]; }
-		CCM_ALWAYS_INLINE inline simd_mask operator||(simd_mask const & other) const
+		CCM_ALWAYS_INLINE std::int64_t & operator[](int i) { return m_value[i]; }
+		CCM_ALWAYS_INLINE simd_mask operator||(simd_mask const & other) const
 		{
 			simd_mask result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
@@ -96,7 +96,7 @@ namespace ccm::intrin
 			}
 			return result;
 		}
-		CCM_ALWAYS_INLINE inline simd_mask operator&&(simd_mask const & other) const
+		CCM_ALWAYS_INLINE simd_mask operator&&(simd_mask const & other) const
 		{
 			simd_mask result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
@@ -105,7 +105,7 @@ namespace ccm::intrin
 			}
 			return result;
 		}
-		CCM_ALWAYS_INLINE inline simd_mask operator!() const
+		CCM_ALWAYS_INLINE simd_mask operator!() const
 		{
 			simd_mask result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
@@ -120,7 +120,7 @@ namespace ccm::intrin
 	};
 
 	template <class T, int N>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline bool all_of(simd_mask<T, abi::pack<N>> const & a)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE bool all_of(simd_mask<T, abi::pack<N>> const & a)
 	{
 		bool result = true;
 		CCM_SIMD_VECTORIZE for (int i = 0; i < a.size(); ++i)
@@ -131,7 +131,7 @@ namespace ccm::intrin
 	}
 
 	template <class T, int N>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline bool any_of(simd_mask<T, abi::pack<N>> const & a)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE bool any_of(simd_mask<T, abi::pack<N>> const & a)
 	{
 		bool result = false;
 		CCM_SIMD_VECTORIZE for (int i = 0; i < a.size(); ++i)
@@ -149,17 +149,17 @@ namespace ccm::intrin
 		using abi_type					= abi::pack<N>;
 		using mask_type					= simd_mask<T, abi_type>;
 		using storage_type				= simd_storage<T, abi_type>;
-		CCM_ALWAYS_INLINE inline simd() = default;
+		CCM_ALWAYS_INLINE simd() = default;
 		[[nodiscard]] static constexpr int size() { return N; }
-		CCM_ALWAYS_INLINE inline explicit simd(T value)
+		CCM_ALWAYS_INLINE explicit simd(T value)
 		{
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
 			{
 				m_value[i] = value;
 			}
 		}
-		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline explicit simd(storage_type const & value) { copy_from(value.data(), element_aligned_tag()); }
-		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd & operator=(storage_type const & value)
+		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE explicit simd(storage_type const & value) { copy_from(value.data(), element_aligned_tag()); }
+		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd & operator=(storage_type const & value)
 		{
 			copy_from(value.data(), element_aligned_tag());
 			return *this;
@@ -205,7 +205,7 @@ namespace ccm::intrin
 			}
 			return result;
 		}
-		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd operator-() const
+		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd operator-() const
 		{
 			simd result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
@@ -254,7 +254,7 @@ namespace ccm::intrin
 	};
 
 	template <class T, int N>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, abi::pack<N>> choose(simd_mask<T, abi::pack<N>> const & a, simd<T, abi::pack<N>> const & b,
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, abi::pack<N>> choose(simd_mask<T, abi::pack<N>> const & a, simd<T, abi::pack<N>> const & b,
 																			  simd<T, abi::pack<N>> const & c)
 	{
 		simd<T, abi::pack<N>> result;

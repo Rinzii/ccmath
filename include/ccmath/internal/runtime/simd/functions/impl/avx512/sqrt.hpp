@@ -14,13 +14,13 @@
 	#ifdef CCMATH_HAS_SIMD_AVX512F
 namespace ccm::intrin
 {
-	CCM_ALWAYS_INLINE inline simd<float, abi::avx512> sqrt(simd<float, abi::avx512> const & a)
+	CCM_ALWAYS_INLINE simd<float, abi::avx512> sqrt(simd<float, abi::avx512> const & a)
 	{
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
 		return simd<float, abi::avx512>(_mm512_sqrt_ps(a.get()));
 	}
 
-	CCM_ALWAYS_INLINE inline simd<double, abi::avx512> sqrt(simd<double, abi::avx512> const & a)
+	CCM_ALWAYS_INLINE simd<double, abi::avx512> sqrt(simd<double, abi::avx512> const & a)
 	{
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
 		return simd<double, abi::avx512>(_mm512_sqrt_pd(a.get()));
