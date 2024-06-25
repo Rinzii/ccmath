@@ -14,13 +14,13 @@
 	#ifdef CCMATH_HAS_SIMD_SSE4
 namespace ccm::intrin
 {
-	CCM_ALWAYS_INLINE inline simd<float, abi::sse4> sqrt(simd<float, abi::sse4> const & a)
+	CCM_ALWAYS_INLINE simd<float, abi::sse4> sqrt(simd<float, abi::sse4> const & a)
 	{
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
 		return simd<float, abi::sse4>(_mm_sqrt_ps(a.get()));
 	}
 
-	CCM_ALWAYS_INLINE inline simd<double, abi::sse4> sqrt(simd<double, abi::sse4> const & a)
+	CCM_ALWAYS_INLINE simd<double, abi::sse4> sqrt(simd<double, abi::sse4> const & a)
 	{
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
 		return simd<double, abi::sse4>(_mm_sqrt_pd(a.get()));

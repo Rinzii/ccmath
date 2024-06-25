@@ -17,7 +17,7 @@ namespace ccm::intrin
 {
 
 	template <class T, int N>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE inline simd<T, abi::vector_size<N>> sqrt(simd<T, abi::vector_size<N>> const & a)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, abi::vector_size<N>> sqrt(simd<T, abi::vector_size<N>> const & a)
 	{
 		simd<T, abi::vector_size<N>> result;
 
