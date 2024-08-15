@@ -93,8 +93,9 @@ target_link_libraries(${PROJECT_NAME}-fmanip PRIVATE
 
 add_executable(${PROJECT_NAME}-nearest)
 target_sources(${PROJECT_NAME}-nearest PRIVATE
-        nearest/trunc_test.cpp
         nearest/floor_test.cpp
+        nearest/nearbyint_test.cpp
+        nearest/trunc_test.cpp
 
 )
 target_link_libraries(${PROJECT_NAME}-nearest PRIVATE
