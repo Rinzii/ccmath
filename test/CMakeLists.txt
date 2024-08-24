@@ -92,11 +92,32 @@ target_link_libraries(${PROJECT_NAME}-fmanip PRIVATE
 )
 
 add_executable(${PROJECT_NAME}-nearest)
+set(ROUNDING_MODES
+    FE_DOWNWARD
+    FE_UPWARD
+    FE_TONEAREST
+    FE_TOWARDZERO
+)
+set(GENERATED_SOURCES)
+foreach(MODE IN LISTS ROUNDING_MODES)
+    # Set the output file name based on the rounding mode
+    string(REPLACE "FE_" "" MODE_SUFFIX ${MODE})
+    set(OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/rounding_${MODE_SUFFIX}.cpp")
+    set(ROUNDING_MODE "FE_${MODE_SUFFIX}")
+    # Configure the template file to generate the specific cpp file
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/nearest/rint_test.cpp.in
+        ${OUTPUT_FILE}
+        @ONLY
+    )
+    list(APPEND GENERATED_SOURCES ${OUTPUT_FILE})
+endforeach()
 target_sources(${PROJECT_NAME}-nearest PRIVATE
         nearest/floor_test.cpp
         nearest/nearbyint_test.cpp
         nearest/trunc_test.cpp
-
+        nearest/rint_test_compile_time.cpp
+        ${GENERATED_SOURCES}
 )
 target_link_libraries(${PROJECT_NAME}-nearest PRIVATE
         ccmath::test

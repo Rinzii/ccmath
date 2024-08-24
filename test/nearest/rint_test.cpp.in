@@ -1,0 +1,312 @@
+/*
+ * Copyright (c) 2024-Present Ian Pike
+ * Copyright (c) 2024-Present ccmath contributors
+ *
+ * This library is provided under the MIT License.
+ * See LICENSE for more information.
+ */
+
+#include <ccmath/math/nearest/rint.hpp>
+#include <ccmath/internal/support/is_constant_evaluated.hpp>
+
+#include <cfenv>
+#include <cmath>
+#include <functional>
+#include <ranges>
+#include <vector>
+
+#include <gtest/gtest.h>
+
+namespace
+{
+	using testing::TestWithParam;
+	using testing::ValuesIn;
+
+	template <typename InputType, typename OutputType = InputType>
+	struct RIntTestParams
+	{
+		InputType input{};
+		OutputType output{};
+	};
+
+	template <typename T>
+	std::vector<T> make_test_params()
+	{
+		return std::vector<T>{
+			static_cast<T>(-0.0),
+			static_cast<T>(-0.5),
+			static_cast<T>(-1.0),
+			static_cast<T>(-1.5),
+			static_cast<T>(-1.999),
+			static_cast<T>(-2.001),
+			static_cast<T>(-123.0),
+			static_cast<T>(0.0),
+			static_cast<T>(0.5),
+			static_cast<T>(1.0),
+			static_cast<T>(1.5),
+			static_cast<T>(1.999),
+			static_cast<T>(2.001),
+			static_cast<T>(123.0),
+			std::numeric_limits<T>::max(),
+			std::numeric_limits<T>::infinity(),
+			std::numeric_limits<T>::quiet_NaN(),
+			std::numeric_limits<T>::denorm_min(),
+			-std::numeric_limits<T>::max(),
+			-std::numeric_limits<T>::infinity(),
+		};
+	}
+
+	// All of the function calls that raise FE_INVALID.
+	// clang-format off
+	const std::vector<std::function<void()>> k_values_that_will_raise_FE_INVALID{
+		[] { return ccm::rint(std::numeric_limits<double>::infinity()); },
+		[] { return ccm::rint(-std::numeric_limits<double>::infinity()); },
+		[] { return ccm::rint(std::numeric_limits<double>::quiet_NaN()); },
+		[] { return ccm::rint(std::numeric_limits<float>::infinity()); },
+		[] { return ccm::rint(-std::numeric_limits<float>::infinity()); },
+		[] { return ccm::rint(std::numeric_limits<float>::quiet_NaN()); },
+		[] { return ccm::rintf(std::numeric_limits<float>::infinity()); },
+		[] { return ccm::rintf(-std::numeric_limits<float>::infinity()); },
+		[] { return ccm::rintf(std::numeric_limits<float>::quiet_NaN()); },
+		[] { return ccm::rint(std::numeric_limits<long double>::infinity()); },
+		[] { return ccm::rint(-std::numeric_limits<long double>::infinity()); },
+		[] { return ccm::rint(std::numeric_limits<long double>::quiet_NaN()); },
+		[] { return ccm::rintl(std::numeric_limits<long double>::infinity()); },
+		[] { return ccm::rintl(-std::numeric_limits<long double>::infinity()); },
+		[] { return ccm::rintl(std::numeric_limits<long double>::quiet_NaN()); },
+
+		[] { return ccm::lrint(std::numeric_limits<double>::infinity()); },
+		[] { return ccm::lrint(-std::numeric_limits<double>::infinity()); },
+		[] { return ccm::lrint(std::numeric_limits<double>::quiet_NaN()); },
+		[] { return ccm::lrint(std::numeric_limits<float>::infinity()); },
+		[] { return ccm::lrint(-std::numeric_limits<float>::infinity()); },
+		[] { return ccm::lrint(std::numeric_limits<float>::quiet_NaN()); },
+		[] { return ccm::lrintf(std::numeric_limits<float>::infinity()); },
+		[] { return ccm::lrintf(-std::numeric_limits<float>::infinity()); },
+		[] { return ccm::lrintf(std::numeric_limits<float>::quiet_NaN()); },
+		[] { return ccm::lrint(std::numeric_limits<long double>::infinity()); },
+		[] { return ccm::lrint(-std::numeric_limits<long double>::infinity()); },
+		[] { return ccm::lrint(std::numeric_limits<long double>::quiet_NaN()); },
+		[] { return ccm::lrintl(std::numeric_limits<long double>::infinity()); },
+		[] { return ccm::lrintl(-std::numeric_limits<long double>::infinity()); },
+		[] { return ccm::lrintl(std::numeric_limits<long double>::quiet_NaN()); },
+
+		[] { return ccm::llrint(std::numeric_limits<double>::infinity()); },
+		[] { return ccm::llrint(-std::numeric_limits<double>::infinity()); },
+		[] { return ccm::llrint(std::numeric_limits<double>::quiet_NaN()); },
+		[] { return ccm::llrint(std::numeric_limits<float>::infinity()); },
+		[] { return ccm::llrint(-std::numeric_limits<float>::infinity()); },
+		[] { return ccm::llrint(std::numeric_limits<float>::quiet_NaN()); },
+		[] { return ccm::llrintf(std::numeric_limits<float>::infinity()); },
+		[] { return ccm::llrintf(-std::numeric_limits<float>::infinity()); },
+		[] { return ccm::llrintf(std::numeric_limits<float>::quiet_NaN()); },
+		[] { return ccm::llrint(std::numeric_limits<long double>::infinity()); },
+		[] { return ccm::llrint(-std::numeric_limits<long double>::infinity()); },
+		[] { return ccm::llrint(std::numeric_limits<long double>::quiet_NaN()); },
+		[] { return ccm::llrintl(std::numeric_limits<long double>::infinity()); },
+		[] { return ccm::llrintl(-std::numeric_limits<long double>::infinity()); },
+		[] { return ccm::llrintl(std::numeric_limits<long double>::quiet_NaN()); },
+	};
+	// clang-format on
+
+	const std::vector<float> k_float_test_params{make_test_params<float>()};
+	const std::vector<double> k_double_test_params{make_test_params<double>()};
+	const std::vector<long double> k_long_double_test_params{make_test_params<long double>()};
+
+	template <typename InputType, typename OutputType = InputType>
+	auto createTestParams(const std::vector<InputType> & inputValues, OutputType (*func)(InputType))
+	{
+		std::vector<RIntTestParams<InputType, OutputType>> result;
+		std::transform(inputValues.cbegin(), inputValues.cend(), std::back_inserter(result),
+					   [func](InputType value) { return RIntTestParams<InputType, OutputType>{value, func(value)}; });
+		return result;
+	}
+
+} // namespace
+
+template <typename T>
+class CcmathRIntBaseTests_@ROUNDING_MODE@ : public TestWithParam<T>
+{
+protected:
+	CcmathRIntBaseTests_@ROUNDING_MODE@() { std::fesetround(@ROUNDING_MODE@); }
+};
+
+// ccm::rint, ccm::rintl, ccm::rintf
+class CcmathRIntFloatTests_@ROUNDING_MODE@ : public CcmathRIntBaseTests_@ROUNDING_MODE@<RIntTestParams<float>>
+{
+};
+
+class CcmathRIntDoubleTests_@ROUNDING_MODE@ : public CcmathRIntBaseTests_@ROUNDING_MODE@<RIntTestParams<double>>
+{
+};
+
+class CcmathRIntLongDoubleTests_@ROUNDING_MODE@ : public CcmathRIntBaseTests_@ROUNDING_MODE@<RIntTestParams<long double>>
+{
+};
+
+INSTANTIATE_TEST_SUITE_P(RIntFloatTests, CcmathRIntFloatTests_@ROUNDING_MODE@, ValuesIn(createTestParams<float>(k_float_test_params, std::rint)));
+INSTANTIATE_TEST_SUITE_P(RIntDoubleTests, CcmathRIntDoubleTests_@ROUNDING_MODE@, ValuesIn(createTestParams<double>(k_double_test_params, std::rint)));
+INSTANTIATE_TEST_SUITE_P(RIntLongDoubleTests, CcmathRIntLongDoubleTests_@ROUNDING_MODE@, ValuesIn(createTestParams<long double>(k_long_double_test_params, std::rint)));
+
+TEST_P(CcmathRIntFloatTests_@ROUNDING_MODE@, RIntFloat)
+{
+	const auto & params{GetParam()};
+	const auto actual{ccm::rint(params.input)};
+	if (std::isnan(params.input)) { EXPECT_TRUE(std::isnan(actual)); }
+	else { EXPECT_EQ(params.output, actual); }
+}
+
+TEST_P(CcmathRIntFloatTests_@ROUNDING_MODE@, RIntFFloat)
+{
+	const auto & params{GetParam()};
+	const auto actual{ccm::rintf(params.input)};
+	if (std::isnan(params.input)) { EXPECT_TRUE(std::isnan(actual)); }
+	else { EXPECT_EQ(params.output, actual); }
+}
+
+TEST_P(CcmathRIntDoubleTests_@ROUNDING_MODE@, RIntDouble)
+{
+	const auto & params{GetParam()};
+	const auto actual{ccm::rint(params.input)};
+	if (std::isnan(params.input)) { EXPECT_TRUE(std::isnan(actual)); }
+	else { EXPECT_EQ(params.output, actual); }
+}
+
+TEST_P(CcmathRIntLongDoubleTests_@ROUNDING_MODE@, RIntLongDouble)
+{
+	const auto & params{GetParam()};
+	const auto actual{ccm::rint(params.input)};
+	if (std::isnan(params.input)) { EXPECT_TRUE(std::isnan(actual)); }
+	else { EXPECT_EQ(params.output, actual); }
+}
+
+TEST_P(CcmathRIntLongDoubleTests_@ROUNDING_MODE@, RIntLLongDouble)
+{
+	const auto & params{GetParam()};
+	const auto actual{ccm::rintl(params.input)};
+	if (std::isnan(params.input)) { EXPECT_TRUE(std::isnan(actual)); }
+	else { EXPECT_EQ(params.output, actual); }
+}
+
+// ccm::lrint, ccm::lrintf, ccm::lrintl
+class CcmathLRIntFloatTests_@ROUNDING_MODE@ : public CcmathRIntBaseTests_@ROUNDING_MODE@<RIntTestParams<float, long>>
+{
+};
+
+class CcmathLRIntDoubleTests_@ROUNDING_MODE@ : public CcmathRIntBaseTests_@ROUNDING_MODE@<RIntTestParams<double, long>>
+{
+};
+
+class CcmathLRIntLongDoubleTests_@ROUNDING_MODE@ : public CcmathRIntBaseTests_@ROUNDING_MODE@<RIntTestParams<long double, long>>
+{
+};
+
+INSTANTIATE_TEST_SUITE_P(LRIntFloatTests, CcmathLRIntFloatTests_@ROUNDING_MODE@, ValuesIn(createTestParams<float, long>(k_float_test_params, std::lrint)));
+INSTANTIATE_TEST_SUITE_P(LRIntDoubleTests, CcmathLRIntDoubleTests_@ROUNDING_MODE@, ValuesIn(createTestParams<double, long>(k_double_test_params, std::lrint)));
+INSTANTIATE_TEST_SUITE_P(LRIntLongDoubleTests, CcmathLRIntLongDoubleTests_@ROUNDING_MODE@, ValuesIn(createTestParams<long double, long>(k_long_double_test_params, std::lrint)));
+
+TEST_P(CcmathLRIntFloatTests_@ROUNDING_MODE@, LRIntFloat)
+{
+	const auto & params{GetParam()};
+	const auto actual{ccm::lrint(params.input)};
+	EXPECT_EQ(params.output, actual);
+}
+
+TEST_P(CcmathLRIntFloatTests_@ROUNDING_MODE@, LRIntFFloat)
+{
+	const auto & params{GetParam()};
+	const auto actual{ccm::lrintf(params.input)};
+	EXPECT_EQ(params.output, actual);
+}
+
+TEST_P(CcmathLRIntDoubleTests_@ROUNDING_MODE@, LRIntDouble)
+{
+	const auto & params{GetParam()};
+	const auto actual{ccm::lrint(params.input)};
+	EXPECT_EQ(params.output, actual);
+}
+
+TEST_P(CcmathLRIntLongDoubleTests_@ROUNDING_MODE@, LRIntLongDouble)
+{
+	const auto & params{GetParam()};
+	const auto actual{ccm::lrint(params.input)};
+	EXPECT_EQ(params.output, actual);
+}
+
+TEST_P(CcmathLRIntLongDoubleTests_@ROUNDING_MODE@, LRIntLLongDouble)
+{
+	const auto & params{GetParam()};
+	const auto actual{ccm::lrintl(params.input)};
+	EXPECT_EQ(params.output, actual);
+}
+
+// ccm::llrint, ccm::llrintf, ccm::llrintl
+class CcmathLLRIntFloatTests_@ROUNDING_MODE@ : public CcmathRIntBaseTests_@ROUNDING_MODE@<RIntTestParams<float, long long>>
+{
+};
+
+class CcmathLLRIntDoubleTests_@ROUNDING_MODE@ : public CcmathRIntBaseTests_@ROUNDING_MODE@<RIntTestParams<double, long long>>
+{
+};
+
+class CcmathLLRIntLongDoubleTests_@ROUNDING_MODE@ : public CcmathRIntBaseTests_@ROUNDING_MODE@<RIntTestParams<long double, long long>>
+{
+};
+
+INSTANTIATE_TEST_SUITE_P(LLRIntFloatTests, CcmathLLRIntFloatTests_@ROUNDING_MODE@, ValuesIn(createTestParams<float, long long>(k_float_test_params, std::llrint)));
+INSTANTIATE_TEST_SUITE_P(LLRIntDoubleTests, CcmathLLRIntDoubleTests_@ROUNDING_MODE@, ValuesIn(createTestParams<double, long long>(k_double_test_params, std::llrint)));
+INSTANTIATE_TEST_SUITE_P(LLRIntLongDoubleTests, CcmathLLRIntLongDoubleTests_@ROUNDING_MODE@,
+						 ValuesIn(createTestParams<long double, long long>(k_long_double_test_params, std::llrint)));
+
+TEST_P(CcmathLLRIntFloatTests_@ROUNDING_MODE@, LLRIntFloat)
+{
+	const auto & params{GetParam()};
+	const auto actual{ccm::llrint(params.input)};
+	EXPECT_EQ(params.output, actual);
+}
+
+TEST_P(CcmathLLRIntFloatTests_@ROUNDING_MODE@, LLRIntFFloat)
+{
+	const auto & params{GetParam()};
+	const auto actual{ccm::llrintf(params.input)};
+	EXPECT_EQ(params.output, actual);
+}
+
+TEST_P(CcmathLLRIntDoubleTests_@ROUNDING_MODE@, LLRIntDouble)
+{
+	const auto & params{GetParam()};
+	const auto actual{ccm::llrint(params.input)};
+	EXPECT_EQ(params.output, actual);
+}
+
+TEST_P(CcmathLLRIntLongDoubleTests_@ROUNDING_MODE@, LLRIntLongDouble)
+{
+	const auto & params{GetParam()};
+	const auto actual{ccm::llrint(params.input)};
+	EXPECT_EQ(params.output, actual);
+}
+
+TEST_P(CcmathLLRIntLongDoubleTests_@ROUNDING_MODE@, LLRIntLLongDouble)
+{
+	const auto & params{GetParam()};
+	const auto actual{ccm::llrintl(params.input)};
+	EXPECT_EQ(params.output, actual);
+}
+
+// FE_INVALID raised tests
+class RIntRaisesFE_INVALIDTests_@ROUNDING_MODE@ : public CcmathRIntBaseTests_@ROUNDING_MODE@<std::function<void()>>
+{
+protected:
+	void SetUp() override { std::feclearexcept(FE_ALL_EXCEPT); }
+
+	void TearDown() override { std::feclearexcept(FE_ALL_EXCEPT); }
+};
+
+INSTANTIATE_TEST_SUITE_P(FE_INVALIDRaisedTests, RIntRaisesFE_INVALIDTests_@ROUNDING_MODE@, ValuesIn(k_values_that_will_raise_FE_INVALID));
+
+TEST_P(RIntRaisesFE_INVALIDTests_@ROUNDING_MODE@, FE_INVALIDIsRaised)
+{
+	GetParam()();
+	EXPECT_TRUE(std::fetestexcept(FE_INVALID));
+	EXPECT_FALSE(ccm::support::is_constant_evaluated());
+}
