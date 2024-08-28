@@ -80,12 +80,14 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU O
     )
 endif ()
 
-include(ccmath_headers.cmake)
+include(ccmath_internal_headers.cmake)
+include(ccmath_core_headers.cmake)
 
 add_library(${PROJECT_NAME} INTERFACE)
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_headers}>")
+target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_internal_headers}>")
+target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_core_headers}>")
 
 if (CCMATH_ENABLE_EXTENSIONS)
     include(ccmath_extensions_headers.cmake)

@@ -34,8 +34,8 @@ namespace ccm::types
 	 *   real value = (-1)^sign * 2^exponent * (mantissa as unsigned integer)
 	 *
 	 * The data is considered normalized if, for a non-zero mantissa, the leading bit is 1.
-	 * Constructors and most functions ensure that the outputs are normalized. To simplify and improve efficiency,
-	 * many functions assume that the inputs are already normalized.
+	 * Constructors and most func ensure that the outputs are normalized. To simplify and improve efficiency,
+	 * many func assume that the inputs are already normalized.
 	 *
 	 * @tparam Bits The length of the mantissa in bits.
 	 */
@@ -238,7 +238,7 @@ namespace ccm::types
 	// The absolute errors compared to the mathematical sum is bounded by:
 	//   | quick_add(a, b) - (a + b) | < MSB(a + b) * 2^(-Bits + 2),
 	// i.e., errors are up to 2 ULPs.
-	// Assume inputs are normalized (by constructors or other functions) so that we
+	// Assume inputs are normalized (by constructors or other func) so that we
 	// don't need to normalize the inputs again in this function.  If the inputs are
 	// not normalized, the results might lose precision significantly.
 	template <size_t Bits>
@@ -293,7 +293,7 @@ namespace ccm::types
 	//                   ~ (full product a.mantissa * b.mantissa) >> Bits.
 	// The errors compared to the mathematical product is bounded by:
 	//   2 * errors of quick_mul_hi = 2 * (UInt<Bits>::WORD_COUNT - 1) in ULPs.
-	// Assume inputs are normalized (by constructors or other functions) so that we
+	// Assume inputs are normalized (by constructors or other func) so that we
 	// don't need to normalize the inputs again in this function.  If the inputs are
 	// not normalized, the results might lose precision significantly.
 	template <size_t Bits>
