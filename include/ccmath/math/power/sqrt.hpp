@@ -35,8 +35,8 @@ namespace ccm
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_sqrtl(num); }
 		else { return static_cast<T>(__builtin_sqrtl(static_cast<long double>(num))); }
 #else
-		if (ccm::support::is_constant_evaluated()) { return ccm::gen::sqrt_gen<T>(num); }
-		return ccm::rt::sqrt_rt<T>(num);
+		if (support::is_constant_evaluated()) { return gen::sqrt_gen<T>(num); }
+		return rt::sqrt_rt<T>(num);
 #endif
 	}
 
