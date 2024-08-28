@@ -286,6 +286,7 @@ set(ccmath_internal_math_runtime_simd_func_impl_vector_size_headers
 ##########################################
 set(ccmath_internal_math_runtime_simd_func_headers
         ${ccmath_internal_math_runtime_simd_func_impl_avx_headers}
+        ${ccmath_internal_math_runtime_simd_func_impl_avx2_headers}
         ${ccmath_internal_math_runtime_simd_func_impl_avx512_headers}
         ${ccmath_internal_math_runtime_simd_func_impl_neon_headers}
         ${ccmath_internal_math_runtime_simd_func_impl_scalar_headers}
