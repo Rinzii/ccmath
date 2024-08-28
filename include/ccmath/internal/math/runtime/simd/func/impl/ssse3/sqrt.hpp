@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "ccmath/internal/runtime/simd/simd.hpp"
+#include "ccmath/internal/math/runtime/simd/simd.hpp"
 
 #ifdef CCMATH_HAS_SIMD
 	#ifdef CCMATH_HAS_SIMD_SSSE3
@@ -27,5 +27,5 @@ namespace ccm::intrin
 	}
 } // namespace ccm::intrin
 
-	#endif // CCMATH_HAS_SIMD_SSE2
-#endif	   // CCM_CONFIG_USE_RT_SIMD
+	#endif // CCMATH_HAS_SIMD_SSSE3
+#endif	   // CCMATH_HAS_SIMD

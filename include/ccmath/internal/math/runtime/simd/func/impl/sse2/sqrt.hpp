@@ -28,4 +28,4 @@ namespace ccm::intrin
 } // namespace ccm::intrin
 
 	#endif // CCMATH_HAS_SIMD_SSE2
-#endif	   // CCM_CONFIG_USE_RT_SIMD
+#endif	   // CCMATH_HAS_SIMD
