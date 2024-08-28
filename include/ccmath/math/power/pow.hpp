@@ -18,6 +18,7 @@
 
 namespace ccm
 {
+	// TODO: Much of this is going to be removed. New implementation is being worked on elsewhere.
 	namespace internal::impl
 	{
 		template <typename T, std::enable_if_t<std::is_integral_v<T> && std::is_unsigned_v<T>, bool> = true>
