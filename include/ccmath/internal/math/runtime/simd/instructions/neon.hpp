@@ -9,7 +9,7 @@
 #pragma once
 
 #include "ccmath/internal/config/arch/check_simd_support.hpp"
-#include "ccmath/internal/runtime/simd/common.hpp"
+#include "ccmath/internal/math/runtime/simd/common.hpp"
 
 #ifdef CCMATH_HAS_SIMD
 	#ifdef CCMATH_HAS_SIMD_NEON
@@ -193,4 +193,4 @@ namespace ccm::intrin
 	}
 } // namespace ccm::intrin
 	#endif // CCMATH_HAS_SIMD_NEON
-#endif	   // CCM_CONFIG_USE_RT_SIMD
+#endif	   // CCMATH_HAS_SIMD

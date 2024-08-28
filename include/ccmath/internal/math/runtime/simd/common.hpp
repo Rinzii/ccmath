@@ -12,7 +12,6 @@
 #include "ccmath/internal/predef/attributes/gpu_host_device.hpp"
 
 #include <array>
-#include <cstdint>
 
 namespace ccm::intrin
 {
