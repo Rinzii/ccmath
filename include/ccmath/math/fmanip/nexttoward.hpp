@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "ccmath/internal/generic/functions/fmanip/nextafter_gen.hpp"
+#include "ccmath/internal/math/generic/func/fmanip/nextafter_gen.hpp"
 
 #include <type_traits>
 

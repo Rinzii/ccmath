@@ -20,7 +20,7 @@ cppcoreguidelines-*,
 -cppcoreguidelines-avoid-magic-numbers,
 -cppcoreguidelines-macro-usage,
 -cppcoreguidelines-non-private-member-variables-in-classes,
--cppcoreguidelines-special-member-functions,
+-cppcoreguidelines-special-member-func,
 
 cert-dcl21-cpp,
 cert-dcl58-cpp,

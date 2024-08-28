@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "ccmath/internal/helpers/exp_helpers.hpp"
+#include "ccmath/internal/support/helpers/exp_helpers.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fp/bit_mask_traits.hpp"
 #include "ccmath/internal/types/fp_types.hpp"

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "ccmath/internal/helpers/exp_helpers.hpp"
+#include "ccmath/internal/support/helpers/exp_helpers.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
 #include "ccmath/math/exponential/impl/exp_data.hpp"
@@ -66,7 +66,7 @@ namespace ccm::internal::impl
 		 * ideally ties-to-even rule is used, otherwise the magnitude of r
 		 * can be bigger which gives larger approximation error.
 		 */
-		expo	   = helpers::narrow_eval(scaled_input + exp_shift_flt); // Must be double
+		expo	   = support::helpers::narrow_eval(scaled_input + exp_shift_flt); // Must be double
 		expo_int64 = support::double_to_uint64(expo);
 		expo -= exp_shift_flt;
 		rem = scaled_input - expo;
