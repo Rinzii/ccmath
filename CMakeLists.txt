@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-set(CCMATH_BUILD_VERSION 0.1.5)
+set(CCMATH_BUILD_VERSION 0.2.0)
 
 project(ccmath VERSION ${CCMATH_BUILD_VERSION})
 
@@ -80,12 +80,14 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU O
     )
 endif ()
 
-include(ccmath_headers.cmake)
+include(ccmath_internal_headers.cmake)
+include(ccmath_core_headers.cmake)
 
 add_library(${PROJECT_NAME} INTERFACE)
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_headers}>")
+target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_internal_headers}>")
+target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_core_headers}>")
 
 if (CCMATH_ENABLE_EXTENSIONS)
     include(ccmath_extensions_headers.cmake)

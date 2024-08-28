@@ -17,8 +17,8 @@
 
 #include "ccmath/internal/types/float128.hpp"
 
-// TODO: The nan functions are quite brittle and the test cases are extremely forgiving to the functions.
-// 		 At some point we should improve these test cases and the nan functions to handle all edge cases.
+// TODO: The nan func are quite brittle and the test cases are extremely forgiving to the func.
+// 		 At some point we should improve these test cases and the nan func to handle all edge cases.
 
 TEST(CcmathBasicTests, NanStaticAssert)
 {

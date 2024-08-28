@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "ccmath/internal/helpers/digit_to_int.hpp"
+#include "ccmath/internal/support/helpers/digit_to_int.hpp"
 #include "ccmath/internal/support/bits.hpp"
 
 #include <cstdint>
@@ -62,7 +62,7 @@ namespace ccm::internal::impl
 			for (std::size_t i = 0; arg[i] != '\0'; ++i)
 			{
 				flt_bits *= 16;
-				flt_bits += static_cast<std::uint8_t>(ccm::helpers::digit_to_int(arg[i])); // Convert ASCII to numeric value
+				flt_bits += static_cast<std::uint8_t>(ccm::support::helpers::digit_to_int(arg[i])); // Convert ASCII to numeric value
 				if (i >= 7)
 				{
 					flt_bits %= static_cast<std::uint32_t>(1e8); // Wrap around for numbers larger than 8 digits
@@ -75,7 +75,7 @@ namespace ccm::internal::impl
 			for (std::size_t i = 0; arg[i] != '\0'; ++i)
 			{
 				flt_bits *= 10;
-				flt_bits += static_cast<std::uint8_t>(ccm::helpers::digit_to_int(arg[i])); // Convert ASCII to numeric value
+				flt_bits += static_cast<std::uint8_t>(ccm::support::helpers::digit_to_int(arg[i])); // Convert ASCII to numeric value
 				if (i >= 7)
 				{
 					flt_bits %= static_cast<std::uint32_t>(1e8); // Wrap around for numbers larger than 8 digits
