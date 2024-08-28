@@ -244,7 +244,8 @@ namespace ccm::support::fp
 				/**
 				 * @brief Cast operator to convert from BiasedExponent to Exponent.
 				 */
-				explicit constexpr operator Exponent() const { return Exponent(static_cast<std::int32_t>(BASE::value) - exponent_bias); }
+				// NOLINTNEXTLINE(google-explicit-constructor)
+				constexpr operator Exponent() const { return Exponent(static_cast<std::int32_t>(BASE::value) - exponent_bias); }
 
 				constexpr BiasedExponent & operator++()
 				{
@@ -312,7 +313,8 @@ namespace ccm::support::fp
 
 			constexpr FPStorage() : bits(0) {}
 
-			constexpr explicit FPStorage(storage_type value) : bits(value) {}
+			// NOLINTNEXTLINE(google-explicit-constructor)
+			constexpr FPStorage(storage_type value) : bits(value) {}
 
 			/// Observer Functions
 
@@ -345,7 +347,7 @@ namespace ccm::support::fp
 		};
 
 		/**
-		 * @brief This layer defines all functions related to the encoding of the floating point type.
+		 * @brief This layer defines all func related to the encoding of the floating point type.
 		 *
 		 * It facilitates the construction, modification, and observation of values manipulated as 'storage_type'.
 		 */
@@ -593,7 +595,7 @@ namespace ccm::support::fp
 		 *
 		 * Specific float semantics are implemented by 'FPRepSem' above and specialized as needed.
 		 *
-		 * The 'RetT' type is propagated to 'FPRepSem' to ensure that functions creating new values (Builders) return the appropriate type.
+		 * The 'RetT' type is propagated to 'FPRepSem' to ensure that func creating new values (Builders) return the appropriate type.
 		 * For example, when creating a value through 'FPBits', the builder returns an 'FPBits' value.
 		 * Example: FPBits<float>::zero(); // returns an FPBits<>
 		 *
@@ -828,9 +830,9 @@ namespace ccm::support::fp
 		template <typename XType>
 		constexpr explicit FPBits(XType x)
 		{
-			using Unqual = std::remove_cv_t<XType>;
-			if constexpr (std::is_same_v<Unqual, T>) { BASE::bits = support::bit_cast<storage_type>(x); }
-			else if constexpr (std::is_same_v<Unqual, storage_type>) { BASE::bits = x; }
+			using UnQual = std::remove_cv_t<XType>;
+			if constexpr (std::is_same_v<UnQual, T>) { BASE::bits = support::bit_cast<storage_type>(x); }
+			else if constexpr (std::is_same_v<UnQual, storage_type>) { BASE::bits = x; }
 			else
 			{
 				// Prevent accidental type promotion or conversion form being able to happen. Exact types only.

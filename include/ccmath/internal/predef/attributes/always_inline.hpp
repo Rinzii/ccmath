@@ -9,7 +9,7 @@
 #pragma once
 
 // This macro is used to force inlining of a function.
-// Should only be used for runtime functions and not used with compile time functions.
+// Should only be used for runtime func and not used with compile time func.
 // If you want inlining for a compile time function, use the inline keyword.
 #ifndef CCM_ALWAYS_INLINE
 	#if defined(CCM_CONFIG_NO_FORCED_INLINE)

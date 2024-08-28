@@ -109,7 +109,7 @@ namespace ccm::support::fp
 		}
 	}
 
-	// Helper functions to set results for exceptional cases.
+	// Helper func to set results for exceptional cases.
 	template <typename T> constexpr T round_result_slightly_down(T value_rn) {
 		volatile T tmp = value_rn;
 		tmp -= FPBits<T>::min_normal().get_val();

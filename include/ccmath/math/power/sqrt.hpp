@@ -10,8 +10,8 @@
 
 // If we don't have constexpr sqrt builtins, include the generic and runtime implementations.
 #if !(defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__))
-	#include "ccmath/internal/generic/functions/power/sqrt_gen.hpp"
-	#include "ccmath/internal/runtime/functions/power/sqrt_rt.hpp"
+	#include "ccmath/internal/math/generic/func/power/sqrt_gen.hpp"
+	#include "ccmath/internal/math/runtime/func/power/sqrt_rt.hpp"
 	#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #endif
 

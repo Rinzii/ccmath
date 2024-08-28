@@ -10,8 +10,8 @@
 
 #include "ccmath/internal/config/builtin/bit_cast_support.hpp"
 #include "ccmath/internal/config/builtin/ldexp_support.hpp"
+#include "ccmath/internal/helpers/internal_ldexp.hpp"
 #include "ccmath/internal/predef/has_const_builtin.hpp"
-#include "ccmath/internal/support/helpers/internal_ldexp.hpp"
 
 /* TODO: Move, remove, or change this to not use bit_cast.
 	#include "ccmath/internal/support/bits.hpp"
@@ -42,7 +42,7 @@ namespace ccm
 		if constexpr (std::is_same_v<T, long double>) { return __builtin_ldexpl(num, exp); }
 		return static_cast<T>(__builtin_ldexpl(num, exp));
 #else
-		return support::helpers::internal_ldexp(num, exp);
+		return helpers::internal_ldexp(num, exp);
 		/* TODO: Move, remove, or change this to not use bit_cast.
 		// Fallback option. Does not give perfect results, but generally good enough.
 		int old_exp = static_cast<int>(support::get_exponent_of_floating_point<T>(num));
