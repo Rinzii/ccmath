@@ -55,10 +55,10 @@ namespace ccm::rt
 		else { return static_cast<T>(__builtin_sqrtl(static_cast<long double>(num))); }
 #elif defined(CCMATH_HAS_SIMD)
 		// In the unlikely event, the rounding mode is not the default, use the runtime implementation instead.
-		if (CCM_UNLIKELY(ccm::support::fenv::get_rounding_mode() != FE_TONEAREST)) { return ccm::ct::sqrt_ct<T>(num); }
+		if (CCM_UNLIKELY(ccm::support::fenv::get_rounding_mode() != FE_TONEAREST)) { return gen::sqrt_gen<T>(num); }
 	#if !defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64) // If long double is different from double, use the generic implementation instead.
 		if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>) { return simd_impl::sqrt_simd_impl(num); }
-		else { return ccm::ct::sqrt_ct<T>(num); }
+		else { return gen::sqrt_gen<T>(num); }
 	#else										   // If long double is the same as double we can use the SIMD implementation instead.
 		if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>) { return simd_impl::sqrt_simd_impl(num); }
 		else if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(simd_impl::sqrt_simd_impl(static_cast<double>(num))); }
