@@ -8,9 +8,12 @@
 
 #pragma once
 
-#include "ccmath/internal/version.hpp"
+#include <cstdint>
 
-namespace ccm
+namespace ccm::config
 {
-	constexpr version_v = Version{@PROJECT_VERSION_MAJOR@, @PROJECT_VERSION_MINOR@, @PROJECT_VERSION_PATCH@};
-}
+    constexpr std::uint32_t CCMATH_VERSION_MAJOR = @PROJECT_VERSION_MAJOR@U;
+    constexpr std::uint32_t CCMATH_VERSION_MINOR = @PROJECT_VERSION_MINOR@U;
+    constexpr std::uint32_t CCMATH_VERSION_PATCH = @PROJECT_VERSION_PATCH@U;
+    constexpr std::uint32_t CCMATH_VERSION = ((@PROJECT_VERSION_MAJOR@U << 22U) | (@PROJECT_VERSION_MINOR@U << 12U) | (@PROJECT_VERSION_PATCH@U));
+} // namespace ccm::config

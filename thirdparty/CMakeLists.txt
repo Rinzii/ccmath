@@ -36,13 +36,16 @@ if (CCMATH_BUILD_TESTS)
   set(gtest_build_samples OFF CACHE BOOL "" FORCE)
   set(gtest_build_tests OFF CACHE BOOL "" FORCE)
 
-
-  FetchContent_Declare(
-          googletest
-          GIT_REPOSITORY https://github.com/google/googletest.git
-          GIT_TAG v1.14.0
-  )
+  if(CCMATH_FIND_GTEST_PACKAGE)
+    find_package(GTest REQUIRED)
+  else()
+    FetchContent_Declare(
+            googletest
+            GIT_REPOSITORY https://github.com/google/googletest.git
+            GIT_TAG v1.14.0
+    )
   FetchContent_MakeAvailable(googletest)
+  endif ()
 
   add_library(gtest::gtest ALIAS gtest)
 endif()
