@@ -4,6 +4,31 @@ cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
 project(ccmath-benchmark)
 
+if(CCMATH_FIND_GTEST_PACKAGE)
+  find_package(benchmark REQUIRED)
+else()
+
+  # Intel does implement the regex library but google test is unable to detect this.
+  # Lets help them out and set the var ourselves.
+  if(CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
+    set(HAVE_STD_REGEX ON CACHE BOOL "" FORCE)
+  endif ()
+  set(BENCHMARK_ENABLE_TESTING NO)
+  FetchContent_Declare(
+          benchmark
+          GIT_REPOSITORY https://github.com/google/benchmark.git
+          GIT_TAG v1.8.3
+          GIT_SHALLOW 1
+  )
+
+  FetchContent_GetProperties(benchmark)
+
+  if(NOT benchmark_POPULATED)
+    FetchContent_Populate(benchmark)
+    add_subdirectory(${benchmark_SOURCE_DIR} ${benchmark_BINARY_DIR})
+  endif()
+endif()
+
 option(CCM_BENCH_BASIC "Enable basic benchmarks" OFF)
 option(CCM_BENCH_COMPARE "Enable comparison benchmarks" OFF)
 option(CCM_BENCH_POWER "Enable power benchmarks" ON)

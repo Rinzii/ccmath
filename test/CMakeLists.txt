@@ -1,17 +1,59 @@
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
+# TODO: Major rewrite of how the testing suite cmake script is handled needs to be done.
+# Currently approach is fragile and not very robust.
+
 project(ccmath-test)
+
+include(FetchContent)
+include(CheckCXXSourceCompiles)
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
 
 if (NOT TARGET ccmath)
     find_package(ccmath CONFIG REQUIRED)
 endif ()
+
+if(CCMATH_FIND_GTEST_PACKAGE)
+    find_package(GTest REQUIRED)
+else()
+    FetchContent_Declare(
+            googletest
+            GIT_REPOSITORY https://github.com/google/googletest.git
+            GIT_TAG main
+            GIT_SHALLOW 1
+    )
+
+    FetchContent_GetProperties(googletest)
+
+    if(NOT googletest_POPULATED)
+        FetchContent_Populate(googletest)
+        set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+        add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
+    endif()
+
+    add_library(GTest::Main ALIAS gtest_main)
+
+    target_compile_features(gtest PUBLIC cxx_std_17)
+    set_target_properties(gtest PROPERTIES CXX_CLANG_TIDY "")
+
+    target_compile_features(gtest_main PUBLIC cxx_std_17)
+    set_target_properties(gtest_main PROPERTIES CXX_CLANG_TIDY "")
+
+    target_compile_features(gmock PUBLIC cxx_std_17)
+    set_target_properties(gmock PROPERTIES CXX_CLANG_TIDY "")
+
+    target_compile_features(gmock_main PUBLIC cxx_std_17)
+    set_target_properties(gmock_main PROPERTIES CXX_CLANG_TIDY "")
+endif()
 
 
 add_library(${PROJECT_NAME} STATIC)
 add_library(ccmath::test ALIAS ${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME} PUBLIC
         ccmath::ccmath
-        gtest::gtest
+        GTest::Main
 )
 target_include_directories(${PROJECT_NAME} PUBLIC .)
 target_sources(${PROJECT_NAME} PRIVATE
@@ -33,7 +75,7 @@ target_sources(${PROJECT_NAME}-basic PRIVATE
 )
 target_link_libraries(${PROJECT_NAME}-basic PRIVATE
         ccmath::test
-        gtest::gtest
+        GTest::Main
 )
 
 add_executable(${PROJECT_NAME}-compare)
@@ -54,7 +96,7 @@ target_sources(${PROJECT_NAME}-compare PRIVATE
 )
 target_link_libraries(${PROJECT_NAME}-compare PRIVATE
         ccmath::test
-        gtest::gtest
+        GTest::Main
 )
 
 add_executable(${PROJECT_NAME}-exponential)
@@ -71,7 +113,7 @@ target_sources(${PROJECT_NAME}-exponential PRIVATE
 )
 target_link_libraries(${PROJECT_NAME}-exponential PRIVATE
         ccmath::test
-        gtest::gtest
+        GTest::Main
 )
 
 add_executable(${PROJECT_NAME}-fmanip)
@@ -88,7 +130,7 @@ target_sources(${PROJECT_NAME}-fmanip PRIVATE
 )
 target_link_libraries(${PROJECT_NAME}-fmanip PRIVATE
         ccmath::test
-        gtest::gtest
+        GTest::Main
 )
 
 add_executable(${PROJECT_NAME}-nearest)
@@ -100,7 +142,7 @@ target_sources(${PROJECT_NAME}-nearest PRIVATE
 )
 target_link_libraries(${PROJECT_NAME}-nearest PRIVATE
         ccmath::test
-        gtest::gtest
+        GTest::Main
 )
 
 add_executable(${PROJECT_NAME}-power)
@@ -110,7 +152,7 @@ target_sources(${PROJECT_NAME}-power PRIVATE
 )
 target_link_libraries(${PROJECT_NAME}-power PRIVATE
         ccmath::test
-        gtest::gtest
+        GTest::Main
 )
 
 add_executable(${PROJECT_NAME}-misc)
@@ -129,7 +171,7 @@ endif ()
 
 target_link_libraries(${PROJECT_NAME}-misc PRIVATE
         ccmath::test
-        gtest::gtest
+        GTest::Main
 )
 
 
@@ -141,7 +183,7 @@ target_sources(${PROJECT_NAME}-internal-types PRIVATE
 )
 target_link_libraries(${PROJECT_NAME}-internal-types PRIVATE
         ccmath::test
-        gtest::gtest
+        GTest::Main
 )
 
 
