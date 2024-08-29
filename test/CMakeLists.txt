@@ -204,18 +204,6 @@ if (CCMATH_OS_WINDOWS)
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 endif ()
 
-# Only supported compilers currently are MSVC, GNU and Clang
-if (CMAKE_CXX_COMPILER_ID STREQUAL MSVC)
-    target_compile_options(${PROJECT_NAME} PUBLIC
-            /W4 /WX
-    )
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL GNU OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-    target_compile_options(${PROJECT_NAME} PUBLIC
-            -Wall -Wextra -Wno-pedantic -Wno-unused-function
-    )
-endif ()
-
-
 add_test(NAME ${PROJECT_NAME}-basic COMMAND ${PROJECT_NAME}-basic)
 add_test(NAME ${PROJECT_NAME}-compare COMMAND ${PROJECT_NAME}-compare)
 add_test(NAME ${PROJECT_NAME}-exponential COMMAND ${PROJECT_NAME}-exponential)
