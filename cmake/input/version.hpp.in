@@ -1,0 +1,23 @@
+/*
+ * Copyright (c) 2024-Present Ian Pike
+ * Copyright (c) 2024-Present ccmath contributors
+ *
+ * This library is provided under the MIT License.
+ * See LICENSE for more information.
+ */
+
+#pragma once
+
+#include <cstdint>
+
+namespace ccm::config
+{
+    constexpr std::uint32_t CCMATH_VERSION_MAJOR = @PROJECT_VERSION_MAJOR@;
+    constexpr std::uint32_t CCMATH_VERSION_MINOR = @PROJECT_VERSION_MINOR@;
+    constexpr std::uint32_t CCMATH_VERSION_PATCH = @PROJECT_VERSION_PATCH@;
+    constexpr std::uint32_t CCMATH_VERSION = (
+    (static_cast<std::uint32_t>(0) << 29U) |
+    (static_cast<std::uint32_t>(@PROJECT_VERSION_MAJOR@) << 22U) |
+    (static_cast<std::uint32_t>(@PROJECT_VERSION_MINOR@) << 12U) |
+    static_cast<std::uint32_t>(@PROJECT_VERSION_PATCH@));
+}
