@@ -11,6 +11,8 @@
 #include <cmath>
 #include <limits>
 
+// NOLINTBEGIN
+
 namespace
 {
 
@@ -247,3 +249,5 @@ TEST(CcmathBasicTests, CcmAbsCanBeEvaluatedAtCompileTime)
 	// Assert
 	static_assert(abs == 1, "abs has failed testing that it is static_assert-able!");
 }
+
+// NOLINTEND
