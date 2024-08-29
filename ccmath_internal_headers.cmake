@@ -487,5 +487,4 @@ set(ccmath_internal_headers
         ${ccmath_internal_types_headers}
 
         ${CCMATH_SOURCE_DIR}/include/ccmath/internal/setup.hpp
-        ${CCMATH_SOURCE_DIR}/include/ccmath/internal/version.hpp
 )
