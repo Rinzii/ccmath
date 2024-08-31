@@ -3,7 +3,7 @@
 [![image](https://api.securityscorecards.dev/projects/github.com/Rinzii/ccmath/badge)](https://securityscorecards.dev/viewer/?uri=github.com/Rinzii/ccmath)
 
 
-CCMath is a C++17 library that provides a re-implementation of the standard `<cmath>` library with all features made `constexpr`.
+**CCMath** is a C++17 library that provides a re-implementation of the standard `<cmath>` library with all features made `constexpr`.
 This enables compile-time evaluation of mathematical functions,
 improving performance and allows for more efficient code in scenarios where constant expressions are required.
 
@@ -31,6 +31,9 @@ Here's a basic example:
 ```cpp
 
 #include <ccmath/ccmath.hpp> // Monolithic header file that includes all functions. Similar to including <cmath>
+// #include <ccmath/power/sqrt.hpp> // You can also directly include the functions you require without bringing in extra functions!
+
+
 #include <iostream> // For std::cout
 
 int main() {
@@ -57,6 +60,8 @@ FetchContent_MakeAvailable(ccmath)
 
 target_link_libraries(main PRIVATE ccmath::ccmath)
 ```
+
+CCMath is also designed with functions being freestanding and header only so you can also just drop the headers directly into your project!
 
 ## Compiler Support
 * GCC 11.1+
@@ -88,7 +93,7 @@ CCmath is an open-source project, and it needs your help to go on growing and im
 | Misc Functions           | 30     |              |        |                            |
 | Total Library Completion | 37     |              |        |                            |
 
-> Last Updated: May 11, 2024
+> Last Updated: Aug 31, 2024
 
 ## Implementation Progress (Functions)
 
@@ -177,21 +182,21 @@ CCmath is an open-source project, and it needs your help to go on growing and im
 | lerp           | 90     | Nearly finished, just need to test the function further and validate full compliance.                       |
 | lgamma         | 0      | Implement function                                                                                          |
 
-> Last Updated: Jun 14, 2024
+> Last Updated: Aug 31, 2024
 
 ## Projects using CCMath!
 
-- [KittyOS](https://github.com/aomine001/kitty-os-cpp) - The kitty os but rewritten in C++ and better!
+- [KittyOS](https://github.com/kitty-os/kitty-os/) - KittyOS is meant to be a silly non-unix operating system for cat lovers and cats themselves.
 
 _(Are you using CCMath in your project? Let us know!)_
 
 ## License
 
-CCMath is distributed under the MIT License. See the LICENSE file for more information.
+CCMath is distributed under the Apache-2.0 WITH LLVM-exception. See the LICENSE file for more information.
 
 
 ## Special Thanks
 
 Thanks a lot to LLVM, GCC,
 and LibM for a lot of insights and inspiration for many different tough issues
-encountered throughout the development of ccmath!
+encountered throughout the development of CCMath!
