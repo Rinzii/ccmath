@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "ccmath/internal/helpers/exp_helpers.hpp"
+#include "ccmath/internal/support/helpers/exp_helpers.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
 #include "ccmath/math/exponential/impl/exp_data.hpp"
@@ -57,7 +57,7 @@ namespace ccm::internal::impl
 			lo	   = scale - result + scale * tmp;
 			hi	   = 1.0 + result;
 			lo	   = 1.0 - hi + result + lo;
-			result = helpers::narrow_eval(hi + lo) - 1.0;
+			result = support::helpers::narrow_eval(hi + lo) - 1.0;
 			// Prevent -0.0 with downward rounding.
 			if (result == 0.0) { result = 0.0; }
 		}
@@ -111,7 +111,7 @@ namespace ccm::internal::impl
 		scaled_input = exp_invLn2N_dbl * x;
 
 		// scaled_input - expo is in [-1, 1] in non-nearest rounding modes.
-		expo	   = helpers::narrow_eval(scaled_input + exp_shift_dbl);
+		expo	   = support::helpers::narrow_eval(scaled_input + exp_shift_dbl);
 		expo_int64 = support::double_to_uint64(expo);
 		expo -= exp_shift_dbl;
 

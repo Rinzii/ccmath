@@ -35,7 +35,7 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Copies the sign of a integer value.
+	 * @brief Copies the sign of an integer value.
 	 * @tparam Integer Type of the integer value.
 	 * @param mag A integer value
 	 * @param sgn A integer value
