@@ -8,10 +8,10 @@
 
 #include <gtest/gtest.h>
 
-#include "ccmath/ccmath.hpp"
-#include "ccmath/numbers.hpp"
 #include <cmath>
 #include <limits>
+#include "../../include/ccmath/math/numbers.hpp"
+#include "ccmath/ccmath.hpp"
 
 TEST(CcmathExponentialTests, Exp)
 {

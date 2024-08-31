@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "ccmath/internal/helpers/digit_to_int.hpp"
+#include "ccmath/internal/support/helpers/digit_to_int.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/types/int128_types.hpp"
 
@@ -78,7 +78,7 @@ namespace ccm::internal::impl
 			for (std::size_t i = 0; arg[i] != '\0'; ++i)
 			{
 				dbl_bits *= 16;
-				dbl_bits += static_cast<std::uint8_t>(ccm::helpers::digit_to_int(arg[i])); // Convert ASCII to numeric value
+				dbl_bits += static_cast<std::uint8_t>(ccm::support::helpers::digit_to_int(arg[i])); // Convert ASCII to numeric value
 				if (i >= 15)
 				{
 					dbl_bits %= static_cast<ccm::types::uint128_t>(1e18); // Wrap around for numbers larger than 8 digits

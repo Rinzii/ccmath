@@ -1,19 +1,19 @@
 
 
 set(ccmath_extensions_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/align.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/clamp.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/cubic.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/degrees.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/fract.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/is_power_of_two.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/lerp_smooth.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/mix.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/normalize.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/ping_pong.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/radians.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/rcp.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/extensions/smoothstep.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/ext/align.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/ext/clamp.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/ext/cubic.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/ext/degrees.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/ext/fract.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/ext/is_power_of_two.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/ext/lerp_smooth.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/ext/mix.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/ext/normalize.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/ext/ping_pong.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/ext/radians.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/ext/rcp.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/ext/smoothstep.hpp
 
 
 )

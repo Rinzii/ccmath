@@ -8,8 +8,7 @@
 
 #pragma once
 
-#include "ccmath/math/compare/isinf.hpp"
-#include "ccmath/math/compare/isnan.hpp"
+#include "ccmath/internal/support/fp/fp_bits.hpp"
 
 namespace ccm
 {
@@ -22,7 +21,9 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr bool isfinite(T num)
 	{
-		return (!ccm::isnan(num)) && (!ccm::isinf(num));
+		using FPBits_t = typename ccm::support::fp::FPBits<T>;
+		const FPBits_t num_bits(num);
+		return num_bits.is_finite();
 	}
 
 	/**

@@ -8,34 +8,34 @@
 
 #pragma once
 
-/// Basic math functions
-#include "ccmath/basic.hpp"
+/// Basic math func
+#include "math/basic.hpp"
 
-/// Comparison functions
-#include "ccmath/compare.hpp"
+/// Comparison func
+#include "math/compare.hpp"
 
-/// Exponential functions
-#include "ccmath/exponential.hpp"
+/// Exponential func
+#include "math/exponential.hpp"
 
-/// Float manipulation functions
-#include "ccmath/fmanip.hpp"
+/// Float manipulation func
+#include "math/fmanip.hpp"
 
-/// Hyperbolic functions
-#include "ccmath/hyperbolic.hpp"
+/// Hyperbolic func
+#include "math/hyperbolic.hpp"
 
-/// Nearest functions
-#include "ccmath/nearest.hpp"
+/// Nearest func
+#include "math/nearest.hpp"
 
-/// Power functions
-#include "ccmath/power.hpp"
+/// Power func
+#include "math/power.hpp"
 
-/// Special functions
-#include "ccmath/special.hpp"
+/// Special func
+#include "math/special.hpp"
 
-/// Trigonometric functions
-#include "ccmath/trig.hpp"
+/// Trigonometric func
+#include "math/trig.hpp"
 
-/// Uncategorized functions
-#include "ccmath/math/gamma.hpp"
-#include "ccmath/math/lerp.hpp"
-#include "ccmath/math/lgamma.hpp"
+/// Uncategorized func
+#include "ccmath/math/misc/gamma.hpp"
+#include "ccmath/math/misc/lerp.hpp"
+#include "ccmath/math/misc/lgamma.hpp"

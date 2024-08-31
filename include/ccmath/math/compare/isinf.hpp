@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "ccmath/internal/support/fp/fp_bits.hpp"
+
 #include <limits>
 #include <type_traits>
 
@@ -22,8 +24,13 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr bool isinf(T num) noexcept
 	{
-		if constexpr (std::numeric_limits<T>::is_signed) { return num == -std::numeric_limits<T>::infinity() || num == std::numeric_limits<T>::infinity(); }
-		else { return num == std::numeric_limits<T>::infinity(); }
+#if defined(__GNUC__) || defined(__clang__)
+		return __builtin_isinf(num); // GCC and Clang implement this as constexpr
+#else							   // If we can't use the builtin, fallback to this comparison and hope for the best.
+		using FPBits_t = typename ccm::support::fp::FPBits<T>;
+		const FPBits_t num_bits(num);
+		return num_bits.is_inf();
+#endif
 	}
 
 	/**
