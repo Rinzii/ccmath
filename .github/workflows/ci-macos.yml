@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Cache CMake build files
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: build
           key: ${{ runner.os }}-cmake-${{ matrix.compiler }}-${{ matrix.cxx_version }}-${{ matrix.target }}
@@ -61,7 +61,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Cache CMake build files
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: build
           key: ${{ runner.os }}-cmake-${{ matrix.compiler }}-${{ matrix.cxx_version }}-${{ matrix.target }}
