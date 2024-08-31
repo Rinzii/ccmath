@@ -134,7 +134,7 @@ if (CCMATH_DISABLE_ERRNO)
     target_compile_definitions(${PROJECT_NAME} INTERFACE CCM_CONFIG_DISABLE_ERRNO)
 endif ()
 
-configure_file(cmake/version.hpp.in "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/version.hpp" @ONLY)
+configure_file(cmake/version.hpp.in "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp" @ONLY)
 
 if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TESTS)
     add_subdirectory(thirdparty)
@@ -172,7 +172,7 @@ if (CCMATH_INSTALL)
     )
 
     install(FILES
-            "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/version.hpp"
+            "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp"
             DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}"
     )
 

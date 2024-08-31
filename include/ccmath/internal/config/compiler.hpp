@@ -1,12 +1,14 @@
 /*
- * Copyright (c) 2024-Present Ian Pike
- * Copyright (c) 2024-Present ccmath contributors
+ * Copyright (c) Ian Pike
+ * Copyright (c) CCMath contributors
  *
- * This library is provided under the MIT License.
+ * CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
  * See LICENSE for more information.
+ *
+ * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-/**
+/*
  * Currently supported compilers:
  * - MSVC
  * - Clang-CL
