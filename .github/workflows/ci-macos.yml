@@ -1,0 +1,70 @@
+name: ci-macos
+on:
+  push:
+    tags-ignore:
+      - v*.*
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-14
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [ninja-clang, ninja-gcc]
+        cxx_version: [17, 20]
+        target: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache CMake build files
+        uses: actions/cache@v3
+        with:
+          path: build
+          key: ${{ runner.os }}-cmake-${{ matrix.compiler }}-${{ matrix.cxx_version }}-${{ matrix.target }}
+          restore-keys: |
+            ${{ runner.os }}-cmake-${{ matrix.compiler }}-${{ matrix.cxx_version }}-
+            ${{ runner.os }}-cmake-${{ matrix.compiler }}-
+
+      - name: install homebrew formulae
+        run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+      - name: install ninja
+        run: brew install ninja
+
+      - name: update AppleClang to 14.0.3
+        run: sudo xcode-select -s /Applications/Xcode_14.3.app/Contents/Developer
+
+      - name: configure
+        run: cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
+
+      - name: build
+        run: cmake --build build --config=${{matrix.target}}
+
+  test:
+    runs-on: macos-14
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [ninja-clang, ninja-gcc]
+        cxx_version: [17, 20]
+        target: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache CMake build files
+        uses: actions/cache@v3
+        with:
+          path: build
+          key: ${{ runner.os }}-cmake-${{ matrix.compiler }}-${{ matrix.cxx_version }}-${{ matrix.target }}
+
+      - name: test
+        run: cd build && ctest -C ${{matrix.target}} --output-on-failure
