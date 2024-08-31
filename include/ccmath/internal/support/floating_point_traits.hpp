@@ -206,8 +206,8 @@ struct floating_point_traits<long double>
 	inline constexpr typename floating_point_traits<T>::uint_type sign_mask_v = floating_point_traits<T>::shifted_sign_mask;
 
 
-	// TODO: Possible remove these functions from floating_point_traits as they are more so there own things and not really traits.
-	// All functions below that use bit_cast have to use the __builtin_bit_cast as bit_cast itself includes floating_point_traits.hpp
+	// TODO: Possible remove these func from floating_point_traits as they are more so there own things and not really traits.
+	// All func below that use bit_cast have to use the __builtin_bit_cast as bit_cast itself includes floating_point_traits.hpp
 
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 	[[nodiscard]] constexpr T floating_point_abs_bits(const T & x) noexcept

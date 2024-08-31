@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include "ccmath/internal/config/arch/check_arch_support.hpp"
 #include "ccmath/internal/config/type_support.hpp"
+// ReSharper disable once CppUnusedIncludeDirective
+#include "ccmath/internal/math/runtime/simd/simd_vectorize.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
-#include "ccmath/internal/runtime/simd/simd_vectorize.hpp"
 #include "ccmath/internal/support/ctz.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
@@ -27,9 +27,10 @@
 namespace ccm::support
 {
 	template <typename To, typename From>
-	constexpr std::enable_if_t<
+	[[nodiscard]] constexpr std::enable_if_t<
 		sizeof(To) == sizeof(From) && std::is_trivially_constructible_v<To> && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From>, To>
-	bit_cast(const From & from)
+	// ReSharper disable once CppDFAUnreachableFunctionCall
+	bit_cast(const From & from) noexcept
 	{
 		return __builtin_bit_cast(To, from);
 	}
@@ -41,7 +42,7 @@ namespace ccm::support
 		return x && !(x & (x - 1));
 	}
 
-	// TODO: Have the below function replace all other top_bits functions.
+	// TODO: Have the below function replace all other top_bits func.
 
 	template <typename T, std::size_t TopBitsToTake, std::enable_if_t<std::is_floating_point_v<T> && !std::is_same_v<T, long double>, bool> = true>
 	constexpr std::uint32_t top_bits(T x) noexcept
@@ -51,10 +52,7 @@ namespace ccm::support
 		{
 			return static_cast<std::uint32_t>(bit_cast<std::uint64_t>(x) >> (std::numeric_limits<std::uint64_t>::digits - TopBitsToTake));
 		}
-		else
-		{
-			return bit_cast<std::uint32_t>(x) >> (std::numeric_limits<std::uint32_t>::digits - TopBitsToTake);
-		}
+		else { return bit_cast<std::uint32_t>(x) >> (std::numeric_limits<std::uint32_t>::digits - TopBitsToTake); }
 	}
 
 	/**
@@ -128,7 +126,7 @@ namespace ccm::support
 		// Allow for the use of compiler intrinsics if we are not being evaluated at compile time in msvc.
 		if (!is_constant_evaluated())
 		{
-			// These functions are not constexpr in msvc.
+			// These func are not constexpr in msvc.
 			if constexpr (std::is_same_v<T, unsigned int>) { return _rotr(t, cnt); }
 			else if constexpr (std::is_same_v<T, std::uint64_t>) { return _rotr64(t, cnt); }
 		}
@@ -158,7 +156,7 @@ namespace ccm::support
 		// Allow for the use of compiler intrinsics if we are not being evaluated at compile time in msvc.
 		if (!is_constant_evaluated())
 		{
-			// These functions are not constexpr in msvc.
+			// These func are not constexpr in msvc.
 			if constexpr (std::is_same_v<T, unsigned int>) { return _rotl(t, cnt); }
 			else if constexpr (std::is_same_v<T, std::uint64_t>) { return _rotl64(t, cnt); }
 		}
@@ -185,7 +183,7 @@ namespace ccm::support
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<ccm::support::traits::ccm_is_unsigned_v<T>, int> countr_zero(T value)
 	{
-		return __builtin_ctzg(value, std::numeric_limits<T>::digits);
+		return __builtin_ctzg(value, std::numeric_limits<T>::digits); // NOLINT
 	}
 #else  // !CCM_HAS_BUILTIN(__builtin_ctzg)
 	/**
@@ -232,7 +230,7 @@ namespace ccm::support
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countl_zero(T value)
 	{
-		return __builtin_clzg(value, std::numeric_limits<T>::digits);
+		return __builtin_clzg(value, std::numeric_limits<T>::digits); // NOLINT
 	}
 #else  // !CCM_HAS_BUILTIN(__builtin_clzg)
 	template <typename T>
@@ -300,7 +298,7 @@ namespace ccm::support
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> popcount(T value)
 	{
-		return __builtin_popcountg(value);
+		return __builtin_popcountg(value); // NOLINT
 	}
 #else  // !CCM_HAS_BUILTIN(__builtin_popcountg)
 	template <typename T>
