@@ -2,21 +2,34 @@ cmake_minimum_required(VERSION 3.18)
 
 set(CCMATH_BUILD_VERSION 0.2.0)
 
-project(ccmath VERSION ${CCMATH_BUILD_VERSION})
+project(
+        ccmath
+        VERSION ${CCMATH_BUILD_VERSION}
+        DESCRIPTION "A C++17 Compile Time <cmath> Library"
+        HOMEPAGE_URL "https://github.com/Rinzii/ccmath"
+        LANGUAGES CXX
+)
 
 set(is_root_project OFF) # Identifies if this is the root project
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     set(is_root_project ON)
+endif ()
+if(NOT CCMATH_SOURCE_DIR)
+    set(CCMATH_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 endif ()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+message(STATUS "CCMath version: ${PROJECT_VERSION}")
+
 # TO THE IMPLEMENTOR: If CCMATH_BUILD_TESTS is set to OFF then googletest can be deleted from the ext folder.
 option(CCMATH_BUILD_TESTS "Build ccmath tests" ${is_root_project})
+option(CCMATH_FIND_GTEST_PACKAGE "Enable finding of gtest package" OFF)
 option(CCMATH_BUILD_EXAMPLES "Build ccmath examples" ${is_root_project})
 option(CCMATH_BUILD_BENCHMARKS "Build ccmath benchmarks" ${is_root_project})
+option(CCMATH_FIND_GBENCH_PACKAGE "Enable finding of google benchmark package" OFF)
 option(CCMATH_INSTALL "Setup install and package steps" ${is_root_project})
 option(CCMATH_ENABLE_EXTENSIONS "Enable the extended ccmath library that adds helpful additional methods that are not defined by the standard" ${is_root_project})
 option(CCMATH_ENABLE_RUNTIME_SIMD "Enable SIMD optimization for runtime evaluation (does not effect compile time)" ON)
@@ -33,7 +46,7 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME}-compile-options ALIAS ${PROJECT_NAM
 ##### ccmath specified compiler options
 
 # Generic clang/gcc compiler options
-if (CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU OR CMAKE_CXX_COMPILER_ID STREQUAL IntelLLVM)
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU|IntelLLVM")
     target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
             -Wall
             -Wextra
@@ -121,7 +134,7 @@ if (CCMATH_DISABLE_ERRNO)
     target_compile_definitions(${PROJECT_NAME} INTERFACE CCM_CONFIG_DISABLE_ERRNO)
 endif ()
 
-configure_file(cmake/version.hpp.in "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp" @ONLY)
+configure_file(cmake/version.hpp.in "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/version.hpp" @ONLY)
 
 if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TESTS)
     add_subdirectory(thirdparty)
@@ -159,7 +172,7 @@ if (CCMATH_INSTALL)
     )
 
     install(FILES
-            "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp"
+            "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/version.hpp"
             DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}"
     )
 
