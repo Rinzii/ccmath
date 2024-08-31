@@ -83,6 +83,7 @@ target_sources(${PROJECT_NAME}-fmanip PRIVATE
         fmanip/logb_test.cpp
         fmanip/modf_test.cpp
         fmanip/nextafter_test.cpp
+        fmanip/nexttoward_test.cpp
         fmanip/scalbn_test.cpp
 )
 target_link_libraries(${PROJECT_NAME}-fmanip PRIVATE
@@ -92,8 +93,9 @@ target_link_libraries(${PROJECT_NAME}-fmanip PRIVATE
 
 add_executable(${PROJECT_NAME}-nearest)
 target_sources(${PROJECT_NAME}-nearest PRIVATE
-        nearest/trunc_test.cpp
         nearest/floor_test.cpp
+        nearest/nearbyint_test.cpp
+        nearest/trunc_test.cpp
 
 )
 target_link_libraries(${PROJECT_NAME}-nearest PRIVATE

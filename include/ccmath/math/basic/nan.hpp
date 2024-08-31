@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "ccmath/math/basic/impl/nan_ldouble_impl.hpp"
 #include "ccmath/math/basic/impl/nan_double_impl.hpp"
 #include "ccmath/math/basic/impl/nan_float_impl.hpp"
+#include "ccmath/math/basic/impl/nan_ldouble_impl.hpp"
 
 namespace ccm
 {
