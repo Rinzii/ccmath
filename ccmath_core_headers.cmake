@@ -268,6 +268,7 @@ set(ccmath_monolithic_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/numbers.hpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/ccmath.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/version.hpp
 )
 
 

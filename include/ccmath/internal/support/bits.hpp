@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "ccmath/internal/config/arch/check_arch_support.hpp"
 #include "ccmath/internal/config/type_support.hpp"
+// ReSharper disable once CppUnusedIncludeDirective
 #include "ccmath/internal/math/runtime/simd/simd_vectorize.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/ctz.hpp"
@@ -26,30 +26,14 @@
 
 namespace ccm::support
 {
-	/*
-	template <typename To, typename From>
-	[[nodiscard]] constexpr To bit_cast(const From & from) noexcept
-	{
-		return __builtin_bit_cast(To, from);
-	}
-	*/
-
 	template <typename To, typename From>
 	[[nodiscard]] constexpr std::enable_if_t<
 		sizeof(To) == sizeof(From) && std::is_trivially_constructible_v<To> && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From>, To>
+	// ReSharper disable once CppDFAUnreachableFunctionCall
 	bit_cast(const From & from) noexcept
 	{
 		return __builtin_bit_cast(To, from);
 	}
-	/*
-	template <typename To, typename From>
-	constexpr std::enable_if_t<
-		sizeof(To) == sizeof(From) && std::is_trivially_constructible_v<To> && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From>, To>
-	bit_cast(const From & from)
-	{
-		return __builtin_bit_cast(To, from);
-	}
-	*/
 
 	template <class T,
 			  std::enable_if_t<traits::ccm_is_integral_v<T> && traits::ccm_is_unsigned_v<T> && !traits::is_char_v<T> && !std::is_same_v<T, bool>, bool> = true>
@@ -199,7 +183,7 @@ namespace ccm::support
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<ccm::support::traits::ccm_is_unsigned_v<T>, int> countr_zero(T value)
 	{
-		return __builtin_ctzg(value, std::numeric_limits<T>::digits);
+		return __builtin_ctzg(value, std::numeric_limits<T>::digits); // NOLINT
 	}
 #else  // !CCM_HAS_BUILTIN(__builtin_ctzg)
 	/**
@@ -246,7 +230,7 @@ namespace ccm::support
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countl_zero(T value)
 	{
-		return __builtin_clzg(value, std::numeric_limits<T>::digits);
+		return __builtin_clzg(value, std::numeric_limits<T>::digits); // NOLINT
 	}
 #else  // !CCM_HAS_BUILTIN(__builtin_clzg)
 	template <typename T>
@@ -314,7 +298,7 @@ namespace ccm::support
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> popcount(T value)
 	{
-		return __builtin_popcountg(value);
+		return __builtin_popcountg(value); // NOLINT
 	}
 #else  // !CCM_HAS_BUILTIN(__builtin_popcountg)
 	template <typename T>
