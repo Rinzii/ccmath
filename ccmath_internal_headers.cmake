@@ -2,6 +2,10 @@
 # Internal Section
 ##############################################################################
 
+##########################################
+### Config Section
+##########################################
+
 ### Config/Arch/Targets headers
 ##########################################
 set(ccmath_internal_config_arch_targets_headers
@@ -56,7 +60,12 @@ set(ccmath_internal_config_headers
 )
 
 
-#### Math/Generic Modules ####
+##########################################
+### Math Section
+##########################################
+
+### Generic Module
+##########################################
 
 ### Math/Generic/Func/Basic headers
 ##########################################
@@ -75,9 +84,13 @@ set(ccmath_internal_math_generic_func_basic_headers
 ### Math/Generic/Func/Expo headers
 ##########################################
 set(ccmath_internal_math_generic_func_expo_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/expo/exp2_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/expo/exp_gen.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/expo/expm1_gen.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/expo/log1p_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/expo/log2_gen.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/expo/log10_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/expo/log_gen.hpp
 )
 
 
@@ -129,37 +142,39 @@ set(ccmath_internal_math_generic_func_nearest_headers
 ### Math/Generic/Func/Power headers
 ##########################################
 set(ccmath_internal_math_generic_func_power_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/nearest/cbrt_gen.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/nearest/hypot_gen.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/nearest/pow_gen.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/nearest/sqrt_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/power/cbrt_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/power/hypot_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/power/pow_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/power/pow_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/power/powf_impl.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/power/sqrt_gen.hpp
 )
 
 
 ### Math/Generic/Func/Special headers
 ##########################################
 set(ccmath_internal_math_generic_func_special_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/assoc_laguerre.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/assoc_legendre.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/beta.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/comp_ellint_1.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/comp_ellint_2.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/comp_ellint_3.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/cyl_bessel_i.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/cyl_bessel_j.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/cyl_bessel_k.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/cyl_neumann.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/ellint_1.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/ellint_2.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/ellint_3.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/expint.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/hermite.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/laguerre.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/legendre.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/riemann_zeta.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/sph_bessel.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/sph_legendre.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/sph_neumann.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/assoc_laguerre_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/assoc_legendre_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/beta_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/comp_ellint_1_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/comp_ellint_2_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/comp_ellint_3_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/cyl_bessel_i_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/cyl_bessel_j_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/cyl_bessel_k_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/cyl_neumann_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/ellint_1_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/ellint_2_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/ellint_3_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/expint_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/hermite_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/laguerre_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/legendre_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/riemann_zeta_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/sph_bessel_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/sph_legendre_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/generic/func/special/sph_neumann_gen.hpp
 )
 
 
@@ -197,18 +212,17 @@ set(ccmath_internal_math_generic_headers
 )
 
 
+### Math/Runtime/Func/Power headers
+##########################################
+set(ccmath_internal_math_runtime_func_power_headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/func/power/pow_rt.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/func/power/sqrt_rt.hpp
+)
 
-### Math/Runtime/func headers
+### Math/Runtime/Func headers
 ##########################################
 set(ccmath_internal_math_runtime_func_headers
         ${ccmath_internal_math_runtime_func_power_headers}
-)
-
-
-### Math/Runtime headers
-##########################################
-set(ccmath_internal_math_runtime_headers
-        ${ccmath_internal_math_runtime_func_headers}
 )
 
 
@@ -297,6 +311,7 @@ set(ccmath_internal_math_runtime_simd_func_headers
         ${ccmath_internal_math_runtime_simd_func_impl_vector_size_headers}
 
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/func/sqrt.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/func/pow.hpp
 )
 
 
@@ -327,7 +342,8 @@ set(ccmath_internal_math_runtime_simd_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/simd.hpp
 )
 
-
+### Math/Runtime headers
+##########################################
 set(ccmath_internal_math_runtime_headers
         ${ccmath_internal_math_runtime_func_headers}
         ${ccmath_internal_math_runtime_simd_headers}
@@ -480,9 +496,8 @@ set(ccmath_internal_types_headers
 
 set(ccmath_internal_headers
         ${ccmath_internal_config_headers}
-        ${ccmath_internal_generic_headers}
+        ${ccmath_internal_math_headers}
         ${ccmath_internal_predef_headers}
-        ${ccmath_internal_math_runtime_headers}
         ${ccmath_internal_support_headers}
         ${ccmath_internal_types_headers}
 
