@@ -41,7 +41,7 @@ namespace ccm::rt::simd_impl
 	{
 		intrin::simd<T, intrin::abi::native> const base_m(base);
 		intrin::simd<T, intrin::abi::native> const exp_m(exp);
-		intrin::simd<T, intrin::abi::native> const pow_m = intrin::sqrt(base_m, exp_m);
+		intrin::simd<T, intrin::abi::native> const pow_m = intrin::pow(base_m, exp_m);
 		return pow_m.convert();
 	}
 #endif
