@@ -7,6 +7,7 @@
 # Math Section
 ##############################################################################
 
+# TODO: Remove all impls from here into the generic headers.
 
 ### Basic/Impl headers
 ##########################################
@@ -151,13 +152,6 @@ set(ccmath_detail_nearest_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/nearest/round.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/nearest/trunc.hpp
 )
-
-### Power/Impl headers - TODO: Remove this an instead use the generic power headers
-##########################################
-set(ccmath_math_power_impl_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/math/power/impl/pow_impl.hpp
-)
-
 
 
 #######################################

@@ -10,19 +10,23 @@
 
 #pragma once
 
-#include "ccmath/internal/math/generic/func/power/pow_impl.hpp"
-#include "ccmath/internal/math/generic/func/power/powf_impl.hpp"
-
 #include <type_traits>
 
-namespace ccm::gen
+namespace ccm::gen::impl
 {
-	template <typename T>
-	constexpr T pow_gen(T base, T exp) noexcept
+	namespace internal::impl
 	{
-		//if constexpr (std::is
+		template <typename T>
+		constexpr T powf_impl(T base, T exp) noexcept
+		{
+			return 0;
+		}
+	}
 
-		return 0;
+	template <typename T>
+	constexpr T powf_impl(T base, T exp) noexcept
+	{
+		return internal::impl::powf_impl(base, exp);
 	}
 
 } // namespace ccm
