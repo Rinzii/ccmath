@@ -10,14 +10,14 @@
 
 #pragma once
 
-#include "ccmath/internal/math/generic/func/power/sqrt_gen.hpp"
+#include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
 #include "ccmath/internal/math/runtime/simd/simd.hpp"
 
 namespace ccm::intrin
 {
 	template <class T>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, abi::scalar> sqrt(simd<T, abi::scalar> const& a)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, abi::scalar> pow(simd<T, abi::scalar> const& a, simd<T, abi::scalar> const& b)
 	{
-		return simd<T, abi::scalar>(ccm::gen::sqrt_gen(a.get()));
+		return simd<T, abi::scalar>(gen::pow_gen(a.get(), b.get()));
 	}
 } // namespace ccm::intrin

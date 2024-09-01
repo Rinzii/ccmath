@@ -230,6 +230,7 @@ set(ccmath_internal_math_runtime_func_headers
 ##########################################
 set(ccmath_internal_math_runtime_simd_func_impl_avx_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/func/impl/avx/sqrt.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/func/impl/avx/pow.hpp
 )
 
 
@@ -237,6 +238,8 @@ set(ccmath_internal_math_runtime_simd_func_impl_avx_headers
 ##########################################
 set(ccmath_internal_math_runtime_simd_func_impl_avx2_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/func/impl/avx2/sqrt.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/func/impl/avx2/pow.hpp
+
 )
 
 
@@ -244,6 +247,8 @@ set(ccmath_internal_math_runtime_simd_func_impl_avx2_headers
 ##########################################
 set(ccmath_internal_math_runtime_simd_func_impl_avx512_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/func/impl/avx512/sqrt.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/func/impl/avx512/pow.hpp
+
 )
 
 
@@ -258,6 +263,8 @@ set(ccmath_internal_math_runtime_simd_func_impl_neon_headers
 ##########################################
 set(ccmath_internal_math_runtime_simd_func_impl_scalar_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/func/impl/scalar/sqrt.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/func/impl/scalar/pow.hpp
+
 )
 
 
@@ -265,6 +272,8 @@ set(ccmath_internal_math_runtime_simd_func_impl_scalar_headers
 ##########################################
 set(ccmath_internal_math_runtime_simd_func_impl_sse2_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/func/impl/sse2/sqrt.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/func/impl/sse2/pow.hpp
+
 )
 
 
@@ -272,6 +281,8 @@ set(ccmath_internal_math_runtime_simd_func_impl_sse2_headers
 ##########################################
 set(ccmath_internal_math_runtime_simd_func_impl_sse3_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/func/impl/sse3/sqrt.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/func/impl/sse3/pow.hpp
+
 )
 
 
@@ -279,6 +290,8 @@ set(ccmath_internal_math_runtime_simd_func_impl_sse3_headers
 ##########################################
 set(ccmath_internal_math_runtime_simd_func_impl_sse4_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/func/impl/sse4/sqrt.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/func/impl/sse4/pow.hpp
+
 )
 
 
@@ -286,6 +299,8 @@ set(ccmath_internal_math_runtime_simd_func_impl_sse4_headers
 ##########################################
 set(ccmath_internal_math_runtime_simd_func_impl_ssse3_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/func/impl/ssse3/sqrt.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/func/impl/ssse3/pow.hpp
+
 )
 
 
@@ -293,6 +308,7 @@ set(ccmath_internal_math_runtime_simd_func_impl_ssse3_headers
 ##########################################
 set(ccmath_internal_math_runtime_simd_func_impl_vector_size_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ccmath/internal/math/runtime/simd/func/impl/vector_size/sqrt.hpp
+
 )
 
 

@@ -16,16 +16,16 @@
 	#ifdef CCMATH_HAS_SIMD_SSSE3
 namespace ccm::intrin
 {
-	CCM_ALWAYS_INLINE simd<float, abi::ssse3> sqrt(simd<float, abi::ssse3> const & a)
+	CCM_ALWAYS_INLINE simd<float, abi::ssse3> pow(simd<float, abi::ssse3> const & a, simd<float, abi::ssse3> const & b)
 	{
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
-		return simd<float, abi::ssse3>(_mm_sqrt_ps(a.get()));
+		return simd<float, abi::ssse3>(_mm_pow_ps(a.get(), b.get()));
 	}
 
-	CCM_ALWAYS_INLINE simd<double, abi::ssse3> sqrt(simd<double, abi::ssse3> const & a)
+	CCM_ALWAYS_INLINE simd<double, abi::ssse3> pow(simd<double, abi::ssse3> const & a, simd<double, abi::ssse3> const & b)
 	{
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
-		return simd<double, abi::ssse3>(_mm_sqrt_pd(a.get()));
+		return simd<double, abi::ssse3>(_mm_pow_pd(a.get(), b.get()));
 	}
 } // namespace ccm::intrin
 

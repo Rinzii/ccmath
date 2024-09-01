@@ -17,16 +17,16 @@
 namespace ccm::intrin
 {
 
-	CCM_ALWAYS_INLINE simd<float, abi::avx> sqrt(simd<float, abi::avx> const & a)
+	CCM_ALWAYS_INLINE simd<float, abi::avx> pow(simd<float, abi::avx> const & a, simd<float, abi::avx> const & b)
 	{
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
-		return simd<float, abi::avx>(_mm256_sqrt_ps(a.get()));
+		return simd<float, abi::avx>(_mm256_pow_ps(a.get(), b.get()));
 	}
 
-	CCM_ALWAYS_INLINE simd<double, abi::avx> sqrt(simd<double, abi::avx> const & a)
+	CCM_ALWAYS_INLINE simd<double, abi::avx> pow(simd<double, abi::avx> const & a, simd<double, abi::avx> const & b)
 	{
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
-		return simd<double, abi::avx>(_mm256_sqrt_pd(a.get()));
+		return simd<double, abi::avx>(_mm256_pow_pd(a.get(), b.get()));
 	}
 
 } // namespace ccm::intrin
