@@ -16,15 +16,14 @@ namespace ccm::gen::impl
 {
 	namespace internal::impl
 	{
-		template <typename T>
-		constexpr T powf_impl(T base, T exp) noexcept
+		constexpr float powf_impl(float base, float exp) noexcept
 		{
+			// TODO: Implement this.
 			return 0;
 		}
 	}
 
-	template <typename T>
-	constexpr T powf_impl(T base, T exp) noexcept
+	constexpr float powf_impl(float base, float exp) noexcept
 	{
 		return internal::impl::powf_impl(base, exp);
 	}
