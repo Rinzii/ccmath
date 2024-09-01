@@ -10,6 +10,8 @@
 
 #pragma once
 
+// TODO: Implement pow for neon
+
 #include "ccmath/internal/math/runtime/simd/simd.hpp"
 
 #ifdef CCMATH_HAS_SIMD
