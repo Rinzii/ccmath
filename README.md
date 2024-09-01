@@ -1,6 +1,9 @@
 # CCMath - A C++17 constexpr-Compatible CMath Library
-[![image](https://github.com/Rinzii/ccmath/workflows/build/badge.svg)](https://github.com/Rinzii/ccmath/actions?query=workflow%3Abuild)
+[![image](https://github.com/Rinzii/ccmath/workflows/ci-windows/badge.svg)](https://github.com/Rinzii/ccmath/actions?query=workflow%3Aci-windows)
+[![image](https://github.com/Rinzii/ccmath/workflows/ci-linux/badge.svg)](https://github.com/Rinzii/ccmath/actions?query=workflow%3Aci-linux)
+[![image](https://github.com/Rinzii/ccmath/workflows/ci-macos/badge.svg)](https://github.com/Rinzii/ccmath/actions?query=workflow%3Aci-macos)
 [![image](https://api.securityscorecards.dev/projects/github.com/Rinzii/ccmath/badge)](https://securityscorecards.dev/viewer/?uri=github.com/Rinzii/ccmath)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9402/badge)](https://www.bestpractices.dev/projects/9402)
 
 
 **CCMath** is a C++17 library that provides a re-implementation of the standard `<cmath>` library with all features made `constexpr`.
