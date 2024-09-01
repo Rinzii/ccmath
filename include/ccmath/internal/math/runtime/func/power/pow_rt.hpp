@@ -11,10 +11,8 @@
 #pragma once
 
 #include "ccmath/internal/predef/unlikely.hpp"
-#include "ccmath/internal/config/type_support.hpp"
 #include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
 #include "ccmath/internal/math/runtime/simd/func/pow.hpp"
-#include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 
@@ -62,12 +60,12 @@ namespace ccm::rt
 		if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>) { return simd_impl::pow_simd_impl(base, exp); }
 		else { return gen::pow_gen<T>(base, exp); }
 	#else										   // If long double is the same as double, we can use the SIMD implementation instead.
-		if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>) { return simd_impl::sqrt_simd_impl(num); }
-		else if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(simd_impl::sqrt_simd_impl(static_cast<double>(num))); }
-		else { return ccm::gen::sqrt_gen<T>(num); }
+		if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>) { return simd_impl::pow_simd_impl(base, exp); }
+		else if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(simd_impl::pow_simd_impl(static_cast<double>(base), static_cast<double>(exp))); }
+		else { return ccm::gen::pow_gen<T>(base, exp); }
 	#endif
 #else // If we don't have a builtin or SIMD, use the generic implementation.
-		return gen::pow_gen<T>(num);
+		return gen::pow_gen<T>(base, exp);
 #endif
 	}
 } // namespace ccm::rt

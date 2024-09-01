@@ -17,12 +17,14 @@
 
 namespace ccm::gen
 {
-	template <typename T>
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T pow_gen(T base, T exp) noexcept
 	{
-		//if constexpr (std::is
-
-		return 0;
+		// TODO: Maybe add more specific optimizations for integers?
+		// Currently we only support float and double for all rounding modes
+		if constexpr (std::is_same_v<T, float>) { return impl::powf_impl(base, exp); }
+		else if constexpr (std::is_same_v<T, double>) { return impl::pow_impl(base, exp); }
+		else { return static_cast<T>(impl::pow_impl(static_cast<double>(base), static_cast<double>(exp))); }
 	}
 
-} // namespace ccm
+} // namespace ccm::gen
