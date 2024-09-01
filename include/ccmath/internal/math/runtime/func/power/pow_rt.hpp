@@ -14,11 +14,9 @@
 #include "ccmath/internal/config/type_support.hpp"
 #include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
 #include "ccmath/internal/math/runtime/simd/func/pow.hpp"
-#include "ccmath/internal/support/always_false.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
-#include "ccmath/internal/support/is_constant_evaluated.hpp"
 
 #include <type_traits>
 
