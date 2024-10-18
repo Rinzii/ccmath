@@ -1,9 +1,12 @@
-# CCMath - A C++17 constexpr-Compatible CMath Library
+# CCMath - A C++17 Compile Time CMath Library
 [![image](https://github.com/Rinzii/ccmath/workflows/ci-windows/badge.svg)](https://github.com/Rinzii/ccmath/actions?query=workflow%3Aci-windows)
 [![image](https://github.com/Rinzii/ccmath/workflows/ci-linux/badge.svg)](https://github.com/Rinzii/ccmath/actions?query=workflow%3Aci-linux)
 [![image](https://github.com/Rinzii/ccmath/workflows/ci-macos/badge.svg)](https://github.com/Rinzii/ccmath/actions?query=workflow%3Aci-macos)
 [![image](https://api.securityscorecards.dev/projects/github.com/Rinzii/ccmath/badge)](https://securityscorecards.dev/viewer/?uri=github.com/Rinzii/ccmath)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9402/badge)](https://www.bestpractices.dev/projects/9402)
+[![License](https://img.shields.io/badge/License-Apache%202.0%20WITH%20LLVM--exception-blue.svg)](
+https://opensource.org/licenses/Apache-2.0)
+[![Discord](https://img.shields.io/discord/1286067628456284244?label=Discord)](https://discord.gg/p3mVxAbdmc)
 
 
 **CCMath** is a C++17 library that provides a re-implementation of the standard `<cmath>` library with all features made `constexpr`.
@@ -76,6 +79,12 @@ CCMath is also designed with functions being freestanding and header only so you
 
 > [!NOTE]
 > Currently working on finding manners to lower these requirements.
+
+## Join Our Discord!
+
+If you have any questions, suggestions, or just want to chat, feel free to join our Discord server!
+
+[![Discord Banner](https://discord.com/api/guilds/1286067628456284244/widget.png?style=banner2)](https://discord.gg/p3mVxAbdmc)
 
 ## Contributing
 
