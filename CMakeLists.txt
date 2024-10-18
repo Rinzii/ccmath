@@ -101,7 +101,23 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 # IanP: Begin initial work here
 
+# Initialize an empty list to hold all the source files
+set(INTERNAL_CCMATH_SOURCES "")
+
+include(cmake/Macros.cmake)
+
+# Define a macro to add headers and append them to the source list
+macro(ccm_add_headers headers)
+  list(APPEND INTERNAL_CCMATH_SOURCES "${headers}")
+  ccmath_message(COLOR yellow "Passed headers: ${headers}")
+  ccmath_message(COLOR yellow "Internal sources Currently: ${INTERNAL_CCMATH_SOURCES}")
+endmacro()
+
 add_subdirectory(include/ccmath)
+
+target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${headers}>")
+
+message(STATUS "Final Source files for target ${PROJECT_NAME}: ${SOURCES}")
 
 #message(STATUS "ccmath_internal_headers: ${ccmath_internal_headers}")
 
@@ -112,6 +128,8 @@ add_subdirectory(include/ccmath)
 #    include(ccmath_extensions_headers.cmake)
 #    target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_extensions_headers}>")
 #endif ()
+
+
 
 target_include_directories(${PROJECT_NAME} INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>)
 target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)

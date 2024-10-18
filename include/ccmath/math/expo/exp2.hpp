@@ -12,8 +12,8 @@
 
 #include "ccmath/internal/config/builtin/exp2_support.hpp"
 #include "ccmath/internal/predef/has_const_builtin.hpp"
-#include "ccmath/math/exponential/impl/exp2_double_impl.hpp"
-#include "ccmath/math/exponential/impl/exp2_float_impl.hpp"
+#include "ccmath/math/expo/impl/exp2_double_impl.hpp"
+#include "ccmath/math/expo/impl/exp2_float_impl.hpp"
 
 #include <type_traits>
 

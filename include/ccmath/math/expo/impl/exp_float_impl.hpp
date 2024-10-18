@@ -13,7 +13,7 @@
 #include "ccmath/internal/support/helpers/exp_helpers.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
-#include "ccmath/math/exponential/impl/exp_data.hpp"
+#include "ccmath/math/expo/impl/exp_data.hpp"
 #include <cstdint>
 
 namespace ccm::internal::impl
