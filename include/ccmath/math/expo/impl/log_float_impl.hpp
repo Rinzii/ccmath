@@ -14,7 +14,7 @@
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
 #include "ccmath/math/compare/isnan.hpp"
-#include "ccmath/math/exponential/impl/log_data.hpp"
+#include "ccmath/math/expo/impl/log_data.hpp"
 
 #include <array>
 #include <cstdint>

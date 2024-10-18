@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "ccmath/math/exponential/impl/log_double_impl.hpp"
-#include "ccmath/math/exponential/impl/log_float_impl.hpp"
+#include "ccmath/math/expo/impl/log_double_impl.hpp"
+#include "ccmath/math/expo/impl/log_float_impl.hpp"
 #include "ccmath/internal/math/generic/func/expo/log_gen.hpp"
 
 namespace ccm

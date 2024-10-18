@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include "exponential/exp.hpp"
-#include "exponential/exp2.hpp"
-#include "exponential/expm1.hpp"
-#include "exponential/log.hpp"
-#include "exponential/log10.hpp"
-#include "exponential/log1p.hpp"
-#include "exponential/log2.hpp"
+#include "expo/exp.hpp"
+#include "expo/exp2.hpp"
+#include "expo/expm1.hpp"
+#include "expo/log.hpp"
+#include "expo/log10.hpp"
+#include "expo/log1p.hpp"
+#include "expo/log2.hpp"

@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "ccmath/math/exponential/impl/exp_double_impl.hpp"
-#include "ccmath/math/exponential/impl/exp_float_impl.hpp"
+#include "ccmath/math/expo/impl/exp_double_impl.hpp"
+#include "ccmath/math/expo/impl/exp_float_impl.hpp"
 
 namespace ccm
 {

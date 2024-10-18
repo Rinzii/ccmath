@@ -13,7 +13,7 @@
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
-#include "ccmath/math/exponential/impl/exp2_data.hpp"
+#include "ccmath/math/expo/impl/exp2_data.hpp"
 
 #include <cstdint>
 #include <limits>

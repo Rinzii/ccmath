@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include "hyperbolic/acosh.hpp"
-#include "hyperbolic/asinh.hpp"
-#include "hyperbolic/atanh.hpp"
-#include "hyperbolic/cosh.hpp"
-#include "hyperbolic/sinh.hpp"
-#include "hyperbolic/tanh.hpp"
+#include "hyper/acosh.hpp"
+#include "hyper/asinh.hpp"
+#include "hyper/atanh.hpp"
+#include "hyper/cosh.hpp"
+#include "hyper/sinh.hpp"
+#include "hyper/tanh.hpp"
