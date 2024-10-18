@@ -30,7 +30,7 @@ option(CCMATH_FIND_GTEST_PACKAGE "Enable finding of gtest package" OFF)
 option(CCMATH_BUILD_EXAMPLES "Build ccmath examples" ${is_root_project})
 option(CCMATH_BUILD_BENCHMARKS "Build ccmath benchmarks" ${is_root_project})
 option(CCMATH_FIND_GBENCH_PACKAGE "Enable finding of google benchmark package" OFF)
-option(CCMATH_INSTALL "Setup install and package steps" ${is_root_project})
+option(CCMATH_INSTALL "Setup install and package steps" OFF)#${is_root_project}
 option(CCMATH_ENABLE_EXTENSIONS "Enable the extended ccmath library that adds helpful additional methods that are not defined by the standard" ${is_root_project})
 option(CCMATH_ENABLE_RUNTIME_SIMD "Enable SIMD optimization for runtime evaluation (does not effect compile time)" ON)
 option(CCMATH_ENABLE_USER_DEFINED_OPTIMIZATION_MACROS "Enable user defined optimization macros instead of having ccmath define its own internal ones in cmake" OFF)
@@ -93,19 +93,25 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU|IntelLLVM")
     )
 endif ()
 
-include(ccmath_internal_headers.cmake)
-include(ccmath_core_headers.cmake)
+#include(ccmath_internal_headers.cmake)
+#include(ccmath_core_headers.cmake)
 
 add_library(${PROJECT_NAME} INTERFACE)
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_internal_headers}>")
-target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_core_headers}>")
+# IanP: Begin initial work here
 
-if (CCMATH_ENABLE_EXTENSIONS)
-    include(ccmath_extensions_headers.cmake)
-    target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_extensions_headers}>")
-endif ()
+add_subdirectory(include/ccmath)
+
+#message(STATUS "ccmath_internal_headers: ${ccmath_internal_headers}")
+
+#target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_internal_headers}>")
+#target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_core_headers}>")
+
+#if (CCMATH_ENABLE_EXTENSIONS)
+#    include(ccmath_extensions_headers.cmake)
+#    target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_extensions_headers}>")
+#endif ()
 
 target_include_directories(${PROJECT_NAME} INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>)
 target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)

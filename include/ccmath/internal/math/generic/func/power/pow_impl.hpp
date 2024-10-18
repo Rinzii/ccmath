@@ -21,11 +21,11 @@ namespace ccm::gen::impl
 			// TODO: Implement this.
 			return 0;
 		}
-	}
+	} // namespace internal::impl
 
 	constexpr double pow_impl(double base, double exp) noexcept
 	{
 		return internal::impl::pow_impl(base, exp);
 	}
 
-} // namespace ccm
+} // namespace ccm::gen::impl

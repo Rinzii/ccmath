@@ -1,0 +1,27 @@
+macro(ccm_add_headers headers)
+  target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${headers}>")
+endmacro()
+
+ccm_add_headers(
+        ${CMAKE_CURRENT_SOURCE_DIR}/assoc_laguerre.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/assoc_legendre.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/beta.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/comp_ellint_1.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/comp_ellint_2.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/comp_ellint_3.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cyl_bessel_i.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cyl_bessel_j.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cyl_bessel_k.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cyl_neumann.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ellint_1.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ellint_2.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ellint_3.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/expint.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/hermite.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/laguerre.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/legendre.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/riemann_zeta.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sph_bessel.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sph_legendre.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sph_neumann.hpp
+)
