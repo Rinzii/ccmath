@@ -1,0 +1,26 @@
+macro(ccm_add_headers headers)
+  target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${headers}>")
+endmacro()
+
+ccm_add_headers(
+        ${CMAKE_CURRENT_SOURCE_DIR}/basic.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/compare.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/expo.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fmanip.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/hyper.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/nearest.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/numbers.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/power.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/special.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/trig.hpp
+)
+
+add_subdirectory(basic)
+add_subdirectory(compare)
+add_subdirectory(expo)
+add_subdirectory(fmanip)
+add_subdirectory(hyper)
+add_subdirectory(nearest)
+add_subdirectory(power)
+add_subdirectory(special)
+add_subdirectory(trig)

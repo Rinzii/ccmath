@@ -28,4 +28,4 @@ namespace ccm::gen::impl
 		return internal::impl::powf_impl(base, exp);
 	}
 
-} // namespace ccm
+} // namespace ccm::gen::impl

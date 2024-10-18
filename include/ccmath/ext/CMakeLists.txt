@@ -1,0 +1,19 @@
+macro(ccm_add_headers headers)
+  target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${headers}>")
+endmacro()
+
+ccm_add_headers(
+        ${CMAKE_CURRENT_SOURCE_DIR}/align.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/clamp.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cubic.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/degrees.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/fract.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/is_power_of_two.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lerp_smooth.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/mix.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/normalize.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ping_pong.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/radians.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/rcp.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/smoothstep.hpp
+)
