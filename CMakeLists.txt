@@ -25,14 +25,16 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 message(STATUS "CCMath version: ${PROJECT_VERSION}")
 
 # TO THE IMPLEMENTOR: If CCMATH_BUILD_TESTS is set to OFF then googletest can be deleted from the ext folder.
+option(CCMATH_INSTALL "Setup install and package steps" ${is_root_project})
+
 option(CCMATH_BUILD_TESTS "Build ccmath tests" ${is_root_project})
 option(CCMATH_FIND_GTEST_PACKAGE "Enable finding of gtest package" OFF)
-option(CCMATH_BUILD_EXAMPLES "Build ccmath examples" ${is_root_project})
 option(CCMATH_BUILD_BENCHMARKS "Build ccmath benchmarks" ${is_root_project})
 option(CCMATH_FIND_GBENCH_PACKAGE "Enable finding of google benchmark package" OFF)
-option(CCMATH_INSTALL "Setup install and package steps" OFF)#${is_root_project}
+option(CCMATH_BUILD_EXAMPLES "Build ccmath examples" ${is_root_project})
+
 option(CCMATH_ENABLE_EXTENSIONS "Enable the extended ccmath library that adds helpful additional methods that are not defined by the standard" ${is_root_project})
-option(CCMATH_ENABLE_RUNTIME_SIMD "Enable SIMD optimization for runtime evaluation (does not effect compile time)" ON)
+option(CCMATH_ENABLE_RUNTIME_SIMD "Enable SIMD optimization for runtime evaluation (does not effect compile time)" ON) # By default we want SIMD to be enabled
 option(CCMATH_ENABLE_USER_DEFINED_OPTIMIZATION_MACROS "Enable user defined optimization macros instead of having ccmath define its own internal ones in cmake" OFF)
 option(CCMATH_DISABLE_ERRNO "Disable the use of errno in ccmath during runtime" OFF)
 
@@ -92,9 +94,6 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU|IntelLLVM")
           -Wno-unused-but-set-variable -Wno-unused-value -Wno-unused-parameter
   )
 endif ()
-
-#include(ccmath_internal_headers.cmake)
-#include(ccmath_core_headers.cmake)
 
 add_library(${PROJECT_NAME} INTERFACE)
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
