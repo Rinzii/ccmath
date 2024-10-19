@@ -100,28 +100,13 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 include(cmake/Macros.cmake)
 
-# Initialize a global empty list to hold all the source files
-set_property(GLOBAL PROPERTY INTERNAL_CCMATH_SOURCES "")
-
 # Helper function to add headers to the global source list
 function(ccm_add_headers)
-  # Retrieve the current global property value
-  get_property(tmp GLOBAL PROPERTY INTERNAL_CCMATH_SOURCES)
-
-  foreach (arg ${ARGV})
-    list(APPEND tmp "${arg}")
-  endforeach ()
-
-  # Update the global property using APPEND
-  set_property(GLOBAL PROPERTY INTERNAL_CCMATH_SOURCES "${tmp}")
+  # Append all the passed arguments (headers) to the target's sources
+  target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ARGV}>")
 endfunction()
 
 add_subdirectory(include/ccmath)
-
-# Add all the headers to the target interface
-get_property(internal_ccmath_headers GLOBAL PROPERTY INTERNAL_CCMATH_SOURCES)
-target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${internal_ccmath_headers}>")
-
 
 target_include_directories(${PROJECT_NAME} INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>)
 target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)
