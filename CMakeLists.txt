@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.23.0)
+cmake_minimum_required(VERSION 3.18.0)
 
 set(CCMATH_BUILD_VERSION 0.2.0)
 
