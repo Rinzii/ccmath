@@ -28,6 +28,17 @@
 	#define CCMATH_COMPILER_MSVC
 	#define CCMATH_COMPILER_MSVC_VER _MSC_VER
 
+/// Intel DPC++ Compiler
+#elif defined(SYCL_LANGUAGE_VERSION) || defined(__INTEL_LLVM_COMPILER) && !defined(CCMATH_COMPILER_INTEL)
+	#define CCMATH_COMPILER_INTEL
+	#define CCMATH_COMPILER_INTEL_VER __INTEL_LLVM_COMPILER
+
+	#ifndef CCMATH_COMPILER_CLANG_BASED
+		#define CCMATH_COMPILER_CLANG_BASED
+	#endif
+
+// TODO: Add precise detection for specific compiler versions along with a warning if using unsupported compiler
+
 
 #elif defined(_MSC_VER) && defined(__clang__) && !defined(CCMATH_COMPILER_CLANG_CL)
 	#define CCMATH_COMPILER_CLANG_CL
@@ -42,16 +53,6 @@
 
 // TODO: Add precise detection for specific compiler versions along with a warning if using unsupported compiler
 
-/// Intel DPC++ Compiler
-#elif defined(SYCL_LANGUAGE_VERSION) || defined(__INTEL_LLVM_COMPILER) && !defined(CCMATH_COMPILER_INTEL)
-	#define CCMATH_COMPILER_INTEL
-	#define CCMATH_COMPILER_INTEL_VER __INTEL_LLVM_COMPILER
-
-	#ifndef CCMATH_COMPILER_CLANG_BASED
-		#define CCMATH_COMPILER_CLANG_BASED
-    #endif
-
-// TODO: Add precise detection for specific compiler versions along with a warning if using unsupported compiler
 
 
 /// Nvidia HPC SDK
