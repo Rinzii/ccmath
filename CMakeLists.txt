@@ -12,10 +12,10 @@ project(
 
 set(is_root_project OFF) # Identifies if this is the root project
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    set(is_root_project ON)
+  set(is_root_project ON)
 endif ()
-if(NOT CCMATH_SOURCE_DIR)
-    set(CCMATH_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+if (NOT CCMATH_SOURCE_DIR)
+  set(CCMATH_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 endif ()
 
 set(CMAKE_CXX_STANDARD 17)
@@ -47,50 +47,50 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME}-compile-options ALIAS ${PROJECT_NAM
 
 # Generic clang/gcc compiler options
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU|IntelLLVM")
+  target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+          -Wall
+          -Wextra
+          -Wconversion
+          -Werror=return-type
+
+          -Wno-pedantic
+
+          # Allow FMA instructions
+          -ffp-contract=fast
+
+          # Macros to define
+          -DNOMINMAX
+  )
+
+
+  if (CMAKE_CXX_COMPILER_ID STREQUAL MSVC)
     target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
-            -Wall
-            -Wextra
-            -Wconversion
-            -Werror=return-type
+            /W3
+            /WX
+            /permissive-
 
-            -Wno-pedantic
-
-            # Allow FMA instructions
-            -ffp-contract=fast
+            /Zc:__cplusplus
 
             # Macros to define
-            -DNOMINMAX
+            /DNOMINMAX
+            /D_ENABLE_EXTENDED_ALIGNED_STORAGE
     )
+  endif ()
 
-
-    if (CMAKE_CXX_COMPILER_ID STREQUAL MSVC)
-        target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
-                /W3
-                /WX
-                /permissive-
-
-                /Zc:__cplusplus
-
-                # Macros to define
-                /DNOMINMAX
-                /D_ENABLE_EXTENDED_ALIGNED_STORAGE
-        )
-    endif ()
-
-    # Disable intel specific warnings that don't apply to us.
-    if (CMAKE_CXX_COMPILER_ID STREQUAL IntelLLVM)
-        target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
-                -Wno-tautological-constant-compare
-        )
-    endif ()
-
-
-    # TODO: Remove this later.
-    #       Some variables have been provided but are not currently being used, but it would not atm make sense to remove them.
-    #       So to clean up the warnings we are just silencing these specific cases.
+  # Disable intel specific warnings that don't apply to us.
+  if (CMAKE_CXX_COMPILER_ID STREQUAL IntelLLVM)
     target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
-            -Wno-unused-but-set-variable -Wno-unused-value -Wno-unused-parameter
+            -Wno-tautological-constant-compare
     )
+  endif ()
+
+
+  # TODO: Remove this later.
+  #       Some variables have been provided but are not currently being used, but it would not atm make sense to remove them.
+  #       So to clean up the warnings we are just silencing these specific cases.
+  target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+          -Wno-unused-but-set-variable -Wno-unused-value -Wno-unused-parameter
+  )
 endif ()
 
 #include(ccmath_internal_headers.cmake)
@@ -99,36 +99,29 @@ endif ()
 add_library(${PROJECT_NAME} INTERFACE)
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-# IanP: Begin initial work here
-
-# Initialize an empty list to hold all the source files
-set(INTERNAL_CCMATH_SOURCES "")
-
 include(cmake/Macros.cmake)
 
-# Define a macro to add headers and append them to the source list
-macro(ccm_add_headers headers)
-  list(APPEND INTERNAL_CCMATH_SOURCES "${headers}")
-  ccmath_message(COLOR yellow "Passed headers: ${headers}")
-  ccmath_message(COLOR yellow "Internal sources Currently: ${INTERNAL_CCMATH_SOURCES}")
-endmacro()
+# Initialize a global empty list to hold all the source files
+set_property(GLOBAL PROPERTY INTERNAL_CCMATH_SOURCES "")
+
+# Helper function to add headers to the global source list
+function(ccm_add_headers)
+  # Retrieve the current global property value
+  get_property(tmp GLOBAL PROPERTY INTERNAL_CCMATH_SOURCES)
+
+  foreach (arg ${ARGV})
+    list(APPEND tmp "${arg}")
+  endforeach ()
+
+  # Update the global property using APPEND
+  set_property(GLOBAL PROPERTY INTERNAL_CCMATH_SOURCES "${tmp}")
+endfunction()
 
 add_subdirectory(include/ccmath)
 
-target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${headers}>")
-
-message(STATUS "Final Source files for target ${PROJECT_NAME}: ${SOURCES}")
-
-#message(STATUS "ccmath_internal_headers: ${ccmath_internal_headers}")
-
-#target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_internal_headers}>")
-#target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_core_headers}>")
-
-#if (CCMATH_ENABLE_EXTENSIONS)
-#    include(ccmath_extensions_headers.cmake)
-#    target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ccmath_extensions_headers}>")
-#endif ()
-
+# Add all the headers to the target interface
+get_property(internal_ccmath_headers GLOBAL PROPERTY INTERNAL_CCMATH_SOURCES)
+target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${internal_ccmath_headers}>")
 
 
 target_include_directories(${PROJECT_NAME} INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>)
@@ -139,81 +132,81 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
 )
 
 if (CCMATH_ENABLE_RUNTIME_SIMD)
-    target_compile_definitions(${PROJECT_NAME} INTERFACE CCM_CONFIG_USE_RT_SIMD)
+  target_compile_definitions(${PROJECT_NAME} INTERFACE CCM_CONFIG_USE_RT_SIMD)
 endif ()
 
 if (NOT CCMATH_ENABLE_USER_DEFINED_OPTIMIZATION_MACROS)
-    # Set these definitions based on the build type to aid in identifying the optimization level.
-    # These are essential when dealing with compiler specific outcomes that are based on the optimization level.
-    target_compile_definitions(${PROJECT_NAME}
-            INTERFACE
-            $<$<CONFIG:Debug>:CCM_CONFIG_DEBUG> # -O0
-            $<$<CONFIG:RelWithDebInfo>:CCM_CONFIG_OPTIMIZE> # -O2
-            $<$<CONFIG:Release>:CCM_CONFIG_AGGRESSIVELY_OPTIMIZE> # -O3
-            $<$<CONFIG:MinSizeRel>:CCM_CONFIG_MINSIZE> # -Os
-    )
+  # Set these definitions based on the build type to aid in identifying the optimization level.
+  # These are essential when dealing with compiler specific outcomes that are based on the optimization level.
+  target_compile_definitions(${PROJECT_NAME}
+          INTERFACE
+          $<$<CONFIG:Debug>:CCM_CONFIG_DEBUG> # -O0
+          $<$<CONFIG:RelWithDebInfo>:CCM_CONFIG_OPTIMIZE> # -O2
+          $<$<CONFIG:Release>:CCM_CONFIG_AGGRESSIVELY_OPTIMIZE> # -O3
+          $<$<CONFIG:MinSizeRel>:CCM_CONFIG_MINSIZE> # -Os
+  )
 endif ()
 
 if (CCMATH_DISABLE_ERRNO)
-    target_compile_definitions(${PROJECT_NAME} INTERFACE CCM_CONFIG_DISABLE_ERRNO)
+  target_compile_definitions(${PROJECT_NAME} INTERFACE CCM_CONFIG_DISABLE_ERRNO)
 endif ()
 
 configure_file(cmake/version.hpp.in "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp" @ONLY)
 
 if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TESTS)
-    add_subdirectory(thirdparty)
+  add_subdirectory(thirdparty)
 endif ()
 
 if (CCMATH_BUILD_EXAMPLES)
-    add_subdirectory(example)
+  add_subdirectory(example)
 endif ()
 
 if (CCMATH_BUILD_BENCHMARKS)
-    add_subdirectory(benchmark)
+  add_subdirectory(benchmark)
 endif ()
 
 if (CCMATH_BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(test)
+  enable_testing()
+  add_subdirectory(test)
 endif ()
 
 
 if (CCMATH_INSTALL)
-    include(GNUInstallDirs)
-    include(CMakePackageConfigHelpers)
+  include(GNUInstallDirs)
+  include(CMakePackageConfigHelpers)
 
-    install(TARGETS
-            ${PROJECT_NAME}
-            ${PROJECT_NAME}-compile-options
-            EXPORT ${PROJECT_NAME}-targets
-    )
+  install(TARGETS
+          ${PROJECT_NAME}
+          ${PROJECT_NAME}-compile-options
+          EXPORT ${PROJECT_NAME}-targets
+  )
 
-    # Manually specify the headers to install
-    install(DIRECTORY
-            "${CMAKE_CURRENT_SOURCE_DIR}/include/"
-            DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-            FILES_MATCHING PATTERN "*.hpp"
-    )
+  # Manually specify the headers to install
+  install(DIRECTORY
+          "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+          DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+          FILES_MATCHING PATTERN "*.hpp"
+  )
 
-    install(FILES
-            "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp"
-            DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}"
-    )
+  install(FILES
+          "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp"
+          DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}"
+  )
 
-    install(EXPORT ${PROJECT_NAME}-targets
-            FILE ${PROJECT_NAME}-targets.cmake
-            NAMESPACE ${PROJECT_NAME}::
-            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-    )
+  install(EXPORT ${PROJECT_NAME}-targets
+          FILE ${PROJECT_NAME}-targets.cmake
+          NAMESPACE ${PROJECT_NAME}::
+          DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+  )
 
-    configure_package_config_file(
-            cmake/${PROJECT_NAME}-config.cmake.in
-            "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
-            INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-    )
+  configure_package_config_file(
+          cmake/${PROJECT_NAME}-config.cmake.in
+          "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
+          INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+  )
 
-    install(FILES
-            "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
-            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+  install(FILES
+          "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
+          DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
 endif ()

@@ -1,0 +1,12 @@
+ccm_add_headers(
+        ${CMAKE_CURRENT_SOURCE_DIR}/avx.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/avx2.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/avx512.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/neon.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sse2.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sse3.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sse4.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ssse3.hpp
+)
+
+add_subdirectory(func)
