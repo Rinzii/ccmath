@@ -1,0 +1,9 @@
+ccm_add_headers(
+        ${CMAKE_CURRENT_SOURCE_DIR}/exp2_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/exp_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/expm1_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/log1p_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/log2_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/log10_gen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/log_gen.hpp
+)

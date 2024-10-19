@@ -45,6 +45,12 @@ namespace ccm::support::helpers
 		static constexpr int eFP_ZERO = 2;
 		static constexpr int eFP_SUBNORMAL = 2;
 		static constexpr int eFP_NORMAL = 4;
+#elif defined(CCMATH_COMPILER_INTEL) // Intel OneAPI DPC++ has a different set of defines than Clang
+		static constexpr int eFP_NAN = 2;
+		static constexpr int eFP_INFINITE = 1;
+		static constexpr int eFP_ZERO = 0;
+		static constexpr int eFP_SUBNORMAL = -2;
+		static constexpr int eFP_NORMAL = -1;
 #elif defined(CCMATH_COMPILER_CLANG) || defined(CCMATH_COMPILER_GCC) || defined(CCMATH_COMPILER_CLANG_BASED) // Clang and GCC have the same defines
 		static constexpr int eFP_NAN = 0;
 		static constexpr int eFP_INFINITE = 1;
