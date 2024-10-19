@@ -8,16 +8,12 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
+#pragma once
 
-#include "ccmath/ccmath.hpp"
-
-#include <cmath>
-#include <limits>
-
-TEST(CcmathFmanipTests, Nexttoward)
-{
-	EXPECT_EQ(ccm::nexttoward(1.0, 2.0), std::nexttoward(1.0, 2.0));
-
-}
-
+#include "expo/exp.hpp"
+#include "expo/exp2.hpp"
+#include "expo/expm1.hpp"
+#include "expo/log.hpp"
+#include "expo/log10.hpp"
+#include "expo/log1p.hpp"
+#include "expo/log2.hpp"
