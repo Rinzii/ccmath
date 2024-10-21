@@ -4,6 +4,6 @@ ccm_add_headers(
 
 add_subdirectory(config)
 add_subdirectory(math)
-#add_subdirectory(predef)
-#add_subdirectory(support)
-#add_subdirectory(types)
+add_subdirectory(predef)
+add_subdirectory(support)
+add_subdirectory(types)
