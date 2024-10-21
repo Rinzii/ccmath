@@ -302,7 +302,7 @@ namespace ccm::support
 	{
 		return __builtin_popcountg(value); // NOLINT
 	}
-#else  // !CCM_HAS_BUILTIN(__builtin_popcountg)
+#else // !CCM_HAS_BUILTIN(__builtin_popcountg)
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> popcount(T value)
 	{
@@ -323,6 +323,48 @@ namespace ccm::support
 		}
 		return count;
 	}
+
+	// Specific optimizations for known types
+	constexpr int popcount(std::uint8_t n)
+	{
+		// The algorithm is specific to 8-bit input, and avoids using 64-bit register for code size.
+		std::uint32_t r = static_cast<std::uint32_t>(n * 0x08040201U);
+		r				= static_cast<std::uint32_t>(((r >> 3) & 0x11111111U) * 0x11111111U) >> 28;
+		return r;
+	}
+
+	// We don't want these overloads to be defined if the builtins are available, so we check for the builtins first.
+
+	#if !CCM_HAS_BUILTIN(__builtin_popcount)
+	constexpr int popcount(unsigned int n) // Assume int is 32 bit and not 16.
+	{
+		n = n - (n >> 1) & 0x55555555;
+		n = (n & 0x33333333) + (n >> 2) & 0x33333333;
+		n = (n + n >> 4) & 0x0F0F0F0F;
+		return (n * 0x01010101) >> 24;
+	}
+	#endif // !CCM_HAS_BUILTIN(__builtin_popcount)
+
+	#if !CCM_HAS_BUILTIN(__builtin_popcountl)
+	constexpr int popcount(unsigned long n)
+	{
+		n = n - (n >> 1) & 0x55555555;
+		n = (n & 0x33333333) + (n >> 2) & 0x33333333;
+		n = (n + n >> 4) & 0x0F0F0F0F;
+		return (n * 0x01010101) >> 24;
+	}
+	#endif // !CCM_HAS_BUILTIN(__builtin_popcount)
+
+	#if !CCM_HAS_BUILTIN(__builtin_popcountll)
+	constexpr int popcount(unsigned long long n)
+	{
+		n = n - ((n >> 1) & 0x5555555555555555);
+		n = (n & 0x3333333333333333) + ((n >> 2) & 0x3333333333333333);
+		n = (n + (n >> 4)) & 0xF0F0F0F0F0F0F0F;
+		return (n * 0x101010101010101) >> 56;
+	}
+	#endif // !CCM_HAS_BUILTIN(__builtin_popcountll)
+
 #endif // CCM_HAS_BUILTIN(__builtin_popcountg)
 
 // Macro to allow simplified creation of specializations
