@@ -27,6 +27,6 @@ namespace ccm::ext
 	template<typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T normalize(T value, T min = T(0), T max = T(1))
 	{
-		return ccm::ext::clamp((value - min) / (max - min), static_cast<T>(0), static_cast<T>(1));
+		return ext::clamp((value - min) / (max - min), static_cast<T>(0), static_cast<T>(1));
 	}
 } // namespace ccm::ext

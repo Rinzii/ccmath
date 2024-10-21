@@ -34,6 +34,6 @@ namespace ccm::ext
 
 		const T t2 = t * t;
 
-		return a0 * t * t2 + a1 * t2 + a2 * t + a3;
+		return (a0 * t * t2) + (a1 * t2) + (a2 * t) + a3;
 	}
 } // namespace ccm::ext

@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "ccmath/math/exponential/exp2.hpp"
+#include "ccmath/math/expo/exp2.hpp"
 
 namespace ccm::ext
 {

@@ -32,7 +32,7 @@ namespace ccm::ext
 			return T(0);
 		}
 
-		return ccm::abs(ccm::ext::fract((a - b) / (b * 2.0)) * b * 2.0 - b);
+		return ccm::abs((ccm::ext::fract((a - b) / (b * 2.0)) * b * 2.0) - b);
 
 	}
 } // namespace ccm::ext
