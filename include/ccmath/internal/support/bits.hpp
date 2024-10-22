@@ -324,45 +324,20 @@ namespace ccm::support
 		return count;
 	}
 
-	// Specific optimizations for known types
-	constexpr int popcount(std::uint8_t n)
-	{
-		// The algorithm is specific to 8-bit input, and avoids using 64-bit register for code size.
-		std::uint32_t r = static_cast<std::uint32_t>(n * 0x08040201U);
-		r				= static_cast<std::uint32_t>(((r >> 3) & 0x11111111U) * 0x11111111U) >> 28;
-		return r;
-	}
-
 	// We don't want these overloads to be defined if the builtins are available, so we check for the builtins first.
-
+	// Provides optimizations for common types.
+	// All provided optimizations are based on the Hammering Weight algorithm except for unsigned char.
+	// https://en.wikipedia.org/wiki/Hamming_weight
 	#if !CCM_HAS_BUILTIN(__builtin_popcount)
-	constexpr int popcount(unsigned int n) // Assume int is 32 bit and not 16.
-	{
-		n = n - (n >> 1) & 0x55555555;
-		n = (n & 0x33333333) + (n >> 2) & 0x33333333;
-		n = (n + n >> 4) & 0x0F0F0F0F;
-		return (n * 0x01010101) >> 24;
-	}
+
 	#endif // !CCM_HAS_BUILTIN(__builtin_popcount)
 
 	#if !CCM_HAS_BUILTIN(__builtin_popcountl)
-	constexpr int popcount(unsigned long n)
-	{
-		n = n - (n >> 1) & 0x55555555;
-		n = (n & 0x33333333) + (n >> 2) & 0x33333333;
-		n = (n + n >> 4) & 0x0F0F0F0F;
-		return (n * 0x01010101) >> 24;
-	}
+
 	#endif // !CCM_HAS_BUILTIN(__builtin_popcount)
 
 	#if !CCM_HAS_BUILTIN(__builtin_popcountll)
-	constexpr int popcount(unsigned long long n)
-	{
-		n = n - ((n >> 1) & 0x5555555555555555);
-		n = (n & 0x3333333333333333) + ((n >> 2) & 0x3333333333333333);
-		n = (n + (n >> 4)) & 0xF0F0F0F0F0F0F0F;
-		return (n * 0x101010101010101) >> 56;
-	}
+
 	#endif // !CCM_HAS_BUILTIN(__builtin_popcountll)
 
 #endif // CCM_HAS_BUILTIN(__builtin_popcountg)
@@ -376,21 +351,87 @@ namespace ccm::support
 		static_assert(ccm::support::traits::ccm_is_unsigned_v<TYPE>);                                                                                          \
 		return BUILTIN(value);                                                                                                                                 \
 	}
+
 // NOLINTEND(bugprone-macro-parentheses)
 // If the compiler has builtins for popcount, then create specializations that use the builtins.
 #if CCM_HAS_BUILTIN(__builtin_popcount)
 	INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(popcount, unsigned char, __builtin_popcount)
 	INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(popcount, unsigned short, __builtin_popcount)
 	INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(popcount, unsigned, __builtin_popcount)
-#endif // CCM_HAS_BUILTIN(__builtin_popcount)
+#else
+	// If we don't have builtins, then provide optimizations for common types.
+	// All provided optimizations are based on the Hamming Weight algorithm except for unsigned char.
+	// https://en.wikipedia.org/wiki/Hamming_weight
+	constexpr int popcount(unsigned char n)
+	{
+		// The algorithm is specific to 8-bit input, and avoids using 64-bit register for code size.
+		std::uint32_t r = static_cast<std::uint32_t>(n * 0x08040201U);
+		r				= static_cast<std::uint32_t>(((r >> 3) & 0x11111111U) * 0x11111111U) >> 28;
+		return r;
+	}
+
+	constexpr int popcount(unsigned short n)
+	{
+		n = n - (n >> 1) & 0x5555;
+		n = (n & 0x3333) + (n >> 2) & 0x3333;
+		n = (n + n >> 4) & 0x0F0F;
+		return (n * 0x0101) >> 16;
+	}
+
+	constexpr int popcount(unsigned int n)
+	{
+		// int can be 32 or 16 bits, so we need to check.
+		if constexpr (constexpr int bits = std::numeric_limits<unsigned int>::digits; bits == 32) // 32 bit int
+		{
+			n = n - (n >> 1) & 0x55555555;
+			n = (n & 0x33333333) + (n >> 2) & 0x33333333;
+			n = (n + n >> 4) & 0x0F0F0F0F;
+			return (n * 0x01010101) >> 24;
+		}
+		else // 16 bit int
+		{
+			n = n - (n >> 1) & 0x5555;
+			n = (n & 0x3333) + (n >> 2) & 0x3333;
+			n = (n + n >> 4) & 0x0F0F;
+			return (n * 0x0101) >> 16;
+		}
+	}
+#endif
 
 #if CCM_HAS_BUILTIN(__builtin_popcountl)
 	INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(popcount, unsigned long, __builtin_popcountl)
-#endif // CCM_HAS_BUILTIN(__builtin_popcountl)
+#else
+	constexpr int popcount(unsigned long n)
+	{
+		// long can be 32 or 64 bits, so we need to check.
+		if constexpr (constexpr long bits = std::numeric_limits<unsigned long>::digits; bits == 32) // 32 bit long
+		{
+			n = n - (n >> 1) & 0x55555555;
+			n = (n & 0x33333333) + (n >> 2) & 0x33333333;
+			n = (n + n >> 4) & 0x0F0F0F0F;
+			return (n * 0x01010101) >> 24;
+		}
+		else // 64-bit long
+		{
+			n = n - ((n >> 1) & 0x5555555555555555);
+			n = (n & 0x3333333333333333) + ((n >> 2) & 0x3333333333333333);
+			n = (n + (n >> 4)) & 0xF0F0F0F0F0F0F0F;
+			return (n * 0x101010101010101) >> 56;
+		}
+	}
+#endif
 
 #if CCM_HAS_BUILTIN(__builtin_popcountll)
 	INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(popcount, unsigned long long, __builtin_popcountll)
-#endif // CCM_HAS_BUILTIN(__builtin_popcountll)
+#else
+	constexpr int popcount(unsigned long long n)
+	{
+		n = n - ((n >> 1) & 0x5555555555555555);
+		n = (n & 0x3333333333333333) + ((n >> 2) & 0x3333333333333333);
+		n = (n + (n >> 4)) & 0xF0F0F0F0F0F0F0F;
+		return (n * 0x101010101010101) >> 56;
+	}
+#endif
 
 #undef INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION
 
