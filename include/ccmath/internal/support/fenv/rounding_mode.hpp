@@ -114,6 +114,6 @@ namespace ccm::support::fenv
 			default: return FE_TONEAREST; // Default rounding mode.
 			}
 		}
-		else { return internal::rt_get_rounding_mode(); }
+		return internal::rt_get_rounding_mode();
 	}
 } // namespace ccm::support::fenv
