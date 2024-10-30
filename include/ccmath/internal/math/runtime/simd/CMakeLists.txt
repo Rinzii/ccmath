@@ -7,3 +7,4 @@ ccm_add_headers(
 )
 
 add_subdirectory(func)
+add_subdirectory(instructions)
