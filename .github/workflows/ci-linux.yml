@@ -39,7 +39,7 @@ jobs:
             ${{ runner.os }}-cmake-${{ matrix.compiler }}-
 
       - name: install dependencies
-        run: sudo apt install -yqq ninja-build
+        run: sudo apt install -yqq --no-install-recommends ninja-build
 
       - name: configure cmake
         run: cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
