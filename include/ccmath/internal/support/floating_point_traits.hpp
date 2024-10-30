@@ -100,9 +100,9 @@ namespace ccm::support
 
 		using int_type = ccm::types::int128_t;
 
-		static constexpr int_type mantissa_bits			  = 112;	 // LDBL_MANT_DIG
-		static constexpr int_type exponent_bits			  = 15;	 // sizeof(long double) * CHAR_BIT - LDBL_MANT_DIG
-		static constexpr int_type maximum_binary_exponent = 16383; // LDBL_MAX_EXP - 1
+		static constexpr int_type mantissa_bits			  = 112;	// LDBL_MANT_DIG
+		static constexpr int_type exponent_bits			  = 15;		// sizeof(long double) * CHAR_BIT - LDBL_MANT_DIG
+		static constexpr int_type maximum_binary_exponent = 16383;	// LDBL_MAX_EXP - 1
 		static constexpr int_type minimum_binary_exponent = -16382; // LDBL_MIN_EXP - 1
 		static constexpr int_type exponent_bias			  = 16383;
 		static constexpr int_type sign_shift			  = 79; // exponent_bits + mantissa_bits - 1
@@ -120,20 +120,18 @@ namespace ccm::support
 		static constexpr long double normalize_factor = 340282366920938463463374607431768211456.0L; // 2^128
 
 		static constexpr long double max_safe_integer = 0x1p+112; // 5192296858534827628530496329220096.0L (2^112)
-
-
 	};
 #elif defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
 	template <>
-struct floating_point_traits<long double>
+	struct floating_point_traits<long double>
 	{
 		using upgraded_floating_type = ccm::types::DyadicFloat<256>;
 
 		using int_type = ccm::types::int128_t;
 
-		static constexpr int_type mantissa_bits			  = 64;	 // LDBL_MANT_DIG
-		static constexpr int_type exponent_bits			  = 15;	 // sizeof(long double) * CHAR_BIT - LDBL_MANT_DIG
-		static constexpr int_type maximum_binary_exponent = 16383; // LDBL_MAX_EXP - 1
+		static constexpr int_type mantissa_bits			  = 64;		// LDBL_MANT_DIG
+		static constexpr int_type exponent_bits			  = 15;		// sizeof(long double) * CHAR_BIT - LDBL_MANT_DIG
+		static constexpr int_type maximum_binary_exponent = 16383;	// LDBL_MAX_EXP - 1
 		static constexpr int_type minimum_binary_exponent = -16382; // LDBL_MIN_EXP - 1
 		static constexpr int_type exponent_bias			  = 16383;
 		static constexpr int_type sign_shift			  = 79; // exponent_bits + mantissa_bits - 1
@@ -154,21 +152,13 @@ struct floating_point_traits<long double>
 		static constexpr long double max_safe_integer = 0x1p+64L; // 18446744073709551616.0L (2^64)
 	};
 
-	#else // long double is the same as double
+#else // long double is the same as double
 	template <>
 	struct floating_point_traits<long double>
 	{
-	#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT128)
-		using upgraded_floating_type = long double
-	#elif defined(CCM_TYPES_HAS_FLOAT128)
-		using upgraded_floating_type = ccm::types::float128;
-	#elif defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
 		using upgraded_floating_type = ccm::types::DyadicFloat<128>;
-	#else
-		using upgraded_floating_type = ccm::types::DyadicFloat<128>;
-	#endif
 
-			using int_type = std::int64_t;
+		using int_type = std::int64_t;
 
 		static constexpr int_type mantissa_bits			  = 53;	   // DBL_MANT_DIG
 		static constexpr int_type exponent_bits			  = 11;	   // sizeof(double) * CHAR_BIT - DBL_MANT_DIG
@@ -206,7 +196,6 @@ struct floating_point_traits<long double>
 
 	template <typename T>
 	inline constexpr typename floating_point_traits<T>::uint_type sign_mask_v = floating_point_traits<T>::shifted_sign_mask;
-
 
 	// TODO: Possible remove these func from floating_point_traits as they are more so there own things and not really traits.
 	// All func below that use bit_cast have to use the __builtin_bit_cast as bit_cast itself includes floating_point_traits.hpp

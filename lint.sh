@@ -10,14 +10,18 @@
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 #
 
+echo "Beginning linting..."
+
 status=0
-while read f
+while read -r f
 do
-    echo checking $f
-    clang-tidy $f -p=out/clang-tidy
+    clang-tidy "$f" -p=out/clang-tidy --quiet 2>/dev/null
     ret=$?
     if [ $ret -ne 0 ]; then
+        echo "Error in $f"
         status=1
     fi
-done <<< $(find include/ccmath -name "*.hpp")
+done <<< "$(find include/ccmath -name "*.hpp")"
+
+echo "Done linting."
 exit $status

@@ -21,7 +21,7 @@ namespace ccm::gen::impl
 			// TODO: Implement this.
 			return 0;
 		}
-	}
+	} // namespace internal::impl
 
 	constexpr float powf_impl(float base, float exp) noexcept
 	{

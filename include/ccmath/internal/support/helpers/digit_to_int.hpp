@@ -28,4 +28,4 @@ namespace ccm::support::helpers
 		}
 		return 0;
 	}
-} // namespace ccm::helpers
+} // namespace ccm::support::helpers

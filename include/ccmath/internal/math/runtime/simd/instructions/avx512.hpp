@@ -18,6 +18,7 @@
 
 		#include <immintrin.h>
 
+// NOLINTBEGIN
 namespace ccm::intrin
 {
 	namespace abi
@@ -214,6 +215,7 @@ namespace ccm::intrin
 	}
 
 } // namespace ccm::intrin
+// NOLINTEND
 
 	#endif // CCMATH_HAS_SIMD_AVX512F
 #endif	   // CCMATH_HAS_SIMD

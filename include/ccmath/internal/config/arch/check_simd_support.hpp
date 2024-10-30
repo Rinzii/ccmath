@@ -157,6 +157,22 @@
 		#define CCMATH_HAS_SIMD_AVX512 1
 	#endif
 
+// Intel Short Vector Math Library (SVML)
+	#if defined(__FMA__) || defined(CCM_CONFIG_RT_SIMD_HAS_FMA)
+		#ifndef CCMATH_HAS_SIMD
+			#define CCMATH_HAS_SIMD 1
+		#endif
+		#define CCMATH_HAS_SIMD_FMA 1
+	#endif
+
+// Intel Short Vector Math Library (SVML)
+	#if defined(CCM_CONFIG_RT_SIMD_HAS_SVML)
+		#ifndef CCMATH_HAS_SIMD
+			#define CCMATH_HAS_SIMD 1
+		#endif
+		#define CCMATH_HAS_SIMD_SVML 1
+	#endif
+
 // ARM Advanced SIMD (NEON)
 	#if defined(__ARM_NEON) || defined(__ARM_NEON__) || defined(CCM_CONFIG_RT_SIMD_HAS_NEON)
 		#ifndef CCMATH_HAS_SIMD
@@ -164,6 +180,8 @@
 		#endif
 		#define CCMATH_HAS_SIMD_NEON 1
 	#endif
+
+
 
 // ARM Scalable Vector Extension (SVE)
 /* TODO: At some point add proper SVE support.

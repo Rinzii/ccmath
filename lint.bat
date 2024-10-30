@@ -12,10 +12,14 @@ REM
 
 set status=0
 
+echo Beginning linting...
 for /r "include\ccmath" %%f in (*.hpp) do (
-    echo Checking %%f
-    clang-tidy %%f -p=out/clang-tidy
-    if errorlevel 1 set status=1
+    clang-tidy %%f -p=out/clang-tidy --quiet 2>nul
+    if errorlevel 1 (
+        echo Error in %%f
+        set status=1
+    )
 )
+echo Linting complete.
 
 exit /b %status%
