@@ -19,13 +19,13 @@ namespace ccm::intrin
 	CCM_ALWAYS_INLINE simd<float, abi::avx512> pow(simd<float, abi::avx512> const & a, simd<float, abi::avx512> const & b)
 	{
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
-		return simd<float, abi::avx2>(_mm512_pow_ps(a.get(), b.get()));
+		return simd<float, abi::avx512>(_mm512_pow_ps(a.get(), b.get()));
 	}
 
 	CCM_ALWAYS_INLINE simd<double, abi::avx512> pow(simd<double, abi::avx512> const & a, simd<double, abi::avx512> const & b)
 	{
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
-		return simd<double, abi::avx2>(_mm512_pow_pd(a.get(), b.get()));
+		return simd<double, abi::avx512>(_mm512_pow_pd(a.get(), b.get()));
 
 	}
 
