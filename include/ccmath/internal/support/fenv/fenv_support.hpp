@@ -22,12 +22,12 @@
 
 namespace ccm::support::fenv::internal
 {
-	inline int clear_except(int err_code)
+	inline int clear_except(const int err_code)
 	{
 		return std::feclearexcept(err_code);
 	}
 
-	inline int test_except(int err_code)
+	inline int test_except(const int err_code)
 	{
 		return std::fetestexcept(err_code);
 	}
@@ -42,7 +42,7 @@ namespace ccm::support::fenv::internal
 #endif
 	}
 
-	inline int set_except(int err_code)
+	inline int set_except([[maybe_unused]] int err_code)
 	{
 		// Only GNU-based compilers support this function.
 #ifdef __USE_GNU
@@ -52,12 +52,12 @@ namespace ccm::support::fenv::internal
 #endif
 	}
 
-	inline int raise_except(int err_code)
+	inline int raise_except(const int err_code)
 	{
 		return std::feraiseexcept(err_code);
 	}
 
-	inline int enable_except(int err_code)
+	inline int enable_except([[maybe_unused]] int err_code)
 	{
 		// Only GNU-based compilers support this function.
 #ifdef __USE_GNU
@@ -66,7 +66,7 @@ namespace ccm::support::fenv::internal
 		return 0;
 #endif
 	}
-	inline int disable_except(int err_code)
+	inline int disable_except([[maybe_unused]] int err_code)
 	{
 // Only GNU-based compilers support this function.
 #ifdef __USE_GNU
@@ -78,10 +78,10 @@ namespace ccm::support::fenv::internal
 
 	inline int get_round()
 	{
-		return ccm::support::fenv::get_rounding_mode();
+		return get_rounding_mode();
 	}
 
-	inline int set_round(int rounding_mode)
+	inline int set_round(const int rounding_mode)
 	{
 		return std::fesetround(rounding_mode);
 	}
@@ -105,11 +105,22 @@ namespace ccm::support::fenv
 		eErrnoExcept = 2,
 	};
 
+	constexpr bool is_errno_enabled()
+	{
+		#if defined(__FAST_MATH__) || defined(CCM_CONFIG_DISABLE_ERRNO)
+		return false;
+		#else
+		return true;
+		#endif
+	}
+
 	// Helper function to convert the enum class to an integer to enable bitwise operations.
 	constexpr int get_mode(ccm_math_err_mode mode)
 	{
 		return static_cast<int>(mode);
 	}
+
+
 
 	constexpr int ccm_math_err_handling()
 	{
@@ -124,31 +135,36 @@ namespace ccm::support::fenv
 #endif
 	}
 
-	constexpr int set_except_if_required(int excepts)
+	// ReSharper disable once CppDFAConstantFunctionResult
+	inline int set_except_if_required(const int excepts)
 	{
-		if (is_constant_evaluated()) { return 0; } // We cannot raise fenv exceptions in a constexpr context. So we return.
-		if ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { return internal::set_except(excepts); }
-		return 0;
-	}
-
-	constexpr int raise_except_if_required(int excepts)
-	{
-		if (is_constant_evaluated()) { return 0; } // We cannot raise fenv exceptions in a constexpr context. So we return.
-
-		if ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { return internal::raise_except(excepts); }
-		return 0;
-	}
-
-	constexpr void set_errno_if_required(int err)
-	{
-		// NOLINTNEXTLINE(bugprone-branch-clone)
-		if (is_constant_evaluated()) // We cannot raise fenv exceptions in a constexpr context. So we return.
+		// Now following the mentality that fenv exceptions will enforce a constexpr function must be evaluated at runtime.
+		//if (is_constant_evaluated()) { return 0; } // We cannot raise fenv exceptions in a constexpr context. So we return.
+		if constexpr (is_errno_enabled())
 		{
-			// Do nothing
+			if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { return internal::set_except(excepts); }
 		}
-		else
+		// ReSharper disable once CppDFAUnreachableCode // This is unreachable code if the above constexpr if statement is true which is desired.
+		return 0;
+	}
+
+	inline int raise_except_if_required(const int excepts)
+	{
+		// Now following the mentality that fenv exceptions will enforce a constexpr function must be evaluated at runtime.
+		//if (is_constant_evaluated()) { return 0; } // We cannot raise fenv exceptions in a constexpr context. So we return.
+		if constexpr (is_errno_enabled())
 		{
-			if ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { errno = err; }
+			if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { return internal::raise_except(excepts); }
+		}
+		// ReSharper disable once CppDFAUnreachableCode // This is unreachable code if the above constexpr if statement is true which is desired.
+		return 0;
+	}
+
+	inline void set_errno_if_required(const int err)
+	{
+		if constexpr (is_errno_enabled())
+		{
+			if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { errno = err; }
 		}
 	}
 } // namespace ccm::support::fenv
