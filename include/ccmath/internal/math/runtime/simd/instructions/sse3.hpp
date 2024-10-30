@@ -18,10 +18,6 @@
 		#include <pmmintrin.h> // SSE3
 	#endif
 
-	#if defined(__FMA__) || defined(CCMATH_HAS_SIMD_AVX2)
-		#include <immintrin.h>
-	#endif
-
 	#ifdef CCMATH_HAS_SIMD_SSE3
 
 namespace ccm::intrin

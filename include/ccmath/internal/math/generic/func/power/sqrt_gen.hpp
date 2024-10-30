@@ -11,8 +11,8 @@
 #pragma once
 
 #include "ccmath/internal/config/type_support.hpp"
-#include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/math/runtime/simd/simd_vectorize.hpp"
+#include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/always_false.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"

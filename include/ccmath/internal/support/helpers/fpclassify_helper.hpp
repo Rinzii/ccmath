@@ -61,4 +61,4 @@ namespace ccm::support::helpers
 		#error "FP_* macros are extremely implementation specific and are not defined for this compiler. Please add support for this compiler."
 #endif
 	};
-} // namespace ccm::helpers
+} // namespace ccm::support::helpers

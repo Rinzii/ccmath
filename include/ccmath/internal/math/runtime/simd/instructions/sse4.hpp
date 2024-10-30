@@ -15,11 +15,8 @@
 
 #ifdef CCMATH_HAS_SIMD
 	#ifdef CCMATH_HAS_SIMD_SSE4
-		#include <smmintrin.h> // SSE4
-	#endif
-
-	#if defined(__FMA__) || defined(CCMATH_HAS_SIMD_AVX2)
-		#include <immintrin.h>
+		#include <smmintrin.h> // SSE4.1
+		#include <nmmintrin.h> // SSE4.2
 	#endif
 
 	#ifdef CCMATH_HAS_SIMD_SSE4

@@ -83,6 +83,7 @@ namespace ccm::intrin
 	}
 
 	template <class T>
+	// NOLINTNEXTLINE
 	struct simd<T, abi::scalar>
 	{
 		using value_type										= T;
@@ -95,8 +96,8 @@ namespace ccm::intrin
 		CCM_ALWAYS_INLINE simd & operator=(simd const &) = default;
 		CCM_ALWAYS_INLINE simd & operator=(simd &&)		= default;
 		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE static constexpr int size() { return 1; }
-		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd(T value) : m_value(value) {}
-		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd(storage_type const & value) { copy_from(value.data(), element_aligned_tag()); }
+		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd(T value) : m_value(value) {} // NOLINT(google-explicit-constructor)
+		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd(storage_type const & value) { copy_from(value.data(), element_aligned_tag()); }  // NOLINT(google-explicit-constructor)
 		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd & operator=(storage_type const & value)
 		{
 			copy_from(value.data(), element_aligned_tag());
@@ -107,7 +108,7 @@ namespace ccm::intrin
 		{
 			copy_from(ptr, flags);
 		}
-		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd(T const * ptr, int /*stride*/) : m_value(ptr[0]) {}
+		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd(T const * ptr, int /*stride*/) : m_value(ptr[0]) {} // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd operator*(simd const & other) const { return simd(m_value * other.m_value); }
 		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd operator/(simd const & other) const { return simd(m_value / other.m_value); }
 		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd operator+(simd const & other) const { return simd(m_value + other.m_value); }
