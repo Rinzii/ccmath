@@ -1,4 +1,4 @@
-include(cmake/Macros.cmake)
+include(cmake/functions/CcmathMessage.cmake)
 
 # detect our OS
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")

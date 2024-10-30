@@ -8,5 +8,3 @@ ccm_add_headers(
         ${CMAKE_CURRENT_SOURCE_DIR}/sse4.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ssse3.hpp
 )
-
-add_subdirectory(func)
