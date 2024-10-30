@@ -27,19 +27,26 @@ message(STATUS "CCMath version: ${PROJECT_VERSION}")
 # TO THE IMPLEMENTOR: If CCMATH_BUILD_TESTS is set to OFF then googletest can be deleted from the ext folder.
 option(CCMATH_INSTALL "Setup install and package steps" ${is_root_project})
 
-option(CCMATH_BUILD_TESTS "Build ccmath tests" ${is_root_project})
+## CCMath specific user defined options
+option(CCMATH_BUILD_TESTS "Build ccmath tests" ${is_root_project}) # If disabled then gtest will not be fetched.
 option(CCMATH_FIND_GTEST_PACKAGE "Enable finding of gtest package" OFF)
-option(CCMATH_BUILD_BENCHMARKS "Build ccmath benchmarks" ${is_root_project})
+option(CCMATH_BUILD_BENCHMARKS "Build ccmath benchmarks" ${is_root_project}) # If disabled then gbench will not be fetched.
 option(CCMATH_FIND_GBENCH_PACKAGE "Enable finding of google benchmark package" OFF)
 option(CCMATH_BUILD_EXAMPLES "Build ccmath examples" ${is_root_project})
-
-option(CCMATH_ENABLE_EXTENSIONS "Enable the extended ccmath library that adds helpful additional methods that are not defined by the standard" ${is_root_project})
-option(CCMATH_ENABLE_RUNTIME_SIMD "Enable SIMD optimization for runtime evaluation (does not effect compile time)" ON) # By default we want SIMD to be enabled
 option(CCMATH_ENABLE_USER_DEFINED_OPTIMIZATION_MACROS "Enable user defined optimization macros instead of having ccmath define its own internal ones in cmake" OFF)
-option(CCMATH_DISABLE_ERRNO "Disable the use of errno in ccmath during runtime" OFF)
+
+## Standard changing user defined options
+# Most options here are by default set to OFF. Setting them to ON will violate the standard, but generally
+# provide better performance or get rid of extra bloat that the standard requires.
+option(CCMATH_ENABLE_EXTENSIONS "Enable the extended ccmath library that adds helpful additional methods that are not defined by the standard" OFF)
+option(CCMATH_DISABLE_ERRNO "Disable the use of errno in ccmath during runtime (this will allow compile time evaluation of edge cases that normally can not be evaluated at compile time)" OFF)
+
+## Simd specific user defined options
+option(CCMATH_ENABLE_RUNTIME_SIMD "Enable SIMD optimization for runtime evaluation (does not effect compile time)" ON) # By default we want SIMD to be enabled to allow faster runtime evaluation.
+option(CCMATH_DISABLE_SVML_USAGE "Disable the use of SVML functions in ccmath. (This only effects compilers that use SVML)" OFF)
 
 # include the global configuration file
-include(cmake/GlobalConfig.cmake)
+include(cmake/config/GlobalConfig.cmake)
 
 add_library(${PROJECT_NAME}-compile-options INTERFACE)
 add_library(${PROJECT_NAME}::${PROJECT_NAME}-compile-options ALIAS ${PROJECT_NAME}-compile-options)
@@ -98,13 +105,9 @@ endif ()
 add_library(${PROJECT_NAME} INTERFACE)
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-include(cmake/Macros.cmake)
+include(cmake/functions/CcmathMessage.cmake)
 
-# Helper function to add headers to the global source list
-function(ccm_add_headers)
-  # Append all the passed arguments (headers) to the target's sources
-  target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ARGV}>")
-endfunction()
+include(cmake/functions/CcmAddHeaders.cmake)
 
 add_subdirectory(include/ccmath)
 
@@ -117,6 +120,10 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
 
 if (CCMATH_ENABLE_RUNTIME_SIMD)
   target_compile_definitions(${PROJECT_NAME} INTERFACE CCM_CONFIG_USE_RT_SIMD)
+
+  if (NOT CCMATH_DISABLE_SVML_USAGE)
+    include(cmake/config/features/CheckAllSupportedSimdFeatures.cmake) # Checks for specific SIMD features and sets the appropriate macros.
+  endif ()
 endif ()
 
 if (NOT CCMATH_ENABLE_USER_DEFINED_OPTIMIZATION_MACROS)
