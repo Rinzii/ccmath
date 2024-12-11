@@ -28,6 +28,7 @@ namespace ccm::ext
 	template<typename T>
     constexpr T lerp_smooth(T a, T b, T t, T h)
     {
-        return b + (a - b) * ccm::exp2<T>(-t / h);
+	    // ReSharper disable once CppRedundantParentheses
+	    return b + ((a - b) * ccm::exp2<T>(-t / h));
     }
 } // namespace ccm::ext

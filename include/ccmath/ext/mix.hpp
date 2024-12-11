@@ -25,7 +25,8 @@ namespace ccm::ext
     template <typename T>
     constexpr T mix(T x, T y, T a) noexcept
 	{
-        return x * (1 - a) + y * a;
+		// ReSharper disable once CppRedundantParentheses
+		return (x * (1 - a)) + (y * a);
     }
 
 	/**
