@@ -91,9 +91,6 @@ jobs:
       - name: Install Ninja
         run: brew install ninja
 
-      - name: Update AppleClang to 14.0.3
-        run: sudo xcode-select -s /Applications/Xcode_14.3.app/Contents/Developer
-
       - name: Configure
         run: cmake --preset="${{ matrix.configurePreset }}" -DCMAKE_CXX_STANDARD="${{ matrix.cxx_version }}"
 
