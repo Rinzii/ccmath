@@ -2,66 +2,106 @@
 	"version": 2,
 	"cmakeMinimumRequired": {
 		"major": 3,
-		"minor": 20,
+		"minor": 18,
 		"patch": 0
 	},
 	"configurePresets": [
 		{
-			"name": "default",
-			"description": "Build configuration using Ninja Multi-config",
+			"name": "base",
+			"description": "Base configuration using Ninja Multi-config",
 			"generator": "Ninja Multi-Config",
-			"binaryDir": "${sourceDir}/out/default",
+			"hidden": true,
+			"binaryDir": "${sourceDir}/out/build/ninja/${presetName}",
 			"cacheVariables": {
-				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+				"CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+				"CMAKE_CONFIGURATION_TYPES": "Debug;RelWithDebInfo;MinSizeRel",
+				"CMAKE_CXX_STANDARD": "17"
 			}
 		},
 		{
-			"name": "ninja-gcc",
-			"description": "Build configuration using Ninja Multi-config / gcc",
-			"inherits": "default",
-			"binaryDir": "${sourceDir}/out/gcc",
+			"name": "base-vs19",
+			"description": "Base configuration using Visual Studio 16 (2019)",
+			"generator": "Visual Studio 16 2019",
+			"hidden": true,
+			"binaryDir": "${sourceDir}/out/build/vs19/${presetName}",
+			"architecture": {
+				"value": "x64",
+				"strategy": "external"
+			},
+			"cacheVariables": {
+				"CMAKE_CXX_STANDARD": "17"
+			}
+		},
+		{
+			"name": "base-vs22",
+			"description": "Base configuration using Visual Studio 17 (2022)",
+			"generator": "Visual Studio 17 2022",
+			"hidden": true,
+			"binaryDir": "${sourceDir}/out/build/vs22/${presetName}",
+			"architecture": {
+				"value": "x64",
+				"strategy": "external"
+			},
+			"cacheVariables": {
+				"CMAKE_CXX_STANDARD": "17"
+			}
+		},
+		{
+			"name": "Debug",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "Release",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "RelWithDebInfo"
+			}
+		},
+		{
+			"name": "MinSizeRel",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "MinSizeRel"
+			}
+		},
+		{
+			"name": "RelWithDebInfo",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "RelWithDebInfo"
+			}
+		},
+		{
+			"name": "ccache",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_C_COMPILER_LAUNCHER": "ccache",
+				"CMAKE_CXX_COMPILER_LAUNCHER": "ccache"
+			}
+		},
+		{
+			"name": "gcc",
+			"hidden": true,
 			"cacheVariables": {
 				"CMAKE_C_COMPILER": "gcc",
 				"CMAKE_CXX_COMPILER": "g++"
 			}
 		},
 		{
-			"name": "ninja-gcc-minsize",
-			"description": "Build configuration using Ninja Multi-config / gcc",
-			"inherits": "ninja-gcc",
-			"binaryDir": "${sourceDir}/out/gcc-minsize",
-			"cacheVariables": {
-				"CMAKE_C_COMPILER": "gcc",
-				"CMAKE_CXX_COMPILER": "g++",
-				"CMAKE_CXX_FLAGS": "-Os"
-			}
-		},
-		{
-			"name": "ninja-clang",
-			"description": "Build configuration using Ninja Multi-config / clang",
-			"inherits": "default",
-			"binaryDir": "${sourceDir}/out/clang",
+			"name": "clang",
+			"hidden": true,
 			"cacheVariables": {
 				"CMAKE_C_COMPILER": "clang",
 				"CMAKE_CXX_COMPILER": "clang++"
 			}
 		},
 		{
-			"name": "ninja-clang-minsize",
-			"description": "Build configuration using Ninja Multi-config / clang",
-			"inherits": "ninja-clang",
-			"binaryDir": "${sourceDir}/out/clang-minsize",
-			"cacheVariables": {
-				"CMAKE_C_COMPILER": "clang",
-				"CMAKE_CXX_COMPILER": "clang++",
-				"CMAKE_CXX_FLAGS": "-Os"
-			}
-		},
-		{
-			"name": "ninja-clang-libcpp",
-			"description": "Build configuration using Ninja Multi-config / clang",
-			"inherits": "default",
-			"binaryDir": "${sourceDir}/out/clang-libcpp",
+			"name": "clang-libcpp",
+			"hidden": true,
 			"cacheVariables": {
 				"CMAKE_C_COMPILER": "clang",
 				"CMAKE_CXX_COMPILER": "clang++",
@@ -70,147 +110,327 @@
 			}
 		},
 		{
-			"name": "ninja-intel",
-			"description": "Build configuration using Ninja Multi-config / intel",
-			"inherits": "default",
-			"binaryDir": "${sourceDir}/out/intel",
+			"name": "msvc",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "cl",
+				"CMAKE_CXX_COMPILER": "cl"
+			}
+		},
+		{
+			"name": "msvc-clang",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "clang-cl",
+				"CMAKE_CXX_COMPILER": "clang-cl"
+			}
+		},
+		{
+			"name": "intel",
+			"hidden": true,
 			"cacheVariables": {
 				"CMAKE_C_COMPILER": "icx",
 				"CMAKE_CXX_COMPILER": "icpx"
 			}
 		},
 		{
-			"name": "ninja-nvidia-hpc",
-			"description": "Build configuration using Ninja Multi-config / nvidia-hpc",
-			"inherits": "default",
-			"binaryDir": "${sourceDir}/out/nvidia-hpc",
-			"cacheVariables": {
-				"CMAKE_C_COMPILER": "nvc",
-				"CMAKE_CXX_COMPILER": "nvc++"
-			}
+			"name": "ninja-gcc-debug",
+			"inherits": [
+				"base",
+				"gcc",
+				"Debug"
+			],
+			"description": "Ninja Multi-config + GCC (Debug)"
 		},
 		{
-			"name": "ninja-ubsan",
-			"description": "UBSan build configuration using Ninja Multi-config",
-			"inherits": "default",
-			"binaryDir": "${sourceDir}/out/ubsan",
-			"cacheVariables": {
-				"CMAKE_CXX_FLAGS": "-fsanitize=undefined"
-			}
+			"name": "ninja-gcc-release",
+			"inherits": [
+				"base",
+				"gcc",
+				"Release"
+			],
+			"description": "Ninja Multi-config + GCC (RelWithDebInfo)"
 		},
 		{
-			"name": "clang-tidy",
-			"description": "UBSan build configuration using Ninja Multi-config",
-			"inherits": "ninja-clang",
-			"binaryDir": "${sourceDir}/out/clang-tidy",
-			"cacheVariables": {
-				"CMAKE_EXPORT_COMPILE_COMMANDS": "On"
-			}
+			"name": "ninja-gcc-ccache-debug",
+			"inherits": [
+				"base",
+				"ccache",
+				"gcc",
+				"Debug"
+			],
+			"description": "Ninja Multi-config + GCC + ccache (Debug)"
 		},
 		{
-			"name": "vs19",
-			"description": "Build configuration using Visual Studio 16 (2019)",
-			"generator": "Visual Studio 16 2019",
-			"binaryDir": "${sourceDir}/out/vs",
-			"architecture": {
-				"value": "x64",
-				"strategy": "external"
-			}
+			"name": "ninja-clang-debug",
+			"inherits": [
+				"base",
+				"clang",
+				"Debug"
+			],
+			"description": "Ninja Multi-config + Clang (Debug)"
 		},
 		{
-			"name": "vs22",
-			"description": "Build configuration using Visual Studio 17 (2022)",
-			"inherits": "vs19",
-			"generator": "Visual Studio 17 2022"
+			"name": "ninja-clang-release",
+			"inherits": [
+				"base",
+				"clang",
+				"Release"
+			],
+			"description": "Ninja Multi-config + Clang (RelWithDebInfo)"
 		},
 		{
-			"name": "benchmark-default",
-			"description": "Benchmark build configuration using Ninja Multi-config",
-			"inherits": "default",
-			"binaryDir": "${sourceDir}/out/benchmark",
-			"cacheVariables": {
-				"CCMATH_BUILD_BENCHMARKS": "ON",
-				"CCMATH_BUILD_TESTS": "OFF",
-				"CCMATH_BUILD_EXAMPLES": "OFF"
-			}
+			"name": "ninja-clang-minsizerel",
+			"inherits": [
+				"base",
+				"clang",
+				"MinSizeRel"
+			],
+			"description": "Ninja Multi-config + Clang (MinSizeRel)"
+		},
+		{
+			"name": "ninja-clang-libcpp-relwithdebinfo",
+			"inherits": [
+				"base",
+				"clang-libcpp",
+				"RelWithDebInfo"
+			],
+			"description": "Ninja + Clang + libc++ (RelWithDebInfo)"
+		},
+		{
+			"name": "ninja-intel-relwithdebinfo",
+			"inherits": [
+				"base",
+				"intel",
+				"RelWithDebInfo"
+			],
+			"description": "Ninja + Intel (RelWithDebInfo)"
+		},
+		{
+			"name": "vs19-debug",
+			"inherits": [
+				"base-vs19",
+				"Debug"
+			],
+			"description": "VS2019 + Debug"
+		},
+		{
+			"name": "vs19-release",
+			"inherits": [
+				"base-vs19",
+				"Release"
+			],
+			"description": "VS2019 + RelWithDebInfo"
+		},
+		{
+			"name": "vs22-debug",
+			"inherits": [
+				"base-vs22",
+				"Debug"
+			],
+			"description": "VS2022 + Debug"
+		},
+		{
+			"name": "vs22-release",
+			"inherits": [
+				"base-vs22",
+				"Release"
+			],
+			"description": "VS2022 + RelWithDebInfo"
+		},
+		{
+			"name": "vs22-clang-debug",
+			"inherits": [
+				"base-vs22",
+				"msvc-clang",
+				"Debug"
+			],
+			"description": "VS2022 + clang-cl (Debug)"
 		}
 	],
 	"buildPresets": [
 		{
-			"name": "Debug",
-			"configurePreset": "default",
-			"configuration": "Debug"
+			"name": "build-ninja-gcc-debug",
+			"configurePreset": "ninja-gcc-debug",
+			"configuration": "Debug",
+			"targets": [
+				"all"
+			]
 		},
 		{
-			"name": "Debug-gcc",
-			"configurePreset": "ninja-gcc",
-			"configuration": "Debug"
+			"name": "build-ninja-gcc-release",
+			"configurePreset": "ninja-gcc-release",
+			"configuration": "RelWithDebInfo",
+			"targets": [
+				"all"
+			]
 		},
 		{
-			"name": "Debug-clang",
-			"configurePreset": "ninja-clang",
-			"configuration": "Debug"
+			"name": "build-ninja-gcc-ccache-debug",
+			"configurePreset": "ninja-gcc-ccache-debug",
+			"configuration": "Debug",
+			"targets": [
+				"all"
+			]
 		},
 		{
-			"name": "Release",
-			"configurePreset": "default",
-			"configuration": "Release"
+			"name": "build-ninja-clang-debug",
+			"configurePreset": "ninja-clang-debug",
+			"configuration": "Debug",
+			"targets": [
+				"all"
+			]
 		},
 		{
-			"name": "Release-gcc",
-			"configurePreset": "ninja-gcc",
-			"configuration": "Release"
+			"name": "build-ninja-clang-release",
+			"configurePreset": "ninja-clang-release",
+			"configuration": "RelWithDebInfo",
+			"targets": [
+				"all"
+			]
 		},
 		{
-			"name": "Release-clang",
-			"configurePreset": "ninja-clang",
-			"configuration": "Release"
+			"name": "build-ninja-clang-minsizerel",
+			"configurePreset": "ninja-clang-minsizerel",
+			"configuration": "MinSizeRel",
+			"targets": [
+				"all"
+			]
 		},
 		{
-			"name": "RelWithDebInfo",
-			"configurePreset": "default",
-			"configuration": "RelWithDebInfo"
+			"name": "build-ninja-clang-libcpp-relwithdebinfo",
+			"configurePreset": "ninja-clang-libcpp-relwithdebinfo",
+			"configuration": "RelWithDebInfo",
+			"targets": [
+				"all"
+			]
 		},
 		{
-			"name": "RelWithDebInfo-gcc",
-			"configurePreset": "ninja-gcc",
-			"configuration": "RelWithDebInfo"
+			"name": "build-ninja-intel-relwithdebinfo",
+			"configurePreset": "ninja-intel-relwithdebinfo",
+			"configuration": "RelWithDebInfo",
+			"targets": [
+				"all"
+			]
 		},
 		{
-			"name": "RelWithDebInfo-clang",
-			"configurePreset": "ninja-clang",
-			"configuration": "RelWithDebInfo"
+			"name": "build-vs19-debug",
+			"configurePreset": "vs19-debug",
+			"configuration": "Debug",
+			"targets": [
+				"ALL_BUILD"
+			]
 		},
 		{
-			"name": "Benchmark",
-			"configurePreset": "benchmark-default",
-			"configuration": "Release"
+			"name": "build-vs19-release",
+			"configurePreset": "vs19-release",
+			"configuration": "RelWithDebInfo",
+			"targets": [
+				"ALL_BUILD"
+			]
+		},
+		{
+			"name": "build-vs22-debug",
+			"configurePreset": "vs22-debug",
+			"configuration": "Debug",
+			"targets": [
+				"ALL_BUILD"
+			]
+		},
+		{
+			"name": "build-vs22-release",
+			"configurePreset": "vs22-release",
+			"configuration": "RelWithDebInfo",
+			"targets": [
+				"ALL_BUILD"
+			]
+		},
+		{
+			"name": "build-vs22-clang-debug",
+			"configurePreset": "vs22-clang-debug",
+			"configuration": "Debug",
+			"targets": [
+				"ALL_BUILD"
+			]
 		}
-
 	],
 	"testPresets": [
 		{
-			"name": "Debug",
-			"configurePreset": "default",
+			"name": "test-ninja-gcc-debug",
+			"configurePreset": "ninja-gcc-debug",
 			"configuration": "Debug",
 			"inheritConfigureEnvironment": true
 		},
 		{
-			"name": "Release",
-			"configurePreset": "default",
-			"configuration": "Release",
-			"inheritConfigureEnvironment": true
-		},
-		{
-			"name": "Release-clang",
-			"configurePreset": "ninja-clang",
-			"configuration": "Release",
-			"inheritConfigureEnvironment": true
-		},
-		{
-			"name": "RelWithDebInfo",
-			"configurePreset": "default",
+			"name": "test-ninja-gcc-release",
+			"configurePreset": "ninja-gcc-release",
 			"configuration": "RelWithDebInfo",
+			"inheritConfigureEnvironment": true
+		},
+		{
+			"name": "test-ninja-gcc-ccache-debug",
+			"configurePreset": "ninja-gcc-ccache-debug",
+			"configuration": "Debug",
+			"inheritConfigureEnvironment": true
+		},
+		{
+			"name": "test-ninja-clang-debug",
+			"configurePreset": "ninja-clang-debug",
+			"configuration": "Debug",
+			"inheritConfigureEnvironment": true
+		},
+		{
+			"name": "test-ninja-clang-release",
+			"configurePreset": "ninja-clang-release",
+			"configuration": "RelWithDebInfo",
+			"inheritConfigureEnvironment": true
+		},
+		{
+			"name": "test-ninja-clang-minsizerel",
+			"configurePreset": "ninja-clang-minsizerel",
+			"configuration": "MinSizeRel",
+			"inheritConfigureEnvironment": true
+		},
+		{
+			"name": "test-ninja-clang-libcpp-relwithdebinfo",
+			"configurePreset": "ninja-clang-libcpp-relwithdebinfo",
+			"configuration": "RelWithDebInfo",
+			"inheritConfigureEnvironment": true
+		},
+		{
+			"name": "test-ninja-intel-relwithdebinfo",
+			"configurePreset": "ninja-intel-relwithdebinfo",
+			"configuration": "RelWithDebInfo",
+			"inheritConfigureEnvironment": true
+		},
+		{
+			"name": "test-vs19-debug",
+			"configurePreset": "vs19-debug",
+			"configuration": "Debug",
+			"inheritConfigureEnvironment": true
+		},
+		{
+			"name": "test-vs19-release",
+			"configurePreset": "vs19-release",
+			"configuration": "RelWithDebInfo",
+			"inheritConfigureEnvironment": true
+		},
+		{
+			"name": "test-vs22-debug",
+			"configurePreset": "vs22-debug",
+			"configuration": "Debug",
+			"inheritConfigureEnvironment": true
+		},
+		{
+			"name": "test-vs22-release",
+			"configurePreset": "vs22-release",
+			"configuration": "RelWithDebInfo",
+			"inheritConfigureEnvironment": true
+		},
+		{
+			"name": "test-vs22-clang-debug",
+			"configurePreset": "vs22-clang-debug",
+			"configuration": "Debug",
 			"inheritConfigureEnvironment": true
 		}
 	]

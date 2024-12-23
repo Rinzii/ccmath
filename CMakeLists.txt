@@ -19,82 +19,18 @@ if (NOT CCMATH_SOURCE_DIR)
   set(CCMATH_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 endif ()
 
-# TODO: Change this to instead use cmakes more modern target_compile_features
+# TODO: Possibly change this to instead use cmakes more modern target_compile_features
+# TODO: Changing this to use target_compile_features will require adjustments of the CI
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-message(STATUS "CCMath version: ${PROJECT_VERSION}")
+message(STATUS "CCMath: Version: ${PROJECT_VERSION}")
 
 #
 # User-facing options
 #
-
-# CCMATH_INSTALL:
-# Controls whether installation and packaging steps are configured.
-# If this is the root project (standalone), default to ON.
-# If this project is included as a subproject, default to OFF.
-option(CCMATH_INSTALL "Setup install and package steps" ${is_root_project})
-
-# CCMATH_BUILD_TESTS:
-# Enable building of ccmath tests. If OFF, tests are skipped. Should only be used by ccmath developers.
-option(CCMATH_BUILD_TESTS "Build ccmath tests" ${is_root_project})
-
-# CCMATH_FIND_GTEST_PACKAGE:
-# Look for gtest package rather than downloading it if needed.
-option(CCMATH_FIND_GTEST_PACKAGE "Enable finding of gtest package" OFF)
-
-# CCMATH_BUILD_BENCHMARKS:
-# Enable building of ccmath benchmarks. If OFF, benchmarks are skipped.
-option(CCMATH_BUILD_BENCHMARKS "Build ccmath benchmarks" ${is_root_project})
-
-# CCMATH_FIND_GBENCH_PACKAGE:
-# Look for google benchmark package rather than downloading it if needed. Should only be used by ccmath developers.
-option(CCMATH_FIND_GBENCH_PACKAGE "Enable finding of google benchmark package" OFF)
-
-# CCMATH_BUILD_EXAMPLES:
-# Build example code demonstrating usage of ccmath.
-option(CCMATH_BUILD_EXAMPLES "Build ccmath examples" ${is_root_project})
-
-# CCMATH_ENABLE_USER_DEFINED_OPTIMIZATION_MACROS:
-# Allow users to supply their own optimization macros rather than CCMath defining them itself.
-option(CCMATH_ENABLE_USER_DEFINED_OPTIMIZATION_MACROS
-        "Enable user defined optimization macros instead of having ccmath define its own"
-        OFF)
-
-# CCMATH_ENABLE_EXTENSIONS:
-# Enable non-standard extensions that go beyond the <cmath> interface.
-option(CCMATH_ENABLE_EXTENSIONS
-        "Enable the extended ccmath library that adds additional methods beyond the standard"
-        OFF)
-
-# CCMATH_DISABLE_ERRNO:
-# Disable usage of errno during runtime breaking standard compliance, but may lead to faster evaluation and smaller binaries.
-option(CCMATH_DISABLE_ERRNO
-        "Disable the use of errno in ccmath during runtime (may lead to faster evaluations but is non-standard)"
-        OFF)
-
-# CCMATH_ENABLE_RUNTIME_SIMD:
-# Enable runtime SIMD optimizations for faster evaluations at runtime.
-option(CCMATH_ENABLE_RUNTIME_SIMD
-        "Enable SIMD optimization for runtime evaluation (does not affect compile-time)"
-        ON)
-
-# CCMATH_DISABLE_SVML_USAGE:
-# Disable the use of SVML (Short Vector Math Library) if supported by the compiler.
-option(CCMATH_DISABLE_SVML_USAGE
-        "Disable the use of SVML functions in ccmath (if supported by compiler)"
-        OFF)
-
-# CCMATH_STRICT_WARNINGS:
-# Enable strict warning handling, turning certain warnings into errors.
-# This might be intrusive for downstream users, so disable if we are not the root project.
-option(CCMATH_STRICT_WARNINGS
-        "Enable strict warnings and treat certain warnings as errors. May be intrusive downstream."
-        ${is_root_project})
-
-# Include global configuration
-include(cmake/config/GlobalConfig.cmake)
+include(cmake/config/UserOptions.cmake) # To see the options, look at this file
 
 add_library(${PROJECT_NAME}-compile-options INTERFACE)
 add_library(${PROJECT_NAME}::${PROJECT_NAME}-compile-options ALIAS ${PROJECT_NAME}-compile-options)
@@ -105,7 +41,7 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME}-compile-options ALIAS ${PROJECT_NAM
 if (MSVC)
   # MSVC-specific options
   target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
-          /W3
+          /W4
           /permissive-
           /Zc:__cplusplus
           /D_ENABLE_EXTENDED_ALIGNED_STORAGE
@@ -129,24 +65,23 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
           -Wall
           -Wextra
           -Wconversion
-          -Wno-pedantic
-          -ffp-contract=fast
+          -Wpedantic
           # Define NOMINMAX only on Windows to avoid conflicts with min/max macros
           $<$<BOOL:${WIN32}>:-DNOMINMAX>
-          -Wno-unused-but-set-variable
-          -Wno-unused-value
-          -Wno-unused-parameter
+          #-Wno-unused-but-set-variable
+          #-Wno-unused-value
+          #-Wno-unused-parameter
   )
 
   if (CCMATH_STRICT_WARNINGS)
     target_compile_options(${PROJECT_NAME}-compile-options INTERFACE -Werror=return-type)
   endif ()
 
-  if (CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
-    target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
-            -Wno-tautological-constant-compare
-    )
-  endif()
+#  if (CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
+#    target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+#            -Wno-tautological-constant-compare
+#    )
+#  endif()
 
 else()
   message(WARNING "CCMath: Unknown compiler. No specific flags applied.")
@@ -155,8 +90,7 @@ endif()
 add_library(${PROJECT_NAME} INTERFACE)
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-include(cmake/functions/CcmathMessage.cmake)
-include(cmake/functions/CcmAddHeaders.cmake)
+include(cmake/helpers/CcmAddHeaders.cmake)
 
 # Add public headers through a directory-level CMakeLists that sets variables, etc.
 add_subdirectory(include/ccmath)
