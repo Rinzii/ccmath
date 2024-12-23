@@ -3,7 +3,7 @@
 # Original script from here:
 # https://github.com/lakshayg/google_benchmark_plot/
 # Script has been modified to meet the needs of ccmath
-
+# TODO: Replace this with new script able to handle averaged data.
 
 """Script to visualize google-benchmark output"""
 import argparse
