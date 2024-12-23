@@ -2,7 +2,7 @@ project(ccmath-ext)
 
 include(FetchContent)
 
-set(CCMATH_BENCHMARK_VERSION v1.8.3)
+set(CCMATH_BENCHMARK_VERSION v1.9.1)
 set(CCMATH_GTEST_VERSION v1.14.0)
 
 if (CCMATH_BUILD_BENCHMARKS)
