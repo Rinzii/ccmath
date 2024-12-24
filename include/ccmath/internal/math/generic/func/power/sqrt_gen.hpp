@@ -73,6 +73,7 @@ namespace ccm::gen
 			namespace bit80
 			{
 				// This has to be defined for sqrt_impl to work as it still needs to see that this function exists
+				// ReSharper disable once CppFunctionIsNotImplemented
 				static constexpr long double sqrt_calc_80bits(long double x);
 
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
