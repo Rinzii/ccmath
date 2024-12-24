@@ -21,19 +21,19 @@ namespace ccm::support::fenv
 	{
 		inline bool rt_rounding_mode_is_round_up()
 		{
-			volatile constexpr float x = 0x1.0p-25F;
+			static volatile const float x = 0x1.0p-25F;
 			return (1.0F + x != 1.0F);
 		}
 
 		inline bool rt_rounding_mode_is_round_down()
 		{
-			volatile constexpr float x = 0x1.0p-25F;
+			static volatile const float x = 0x1.0p-25F;
 			return (-1.0F - x != -1.0F);
 		}
 
 		inline bool rt_rounding_mode_is_round_to_nearest()
 		{
-			static volatile constexpr float x = 0x1.0p-24F;
+			static volatile const float x = 0x1.0p-24F;
 			float const y					  = x;
 			return (1.5F + y == 1.5F - y);
 		}
@@ -41,14 +41,14 @@ namespace ccm::support::fenv
 		inline bool rt_rounding_mode_is_round_to_zero()
 		{
 
-			static volatile float const x = 0x1.0p-24F;
+			static volatile const float x = 0x1.0p-24F;
 			const float y			= x;
 			return ((0x1.000002p0F + y) + (-1.0F - y) == 0x1.0p-23F);
 		}
 
 		inline int rt_get_rounding_mode()
 		{
-			static volatile float const x = 0x1.0p-24F;
+			static volatile const float x = 0x1.0p-24F;
 			float const y			= x;
 			float const z			= (0x1.000002p0F + y) + (-1.0F - y);
 
