@@ -17,6 +17,8 @@
 
 #include <cstdint>
 
+#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+
 namespace ccm::internal
 {
 	namespace impl
@@ -31,7 +33,9 @@ namespace ccm::internal
 				exp -= 127;
 				if (exp > 127)
 				{
+					CCM_DISABLE_MSVC_WARNING(4756) // 4756: overflow in constant arithmetic
 					tmp *= 0x1p127F;
+					CCM_RESTORE_MSVC_WARNING()
 					exp -= 127;
 					exp = ccm::min(exp, 127);
 				}
