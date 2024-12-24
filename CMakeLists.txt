@@ -45,6 +45,7 @@ if (MSVC)
           /permissive-
           /Zc:__cplusplus
           /D_ENABLE_EXTENDED_ALIGNED_STORAGE
+          /D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
   )
   # Only define NOMINMAX on Windows platforms
   if (WIN32)

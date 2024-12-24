@@ -15,4 +15,3 @@ include(${CCMATH_SOURCE_DIR}/cmake/config/features/simd/CheckNEONSupport.cmake)
 if (NOT CCMATH_DISABLE_SVML_USAGE)
   include(${CCMATH_SOURCE_DIR}/cmake/config/features/simd/CheckSVMLSupport.cmake)
 endif ()
-
