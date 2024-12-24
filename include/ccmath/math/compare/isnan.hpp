@@ -23,7 +23,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	[[nodiscard]] constexpr bool isnan(T num) noexcept
 	{
-#if defined(__GNUC__) || defined(__clang__)
+#if defined(__GNUC__) || defined(__clang__) || defined(CCM_CONFIG_HAS_BUILTIN_ISNAN_CONSTEXPR)
 		return __builtin_isnan(num); // GCC and Clang implement this as constexpr
 #else							   // If we can't use the builtin, fallback to this comparison and hope for the best.
 		using FPBits_t = typename ccm::support::fp::FPBits<T>;
