@@ -11,7 +11,6 @@
 // Workaround for the GitHub Actions causing SEH exceptions
 // https://github.com/actions/runner-images/issues/10004#
 // NOLINTNEXTLINE
-#define _DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
 
 #include <gtest/gtest.h>
 
@@ -208,4 +207,4 @@ TEST(CcmathPowerTests, Sqrt_RT_LDouble_EdgeCases)
 
 	//EXPECT_EQ(ccm::sqrt(std::numeric_limits<double>::lowest()), std::sqrt(std::numeric_limits<double>::lowest()));
 }
-#endif
+#endif // defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
