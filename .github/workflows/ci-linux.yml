@@ -112,4 +112,4 @@ jobs:
         run: cmake --build --preset="${{ matrix.buildPreset }}"
 
       - name: Test
-        run: ctest --preset="${{ matrix.testPreset }}" --output-on-failure --extra-verbose --schedule-random -F
+        run: ctest --preset="${{ matrix.testPreset }}" --output-on-failure --verbose --schedule-random -F
