@@ -260,7 +260,7 @@
 		{
 			"name": "build-ninja-gcc-release",
 			"configurePreset": "ninja-gcc-release",
-			"configuration": "RelWithDebInfo",
+			"configuration": "Release",
 			"targets": [
 				"all"
 			]
@@ -284,7 +284,7 @@
 		{
 			"name": "build-ninja-clang-release",
 			"configurePreset": "ninja-clang-release",
-			"configuration": "RelWithDebInfo",
+			"configuration": "Release",
 			"targets": [
 				"all"
 			]
@@ -324,7 +324,7 @@
 		{
 			"name": "build-vs19-release",
 			"configurePreset": "vs19-release",
-			"configuration": "RelWithDebInfo",
+			"configuration": "Release",
 			"targets": [
 				"ALL_BUILD"
 			]
@@ -340,7 +340,7 @@
 		{
 			"name": "build-vs22-release",
 			"configurePreset": "vs22-release",
-			"configuration": "RelWithDebInfo",
+			"configuration": "Release",
 			"targets": [
 				"ALL_BUILD"
 			]
@@ -364,7 +364,7 @@
 		{
 			"name": "test-ninja-gcc-release",
 			"configurePreset": "ninja-gcc-release",
-			"configuration": "RelWithDebInfo",
+			"configuration": "Release",
 			"inheritConfigureEnvironment": true
 		},
 		{
@@ -382,7 +382,7 @@
 		{
 			"name": "test-ninja-clang-release",
 			"configurePreset": "ninja-clang-release",
-			"configuration": "RelWithDebInfo",
+			"configuration": "Release",
 			"inheritConfigureEnvironment": true
 		},
 		{
@@ -412,7 +412,7 @@
 		{
 			"name": "test-vs19-release",
 			"configurePreset": "vs19-release",
-			"configuration": "RelWithDebInfo",
+			"configuration": "Release",
 			"inheritConfigureEnvironment": true
 		},
 		{
@@ -424,7 +424,7 @@
 		{
 			"name": "test-vs22-release",
 			"configurePreset": "vs22-release",
-			"configuration": "RelWithDebInfo",
+			"configuration": "Release",
 			"inheritConfigureEnvironment": true
 		},
 		{
