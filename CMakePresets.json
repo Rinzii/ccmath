@@ -15,7 +15,7 @@
 			"cacheVariables": {
 				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
 				"CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-				"CMAKE_CONFIGURATION_TYPES": "Debug;RelWithDebInfo;MinSizeRel",
+				"CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
 				"CMAKE_CXX_STANDARD": "17"
 			}
 		},
@@ -58,7 +58,7 @@
 			"name": "Release",
 			"hidden": true,
 			"cacheVariables": {
-				"CMAKE_BUILD_TYPE": "RelWithDebInfo"
+				"CMAKE_BUILD_TYPE": "Release"
 			}
 		},
 		{
@@ -149,7 +149,7 @@
 				"gcc",
 				"Release"
 			],
-			"description": "Ninja Multi-config + GCC (RelWithDebInfo)"
+			"description": "Ninja Multi-config + GCC (Release)"
 		},
 		{
 			"name": "ninja-gcc-ccache-debug",
@@ -177,7 +177,7 @@
 				"clang",
 				"Release"
 			],
-			"description": "Ninja Multi-config + Clang (RelWithDebInfo)"
+			"description": "Ninja Multi-config + Clang (Release)"
 		},
 		{
 			"name": "ninja-clang-minsizerel",
@@ -220,7 +220,7 @@
 				"base-vs19",
 				"Release"
 			],
-			"description": "VS2019 + RelWithDebInfo"
+			"description": "VS2019 + Release"
 		},
 		{
 			"name": "vs22-debug",
@@ -236,7 +236,7 @@
 				"base-vs22",
 				"Release"
 			],
-			"description": "VS2022 + RelWithDebInfo"
+			"description": "VS2022 + Release"
 		},
 		{
 			"name": "vs22-clang-debug",
