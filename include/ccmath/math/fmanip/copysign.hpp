@@ -32,7 +32,7 @@ namespace ccm
 			return std::numeric_limits<T>::quiet_NaN();
 		}
 
-		T sign_bit = ccm::signbit(sgn) ? -1 : 1;
+		T sign_bit = ccm::signbit(sgn) ? T(-1) : T(1);
 		return ccm::abs(mag) * sign_bit;
 	}
 

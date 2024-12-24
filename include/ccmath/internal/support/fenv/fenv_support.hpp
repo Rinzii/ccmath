@@ -20,6 +20,11 @@
 #include <cfenv>
 #include <cstdint>
 
+#if defined(_MSC_VER) && !defined(__clang__)
+#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+CCM_DISABLE_MSVC_WARNING(4702) // 4702: unreachable code
+#endif
+
 namespace ccm::support::fenv::internal
 {
 	inline int clear_except(const int err_code)
@@ -168,3 +173,7 @@ namespace ccm::support::fenv
 		}
 	}
 } // namespace ccm::support::fenv
+
+#if defined(_MSC_VER) && !defined(__clang__)
+CCM_RESTORE_MSVC_WARNING()
+#endif

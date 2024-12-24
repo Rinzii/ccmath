@@ -16,7 +16,7 @@ namespace ccm::gen::impl
 {
 	namespace internal::impl
 	{
-		constexpr float powf_impl(float base, float exp) noexcept
+		constexpr float powf_impl([[maybe_unused]] float base, [[maybe_unused]] float exp) noexcept
 		{
 			// TODO: Implement this.
 			return 0;

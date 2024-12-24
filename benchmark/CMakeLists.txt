@@ -38,5 +38,5 @@ if(CCM_BENCH_POWER)
 endif ()
 
 if(CCM_BENCH_NEAREST)
-  add_benchmark(trunc benchmarks/nearest/trunc.bench.cpp benchmarks/nearest/trunc.bench.hpp)
+  #add_benchmark(trunc benchmarks/nearest/trunc.bench.cpp benchmarks/nearest/trunc.bench.hpp)
 endif ()

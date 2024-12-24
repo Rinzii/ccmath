@@ -15,13 +15,13 @@
 namespace ccm
 {
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T log10(T num)
+	constexpr T log10([[maybe_unused]] T num)
 	{
 		#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
 		if constexpr (std::is_same_v<T, float>) { return __builtin_log10f(num); }
 		if constexpr (std::is_same_v<T, double>) { return __builtin_log10(num); }
 		if constexpr (std::is_same_v<T, long double>) { return __builtin_log10l(num); }
-		return static_cast<T>(__builtin_expm1l(num));
+		return static_cast<T>(__builtin_expm1l(static_cast<long double>(num)));
 		#else
 		if constexpr (std::is_same_v<T, float>) { return 0; }
 		if constexpr (std::is_same_v<T, double>) { return 0; }

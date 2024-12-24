@@ -374,7 +374,7 @@ namespace ccm::support
 	{
 		n = n - (n >> 1) & 0x5555;
 		n = (n & 0x3333) + (n >> 2) & 0x3333;
-		n = (n + n >> 4) & 0x0F0F;
+		n = (n + (n >> 4)) & 0x0F0F;
 		return (n * 0x0101) >> 16;
 	}
 
@@ -385,14 +385,14 @@ namespace ccm::support
 		{
 			n = n - (n >> 1) & 0x55555555;
 			n = (n & 0x33333333) + (n >> 2) & 0x33333333;
-			n = (n + n >> 4) & 0x0F0F0F0F;
+			n = (n + (n >> 4)) & 0x0F0F0F0F;
 			return (n * 0x01010101) >> 24;
 		}
 		else // 16 bit int
 		{
 			n = n - (n >> 1) & 0x5555;
 			n = (n & 0x3333) + (n >> 2) & 0x3333;
-			n = (n + n >> 4) & 0x0F0F;
+			n = (n + (n >> 4)) & 0x0F0F;
 			return (n * 0x0101) >> 16;
 		}
 	}
@@ -408,7 +408,7 @@ namespace ccm::support
 		{
 			n = n - (n >> 1) & 0x55555555;
 			n = (n & 0x33333333) + (n >> 2) & 0x33333333;
-			n = (n + n >> 4) & 0x0F0F0F0F;
+			n = (n + (n >> 4)) & 0x0F0F0F0F;
 			return (n * 0x01010101) >> 24;
 		}
 		else // 64-bit long
