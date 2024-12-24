@@ -8,6 +8,11 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+// Workaround for the GitHub Actions causing SEH exceptions
+// https://github.com/actions/runner-images/issues/10004#
+// NOLINTNEXTLINE
+#define _DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
+
 #include <gtest/gtest.h>
 
 #include "ccmath/ccmath.hpp"
