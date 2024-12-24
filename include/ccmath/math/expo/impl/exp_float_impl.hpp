@@ -14,7 +14,14 @@
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
 #include "ccmath/math/expo/impl/exp_data.hpp"
+
+#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+
 #include <cstdint>
+
+// TODO: Replace with more modern implementation.
+
+CCM_DISABLE_MSVC_WARNING(4056)
 
 namespace ccm::internal::impl
 {
@@ -86,3 +93,5 @@ namespace ccm::internal::impl
 		return static_cast<float>(result);
 	}
 } // namespace ccm::internal::impl
+
+CCM_RESTORE_MSVC_WARNING()

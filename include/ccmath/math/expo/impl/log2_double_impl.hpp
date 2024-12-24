@@ -18,6 +18,9 @@
 #include <array>
 #include <cstdint>
 
+// TODO: Replace with more modern implementation.
+CCM_DISABLE_MSVC_WARNING(4146)
+
 namespace ccm::internal
 {
 	namespace impl
@@ -128,3 +131,5 @@ namespace ccm::internal
 		return impl::log2_double_impl(num);
 	}
 } // namespace ccm::internal
+
+CCM_RESTORE_MSVC_WARNING()

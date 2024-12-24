@@ -16,7 +16,7 @@ namespace ccm::gen::impl
 {
 	namespace internal::impl
 	{
-		constexpr double pow_impl(double base, double exp) noexcept
+		constexpr double pow_impl([[maybe_unused]] double base, [[maybe_unused]] double exp) noexcept
 		{
 			// TODO: Implement this.
 			return 0;

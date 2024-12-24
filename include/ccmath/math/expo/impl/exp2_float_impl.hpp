@@ -15,8 +15,13 @@
 #include "ccmath/internal/types/fp_types.hpp"
 #include "ccmath/math/expo/impl/exp2_data.hpp"
 
+#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+
 #include <cstdint>
 #include <limits>
+
+// TODO: Replace with more modern implementation.
+CCM_DISABLE_MSVC_WARNING(4056)
 
 namespace ccm::internal
 {
@@ -81,3 +86,4 @@ namespace ccm::internal
 		return impl::exp2_float_impl(x);
 	}
 } // namespace ccm::internal
+CCM_RESTORE_MSVC_WARNING()

@@ -19,6 +19,11 @@
 #include <limits>
 #include <type_traits>
 
+#if defined(_MSC_VER) && !defined(__clang__)
+#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+CCM_DISABLE_MSVC_WARNING(4702)
+#endif
+
 namespace ccm
 {
 	/**
@@ -96,3 +101,7 @@ namespace ccm
 		return ccm::log2<long double>(num);
 	}
 } // namespace ccm
+
+#if defined(_MSC_VER) && !defined(__clang__)
+CCM_RESTORE_MSVC_WARNING()
+#endif

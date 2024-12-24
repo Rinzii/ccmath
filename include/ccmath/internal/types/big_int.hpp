@@ -32,6 +32,11 @@
 #include <limits>
 #include <optional>
 
+#if defined(_MSC_VER) && !defined(__clang__)
+#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+CCM_DISABLE_MSVC_WARNING(4702) // 4702: unreachable code
+#endif
+
 namespace ccm::types
 {
 	namespace multiword
@@ -611,7 +616,7 @@ namespace ccm::types
 		template <size_t OtherBits, bool OtherSigned>
 		constexpr BigInt(const BigInt<OtherBits, OtherSigned, WordType> & other) // NOLINT(google-explicit-constructor)
 		{
-			if (OtherBits >= Bits)
+			if constexpr (OtherBits >= Bits)
 			{
 				// Truncate the extra bits
 				for (size_t i = 0; i < WORD_COUNT; ++i) { val[i] = other[i]; }
@@ -1562,7 +1567,7 @@ namespace ccm::support
 	constexpr std::enable_if_t<types::is_big_int_v<T>, T> mask_trailing_ones()
 	{
 		static_assert(!T::SIGNED && count <= T::BITS);
-		if (count == T::BITS) { return T::all_ones(); }
+		if constexpr (count == T::BITS) { return T::all_ones(); }
 		constexpr std::size_t QUOTIENT	= count / T::WORD_SIZE;
 		constexpr std::size_t REMAINDER = count % T::WORD_SIZE;
 		T out; // zero initialized
@@ -1624,3 +1629,7 @@ namespace ccm::support
 		return value == std::numeric_limits<T>::max() ? 0 : support::countr_zero(value) + 1;
 	}
 } // namespace ccm::support
+
+#if defined(_MSC_VER) && !defined(__clang__)
+CCM_RESTORE_MSVC_WARNING()
+#endif
