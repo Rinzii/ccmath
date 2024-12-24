@@ -6,7 +6,8 @@ project(ccmath-benchmark)
 
 option(CCM_BENCH_BASIC "Enable basic benchmarks" OFF)
 option(CCM_BENCH_COMPARE "Enable comparison benchmarks" OFF)
-option(CCM_BENCH_POWER "Enable power benchmarks" ON)
+option(CCM_BENCH_POWER "Enable power benchmarks" OFF)
+option(CCM_BENCH_NEAREST "Enable nearest benchmarks" ON)
 
 option(CCM_BENCH_ALL "Enable all benchmarks" OFF)
 
@@ -18,12 +19,6 @@ endif()
 if(NOT TARGET ccmath)
   find_package(ccmath CONFIG REQUIRED)
 endif()
-
-#if (CMAKE_CXX_COMPILER_ID STREQUAL Clang OR CMAKE_CXX_COMPILER_ID STREQUAL GNU OR CMAKE_CXX_COMPILER_ID STREQUAL IntelLLVM)
-#  target_compile_options(ccm_benchmark_${function_name} INTERFACE
-#          -S
-#  )
-#endif()
 
 function(add_benchmark function_name source_files)
   add_executable(ccm_benchmark_${function_name} helpers/randomizers.hpp ${source_files})
@@ -40,4 +35,8 @@ endif ()
 
 if(CCM_BENCH_POWER)
   add_benchmark(sqrt benchmarks/power/sqrt.bench.cpp benchmarks/power/sqrt.bench.hpp)
+endif ()
+
+if(CCM_BENCH_NEAREST)
+  add_benchmark(trunc benchmarks/nearest/trunc.bench.cpp benchmarks/nearest/trunc.bench.hpp)
 endif ()
