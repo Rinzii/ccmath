@@ -11,9 +11,13 @@ add_library(${PROJECT_NAME} STATIC)
 add_library(ccmath::test ALIAS ${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME} PUBLIC
         ccmath::ccmath
+
+        ${Abseil_LIBRARIES}
         gtest::gtest
+        re2::re2
 )
 target_include_directories(${PROJECT_NAME} PUBLIC .)
+target_include_directories(${PROJECT_NAME} PUBLIC ${Abseil_INCLUDE_DIRS})
 target_sources(${PROJECT_NAME} PRIVATE
         ccmath_test_main.cpp
 )

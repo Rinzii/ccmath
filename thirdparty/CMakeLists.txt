@@ -2,8 +2,12 @@ project(ccmath-ext)
 
 include(FetchContent)
 
+# TODO: Cleanup all of the logic of handling deps
+
 set(CCMATH_BENCHMARK_VERSION v1.9.1)
 set(CCMATH_GTEST_VERSION v1.15.2)
+set(CCMATH_ABSEIL_VERSION 20240722.0)
+set(CCMATH_RE2_VERSION 2024-07-02)
 
 if (CCMATH_BUILD_BENCHMARKS)
   if (CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM" OR CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
@@ -18,11 +22,28 @@ if (CCMATH_BUILD_BENCHMARKS)
 endif()
 
 if (CCMATH_BUILD_TESTS)
+  set(ABSL_PROPAGATE_CXX_STD ON)
+  set(ABSL_ENABLE_INSTALL ON)
+  set(GTEST_HAS_ABSL ON)
+  FetchContent_Declare(
+          abseil
+          GIT_REPOSITORY https://github.com/abseil/abseil-cpp.git
+          GIT_TAG ${CCMATH_ABSEIL_VERSION}
+  )
+  FetchContent_MakeAvailable(abseil)
+
+  FetchContent_Declare(
+          re2
+          GIT_REPOSITORY https://github.com/google/re2.git
+          GIT_TAG ${CCMATH_RE2_VERSION}
+  )
+  FetchContent_MakeAvailable(re2)
+
   if (CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM" OR CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
     set(HAVE_STD_REGEX ON)
   endif()
   if (WIN32)
-    #set(gtest_force_shared_crt ON)
+    set(gtest_force_shared_crt ON)
     set(gtest_disable_pthreads ON)
   endif()
   set(BUILD_GMOCK OFF)
@@ -43,6 +64,7 @@ if (CCMATH_BUILD_TESTS)
       add_library(gtest::gtest ALIAS gtest)
     endif()
   endif()
+
 endif()
 
 FetchContent_MakeAvailable(benchmark)
@@ -54,9 +76,12 @@ add_library(ccmath::ext ALIAS ${PROJECT_NAME})
 # Link GTest only if tests are enabled
 if (CCMATH_BUILD_TESTS)
   target_link_libraries(${PROJECT_NAME} INTERFACE gtest::gtest)
+  target_link_libraries(${PROJECT_NAME} INTERFACE absl::base absl::debugging re2::re2)
 endif()
 
 # Link Google Benchmark only if benchmarks are enabled
 if (CCMATH_BUILD_BENCHMARKS)
   target_link_libraries(${PROJECT_NAME} INTERFACE benchmark::benchmark)
 endif()
+
+
