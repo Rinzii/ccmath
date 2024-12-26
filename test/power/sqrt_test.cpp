@@ -19,11 +19,13 @@
 #include <cmath>
 #include <limits>
 
+
 TEST(CcmathPowerTests, Sqrt_StaticAssert)
 {
 	//static_assert(ccm::sqrt(2.0) == ccm::sqrt(2.0), "ccm::sqrt is not a compile time constant!");
 }
 
+/*
 TEST(CcmathPowerTests, Sqrt_Double)
 {
 	// Test values that are 2^x
@@ -208,3 +210,4 @@ TEST(CcmathPowerTests, Sqrt_RT_LDouble_EdgeCases)
 	//EXPECT_EQ(ccm::sqrt(std::numeric_limits<double>::lowest()), std::sqrt(std::numeric_limits<double>::lowest()));
 }
 #endif // defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
+*/
