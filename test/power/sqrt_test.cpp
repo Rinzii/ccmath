@@ -31,6 +31,12 @@ TEST(CcmathPowerTests, Sqrt_Double_CheckCCM)
 	EXPECT_EQ(ccm::sqrt(0.0), ccm::sqrt(0.0));
 }
 
+TEST(CcmathPowerTests, Sqrt_Double_CheckCCM_static)
+{
+	constexpr double sqrt_0 = ccm::sqrt(0.0);
+	EXPECT_EQ(sqrt_0, sqrt_0);
+}
+
 TEST(CcmathPowerTests, Sqrt_Double_CheckSTD)
 {
 	EXPECT_EQ(std::sqrt(0.0), std::sqrt(0.0));
