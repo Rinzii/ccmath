@@ -6,3 +6,4 @@ updates:
       interval: "monthly"
     # Allow up to 3 opened pull requests for github-actions versions.
     open-pull-requests-limit: 3
+    target-branch: "dev"
