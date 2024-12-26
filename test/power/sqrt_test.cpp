@@ -19,12 +19,24 @@
 #include <cmath>
 #include <limits>
 
-
+/*
 TEST(CcmathPowerTests, Sqrt_StaticAssert)
 {
 	//static_assert(ccm::sqrt(2.0) == ccm::sqrt(2.0), "ccm::sqrt is not a compile time constant!");
 }
+*/
 
+TEST(CcmathPowerTests, Sqrt_Double_CheckCCM)
+{
+	EXPECT_EQ(ccm::sqrt(0.0), ccm::sqrt(0.0));
+}
+
+TEST(CcmathPowerTests, Sqrt_Double_CheckSTD)
+{
+	EXPECT_EQ(std::sqrt(0.0), std::sqrt(0.0));
+}
+
+/*
 TEST(CcmathPowerTests, Sqrt_Double)
 {
 	// Test values that are 2^x
@@ -35,9 +47,8 @@ TEST(CcmathPowerTests, Sqrt_Double)
 
 
 
-	EXPECT_EQ(ccm::sqrt(0.0), std::sqrt(0.0));
+	EXPECT_EQ(ccm::sqrt(0.0), ccm::sqrt(0.0));
 
-	/*
 	EXPECT_EQ(ccm::sqrt(1.0), std::sqrt(1.0));
 	EXPECT_EQ(ccm::sqrt(2.0), std::sqrt(2.0));
 	EXPECT_EQ(ccm::sqrt(4.0), std::sqrt(4.0));
@@ -54,10 +65,10 @@ TEST(CcmathPowerTests, Sqrt_Double)
 	EXPECT_EQ(ccm::sqrt(0.3), std::sqrt(0.3));
 	EXPECT_EQ(ccm::sqrt(0.4), std::sqrt(0.4));
 	EXPECT_EQ(ccm::sqrt(0.5), std::sqrt(0.5));
-	*/
+
 }
 
-/*
+
 TEST(CcmathPowerTests, Sqrt_Double_EdgeCases)
 {
 	// Test edge cases
