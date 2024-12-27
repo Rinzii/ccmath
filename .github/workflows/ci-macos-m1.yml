@@ -85,9 +85,6 @@ jobs:
             ./**/out
           key: ${{ runner.os }}-${{ matrix.name }}
 
-      - name: Install Homebrew
-        run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
       - name: Install Ninja
         run: brew install ninja
 
