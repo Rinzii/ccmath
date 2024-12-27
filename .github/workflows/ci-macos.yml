@@ -89,7 +89,7 @@ jobs:
         run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
       - name: Install Ninja
-        run: brew install ninja
+        run: brew install cmake ninja # /usr/local/bin/ninja
 
       - name: Where is Ninja
         run: |
