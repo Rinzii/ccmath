@@ -19,7 +19,6 @@
  * 			- SSE4.2
  * 			- AVX
  * 			- AVX2
- * 			- AVX512
  *
  * 		ARM:
  * 			- NEON
@@ -93,71 +92,7 @@
 		#define CCMATH_HAS_SIMD_AVX2 1
 	#endif
 
-	// Processors that support Intel Advanced Vector Extensions 512 (Intel AVX-512) Byte and Word instructions.
-	#if defined(__AVX512BW__) || defined(CCM_CONFIG_RT_SIMD_HAS_AVX512BW)
-		#ifndef CCMATH_HAS_SIMD
-			#define CCMATH_HAS_SIMD 1
-		#endif
-		#define CCMATH_HAS_SIMD_AVX512BW 1
-	#endif
-
-	// Processors that support Intel Advanced Vector Extensions 512 (Intel AVX-512) Conflict Detection instructions.
-	#if defined(__AVX512CD__) || defined(CCM_CONFIG_RT_SIMD_HAS_AVX512CD)
-		#ifndef CCMATH_HAS_SIMD
-			#define CCMATH_HAS_SIMD 1
-		#endif
-		#define CCMATH_HAS_SIMD_AVX512CD 1
-	#endif
-
-	// Processors that support Intel Advanced Vector Extensions 512 (Intel AVX-512) Doubleword and Quadword instructions.
-	#if defined(__AVX512DQ__) || defined(CCM_CONFIG_RT_SIMD_HAS_AVX512DQ)
-		#ifndef CCMATH_HAS_SIMD
-			#define CCMATH_HAS_SIMD 1
-		#endif
-		#define CCMATH_HAS_SIMD_AVX512DQ 1
-	#endif
-
-	// Processors that support Intel Advanced Vector Extensions 512 (Intel AVX-512) Exponential and Reciprocal instructions.
-	#if defined(__AVX512ER__) || defined(CCM_CONFIG_RT_SIMD_HAS_AVX512ER)
-		#ifndef CCMATH_HAS_SIMD
-			#define CCMATH_HAS_SIMD 1
-		#endif
-		#define CCMATH_HAS_SIMD_AVX512ER 1
-	#endif
-
-	// Processors that support Intel Advanced Vector Extensions 512 (Intel AVX-512) Foundation instructions.
-	#if defined(__AVX512F__) || defined(CCM_CONFIG_RT_SIMD_HAS_AVX512F)
-		#ifndef CCMATH_HAS_SIMD
-			#define CCMATH_HAS_SIMD 1
-		#endif
-		#define CCMATH_HAS_SIMD_AVX512F 1
-	#endif
-
-	// Processors that support Intel Advanced Vector Extensions 512 (Intel AVX-512) Prefetch instructions.
-	#if defined(__AVX512PF__) || defined(CCM_CONFIG_RT_SIMD_HAS_AVX512PF)
-		#ifndef CCMATH_HAS_SIMD
-			#define CCMATH_HAS_SIMD 1
-		#endif
-		#define CCMATH_HAS_SIMD_AVX512PF 1
-	#endif
-
-	// Processors that support Intel Advanced Vector Extensions 512 (Intel AVX-512) Vector Length extensions.
-	#if defined(__AVX512VL__) || defined(CCM_CONFIG_RT_SIMD_HAS_AVX512VL)
-		#ifndef CCMATH_HAS_SIMD
-			#define CCMATH_HAS_SIMD 1
-		#endif
-		#define CCMATH_HAS_SIMD_AVX512VL 1
-	#endif
-
-	// Processors that support Intel Advanced Vector Extensions 512 (Intel AVX-512) Byte and Word instructions.
-	#if (defined(__AVX512F__) && defined(__AVX512VL__) && defined(__AVX512BW__) && defined(__AVX512DQ__)) || defined(CCM_CONFIG_RT_SIMD_HAS_AVX512)
-		#ifndef CCMATH_HAS_SIMD
-			#define CCMATH_HAS_SIMD 1
-		#endif
-		#define CCMATH_HAS_SIMD_AVX512 1
-	#endif
-
-// Intel Short Vector Math Library (SVML)
+// FMA (Fused Multiply-Add) Extensions
 	#if defined(__FMA__) || defined(CCM_CONFIG_RT_SIMD_HAS_FMA)
 		#ifndef CCMATH_HAS_SIMD
 			#define CCMATH_HAS_SIMD 1
@@ -166,6 +101,7 @@
 	#endif
 
 // Intel Short Vector Math Library (SVML)
+// As far as I am aware, there is no reliable way to detect SVML support at compile-time.
 	#if defined(CCM_CONFIG_RT_SIMD_HAS_SVML)
 		#ifndef CCMATH_HAS_SIMD
 			#define CCMATH_HAS_SIMD 1

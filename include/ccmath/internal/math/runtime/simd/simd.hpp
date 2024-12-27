@@ -42,10 +42,6 @@
 		#include "instructions/avx2.hpp"
 	#endif
 
-	#ifdef CCMATH_HAS_SIMD_AVX512F
-		#include "instructions/avx512.hpp"
-	#endif
-
 	#ifdef CCMATH_HAS_SIMD_NEON
 		#include "instructions/neon.hpp"
 	#endif
