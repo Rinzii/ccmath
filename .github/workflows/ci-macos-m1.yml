@@ -1,4 +1,4 @@
-name: ci-linux
+name: ci-macos
 
 on:
   push:
@@ -15,39 +15,12 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          # GCC Debug
-          - name: gcc-debug
-            configurePreset: ninja-gcc-debug
-            buildPreset: build-ninja-gcc-debug
-            testPreset: test-ninja-gcc-debug
-            cxx_version: 17
-
-          - name: gcc-debug-cxx20
-            configurePreset: ninja-gcc-debug
-            buildPreset: build-ninja-gcc-debug
-            testPreset: test-ninja-gcc-debug
-            cxx_version: 20
-
-          # GCC Release
-          - name: gcc-release
-            configurePreset: ninja-gcc-release
-            buildPreset: build-ninja-gcc-release
-            testPreset: test-ninja-gcc-release
-            cxx_version: 17
-
-          - name: gcc-release-cxx20
-            configurePreset: ninja-gcc-release
-            buildPreset: build-ninja-gcc-release
-            testPreset: test-ninja-gcc-release
-            cxx_version: 20
-
-          # Clang Debug
-          - name: clang-debug
+          - name: clang-debug-cxx17
             configurePreset: ninja-clang-debug
             buildPreset: build-ninja-clang-debug
             testPreset: test-ninja-clang-debug
@@ -59,8 +32,7 @@ jobs:
             testPreset: test-ninja-clang-debug
             cxx_version: 20
 
-          # Clang Release
-          - name: clang-release
+          - name: clang-release-cxx17
             configurePreset: ninja-clang-release
             buildPreset: build-ninja-clang-release
             testPreset: test-ninja-clang-release
@@ -72,17 +44,28 @@ jobs:
             testPreset: test-ninja-clang-release
             cxx_version: 20
 
-          # Clang libcpp Release
-          - name: clang-libcpp-release
-            configurePreset: ninja-clang-libcpp-relwithdebinfo
-            buildPreset: build-ninja-clang-libcpp-relwithdebinfo
-            testPreset: test-ninja-clang-libcpp-relwithdebinfo
+          - name: gcc-debug-cxx17
+            configurePreset: ninja-gcc-debug
+            buildPreset: build-ninja-gcc-debug
+            testPreset: test-ninja-gcc-debug
             cxx_version: 17
 
-          - name: clang-libcpp-release-cxx20
-            configurePreset: ninja-clang-libcpp-relwithdebinfo
-            buildPreset: build-ninja-clang-libcpp-relwithdebinfo
-            testPreset: test-ninja-clang-libcpp-relwithdebinfo
+          - name: gcc-debug-cxx20
+            configurePreset: ninja-gcc-debug
+            buildPreset: build-ninja-gcc-debug
+            testPreset: test-ninja-gcc-debug
+            cxx_version: 20
+
+          - name: gcc-release-cxx17
+            configurePreset: ninja-gcc-release
+            buildPreset: build-ninja-gcc-release
+            testPreset: test-ninja-gcc-release
+            cxx_version: 17
+
+          - name: gcc-release-cxx20
+            configurePreset: ninja-gcc-release
+            buildPreset: build-ninja-gcc-release
+            testPreset: test-ninja-gcc-release
             cxx_version: 20
 
     steps:
@@ -102,8 +85,11 @@ jobs:
             ./**/out
           key: ${{ runner.os }}-${{ matrix.name }}
 
-      - name: Install dependencies
-        run: sudo apt-get update -qq && sudo apt-get install -yqq --no-install-recommends ninja-build
+      - name: Install Homebrew
+        run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+      - name: Install Ninja
+        run: brew install ninja
 
       - name: Configure
         run: cmake --preset="${{ matrix.configurePreset }}" -DCMAKE_CXX_STANDARD="${{ matrix.cxx_version }}"

@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: macos-13
     strategy:
       fail-fast: false
       matrix:
@@ -98,4 +98,4 @@ jobs:
         run: cmake --build --preset="${{ matrix.buildPreset }}"
 
       - name: Test
-        run: ctest --preset="${{ matrix.testPreset }}" --output-on-failure --verbose --schedule-random -F
+        run: ctest --preset="${{ matrix.testPreset }}" --output-on-failure --schedule-random -F
