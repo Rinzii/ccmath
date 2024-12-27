@@ -3,3 +3,10 @@ function(ccm_add_headers)
   # Append all the passed arguments (headers) to the target's sources
   target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${ARGV}>")
 endfunction()
+
+function(ccm_add_headers_temp)
+  foreach(header IN LISTS ARGV)
+    target_sources(${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${header}>")
+  endforeach()
+endfunction()
+
