@@ -90,7 +90,8 @@ jobs:
       # Actual: /usr/local/bin/ninja
       # Searched: /opt/homebrew/bin/ninja
       - name: Symbolic link Ninja # Workaround for CMake not checking the right area for Ninja
-        run: mkdir -p /opt/homebrew/bin && ln -s /usr/local/bin/ninja /opt/homebrew/bin/ninja
+        run: sudo mkdir -p /opt/homebrew/bin && sudo ln -s /usr/local/bin/ninja /opt/homebrew/bin/ninja
+
 
       - name: Configure
         run: cmake --preset="${{ matrix.configurePreset }}" -DCMAKE_CXX_STANDARD="${{ matrix.cxx_version }}"
