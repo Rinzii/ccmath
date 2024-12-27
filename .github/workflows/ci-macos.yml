@@ -85,11 +85,14 @@ jobs:
             ./**/out
           key: ${{ runner.os }}-${{ matrix.name }}
 
-      - name: Install Homebrew
-        run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
       - name: Install Ninja
         run: brew install ninja
+
+      - name: Where is Ninja
+        run: |
+            which ninja
+            ninja --version
+            ls -l /opt/homebrew/bin/
 
       - name: Configure
         run: cmake --preset="${{ matrix.configurePreset }}" -DCMAKE_CXX_STANDARD="${{ matrix.cxx_version }}"
