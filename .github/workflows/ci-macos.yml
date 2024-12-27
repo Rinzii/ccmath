@@ -95,7 +95,7 @@ jobs:
         run: |
             which ninja
             ninja --version
-            ls -l /opt/homebrew/bin/
+            cat $PATH
 
       - name: Configure
         run: cmake --preset="${{ matrix.configurePreset }}" -DCMAKE_CXX_STANDARD="${{ matrix.cxx_version }}"
