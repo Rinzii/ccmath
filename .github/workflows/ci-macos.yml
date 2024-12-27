@@ -95,7 +95,6 @@ jobs:
         run: |
             which ninja
             ninja --version
-            cat $PATH
 
       - name: Configure
         run: cmake --preset="${{ matrix.configurePreset }}" -DCMAKE_CXX_STANDARD="${{ matrix.cxx_version }}"
