@@ -1,4 +1,4 @@
-name: ci-macos-m1
+name: ci-macos
 
 on:
   push:
