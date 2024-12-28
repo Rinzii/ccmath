@@ -1,14 +1,14 @@
 ccm_add_headers(
-        ${CMAKE_CURRENT_SOURCE_DIR}/basic.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/compare.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/expo.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/fmanip.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/hyper.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/nearest.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/numbers.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/power.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/special.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/trig.hpp
+        basic.hpp
+        compare.hpp
+        expo.hpp
+        fmanip.hpp
+        hyper.hpp
+        nearest.hpp
+        numbers.hpp
+        power.hpp
+        special.hpp
+        trig.hpp
 )
 
 add_subdirectory(basic)

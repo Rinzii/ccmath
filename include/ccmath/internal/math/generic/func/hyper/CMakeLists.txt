@@ -1,8 +1,8 @@
 ccm_add_headers(
-        ${CMAKE_CURRENT_SOURCE_DIR}/acosh_gen.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/asinh_gen.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/atanh_gen.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/cosh_gen.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/sinh_gen.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/tanh_gen.hpp
+        acosh_gen.hpp
+        asinh_gen.hpp
+        atanh_gen.hpp
+        cosh_gen.hpp
+        sinh_gen.hpp
+        tanh_gen.hpp
 )

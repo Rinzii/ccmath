@@ -1,11 +1,11 @@
 ccm_add_headers(
-        ${CMAKE_CURRENT_SOURCE_DIR}/assume.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/expects_bool_condition.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/has_attribute.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/has_builtin.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/has_const_builtin.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/likely.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/unlikely.hpp
+        assume.hpp
+        expects_bool_condition.hpp
+        has_attribute.hpp
+        has_builtin.hpp
+        has_const_builtin.hpp
+        likely.hpp
+        unlikely.hpp
 )
 
 add_subdirectory(attributes)

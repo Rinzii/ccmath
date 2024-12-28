@@ -1,12 +1,12 @@
 ccm_add_headers(
-        ${CMAKE_CURRENT_SOURCE_DIR}/cbrt_gen.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/hypot_gen.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/pow_gen.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/sqrt_gen.hpp
+        cbrt_gen.hpp
+        hypot_gen.hpp
+        pow_gen.hpp
+        sqrt_gen.hpp
 )
 
 # TODO: Move this to its own folder at some point
 ccm_add_headers(
-        ${CMAKE_CURRENT_SOURCE_DIR}/pow_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/powf_impl.hpp
+        pow_impl.hpp
+        powf_impl.hpp
 )

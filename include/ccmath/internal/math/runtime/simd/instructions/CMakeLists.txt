@@ -1,10 +1,10 @@
 ccm_add_headers(
-        ${CMAKE_CURRENT_SOURCE_DIR}/avx.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/avx2.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/avx512.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/neon.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/sse2.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/sse3.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/sse4.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/ssse3.hpp
+        avx.hpp
+        avx2.hpp
+        avx512.hpp
+        neon.hpp
+        sse2.hpp
+        sse3.hpp
+        sse4.hpp
+        ssse3.hpp
 )

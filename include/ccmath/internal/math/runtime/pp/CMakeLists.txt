@@ -1,3 +1,3 @@
-ccm_add_headers_temp(
+ccm_add_headers(
     simd.hpp
 )
