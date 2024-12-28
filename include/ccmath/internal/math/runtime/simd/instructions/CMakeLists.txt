@@ -1,7 +1,6 @@
 ccm_add_headers(
         avx.hpp
         avx2.hpp
-        avx512.hpp
         neon.hpp
         sse2.hpp
         sse3.hpp

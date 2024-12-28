@@ -1,6 +1,5 @@
 add_subdirectory(avx)
 add_subdirectory(avx2)
-add_subdirectory(avx512)
 add_subdirectory(neon)
 add_subdirectory(scalar)
 add_subdirectory(sse2)
