@@ -1,9 +1,9 @@
 ccm_add_headers(
-        ${CMAKE_CURRENT_SOURCE_DIR}/always_inline.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/gpu_device.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/gpu_host_device.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/gsl_suppress.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/never_inline.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/no_debug.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/optnone.hpp
+        always_inline.hpp
+        gpu_device.hpp
+        gpu_host_device.hpp
+        gsl_suppress.hpp
+        never_inline.hpp
+        no_debug.hpp
+        optnone.hpp
 )

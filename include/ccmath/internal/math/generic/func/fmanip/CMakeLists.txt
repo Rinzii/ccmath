@@ -1,10 +1,10 @@
 ccm_add_headers(
-        ${CMAKE_CURRENT_SOURCE_DIR}/copysign_gen.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/frexp_gen.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/ilogb_gen.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/ldexp_gen.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/logb_gen.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/modf_gen.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/nextafter_gen.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/scalbn_gen.hpp
+        copysign_gen.hpp
+        frexp_gen.hpp
+        ilogb_gen.hpp
+        ldexp_gen.hpp
+        logb_gen.hpp
+        modf_gen.hpp
+        nextafter_gen.hpp
+        scalbn_gen.hpp
 )

@@ -1,18 +1,18 @@
 ccm_add_headers(
-        ${CMAKE_CURRENT_SOURCE_DIR}/always_false.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/bits.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/ctz.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/endian.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/floating_point_traits.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/integer_literals.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/is_constant_evaluated.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/limits.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/math_support.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/meta_compare.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/multiply_add.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/poly_eval.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/type_traits.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/unreachable.hpp
+        always_false.hpp
+        bits.hpp
+        ctz.hpp
+        endian.hpp
+        floating_point_traits.hpp
+        integer_literals.hpp
+        is_constant_evaluated.hpp
+        limits.hpp
+        math_support.hpp
+        meta_compare.hpp
+        multiply_add.hpp
+        poly_eval.hpp
+        type_traits.hpp
+        unreachable.hpp
 )
 
 add_subdirectory(fenv)

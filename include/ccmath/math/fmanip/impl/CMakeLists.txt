@@ -1,8 +1,8 @@
 ccm_add_headers(
-        ${CMAKE_CURRENT_SOURCE_DIR}/modf_double_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/modf_float_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/scalbn_double_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/scalbn_float_impl.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/scalbn_ldouble_impl.hpp
+        modf_double_impl.hpp
+        modf_float_impl.hpp
+        scalbn_double_impl.hpp
+        scalbn_float_impl.hpp
+        scalbn_ldouble_impl.hpp
 )
 

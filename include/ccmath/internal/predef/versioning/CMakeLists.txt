@@ -1,9 +1,9 @@
 ccm_add_headers(
-        ${CMAKE_CURRENT_SOURCE_DIR}/arm_version.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/clang_version.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/gcc_version.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/intel_version.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/msvc_version.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/version_encode.hpp
+        arm_version.hpp
+        clang_version.hpp
+        gcc_version.hpp
+        intel_version.hpp
+        msvc_version.hpp
+        version_encode.hpp
 
 )
