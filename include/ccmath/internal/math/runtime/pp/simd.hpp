@@ -176,28 +176,38 @@ namespace ccm::pp
 	vectorized_sizeof()
 	{
 		if constexpr (!is_vectorizable_v<T>)
+		{
 			return 0;
+		}
 
 		if constexpr (sizeof(T) <= 8)
 		{
 			// X86:
 			if constexpr (have_avx2)
+			{
 				return 32;
+			}
 
 			if constexpr (have_sse2)
+			{
 				return 16;
+			}
 
 			// ARM:
 			if constexpr (have_neon_a64
 			              || (have_neon_a32 && !std::is_same_v<T, double>))
+			{
 				return 16;
+			}
 			if constexpr (have_neon
 			              && sizeof(T) < 8
 			              // Only allow fp if the user allows non-ICE559 fp (e.g.
 			              // via -ffast-math). ARMv7 NEON fp is not conforming to
 			              // IEC559.
 			              && (support_neon_float || !std::is_floating_point_v<T>))
+			{
 				return 16;
+			}
 		}
 
 		return sizeof(T);
@@ -221,10 +231,14 @@ namespace ccm::pp
 					UsedBytes / sizeof(T) > 1 &&
 					UsedBytes % sizeof(T) == 0 &&
 					UsedBytes <= vectorized_sizeof<T>() &&
-					UsedBytes <= 32)> {};
+					UsedBytes <= 32)>
+			{
+			};
 
 			template <typename T>
-			struct is_valid : std::conjunction<is_valid_abi_tag, is_vectorizable<T>, is_valid_size_for<T>> {};
+			struct is_valid : std::conjunction<is_valid_abi_tag, is_vectorizable<T>, is_valid_size_for<T> >
+			{
+			};
 
 			template <typename T>
 			static constexpr bool is_valid_v = is_valid<T>::value;
@@ -289,12 +303,12 @@ namespace ccm::pp
 		// ctors
 
 		template <class U>
-		constexpr basic_simd(U&& value) noexcept
+		constexpr basic_simd(U && value) noexcept
 		{
 		}
 
 		template <class U, class UAbi>
-		constexpr CCM_CPP20_EXPLICIT(true) basic_simd(basic_simd<U, UAbi> const& value) noexcept
+		constexpr CCM_CPP20_EXPLICIT(true) basic_simd(basic_simd<U, UAbi> const & value) noexcept
 		{
 		}
 
