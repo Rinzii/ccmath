@@ -1,5 +1,5 @@
 /*
-* Copyright (c) Ian Pike
+ * Copyright (c) Ian Pike
  * Copyright (c) CCMath contributors
  *
  * CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
@@ -19,11 +19,32 @@
 ///
 /// Compilers with Support:
 /// - GCC 5.1+
+/// - Clang 5.0.0+
+/// NVC++ 22.7+ (Lowest tested version)
+/// Intel DPC++ 2021.1.2+ (Lowest tested version)
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_ISNAN
-#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
-#define CCMATH_HAS_CONSTEXPR_BUILTIN_ISNAN
+	#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_ISNAN
+	#endif
 #endif
+
+#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_ISNAN
+	#if defined(__clang__) && (__clang_major__ > 5 || (__clang_major__ == 5 && __clang_minor__ >= 0)) && !defined(__MSC_VER) && !defined(__INTEL_LLVM_COMPILER)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_ISNAN
+	#endif
+#endif
+
+#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_ISNAN
+	#if defined(__NVCOMPILER_MAJOR__) && (__NVCOMPILER_MAJOR__ > 22 || (__NVCOMPILER_MAJOR__ == 22 && __NVCOMPILER_MINOR__ >= 7))
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_ISNAN
+	#endif
+#endif
+
+#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_ISNAN
+	#if defined(__INTEL_LLVM_COMPILER) && (__INTEL_LLVM_COMPILER >= 202110)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_ISNAN
+	#endif
 #endif
 
 namespace ccm::builtin
@@ -47,18 +68,9 @@ namespace ccm::builtin
 	template <typename T>
 	constexpr auto isnan(T x) -> std::enable_if_t<has_constexpr_isnan<T>, bool>
 	{
-		if constexpr (std::is_same_v<T, float>)
-		{
-			return __builtin_isnan(x);
-		}
-		else if constexpr (std::is_same_v<T, double>)
-		{
-			return __builtin_isnan(x);
-		}
-		else if constexpr (std::is_same_v<T, long double>)
-		{
-			return __builtin_isnan(x);
-		}
+		if constexpr (std::is_same_v<T, float>) { return __builtin_isnan(x); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_isnan(x); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_isnan(x); }
 		// This should never be reached
 		return false;
 	}

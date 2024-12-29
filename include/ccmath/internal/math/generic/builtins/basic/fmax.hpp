@@ -19,11 +19,26 @@
 ///
 /// Compilers with Support:
 /// - GCC 5.1+
+/// - Clang 16.0.0+
+/// - Intel DPC++ 2023.1.0+
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_FMAX
-#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
-#define CCMATH_HAS_CONSTEXPR_BUILTIN_FMAX
+	#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_FMAX
+	#endif
 #endif
+
+#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_FMAX
+	#if defined(__clang__) && (__clang_major__ > 16 || (__clang_major__ == 16 && __clang_minor__ >= 0)) && !defined(__MSC_VER) &&                              \
+		!defined(__INTEL_LLVM_COMPILER)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_FMAX
+	#endif
+#endif
+
+#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_FMAX
+	#if defined(__INTEL_LLVM_COMPILER) && (__INTEL_LLVM_COMPILER >= 20230100)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_FMAX
+	#endif
 #endif
 
 namespace ccm::builtin
@@ -45,21 +60,11 @@ namespace ccm::builtin
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
-	constexpr auto fmax(T x, T y)
-		-> std::enable_if_t<has_constexpr_fmax<T>, T>
+	constexpr auto fmax(T x, T y) -> std::enable_if_t<has_constexpr_fmax<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>)
-		{
-			return __builtin_fmaxf(x, y);
-		}
-		else if constexpr (std::is_same_v<T, double>)
-		{
-			return __builtin_fmax(x, y);
-		}
-		else if constexpr (std::is_same_v<T, long double>)
-		{
-			return __builtin_fmaxl(x, y);
-		}
+		if constexpr (std::is_same_v<T, float>) { return __builtin_fmaxf(x, y); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_fmax(x, y); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fmaxl(x, y); }
 		// This should never be reached
 		return T{};
 	}
