@@ -11,6 +11,9 @@
 #pragma once
 
 #include "ccmath/math/compare/isnan.hpp"
+#include "ccmath/internal/math/generic/builtins/compare/isunordered.hpp"
+
+
 #include <type_traits>
 
 namespace ccm
@@ -25,7 +28,11 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr bool isunordered(T x, T y) noexcept
 	{
-		return ccm::isnan(x) || ccm::isnan(y);
+		if constexpr (ccm::builtin::has_constexpr_isunordered<T>) { return ccm::builtin::isunordered(x, y); }
+		else
+		{
+			return ccm::isnan(x) || ccm::isnan(y);
+		}
 	}
 
 	/**

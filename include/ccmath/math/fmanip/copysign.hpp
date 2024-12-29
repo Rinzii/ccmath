@@ -13,6 +13,8 @@
 #include "ccmath/math/basic/fabs.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/compare/signbit.hpp"
+#include "ccmath/internal/math/generic/builtins/fmanip/copysign.hpp"
+
 
 namespace ccm
 {
@@ -26,14 +28,21 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T copysign(T mag, T sgn)
 	{
-		if (ccm::isnan(mag) || ccm::isnan(sgn))
+		if constexpr (ccm::builtin::has_constexpr_copysign<T>)
 		{
-			if (ccm::signbit(sgn)) { return -std::numeric_limits<T>::quiet_NaN(); }
-			return std::numeric_limits<T>::quiet_NaN();
+			return ccm::builtin::copysign(mag, sgn);
 		}
+		else
+		{
+			if (ccm::isnan(mag) || ccm::isnan(sgn))
+			{
+				if (ccm::signbit(sgn)) { return -std::numeric_limits<T>::quiet_NaN(); }
+				return std::numeric_limits<T>::quiet_NaN();
+			}
 
-		T sign_bit = ccm::signbit(sgn) ? T(-1) : T(1);
-		return ccm::abs(mag) * sign_bit;
+			T sign_bit = ccm::signbit(sgn) ? T(-1) : T(1);
+			return ccm::abs(mag) * sign_bit;
+		}
 	}
 
 	/**

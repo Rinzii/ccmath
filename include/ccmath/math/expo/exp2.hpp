@@ -14,6 +14,8 @@
 #include "ccmath/internal/predef/has_const_builtin.hpp"
 #include "ccmath/math/expo/impl/exp2_double_impl.hpp"
 #include "ccmath/math/expo/impl/exp2_float_impl.hpp"
+#include "ccmath/internal/math/generic/builtins/expo/exp2.hpp"
+
 
 #include <type_traits>
 
@@ -33,17 +35,14 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T exp2(T num)
 	{
-#if defined(CCMATH_HAS_CONSTEXPR_BUILTIN_EXP2) || CCM_HAS_CONST_BUILTIN(__builtin_exp2)
-		if constexpr (std::is_same_v<T, float>) { return __builtin_exp2f(num); }
-		if constexpr (std::is_same_v<T, double>) { return __builtin_exp2(num); }
-		if constexpr (std::is_same_v<T, long double>) { return __builtin_exp2l(num); }
-		return static_cast<T>(__builtin_exp2l(num));
-#else
-		if constexpr (std::is_same_v<T, float>) { return internal::exp2_float(num); }
-		if constexpr (std::is_same_v<T, double>) { return internal::exp2_double(num); }
-		if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::exp2_double(static_cast<double>(num))); }
-		return static_cast<T>(internal::exp2_double(static_cast<double>(num)));
-#endif
+		if constexpr (ccm::builtin::has_constexpr_exp2<T>) { return ccm::builtin::exp2(num); }
+		else
+		{
+			if constexpr (std::is_same_v<T, float>) { return internal::exp2_float(num); }
+			if constexpr (std::is_same_v<T, double>) { return internal::exp2_double(num); }
+			if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::exp2_double(static_cast<double>(num))); }
+			return static_cast<T>(internal::exp2_double(static_cast<double>(num)));
+		}
 	}
 
 	/**

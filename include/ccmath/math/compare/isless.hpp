@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/compare/isless.hpp"
+
 #include <type_traits>
 
 namespace ccm
@@ -24,7 +26,11 @@ namespace ccm
 	template <typename T>
 	constexpr bool isless(T x, T y) noexcept
 	{
-		return x < y;
+		if constexpr (ccm::builtin::has_constexpr_isless<T>) { return ccm::builtin::isless(x, y); }
+		else
+		{
+			return x < y;
+		}
 	}
 
 	/**
