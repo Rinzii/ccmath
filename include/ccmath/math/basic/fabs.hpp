@@ -11,7 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/predef/unlikely.hpp"
-#include "ccmath/internal/math/generic/builtins/basic/abs.hpp"
+#include "ccmath/internal/math/generic/builtins/basic/fabs.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 
 #include <limits>

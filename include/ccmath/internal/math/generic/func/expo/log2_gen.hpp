@@ -16,7 +16,7 @@
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/unreachable.hpp"
 #include "ccmath/internal/types/big_int.hpp"
-#include "ccmath/math/basic/abs.hpp"
+#include "ccmath/math/basic/fabs.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/power/sqrt.hpp"
 

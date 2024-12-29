@@ -9,7 +9,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <ccmath/math/basic/abs.hpp>
+#include <ccmath/math/basic/fabs.hpp>
 #include <cmath>
 #include <limits>
 
