@@ -3,6 +3,7 @@ ccm_add_headers(
 )
 
 add_subdirectory(basic)
+add_subdirectory(compare)
 add_subdirectory(expo)
 add_subdirectory(fmanip)
 add_subdirectory(hyper)
