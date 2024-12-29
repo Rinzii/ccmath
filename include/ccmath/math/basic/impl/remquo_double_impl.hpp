@@ -14,7 +14,7 @@
 #include "ccmath/internal/predef/compiler_suppression/gcc_compiler_suppression.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/bits.hpp"
-#include "ccmath/math/basic/abs.hpp"
+#include "ccmath/math/basic/fabs.hpp"
 #include "ccmath/math/basic/fmod.hpp"
 
 #include <cstdint>

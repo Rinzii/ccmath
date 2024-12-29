@@ -1,4 +1,4 @@
 ccm_add_headers(
-        gamma.hpp
+        tgamma.hpp
         lgamma.hpp
 )

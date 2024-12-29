@@ -21,7 +21,7 @@
 /// - GCC 6.1+
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_TAN
-#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
+#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
 #define CCMATH_HAS_CONSTEXPR_BUILTIN_TAN
 #endif
 #endif

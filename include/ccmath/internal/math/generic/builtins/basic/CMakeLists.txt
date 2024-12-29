@@ -1,5 +1,5 @@
 ccm_add_headers(
-        abs.hpp
+        fabs.hpp
         fdim.hpp
         fma.hpp
         fmod.hpp

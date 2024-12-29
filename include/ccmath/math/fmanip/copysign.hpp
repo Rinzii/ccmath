@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "ccmath/math/basic/abs.hpp"
+#include "ccmath/math/basic/fabs.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/compare/signbit.hpp"
 

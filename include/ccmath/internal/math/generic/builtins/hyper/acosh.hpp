@@ -18,10 +18,10 @@
 /// This is a macro that is defined if the compiler has constexpr __builtin functions for acosh that allow static_assert
 ///
 /// Compilers with Support:
-/// - GCC 6.1+
+/// - GCC 5.1+
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_ACOSH
-#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
+#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
 #define CCMATH_HAS_CONSTEXPR_BUILTIN_ACOSH
 #endif
 #endif

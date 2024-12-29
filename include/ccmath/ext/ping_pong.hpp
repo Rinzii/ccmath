@@ -11,7 +11,7 @@
 #pragma once
 
 #include "ccmath/ext/fract.hpp"
-#include "ccmath/math/basic/abs.hpp"
+#include "ccmath/math/basic/fabs.hpp"
 
 #include <type_traits>
 
