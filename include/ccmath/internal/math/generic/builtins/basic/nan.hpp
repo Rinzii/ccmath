@@ -31,7 +31,7 @@ namespace ccm::builtin
 	// clang-format off
 	template <typename T>
 	inline constexpr bool has_constexpr_nan =
-#ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_NAN
+		#ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_NAN
 		is_valid_builtin_type<T>;
 	#else
 			false;
@@ -45,7 +45,7 @@ namespace ccm::builtin
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
-	constexpr auto nan(const char* tag) -> std::enable_if_t<has_constexpr_nan<T>, T>
+	constexpr auto nan(const char * tag) -> std::enable_if_t<has_constexpr_nan<T>, T>
 	{
 		if constexpr (std::is_same_v<T, float>)
 		{

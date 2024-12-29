@@ -31,7 +31,7 @@ namespace ccm::builtin
 	// clang-format off
 	template <typename T>
 	inline constexpr bool has_constexpr_fmod =
-#ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_FMOD
+		#ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_FMOD
 		is_valid_builtin_type<T>;
 	#else
 			false;

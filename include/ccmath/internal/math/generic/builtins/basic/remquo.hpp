@@ -28,40 +28,40 @@
 
 namespace ccm::builtin
 {
-    // clang-format off
-    template <typename T>
-    inline constexpr bool has_constexpr_remquo =
-#ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_REMQUO
-        is_valid_builtin_type<T>;
-#else
+	// clang-format off
+	template <typename T>
+	inline constexpr bool has_constexpr_remquo =
+		#ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_REMQUO
+		is_valid_builtin_type<T>;
+	#else
         false;
-#endif
-    // clang-format on
+	#endif
+	// clang-format on
 
-    /**
-     * Wrapper for constexpr __builtin remquo functions.
-     * This should be used internally and always be wrapped in an if constexpr statement.
-     * It exists only to allow for usage of __builtin remquo functions without triggering a compiler error
-     * when the compiler does not support them.
-     */
-    template <typename T>
-    constexpr auto remquo(T x, T y, int* quo) -> std::enable_if_t<has_constexpr_remquo<T>, T>
-    {
-        if constexpr (std::is_same_v<T, float>)
-        {
-            return __builtin_remquof(x, y, quo);
-        }
-        else if constexpr (std::is_same_v<T, double>)
-        {
-            return __builtin_remquo(x, y, quo);
-        }
-        else if constexpr (std::is_same_v<T, long double>)
-        {
-            return __builtin_remquol(x, y, quo);
-        }
-        // This should never be reached
-        return T{};
-    }
+	/**
+	 * Wrapper for constexpr __builtin remquo functions.
+	 * This should be used internally and always be wrapped in an if constexpr statement.
+	 * It exists only to allow for usage of __builtin remquo functions without triggering a compiler error
+	 * when the compiler does not support them.
+	 */
+	template <typename T>
+	constexpr auto remquo(T x, T y, int * quo) -> std::enable_if_t<has_constexpr_remquo<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_remquof(x, y, quo);
+		}
+		else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_remquo(x, y, quo);
+		}
+		else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_remquol(x, y, quo);
+		}
+		// This should never be reached
+		return T{};
+	}
 } // namespace ccm::builtin
 
 // Cleanup the global namespace
