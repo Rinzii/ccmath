@@ -158,10 +158,10 @@ namespace ccm::pp
 		#endif
 		#else
 		false;
-	#endif
-	#else
-	#if defined(__GCC_IEC_559)
-				__GCC_IEC_559 == 0;
+		#endif
+		#else
+		#if defined(__GCC_IEC_559)
+		__GCC_IEC_559 == 0;
 	#elif defined(__FAST_MATH__)
 				true;
 	#else

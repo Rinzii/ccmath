@@ -28,41 +28,41 @@
 
 namespace ccm::builtin
 {
-    // clang-format off
-    template <typename T>
-    inline constexpr bool has_constexpr_fmax =
-#ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_FMAX
-        is_valid_builtin_type<T>;
-#else
+	// clang-format off
+	template <typename T>
+	inline constexpr bool has_constexpr_fmax =
+		#ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_FMAX
+		is_valid_builtin_type<T>;
+	#else
         false;
-#endif
-    // clang-format on
+	#endif
+	// clang-format on
 
-    /**
-     * Wrapper for constexpr __builtin fmax functions.
-     * This should be used internally and always be wrapped in an if constexpr statement.
-     * It exists only to allow for usage of __builtin fmax functions without triggering a compiler error
-     * when the compiler does not support them.
-     */
-    template <typename T>
-    constexpr auto fmax(T x, T y)
-        -> std::enable_if_t<has_constexpr_fmax<T>, T>
-    {
-        if constexpr (std::is_same_v<T, float>)
-        {
-            return __builtin_fmaxf(x, y);
-        }
-        else if constexpr (std::is_same_v<T, double>)
-        {
-            return __builtin_fmax(x, y);
-        }
-        else if constexpr (std::is_same_v<T, long double>)
-        {
-            return __builtin_fmaxl(x, y);
-        }
-        // This should never be reached
-        return T{};
-    }
+	/**
+	 * Wrapper for constexpr __builtin fmax functions.
+	 * This should be used internally and always be wrapped in an if constexpr statement.
+	 * It exists only to allow for usage of __builtin fmax functions without triggering a compiler error
+	 * when the compiler does not support them.
+	 */
+	template <typename T>
+	constexpr auto fmax(T x, T y)
+		-> std::enable_if_t<has_constexpr_fmax<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_fmaxf(x, y);
+		}
+		else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_fmax(x, y);
+		}
+		else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_fmaxl(x, y);
+		}
+		// This should never be reached
+		return T{};
+	}
 } // namespace ccm::builtin
 
 // Cleanup the global namespace
