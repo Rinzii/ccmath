@@ -12,6 +12,9 @@
 
 #include <type_traits>
 
+#include "ccmath/internal/math/generic/builtins/compare/isgreater.hpp"
+
+
 namespace ccm
 {
 	/**
@@ -24,7 +27,11 @@ namespace ccm
 	template <typename T>
 	constexpr bool isgreater(T x, T y) noexcept
 	{
-		return x > y;
+		if constexpr (ccm::builtin::has_constexpr_isgreater<T>) { return ccm::builtin::isgreater(x, y); }
+		else
+		{
+			return x > y;
+		}
 	}
 
 	/**

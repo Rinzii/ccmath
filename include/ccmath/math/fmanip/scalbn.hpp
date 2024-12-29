@@ -10,9 +10,11 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/fmanip/scalbn.hpp"
 #include "ccmath/math/fmanip/impl/scalbn_double_impl.hpp"
 #include "ccmath/math/fmanip/impl/scalbn_float_impl.hpp"
 #include "ccmath/math/fmanip/impl/scalbn_ldouble_impl.hpp"
+
 
 #if defined(_MSC_VER) && !defined(__clang__)
 #include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
@@ -31,17 +33,14 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T scalbn(T num, int exp) noexcept
 	{
-#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
-		if constexpr (std::is_same_v<T, float>) { return __builtin_scalbnf(num, exp); }
-		if constexpr (std::is_same_v<T, double>) { return __builtin_scalbn(num, exp); }
-		if constexpr (std::is_same_v<T, long double>) { return __builtin_scalbnl(num, exp); }
-		return static_cast<T>(__builtin_scalbnl(num, exp));
-#else
-		if constexpr (std::is_same_v<T, float>) { return internal::scalbn_float(num, exp); }
-		if constexpr (std::is_same_v<T, double>) { return internal::scalbn_double(num, exp); }
-		if constexpr (std::is_same_v<T, long double>) { return internal::scalbn_ldouble(num, exp); }
-		return static_cast<T>(internal::scalbn_ldouble(num, exp));
-#endif
+		if constexpr (ccm::builtin::has_constexpr_scalbn<T>) { return ccm::builtin::scalbn(num, exp); }
+		else
+		{
+			if constexpr (std::is_same_v<T, float>) { return internal::scalbn_float(num, exp); }
+			if constexpr (std::is_same_v<T, double>) { return internal::scalbn_double(num, exp); }
+			if constexpr (std::is_same_v<T, long double>) { return internal::scalbn_ldouble(num, exp); }
+			return static_cast<T>(internal::scalbn_ldouble(num, exp));
+		}
 	}
 
 	/**
@@ -54,17 +53,14 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T scalbn(T num, long exp) noexcept
 	{
-		#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
-		if constexpr (std::is_same_v<T, float>) { return __builtin_scalbnf(num, static_cast<int>(exp)); }
-		if constexpr (std::is_same_v<T, double>) { return __builtin_scalbn(num, static_cast<int>(exp)); }
-		if constexpr (std::is_same_v<T, long double>) { return __builtin_scalbnl(num, static_cast<int>(exp)); }
-		return static_cast<T>(__builtin_scalbnl(num, static_cast<int>(exp)));
-		#else
-		if constexpr (std::is_same_v<T, float>) { return internal::scalbn_float(num, exp); }
-		if constexpr (std::is_same_v<T, double>) { return internal::scalbn_double(num, exp); }
-		if constexpr (std::is_same_v<T, long double>) { return internal::scalbn_ldouble(num, exp); }
-		return static_cast<T>(internal::scalbn_ldouble(num, exp));
-		#endif
+		if constexpr (ccm::builtin::has_constexpr_scalbn<T>) { return ccm::builtin::scalbn(num, exp); }
+		else
+		{
+			if constexpr (std::is_same_v<T, float>) { return internal::scalbn_float(num, exp); }
+			if constexpr (std::is_same_v<T, double>) { return internal::scalbn_double(num, exp); }
+			if constexpr (std::is_same_v<T, long double>) { return internal::scalbn_ldouble(num, exp); }
+			return static_cast<T>(internal::scalbn_ldouble(num, exp));
+		}
 	}
 
 	/**

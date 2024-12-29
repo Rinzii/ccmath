@@ -10,11 +10,20 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/fmanip/modf.hpp"
+
 namespace ccm
 {
 	template <typename T>
 	constexpr T modf(T x, T* iptr) noexcept
 	{
-		return 0;
+		if constexpr (ccm::builtin::has_constexpr_modf<T>)
+		{
+			return ccm::builtin::modf(x, iptr);
+		}
+		else
+		{
+			return 0;
+		}
 	}
 } // namespace ccm

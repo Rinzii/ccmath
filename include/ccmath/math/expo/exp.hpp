@@ -12,6 +12,8 @@
 
 #include "ccmath/math/expo/impl/exp_double_impl.hpp"
 #include "ccmath/math/expo/impl/exp_float_impl.hpp"
+#include "ccmath/internal/math/generic/builtins/expo/exp.hpp"
+
 
 #if defined(_MSC_VER) && !defined(__clang__)
 #include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
@@ -29,17 +31,14 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T exp(T num)
 	{
-#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
-		if constexpr (std::is_same_v<T, float>) { return __builtin_expf(num); }
-		if constexpr (std::is_same_v<T, double>) { return __builtin_exp(num); }
-		if constexpr (std::is_same_v<T, long double>) { return __builtin_expl(num); }
-		return static_cast<T>(__builtin_expl(num));
-#else
-		if constexpr (std::is_same_v<T, float>) { return internal::impl::exp_float_impl(num); }
-		if constexpr (std::is_same_v<T, double>) { return internal::impl::exp_double_impl(num); }
-		if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::impl::exp_double_impl(static_cast<double>(num))); }
-		return static_cast<T>(internal::impl::exp_double_impl(static_cast<double>(num)));
-#endif
+		if constexpr (ccm::builtin::has_constexpr_exp<T>) { return ccm::builtin::exp(num); }
+		else
+		{
+			if constexpr (std::is_same_v<T, float>) { return internal::impl::exp_float_impl(num); }
+			if constexpr (std::is_same_v<T, double>) { return internal::impl::exp_double_impl(num); }
+			if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::impl::exp_double_impl(static_cast<double>(num))); }
+			return static_cast<T>(internal::impl::exp_double_impl(static_cast<double>(num)));
+		}
 	}
 
 	/**

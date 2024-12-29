@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/compare/islessgreater.hpp"
+
 #include <type_traits>
 
 namespace ccm
@@ -24,7 +26,11 @@ namespace ccm
 	template <typename T>
 	constexpr bool islessgreater(T x, T y) noexcept
 	{
-		return x < y || x > y;
+		if constexpr (ccm::builtin::has_constexpr_islessgreater<T>) { return ccm::builtin::islessgreater(x, y); }
+		else
+		{
+			return x < y || x > y;
+		}
 	}
 
 	/**

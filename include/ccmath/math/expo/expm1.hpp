@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/expo/expm1.hpp"
+
 #include <type_traits>
 
 // TODO: Implement this.
@@ -19,17 +21,14 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T expm1([[maybe_unused]] T num)
 	{
-		#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
-		if constexpr (std::is_same_v<T, float>) { return __builtin_expm1f(num); }
-		if constexpr (std::is_same_v<T, double>) { return __builtin_expm1(num); }
-		if constexpr (std::is_same_v<T, long double>) { return __builtin_expm1l(num); }
-		return static_cast<T>(__builtin_expm1l(static_cast<long double>(num)));
-		#else
-		if constexpr (std::is_same_v<T, float>) { return 0; }
-		if constexpr (std::is_same_v<T, double>) { return 0; }
-		if constexpr (std::is_same_v<T, long double>) { return 0; }
-		return 0;
-		#endif
+		if constexpr (ccm::builtin::has_constexpr_expm1<T>) { return ccm::builtin::expm1(num); }
+		else
+		{
+			if constexpr (std::is_same_v<T, float>) { return 0; }
+			if constexpr (std::is_same_v<T, double>) { return 0; }
+			if constexpr (std::is_same_v<T, long double>) { return 0; }
+			return 0;
+		}
 	}
 
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
