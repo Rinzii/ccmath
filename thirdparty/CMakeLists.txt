@@ -77,6 +77,10 @@ add_library(ccmath::ext ALIAS ${PROJECT_NAME})
 if (CCMATH_BUILD_TESTS)
   target_link_libraries(${PROJECT_NAME} INTERFACE gtest::gtest)
   target_link_libraries(${PROJECT_NAME} INTERFACE absl::base absl::debugging re2::re2)
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    target_compile_options(gtest INTERFACE -Wno-everything)
+  endif()
+
 endif()
 
 # Link Google Benchmark only if benchmarks are enabled
