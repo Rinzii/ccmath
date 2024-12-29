@@ -1,6 +1,11 @@
 ccm_add_headers(
         isfinite.hpp
+        isgreater.hpp
+        isgreaterequal.hpp
         isinf.hpp
+        isless.hpp
+        islessequal.hpp
+        islessgreater.hpp
         isnan.hpp
         isnormal.hpp
         isunordered.hpp
