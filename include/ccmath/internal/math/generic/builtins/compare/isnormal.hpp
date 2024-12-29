@@ -19,16 +19,37 @@
 ///
 /// Compilers with Support:
 /// - GCC 5.1+
+/// - Clang 5.0.0+
+/// - NVC++ 22.7+ (Lowest tested version)
+/// - Intel DPC++ 2021.1.2+ (Lowest tested version)
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_ISNORMAL
-#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
-#define CCMATH_HAS_CONSTEXPR_BUILTIN_ISNORMAL
+	#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_ISNORMAL
+	#endif
 #endif
+
+#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_ISNORMAL
+	#if defined(__clang__) && (__clang_major__ > 5 || (__clang_major__ == 5 && __clang_minor__ >= 0)) && !defined(__MSC_VER) && !defined(__INTEL_LLVM_COMPILER)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_ISNORMAL
+	#endif
+#endif
+
+#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_ISNORMAL
+	#if defined(__NVCOMPILER_MAJOR__) && (__NVCOMPILER_MAJOR__ > 22 || (__NVCOMPILER_MAJOR__ == 22 && __NVCOMPILER_MINOR__ >= 7))
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_ISNORMAL
+	#endif
+#endif
+
+#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_ISNORMAL
+	#if defined(__INTEL_LLVM_COMPILER) && (__INTEL_LLVM_COMPILER >= 202110)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_ISNORMAL
+	#endif
 #endif
 
 namespace ccm::builtin
 {
-    // clang-format off
+	// clang-format off
     template <typename T>
     inline constexpr bool has_constexpr_isnormal =
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_ISNORMAL
@@ -36,32 +57,23 @@ namespace ccm::builtin
 #else
         false;
 #endif
-    // clang-format on
+	// clang-format on
 
-    /**
-     * Wrapper for constexpr __builtin isnormal functions.
-     * This should be used internally and always be wrapped in an if constexpr statement.
-     * It exists only to allow for usage of __builtin isnormal functions without triggering a compiler error
-     * when the compiler does not support them.
-     */
-    template <typename T>
-    constexpr auto isnormal(T x) -> std::enable_if_t<has_constexpr_isnormal<T>, bool>
-    {
-        if constexpr (std::is_same_v<T, float>)
-        {
-            return __builtin_isnormal(x);
-        }
-        else if constexpr (std::is_same_v<T, double>)
-        {
-            return __builtin_isnormal(x);
-        }
-        else if constexpr (std::is_same_v<T, long double>)
-        {
-            return __builtin_isnormal(x);
-        }
-        // This should never be reached
-        return false;
-    }
+	/**
+	 * Wrapper for constexpr __builtin isnormal functions.
+	 * This should be used internally and always be wrapped in an if constexpr statement.
+	 * It exists only to allow for usage of __builtin isnormal functions without triggering a compiler error
+	 * when the compiler does not support them.
+	 */
+	template <typename T>
+	constexpr auto isnormal(T x) -> std::enable_if_t<has_constexpr_isnormal<T>, bool>
+	{
+		if constexpr (std::is_same_v<T, float>) { return __builtin_isnormal(x); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_isnormal(x); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_isnormal(x); }
+		// This should never be reached
+		return false;
+	}
 } // namespace ccm::builtin
 
 // Cleanup the global namespace
