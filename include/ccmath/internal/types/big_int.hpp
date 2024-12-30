@@ -13,18 +13,17 @@
 
 #pragma once
 
+// ReSharper disable once CppUnusedIncludeDirective - compiler.hpp is used in the code below.
 #include "ccmath/internal/config/compiler.hpp"
 #include "ccmath/internal/config/type_support.hpp"
-#include "ccmath/internal/predef/assume.hpp"
+#ifdef CCMATH_COMPILER_CLANG
+	#include "ccmath/internal/predef/assume.hpp"
+#endif
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "ccmath/internal/support/math_support.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
-
-//#include "ccmath/internal/math/runtime/simd/simd_vectorize.hpp"
-//#include "ccmath/internal/support/is_constant_evaluated.hpp"
-
 
 #include <algorithm>
 #include <array>
@@ -32,6 +31,11 @@
 #include <cstdint>
 #include <limits>
 #include <optional>
+
+#if defined(_MSC_VER) && !defined(__clang__)
+#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+CCM_DISABLE_MSVC_WARNING(4702) // 4702: unreachable code
+#endif
 
 namespace ccm::types
 {
@@ -567,7 +571,7 @@ namespace ccm::types
 	} // namespace multiword
 
 	template <std::size_t Bits, bool Signed, typename WordType = std::uint64_t>
-	struct BigInt
+	struct BigInt // NOLINT(cppcoreguidelines-special-member-functions)
 	{
 	private:
 		static_assert(ccm::support::traits::ccm_is_integral_v<WordType> && ccm::support::traits::ccm_is_unsigned_v<WordType>,
@@ -610,9 +614,9 @@ namespace ccm::types
 		 * @param other The source BigInt to construct from.
 		 */
 		template <size_t OtherBits, bool OtherSigned>
-		constexpr BigInt(const BigInt<OtherBits, OtherSigned, WordType> & other)
+		constexpr BigInt(const BigInt<OtherBits, OtherSigned, WordType> & other) // NOLINT(google-explicit-constructor)
 		{
-			if (OtherBits >= Bits)
+			if constexpr (OtherBits >= Bits)
 			{
 				// Truncate the extra bits
 				for (size_t i = 0; i < WORD_COUNT; ++i) { val[i] = other[i]; }
@@ -632,8 +636,8 @@ namespace ccm::types
 		 * @param nums The input array of WordType values.
 		 */
 		template <std::size_t N>
-		constexpr BigInt(
-			const WordType (&nums)[N]) // NOLINT(cppcoreguidelines-avoid-c-arrays) - We are intentionally using C-style arrays here.
+		// NOLINTNEXTLINE(google-explicit-constructor) - Cannot be marked explicit.
+		constexpr BigInt(const WordType (&nums)[N]) // NOLINT(cppcoreguidelines-avoid-c-arrays) - We are intentionally using C-style arrays here.
 		{
 			static_assert(N == WORD_COUNT);
 			for (std::size_t i = 0; i < WORD_COUNT; ++i) { val[i] = nums[i]; }
@@ -815,7 +819,7 @@ namespace ccm::types
 		 */
 		constexpr BigInt operator+(BigInt && other) const
 		{
-			std::move(other); // We ignore the moved value here.
+			std::move(other);		   // We ignore the moved value here.
 			other.add_overflow(*this); // We ignore the returned carry value here.
 			return other;
 		}
@@ -1183,11 +1187,11 @@ namespace ccm::types
 			return *this;
 		}
 
-		constexpr BigInt operator++(int)
+		constexpr BigInt operator++(int) // NOLINT(cert-dcl21-cpp)
 		{
-			BigInt oldval(*this);
+			BigInt old_val(*this);
 			increment();
-			return oldval;
+			return old_val;
 		}
 
 		constexpr BigInt & operator--()
@@ -1196,11 +1200,11 @@ namespace ccm::types
 			return *this;
 		}
 
-		constexpr BigInt operator--(int)
+		constexpr BigInt operator--(int) // NOLINT(cert-dcl21-cpp)
 		{
-			BigInt oldval(*this);
+			BigInt old_val(*this);
 			decrement();
-			return oldval;
+			return old_val;
 		}
 
 		constexpr const WordType & operator[](std::size_t i) const { return val[i]; }
@@ -1358,6 +1362,7 @@ namespace ccm::types
 namespace std
 {
 	template <>
+	// ReSharper disable once CppMismatchedClassTags - Compilers are inconsistent with struct or class. Functionally the selection does not matter.
 	struct numeric_limits<ccm::types::UInt<128>>
 	{
 	public:
@@ -1368,6 +1373,7 @@ namespace std
 	};
 
 	template <>
+	// ReSharper disable once CppMismatchedClassTags - Compilers are inconsistent with struct or class. Functionally the selection does not matter.
 	struct numeric_limits<ccm::types::Int<128>>
 	{
 	public:
@@ -1561,7 +1567,7 @@ namespace ccm::support
 	constexpr std::enable_if_t<types::is_big_int_v<T>, T> mask_trailing_ones()
 	{
 		static_assert(!T::SIGNED && count <= T::BITS);
-		if (count == T::BITS) { return T::all_ones(); }
+		if constexpr (count == T::BITS) { return T::all_ones(); }
 		constexpr std::size_t QUOTIENT	= count / T::WORD_SIZE;
 		constexpr std::size_t REMAINDER = count % T::WORD_SIZE;
 		T out; // zero initialized
@@ -1623,3 +1629,7 @@ namespace ccm::support
 		return value == std::numeric_limits<T>::max() ? 0 : support::countr_zero(value) + 1;
 	}
 } // namespace ccm::support
+
+#if defined(_MSC_VER) && !defined(__clang__)
+CCM_RESTORE_MSVC_WARNING()
+#endif

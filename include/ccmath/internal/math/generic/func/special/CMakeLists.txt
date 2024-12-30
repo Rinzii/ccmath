@@ -1,0 +1,23 @@
+ccm_add_headers(
+        assoc_laguerre_gen.hpp
+        assoc_legendre_gen.hpp
+        beta_gen.hpp
+        comp_ellint_1_gen.hpp
+        comp_ellint_2_gen.hpp
+        comp_ellint_3_gen.hpp
+        cyl_bessel_i_gen.hpp
+        cyl_bessel_j_gen.hpp
+        cyl_bessel_k_gen.hpp
+        cyl_neumann_gen.hpp
+        ellint_1_gen.hpp
+        ellint_2_gen.hpp
+        ellint_3_gen.hpp
+        expint_gen.hpp
+        hermite_gen.hpp
+        laguerre_gen.hpp
+        legendre_gen.hpp
+        riemann_zeta_gen.hpp
+        sph_bessel_gen.hpp
+        sph_legendre_gen.hpp
+        sph_neumann_gen.hpp
+)

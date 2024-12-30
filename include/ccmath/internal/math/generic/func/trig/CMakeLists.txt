@@ -1,0 +1,9 @@
+ccm_add_headers(
+        acos_gen.hpp
+        asin_gen.hpp
+        atan2_gen.hpp
+        atan_gen.hpp
+        cos_gen.hpp
+        sin_gen.hpp
+        tan_gen.hpp
+)

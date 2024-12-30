@@ -12,6 +12,8 @@
 
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
+#include "ccmath/internal/math/generic/builtins/nearest/trunc.hpp"
+
 
 namespace ccm
 {
@@ -24,31 +26,35 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T trunc(T num) noexcept
 	{
-		using FPBits_t	= ccm::support::fp::FPBits<T>;
-		using Storage_t = typename FPBits_t::storage_type;
+		if constexpr (ccm::builtin::has_constexpr_trunc<T>) { return ccm::builtin::trunc(num); }
+		else
+		{
+			using FPBits_t	= ccm::support::fp::FPBits<T>;
+			using Storage_t = typename FPBits_t::storage_type;
 
-		FPBits_t bits(num);
+			FPBits_t bits(num);
 
-		// If x == ±∞ then return num
-		// If x == ±NaN then return num
-		if (CCM_UNLIKELY(bits.is_inf_or_nan())) { return num; }
+			// If x == ±∞ then return num
+			// If x == ±NaN then return num
+			if (CCM_UNLIKELY(bits.is_inf_or_nan())) { return num; }
 
-		// If x == ±0 then return num
-		if (CCM_UNLIKELY(num == 0.0)) { return num; }
+			// If x == ±0 then return num
+			if (CCM_UNLIKELY(num == 0.0)) { return num; }
 
-		const int exponent = bits.get_exponent();
+			const int exponent = bits.get_exponent();
 
-		// If the exponent is greater than or equal to the fraction length, then we will return the number as is since it is already an integer.
-		if (exponent >= FPBits_t::fraction_length) { return num; }
+			// If the exponent is greater than or equal to the fraction length, then we will return the number as is since it is already an integer.
+			if (exponent >= FPBits_t::fraction_length) { return num; }
 
-		// If our exponent is set up such that the abs(x) is less than 1 we will instead return 0.
-		if (exponent <= -1) { return FPBits_t::zero(bits.sign()).get_val(); }
+			// If our exponent is set up such that the abs(x) is less than 1 we will instead return 0.
+			if (exponent <= -1) { return FPBits_t::zero(bits.sign()).get_val(); }
 
-		// Perform the truncation
-		const int trimming_size = FPBits_t::fraction_length - exponent;
-		const auto truncated_mantissa = static_cast<Storage_t>((bits.get_mantissa() >> trimming_size) << trimming_size);
-		bits.set_mantissa(truncated_mantissa);
-		return bits.get_val();
+			// Perform the truncation
+			const int trimming_size = FPBits_t::fraction_length - exponent;
+			const auto truncated_mantissa = static_cast<Storage_t>((bits.get_mantissa() >> trimming_size) << trimming_size);
+			bits.set_mantissa(truncated_mantissa);
+			return bits.get_val();
+		}
 	}
 
 	/**

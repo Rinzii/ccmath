@@ -13,8 +13,12 @@
 #include "ccmath/internal/support/helpers/digit_to_int.hpp"
 #include "ccmath/internal/support/bits.hpp"
 
+#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+
 #include <cstdint>
 #include <limits>
+
+CCM_DISABLE_MSVC_WARNING(4702) // 4702: unreachable code
 
 namespace ccm::internal::impl
 {
@@ -104,3 +108,5 @@ namespace ccm::internal::impl
 		return ccm::support::bit_cast<double>(dbl_bits);
 	}
 } // namespace ccm::internal::impl
+
+CCM_RESTORE_MSVC_WARNING()

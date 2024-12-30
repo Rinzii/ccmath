@@ -1,0 +1,10 @@
+ccm_add_headers(
+        copysign_gen.hpp
+        frexp_gen.hpp
+        ilogb_gen.hpp
+        ldexp_gen.hpp
+        logb_gen.hpp
+        modf_gen.hpp
+        nextafter_gen.hpp
+        scalbn_gen.hpp
+)

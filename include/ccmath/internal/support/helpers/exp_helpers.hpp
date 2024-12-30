@@ -42,4 +42,4 @@ namespace ccm::support::helpers
 		return math_narrow_eval_tmp;
 #endif
 	}
-} // namespace ccm::helpers
+} // namespace ccm::support::helpers

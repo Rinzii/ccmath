@@ -17,13 +17,13 @@
 #include "math/compare.hpp"
 
 /// Exponential func
-#include "math/exponential.hpp"
+#include "math/expo.hpp"
 
 /// Float manipulation func
 #include "math/fmanip.hpp"
 
 /// Hyperbolic func
-#include "math/hyperbolic.hpp"
+#include "math/hyper.hpp"
 
 /// Nearest func
 #include "math/nearest.hpp"

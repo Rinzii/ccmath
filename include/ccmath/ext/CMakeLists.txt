@@ -1,0 +1,15 @@
+ccm_add_headers(
+        align.hpp
+        clamp.hpp
+        cubic.hpp
+        degrees.hpp
+        fract.hpp
+        is_power_of_two.hpp
+        lerp_smooth.hpp
+        mix.hpp
+        normalize.hpp
+        ping_pong.hpp
+        radians.hpp
+        rcp.hpp
+        smoothstep.hpp
+)

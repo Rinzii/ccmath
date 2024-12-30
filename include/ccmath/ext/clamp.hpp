@@ -20,7 +20,7 @@ namespace ccm::ext
 	/**
      * @brief Clamps a value between a minimum and maximum value.
      * @tparam T Type of the input and output.
-     * @param x Value to clamp.
+     * @param v Value to clamp.
      * @param lo Minimum value.
      * @param hi Maximum value.
      * @return The clamped value.

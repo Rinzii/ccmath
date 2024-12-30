@@ -188,7 +188,7 @@ namespace ccm::support::fp
 			 * @tparam T The type of the integer.
 			 */
 			template <typename T>
-			struct TypedInt
+			struct TypedInt // NOLINT(cppcoreguidelines-special-member-functions)
 			{
 				using value_type = T;
 				constexpr explicit TypedInt(T value) : value(value) {}

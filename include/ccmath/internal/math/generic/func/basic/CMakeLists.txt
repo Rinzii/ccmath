@@ -1,0 +1,10 @@
+ccm_add_headers(
+        abs_gen.hpp
+        fdim_gen.hpp
+        fma_gen.hpp
+        fmod_gen.hpp
+        max_gen.hpp
+        min_gen.hpp
+        remainder_gen.hpp
+        remquo_gen.hpp
+)

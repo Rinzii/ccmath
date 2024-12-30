@@ -36,14 +36,17 @@ namespace ccm::support::helpers
 			if ((sign == types::Sign::POS && rounding_mode == FE_DOWNWARD) || (sign == types::Sign::NEG && rounding_mode == FE_UPWARD) ||
 				(rounding_mode == FE_TOWARDZERO))
 			{
-				return support::fp::FPBits<T>::max_normal(sign).get_val();
+				return fp::FPBits<T>::max_normal(sign).get_val();
 			}
 
-			// These func do nothing at compile time, but at runtime will set errno and raise exceptions if required.
-			support::fenv::set_errno_if_required(ERANGE);
-			support::fenv::raise_except_if_required(FE_OVERFLOW);
+			if constexpr (fenv::is_errno_enabled())
+			{
+				// These func do nothing at compile time, but at runtime will set errno and raise exceptions if required.
+				fenv::set_errno_if_required(ERANGE);
+				fenv::raise_except_if_required(FE_OVERFLOW);
+			}
 
-			return support::fp::FPBits<T>::inf(sign).get_val();
+			return fp::FPBits<T>::inf(sign).get_val();
 		}
 
 		if (CCM_UNLIKELY(exp < -EXP_LIMIT))
@@ -68,4 +71,4 @@ namespace ccm::support::helpers
 		normal.exponent += exp;
 		return static_cast<T>(normal);
 	}
-} // namespace ccm::helpers
+} // namespace ccm::support::helpers

@@ -11,7 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/support/helpers/fpclassify_helper.hpp"
-#include "ccmath/math/basic/abs.hpp"
+#include "ccmath/math/basic/fabs.hpp"
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 

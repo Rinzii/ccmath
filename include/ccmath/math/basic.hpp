@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "basic/abs.hpp"
+#include "basic/fabs.hpp"
 #include "basic/fdim.hpp"
 #include "basic/fma.hpp"
 #include "basic/fmod.hpp"
