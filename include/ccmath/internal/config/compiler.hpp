@@ -8,6 +8,9 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+// TODO: I'd like to redo how we detect platform information so we can worry less about
+//			poluting the global namespace with macros.
+
 /*
  * Currently supported compilers:
  * - MSVC
