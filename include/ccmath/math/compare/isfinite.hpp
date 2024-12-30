@@ -11,6 +11,8 @@
 #pragma once
 
 #include "ccmath/internal/support/fp/fp_bits.hpp"
+#include "ccmath/internal/math/generic/builtins/compare/isfinite.hpp"
+
 
 namespace ccm
 {
@@ -23,9 +25,13 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr bool isfinite(T num)
 	{
-		using FPBits_t = typename ccm::support::fp::FPBits<T>;
-		const FPBits_t num_bits(num);
-		return num_bits.is_finite();
+		if constexpr (ccm::builtin::has_constexpr_isfinite<T>) { return ccm::builtin::isfinite(num); }
+		else
+		{
+			using FPBits_t = typename ccm::support::fp::FPBits<T>;
+			const FPBits_t num_bits(num);
+			return num_bits.is_finite();
+		}
 	}
 
 	/**

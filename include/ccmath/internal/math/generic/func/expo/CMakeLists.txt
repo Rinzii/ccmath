@@ -1,0 +1,9 @@
+ccm_add_headers(
+        exp2_gen.hpp
+        exp_gen.hpp
+        expm1_gen.hpp
+        log1p_gen.hpp
+        log2_gen.hpp
+        log10_gen.hpp
+        log_gen.hpp
+)

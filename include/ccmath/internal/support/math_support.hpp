@@ -49,7 +49,7 @@ namespace ccm::support
 		}
 		else
 		{
-			if (lres < 0 || lres > std::numeric_limits<T>::max()) { overflow = true; }
+			if (static_cast<unsigned long long>(lres) < 0 || static_cast<unsigned long long>(lres) > std::numeric_limits<T>::max()) { overflow = true; }
 		}
 
 		// Store the result if no overflow

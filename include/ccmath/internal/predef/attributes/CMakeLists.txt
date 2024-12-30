@@ -1,0 +1,9 @@
+ccm_add_headers(
+        always_inline.hpp
+        gpu_device.hpp
+        gpu_host_device.hpp
+        gsl_suppress.hpp
+        never_inline.hpp
+        no_debug.hpp
+        optnone.hpp
+)

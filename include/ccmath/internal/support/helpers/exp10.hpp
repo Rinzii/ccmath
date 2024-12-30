@@ -13,13 +13,13 @@
 #include "ccmath/internal/support/multiply_add.hpp"
 #include "ccmath/internal/types/double_double.hpp"
 #include "ccmath/internal/types/triple_double.hpp"
-#include "ccmath/math/exponential/log2.hpp"
+#include "ccmath/math/expo/log2.hpp"
 
 #include <array>
 
 #include "ccmath/internal/support/poly_eval.hpp"
 
-namespace ccm::internal
+namespace ccm::support::helpers
 {
 	namespace impl
 	{
@@ -109,4 +109,4 @@ namespace ccm::internal
 	{
 		return impl::exp10_float_impl(exp);
 	}
-} // namespace ccm::internal
+} // namespace ccm::support::helpers

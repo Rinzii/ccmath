@@ -14,6 +14,7 @@
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/compare/signbit.hpp"
+#include "ccmath/internal/math/generic/builtins/basic/fma.hpp"
 
 #include <limits>
 #include <type_traits>

@@ -9,11 +9,17 @@
  */
 
 #include <gtest/gtest.h>
-#include <ccmath/math/basic/abs.hpp>
+#include <ccmath/math/basic/fabs.hpp>
 #include <cmath>
 #include <limits>
 
 // NOLINTBEGIN
+
+#if defined(_MSC_VER) && !defined(__clang__)
+#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+// TODO: Look into this issue at a later date.
+CCM_DISABLE_MSVC_WARNING(4756) // 4756: overflow in constant arithmetic - Not sure why this is happening
+#endif
 
 namespace
 {
@@ -253,3 +259,7 @@ TEST(CcmathBasicTests, CcmAbsCanBeEvaluatedAtCompileTime)
 }
 
 // NOLINTEND
+
+#if defined(_MSC_VER) && !defined(__clang__)
+CCM_RESTORE_MSVC_WARNING()
+#endif

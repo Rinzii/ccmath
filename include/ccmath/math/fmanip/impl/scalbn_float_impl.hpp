@@ -17,6 +17,9 @@
 
 #include <cstdint>
 
+#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+CCM_DISABLE_MSVC_WARNING(4756) // 4756: overflow in constant arithmetic
+
 namespace ccm::internal
 {
 	namespace impl
@@ -31,7 +34,7 @@ namespace ccm::internal
 				exp -= 127;
 				if (exp > 127)
 				{
-					tmp *= 0x1p127F;
+					tmp *= 0x1p127F; // This is what we are disabling the warning for.
 					exp -= 127;
 					exp = ccm::min(exp, 127);
 				}
@@ -65,3 +68,5 @@ namespace ccm::internal
 		return impl::scalbn_float_impl(arg, static_cast<int>(exp));
 	}
 } // namespace ccm::internal
+
+CCM_RESTORE_MSVC_WARNING()

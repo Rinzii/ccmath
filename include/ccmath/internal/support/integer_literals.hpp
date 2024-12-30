@@ -72,9 +72,9 @@ namespace ccm::support
 			// for buffer allocation.
 			static constexpr std::size_t calculate_bits_per_digit()
 			{
-				if (base == 2) { return 1; }
-				if (base == 10) { return 3; }
-				if (base == 16) { return 4; }
+				if constexpr (base == 2) { return 1; }
+				if constexpr (base == 10) { return 3; }
+				if constexpr (base == 16) { return 4; }
 				return 0;
 			}
 
@@ -90,6 +90,7 @@ namespace ccm::support
 				for (char const ch : str) { push(ch); }
 			}
 
+			CCM_DISABLE_MSVC_WARNING(4127) // MSVC thinks the is_alpha is a constant expression; It is not.
 			// Returns the digit for a particular character.
 			// Returns INVALID_DIGIT if the character is invalid.
 			static constexpr uint8_t get_digit_value(const char c)
@@ -98,9 +99,12 @@ namespace ccm::support
 				const auto is_digit = [](char ch) { return ch >= '0' && ch <= '9'; };
 				const auto is_alpha = [](char ch) { return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z'); };
 				if (is_digit(c)) { return static_cast<std::uint8_t>(c - '0'); }
+
 				if (base > 10 && is_alpha(c)) { return static_cast<std::uint8_t>(to_lower(c) - 'a' + 10); }
 				return INVALID_DIGIT;
 			}
+			CCM_RESTORE_MSVC_WARNING()
+
 
 			// Adds a single character to this buffer.
 			constexpr void push(char c)

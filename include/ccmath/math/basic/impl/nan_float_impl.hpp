@@ -31,7 +31,7 @@ namespace ccm::internal::impl
 		// So if we detect we are using MSVC without Clang-CL then
 		// we can just return NaN and not bother doing any extra work.
 		// To properly mimic the behavior of MSVC.
-		return std::numeric_limits<double>::quiet_NaN(); // Default NaN
+		return std::numeric_limits<float>::quiet_NaN(); // Default NaN
 #endif
 
 		std::uint32_t flt_bits{0};

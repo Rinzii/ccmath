@@ -10,6 +10,9 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/compare/isnan.hpp"
+
+
 #include <type_traits>
 
 namespace ccm
@@ -23,13 +26,14 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	[[nodiscard]] constexpr bool isnan(T num) noexcept
 	{
-#if defined(__GNUC__) || defined(__clang__)
-		return __builtin_isnan(num); // GCC and Clang implement this as constexpr
-#else							   // If we can't use the builtin, fallback to this comparison and hope for the best.
-		using FPBits_t = typename ccm::support::fp::FPBits<T>;
-		const FPBits_t num_bits(num);
-		return num_bits.is_nan();
-#endif
+		if constexpr (ccm::builtin::has_constexpr_isnan<T>) { return ccm::builtin::isnan(num); }
+		else
+		{
+			// If we can't use the builtin, fallback to this comparison and hope for the best.
+			using FPBits_t = typename ccm::support::fp::FPBits<T>;
+			const FPBits_t num_bits(num);
+			return num_bits.is_nan();
+		}
 	}
 
 	/**

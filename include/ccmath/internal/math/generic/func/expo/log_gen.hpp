@@ -16,17 +16,19 @@
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/unreachable.hpp"
 #include "ccmath/internal/types/big_int.hpp"
-#include "ccmath/math/basic/abs.hpp"
+#include "ccmath/math/basic/fabs.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/power/sqrt.hpp"
 
 #include <limits>
 
+// TODO: Do something with this.
+
 namespace ccm::gen
 {
 	namespace internal::impl
 	{
-		constexpr float log_impl(float num) noexcept
+		constexpr float log_impl([[maybe_unused]] float num) noexcept
 		{
 			//constexpr double ln2 = 0x1.62e42fefa39efp-1;
 			//using FPBits_t = typename support::fp::FPBits<float>;
@@ -42,12 +44,12 @@ namespace ccm::gen
 			return 0;
 		}
 
-		constexpr double log_impl(double num) noexcept
+		constexpr double log_impl([[maybe_unused]] double num) noexcept
 		{
 			return 0;
 		}
 
-		constexpr long double log_impl(long double num) noexcept
+		constexpr long double log_impl([[maybe_unused]] long double num) noexcept
 		{
 			return 0;
 		}

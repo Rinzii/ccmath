@@ -11,7 +11,7 @@
 #pragma once
 
 #include "ccmath/ext/fract.hpp"
-#include "ccmath/math/basic/abs.hpp"
+#include "ccmath/math/basic/fabs.hpp"
 
 #include <type_traits>
 
@@ -32,7 +32,7 @@ namespace ccm::ext
 			return T(0);
 		}
 
-		return ccm::abs(ccm::ext::fract((a - b) / (b * 2.0)) * b * 2.0 - b);
+		return ccm::abs((ccm::ext::fract((a - b) / (b * 2.0)) * b * 2.0) - b);
 
 	}
 } // namespace ccm::ext

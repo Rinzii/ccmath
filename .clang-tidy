@@ -66,3 +66,5 @@ openmp-use-default-none,
 CheckOptions:
   cppcoreguidelines-avoid-do-while.IgnoreMacros: 'true'
   readability-function-cognitive-complexity.Threshold: 35
+
+UseColor: true
