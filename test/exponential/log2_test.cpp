@@ -15,6 +15,7 @@
 #include <cmath>
 #include <cstdint>
 #include <limits>
+#include <type_traits>
 
 // ULP Difference Function
 template <typename T>
@@ -22,23 +23,41 @@ int64_t ulp_difference(T a, T b)
 {
 	static_assert(std::is_floating_point_v<T>, "T must be a floating-point type.");
 
-	// Handle special cases like infinity or NaN
-	if (std::isnan(a) || std::isnan(b)) { return std::numeric_limits<int64_t>::max(); }
-	if (std::isinf(a) || std::isinf(b)) { return std::numeric_limits<int64_t>::max(); }
+	// Handle special cases like NaN or Infinity
+	if (std::isnan(a) && std::isnan(b))
+	{
+		return 0; // Both are NaN, considered equal
+	}
+	if (std::isnan(a) || std::isnan(b))
+	{
+		return std::numeric_limits<int64_t>::max(); // One is NaN, the other is not
+	}
+	if (std::isinf(a) && std::isinf(b))
+	{
+		if (std::signbit(a) == std::signbit(b))
+		{
+			return 0; // Both infinities with the same sign are considered equal
+		}
+		return std::numeric_limits<int64_t>::max(); // Opposite sign infinities
+	}
+	if (std::isinf(a) || std::isinf(b))
+	{
+		return std::numeric_limits<int64_t>::max(); // One is infinity, the other is not
+	}
 
-	// Determine the appropriate unsigned integer type for bit representation
-	using UIntType = std::conditional_t<std::is_same_v<T, float>, uint32_t, uint64_t>;
+	using UIntType				 = std::conditional_t<std::is_same_v<T, float>, uint32_t, uint64_t>;
+	constexpr UIntType sign_mask = std::is_same_v<T, float> ? 0x80000000U : 0x8000000000000000ULL;
 
-	// Convert floating-point values to their bit representation
-	UIntType a_bits = *reinterpret_cast<UIntType *>(&a); // NOLINT
-	UIntType b_bits = *reinterpret_cast<UIntType *>(&b); // NOLINT
+	// Use __builtin_bit_cast for bit-level reinterpretation
+	auto a_bits = __builtin_bit_cast(UIntType, a);
+	auto b_bits = __builtin_bit_cast(UIntType, b);
 
 	// Handle the sign bit by flipping it to treat all values as positive
-	if (static_cast<std::make_signed_t<UIntType>>(a_bits) < 0) { a_bits = 0x8000000000000000ULL - a_bits; }
-	if (static_cast<std::make_signed_t<UIntType>>(b_bits) < 0) { b_bits = 0x8000000000000000ULL - b_bits; }
+	if (static_cast<std::make_signed_t<UIntType>>(a_bits) < 0) { a_bits = sign_mask - a_bits; }
+	if (static_cast<std::make_signed_t<UIntType>>(b_bits) < 0) { b_bits = sign_mask - b_bits; }
 
-	// Return the absolute difference as a signed integer
-	return std::abs(static_cast<int64_t>(a_bits) - static_cast<int64_t>(b_bits));
+	// Return the absolute difference using unsigned arithmetic
+	return (a_bits > b_bits) ? a_bits - b_bits : b_bits - a_bits;
 }
 
 // ULP Comparison Macro for Google Test
@@ -73,7 +92,7 @@ TEST(ULPTest, HandlesNegativeNumbers)
 {
 	double value1 = -1.0;
 	double value2 = -1.0;
-	EXPECT_EQ(ulp_difference(value1, value2), 0);
+	EXPECT_EQ(ulp_difference(value1, value2), 0.5);
 }
 
 TEST(CcmathExponentialTests, Log2)
@@ -84,7 +103,7 @@ TEST(CcmathExponentialTests, Log2)
 	double const v2 = 2.7725887222397811;
 	// EXPECT_DOUBLE_EQ(v1, v2);
 
-	EXPECT_ULP_EQ(v1, v2, 1);
+	EXPECT_ULP_EQ(v1, v2, 0);
 
 	EXPECT_NEAR(v1, v2, std::numeric_limits<double>::epsilon() + std::numeric_limits<double>::epsilon());
 
