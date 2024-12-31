@@ -13,59 +13,41 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  setup:
     runs-on: windows-2022
+    outputs:
+      cache-hit: ${{ steps.cache-build.outputs.cache-hit }}
+    steps:
+      - name: Cache Build Files
+        id: cache-build
+        uses: actions/cache@v4
+        with:
+          path: build
+          key: ${{ runner.os }}-cmake-build
+
+  build-and-test:
+    runs-on: windows-2022
+    needs: setup
     strategy:
       fail-fast: false
       matrix:
-        compiler: [vs22]
-        cxx_version: [17, 20]
-        target: [Debug, Release]
+        compiler: [ vs22 ]
+        cxx_version: [ 17, 20 ]
+        target: [ Debug, Release ]
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+        uses: step-security/harden-runner@v2.10.1
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@v4
 
-      - name: Cache CMake build files
-        uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
-        with:
-          path: build
-          key: ${{ runner.os }}-cmake-${{ matrix.compiler }}-${{ matrix.cxx_version }}-${{ matrix.target }}
-          restore-keys: |
-            ${{ runner.os }}-cmake-${{ matrix.compiler }}-${{ matrix.cxx_version }}-
-            ${{ runner.os }}-cmake-${{ matrix.compiler }}-
+      - name: Configure CMake
+        run: |
+          cmake -S . --preset=${{ matrix.compiler }} -B build -DCMAKE_CXX_STANDARD=${{ matrix.cxx_version }}
 
-      - name: configure
-        run: cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
+      - name: Build
+        run: cmake --build build --config=${{ matrix.target }}
 
-      - name: build
-        run: cmake --build build --config=${{matrix.target}}
-
-  test:
-    runs-on: windows-2022
-    needs: build
-    strategy:
-      fail-fast: false
-      matrix:
-        compiler: [vs22]
-        cxx_version: [17, 20]
-        target: [Debug, Release]
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
-        with:
-          egress-policy: audit
-
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
-      - name: Cache CMake build files
-        uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
-        with:
-          path: build
-          key: ${{ runner.os }}-cmake-${{ matrix.compiler }}-${{ matrix.cxx_version }}-${{ matrix.target }}
-
-      - name: test
-        run: cd build && ctest -C ${{matrix.target}} --output-on-failure
+      - name: Test
+        run: cd build && ctest -C ${{ matrix.target }} --output-on-failure
