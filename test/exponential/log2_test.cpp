@@ -10,39 +10,71 @@
 
 #include <gtest/gtest.h>
 
+#include "ccmath/ccmath.hpp"
+
 #include <cmath>
 #include <cstdint>
 #include <limits>
-#include "ccmath/ccmath.hpp"
 
-// Function to calculate the ULP difference
-int64_t ulp_difference(double a, double b)
+// ULP Difference Function
+template <typename T>
+int64_t ulp_difference(T a, T b)
 {
+	static_assert(std::is_floating_point_v<T>, "T must be a floating-point type.");
+
 	// Handle special cases like infinity or NaN
 	if (std::isnan(a) || std::isnan(b)) { return std::numeric_limits<int64_t>::max(); }
 	if (std::isinf(a) || std::isinf(b)) { return std::numeric_limits<int64_t>::max(); }
 
-	// Interpret the bit patterns of the doubles as int64_t
-	int64_t a_bits = *reinterpret_cast<int64_t *>(&a); // NOLINT
-	int64_t b_bits = *reinterpret_cast<int64_t *>(&b); // NOLINT
+	// Determine the appropriate unsigned integer type for bit representation
+	using UIntType = std::conditional_t<std::is_same_v<T, float>, uint32_t, uint64_t>;
 
-	// Ensure the sign bit is handled correctly for bitwise comparison
-	if (a_bits < 0) { a_bits = 0x8000000000000000 - a_bits; }
-	if (b_bits < 0) { b_bits = 0x8000000000000000 - b_bits; }
+	// Convert floating-point values to their bit representation
+	UIntType a_bits = *reinterpret_cast<UIntType *>(&a); // NOLINT
+	UIntType b_bits = *reinterpret_cast<UIntType *>(&b); // NOLINT
 
-	// Calculate the absolute ULP difference
-	return std::abs(a_bits - b_bits);
+	// Handle the sign bit by flipping it to treat all values as positive
+	if (static_cast<std::make_signed_t<UIntType>>(a_bits) < 0) { a_bits = 0x8000000000000000ULL - a_bits; }
+	if (static_cast<std::make_signed_t<UIntType>>(b_bits) < 0) { b_bits = 0x8000000000000000ULL - b_bits; }
+
+	// Return the absolute difference as a signed integer
+	return std::abs(static_cast<int64_t>(a_bits) - static_cast<int64_t>(b_bits));
 }
 
-#define EXPECT_ULP_EQ(val1, val2, max_ulp)                                                                                                                     \
+// ULP Comparison Macro for Google Test
+#define EXPECT_ULP_EQ(V1, V2, MAX_ULP)                                                                                                                         \
 	do {                                                                                                                                                       \
-		const int64_t ulp_diff = ulp_difference(val1, val2);                                                                                                   \
-		ASSERT_LE(ulp_diff, max_ulp) << "Values differ by " << ulp_diff << " ULPs, which exceeds " << (max_ulp) << " ULPs.\n"                                  \
-									 << "  Actual: " << (val1) << "\n"                                                                                         \
-									 << "  Expected: " << (val2);                                                                                              \
+		const int64_t ulp_diff = ulp_difference(V1, V2);                                                                                                       \
+		if (ulp_diff > (MAX_ULP))                                                                                                                              \
+		{                                                                                                                                                      \
+			ADD_FAILURE() << "ULP Difference Exceeded:\n"                                                                                                      \
+						  << "  Actual: " << (V1) << "\n"                                                                                                      \
+						  << "  Expected: " << (V2) << "\n"                                                                                                    \
+						  << "  ULP Difference: " << ulp_diff << "\n"                                                                                          \
+						  << "  Maximum Allowed ULPs: " << (MAX_ULP);                                                                                          \
+		}                                                                                                                                                      \
+		else { SUCCEED(); }                                                                                                                                    \
 	} while (0)
 
-#define EXPECT_2ULP_EQ(val1, val2) EXPECT_ULP_EQ(val1, val2, 2)
+#define ASSERT_ULP_EQ(val1, val2, max_ulp)                                                                                                                     \
+	do {                                                                                                                                                       \
+		const int64_t ulp_diff = ulp_difference(val1, val2);                                                                                                   \
+		ASSERT_LE(ulp_diff, max_ulp) << "ULP Difference Exceeded:\n"                                                                                           \
+									 << "  Actual: " << (val1) << "\n"                                                                                         \
+									 << "  Expected: " << (val2) << "\n"                                                                                       \
+									 << "  ULP Difference: " << ulp_diff << "\n"                                                                               \
+									 << "  Maximum Allowed ULPs: " << (max_ulp);                                                                               \
+	} while (0)
+
+#define EXPECT_ONE_ULP_EQ(V1, V2) EXPECT_ULP_EQ(V1, V2, 1)
+#define ASSERT_ONE_ULP_EQ(V1, V2) ASSERT_ULP_EQ(V1, V2, 1)
+
+TEST(ULPTest, HandlesNegativeNumbers)
+{
+	double value1 = -1.0;
+	double value2 = -1.0;
+	EXPECT_EQ(ulp_difference(value1, value2), 0);
+}
 
 TEST(CcmathExponentialTests, Log2)
 {
