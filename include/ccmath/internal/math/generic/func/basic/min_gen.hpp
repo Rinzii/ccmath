@@ -44,4 +44,3 @@ namespace ccm::gen
 		return (x < y) ? x : y;
 	}
 } // namespace ccm::gen
-
