@@ -72,11 +72,13 @@ jobs:
         run: |
           if [[ "${{ matrix.compiler }}" == "ninja-intel" ]]; then
             echo "/opt/intel/oneapi/compiler/latest/linux/bin" >> $GITHUB_PATH
+            sudo chmod +x /opt/intel/oneapi/setvars.sh  # Ensure the script is executable
             /opt/intel/oneapi/setvars.sh > setvars_output.sh
             sed -n '/export /p' setvars_output.sh | sed 's/export //g' >> $GITHUB_ENV
           elif [[ "${{ matrix.compiler }}" == "ninja-nvidia-hpc" ]]; then
             echo "/opt/nvidia/hpc_sdk/Linux_x86_64/${{ matrix.nvhpc }}/compilers/bin" >> $GITHUB_PATH
           fi
+
 
       - name: Configure CMake
         run: |
