@@ -18,9 +18,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [ninja-clang, ninja-gcc]
-        cxx_version: [17, 20]
-        target: [Debug, Release]
+        compiler: [ ninja-clang, ninja-gcc ]
+        cxx_version: [ 17, 20 ]
+        target: [ Debug, Release ]
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
@@ -38,14 +38,8 @@ jobs:
             ${{ runner.os }}-cmake-${{ matrix.compiler }}-${{ matrix.cxx_version }}-
             ${{ runner.os }}-cmake-${{ matrix.compiler }}-
 
-      - name: install homebrew formulae
-        run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
       - name: install ninja
         run: brew install ninja
-
-      - name: update AppleClang to 14.0.3
-        run: sudo xcode-select -s /Applications/Xcode_14.3.app/Contents/Developer
 
       - name: configure
         run: cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
@@ -59,9 +53,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [ninja-clang, ninja-gcc]
-        cxx_version: [17, 20]
-        target: [Debug, Release]
+        compiler: [ ninja-clang, ninja-gcc ]
+        cxx_version: [ 17, 20 ]
+        target: [ Debug, Release ]
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
