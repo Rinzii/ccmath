@@ -17,27 +17,24 @@
 
 namespace ccm::support
 {
-	// Simple wrapper for FMA. Will use constexpr builtin FMA if available. Will also use non-constexpr builtin FMA if available when not in constexpr context.
+	// Simple wrapper for fma
 
 	template <typename T>
 	constexpr std::enable_if_t<(sizeof(T) > sizeof(void *)), T> multiply_add(const T & x, const T & y, const T & z)
 	{
-		if constexpr (ccm::builtin::has_constexpr_fma<T>) { return ccm::builtin::fma(x, y, z); }
-		else if constexpr (ccm::builtin::has_fma<T>)
-		{
-			if (is_constant_evaluated())
-			{
-				return (x * y) + z; // We can only hope the compiler optimizes this.
-			}
-
-			return ccm::builtin::fma(x, y, z);
-		}
-		else { return (x * y) + z; }
+		return (x * y) + z;
 	}
 
 	template <typename T>
 	constexpr std::enable_if_t<(sizeof(T) <= sizeof(void *)), T> multiply_add(T x, T y, T z)
 	{
+		return (x * y) + z;
+	}
+
+#ifdef CCMATH_TARGET_CPU_HAS_FMA
+
+	constexpr float multiply_add(float x, float y, float z)
+	{
 		if constexpr (ccm::builtin::has_constexpr_fma<T>) { return ccm::builtin::fma(x, y, z); }
 		else if constexpr (ccm::builtin::has_fma<T>)
 		{
@@ -50,4 +47,20 @@ namespace ccm::support
 		}
 		else { return (x * y) + z; }
 	}
+
+	constexpr double multiply_add(double x, double y, double z)
+	{
+		if constexpr (ccm::builtin::has_constexpr_fma<T>) { return ccm::builtin::fma(x, y, z); }
+		else if constexpr (ccm::builtin::has_fma<T>)
+		{
+			if (is_constant_evaluated())
+			{
+				return (x * y) + z; // We can only hope the compiler optimizes this.
+			}
+
+			return ccm::builtin::fma(x, y, z);
+		}
+		else { return (x * y) + z; }
+	}
+#endif
 } // namespace ccm::support

@@ -8,8 +8,10 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-// Code borrowed from LLVM with heavy modifications done for ccmath to allow for both cross-platform and cross-compiler support.
-// https://github.com/llvm/llvm-project/
+// Portions of this code was borrowed from the LLVM Project,
+// under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 #pragma once
 
@@ -30,6 +32,7 @@ namespace ccm::support::fp
 	/// All supported floating point types
 	enum class FPType : std::uint8_t
 	{
+		eBinary16, // TODO: Currently don't handle float16 but might in the future
 		eBinary32,
 		eBinary64,
 		eBinary80,
@@ -47,43 +50,58 @@ namespace ccm::support::fp
 		};
 
 		template <>
+		struct FPLayout<FPType::eBinary16>
+		{
+			using storage_type									  = std::uint16_t;
+			static constexpr std::int_fast32_t sign_length		  = 1;
+			static constexpr std::int_fast32_t exponent_length	  = 5;
+			static constexpr std::int_fast32_t significand_length = 10;
+			static constexpr std::int_fast32_t fraction_length	  = significand_length;
+		};
+
+		template <>
 		struct FPLayout<FPType::eBinary32>
 		{
-			using storage_type						= std::uint32_t;
-			static constexpr std::int_fast32_t sign_length		= 1;
-			static constexpr std::int_fast32_t exponent_length	= 8;
+			using storage_type									  = std::uint32_t;
+			static constexpr std::int_fast32_t sign_length		  = 1;
+			static constexpr std::int_fast32_t exponent_length	  = 8;
 			static constexpr std::int_fast32_t significand_length = 23;
-			static constexpr std::int_fast32_t fraction_length	= significand_length;
+			static constexpr std::int_fast32_t fraction_length	  = significand_length;
 		};
 
 		template <>
 		struct FPLayout<FPType::eBinary64>
 		{
-			using storage_type						= std::uint64_t;
-			static constexpr std::int_fast32_t sign_length		= 1;
-			static constexpr std::int_fast32_t exponent_length	= 11;
+			using storage_type									  = std::uint64_t;
+			static constexpr std::int_fast32_t sign_length		  = 1;
+			static constexpr std::int_fast32_t exponent_length	  = 11;
 			static constexpr std::int_fast32_t significand_length = 52;
-			static constexpr std::int_fast32_t fraction_length	= significand_length;
+			static constexpr std::int_fast32_t fraction_length	  = significand_length;
 		};
 
 		template <>
 		struct FPLayout<FPType::eBinary80>
 		{
-			using storage_type						= types::uint128_t;
-			static constexpr std::int_fast32_t sign_length		= 1;
-			static constexpr std::int_fast32_t exponent_length	= 15;
+			// Special case for 96-bit long double on x86
+#if __SIZEOF_LONG_DOUBLE__ == 12
+			using StorageType = types::UInt<__SIZEOF_LONG_DOUBLE__ * CHAR_BIT>;
+#else
+			using storage_type = types::uint128_t;
+#endif
+			static constexpr std::int_fast32_t sign_length		  = 1;
+			static constexpr std::int_fast32_t exponent_length	  = 15;
 			static constexpr std::int_fast32_t significand_length = 64;
-			static constexpr std::int_fast32_t fraction_length	= significand_length - 1;
+			static constexpr std::int_fast32_t fraction_length	  = significand_length - 1;
 		};
 
 		template <>
 		struct FPLayout<FPType::eBinary128>
 		{
-			using storage_type						= types::uint128_t;
-			static constexpr std::int_fast32_t sign_length		= 1;
-			static constexpr std::int_fast32_t exponent_length	= 15;
+			using storage_type									  = types::uint128_t;
+			static constexpr std::int_fast32_t sign_length		  = 1;
+			static constexpr std::int_fast32_t exponent_length	  = 15;
 			static constexpr std::int_fast32_t significand_length = 112;
-			static constexpr std::int_fast32_t fraction_length	= significand_length;
+			static constexpr std::int_fast32_t fraction_length	  = significand_length;
 		};
 
 		template <FPType fp_type>
@@ -631,7 +649,7 @@ namespace ccm::support::fp
 			using BASE::sign_mask;
 			using BASE::significand_length;
 			using BASE::significand_mask;
-			static constexpr int MAX_BIASED_EXPONENT = (1 << BASE::exponent_length) - 1;
+			static constexpr int max_biased_exponent = (1 << BASE::exponent_length) - 1;
 
 			/// Constructors
 

@@ -14,6 +14,13 @@
 
 #include "ccmath/internal/math/generic/builtins/builtin_helpers.hpp"
 
+// Checks if the cpu supports FMA instructions.
+// This macro is allowed to be defined in the global namespace.
+#if defined(__ARM_FEATURE_FMA) || (defined(__AVX2__) && defined(__FMA__)) || defined(__NVPTX__) || defined(__AMDGPU__) ||                                      \
+	(defined(__riscv) && (__riscv_xlen == 64))
+	#define CCMATH_TARGET_CPU_HAS_FMA
+#endif
+
 /// CCMATH_HAS_CONSTEXPR_BUILTIN_FMA
 /// This is a macro that is defined if the compiler has constexpr __builtin_copysign that allows static_assert
 ///

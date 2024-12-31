@@ -33,7 +33,7 @@
 #include <optional>
 
 #if defined(_MSC_VER) && !defined(__clang__)
-#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+	#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
 CCM_DISABLE_MSVC_WARNING(4702) // 4702: unreachable code
 #endif
 
@@ -105,7 +105,7 @@ namespace ccm::types
 		 * @return A DoubleWide object containing the lower and upper half-width parts of the input value.
 		 */
 		template <typename T>
-		constexpr auto split(T value)
+		constexpr auto split(T value) // TODO: IanP: Return to this
 		{
 			static_assert(ccm::support::traits::ccm_is_unsigned_v<T>);
 			using half_type = half_width_t<T>;
@@ -663,7 +663,7 @@ namespace ccm::types
 		constexpr BigInt(T v)
 		{
 			constexpr std::size_t T_SIZE = sizeof(T) * CHAR_BIT;
-			const bool is_neg			 = Signed && (v < 0);
+			const bool is_neg			 = v < 0;
 			for (std::size_t i = 0; i < WORD_COUNT; ++i)
 			{
 				if (v == 0)
@@ -725,6 +725,12 @@ namespace ccm::types
 		 * @brief Determines if the value of the BigInt is negative.
 		 */
 		[[nodiscard]] constexpr bool is_neg() const { return SIGNED && get_msb(); }
+
+		template <size_t OtherBits, bool OtherSigned, typename OtherWordType>
+		constexpr explicit operator BigInt<OtherBits, OtherSigned, OtherWordType>() const
+		{
+			return BigInt<OtherBits, OtherSigned, OtherWordType>(this);
+		}
 
 		/**
 		 * @brief Converts the BigInt to another integral type.
@@ -1341,9 +1347,20 @@ namespace ccm::types
 		{
 		};
 
-		// In special cases where a size of 32 bits is requested, we use a 32-bit word type instead.
+		// In special cases where a size of 16 bits is requested, we use a 16-bit word type instead.
+		template <>
+		struct WordTypeSelector<16> : support::traits::type_identity<std::uint16_t>
+		{
+		};
+
+		// In special cases where a size of 32 or 96 bits is requested, we use a 32-bit word type instead.
 		template <>
 		struct WordTypeSelector<32> : support::traits::type_identity<std::uint32_t>
+		{
+		};
+
+		template <>
+		struct WordTypeSelector<96> : support::traits::type_identity<std::uint32_t>
 		{
 		};
 
