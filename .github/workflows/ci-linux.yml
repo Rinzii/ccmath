@@ -71,7 +71,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [ ninja-gcc, ninja-clang, ninja-clang-libcpp ]
+        compiler: [ ninja-gcc, ninja-clang, ninja-clang-libcpp, ninja-intel ]
         cxx_version: [ 17, 20 ]
         target: [ Debug, Release ]
     steps:
