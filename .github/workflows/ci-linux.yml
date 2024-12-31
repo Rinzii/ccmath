@@ -38,10 +38,19 @@ jobs:
             ${{ runner.os }}-cmake-${{ matrix.compiler }}-${{ matrix.cxx_version }}-
             ${{ runner.os }}-cmake-${{ matrix.compiler }}-
 
+      - name: Cache Compiler
+        uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
+        with:
+          path: /opt/intel
+          key: ${{ runner.os }}-compiler-intel-${{ matrix.compiler }}-${{ matrix.cxx_version }}
+          restore-keys: |
+            ${{ runner.os }}-compiler-intel-
+
       - name: install dependencies
         run: sudo apt install -yqq ninja-build
 
       - name: Install compiler
+        if: steps.cache-compiler.outputs.cache-hit != 'true'
         run: |
           wget --progress=dot:giga https://registrationcenter-download.intel.com/akdlm/IRC_NAS/ac92f2bb-4818-4e53-a432-f8b34d502f23/intel-dpcpp-cpp-compiler-2025.0.0.740_offline.sh
           sudo bash intel-dpcpp-cpp-compiler-2025.0.0.740_offline.sh -s -a -s --action install --eula accept
@@ -50,7 +59,6 @@ jobs:
         run: |
           source /opt/intel/oneapi/setvars.sh
           cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
-
 
       - name: build
         run: |
@@ -79,6 +87,12 @@ jobs:
         with:
           path: build
           key: ${{ runner.os }}-cmake-${{ matrix.compiler }}-${{ matrix.cxx_version }}-${{ matrix.target }}
+
+      - name: Cache Compiler
+        uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
+        with:
+          path: /opt/intel
+          key: ${{ runner.os }}-compiler-intel-${{ matrix.compiler }}-${{ matrix.cxx_version }}
 
       - name: test
         run: |
