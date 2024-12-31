@@ -58,8 +58,8 @@ jobs:
               sudo bash intel-dpcpp-cpp-compiler-2025.0.0.740_offline.sh -s -a -s --action install --eula accept
             fi
           elif [[ "${{ matrix.compiler }}" == "ninja-nvidia-hpc" ]]; then
-            MAJOR_VERSION=$(echo ${{matrix.nvhpc}} | sed 's/\..*//')
-            MINOR_VERSION=$(echo ${{matrix.nvhpc}} | sed 's/.*\.//')
+            MAJOR_VERSION=$(echo ${{matrix.nvhpc}} | sed 's/\\..*//')
+            MINOR_VERSION=$(echo ${{matrix.nvhpc}} | sed 's/.*\\.//')
             if [[ ! -d /opt/nvidia/hpc_sdk ]]; then
               curl https://developer.download.nvidia.com/hpc-sdk/ubuntu/DEB-GPG-KEY-NVIDIA-HPC-SDK | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-hpcsdk-archive-keyring.gpg
               echo 'deb [signed-by=/usr/share/keyrings/nvidia-hpcsdk-archive-keyring.gpg] https://developer.download.nvidia.com/hpc-sdk/ubuntu/amd64 /' | sudo tee /etc/apt/sources.list.d/nvhpc.list
@@ -72,6 +72,8 @@ jobs:
         run: |
           if [[ "${{ matrix.compiler }}" == "ninja-intel" ]]; then
             source /opt/intel/oneapi/setvars.sh
+          elif [[ "${{ matrix.compiler }}" == "ninja-nvidia-hpc" ]]; then
+            export PATH=/opt/nvidia/hpc_sdk/Linux_x86_64/${{ matrix.nvhpc }}/compilers/bin:$PATH
           fi
           cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
 
@@ -79,6 +81,8 @@ jobs:
         run: |
           if [[ "${{ matrix.compiler }}" == "ninja-intel" ]]; then
             source /opt/intel/oneapi/setvars.sh
+          elif [[ "${{ matrix.compiler }}" == "ninja-nvidia-hpc" ]]; then
+            export PATH=/opt/nvidia/hpc_sdk/Linux_x86_64/${{ matrix.nvhpc }}/compilers/bin:$PATH
           fi
           cmake --build build --config=${{matrix.target}}
 
@@ -110,5 +114,7 @@ jobs:
         run: |
           if [[ "${{ matrix.compiler }}" == "ninja-intel" ]]; then
             source /opt/intel/oneapi/setvars.sh
+          elif [[ "${{ matrix.compiler }}" == "ninja-nvidia-hpc" ]]; then
+            export PATH=/opt/nvidia/hpc_sdk/Linux_x86_64/${{ matrix.nvhpc }}/compilers/bin:$PATH
           fi
           cd build && ctest -C ${{matrix.target}} --output-on-failure
