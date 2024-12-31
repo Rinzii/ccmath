@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/basic/fmin.hpp"
+#include "ccmath/internal/math/generic/func/basic/min_gen.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 
@@ -27,21 +29,8 @@ namespace ccm
 	template <typename T>
 	constexpr T min(const T x, const T y) noexcept
 	{
-		// If we are comparing floating point numbers, we need to check for NaN
-		if constexpr (std::is_floating_point_v<T>)
-		{
-			using FPBits_t = typename ccm::support::fp::FPBits<T>;
-			const FPBits_t x_bits(x);
-			const FPBits_t y_bits(y);
-
-			const bool x_is_nan = x_bits.is_nan();
-			const bool y_is_nan = y_bits.is_nan();
-
-			if (CCM_UNLIKELY(x_is_nan)) { return y; }
-			if (CCM_UNLIKELY(y_is_nan)) { return x; }
-		}
-
-		return (x < y) ? x : y;
+		if constexpr (ccm::builtin::has_constexpr_fmin<T>) { return ccm::builtin::fmin(x, y); }
+		else { return ccm::gen::min(x, y); }
 	}
 
 	/**

@@ -16,7 +16,7 @@
 #include <limits>
 #include <type_traits>
 
-namespace ccm
+namespace ccm::gen
 {
 	/**
 	 * @brief Computes the larger of the two values.
@@ -129,6 +129,6 @@ namespace ccm
 	{
 		return fmax<long double>(x, y);
 	}
-} // namespace ccm
+} // namespace ccm::gen
 
 /// @ingroup basic

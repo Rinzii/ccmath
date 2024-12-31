@@ -15,7 +15,7 @@
 
 #include <type_traits>
 
-namespace ccm
+namespace ccm::gen
 {
 	/**
 	 * @brief Computes the smaller of the two values.
@@ -105,6 +105,6 @@ namespace ccm
 	{
 		return min<Integer>(x, y);
 	}
-} // namespace ccm
+} // namespace ccm::gen
 
 /// @ingroup basic
