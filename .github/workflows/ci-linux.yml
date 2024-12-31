@@ -68,24 +68,18 @@ jobs:
             fi
           fi
 
-      - name: Export compiler paths
-        run: |
-          if [[ "${{ matrix.compiler }}" == "ninja-intel" ]]; then
-            echo "/opt/intel/oneapi/compiler/latest/linux/bin" >> $GITHUB_PATH
-            sudo chmod +x /opt/intel/oneapi/setvars.sh  # Ensure the script is executable
-            /opt/intel/oneapi/setvars.sh > setvars_output.sh
-            sed -n '/export /p' setvars_output.sh | sed 's/export //g' >> $GITHUB_ENV
-          elif [[ "${{ matrix.compiler }}" == "ninja-nvidia-hpc" ]]; then
-            echo "/opt/nvidia/hpc_sdk/Linux_x86_64/${{ matrix.nvhpc }}/compilers/bin" >> $GITHUB_PATH
-          fi
-
-
       - name: Configure CMake
         run: |
+          if [[ "${{ matrix.compiler }}" == "ninja-intel" ]]; then
+            source /opt/intel/oneapi/setvars.sh
+          fi
           cmake -S . --preset=${{matrix.compiler}} -B build -DCMAKE_CXX_STANDARD=${{matrix.cxx_version}}
 
       - name: Build
         run: |
+          if [[ "${{ matrix.compiler }}" == "ninja-intel" ]]; then
+            source /opt/intel/oneapi/setvars.sh
+          fi
           cmake --build build --config=${{matrix.target}}
 
   test:
@@ -114,4 +108,7 @@ jobs:
 
       - name: Test
         run: |
+          if [[ "${{ matrix.compiler }}" == "ninja-intel" ]]; then
+            source /opt/intel/oneapi/setvars.sh
+          fi
           cd build && ctest -C ${{matrix.target}} --output-on-failure
