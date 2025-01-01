@@ -8,12 +8,11 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
-
-#include <cmath>
-#include <limits>
 #include "ccmath/ccmath.hpp"
 
+#include <gtest/gtest.h>
+#include <cmath>
+#include <limits>
 
 TEST(CcmathExponentialTests, Log)
 {
@@ -43,7 +42,6 @@ TEST(CcmathExponentialTests, Log)
 	EXPECT_EQ(ccm::log(524288.0), std::log(524288.0));
 	EXPECT_EQ(ccm::log(1048576.0), std::log(1048576.0));
 
-
 	// Check for edge cases
 	bool ccmCheckForNan = std::isnan(ccm::log(std::numeric_limits<double>::quiet_NaN()));
 	bool stdCheckForNan = std::isnan(std::log(std::numeric_limits<double>::quiet_NaN()));
@@ -54,6 +52,4 @@ TEST(CcmathExponentialTests, Log)
 	EXPECT_EQ(ccmCheckForNegativeNan, stdCheckForNegativeNan);
 	EXPECT_EQ(ccm::log(0.0), std::log(0.0));
 	EXPECT_EQ(ccm::log(-0.0), std::log(-0.0));
-
-
 }

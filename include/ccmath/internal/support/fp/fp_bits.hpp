@@ -49,41 +49,41 @@ namespace ccm::support::fp
 		template <>
 		struct FPLayout<FPType::eBinary32>
 		{
-			using storage_type						= std::uint32_t;
-			static constexpr std::int_fast32_t sign_length		= 1;
-			static constexpr std::int_fast32_t exponent_length	= 8;
+			using storage_type									  = std::uint32_t;
+			static constexpr std::int_fast32_t sign_length		  = 1;
+			static constexpr std::int_fast32_t exponent_length	  = 8;
 			static constexpr std::int_fast32_t significand_length = 23;
-			static constexpr std::int_fast32_t fraction_length	= significand_length;
+			static constexpr std::int_fast32_t fraction_length	  = significand_length;
 		};
 
 		template <>
 		struct FPLayout<FPType::eBinary64>
 		{
-			using storage_type						= std::uint64_t;
-			static constexpr std::int_fast32_t sign_length		= 1;
-			static constexpr std::int_fast32_t exponent_length	= 11;
+			using storage_type									  = std::uint64_t;
+			static constexpr std::int_fast32_t sign_length		  = 1;
+			static constexpr std::int_fast32_t exponent_length	  = 11;
 			static constexpr std::int_fast32_t significand_length = 52;
-			static constexpr std::int_fast32_t fraction_length	= significand_length;
+			static constexpr std::int_fast32_t fraction_length	  = significand_length;
 		};
 
 		template <>
 		struct FPLayout<FPType::eBinary80>
 		{
-			using storage_type						= types::uint128_t;
-			static constexpr std::int_fast32_t sign_length		= 1;
-			static constexpr std::int_fast32_t exponent_length	= 15;
+			using storage_type									  = types::uint128_t;
+			static constexpr std::int_fast32_t sign_length		  = 1;
+			static constexpr std::int_fast32_t exponent_length	  = 15;
 			static constexpr std::int_fast32_t significand_length = 64;
-			static constexpr std::int_fast32_t fraction_length	= significand_length - 1;
+			static constexpr std::int_fast32_t fraction_length	  = significand_length - 1;
 		};
 
 		template <>
 		struct FPLayout<FPType::eBinary128>
 		{
-			using storage_type						= types::uint128_t;
-			static constexpr std::int_fast32_t sign_length		= 1;
-			static constexpr std::int_fast32_t exponent_length	= 15;
+			using storage_type									  = types::uint128_t;
+			static constexpr std::int_fast32_t sign_length		  = 1;
+			static constexpr std::int_fast32_t exponent_length	  = 15;
 			static constexpr std::int_fast32_t significand_length = 112;
-			static constexpr std::int_fast32_t fraction_length	= significand_length;
+			static constexpr std::int_fast32_t fraction_length	  = significand_length;
 		};
 
 		template <FPType fp_type>
@@ -218,13 +218,9 @@ namespace ccm::support::fp
 				using BASE::BASE;
 
 				static constexpr auto subnormal() { return Exponent(-exponent_bias); }
-
 				static constexpr auto min() { return Exponent(1 - exponent_bias); }
-
 				static constexpr auto zero() { return Exponent(0); }
-
 				static constexpr auto max() { return Exponent(exponent_bias); }
-
 				static constexpr auto inf() { return Exponent(exponent_bias + 1); }
 			};
 
@@ -293,18 +289,13 @@ namespace ccm::support::fp
 				friend constexpr Significand operator>>(const Significand a, int shift) { return Significand(storage_type(a.to_storage_type() >> shift)); }
 
 				static constexpr auto zero() { return Significand(storage_type(0)); }
-
 				static constexpr auto lsb() { return Significand(storage_type(1)); }
-
 				static constexpr auto msb() { return Significand(storage_type(1) << (significand_length - 1)); }
-
 				static constexpr auto bits_all_ones() { return Significand(significand_mask); }
 			};
 
 			static constexpr storage_type encode(BiasedExponent exp) { return (exp.to_storage_type() << significand_length) & exponent_mask; }
-
 			static constexpr storage_type encode(Significand value) { return value.to_storage_type() & significand_mask; }
-
 			static constexpr storage_type encode(BiasedExponent exp, Significand sig) { return encode(exp) | encode(sig); }
 
 			static constexpr storage_type encode(types::Sign sign, BiasedExponent exp, Significand sig)
@@ -321,9 +312,7 @@ namespace ccm::support::fp
 			/// Observer Functions
 
 			[[nodiscard]] constexpr storage_type exp_bits() const { return bits & exponent_mask; }
-
 			[[nodiscard]] constexpr storage_type sig_bits() const { return bits & significand_mask; }
-
 			[[nodiscard]] constexpr storage_type exp_sig_bits() const { return bits & exponent_significand_mask; }
 
 			/// Parts of the floating point number
@@ -375,9 +364,7 @@ namespace ccm::support::fp
 			/// Builder Functions
 
 			static constexpr RetT zero(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::subnormal(), Significand::zero())); }
-
 			static constexpr RetT one(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::zero(), Significand::zero())); }
-
 			static constexpr RetT min_subnormal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::subnormal(), Significand::lsb())); }
 
 			static constexpr RetT max_subnormal(types::Sign sign = types::Sign::POS)
@@ -386,9 +373,7 @@ namespace ccm::support::fp
 			}
 
 			static constexpr RetT min_normal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::min(), Significand::zero())); }
-
 			static constexpr RetT max_normal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::max(), Significand::bits_all_ones())); }
-
 			static constexpr RetT inf(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::inf(), Significand::zero())); }
 
 			static constexpr RetT signaling_nan(types::Sign sign = types::Sign::POS, storage_type v = 0)
@@ -404,19 +389,12 @@ namespace ccm::support::fp
 			/// Observer Functions
 
 			[[nodiscard]] constexpr bool is_zero() const { return exp_sig_bits() == 0; }
-
 			[[nodiscard]] constexpr bool is_nan() const { return exp_sig_bits() > encode(Exponent::inf(), Significand::zero()); }
-
 			[[nodiscard]] constexpr bool is_quiet_nan() const { return exp_sig_bits() >= encode(Exponent::inf(), Significand::msb()); }
-
 			[[nodiscard]] constexpr bool is_signaling_nan() const { return is_nan() && !is_quiet_nan(); }
-
 			[[nodiscard]] constexpr bool is_inf() const { return exp_sig_bits() == encode(Exponent::inf(), Significand::zero()); }
-
 			[[nodiscard]] constexpr bool is_finite() const { return exp_bits() != encode(Exponent::inf()); }
-
 			[[nodiscard]] constexpr bool is_subnormal() const { return exp_bits() == encode(Exponent::subnormal()); }
-
 			[[nodiscard]] constexpr bool is_normal() const { return is_finite() && !is_subnormal(); }
 
 			constexpr RetT next_toward_inf() const
@@ -472,9 +450,7 @@ namespace ccm::support::fp
 			/// Builder Functions
 
 			static constexpr RetT zero(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::subnormal(), Significand::zero())); }
-
 			static constexpr RetT one(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::zero(), Significand::msb())); }
-
 			static constexpr RetT min_subnormal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::subnormal(), Significand::lsb())); }
 
 			static constexpr RetT max_subnormal(types::Sign sign = types::Sign::POS)
@@ -483,9 +459,7 @@ namespace ccm::support::fp
 			}
 
 			static constexpr RetT min_normal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::min(), Significand::msb())); }
-
 			static constexpr RetT max_normal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::max(), Significand::bits_all_ones())); }
-
 			static constexpr RetT inf(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::inf(), Significand::msb())); }
 
 			static constexpr RetT signaling_nan(types::Sign sign = types::Sign::POS, storage_type v = 0)
@@ -538,13 +512,9 @@ namespace ccm::support::fp
 			}
 
 			[[nodiscard]] constexpr bool is_signaling_nan() const { return is_nan() && !is_quiet_nan(); }
-
 			[[nodiscard]] constexpr bool is_inf() const { return exp_sig_bits() == encode(Exponent::inf(), Significand::msb()); }
-
 			[[nodiscard]] constexpr bool is_finite() const { return !is_inf() && !is_nan(); }
-
 			[[nodiscard]] constexpr bool is_subnormal() const { return exp_bits() == encode(Exponent::subnormal()); }
-
 			[[nodiscard]] constexpr bool is_normal() const
 			{
 				if (const auto exp = exp_bits(); exp == encode(Exponent::subnormal()) || exp == encode(Exponent::inf())) { return false; }

@@ -8,10 +8,9 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
-
 #include "ccmath/ccmath.hpp"
 
+#include <gtest/gtest.h>
 #include <cmath>
 #include <limits>
 
@@ -34,8 +33,6 @@ TEST(CcmathExponentialTests, Exp2_Double_ValidInput)
 	// Test that exp2 is mathematically the same as exp( X * log(2) )
 	EXPECT_DOUBLE_EQ(ccm::exp2(4.0), std::exp(4.0 * std::log(2.0)));
 	EXPECT_DOUBLE_EQ(ccm::exp2(4.0), ccm::exp(4.0 * ccm::log(2.0)));
-
-
 }
 
 TEST(CcmathExponentialTests, Exp2_Double_EdgeCases)
@@ -59,8 +56,6 @@ TEST(CcmathExponentialTests, Exp2_Double_EdgeCases)
 	EXPECT_EQ(testCcmExp2ThatNanReturnsNan, testStdExp2ThatNanReturnsNan);
 	EXPECT_EQ(testCcmExp2ThatNanIsPositive, testStdExp2ThatNanIsPositive);
 }
-
-
 
 TEST(CcmathExponentialTests, Exp2_Float)
 {
@@ -93,4 +88,3 @@ TEST(CcmathExponentialTests, Exp2_Float_EdgeCases)
 	EXPECT_EQ(testCcmExp2ThatNanReturnsNan, testStdExp2ThatNanReturnsNan);
 	EXPECT_EQ(testCcmExp2ThatNanIsPositive, testStdExp2ThatNanIsPositive);
 }
-

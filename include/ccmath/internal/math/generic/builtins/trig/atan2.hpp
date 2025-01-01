@@ -1,5 +1,5 @@
 /*
-* Copyright (c) Ian Pike
+ * Copyright (c) Ian Pike
  * Copyright (c) CCMath contributors
  *
  * CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
@@ -21,9 +21,9 @@
 /// - GCC 5.1+
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_ATAN2
-#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
-#define CCMATH_HAS_CONSTEXPR_BUILTIN_ATAN2
-#endif
+	#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_ATAN2
+	#endif
 #endif
 
 namespace ccm::builtin
@@ -47,18 +47,9 @@ namespace ccm::builtin
 	template <typename T>
 	constexpr auto atan2(T y, T x) -> std::enable_if_t<has_constexpr_atan2<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>)
-		{
-			return __builtin_atan2f(y, x);
-		}
-		else if constexpr (std::is_same_v<T, double>)
-		{
-			return __builtin_atan2(y, x);
-		}
-		else if constexpr (std::is_same_v<T, long double>)
-		{
-			return __builtin_atan2l(y, x);
-		}
+		if constexpr (std::is_same_v<T, float>) { return __builtin_atan2f(y, x); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_atan2(y, x); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_atan2l(y, x); }
 		// This should never be reached
 		return T{};
 	}

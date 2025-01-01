@@ -10,11 +10,10 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/power/pow.hpp"
 #include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
 #include "ccmath/internal/math/runtime/func/power/pow_rt.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
-#include "ccmath/internal/math/generic/builtins/power/pow.hpp"
-
 
 #include <type_traits>
 

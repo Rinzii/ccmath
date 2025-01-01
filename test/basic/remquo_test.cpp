@@ -8,37 +8,35 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
-
 #include <ccmath/ccmath.hpp>
+#include <gtest/gtest.h>
 #include <cmath>
 #include <limits>
 
-
 constexpr double get_ccm_rem(double x, double y)
 {
-	int quotient {0};
+	int quotient{0};
 	double remainder = ccm::remquo(x, y, &quotient);
 	return remainder;
 }
 
 constexpr int get_ccm_quo(double x, double y)
 {
-	int quotient {0};
+	int quotient{0};
 	ccm::remquo(x, y, &quotient); // remainder = 1
 	return quotient;
 }
 
 double get_std_rem(double x, double y)
 {
-	int quotient {0};
+	int quotient{0};
 	double remainder = std::remquo(x, y, &quotient);
 	return remainder;
 }
 
 int get_std_quo(double x, double y)
 {
-	int quotient {0};
+	int quotient{0};
 	std::remquo(x, y, &quotient);
 	return quotient;
 }
@@ -46,9 +44,9 @@ int get_std_quo(double x, double y)
 TEST(CcmathBasicTests, Remquo)
 {
 	// Test that remquo can be uses in a static_assert
-	constexpr double sa_x = -7.0;
-	constexpr double sa_y = 2.0;
-	constexpr int sa_quotient = get_ccm_quo(sa_x, sa_y); // quotient = -4
+	constexpr double sa_x		  = -7.0;
+	constexpr double sa_y		  = 2.0;
+	constexpr int sa_quotient	  = get_ccm_quo(sa_x, sa_y); // quotient = -4
 	constexpr double sa_remainder = get_ccm_rem(sa_x, sa_y); // remainder = 1
 	static_assert(sa_quotient == -4, "sa_quotient == -4");
 	static_assert(sa_remainder == 1, "sa_quotient == 1");
@@ -85,20 +83,21 @@ TEST(CcmathBasicTests, Remquo)
 	EXPECT_EQ(get_ccm_quo(-std::numeric_limits<double>::infinity(), 2.0), get_std_quo(-std::numeric_limits<double>::infinity(), 2.0));
 
 	// Test with NaN
-	bool isCcmLeftNanNegative = (std::signbit(get_ccm_rem(std::numeric_limits<double>::quiet_NaN(), 2.0)) == true && std::isnan(get_ccm_rem(std::numeric_limits<double>::quiet_NaN(), 2.0)) == true); // NOLINT
-	bool isStdLeftNanNegative = (std::signbit(get_std_rem(std::numeric_limits<double>::quiet_NaN(), 2.0)) == true && std::isnan(get_std_rem(std::numeric_limits<double>::quiet_NaN(), 2.0)) == true); // NOLINT
-	bool didCcmLeftNanReturnNan = std::isnan(get_ccm_rem(std::numeric_limits<double>::quiet_NaN(), 2.0));
-	bool didStdLeftNanReturnNan = std::isnan(get_std_rem(std::numeric_limits<double>::quiet_NaN(), 2.0));
-	EXPECT_EQ(isCcmLeftNanNegative, isStdLeftNanNegative);
+	bool isCcmLeftNanNegative = (std::signbit(get_ccm_rem(std::numeric_limits<double>::quiet_NaN(), 2.0)) == true &&
+	std::isnan(get_ccm_rem(std::numeric_limits<double>::quiet_NaN(), 2.0)) == true); // NOLINT bool isStdLeftNanNegative =
+	(std::signbit(get_std_rem(std::numeric_limits<double>::quiet_NaN(), 2.0)) == true && std::isnan(get_std_rem(std::numeric_limits<double>::quiet_NaN(), 2.0))
+	== true); // NOLINT bool didCcmLeftNanReturnNan = std::isnan(get_ccm_rem(std::numeric_limits<double>::quiet_NaN(), 2.0)); bool didStdLeftNanReturnNan =
+	std::isnan(get_std_rem(std::numeric_limits<double>::quiet_NaN(), 2.0)); EXPECT_EQ(isCcmLeftNanNegative, isStdLeftNanNegative);
 	EXPECT_EQ(didCcmLeftNanReturnNan, didStdLeftNanReturnNan);
 	EXPECT_EQ(get_ccm_quo(std::numeric_limits<double>::quiet_NaN(), 2.0), get_std_quo(std::numeric_limits<double>::quiet_NaN(), 2.0));
 
 	// Test with negative NaN
-	bool isCcmLeftNegativeNanNegative = (std::signbit(get_ccm_rem(-std::numeric_limits<double>::quiet_NaN(), 2.0)) == true && std::isnan(get_ccm_rem(-std::numeric_limits<double>::quiet_NaN(), 2.0)) == true); // NOLINT
-	bool isStdLeftNegativeNanNegative = (std::signbit(get_std_rem(-std::numeric_limits<double>::quiet_NaN(), 2.0)) == true && std::isnan(get_std_rem(-std::numeric_limits<double>::quiet_NaN(), 2.0)) == true); // NOLINT
-	bool didCcmLeftNegativeNanReturnNan = std::isnan(get_ccm_rem(-std::numeric_limits<double>::quiet_NaN(), 2.0));
-	bool didStdLeftNegativeNanReturnNan = std::isnan(get_std_rem(-std::numeric_limits<double>::quiet_NaN(), 2.0));
-	EXPECT_EQ(isCcmLeftNegativeNanNegative, isStdLeftNegativeNanNegative);
+	bool isCcmLeftNegativeNanNegative = (std::signbit(get_ccm_rem(-std::numeric_limits<double>::quiet_NaN(), 2.0)) == true &&
+	std::isnan(get_ccm_rem(-std::numeric_limits<double>::quiet_NaN(), 2.0)) == true); // NOLINT bool isStdLeftNegativeNanNegative =
+	(std::signbit(get_std_rem(-std::numeric_limits<double>::quiet_NaN(), 2.0)) == true &&
+	std::isnan(get_std_rem(-std::numeric_limits<double>::quiet_NaN(), 2.0)) == true); // NOLINT bool didCcmLeftNegativeNanReturnNan =
+	std::isnan(get_ccm_rem(-std::numeric_limits<double>::quiet_NaN(), 2.0)); bool didStdLeftNegativeNanReturnNan =
+	std::isnan(get_std_rem(-std::numeric_limits<double>::quiet_NaN(), 2.0)); EXPECT_EQ(isCcmLeftNegativeNanNegative, isStdLeftNegativeNanNegative);
 	EXPECT_EQ(didCcmLeftNegativeNanReturnNan, didStdLeftNegativeNanReturnNan);
 	EXPECT_EQ(get_ccm_quo(-std::numeric_limits<double>::quiet_NaN(), 2.0), get_std_quo(-std::numeric_limits<double>::quiet_NaN(), 2.0));
 

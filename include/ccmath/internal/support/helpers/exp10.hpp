@@ -11,13 +11,12 @@
 #pragma once
 
 #include "ccmath/internal/support/multiply_add.hpp"
+#include "ccmath/internal/support/poly_eval.hpp"
 #include "ccmath/internal/types/double_double.hpp"
 #include "ccmath/internal/types/triple_double.hpp"
 #include "ccmath/math/expo/log2.hpp"
 
 #include <array>
-
-#include "ccmath/internal/support/poly_eval.hpp"
 
 namespace ccm::support::helpers
 {

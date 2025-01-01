@@ -7,6 +7,7 @@
  */
 
 #include "ccmath/ccmath.hpp"
+
 #include <cmath>
 #include <iostream>
 
@@ -17,21 +18,21 @@ int main()
 {
 	try_all_ccm_basic_funcs();
 	try_all_ccm_compare_funcs();
-    return 0;
+	return 0;
 }
 
 void try_all_ccm_basic_funcs()
 {
-	int remquo_ptr = 0;
-	const auto try_abs = ccm::abs(-1.0);
-	const auto try_fdim = ccm::fdim(1.0, 0.0);
-	const auto try_fma = ccm::fma(1.0, 1.0, 1.0);
-	const auto try_fmax = ccm::fmax(1.0, 1.0);
-	const auto try_fmin = ccm::fmin(1.0, 1.0);
-	const auto try_fmod = ccm::fmod(1.0, 1.0);
-	const auto try_nan = ccm::nan("");
+	int remquo_ptr			 = 0;
+	const auto try_abs		 = ccm::abs(-1.0);
+	const auto try_fdim		 = ccm::fdim(1.0, 0.0);
+	const auto try_fma		 = ccm::fma(1.0, 1.0, 1.0);
+	const auto try_fmax		 = ccm::fmax(1.0, 1.0);
+	const auto try_fmin		 = ccm::fmin(1.0, 1.0);
+	const auto try_fmod		 = ccm::fmod(1.0, 1.0);
+	const auto try_nan		 = ccm::nan("");
 	const auto try_remainder = ccm::remainder(1.0, 1.0);
-	const auto try_remquo = ccm::remquo(1.0, 1.0, &remquo_ptr);
+	const auto try_remquo	 = ccm::remquo(1.0, 1.0, &remquo_ptr);
 
 	// print all basics output
 	std::cout << "ccm::abs(-1.0): " << try_abs << std::endl;
@@ -47,17 +48,17 @@ void try_all_ccm_basic_funcs()
 
 void try_all_ccm_compare_funcs()
 {
-	const auto try_fpclassify = ccm::fpclassify(1.0);
-	const auto try_isfinite = ccm::isfinite(1.0);
-	constexpr auto try_isgreater = ccm::isgreater(1.0, 0.0);
+	const auto try_fpclassify		  = ccm::fpclassify(1.0);
+	const auto try_isfinite			  = ccm::isfinite(1.0);
+	constexpr auto try_isgreater	  = ccm::isgreater(1.0, 0.0);
 	constexpr auto try_isgreaterequal = ccm::isgreaterequal(1.0, 0.0);
-	constexpr auto try_isless = ccm::isless(1.0, 0.0);
-	constexpr auto try_islessequal = ccm::islessequal(1.0, 0.0);
-	constexpr auto try_islessgreater = ccm::islessgreater(1.0, 0.0);
-	const auto try_isnan = ccm::isnan(1.0);
-	const auto try_isnormal = ccm::isnormal(1.0);
-	const auto try_isunordered = ccm::isunordered(1.0, 0.0);
-	const auto try_signbit = ccm::signbit(1.0);
+	constexpr auto try_isless		  = ccm::isless(1.0, 0.0);
+	constexpr auto try_islessequal	  = ccm::islessequal(1.0, 0.0);
+	constexpr auto try_islessgreater  = ccm::islessgreater(1.0, 0.0);
+	const auto try_isnan			  = ccm::isnan(1.0);
+	const auto try_isnormal			  = ccm::isnormal(1.0);
+	const auto try_isunordered		  = ccm::isunordered(1.0, 0.0);
+	const auto try_signbit			  = ccm::signbit(1.0);
 
 	// print all compares output
 	std::cout << "ccm::fpclassify(1.0): " << try_fpclassify << std::endl;

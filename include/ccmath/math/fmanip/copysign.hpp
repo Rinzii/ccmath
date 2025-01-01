@@ -10,11 +10,10 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/fmanip/copysign.hpp"
 #include "ccmath/math/basic/fabs.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/compare/signbit.hpp"
-#include "ccmath/internal/math/generic/builtins/fmanip/copysign.hpp"
-
 
 namespace ccm
 {
@@ -28,10 +27,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T copysign(T mag, T sgn)
 	{
-		if constexpr (ccm::builtin::has_constexpr_copysign<T>)
-		{
-			return ccm::builtin::copysign(mag, sgn);
-		}
+		if constexpr (ccm::builtin::has_constexpr_copysign<T>) { return ccm::builtin::copysign(mag, sgn); }
 		else
 		{
 			if (ccm::isnan(mag) || ccm::isnan(sgn))

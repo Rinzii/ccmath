@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
+#include "ccmath/ccmath.hpp"
 
+#include <gtest/gtest.h>
 #include <cmath>
 #include <limits>
-#include "ccmath/ccmath.hpp"
 
 TEST(CcmathFmanipTests, Ldexp)
 {
@@ -40,36 +40,35 @@ TEST(CcmathFmanipTests, Ldexp)
 	EXPECT_EQ(std::ldexp(1.f, 1024), ccm::ldexp(1.f, 1024));
 
 	EXPECT_EQ(std::ldexp(std::numeric_limits<double>::max(), std::numeric_limits<int>::max()),
-					ccm::ldexp(std::numeric_limits<double>::max(), std::numeric_limits<int>::max()));
+			  ccm::ldexp(std::numeric_limits<double>::max(), std::numeric_limits<int>::max()));
 	EXPECT_EQ(std::ldexp(std::numeric_limits<float>::max(), std::numeric_limits<int>::max()),
-					ccm::ldexp(std::numeric_limits<float>::max(), std::numeric_limits<int>::max()));
+			  ccm::ldexp(std::numeric_limits<float>::max(), std::numeric_limits<int>::max()));
 
 	EXPECT_EQ(std::ldexp(std::numeric_limits<double>::min(), std::numeric_limits<int>::min()),
-					ccm::ldexp(std::numeric_limits<double>::min(), std::numeric_limits<int>::min()));
+			  ccm::ldexp(std::numeric_limits<double>::min(), std::numeric_limits<int>::min()));
 	EXPECT_EQ(std::ldexp(std::numeric_limits<float>::min(), std::numeric_limits<int>::min()),
-					ccm::ldexp(std::numeric_limits<float>::min(), std::numeric_limits<int>::min()));
+			  ccm::ldexp(std::numeric_limits<float>::min(), std::numeric_limits<int>::min()));
 
 	EXPECT_EQ(std::ldexp(std::numeric_limits<double>::min(), std::numeric_limits<int>::max()),
-					ccm::ldexp(std::numeric_limits<double>::min(), std::numeric_limits<int>::max()));
+			  ccm::ldexp(std::numeric_limits<double>::min(), std::numeric_limits<int>::max()));
 	EXPECT_EQ(std::ldexp(std::numeric_limits<float>::min(), std::numeric_limits<int>::max()),
-					ccm::ldexp(std::numeric_limits<float>::min(), std::numeric_limits<int>::max()));
+			  ccm::ldexp(std::numeric_limits<float>::min(), std::numeric_limits<int>::max()));
 
 	EXPECT_EQ(std::ldexp(std::numeric_limits<double>::max(), std::numeric_limits<int>::min()),
-					ccm::ldexp(std::numeric_limits<double>::max(), std::numeric_limits<int>::min()));
+			  ccm::ldexp(std::numeric_limits<double>::max(), std::numeric_limits<int>::min()));
 	EXPECT_EQ(std::ldexp(std::numeric_limits<float>::max(), std::numeric_limits<int>::min()),
-					ccm::ldexp(std::numeric_limits<float>::max(), std::numeric_limits<int>::min()));
+			  ccm::ldexp(std::numeric_limits<float>::max(), std::numeric_limits<int>::min()));
 
 	EXPECT_EQ(ccm::ldexp(std::numeric_limits<double>::infinity(), 10), std::ldexp(std::numeric_limits<double>::infinity(), 10));
 	EXPECT_EQ(ccm::ldexp(std::numeric_limits<float>::infinity(), 10), std::ldexp(std::numeric_limits<float>::infinity(), 10));
 
 	// Test for edge case where if either argument is NaN, NaN is returned.
-	auto testForNanCcmIfEitherArgumentIsNand	   = std::isnan(ccm::ldexp(std::numeric_limits<double>::quiet_NaN(), 10));
-	auto testForNanStdIfEitherArgumentIsNand	   = std::isnan(std::ldexp(std::numeric_limits<double>::quiet_NaN(), 10));
-	bool isCcmNanSameAsStdNanIfEitherArgumentIsNand = testForNanCcmIfEitherArgumentIsNand == testForNanStdIfEitherArgumentIsNand;
+	auto testForNanCcmIfEitherArgumentIsNand			  = std::isnan(ccm::ldexp(std::numeric_limits<double>::quiet_NaN(), 10));
+	auto testForNanStdIfEitherArgumentIsNand			  = std::isnan(std::ldexp(std::numeric_limits<double>::quiet_NaN(), 10));
+	bool const isCcmNanSameAsStdNanIfEitherArgumentIsNand = testForNanCcmIfEitherArgumentIsNand == testForNanStdIfEitherArgumentIsNand;
 	EXPECT_TRUE(isCcmNanSameAsStdNanIfEitherArgumentIsNand);
-	auto testForNanCcmIfEitherArgumentIsNanf	   = std::isnan(ccm::ldexp(std::numeric_limits<float>::quiet_NaN(), 10));
-	auto testForNanStdIfEitherArgumentIsNanf	   = std::isnan(std::ldexp(std::numeric_limits<float>::quiet_NaN(), 10));
-	bool isCcmNanSameAsStdNanIfEitherArgumentIsNanf = testForNanCcmIfEitherArgumentIsNanf == testForNanStdIfEitherArgumentIsNanf;
+	auto testForNanCcmIfEitherArgumentIsNanf			  = std::isnan(ccm::ldexp(std::numeric_limits<float>::quiet_NaN(), 10));
+	auto testForNanStdIfEitherArgumentIsNanf			  = std::isnan(std::ldexp(std::numeric_limits<float>::quiet_NaN(), 10));
+	bool const isCcmNanSameAsStdNanIfEitherArgumentIsNanf = testForNanCcmIfEitherArgumentIsNanf == testForNanStdIfEitherArgumentIsNanf;
 	EXPECT_TRUE(isCcmNanSameAsStdNanIfEitherArgumentIsNanf);
 }
-

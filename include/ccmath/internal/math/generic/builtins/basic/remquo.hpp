@@ -21,9 +21,9 @@
 /// - GCC 7.1+
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_REMQUO
-#if defined(__GNUC__) && (__GNUC__ > 7 || (__GNUC__ == 7 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
-#define CCMATH_HAS_CONSTEXPR_BUILTIN_REMQUO
-#endif
+	#if defined(__GNUC__) && (__GNUC__ > 7 || (__GNUC__ == 7 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_REMQUO
+	#endif
 #endif
 
 namespace ccm::builtin
@@ -47,18 +47,9 @@ namespace ccm::builtin
 	template <typename T>
 	constexpr auto remquo(T x, T y, int * quo) -> std::enable_if_t<has_constexpr_remquo<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>)
-		{
-			return __builtin_remquof(x, y, quo);
-		}
-		else if constexpr (std::is_same_v<T, double>)
-		{
-			return __builtin_remquo(x, y, quo);
-		}
-		else if constexpr (std::is_same_v<T, long double>)
-		{
-			return __builtin_remquol(x, y, quo);
-		}
+		if constexpr (std::is_same_v<T, float>) { return __builtin_remquof(x, y, quo); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_remquo(x, y, quo); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_remquol(x, y, quo); }
 		// This should never be reached
 		return T{};
 	}

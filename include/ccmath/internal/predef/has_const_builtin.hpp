@@ -17,4 +17,4 @@
 	#else
 		#define CCM_HAS_CONST_BUILTIN(BUILTIN) 0
 	#endif // defined(__has_constexpr_builtin)
-#endif // CCM_HAS_CONST_BUILTIN
+#endif	   // CCM_HAS_CONST_BUILTIN

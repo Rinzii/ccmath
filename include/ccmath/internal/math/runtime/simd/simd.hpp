@@ -11,7 +11,6 @@
 #pragma once
 
 #include "ccmath/internal/config/arch/check_simd_support.hpp"
-
 #include "ccmath/internal/math/runtime/simd/instructions/scalar.hpp"
 #include "common.hpp"
 #include "pack.hpp"

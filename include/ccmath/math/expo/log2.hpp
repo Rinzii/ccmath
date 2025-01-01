@@ -10,19 +10,18 @@
 
 #pragma once
 
-#include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/internal/config/compiler.hpp"
 #include "ccmath/internal/math/generic/builtins/expo/log2.hpp"
+#include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/compare/signbit.hpp"
 #include "ccmath/math/expo/impl/log2_double_impl.hpp"
 #include "ccmath/math/expo/impl/log2_float_impl.hpp"
-
 
 #include <limits>
 #include <type_traits>
 
 #if defined(_MSC_VER) && !defined(__clang__)
-#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+	#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
 CCM_DISABLE_MSVC_WARNING(4702)
 #endif
 
@@ -37,10 +36,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T log2(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_log2<T>)
-		{
-			return ccm::builtin::log2(num);
-		}
+		if constexpr (ccm::builtin::has_constexpr_log2<T>) { return ccm::builtin::log2(num); }
 		else
 		{
 			// If the argument is ±0, -∞ is returned
@@ -50,17 +46,14 @@ namespace ccm
 			if (num == static_cast<T>(1)) { return 0; }
 
 			// If the argument is NaN, NaN is returned.
-			if (ccm::isnan(num) || num == std::numeric_limits<T>::infinity())
-			{
-				return num;
-			}
+			if (ccm::isnan(num) || num == std::numeric_limits<T>::infinity()) { return num; }
 
-			// If the argument is negative, -NaN is returned
-			#ifdef CCMATH_COMPILER_APPLE_CLANG // Apple clang returns +qNaN
+// If the argument is negative, -NaN is returned
+#ifdef CCMATH_COMPILER_APPLE_CLANG // Apple clang returns +qNaN
 			if (ccm::signbit(num)) { return std::numeric_limits<T>::quiet_NaN(); }
-			#else // All other major compilers return -qNaN
+#else // All other major compilers return -qNaN
 			if (ccm::signbit(num)) { return -std::numeric_limits<T>::quiet_NaN(); }
-			#endif
+#endif
 
 			// We cannot handle long double at this time due to problems
 			// with long double being platform-dependent with its bit size.

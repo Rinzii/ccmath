@@ -8,12 +8,10 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
-
 #include <ccmath/ccmath.hpp>
+#include <gtest/gtest.h>
 #include <cmath>
 #include <limits>
-
 
 TEST(CcmathBasicTests, Min)
 {
@@ -46,5 +44,4 @@ TEST(CcmathBasicTests, Min)
 	EXPECT_EQ(ccm::fmin(-1, 0.0f), std::fmin(-1, 0.0f));
 	EXPECT_EQ(ccm::fmin(0.0f, -1), std::fmin(0.0f, -1));
 	EXPECT_EQ(ccm::fmin(-1.0f, -1), std::fmin(-1.0f, -1));
-
 }

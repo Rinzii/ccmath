@@ -33,7 +33,7 @@
 #include <optional>
 
 #if defined(_MSC_VER) && !defined(__clang__)
-#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+	#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
 CCM_DISABLE_MSVC_WARNING(4702) // 4702: unreachable code
 #endif
 
@@ -41,7 +41,6 @@ namespace ccm::types
 {
 	namespace multiword
 	{
-
 		/**
 		 * @brief Type trait that maps unsigned integers to their corresponding half-width types.
 		 *
@@ -1570,8 +1569,10 @@ namespace ccm::support
 		if constexpr (count == T::BITS) { return T::all_ones(); }
 		constexpr std::size_t QUOTIENT	= count / T::WORD_SIZE;
 		constexpr std::size_t REMAINDER = count % T::WORD_SIZE;
+
 		T out; // zero initialized
-		for (std::size_t i = 0; i <= QUOTIENT; ++i) { out[i] = i < QUOTIENT ? -1 : mask_trailing_ones<typename T::word_type, REMAINDER>(); }
+		using word_size_t = traits::type_identity_t<typename T::word_type>;
+		for (std::size_t i = 0; i <= QUOTIENT; ++i) { out[i] = i < QUOTIENT ? static_cast<word_size_t>(-1) : mask_trailing_ones<word_size_t, REMAINDER>(); }
 		return out;
 	}
 

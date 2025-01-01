@@ -8,14 +8,12 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
+#include "ccmath/detail/fmanip/copysign.hpp"
 
+#include <gtest/gtest.h>
 #include <cmath>
 #include <limits>
-#include "ccmath/detail/fmanip/copysign.hpp"
 
 TEST(CcmathFmanipTests, Copysign)
 {
-
 }
-

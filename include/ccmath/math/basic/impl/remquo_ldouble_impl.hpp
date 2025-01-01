@@ -10,13 +10,13 @@
 
 #pragma once
 
-#include <cstdint>
-#include <limits>
-
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/math/basic/fabs.hpp"
 #include "ccmath/math/basic/fmod.hpp"
+
+#include <cstdint>
+#include <limits>
 
 namespace ccm::internal
 {
@@ -24,19 +24,19 @@ namespace ccm::internal
 	{
 		constexpr long double remquo_ldouble_impl(long double x, long double y, int * quo) noexcept
 		{
-		/*
-			std::int32_t x_exponent{};
-			std::int32_t y_exponent{};
-			std::int32_t x_int32{};
-			std::int32_t y_int32{};
+			/*
+				std::int32_t x_exponent{};
+				std::int32_t y_exponent{};
+				std::int32_t x_int32{};
+				std::int32_t y_int32{};
 
-			std::uint32_t x_sign{};
-			std::uint32_t y_msb{};
-			std::uint32_t x_lsb{};
+				std::uint32_t x_sign{};
+				std::uint32_t y_msb{};
+				std::uint32_t x_lsb{};
 
-			int quotient_sign{};
-			int computed_quotient{};
-		 */
+				int quotient_sign{};
+				int computed_quotient{};
+			 */
 			// TODO: For the time being this is mega on hold until we have access to
 			//       necessary implementations of int128_t. Without them extracting the
 			//       needed bits to perform the necessary operations would be extremely challenging

@@ -12,10 +12,9 @@
 // https://github.com/actions/runner-images/issues/10004#
 // NOLINTNEXTLINE
 
-#include <gtest/gtest.h>
-
 #include "ccmath/ccmath.hpp"
 
+#include <gtest/gtest.h>
 #include <cmath>
 #include <limits>
 

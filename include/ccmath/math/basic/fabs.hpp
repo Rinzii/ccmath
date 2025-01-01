@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/math/generic/builtins/basic/fabs.hpp"
+#include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 
 #include <limits>
@@ -24,7 +24,7 @@ namespace ccm
 	 * @param num Floating-point or integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T> && std::is_signed_v<T>, bool>  = true>
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T> && std::is_signed_v<T>, bool> = true>
 	constexpr T abs(T num) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_abs<T>) { return ccm::builtin::abs(num); }
@@ -50,7 +50,7 @@ namespace ccm
 	 * @param num Floating-point or integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename T, std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>, bool>  = true>
+	template <typename T, std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>, bool> = true>
 	constexpr T abs(T num) noexcept
 	{
 		// If num is less than zero, return -num, otherwise return num.
@@ -63,7 +63,7 @@ namespace ccm
 	 * @param num Floating-point or integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename T, std::enable_if_t<std::is_unsigned_v<T>, bool>  = true>
+	template <typename T, std::enable_if_t<std::is_unsigned_v<T>, bool> = true>
 	constexpr T abs(T num) noexcept
 	{
 		// If abs is called with an argument of type X for which is_unsigned_v<X> is true, and
@@ -84,7 +84,7 @@ namespace ccm
 	 * @param num Floating-point value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool>  = true>
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T fabs(T num) noexcept
 	{
 		return ccm::abs<T>(num);
@@ -96,7 +96,7 @@ namespace ccm
 	 * @param num Integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool>  = true>
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double fabs(Integer num) noexcept
 	{
 		return ccm::abs<double>(static_cast<double>(num));

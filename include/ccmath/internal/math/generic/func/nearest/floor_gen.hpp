@@ -72,7 +72,6 @@ namespace ccm
 		}
 	} // namespace internal::impl
 
-
 	/**
 	 * @brief Computes the largest integer value not greater than num.
 	 * @tparam T The type of the number.

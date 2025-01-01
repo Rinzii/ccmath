@@ -46,9 +46,9 @@ namespace ccm::types
 	{
 		using mantissa_type = UInt<Bits>;
 
-		Sign sign				= Sign::POS;
-		int exponent			= 0;
-		mantissa_type mantissa	= mantissa_type(0);
+		Sign sign			   = Sign::POS;
+		int exponent		   = 0;
+		mantissa_type mantissa = mantissa_type(0);
 
 		constexpr DyadicFloat() = default;
 
@@ -135,13 +135,14 @@ namespace ccm::types
 		 * @tparam T The target floating-point type.
 		 * @return The floating-point representation of the DyadicFloat.
 		 */
-		template <typename T, typename = std::enable_if_t<ccm::support::traits::ccm_is_floating_point_v<T> && (support::fp::FPBits<T>::fraction_length < Bits), void>>
+		template <typename T,
+				  typename = std::enable_if_t<ccm::support::traits::ccm_is_floating_point_v<T> && (support::fp::FPBits<T>::fraction_length < Bits), void>>
 		explicit constexpr operator T() const
 		{
 			if (CCM_UNLIKELY(mantissa.is_zero())) { return support::fp::FPBits<T>::zero(sign).get_val(); }
 
 			// Assume normalized input and output.
-			constexpr uint32_t desired_precision		  = support::fp::FPBits<T>::fraction_length + 1;
+			constexpr uint32_t desired_precision  = support::fp::FPBits<T>::fraction_length + 1;
 			using output_bits_t					  = typename support::fp::FPBits<T>::storage_type;
 			constexpr output_bits_t implicit_mask = support::fp::FPBits<T>::significand_mask - support::fp::FPBits<T>::fraction_mask;
 
@@ -171,10 +172,11 @@ namespace ccm::types
 
 			mantissa_type m_hi = shift >= mantissa_len ? mantissa_type(0) : mantissa >> shift;
 
-			T d_hi =
-				support::fp::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_hi), (static_cast<output_bits_t>(m_hi) & support::fp::FPBits<T>::significand_mask) | implicit_mask).get_val();
+			T d_hi = support::fp::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_hi),
+														  (static_cast<output_bits_t>(m_hi) & support::fp::FPBits<T>::significand_mask) | implicit_mask)
+						 .get_val();
 
-			mantissa_type round_mask	 = shift > mantissa_len ? 0 : mantissa_type(1) << (shift - 1);
+			mantissa_type round_mask  = shift > mantissa_len ? 0 : mantissa_type(1) << (shift - 1);
 			mantissa_type sticky_mask = round_mask - mantissa_type(1);
 
 			bool round_bit		 = !(mantissa & round_mask).is_zero();
@@ -187,8 +189,14 @@ namespace ccm::types
 			{
 				// d_lo is denormal, but the output is normal.
 				int scale_up_exponent = 2 * desired_precision;
-				T scale_up_factor	  = support::fp::FPBits<T>::create_value(sign, support::fp::FPBits<T>::exponent_bias + static_cast<output_bits_t>(scale_up_exponent), implicit_mask).get_val();
-				T scale_down_factor	  = support::fp::FPBits<T>::create_value(sign, support::fp::FPBits<T>::exponent_bias - static_cast<output_bits_t>(scale_up_exponent), implicit_mask).get_val();
+				T scale_up_factor =
+					support::fp::FPBits<T>::create_value(sign, support::fp::FPBits<T>::exponent_bias + static_cast<output_bits_t>(scale_up_exponent),
+														 implicit_mask)
+						.get_val();
+				T scale_down_factor =
+					support::fp::FPBits<T>::create_value(sign, support::fp::FPBits<T>::exponent_bias - static_cast<output_bits_t>(scale_up_exponent),
+														 implicit_mask)
+						.get_val();
 
 				d_lo = support::fp::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_lo + scale_up_exponent), implicit_mask).get_val();
 

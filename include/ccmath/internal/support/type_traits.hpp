@@ -171,9 +171,7 @@ template <>	struct ccm_make_signed<__int128_t> : type_identity<__int128_t> {};
 template <>	struct ccm_make_signed<__uint128_t> : type_identity<__int128_t> {};
 #endif
 template <typename T> using ccm_make_signed_t = typename ccm_make_signed<T>::type;
-	
 
 	// clang-format on
-
 
 } // namespace ccm::support::traits

@@ -8,18 +8,17 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
-
 #include "ccmath/ccmath.hpp"
 
+#include <gtest/gtest.h>
 #include <cmath>
 #include <limits>
 
 // Disabling test case ccm::truncl if run on clang linux.
 #ifdef __clang__
-#ifdef __linux__
-#define CLANG_LINUX
-#endif
+	#ifdef __linux__
+		#define CLANG_LINUX
+	#endif
 #endif
 
 namespace
@@ -207,5 +206,5 @@ TEST(CcmathNearestTests, CcmTrunclCanBeEvaluatedAtCompileTime)
 
 // Undefining clang linux macro
 #ifdef CLANG_LINUX
-#undef CLANG_LINUX
+	#undef CLANG_LINUX
 #endif

@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include "ccmath/internal/math/generic/builtins/expo/log1p.hpp"
+
+#include <type_traits>
 
 namespace ccm
 {
