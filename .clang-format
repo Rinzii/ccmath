@@ -14,7 +14,7 @@ AllowShortLambdasOnASingleLine: All
 AllowShortBlocksOnASingleLine: Always
 AllowShortIfStatementsOnASingleLine: WithoutElse
 AllowShortLoopsOnASingleLine: true
-AlwaysBreakTemplateDeclarations: Yes
+AlwaysBreakTemplateDeclarations: true
 BraceWrapping:
     AfterCaseLabel: true
     AfterClass: true
@@ -34,28 +34,39 @@ BraceWrapping:
     SplitEmptyRecord: true
     SplitEmptyNamespace: true
 BreakAfterAttributes: Never
+BreakAfterReturnType: Automatic
 BreakBeforeBraces: Allman
 ColumnLimit: 160
 CompactNamespaces: false
 FixNamespaceComments: true
 IndentPPDirectives: BeforeHash
 IndentWidth: 4
+IncludeBlocks: Regroup
 IncludeCategories:
     # Headers in <> with .h extension.
     - Regex: '<([A-Za-z0-9\/-_])+\.h>'
       Priority: 10
+      SortPriority: 3
     # Headers in <> with .hpp extension.
     - Regex: '<([A-Za-z0-9\/-_])+\.hpp>'
-      Priority: 20
+      Priority: 10
+      SortPriority: 2
     # Headers in <> without an extension.
     - Regex: '<([A-Za-z0-9\/-_])+>'
-      Priority: 30
+      Priority: 10
+    # all library includes wrapped in ""
+    # main header should be the topmost
+    - Regex: '".*"'
+      SortPriority: 1
+IncludeIsMainRegex: '""'
+IncludeIsMainSourceRegex: '""'
 NamespaceIndentation: All
 PointerAlignment: Middle
+ReflowComments: true
+PPIndentWidth: 4
 SpaceAfterTemplateKeyword: true
+PenaltyReturnTypeOnItsOwnLine: 1
+PenaltyBreakOpenParenthesis: 250
 Standard: c++20
 TabWidth: 4
 UseTab: Always
-
-
-
