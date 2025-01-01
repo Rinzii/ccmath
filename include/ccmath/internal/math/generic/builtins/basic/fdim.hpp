@@ -21,9 +21,9 @@
 /// - GCC 5.1+
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_FDIM
-#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
-#define CCMATH_HAS_CONSTEXPR_BUILTIN_FDIM
-#endif
+	#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_FDIM
+	#endif
 #endif
 
 namespace ccm::builtin
@@ -45,21 +45,11 @@ namespace ccm::builtin
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
-	constexpr auto fdim(T x, T y)
-		-> std::enable_if_t<has_constexpr_fdim<T>, T>
+	constexpr auto fdim(T x, T y) -> std::enable_if_t<has_constexpr_fdim<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>)
-		{
-			return __builtin_fdimf(x, y);
-		}
-		else if constexpr (std::is_same_v<T, double>)
-		{
-			return __builtin_fdim(x, y);
-		}
-		else if constexpr (std::is_same_v<T, long double>)
-		{
-			return __builtin_fdiml(x, y);
-		}
+		if constexpr (std::is_same_v<T, float>) { return __builtin_fdimf(x, y); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_fdim(x, y); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fdiml(x, y); }
 		// This should never be reached
 		return T{};
 	}

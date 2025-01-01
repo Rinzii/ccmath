@@ -1,5 +1,5 @@
 /*
-* Copyright (c) Ian Pike
+ * Copyright (c) Ian Pike
  * Copyright (c) CCMath contributors
  *
  * CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
@@ -21,9 +21,9 @@
 /// - GCC 5.1+
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_CBRT
-#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
-#define CCMATH_HAS_CONSTEXPR_BUILTIN_CBRT
-#endif
+	#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_CBRT
+	#endif
 #endif
 
 namespace ccm::builtin
@@ -47,18 +47,9 @@ namespace ccm::builtin
 	template <typename T>
 	constexpr auto cbrt(T x) -> std::enable_if_t<has_constexpr_cbrt<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>)
-		{
-			return __builtin_cbrtf(x);
-		}
-		else if constexpr (std::is_same_v<T, double>)
-		{
-			return __builtin_cbrt(x);
-		}
-		else if constexpr (std::is_same_v<T, long double>)
-		{
-			return __builtin_cbrtl(x);
-		}
+		if constexpr (std::is_same_v<T, float>) { return __builtin_cbrtf(x); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_cbrt(x); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_cbrtl(x); }
 		// This should never be reached
 		return T{};
 	}

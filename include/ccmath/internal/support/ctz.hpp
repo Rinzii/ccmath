@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/config/type_support.hpp"
+#include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
 #include "ccmath/internal/types/float128.hpp"
 
@@ -49,11 +49,11 @@ namespace ccm::support
 	template <typename T, std::enable_if_t<traits::ccm_is_integral_v<T> && traits::ccm_is_unsigned_v<T> && !std::is_same_v<T, bool>, bool> = true>
 	constexpr int ctz(T value) noexcept
 	{
-		#if CCM_HAS_BUILTIN(__builtin_ctzg)
-			return __builtin_ctzg(value);
-		#else
+#if CCM_HAS_BUILTIN(__builtin_ctzg)
+		return __builtin_ctzg(value);
+#else
 		return internal::generic_ctz(value);
-		#endif
+#endif
 	}
 
 	template <>

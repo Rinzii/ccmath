@@ -8,12 +8,12 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
-
-#include <cmath>
-#include <limits>
 #include "../../include/ccmath/math/numbers.hpp"
 #include "ccmath/ccmath.hpp"
+
+#include <gtest/gtest.h>
+#include <cmath>
+#include <limits>
 
 TEST(CcmathExponentialTests, Exp)
 {
@@ -38,16 +38,14 @@ TEST(CcmathExponentialTests, Exp)
 	 * Also the issue only appears with the value 128.0 and only on MSVC under windows.
 	 * The same test passes on GCC and Clang on both Linux and MacOS without issue so I am allowing this test to fail.
 	 */
-	//EXPECT_EQ(ccm::exp(128.0), std::exp(128.0));
+	// EXPECT_EQ(ccm::exp(128.0), std::exp(128.0));
 	EXPECT_EQ(ccm::exp(256.0), std::exp(256.0));
 	EXPECT_EQ(ccm::exp(512.0), std::exp(512.0));
 	EXPECT_EQ(ccm::exp(1024.0), std::exp(1024.0));
 	EXPECT_EQ(ccm::exp(2048.0), std::exp(2048.0));
 	EXPECT_EQ(ccm::exp(4096.0), std::exp(4096.0));
 
-
 	EXPECT_EQ(ccm::exp(4096.0) * ccm::exp(4096.0), std::exp(4096.0) * std::exp(4096.0));
-
 
 	// Test Edge Cases
 
@@ -72,7 +70,7 @@ TEST(CcmathExponentialTests, Exp)
 	EXPECT_EQ(ccm::exp(16.0F), std::exp(16.0F));
 	EXPECT_EQ(ccm::exp(32.0F), std::exp(32.0F));
 	EXPECT_EQ(ccm::exp(64.0F), std::exp(64.0F));
-	//EXPECT_EQ(ccm::exp(128.0F), std::exp(128.0F)); // See above.
+	// EXPECT_EQ(ccm::exp(128.0F), std::exp(128.0F)); // See above.
 	EXPECT_EQ(ccm::exp(256.0F), std::exp(256.0F));
 	EXPECT_EQ(ccm::exp(512.0F), std::exp(512.0F));
 	EXPECT_EQ(ccm::exp(1024.0F), std::exp(1024.0F));
@@ -92,6 +90,4 @@ TEST(CcmathExponentialTests, Exp)
 	bool testStdExpThatNanIsPositiveF = std::signbit(std::exp(std::numeric_limits<float>::quiet_NaN()));
 	EXPECT_EQ(testCcmExpThatNanReturnsNanF, testStdExpThatNanReturnsNanF);
 	EXPECT_EQ(testCcmExpThatNanIsPositiveF, testStdExpThatNanIsPositiveF);
-
-
 }

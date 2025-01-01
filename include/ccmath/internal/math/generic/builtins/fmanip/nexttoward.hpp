@@ -21,14 +21,14 @@
 /// - GCC 9.1+
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_NEXTTOWARD
-#if defined(__GNUC__) && (__GNUC__ > 9 || (__GNUC__ == 9 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
-#define CCMATH_HAS_CONSTEXPR_BUILTIN_NEXTTOWARD
-#endif
+	#if defined(__GNUC__) && (__GNUC__ > 9 || (__GNUC__ == 9 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_NEXTTOWARD
+	#endif
 #endif
 
 namespace ccm::builtin
 {
-    // clang-format off
+	// clang-format off
     template <typename T>
     inline constexpr bool has_constexpr_nexttoward =
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_NEXTTOWARD
@@ -36,32 +36,24 @@ namespace ccm::builtin
 #else
         false;
 #endif
-    // clang-format on
+	// clang-format on
 
-    /**
-     * Wrapper for constexpr __builtin nexttoward functions.
-     * This should be used internally and always be wrapped in an if constexpr statement.
-     * It exists only to allow for usage of __builtin nexttoward functions without triggering a compiler error
-     * when the compiler does not support them.
-     */
-    template <typename T>
-    constexpr auto nexttoward(T x, long double y) -> std::enable_if_t<std::is_same_v<T, float> || std::is_same_v<T, double> || std::is_same_v<T, long double>, T>
-    {
-        if constexpr (std::is_same_v<T, float>)
-        {
-            return __builtin_nexttowardf(x, y);
-        }
-        else if constexpr (std::is_same_v<T, double>)
-        {
-            return __builtin_nexttoward(x, y);
-        }
-        else if constexpr (std::is_same_v<T, long double>)
-        {
-            return __builtin_nexttowardl(x, y);
-        }
-        // This should never be reached
-        return T{};
-    }
+	/**
+	 * Wrapper for constexpr __builtin nexttoward functions.
+	 * This should be used internally and always be wrapped in an if constexpr statement.
+	 * It exists only to allow for usage of __builtin nexttoward functions without triggering a compiler error
+	 * when the compiler does not support them.
+	 */
+	template <typename T>
+	constexpr auto
+	nexttoward(T x, long double y) -> std::enable_if_t<std::is_same_v<T, float> || std::is_same_v<T, double> || std::is_same_v<T, long double>, T>
+	{
+		if constexpr (std::is_same_v<T, float>) { return __builtin_nexttowardf(x, y); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_nexttoward(x, y); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_nexttowardl(x, y); }
+		// This should never be reached
+		return T{};
+	}
 } // namespace ccm::builtin
 
 // Cleanup the global namespace

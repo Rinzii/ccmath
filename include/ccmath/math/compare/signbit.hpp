@@ -32,10 +32,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] constexpr bool signbit(T num) noexcept
 	{
-		if constexpr (builtin::has_constexpr_signbit<T>)
-		{
-			return builtin::signbit(num);
-		}
+		if constexpr (builtin::has_constexpr_signbit<T>) { return builtin::signbit(num); }
 		else
 		{
 			// Check for the sign of +0.0 and -0.0 with bit_cast

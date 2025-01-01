@@ -64,20 +64,20 @@ namespace ccm
 		{
 			DoubleDouble r{0.0, 0.0};
 
-			// If we have builtin FMA, we can use it to get the exact product.
-			#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
+// If we have builtin FMA, we can use it to get the exact product.
+#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
 			r.hi = a * b;
 			r.lo = support::multiply_add(a, b, -r.hi);
-			#else
+#else
 			// Dekker's Product.
 			const DoubleDouble as = split(a);
 			const DoubleDouble bs = split(b);
 			r.hi				  = a * b;
-			const double t1		  = as.hi * bs.hi - r.hi;
-			const double t2		  = as.hi * bs.lo + t1;
-			const double t3		  = as.lo * bs.hi + t2;
-			r.lo				  = as.lo * bs.lo + t3;
-			#endif
+			const double t1		  = (as.hi * bs.hi) - r.hi;
+			const double t2		  = (as.hi * bs.lo) + t1;
+			const double t3		  = (as.lo * bs.hi) + t2;
+			r.lo				  = (as.lo * bs.lo) + t3;
+#endif
 
 			return r;
 		}

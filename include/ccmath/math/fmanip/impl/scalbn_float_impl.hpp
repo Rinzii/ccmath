@@ -10,14 +10,13 @@
 
 #pragma once
 
+#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
 #include "ccmath/math/basic/max.hpp"
 #include "ccmath/math/basic/min.hpp"
 
 #include <cstdint>
-
-#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
 CCM_DISABLE_MSVC_WARNING(4756) // 4756: overflow in constant arithmetic
 
 namespace ccm::internal

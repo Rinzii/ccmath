@@ -8,16 +8,15 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
+#include "ccmath/internal/types/float128.hpp"
 
 #include <ccmath/ccmath.hpp>
+#include <gtest/gtest.h>
 #include <cfloat>
 #include <cmath>
 #include <cstdint>
 #include <cstring>
 #include <limits>
-
-#include "ccmath/internal/types/float128.hpp"
 
 // TODO: The nan func are quite brittle and the test cases are extremely forgiving to the func.
 // 		 At some point we should improve these test cases and the nan func to handle all edge cases.
@@ -29,7 +28,7 @@ TEST(CcmathBasicTests, NanStaticAssert)
 	static_assert(ccm::isnan(ccm::nan("")), "ccm::nan() is NOT static assertable!");
 	// Currently nanl is not possible to static assert on clang due to issues with bit_cast.
 	// TODO: Look into alternative approach to handling nanl.
-	//static_assert(ccm::isnan(ccm::nanl("")), "ccm::nanl() is NOT static assertable!");
+	// static_assert(ccm::isnan(ccm::nanl("")), "ccm::nanl() is NOT static assertable!");
 }
 
 TEST(CcmathBasicTests, Nan_Double)
@@ -111,7 +110,7 @@ TEST(CcmathBasicTests, Nan_Double)
 //       I need to investigate this further but I don't yet have the time.
 //       Return to this later, but for now, I will disable the test for DPC++.
 #if !(defined(SYCL_LANGUAGE_VERSION) || defined(__INTEL_LLVM_COMPILER))
-#if (LDBL_MANT_DIG == 53)
+	#if (LDBL_MANT_DIG == 53)
 
 TEST(CcmathBasicTests, Nan_LDouble64bit)
 {
@@ -166,8 +165,8 @@ TEST(CcmathBasicTests, Nan_LDouble64bit)
 	EXPECT_EQ(ccmNanBits, stdNanBits);
 }
 
-// If our long double is 128 bits, then don't run this test as it would not be correct due to padding removal.
-#elif LDBL_MANT_DIG == 64
+	// If our long double is 128 bits, then don't run this test as it would not be correct due to padding removal.
+	#elif LDBL_MANT_DIG == 64
 
 /*
  * 80 bit long doubles have padding bits that are not determinable.
@@ -248,7 +247,7 @@ TEST(CcmathBasicTests, Nan_LDouble80bit)
 	EXPECT_EQ(ccm_nan_bits, std_nan_bits);
 }
 
-#elif LDBL_MANT_DIG == 113
+	#elif LDBL_MANT_DIG == 113
 
 // Does not strip padding as there shouldn't be any if ldouble is 128 bits
 template <std::size_t N>
@@ -311,11 +310,11 @@ TEST(CcmathBasicTests, Nan_LDouble128bit)
 	std_nan_bits = ldoubleToByteArray<sizeof(long double)>(std::nanl("000000000000000000000000000000000000000000000000000000002"));
 	EXPECT_EQ(ccm_nan_bits, std_nan_bits);
 }
-#else
+	#else
 
 TEST(CcmathBasicTests, Nan_LDoubleUnknownBits)
 {
 	FAIL() << "We do not know how to handle long doubles with an unknown number of bits. Please report this if you see this failure.";
 }
-#endif
+	#endif
 #endif // !(defined(SYCL_LANGUAGE_VERSION) || defined(__INTEL_LLVM_COMPILER))

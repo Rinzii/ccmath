@@ -17,20 +17,14 @@
 
 namespace ccm
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int>  = 0>
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 	constexpr T frexp(T x, int & exp)
 	{
-		if constexpr (ccm::builtin::has_constexpr_frexp<T>)
-		{
-			return ccm::builtin::frexp(x, &exp);
-		}
+		if constexpr (ccm::builtin::has_constexpr_frexp<T>) { return ccm::builtin::frexp(x, &exp); }
 		else
 		{
 			support::fp::FPBits<T> bits(x);
-			if (bits.is_inf_or_nan())
-			{
-				return x;
-			}
+			if (bits.is_inf_or_nan()) { return x; }
 			if (bits.is_zero())
 			{
 				exp = 0;

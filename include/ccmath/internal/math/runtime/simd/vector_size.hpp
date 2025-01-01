@@ -39,9 +39,9 @@ namespace ccm::intrin
 			__attribute__((__vector_size__(N / (sizeof(T) / sizeof(int)) * sizeof(int)))) int __attribute__((vector_size(N / (sizeof(T) / sizeof(int)))));
 
 	public:
-		using value_type					 = bool;
-		using simd_type						 = simd<float, abi::vector_size<N>>;
-		using abi_type						 = abi::vector_size<N>;
+		using value_type			  = bool;
+		using simd_type				  = simd<float, abi::vector_size<N>>;
+		using abi_type				  = abi::vector_size<N>;
 		CCM_ALWAYS_INLINE simd_mask() = default;
 		static constexpr int size() { return N / sizeof(T); }
 		CCM_ALWAYS_INLINE explicit simd_mask(bool value) : m_value(static_cast<int>(value)) {}
@@ -63,9 +63,9 @@ namespace ccm::intrin
 		using native_type = __attribute__((__vector_size__(N * sizeof(long long)))) long long __attribute__((vector_size(N)));
 
 	public:
-		using value_type					 = bool;
-		using simd_type						 = simd<double, abi::vector_size<N>>;
-		using abi_type						 = abi::vector_size<N>;
+		using value_type			  = bool;
+		using simd_type				  = simd<double, abi::vector_size<N>>;
+		using abi_type				  = abi::vector_size<N>;
 		CCM_ALWAYS_INLINE simd_mask() = default;
 		static constexpr int size() { return N / sizeof(long long); }
 		CCM_ALWAYS_INLINE explicit simd_mask(bool value) : m_value(static_cast<long long>(value)) {}
@@ -109,10 +109,10 @@ namespace ccm::intrin
 		using native_type = __attribute__((__vector_size__(N * sizeof(T)))) T __attribute__((vector_size(N)));
 
 	public:
-		using value_type				= T;
-		using abi_type					= abi::vector_size<N>;
-		using mask_type					= simd_mask<T, abi_type>;
-		using storage_type				= simd_storage<T, abi_type>;
+		using value_type		 = T;
+		using abi_type			 = abi::vector_size<N>;
+		using mask_type			 = simd_mask<T, abi_type>;
+		using storage_type		 = simd_storage<T, abi_type>;
 		CCM_ALWAYS_INLINE simd() = default;
 		static constexpr int size() { return N / sizeof(T); }
 		CCM_ALWAYS_INLINE explicit simd(T value)
@@ -180,15 +180,13 @@ namespace ccm::intrin
 	}
 
 	template <class T, int N>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, abi::vector_size<N>> max(simd<T, abi::vector_size<N>> const & a,
-																				  simd<T, abi::vector_size<N>> const & b)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, abi::vector_size<N>> max(simd<T, abi::vector_size<N>> const & a, simd<T, abi::vector_size<N>> const & b)
 	{
 		return choose(b < a, a, b);
 	}
 
 	template <class T, int N>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, abi::vector_size<N>> min(simd<T, abi::vector_size<N>> const & a,
-																				  simd<T, abi::vector_size<N>> const & b)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, abi::vector_size<N>> min(simd<T, abi::vector_size<N>> const & a, simd<T, abi::vector_size<N>> const & b)
 	{
 		return choose(a < b, a, b);
 	}

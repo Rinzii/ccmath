@@ -24,7 +24,7 @@ namespace ccm::intrin
 		simd<T, abi::vector_size<N>> result;
 
 		// TODO: Implement a runtime vector_size<N> sqrt that is optimized for runtime.
-		//CCM_SIMD_VECTORIZE for (int i = 0; i < a.size(); ++i)
+		// CCM_SIMD_VECTORIZE for (int i = 0; i < a.size(); ++i)
 		//{
 		//	result.get()[i] = sqrt(a[i]);
 		//}

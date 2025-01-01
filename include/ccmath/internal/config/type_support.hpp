@@ -14,7 +14,7 @@
 #include <cstdint> // UINT64_MAX, __SIZEOF_INT128__
 
 #if defined(UINT64_MAX)
-#define CCM_TYPES_HAS_INT64
+	#define CCM_TYPES_HAS_INT64
 #endif // UINT64_MAX
 
 // Checks whether the __int128 compiler extension for a 128-bit integral type is
@@ -50,7 +50,6 @@
 // std::_Unsigned128
 // std::_Signed128
 // #include __msvc_int128.hpp
-
 
 // 'long double' properties.
 #if (LDBL_MANT_DIG == 53)

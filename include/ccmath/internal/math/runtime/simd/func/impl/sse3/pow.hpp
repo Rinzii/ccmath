@@ -1,5 +1,5 @@
 /*
-* Copyright (c) Ian Pike
+ * Copyright (c) Ian Pike
  * Copyright (c) CCMath contributors
  *
  * CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
@@ -48,5 +48,5 @@ namespace ccm::intrin
 	}
 } // namespace ccm::intrin
 
-#endif // CCMATH_HAS_SIMD_SSE3
+	#endif // CCMATH_HAS_SIMD_SSE3
 #endif	   // CCMATH_HAS_SIMD

@@ -4,117 +4,130 @@ project(ccmath-test)
 
 if (NOT TARGET ccmath)
     find_package(ccmath CONFIG REQUIRED)
-endif ()
+endif()
 
+# should these go into the `if` above?
+find_package(PkgConfig REQUIRED)
+find_package(GTest CONFIG REQUIRED)
+find_package(re2 CONFIG REQUIRED)
 
 add_library(${PROJECT_NAME} STATIC)
 add_library(ccmath::test ALIAS ${PROJECT_NAME})
-target_link_libraries(${PROJECT_NAME} PUBLIC
-        ccmath::ccmath
 
-        ${Abseil_LIBRARIES}
-        gtest::gtest
-        re2::re2
+target_link_libraries(${PROJECT_NAME} PUBLIC
+    ccmath::ccmath
+    ${Abseil_LIBRARIES}
+    GTest::gtest
+    GTest::gtest_main
+    re2::re2
 )
+
 target_include_directories(${PROJECT_NAME} PUBLIC .)
 target_include_directories(${PROJECT_NAME} PUBLIC ${Abseil_INCLUDE_DIRS})
 target_sources(${PROJECT_NAME} PRIVATE
-        ccmath_test_main.cpp
+    ccmath_test_main.cpp
 )
-
 
 add_executable(${PROJECT_NAME}-basic)
 target_sources(${PROJECT_NAME}-basic PRIVATE
-        basic/abs_test.cpp
-        basic/fdim_test.cpp
-        basic/fma_test.cpp
-        basic/fmod_test.cpp
-        basic/max_test.cpp
-        basic/min_test.cpp
-        basic/nan_test.cpp
-        basic/remainder_test.cpp
-        basic/remquo_test.cpp
+    basic/abs_test.cpp
+    basic/fdim_test.cpp
+    basic/fma_test.cpp
+    basic/fmod_test.cpp
+    basic/max_test.cpp
+    basic/min_test.cpp
+    basic/nan_test.cpp
+    basic/remainder_test.cpp
+    basic/remquo_test.cpp
 )
+
 target_link_libraries(${PROJECT_NAME}-basic PRIVATE
-        ccmath::test
-        gtest::gtest
+    ccmath::test
+    GTest::gtest
+    GTest::gtest_main
 )
 
 add_executable(${PROJECT_NAME}-compare)
 target_sources(${PROJECT_NAME}-compare PRIVATE
-        compare/fpclassify_test.cpp
-        compare/isfinite_test.cpp
-        compare/isgreater_test.cpp
-        compare/isgreaterequal_test.cpp
-        compare/isinf_test.cpp
-        compare/isless_test.cpp
-        compare/islessequal_test.cpp
-        compare/islessgreater_test.cpp
-        compare/isnan_test.cpp
-        compare/isnormal_test.cpp
-        compare/isunordered_test.cpp
-        compare/signbit_test.cpp
-
+    compare/fpclassify_test.cpp
+    compare/isfinite_test.cpp
+    compare/isgreater_test.cpp
+    compare/isgreaterequal_test.cpp
+    compare/isinf_test.cpp
+    compare/isless_test.cpp
+    compare/islessequal_test.cpp
+    compare/islessgreater_test.cpp
+    compare/isnan_test.cpp
+    compare/isnormal_test.cpp
+    compare/isunordered_test.cpp
+    compare/signbit_test.cpp
 )
+
 target_link_libraries(${PROJECT_NAME}-compare PRIVATE
-        ccmath::test
-        gtest::gtest
+    ccmath::test
+    GTest::gtest
+    GTest::gtest_main
 )
 
 add_executable(${PROJECT_NAME}-exponential)
 target_sources(${PROJECT_NAME}-exponential PRIVATE
-        exponential/exp2_test.cpp
-        exponential/exp_test.cpp
-        exponential/expm1_test.cpp
-        exponential/log1p_test.cpp
-        exponential/log2_test.cpp
-        exponential/log10_test.cpp
-        exponential/log_test.cpp
-
-
+    exponential/exp2_test.cpp
+    exponential/exp_test.cpp
+    exponential/expm1_test.cpp
+    exponential/log1p_test.cpp
+    exponential/log2_test.cpp
+    exponential/log10_test.cpp
+    exponential/log_test.cpp
 )
+
 target_link_libraries(${PROJECT_NAME}-exponential PRIVATE
-        ccmath::test
-        gtest::gtest
+    ccmath::test
+    GTest::gtest
+    GTest::gtest_main
 )
 
 add_executable(${PROJECT_NAME}-fmanip)
 target_sources(${PROJECT_NAME}-fmanip PRIVATE
-        fmanip/copysign_test.cpp
-        fmanip/frexp_test.cpp
-        fmanip/ilogb_test.cpp
-        fmanip/ldexp_test.cpp
-        fmanip/logb_test.cpp
-        fmanip/modf_test.cpp
-        fmanip/nextafter_test.cpp
-        fmanip/nexttoward_test.cpp
-        fmanip/scalbn_test.cpp
+    fmanip/copysign_test.cpp
+    fmanip/frexp_test.cpp
+    fmanip/ilogb_test.cpp
+    fmanip/ldexp_test.cpp
+    fmanip/logb_test.cpp
+    fmanip/modf_test.cpp
+    fmanip/nextafter_test.cpp
+    fmanip/nexttoward_test.cpp
+    fmanip/scalbn_test.cpp
 )
+
 target_link_libraries(${PROJECT_NAME}-fmanip PRIVATE
-        ccmath::test
-        gtest::gtest
+    ccmath::test
+    GTest::gtest
+    GTest::gtest_main
 )
 
 add_executable(${PROJECT_NAME}-nearest)
 target_sources(${PROJECT_NAME}-nearest PRIVATE
-        nearest/floor_test.cpp
-        nearest/nearbyint_test.cpp
-        nearest/trunc_test.cpp
+    nearest/floor_test.cpp
+    nearest/nearbyint_test.cpp
+    nearest/trunc_test.cpp
 
 )
 target_link_libraries(${PROJECT_NAME}-nearest PRIVATE
-        ccmath::test
-        gtest::gtest
+    ccmath::test
+    GTest::gtest
+    GTest::gtest_main
 )
 
 add_executable(${PROJECT_NAME}-power)
 target_sources(${PROJECT_NAME}-power PRIVATE
-        power/pow_test.cpp
-        power/sqrt_test.cpp
+    power/pow_test.cpp
+    power/sqrt_test.cpp
 )
+
 target_link_libraries(${PROJECT_NAME}-power PRIVATE
-        ccmath::test
-        gtest::gtest
+    ccmath::test
+    GTest::gtest
+    GTest::gtest_main
 )
 
 add_executable(${PROJECT_NAME}-misc)
@@ -122,48 +135,49 @@ add_executable(${PROJECT_NAME}-misc)
 # This is required as std::lerp is only available in versions of C++20 or greater.
 if (CMAKE_CXX_STANDARD GREATER_EQUAL 20)
     target_sources(${PROJECT_NAME}-misc PRIVATE
-            misc/lerp_test_std.cpp
-
+        misc/lerp_test_std.cpp
     )
-else ()
+else()
     target_sources(${PROJECT_NAME}-misc PRIVATE
-            misc/lerp_test_no_std.cpp
+        misc/lerp_test_no_std.cpp
     )
-endif ()
+endif()
 
 target_link_libraries(${PROJECT_NAME}-misc PRIVATE
-        ccmath::test
-        gtest::gtest
+    ccmath::test
+    GTest::gtest
+    GTest::gtest_main
 )
-
 
 # Tests for internal items
 add_executable(${PROJECT_NAME}-internal-types)
 target_sources(${PROJECT_NAME}-internal-types PRIVATE
         internal/types/big_int_test.cpp
-
-)
-target_link_libraries(${PROJECT_NAME}-internal-types PRIVATE
-        ccmath::test
-        gtest::gtest
 )
 
+target_link_libraries(
+  ${PROJECT_NAME}-internal-types
+  PRIVATE ccmath::test
+          GTest::gtest
+          GTest::gtest_main
+)
 
 if (CCMATH_OS_WINDOWS)
-    # For Windows: Prevent overriding the parent project's compiler/linker settings
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-endif ()
+    # For Windows: Prevent overriding the
+    # parent project's compiler/linker settings
+    set(GTest_force_shared_crt ON CACHE BOOL "" FORCE)
+endif()
 
 # Only supported compilers currently are MSVC, GNU and Clang
 if (CMAKE_CXX_COMPILER_ID STREQUAL MSVC)
     target_compile_options(${PROJECT_NAME} PUBLIC
-            /W4 /WX
+        /W4 /WX
     )
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL GNU OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     target_compile_options(${PROJECT_NAME} PUBLIC
-            -Wall -Wextra -Wno-pedantic -Wno-unused-function
+        -Wall -Wextra -Wno-pedantic -Wno-unused-function
     )
-endif ()
+endif()
 
 
 add_test(NAME ${PROJECT_NAME}-basic COMMAND ${PROJECT_NAME}-basic)
@@ -176,4 +190,3 @@ add_test(NAME ${PROJECT_NAME}-misc COMMAND ${PROJECT_NAME}-misc)
 
 # Internal tests
 add_test(NAME ${PROJECT_NAME}-internal-types COMMAND ${PROJECT_NAME}-internal-types)
-

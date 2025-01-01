@@ -25,20 +25,19 @@
 
 /// MSVC
 #if defined(_MSC_VER) && !defined(__clang__) && !defined(CCMATH_COMPILER_MSVC)
-#define CCMATH_COMPILER_MSVC
-#define CCMATH_COMPILER_MSVC_VER _MSC_VER
+	#define CCMATH_COMPILER_MSVC
+	#define CCMATH_COMPILER_MSVC_VER _MSC_VER
 
 /// Intel DPC++ Compiler
 #elif defined(SYCL_LANGUAGE_VERSION) || defined(__INTEL_LLVM_COMPILER) && !defined(CCMATH_COMPILER_INTEL)
 	#define CCMATH_COMPILER_INTEL
 	#define CCMATH_COMPILER_INTEL_VER __INTEL_LLVM_COMPILER
 
-#ifndef CCMATH_COMPILER_CLANG_BASED
+	#ifndef CCMATH_COMPILER_CLANG_BASED
 		#define CCMATH_COMPILER_CLANG_BASED
-#endif
+	#endif
 
 // TODO: Add precise detection for specific compiler versions along with a warning if using unsupported compiler
-
 
 #elif defined(_MSC_VER) && defined(__clang__) && !defined(CCMATH_COMPILER_CLANG_CL)
 	#define CCMATH_COMPILER_CLANG_CL
@@ -47,12 +46,11 @@
 	#define CCMATH_COMPILER_CLANG_CL_VER_MINOR __clang_minor__
 	#define CCMATH_COMPILER_CLANG_CL_VER_PATCH __clang_patchlevel__
 
-#ifndef CCMATH_COMPILER_CLANG_BASED
+	#ifndef CCMATH_COMPILER_CLANG_BASED
 		#define CCMATH_COMPILER_CLANG_BASED
-#endif
+	#endif
 
 // TODO: Add precise detection for specific compiler versions along with a warning if using unsupported compiler
-
 
 /// Nvidia HPC SDK
 #elif defined(__NVCOMPILER) || defined(__NVCOMPILER_LLVM__) && !defined(CCMATH_COMPILER_NVIDIA_HPC)
@@ -64,25 +62,22 @@
 
 // TODO: Add precise detection for specific compiler versions along with a warning if using unsupported compiler
 
-
 /// Nvidia CUDA
 #elif defined(__CUDACC__) && !defined(CCMATH_COMPILER_NVIDIA_CUDA)
-#if !defined(CUDA_VERSION)
+	#if !defined(CUDA_VERSION)
 		#include <cuda.h> // We need to make sure the version is defined since nvcc doesn't define it
-#endif
+	#endif
 
 	#define CCMATH_COMPILER_NVIDIA_CUDA
 	#define CCMATH_COMPILER_NVIDIA_CUDA_VER (CUDA_VERSION / 1000)
 
 // TODO: Add precise detection for specific compiler versions along with a warning if using unsupported compiler
 
-
 /// AMD HIP
 #elif defined(__HIP__) && !defined(CCMATH_COMPILER_AMD_HIP)
-    #define CCMATH_COMPILER_AMD_HIP
+	#define CCMATH_COMPILER_AMD_HIP
 
 // TODO: Add precise detection for specific compiler versions along with a warning if using unsupported compiler
-
 
 /// Apple Clang
 #elif defined(__apple_build_version__) && defined(__clang__) && !defined(CCMATH_COMPILER_APPLE_CLANG)
@@ -92,9 +87,9 @@
 	#define CCMATH_COMPILER_APPLE_CLANG_VER_MINOR __clang_minor__
 	#define CCMATH_COMPILER_APPLE_CLANG_VER_PATCH __clang_patchlevel__
 
-#ifndef CCMATH_COMPILER_CLANG_BASED
+	#ifndef CCMATH_COMPILER_CLANG_BASED
 		#define CCMATH_COMPILER_CLANG_BASED
-#endif
+	#endif
 
 // TODO: Add precise detection for specific compiler versions along with a warning if using unsupported compiler
 
@@ -106,9 +101,9 @@
 	#define CCMATH_COMPILER_CLANG_VER_MINOR __clang_minor__
 	#define CCMATH_COMPILER_CLANG_VER_PATCH __clang_patchlevel__
 
-#ifndef CCMATH_COMPILER_CLANG_BASED
+	#ifndef CCMATH_COMPILER_CLANG_BASED
 		#define CCMATH_COMPILER_CLANG_BASED
-#endif
+	#endif
 
 // TODO: Add precise detection for specific compiler versions along with a warning if using unsupported compiler
 
@@ -119,7 +114,6 @@
 	#define CCMATH_COMPILER_GCC_VER_MAJOR __GNUC__
 	#define CCMATH_COMPILER_GCC_VER_MINOR __GNUC_MINOR__
 	#define CCMATH_COMPILER_GCC_VER_PATCH __GNUC_PATCHLEVEL__
-
 
 #else
 	#define CCMATH_COMPILER_UNKNOWN
@@ -142,41 +136,41 @@ namespace ccm::internal::platform
 	};
 
 	template <compiler>
-	struct native_compiler : std::false_type{};
+	struct native_compiler : std::false_type
+	{
+	};
 
 	template <>
 	struct native_compiler<compiler::eUnknown> : std::false_type
 	{
 	};
 
-	#ifdef CCMATH_COMPILER_GCC
+#ifdef CCMATH_COMPILER_GCC
 	template <>
 	struct native_compiler<compiler::eGCC> : std::true_type
 	{
 	};
-	#endif
+#endif
 
-	#ifdef CCMATH_COMPILER_CLANG
+#ifdef CCMATH_COMPILER_CLANG
 	template <>
 	struct native_compiler<compiler::eClang> : std::true_type
 	{
 	};
-	#endif
+#endif
 
-	#ifdef CCMATH_COMPILER_MSVC
+#ifdef CCMATH_COMPILER_MSVC
 	template <>
 	struct native_compiler<compiler::eMSVC> : std::true_type
 	{
 	};
-	#endif
+#endif
 
-	#ifdef CCMATH_COMPILER_CLANG_CL
+#ifdef CCMATH_COMPILER_CLANG_CL
 	template <>
 	struct native_compiler<compiler::eClangCL> : std::true_type
 	{
 	};
-	#endif
-
-
+#endif
 
 } // namespace ccm::internal::platform

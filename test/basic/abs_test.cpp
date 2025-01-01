@@ -8,15 +8,15 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
 #include <ccmath/math/basic/fabs.hpp>
+#include <gtest/gtest.h>
 #include <cmath>
 #include <limits>
 
 // NOLINTBEGIN
 
 #if defined(_MSC_VER) && !defined(__clang__)
-#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+	#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
 // TODO: Look into this issue at a later date.
 CCM_DISABLE_MSVC_WARNING(4756) // 4756: overflow in constant arithmetic - Not sure why this is happening
 #endif

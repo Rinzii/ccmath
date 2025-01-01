@@ -16,7 +16,6 @@
 #include "ccmath/internal/predef/has_const_builtin.hpp"
 #include "ccmath/internal/support/helpers/internal_ldexp.hpp"
 
-
 namespace ccm
 {
 	/**

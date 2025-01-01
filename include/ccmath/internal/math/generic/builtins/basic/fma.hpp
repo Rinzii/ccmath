@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include "ccmath/internal/math/generic/builtins/builtin_helpers.hpp"
+
+#include <type_traits>
 
 /// CCMATH_HAS_CONSTEXPR_BUILTIN_FMA
 /// This is a macro that is defined if the compiler has constexpr __builtin_copysign that allows static_assert

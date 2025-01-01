@@ -13,11 +13,10 @@
 TEST(CcmathInternalTypesTests, BigIntTest)
 {
 
-	//ccm::BigInt<64, false> a;
-	//auto t1 = ccm::BigInt<64, false>::bits;
-	//auto t2 = ccm::BigInt<64, false>::is_signed;
+	// ccm::BigInt<64, false> a;
+	// auto t1 = ccm::BigInt<64, false>::bits;
+	// auto t2 = ccm::BigInt<64, false>::is_signed;
 
-	//EXPECT_EQ(t1, 64);
-	//EXPECT_EQ(t2, false);
+	// EXPECT_EQ(t1, 64);
+	// EXPECT_EQ(t2, false);
 }
-

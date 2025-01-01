@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/math/generic/builtins/basic/fdim.hpp"
+#include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 
 #include <limits>
@@ -29,10 +29,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T fdim(T x, T y)
 	{
-		if constexpr (builtin::has_constexpr_fdim<T>)
-		{
-			return builtin::fdim(x, y);
-		}
+		if constexpr (builtin::has_constexpr_fdim<T>) { return builtin::fdim(x, y); }
 		else
 		{
 			using FPBits_t = typename ccm::support::fp::FPBits<T>;

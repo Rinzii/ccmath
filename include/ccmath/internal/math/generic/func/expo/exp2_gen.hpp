@@ -24,20 +24,20 @@
 
 namespace ccm::gen
 {
-   namespace internal::impl
-   {
+	namespace internal::impl
+	{
 
-	   template <typename T>
-	   constexpr std::enable_if_t<std::is_floating_point_v<T>, T> exp2_impl(T x, T y) noexcept
-	   {
+		template <typename T>
+		constexpr std::enable_if_t<std::is_floating_point_v<T>, T> exp2_impl(T x, T y) noexcept
+		{
 
-		   return 0;
-	   }
-   } // namespace internal::impl
+			return 0;
+		}
+	} // namespace internal::impl
 
-   template <typename T>
-   constexpr std::enable_if_t<std::is_floating_point_v<T>, T> exp2_gen(T base, T exp) noexcept
-   {
-	   return internal::impl::exp2_impl(base, exp);
-   }
+	template <typename T>
+	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> exp2_gen(T base, T exp) noexcept
+	{
+		return internal::impl::exp2_impl(base, exp);
+	}
 } // namespace ccm::gen

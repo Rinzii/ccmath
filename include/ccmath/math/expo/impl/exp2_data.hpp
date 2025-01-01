@@ -25,8 +25,8 @@ namespace ccm::internal
 	template <>
 	struct exp2_data<float> // NOLINT
 	{
-		static constexpr std::size_t table_bits = 5;
-		static constexpr std::size_t poly_order = 3;
+		static constexpr std::size_t table_bits			  = 5;
+		static constexpr std::size_t poly_order			  = 3;
 		static constexpr std::uint64_t shifted_table_bits = (1 << table_bits);
 
 		double shift_scaled{0x1.8p+52 / shifted_table_bits};
@@ -48,10 +48,9 @@ namespace ccm::internal
 	template <>
 	struct exp2_data<double>
 	{
-		static constexpr std::size_t table_bits = 7;
-		static constexpr std::size_t poly_order = 5;
+		static constexpr std::size_t table_bits			= 7;
+		static constexpr std::size_t poly_order			= 5;
 		static constexpr std::size_t shifted_table_bits = (1 << table_bits);
-
 
 	private:
 		static constexpr std::size_t internal_table_size = static_cast<std::size_t>(2 * shifted_table_bits);

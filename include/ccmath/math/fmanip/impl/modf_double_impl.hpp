@@ -14,7 +14,7 @@
 
 namespace ccm::internal::impl
 {
-	constexpr double modf_double_impl(double x, double* iptr) noexcept
+	constexpr double modf_double_impl(double x, double * iptr) noexcept
 	{
 		const std::int64_t integerValue = support::double_to_int64(x);
 		// NOLINTNEXTLINE
@@ -46,10 +46,7 @@ namespace ccm::internal::impl
 		*iptr = x * 1.0;
 
 		// Handle the NaN's separately
-		if (exponent == 0x400 && ((static_cast<unsigned long>(integerValue) & UINT64_C(0xfffffffffffff)) != 0U))
-		{
-			return x * 1.0;
-		}
+		if (exponent == 0x400 && ((static_cast<unsigned long>(integerValue) & UINT64_C(0xfffffffffffff)) != 0U)) { return x * 1.0; }
 
 		// Return ±0
 		x = support::int64_to_double(static_cast<std::int64_t>(static_cast<unsigned long>(integerValue) & UINT64_C(0x8000000000000000)));

@@ -19,9 +19,9 @@
 
 // If we don't have access to the standard implementation of [[assume()]] then try to check for compiler intrinsics/attributes
 #ifndef CCM_ASSUME
-// Be aware that CLion Nova's C++ Engine does not recognize __builtin_assume as a valid symbol.
-// It is incorrect and this is a known bug that is fixed in CLion 2024.2.
-// The code will work fine, so ignore the warning it may emit.
+	// Be aware that CLion Nova's C++ Engine does not recognize __builtin_assume as a valid symbol.
+	// It is incorrect and this is a known bug that is fixed in CLion 2024.2.
+	// The code will work fine, so ignore the warning it may emit.
 	#if defined(__clang__)
 		#define CCM_ASSUME(...)                                                                                                                                \
 			do {                                                                                                                                               \

@@ -105,7 +105,6 @@ namespace ccm::support
 			}
 			CCM_RESTORE_MSVC_WARNING()
 
-
 			// Adds a single character to this buffer.
 			constexpr void push(char c)
 			{

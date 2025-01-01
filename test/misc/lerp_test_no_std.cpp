@@ -8,12 +8,10 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
-
 #include <ccmath/ccmath.hpp>
-#include <cmath>
-
+#include <gtest/gtest.h>
 #include <array>
+#include <cmath>
 
 /*
 TEST(CcmathBasicTests, LerpStaticAssert)
@@ -35,9 +33,9 @@ TEST(CcmathBasicTests, LerpFloat)
    std::array<float, 9> expected_values = { -5.0F, -2.5F, 0.0F, 2.5F, 5.0F, 7.5F, 10.0F, 12.5F, 15.0F };
    for (float t = -2.0; t <= 2.0; t += static_cast<float>(0.5))
    {
-       // Testing extrapolation
-       // Expected values are: -5 -2.5 0 2.5 5 7.5 10 12.5 15
-       EXPECT_EQ(ccm::lerp(5.0, 10.0, t), expected_values.at(i)) << "ccm::lerp and std::lerp are not the same with t = " << t;
+	   // Testing extrapolation
+	   // Expected values are: -5 -2.5 0 2.5 5 7.5 10 12.5 15
+	   EXPECT_EQ(ccm::lerp(5.0, 10.0, t), expected_values.at(i)) << "ccm::lerp and std::lerp are not the same with t = " << t;
 	   i++;
    }
    // NOLINTEND

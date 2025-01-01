@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/math/generic/builtins/compare/isinf.hpp"
+#include "ccmath/internal/support/fp/fp_bits.hpp"
 
 #include <limits>
 #include <type_traits>
