@@ -1,4 +1,7 @@
-# CCMath - A C++17 Compile Time CMath Library
+<img src="docs/resources/ccmath_logo_white.png" style="width: 35%;" alt="CCMath Logo">
+
+# CCMath - Compile Time \<cmath\> for the Real World
+
 [![image](https://github.com/Rinzii/ccmath/workflows/ci-windows/badge.svg)](https://github.com/Rinzii/ccmath/actions?query=workflow%3Aci-windows)
 [![image](https://github.com/Rinzii/ccmath/workflows/ci-linux/badge.svg)](https://github.com/Rinzii/ccmath/actions?query=workflow%3Aci-linux)
 [![image](https://github.com/Rinzii/ccmath/workflows/ci-macos/badge.svg)](https://github.com/Rinzii/ccmath/actions?query=workflow%3Aci-macos)
@@ -8,22 +11,31 @@
 https://opensource.org/licenses/Apache-2.0)
 [![Discord](https://img.shields.io/discord/1286067628456284244?label=Discord)](https://discord.gg/p3mVxAbdmc)
 
-
-**CCMath** is a C++17 library that provides a re-implementation of the standard `<cmath>` library with all features made `constexpr`.
+**CCMath** is a C++17 library that provides a re-implementation of the standard `<cmath>` library with all features made
+`constexpr`.
 This enables compile-time evaluation of mathematical functions,
 improving performance and allows for more efficient code in scenarios where constant expressions are required.
 
 ## Features
 
-- **Full constexpr Compatibility**: All functions provided by CCMath are implemented as `constexpr` along with an active effort made to ensure all functions work within `static_assert`. The primary goal is to ensure every function can be evaluated at compile time.
+- **Full constexpr Compatibility**: All functions provided by CCMath are implemented as `constexpr` along with an active
+  effort made to ensure all functions work within `static_assert`. The primary goal is to ensure every function can be
+  evaluated at compile time.
 
-- **Drop-in Replacement for the Standard Math Library**: CCMath provides a comprehensive set of mathematical functions that are 1:1 compatible with the C++ standard library `<cmath>`. The goal of CCMath is to effectively be a drop-in replacement for `<cmath>` with little to no discernible difference between the two. This includes trigonometric, exponential, logarithmic, and other common mathematical operations. If `<cmath>` has it then it is likely CCMath has implemented it.
+- **Drop-in Replacement for the Standard Math Library**: CCMath provides a comprehensive set of mathematical functions
+  that are 1:1 compatible with the C++ standard library `<cmath>`. The goal of CCMath is to effectively be a drop-in
+  replacement for `<cmath>` with little to no discernible difference between the two. This includes trigonometric,
+  exponential, logarithmic, and other common mathematical operations. If `<cmath>` has it then it is likely CCMath has
+  implemented it.
 
-- **Performance Optimization**: Besides all the functions being able to be evaluated at compile time, CCMath was also built with speed in mind. We strive to have speeds nearly as fast as the standard implementation.
+- **Performance Optimization**: Besides all the functions being able to be evaluated at compile time, CCMath was also
+  built with speed in mind. We strive to have speeds nearly as fast as the standard implementation.
 
-- **Optimized Runtime Evaluation**: In all instances where a function cannot be evaluated at compile time, CCMath has been optimized to provide the fastest runtime evaluation possible and aims to be as fast as the standard library.
+- **Optimized Runtime Evaluation**: In all instances where a function cannot be evaluated at compile time, CCMath has
+  been optimized to provide the fastest runtime evaluation possible and aims to be as fast as the standard library.
 
-- **Cross-Platform Compatibility**: CCMath is designed to work on all major platforms and compilers. It has been tested on Windows, macOS, and Linux with compilers such as GCC, Clang, and MSVC.
+- **Cross-Platform Compatibility**: CCMath is designed to work on all major platforms and compilers. It has been tested
+  on Windows, macOS, and Linux with compilers such as GCC, Clang, and MSVC.
 
 - **No External Dependencies**: CCMath has no external dependencies and only requires a modern C++17-compliant compiler.
 
@@ -67,9 +79,11 @@ FetchContent_MakeAvailable(ccmath)
 target_link_libraries(main PRIVATE ccmath::ccmath)
 ```
 
-CCMath is also designed with functions being freestanding and header only so you can also just drop the headers directly into your project!
+CCMath is also designed with functions being freestanding and header only so you can also just drop the headers directly
+into your project!
 
 ## Compiler Support
+
 * GCC 11.1+
 * Clang 9.0.0+
 * AppleClang 14.0.3+ (Lowest tested version)
@@ -88,9 +102,12 @@ If you have any questions, suggestions, or just want to chat, feel free to join 
 
 ## Contributing
 
-CCmath is an open-source project, and it needs your help to go on growing and improving. If you want to get involved and suggest some additional features, file a bug report or submit a patch, please have a look at the [contribution guidelines](CONTRIBUTING.md)!
+CCmath is an open-source project, and it needs your help to go on growing and improving. If you want to get involved and
+suggest some additional features, file a bug report or submit a patch, please have a look at
+the [contribution guidelines](CONTRIBUTING.md)!
 
 ## Implementation Progress (Modules)
+
 | Module                   | % done | In Progress? | Notes? | Planned Completion Version |
 |--------------------------|--------|--------------|--------|----------------------------|
 | Basic                    | 100    |              |        | v0.1.0 (Released)          |
@@ -198,14 +215,14 @@ CCmath is an open-source project, and it needs your help to go on growing and im
 
 ## Projects using CCMath!
 
-- [KittyOS](https://github.com/kitty-os/kitty-os/) - KittyOS is meant to be a silly non-unix operating system for cat lovers and cats themselves.
+- [KittyOS](https://github.com/kitty-os/kitty-os/) - KittyOS is meant to be a silly non-unix operating system for cat
+  lovers and cats themselves.
 
 _(Are you using CCMath in your project? Let us know!)_
 
 ## License
 
 CCMath is distributed under the Apache-2.0 WITH LLVM-exception. See the LICENSE file for more information.
-
 
 ## Special Thanks
 
