@@ -49,7 +49,8 @@ Here's a basic example:
 ```cpp
 
 #include <ccmath/ccmath.hpp> // Monolithic header file that includes all functions. Similar to including <cmath>
-// #include <ccmath/power/sqrt.hpp> // You can also directly include the functions you require without bringing in extra functions!
+// You can also directly include the functions you require without bringing in extra functions!
+// #include <ccmath/power/sqrt.hpp>
 
 
 #include <iostream> // For std::cout
@@ -72,14 +73,14 @@ include(FetchContent)
 FetchContent_Declare(
         ccmath
         GIT_REPOSITORY https://github.com/Rinzii/ccmath.git
-        GIT_TAG v0.2.0 # Replace with the version you want to use
+        GIT_TAG main # Or replace with the version you want to use such as v0.2.0
 )
 FetchContent_MakeAvailable(ccmath)
 
 target_link_libraries(main PRIVATE ccmath::ccmath)
 ```
 
-CCMath is also designed with functions being freestanding and header only so you can also just drop the headers directly
+CCMath is also designed with functions being freestanding and header only, so you can also drop the headers directly
 into your project!
 
 ## Compiler Support
@@ -90,6 +91,9 @@ into your project!
 * MSVC 19.26+
 * Intel DPC++ 2022.0.0+
 * Nvidia HPC SDK 22.7+ (Lowest tested version)
+
+> [!ATTENTION]
+> Listed compilers may not be the actual supported versions as development is still ongoing.
 
 > [!NOTE]
 > Currently working on finding manners to lower these requirements.
@@ -111,12 +115,12 @@ the [contribution guidelines](CONTRIBUTING.md)!
 | Module                   | % done | In Progress? | Notes? | Planned Completion Version |
 |--------------------------|--------|--------------|--------|----------------------------|
 | Basic                    | 100    |              |        | v0.1.0 (Released)          |
-| Compare                  | 100    |              |        | v0.2.0 (Released)          |
-| Exponential              | 57     |              |        | maybe v0.3.0 or v0.4.0     |              
+| Compare                  | 100    |              |        | v0.1.0 (Released)          |
+| Exponential              | 57     |              |        | maybe v0.2.0 or v0.3.0     |              
 | Float Manipulation       | 25     |              |        |                            |
 | Hyperbolic               | 0      |              |        |                            |
 | Nearest                  | 33     |              |        |                            |
-| Power                    | 5      | ✓            |        | maybe v0.3.0 or v0.4.0     |
+| Power                    | 5      | ✓            |        | maybe v0.2.0 or v0.3.0     |
 | Special Functions        | 0      |              |        |                            |
 | Trigonometric            | 0      |              |        |                            |
 | Misc Functions           | 30     |              |        |                            |
@@ -214,6 +218,8 @@ the [contribution guidelines](CONTRIBUTING.md)!
 > Last Updated: Aug 31, 2024
 
 ## Projects using CCMath!
+
+- [Fornani](https://github.com/swagween/fornani) - A 2D action adventure game still currently in development.
 
 - [KittyOS](https://github.com/kitty-os/kitty-os/) - KittyOS is meant to be a silly non-unix operating system for cat
   lovers and cats themselves.
