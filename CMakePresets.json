@@ -20,19 +20,6 @@
       }
     },
     {
-      "name": "base-msvc",
-      "description": "Base configuration using Ninja",
-      "generator": "Ninja",
-      "hidden": true,
-      "binaryDir": "${sourceDir}/out/build/msvc/${presetName}",
-      "cacheVariables": {
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/msvc/${presetName}",
-        "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
-        "CMAKE_CXX_STANDARD": "17"
-      }
-    },
-    {
       "name": "base-vs19",
       "description": "Base configuration using Visual Studio 16 (2019)",
       "generator": "Visual Studio 16 2019",
@@ -252,24 +239,6 @@
       "description": "VS2022 + Release"
     },
     {
-      "name": "msvc-ninja-debug",
-      "inherits": [
-        "base-ninja",
-        "msvc",
-        "Debug"
-      ],
-      "description": "MSVC + Ninja + Debug"
-    },
-    {
-      "name": "msvc-ninja-release",
-      "inherits": [
-        "base-ninja",
-        "msvc",
-        "Release"
-      ],
-      "description": "MSVC + Ninja + Release"
-    },
-    {
       "name": "vs22-clang-debug",
       "inherits": [
         "base-vs22",
@@ -377,22 +346,6 @@
       ]
     },
     {
-      "name": "build-msvc-ninja-debug",
-      "configurePreset": "msvc-ninja-debug",
-      "configuration": "Debug",
-      "targets": [
-        "all"
-      ]
-    },
-    {
-      "name": "build-msvc-ninja-release",
-      "configurePreset": "msvc-ninja-release",
-      "configuration": "Release",
-      "targets": [
-        "all"
-      ]
-    },
-    {
       "name": "build-vs22-clang-debug",
       "configurePreset": "vs22-clang-debug",
       "configuration": "Debug",
@@ -471,18 +424,6 @@
     {
       "name": "test-vs22-release",
       "configurePreset": "vs22-release",
-      "configuration": "Release",
-      "inheritConfigureEnvironment": true
-    },
-    {
-      "name": "test-msvc-ninja-debug",
-      "configurePreset": "vs22-ninja-debug",
-      "configuration": "Debug",
-      "inheritConfigureEnvironment": true
-    },
-    {
-      "name": "test-msvc-ninja-release",
-      "configurePreset": "vs22-ninja-release",
       "configuration": "Release",
       "inheritConfigureEnvironment": true
     },
