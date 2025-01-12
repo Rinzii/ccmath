@@ -10,6 +10,8 @@
 
 #pragma once
 
+// ReSharper disable once CppUnusedIncludeDirective
+#include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 
 #include <limits>
