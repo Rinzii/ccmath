@@ -12,7 +12,7 @@
 
 #include <type_traits>
 
-namespace ccm::type
+namespace ccm::types
 {
 	template <typename T>
 	struct NumberPair

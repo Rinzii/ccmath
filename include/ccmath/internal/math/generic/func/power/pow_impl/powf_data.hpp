@@ -22,7 +22,7 @@
 
 namespace ccm::gen::impl::internal::impl
 {
-	using namespace ccm::type;
+	using namespace ccm::types;
 
 	// We choose the precision of the high part to be 53 - 24 - 8, so that when
 	//   y * (e_x + LOG2_R_DD[i].hi) is exact.

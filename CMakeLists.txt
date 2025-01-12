@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18.0)
 
-set(CCMATH_BUILD_VERSION 0.3.0)
+set(CCMATH_BUILD_VERSION 0.2.0)
 
 project(
         ccmath
@@ -45,7 +45,6 @@ if (MSVC)
             /permissive-
             /Zc:__cplusplus
             /D_ENABLE_EXTENDED_ALIGNED_STORAGE
-            /D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
             /EHsc
     )
     # Only define NOMINMAX on Windows platforms
@@ -68,6 +67,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
             -Wextra
             -Wconversion
             -Wpedantic
+            -Wpedantic-macros
             # Define NOMINMAX only on Windows to avoid conflicts with min/max macros
             $<$<BOOL:${WIN32}>:-DNOMINMAX>
             #-Wno-unused-but-set-variable

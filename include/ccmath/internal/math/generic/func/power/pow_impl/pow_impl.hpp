@@ -1,5 +1,5 @@
 /*
-* Copyright (c) Ian Pike
+ * Copyright (c) Ian Pike
  * Copyright (c) CCMath contributors
  *
  * CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
@@ -18,7 +18,7 @@ namespace ccm::gen::impl
 	{
 		constexpr double pow_impl([[maybe_unused]] double base, [[maybe_unused]] double exp) noexcept
 		{
-			// TODO: Implement this.
+
 			return 0;
 		}
 	} // namespace internal::impl

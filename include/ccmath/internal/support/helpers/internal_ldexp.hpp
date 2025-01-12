@@ -26,7 +26,7 @@
 namespace ccm::support::helpers
 {
 	template <typename T, typename U>
-	constexpr std::enable_if_t<ccm::support::traits::ccm_is_floating_point_v<T> && ccm::support::traits::ccm_is_integral_v<U>, T> internal_ldexp(T x, U exp)
+	constexpr std::enable_if_t<std::is_floating_point_v<T> && std::is_integral_v<U>, T> internal_ldexp(T x, U exp)
 	{
 		fp::FPBits<T> bits(x);
 		if (CCM_UNLIKELY((exp == 0) || bits.is_zero() || bits.is_inf_or_nan())) { return x; }
@@ -37,7 +37,7 @@ namespace ccm::support::helpers
 		// Make sure that we can safely cast exp to int when not returning early.
 		if (CCM_UNLIKELY(exp > exponent_limit))
 		{
-			int const rounding_mode = fenv::internal::rt_get_rounding_mode();
+			int const rounding_mode = fenv::get_rounding_mode();
 			types::Sign sign		= bits.sign();
 
 			if ((sign == types::Sign::POS && rounding_mode == FE_DOWNWARD) || (sign == types::Sign::NEG && rounding_mode == FE_UPWARD) ||
@@ -54,7 +54,7 @@ namespace ccm::support::helpers
 		// Similarly, on the negative side, we return zero early if |exp| is too small.
 		if (CCM_UNLIKELY(exp < -exponent_limit))
 		{
-			int const rounding_mode = fenv::internal::rt_get_rounding_mode();
+			int const rounding_mode = fenv::get_rounding_mode();
 			types::Sign sign		= bits.sign();
 
 			if ((sign == types::Sign::POS && rounding_mode == FE_UPWARD) || (sign == types::Sign::NEG && rounding_mode == FE_DOWNWARD))

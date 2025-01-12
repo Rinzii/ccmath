@@ -1,5 +1,5 @@
 /*
-* Copyright (c) Ian Pike
+ * Copyright (c) Ian Pike
  * Copyright (c) CCMath contributors
  *
  * CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
@@ -10,7 +10,9 @@
 
 #pragma once
 
+// ReSharper disable once CppUnusedIncludeDirective
 #include "ccmath/internal/math/generic/builtins/builtin_helpers.hpp"
+#include "ccmath/internal/support/always_false.hpp"
 
 #include <type_traits>
 
@@ -21,14 +23,17 @@
 /// - GCC 5.1+
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_NAN
-#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
-#define CCMATH_HAS_CONSTEXPR_BUILTIN_NAN
-#endif
+	#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_NAN
+	#endif
 #endif
 
 namespace ccm::builtin
 {
 	// clang-format off
+	/**
+	 * @internal
+	 */
 	template <typename T>
 	inline constexpr bool has_constexpr_nan =
 		#ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_NAN
@@ -39,28 +44,24 @@ namespace ccm::builtin
 	// clang-format on
 
 	/**
-	 * Wrapper for constexpr __builtin nan functions.
+	 * @internal
+	 * Wrapper for constexpr __builtin_nan functions.
 	 * This should be used internally and always be wrapped in an if constexpr statement.
-	 * It exists only to allow for usage of __builtin nan functions without triggering a compiler error
+	 * It exists only to allow for usage of __builtin_nan functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
 	constexpr auto nan(const char * tag) -> std::enable_if_t<has_constexpr_nan<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>)
+		if constexpr (std::is_same_v<T, float>) { return __builtin_nanf(tag); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_nan(tag); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_nanl(tag); }
+		else
 		{
-			return __builtin_nanf(tag);
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_nan");
+			return T{};
 		}
-		else if constexpr (std::is_same_v<T, double>)
-		{
-			return __builtin_nan(tag);
-		}
-		else if constexpr (std::is_same_v<T, long double>)
-		{
-			return __builtin_nanl(tag);
-		}
-		// This should never be reached
-		return T{};
 	}
 } // namespace ccm::builtin
 

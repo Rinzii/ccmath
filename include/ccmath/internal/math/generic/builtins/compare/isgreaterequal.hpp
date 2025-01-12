@@ -1,5 +1,5 @@
 /*
-* Copyright (c) Ian Pike
+ * Copyright (c) Ian Pike
  * Copyright (c) CCMath contributors
  *
  * CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
@@ -10,6 +10,7 @@
 
 #pragma once
 
+// ReSharper disable once CppUnusedIncludeDirective
 #include "ccmath/internal/math/generic/builtins/builtin_helpers.hpp"
 
 #include <type_traits>
@@ -21,14 +22,17 @@
 /// - GCC 5.1+
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_ISGREATEREQUAL
-#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
-#define CCMATH_HAS_CONSTEXPR_BUILTIN_ISGREATEREQUAL
-#endif
+	#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_ISGREATEREQUAL
+	#endif
 #endif
 
 namespace ccm::builtin
 {
 	// clang-format off
+	/**
+	 * @internal
+	 */
 	template <typename T>
 	inline constexpr bool has_constexpr_isgreaterequal =
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_ISGREATEREQUAL
@@ -39,6 +43,7 @@ namespace ccm::builtin
 	// clang-format on
 
 	/**
+	 * @internal
 	 * Wrapper for constexpr __builtin_isgreaterequal.
 	 * This should be used internally and always be wrapped in an if constexpr statement.
 	 * It exists only to allow for usage of __builtin_isgreaterequal without triggering a compiler error

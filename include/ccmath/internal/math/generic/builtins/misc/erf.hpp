@@ -10,7 +10,9 @@
 
 #pragma once
 
+// ReSharper disable once CppUnusedIncludeDirective
 #include "ccmath/internal/math/generic/builtins/builtin_helpers.hpp"
+#include "ccmath/internal/support/always_false.hpp"
 
 #include <type_traits>
 
@@ -29,6 +31,9 @@
 namespace ccm::builtin
 {
 	// clang-format off
+	/**
+	 * @internal
+	 */
 	template <typename T>
 	inline constexpr bool has_constexpr_erf =
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_ERF
@@ -39,6 +44,7 @@ namespace ccm::builtin
 	// clang-format on
 
 	/**
+	 * @internal
 	 * Wrapper for constexpr __builtin_erf functions.
 	 * This should be used internally and always be wrapped in an if constexpr statement.
 	 * It exists only to allow for usage of __builtin_erf without triggering a compiler error
@@ -59,8 +65,12 @@ namespace ccm::builtin
 		{
 			return __builtin_erfl(x);
 		}
-		// This should never be reached
-		return T{};
+		else
+		{
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_erf");
+			return T{};
+		}
 	}
 } // namespace ccm::builtin
 
