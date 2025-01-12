@@ -117,8 +117,6 @@
 		#define CCMATH_HAS_SIMD_NEON 1
 	#endif
 
-
-
 // ARM Scalable Vector Extension (SVE)
 /* TODO: At some point add proper SVE support.
 	#if defined(__ARM_FEATURE_SVE)

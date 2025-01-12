@@ -15,9 +15,8 @@
 #include "ccmath/math/fmanip/impl/scalbn_float_impl.hpp"
 #include "ccmath/math/fmanip/impl/scalbn_ldouble_impl.hpp"
 
-
 #if defined(_MSC_VER) && !defined(__clang__)
-#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+	#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
 CCM_DISABLE_MSVC_WARNING(4702) // 4702: unreachable code
 #endif
 

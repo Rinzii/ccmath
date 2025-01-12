@@ -13,7 +13,6 @@
 #include "ccmath/internal/math/generic/builtins/fmanip/nexttoward.hpp"
 #include "ccmath/internal/math/generic/func/fmanip/nextafter_gen.hpp"
 
-
 #include <type_traits>
 
 namespace ccm

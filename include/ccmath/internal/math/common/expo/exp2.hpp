@@ -11,16 +11,15 @@
 #pragma once
 
 #include "ccmath/internal/config/builtin/exp2_support.hpp"
+#include "ccmath/internal/math/generic/builtins/expo/exp2.hpp"
 #include "ccmath/internal/predef/has_const_builtin.hpp"
 #include "ccmath/math/expo/impl/exp2_double_impl.hpp"
 #include "ccmath/math/expo/impl/exp2_float_impl.hpp"
-#include "ccmath/internal/math/generic/builtins/expo/exp2.hpp"
-
 
 #include <type_traits>
 
 #if defined(_MSC_VER) && !defined(__clang__)
-#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+	#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
 CCM_DISABLE_MSVC_WARNING(4702) // 4702: unreachable code
 #endif
 
@@ -81,4 +80,3 @@ namespace ccm
 #if defined(_MSC_VER) && !defined(__clang__)
 CCM_RESTORE_MSVC_WARNING()
 #endif
-

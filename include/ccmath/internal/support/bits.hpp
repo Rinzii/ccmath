@@ -187,7 +187,7 @@ namespace ccm::support
 	{
 		return __builtin_ctzg(value, std::numeric_limits<T>::digits); // NOLINT
 	}
-#else // !CCM_HAS_BUILTIN(__builtin_ctzg)
+#else  // !CCM_HAS_BUILTIN(__builtin_ctzg)
 	/**
 	 * @brief Returns the number of consecutive 0 bits in the value of x, starting from the least significant bit ("right").
 	 * https://en.cppreference.com/w/cpp/numeric/countr_zero
@@ -234,7 +234,7 @@ namespace ccm::support
 	{
 		return __builtin_clzg(value, std::numeric_limits<T>::digits); // NOLINT
 	}
-#else // !CCM_HAS_BUILTIN(__builtin_clzg)
+#else  // !CCM_HAS_BUILTIN(__builtin_clzg)
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countl_zero(T value)
 	{

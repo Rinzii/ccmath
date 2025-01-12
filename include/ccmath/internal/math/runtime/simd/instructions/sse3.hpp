@@ -22,7 +22,7 @@
 
 namespace ccm::intrin
 {
-	
+
 	namespace abi
 	{
 		struct sse3
@@ -34,9 +34,9 @@ namespace ccm::intrin
 	template <>
 	struct simd_mask<float, abi::sse3>
 	{
-		using value_type					 = bool;
-		using simd_type						 = simd<float, abi::sse3>;
-		using abi_type						 = abi::sse3;
+		using value_type			  = bool;
+		using simd_type				  = simd<float, abi::sse3>;
+		using abi_type				  = abi::sse3;
 		CCM_ALWAYS_INLINE simd_mask() = default;
 		CCM_ALWAYS_INLINE explicit simd_mask(bool value) : m_value(_mm_castsi128_ps(_mm_set1_epi32(-static_cast<int>(value)))) {}
 		static constexpr int size() { return 4; }
@@ -63,10 +63,10 @@ namespace ccm::intrin
 	template <>
 	struct simd<float, abi::sse3>
 	{
-		using value_type				= float;
-		using abi_type					= abi::sse3;
-		using mask_type					= simd_mask<float, abi_type>;
-		using storage_type				= simd_storage<float, abi_type>;
+		using value_type		 = float;
+		using abi_type			 = abi::sse3;
+		using mask_type			 = simd_mask<float, abi_type>;
+		using storage_type		 = simd_storage<float, abi_type>;
 		CCM_ALWAYS_INLINE simd() = default;
 		static constexpr int size() { return 4; }
 		CCM_ALWAYS_INLINE simd(float value) : m_value(_mm_set1_ps(value)) {}
@@ -105,8 +105,7 @@ namespace ccm::intrin
 		__m128 m_value;
 	};
 
-	CCM_ALWAYS_INLINE simd<float, abi::sse3> choose(simd_mask<float, abi::sse3> const & a, simd<float, abi::sse3> const & b,
-														   simd<float, abi::sse3> const & c)
+	CCM_ALWAYS_INLINE simd<float, abi::sse3> choose(simd_mask<float, abi::sse3> const & a, simd<float, abi::sse3> const & b, simd<float, abi::sse3> const & c)
 	{
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
 		return simd<float, abi::sse3>(_mm_add_ps(_mm_and_ps(a.get(), b.get()), _mm_andnot_ps(a.get(), c.get())));
@@ -115,9 +114,9 @@ namespace ccm::intrin
 	template <>
 	struct simd_mask<double, abi::sse3>
 	{
-		using value_type					 = bool;
-		using simd_type						 = simd<double, abi::sse3>;
-		using abi_type						 = abi::sse3;
+		using value_type			  = bool;
+		using simd_type				  = simd<double, abi::sse3>;
+		using abi_type				  = abi::sse3;
 		CCM_ALWAYS_INLINE simd_mask() = default;
 		CCM_ALWAYS_INLINE explicit simd_mask(bool value) : m_value(_mm_castsi128_pd(_mm_set1_epi64x(-static_cast<std::int64_t>(value)))) {}
 		static constexpr int size() { return 4; }
@@ -144,15 +143,15 @@ namespace ccm::intrin
 	template <>
 	struct simd<double, abi::sse3>
 	{
-		using value_type										= double;
-		using abi_type											= abi::sse3;
-		using mask_type											= simd_mask<double, abi_type>;
-		using storage_type										= simd_storage<double, abi_type>;
-		CCM_ALWAYS_INLINE simd()							= default;
-		CCM_ALWAYS_INLINE simd(simd const &)				= default;
-		CCM_ALWAYS_INLINE simd(simd &&)					= default;
+		using value_type								 = double;
+		using abi_type									 = abi::sse3;
+		using mask_type									 = simd_mask<double, abi_type>;
+		using storage_type								 = simd_storage<double, abi_type>;
+		CCM_ALWAYS_INLINE simd()						 = default;
+		CCM_ALWAYS_INLINE simd(simd const &)			 = default;
+		CCM_ALWAYS_INLINE simd(simd &&)					 = default;
 		CCM_ALWAYS_INLINE simd & operator=(simd const &) = default;
-		CCM_ALWAYS_INLINE simd & operator=(simd &&)		= default;
+		CCM_ALWAYS_INLINE simd & operator=(simd &&)		 = default;
 		static constexpr int size() { return 2; }
 		CCM_ALWAYS_INLINE simd(double value) : m_value(_mm_set1_pd(value)) {}
 		CCM_ALWAYS_INLINE simd(double a, double b) : m_value(_mm_setr_pd(a, b)) {}
@@ -192,7 +191,7 @@ namespace ccm::intrin
 	};
 
 	CCM_ALWAYS_INLINE simd<double, abi::sse3> choose(simd_mask<double, abi::sse3> const & a, simd<double, abi::sse3> const & b,
-															simd<double, abi::sse3> const & c)
+													 simd<double, abi::sse3> const & c)
 	{
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
 		return simd<double, abi::sse3>(_mm_add_pd(_mm_and_pd(a.get(), b.get()), _mm_andnot_pd(a.get(), c.get())));

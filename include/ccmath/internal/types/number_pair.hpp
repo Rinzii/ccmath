@@ -31,4 +31,4 @@ namespace ccm::types
 		result.hi = x >> half_bits_width;
 		return result;
 	}
-} // namespace ccm::type
+} // namespace ccm::types

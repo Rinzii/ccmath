@@ -10,11 +10,10 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/compare/isnormal.hpp"
 #include "ccmath/math/basic/fabs.hpp"
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
-#include "ccmath/internal/math/generic/builtins/compare/isnormal.hpp"
-
 
 namespace ccm
 {
@@ -28,10 +27,7 @@ namespace ccm
 	constexpr bool isnormal(T num) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_isnormal<T>) { return ccm::builtin::isnormal(num); }
-		else
-		{
-			return num != static_cast<T>(0) && !ccm::isnan(num) && !ccm::isinf(num) && ccm::abs(num) >= std::numeric_limits<T>::min();
-		}
+		else { return num != static_cast<T>(0) && !ccm::isnan(num) && !ccm::isinf(num) && ccm::abs(num) >= std::numeric_limits<T>::min(); }
 	}
 
 	/**

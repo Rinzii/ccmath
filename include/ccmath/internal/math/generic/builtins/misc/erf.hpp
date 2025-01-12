@@ -1,5 +1,5 @@
 /*
-* Copyright (c) Ian Pike
+ * Copyright (c) Ian Pike
  * Copyright (c) CCMath contributors
  *
  * CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
@@ -23,9 +23,9 @@
 /// - GCC 5.1+
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_ERF
-#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
-#define CCMATH_HAS_CONSTEXPR_BUILTIN_ERF
-#endif
+	#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_ERF
+	#endif
 #endif
 
 namespace ccm::builtin
@@ -53,18 +53,9 @@ namespace ccm::builtin
 	template <typename T>
 	constexpr auto erf(T x) -> std::enable_if_t<has_constexpr_erf<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>)
-		{
-			return __builtin_erff(x);
-		}
-		else if constexpr (std::is_same_v<T, double>)
-		{
-			return __builtin_erf(x);
-		}
-		else if constexpr (std::is_same_v<T, long double>)
-		{
-			return __builtin_erfl(x);
-		}
+		if constexpr (std::is_same_v<T, float>) { return __builtin_erff(x); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_erf(x); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_erfl(x); }
 		else
 		{
 			// This should never be reached

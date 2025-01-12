@@ -12,7 +12,6 @@
 
 #include "ccmath/internal/math/generic/builtins/compare/isnan.hpp"
 
-
 #include <type_traits>
 
 namespace ccm

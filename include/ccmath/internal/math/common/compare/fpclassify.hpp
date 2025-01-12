@@ -30,10 +30,7 @@ namespace ccm
 		if (ccm::isnan(num)) { return ccm::support::helpers::floating_point_defines::eFP_NAN; }
 		if (ccm::isinf(num)) { return ccm::support::helpers::floating_point_defines::eFP_INFINITE; }
 		if (num == static_cast<T>(0)) { return ccm::support::helpers::floating_point_defines::eFP_ZERO; }
-		if (ccm::abs(num) < std::numeric_limits<T>::min() && ccm::abs(num) > 0)
-		{
-			return ccm::support::helpers::floating_point_defines::eFP_SUBNORMAL;
-		}
+		if (ccm::abs(num) < std::numeric_limits<T>::min() && ccm::abs(num) > 0) { return ccm::support::helpers::floating_point_defines::eFP_SUBNORMAL; }
 		return ccm::support::helpers::floating_point_defines::eFP_NORMAL;
 	}
 } // namespace ccm

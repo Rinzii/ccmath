@@ -10,9 +10,9 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/nearest/floor.hpp"
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
-#include "ccmath/internal/math/generic/builtins/nearest/floor.hpp"
 
 #include <limits>
 #include <type_traits>
@@ -72,7 +72,6 @@ namespace ccm
 			return result;
 		}
 	} // namespace internal::impl
-
 
 	/**
 	 * @brief Computes the largest integer value not greater than num.

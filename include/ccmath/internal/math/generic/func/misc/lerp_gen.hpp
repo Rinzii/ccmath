@@ -24,8 +24,8 @@ namespace ccm
 	}
 
 	template <typename T, typename U, typename V>
-	constexpr std::enable_if_t<std::is_arithmetic_v<T> && std::is_arithmetic_v<U> && std::is_arithmetic_v<V>, std::common_type_t<T, U, V>>
-	lerp(T a, U b, V t) noexcept
+	constexpr std::enable_if_t<std::is_arithmetic_v<T> && std::is_arithmetic_v<U> && std::is_arithmetic_v<V>, std::common_type_t<T, U, V>> lerp(T a, U b,
+																																				V t) noexcept
 	{
 		using result_type = std::common_type_t<T, U, V>;
 		static_assert(!(std::is_same_v<T, result_type> && std::is_same_v<U, result_type> && std::is_same_v<V, result_type>));

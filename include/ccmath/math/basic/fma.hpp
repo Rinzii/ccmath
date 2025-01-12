@@ -10,11 +10,11 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/basic/fma.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/compare/signbit.hpp"
-#include "ccmath/internal/math/generic/builtins/basic/fma.hpp"
 
 #include <limits>
 #include <type_traits>
@@ -33,33 +33,27 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T fma(T x, T y, T z) noexcept
 	{
-		// Check for GCC 6.1 or later
-		#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
+// Check for GCC 6.1 or later
+#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
 		if constexpr (std::is_same_v<T, float>) { return __builtin_fmaf(x, y, z); }
 		if constexpr (std::is_same_v<T, double>) { return __builtin_fma(x, y, z); }
 		if constexpr (std::is_same_v<T, long double>) { return __builtin_fmal(x, y, z); }
 		return static_cast<T>(__builtin_fmal(x, y, z));
-		#else
+#else
 		if (CCM_UNLIKELY(x == 0 || y == 0 || z == 0)) { return x * y + z; }
 
 		// If x is zero and y is infinity, or if y is zero and x is infinity and...
 		if ((x == static_cast<T>(0) && ccm::isinf(y)) || (y == T{0} && ccm::isinf(x)))
 		{
 			// ...z is NaN, return +NaN...
-			if (ccm::isnan(z))
-			{
-				return std::numeric_limits<T>::quiet_NaN();
-			}
+			if (ccm::isnan(z)) { return std::numeric_limits<T>::quiet_NaN(); }
 
 			// ...else return -NaN if Z is not NaN.
 			return -std::numeric_limits<T>::quiet_NaN();
 		}
 
 		// If x is a zero and y is an infinity, or if y is zero and x is an infinity and Z is NaN, then the result is -NaN.
-		if (ccm::isinf(x * y) && ccm::isinf(z) && ccm::signbit(x * y) != ccm::signbit(z))
-		{
-			return -std::numeric_limits<T>::quiet_NaN();
-		}
+		if (ccm::isinf(x * y) && ccm::isinf(z) && ccm::signbit(x * y) != ccm::signbit(z)) { return -std::numeric_limits<T>::quiet_NaN(); }
 
 		// If x or y are NaN, NaN is returned.
 		if (ccm::isnan(x) || ccm::isnan(y)) { return std::numeric_limits<T>::quiet_NaN(); }

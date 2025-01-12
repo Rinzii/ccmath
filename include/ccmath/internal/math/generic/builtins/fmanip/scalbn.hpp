@@ -76,7 +76,7 @@ namespace ccm::builtin
 	{
 		if constexpr (std::is_same_v<T, float>) { return __builtin_scalblnf(x, exp); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_scalbln(x, exp); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_scalblnl(x, exp); }\
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_scalblnl(x, exp); }
 		else
 		{
 			// This should never be reached
