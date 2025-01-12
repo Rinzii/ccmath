@@ -44,7 +44,6 @@ if (MSVC)
             /W4
             /permissive-
             /Zc:__cplusplus
-            /D_ENABLE_EXTENDED_ALIGNED_STORAGE
             /EHsc
     )
     # Only define NOMINMAX on Windows platforms
@@ -67,18 +66,21 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
             -Wextra
             -Wconversion
             -Wpedantic
-            -Wpedantic-macros
             # Define NOMINMAX only on Windows to avoid conflicts with min/max macros
             $<$<BOOL:${WIN32}>:-DNOMINMAX>
-            #-Wno-unused-but-set-variable
-            #-Wno-unused-value
-            #-Wno-unused-parameter
     )
+
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang") # TODO: Check if intel llvm has this flag
+        target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+                -Wpedantic-macros
+        )
+    endif ()
 
     if (CCMATH_STRICT_WARNINGS)
         target_compile_options(${PROJECT_NAME}-compile-options INTERFACE -Werror=return-type)
     endif ()
 
+    # TODO: Decide if we plan to delete this or not
     #  if (CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
     #    target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
     #            -Wno-tautological-constant-compare
@@ -130,7 +132,7 @@ if (CCMATH_DISABLE_ERRNO)
 endif ()
 
 # Generate version header
-configure_file(cmake/version.hpp.in "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp" @ONLY)
+configure_file(cmake/version.hpp.in "${CMAKE_CURRENT_BINARY_DIR}/include/ccmath/version.hpp" @ONLY)
 
 # Add optional subdirectories only if requested
 if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TESTS)
