@@ -67,7 +67,11 @@ namespace ccm::intrin
 		CCM_ALWAYS_INLINE simd() = default;
 		static constexpr int size() { return 4; }
 		CCM_ALWAYS_INLINE simd(float value) : m_value(vdupq_n_f32(value)) {}
-		CCM_ALWAYS_INLINE simd(float a, float b, float c, float d) : m_value((float32x4_t){a, b, c, d}) {}
+		CCM_ALWAYS_INLINE simd(float a, float b, float c, float d)
+		{
+			float values[4] = {a, b, c, d};
+			m_value			= vld1q_f32(values);
+		}
 		CCM_ALWAYS_INLINE simd(storage_type const & value) { copy_from(value.data(), element_aligned_tag()); }
 		CCM_ALWAYS_INLINE simd & operator=(storage_type const & value)
 		{
