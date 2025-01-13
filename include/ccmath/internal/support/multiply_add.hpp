@@ -35,8 +35,8 @@ namespace ccm::support
 
 	constexpr float multiply_add(float x, float y, float z)
 	{
-		if constexpr (ccm::builtin::has_constexpr_fma<T>) { return ccm::builtin::fma(x, y, z); }
-		else if constexpr (ccm::builtin::has_fma<T>)
+		if constexpr (ccm::builtin::has_constexpr_fma<float>) { return ccm::builtin::fma(x, y, z); }
+		else if constexpr (ccm::builtin::has_fma<float>)
 		{
 			if (is_constant_evaluated())
 			{
@@ -50,8 +50,8 @@ namespace ccm::support
 
 	constexpr double multiply_add(double x, double y, double z)
 	{
-		if constexpr (ccm::builtin::has_constexpr_fma<T>) { return ccm::builtin::fma(x, y, z); }
-		else if constexpr (ccm::builtin::has_fma<T>)
+		if constexpr (ccm::builtin::has_constexpr_fma<double>) { return ccm::builtin::fma(x, y, z); }
+		else if constexpr (ccm::builtin::has_fma<double>)
 		{
 			if (is_constant_evaluated())
 			{
