@@ -38,49 +38,68 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME}-compile-options ALIAS ${PROJECT_NAM
 #
 # Compiler Flags and Conditions
 #
+
+# MSVC Compiler Options
 if (MSVC)
-    # MSVC-specific options
+    # Set MSVC-specific compilation flags
     target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
-            /W4
-            /permissive-
-            /Zc:__cplusplus
-            /EHsc
+            /W4              # Enable high warning level
+            /permissive-     # Enforce standard C++ conformance
+            /Zc:__cplusplus  # Properly define __cplusplus macro for the compiler version
+            /EHsc            # Enable standard exception handling
     )
-    # Only define NOMINMAX on Windows platforms
+
+    # Define NOMINMAX on Windows platforms to avoid macro conflicts with std::min/std::max
     if (WIN32)
         target_compile_definitions(${PROJECT_NAME}-compile-options INTERFACE NOMINMAX)
     endif ()
 
+    # Treat warnings as errors if CCMATH_STRICT_WARNINGS is set
     if (CCMATH_STRICT_WARNINGS)
-        target_compile_options(${PROJECT_NAME}-compile-options INTERFACE /WX)
+        target_compile_options(${PROJECT_NAME}-compile-options INTERFACE /WX) # Warnings as errors
     endif ()
 
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
-        OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
-        OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
+    # Clang, GCC, and IntelLLVM Compiler Options
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|IntelLLVM")
 
-    # Generic clang/gcc/intel options
-    # Consider making some of these suppressions configurable if requested by users.
+
+    # Generic options for Clang, GCC, and IntelLLVM
     target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
-            -Wall
-            -Wextra
-            -Wconversion
-            -Wpedantic
-            #-Wwrite-strings
-            -fpermissive # TODO: Figure out how to best remove this
-            -g3
-            # Define NOMINMAX only on Windows to avoid conflicts with min/max macros
+            -Wall           # Enable common warnings
+            -Wextra         # Enable additional warnings
+            -Wconversion    # Warn on implicit type conversions
+            -Wpedantic      # Enforce strict standard compliance
+            # Define NOMINMAX on Windows to avoid macro conflicts with min/max
             $<$<BOOL:${WIN32}>:-DNOMINMAX>
     )
 
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang") # TODO: Check if intel llvm has this flag
+    # Add Clang-specific options
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
-                -Wpedantic-macros
+                -Wpedantic-macros  # Warn about non-standard macro usage
         )
     endif ()
 
+    # Treat specific warnings as errors if CCMATH_STRICT_WARNINGS is set
     if (CCMATH_STRICT_WARNINGS)
-        target_compile_options(${PROJECT_NAME}-compile-options INTERFACE -Werror=return-type)
+        target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+                -Werror=return-type  # Treat missing return type warnings as errors
+        )
+    endif ()
+
+    # Add aggressive debug options for developers if CCMATH_DEV_AGGRESSIVE_DEBUG is set
+    if (CCMATH_DEV_AGGRESIVE_DEBUG)
+        if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|IntelLLVM")
+
+            target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+                    -Wwrite-strings  # Warn about writeable string literals
+                    -g3              # Maximum debug information
+            )
+        elseif (MSVC)
+            target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+                    /Zi  # Generate full debugging information
+            )
+        endif ()
     endif ()
 
     # TODO: Decide if we plan to delete this or not

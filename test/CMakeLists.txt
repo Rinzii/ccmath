@@ -6,6 +6,26 @@ if (NOT TARGET ccmath)
     find_package(ccmath CONFIG REQUIRED)
 endif ()
 
+# Apply super lenient compiler warnings for testing
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(
+            -Wall                # Basic warnings
+            -Wextra              # Some additional warnings
+            -Wno-unused-function # Suppress unused function warnings
+            -Wno-unused-variable # Suppress unused variable warnings
+            -Wno-pedantic        # Disable pedantic warnings
+            -Wno-sign-compare    # Disable warnings about signed/unsigned comparisons
+            -Wno-overflow        # Disable warnings about overflow # TODO: Fix test cases that cause actual oflow
+    )
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    add_compile_options(
+            /W3                  # Moderate warning level (instead of /W4)
+            /wd4100              # Suppress 'unreferenced formal parameter'
+            /wd4189              # Suppress 'local variable is initialized but not referenced'
+            /wd4505              # Suppress 'unreferenced local function has been removed'
+    )
+endif ()
+
 
 add_library(${PROJECT_NAME} STATIC)
 add_library(ccmath::test ALIAS ${PROJECT_NAME})
