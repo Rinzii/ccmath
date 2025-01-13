@@ -12,9 +12,7 @@
 
 #include "ccmath/internal/config/type_support.hpp"
 
-#ifndef CCM_TYPES_HAS_INT128
-	#include "ccmath/internal/types/big_int.hpp"
-#endif
+#include "ccmath/internal/types/big_int.hpp"
 
 namespace ccm::types
 {

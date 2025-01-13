@@ -10,6 +10,7 @@
 
 #pragma once
 
+// ReSharper disable once CppUnusedIncludeDirective
 #include "ccmath/internal/math/generic/builtins/builtin_helpers.hpp"
 
 #include <type_traits>
@@ -50,6 +51,9 @@
 namespace ccm::builtin
 {
 	// clang-format off
+	/**
+	 * @internal
+	 */
 	template <typename T>
 	inline constexpr bool has_constexpr_isnan =
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_ISNAN
@@ -60,19 +64,16 @@ namespace ccm::builtin
 	// clang-format on
 
 	/**
-	 * Wrapper for constexpr __builtin isnan functions.
+	 * @internal
+	 * Wrapper for constexpr __builtin_isnan functions.
 	 * This should be used internally and always be wrapped in an if constexpr statement.
-	 * It exists only to allow for usage of __builtin isnan functions without triggering a compiler error
+	 * It exists only to allow for usage of __builtin_isnan functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
 	constexpr auto isnan(T x) -> std::enable_if_t<has_constexpr_isnan<T>, bool>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_isnan(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_isnan(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_isnan(x); }
-		// This should never be reached
-		return false;
+		return __builtin_isnan(x);
 	}
 } // namespace ccm::builtin
 

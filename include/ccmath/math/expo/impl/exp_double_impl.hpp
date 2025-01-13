@@ -10,12 +10,12 @@
 
 #pragma once
 
-#include "ccmath/internal/support/helpers/exp_helpers.hpp"
-#include "ccmath/internal/predef/unlikely.hpp"
-#include "ccmath/internal/types/fp_types.hpp"
-#include "ccmath/math/expo/impl/exp_data.hpp"
 #include <cstdint>
 #include <limits>
+#include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/support/helpers/exp_helpers.hpp"
+#include "ccmath/internal/types/fp_types.hpp"
+#include "ccmath/math/expo/impl/exp_data.hpp"
 
 namespace ccm::internal::impl
 {

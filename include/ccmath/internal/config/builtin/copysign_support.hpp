@@ -32,9 +32,9 @@
 
 // Clang 5.0.0+ has constexpr __builtin_copysign that DOES allow static_assert.
 #if defined(CCMATH_COMPILER_CLANG) && CCMATH_COMPILER_CLANG_VER_MAJOR >= 5
-    #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-        #define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-    #endif
+	#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+	#endif
 #endif
 
 // Clang-CL 5.0.0+ has constexpr __builtin_copysign that DOES allow static_assert.
@@ -55,14 +55,14 @@
 
 // DPC++ 2021.1.2+ has constexpr __builtin_copysign that DOES allow static_assert.
 #if defined(CCMATH_COMPILER_INTEL) && CCMATH_COMPILER_INTEL_VER >= 20210102
-    #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-        #define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-    #endif
+	#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+	#endif
 #endif
 
 // NVIDIA HPC 24.1+ has constexpr __builtin_copysign that DOES allow static_assert.
 #if defined(CCMATH_COMPILER_NVIDIA) && CCMATH_COMPILER_NVIDIA_VER_MAJOR >= 24 && CCMATH_COMPILER_NVIDIA_VER_MINOR >= 1
-    #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-        #define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-    #endif
+	#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+	#endif
 #endif

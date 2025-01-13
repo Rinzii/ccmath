@@ -59,7 +59,7 @@ namespace ccm::gen
 		}
 #elif defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
 		template <>
-		constexpr void normalize<long double>(int & exponent, types::uint128_t & mantissa)
+		constexpr void normalize<long double>(int & exponent, support::fp::FPBits<long double>::storage_type & mantissa)
 		{
 			const auto shift = static_cast<unsigned int>(static_cast<unsigned long>(support::countl_zero(static_cast<std::uint64_t>(mantissa))) -
 														 (8 * sizeof(std::uint64_t) - 1 - support::fp::FPBits<long double>::fraction_length));

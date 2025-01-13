@@ -27,7 +27,6 @@ namespace ccm::intrin
 	{
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
 		return simd<double, abi::avx2>(_mm256_pow_pd(a.get(), b.get()));
-
 	}
 
 } // namespace ccm::intrin

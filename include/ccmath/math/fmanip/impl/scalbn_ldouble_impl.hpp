@@ -13,9 +13,9 @@
 #if LDBL_MANT_DIG == 53 && LDBL_MAX_EXP == 1024
 	#include "ccmath/math/fmanip/impl/scalbn_double_impl.hpp"
 #elif (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113) && LDBL_MAX_EXP == 16384
+	#include <limits>
 	#include "ccmath/math/compare/isinf.hpp"
 	#include "ccmath/math/compare/isnan.hpp"
-	#include <limits>
 #endif
 
 namespace ccm::internal
@@ -24,9 +24,9 @@ namespace ccm::internal
 	{
 		constexpr long double scalbn_ldouble_impl(long double arg, int exp) noexcept
 		{
-			#if LDBL_MANT_DIG == 53 && LDBL_MAX_EXP == 1024 // If long double is the same as double
+#if LDBL_MANT_DIG == 53 && LDBL_MAX_EXP == 1024 // If long double is the same as double
 			return static_cast<long double>(ccm::internal::impl::scalbn_double_impl(static_cast<double>(arg), exp));
-			#elif (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113) && LDBL_MAX_EXP == 16384 // If long double is 80-bit or 128-bit large
+#elif (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113) && LDBL_MAX_EXP == 16384 // If long double is 80-bit or 128-bit large
 			// This is a generic implementation for long double scalbn that does not use bit manipulation.
 			// May be much slower than the double and float version.
 			// Need to benchmark it.
@@ -66,10 +66,10 @@ namespace ccm::internal
 				}
 			}
 			return arg;
-			#else
+#else
 			// This should never be called, but since we are not using templates here can can not static_assert it.
 			return 0;
-			#endif
+#endif
 		}
 	} // namespace impl
 

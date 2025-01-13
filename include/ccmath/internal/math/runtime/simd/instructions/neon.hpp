@@ -31,9 +31,9 @@ namespace ccm::intrin
 	struct simd_mask<float, abi::neon>
 	{
 
-		using value_type					 = bool;
-		using simd_type						 = simd_mask<float, abi::neon>;
-		using abi_type						 = abi::neon;
+		using value_type			  = bool;
+		using simd_type				  = simd_mask<float, abi::neon>;
+		using abi_type				  = abi::neon;
 		CCM_ALWAYS_INLINE simd_mask() = default;
 		CCM_ALWAYS_INLINE simd_mask(bool value) : m_value(vreinterpretq_u32_s32(vdupq_n_s32(-int(value)))) {}
 		static constexpr int size() { return 4; }
@@ -60,14 +60,18 @@ namespace ccm::intrin
 	template <>
 	struct simd<float, abi::neon>
 	{
-		using value_type				= float;
-		using abi_type					= abi::neon;
-		using mask_type					= simd_mask<float, abi_type>;
-		using storage_type				= simd_storage<float, abi_type>;
+		using value_type		 = float;
+		using abi_type			 = abi::neon;
+		using mask_type			 = simd_mask<float, abi_type>;
+		using storage_type		 = simd_storage<float, abi_type>;
 		CCM_ALWAYS_INLINE simd() = default;
 		static constexpr int size() { return 4; }
 		CCM_ALWAYS_INLINE simd(float value) : m_value(vdupq_n_f32(value)) {}
-		CCM_ALWAYS_INLINE simd(float a, float b, float c, float d) : m_value((float32x4_t){a, b, c, d}) {}
+		CCM_ALWAYS_INLINE simd(float a, float b, float c, float d)
+		{
+			float values[4] = {a, b, c, d};
+			m_value			= vld1q_f32(values);
+		}
 		CCM_ALWAYS_INLINE simd(storage_type const & value) { copy_from(value.data(), element_aligned_tag()); }
 		CCM_ALWAYS_INLINE simd & operator=(storage_type const & value)
 		{
@@ -103,8 +107,7 @@ namespace ccm::intrin
 		float32x4_t m_value;
 	};
 
-	CCM_ALWAYS_INLINE simd<float, abi::neon> choose(simd_mask<float, abi::neon> const & a, simd<float, abi::neon> const & b,
-														   simd<float, abi::neon> const & c)
+	CCM_ALWAYS_INLINE simd<float, abi::neon> choose(simd_mask<float, abi::neon> const & a, simd<float, abi::neon> const & b, simd<float, abi::neon> const & c)
 	{
 		return simd<float, abi::neon>(vreinterpretq_f32_u32(vbslq_u32(a.get(), vreinterpretq_u32_f32(b.get()), vreinterpretq_u32_f32(c.get()))));
 	}
@@ -112,9 +115,9 @@ namespace ccm::intrin
 	template <>
 	struct simd_mask<double, abi::neon>
 	{
-		using value_type					 = bool;
-		using simd_type						 = simd<double, abi::neon>;
-		using abi_type						 = abi::neon;
+		using value_type			  = bool;
+		using simd_type				  = simd<double, abi::neon>;
+		using abi_type				  = abi::neon;
 		CCM_ALWAYS_INLINE simd_mask() = default;
 		CCM_ALWAYS_INLINE simd_mask(bool value) : m_value(vreinterpretq_u64_s64(vdupq_n_s64(-std::int64_t(value)))) {}
 		static constexpr int size() { return 4; }
@@ -141,15 +144,15 @@ namespace ccm::intrin
 	template <>
 	struct simd<double, abi::neon>
 	{
-		using value_type										= double;
-		using abi_type											= abi::neon;
-		using mask_type											= simd_mask<double, abi_type>;
-		using storage_type										= simd_storage<double, abi_type>;
-		CCM_ALWAYS_INLINE simd()							= default;
-		CCM_ALWAYS_INLINE simd(simd const &)				= default;
-		CCM_ALWAYS_INLINE simd(simd &&)					= default;
+		using value_type								 = double;
+		using abi_type									 = abi::neon;
+		using mask_type									 = simd_mask<double, abi_type>;
+		using storage_type								 = simd_storage<double, abi_type>;
+		CCM_ALWAYS_INLINE simd()						 = default;
+		CCM_ALWAYS_INLINE simd(simd const &)			 = default;
+		CCM_ALWAYS_INLINE simd(simd &&)					 = default;
 		CCM_ALWAYS_INLINE simd & operator=(simd const &) = default;
-		CCM_ALWAYS_INLINE simd & operator=(simd &&)		= default;
+		CCM_ALWAYS_INLINE simd & operator=(simd &&)		 = default;
 		static constexpr int size() { return 2; }
 		CCM_ALWAYS_INLINE simd(double value) : m_value(vdupq_n_f64(value)) {}
 		CCM_ALWAYS_INLINE simd(double a, double b) : m_value((float64x2_t){a, b}) {}
@@ -189,7 +192,7 @@ namespace ccm::intrin
 	};
 
 	CCM_ALWAYS_INLINE simd<double, abi::neon> choose(simd_mask<double, abi::neon> const & a, simd<double, abi::neon> const & b,
-															simd<double, abi::neon> const & c)
+													 simd<double, abi::neon> const & c)
 	{
 		return simd<double, abi::neon>(vreinterpretq_f64_u64(vbslq_u64(a.get(), vreinterpretq_u64_f64(b.get()), vreinterpretq_u64_f64(c.get()))));
 	}

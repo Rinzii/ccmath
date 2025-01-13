@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "ccmath/internal/support/helpers/exp_helpers.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/support/helpers/exp_helpers.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
 #include "ccmath/math/expo/impl/exp_data.hpp"
 
@@ -44,7 +44,7 @@ namespace ccm::internal::impl
 		ccm::double_t result{};
 		ccm::double_t scale{};
 
-		const auto x_dbl_t = static_cast<ccm::double_t>(x);
+		const auto x_dbl_t			= static_cast<ccm::double_t>(x);
 		const std::uint32_t abs_top = ccm::support::top12_bits_of_float(x) & 0x7ff;
 
 		if (CCM_UNLIKELY(abs_top >= ccm::support::top12_bits_of_float(88.0F)))

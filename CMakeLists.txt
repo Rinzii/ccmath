@@ -13,10 +13,10 @@ project(
 # Determine if this is the root project or a subproject.
 set(is_root_project OFF)
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-  set(is_root_project ON)
+    set(is_root_project ON)
 endif ()
 if (NOT CCMATH_SOURCE_DIR)
-  set(CCMATH_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+    set(CCMATH_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 endif ()
 
 # TODO: Possibly change this to instead use cmakes more modern target_compile_features
@@ -38,56 +38,80 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME}-compile-options ALIAS ${PROJECT_NAM
 #
 # Compiler Flags and Conditions
 #
+
+# MSVC Compiler Options
 if (MSVC)
-  # MSVC-specific options
-  target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
-          /W4
-          /permissive-
-          /Zc:__cplusplus
-          /D_ENABLE_EXTENDED_ALIGNED_STORAGE
-          /D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
-          /EHsc
-  )
-  # Only define NOMINMAX on Windows platforms
-  if (WIN32)
-    target_compile_definitions(${PROJECT_NAME}-compile-options INTERFACE NOMINMAX)
-  endif()
+    # Set MSVC-specific compilation flags
+    target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+            /W4              # Enable high warning level
+            /permissive-     # Enforce standard C++ conformance
+            /Zc:__cplusplus  # Properly define __cplusplus macro for the compiler version
+            /EHsc            # Enable standard exception handling
+    )
 
-  if (CCMATH_STRICT_WARNINGS)
-    target_compile_options(${PROJECT_NAME}-compile-options INTERFACE /WX)
-  endif()
+    # Define NOMINMAX on Windows platforms to avoid macro conflicts with std::min/std::max
+    if (WIN32)
+        target_compile_definitions(${PROJECT_NAME}-compile-options INTERFACE NOMINMAX)
+    endif ()
 
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
-        OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
-        OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
+    # Treat warnings as errors if CCMATH_STRICT_WARNINGS is set
+    if (CCMATH_STRICT_WARNINGS)
+        target_compile_options(${PROJECT_NAME}-compile-options INTERFACE /WX) # Warnings as errors
+    endif ()
 
-  # Generic clang/gcc/intel options
-  # Consider making some of these suppressions configurable if requested by users.
-  target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
-          -Wall
-          -Wextra
-          -Wconversion
-          -Wpedantic
-          # Define NOMINMAX only on Windows to avoid conflicts with min/max macros
-          $<$<BOOL:${WIN32}>:-DNOMINMAX>
-          #-Wno-unused-but-set-variable
-          #-Wno-unused-value
-          #-Wno-unused-parameter
-  )
+    # Clang, GCC, and IntelLLVM Compiler Options
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|IntelLLVM")
 
-  if (CCMATH_STRICT_WARNINGS)
-    target_compile_options(${PROJECT_NAME}-compile-options INTERFACE -Werror=return-type)
-  endif ()
 
-#  if (CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
-#    target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
-#            -Wno-tautological-constant-compare
-#    )
-#  endif()
+    # Generic options for Clang, GCC, and IntelLLVM
+    target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+            -Wall           # Enable common warnings
+            -Wextra         # Enable additional warnings
+            -Wconversion    # Warn on implicit type conversions
+            -Wpedantic      # Enforce strict standard compliance
+            # Define NOMINMAX on Windows to avoid macro conflicts with min/max
+            $<$<BOOL:${WIN32}>:-DNOMINMAX>
+    )
 
-else()
-  message(WARNING "CCMath: Unknown compiler. No specific flags applied.")
-endif()
+    # Add Clang-specific options
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+                -Wpedantic-macros  # Warn about non-standard macro usage
+        )
+    endif ()
+
+    # Treat specific warnings as errors if CCMATH_STRICT_WARNINGS is set
+    if (CCMATH_STRICT_WARNINGS)
+        target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+                -Werror=return-type  # Treat missing return type warnings as errors
+        )
+    endif ()
+
+    # Add aggressive debug options for developers if CCMATH_DEV_AGGRESSIVE_DEBUG is set
+    if (CCMATH_DEV_AGGRESIVE_DEBUG)
+        if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|IntelLLVM")
+
+            target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+                    -Wwrite-strings  # Warn about writeable string literals
+                    -g3              # Maximum debug information
+            )
+        elseif (MSVC)
+            target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+                    /Zi  # Generate full debugging information
+            )
+        endif ()
+    endif ()
+
+    # TODO: Decide if we plan to delete this or not
+    #  if (CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
+    #    target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+    #            -Wno-tautological-constant-compare
+    #    )
+    #  endif()
+
+else ()
+    message(WARNING "CCMath: Unknown compiler. No specific flags applied.")
+endif ()
 
 add_library(${PROJECT_NAME} INTERFACE)
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
@@ -113,91 +137,91 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
 )
 
 if (CCMATH_ENABLE_RUNTIME_SIMD)
-  target_compile_definitions(${PROJECT_NAME} INTERFACE CCM_CONFIG_USE_RT_SIMD)
+    target_compile_definitions(${PROJECT_NAME} INTERFACE CCM_CONFIG_USE_RT_SIMD)
 endif ()
 
 if (NOT CCMATH_ENABLE_USER_DEFINED_OPTIMIZATION_MACROS)
-  target_compile_definitions(${PROJECT_NAME} INTERFACE
-          $<$<CONFIG:Debug>:CCM_CONFIG_DEBUG>
-          $<$<CONFIG:RelWithDebInfo>:CCM_CONFIG_OPTIMIZE>
-          $<$<CONFIG:Release>:CCM_CONFIG_AGGRESSIVELY_OPTIMIZE>
-          $<$<CONFIG:MinSizeRel>:CCM_CONFIG_MINSIZE>
-  )
+    target_compile_definitions(${PROJECT_NAME} INTERFACE
+            $<$<CONFIG:Debug>:CCM_CONFIG_DEBUG>
+            $<$<CONFIG:RelWithDebInfo>:CCM_CONFIG_OPTIMIZE>
+            $<$<CONFIG:Release>:CCM_CONFIG_AGGRESSIVELY_OPTIMIZE>
+            $<$<CONFIG:MinSizeRel>:CCM_CONFIG_MINSIZE>
+    )
 endif ()
 
 if (CCMATH_DISABLE_ERRNO)
-  target_compile_definitions(${PROJECT_NAME} INTERFACE CCM_CONFIG_DISABLE_ERRNO)
+    target_compile_definitions(${PROJECT_NAME} INTERFACE CCM_CONFIG_DISABLE_ERRNO)
 endif ()
 
 # Generate version header
-configure_file(cmake/version.hpp.in "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp" @ONLY)
+configure_file(cmake/version.hpp.in "${CMAKE_CURRENT_BINARY_DIR}/include/ccmath/version.hpp" @ONLY)
 
 # Add optional subdirectories only if requested
 if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TESTS)
-  # Use SYSTEM to suppress warnings from thirdparty code if supported by the CMake version.
-  if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
-    add_subdirectory(thirdparty SYSTEM)
-  else ()
-    add_subdirectory(thirdparty)
-  endif ()
+    # Use SYSTEM to suppress warnings from thirdparty code if supported by the CMake version.
+    if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
+        add_subdirectory(thirdparty SYSTEM)
+    else ()
+        add_subdirectory(thirdparty)
+    endif ()
 endif ()
 
 if (CCMATH_BUILD_EXAMPLES)
-  add_subdirectory(example)
+    add_subdirectory(example)
 endif ()
 
 if (CCMATH_BUILD_BENCHMARKS)
-  add_subdirectory(benchmark)
+    add_subdirectory(benchmark)
 endif ()
 
 if (CCMATH_BUILD_TESTS)
-  enable_testing()
-  add_subdirectory(test)
+    enable_testing()
+    add_subdirectory(test)
 endif ()
 
 # Installation and Packaging
 if (CCMATH_INSTALL)
-  include(GNUInstallDirs)
-  include(CMakePackageConfigHelpers)
+    include(GNUInstallDirs)
+    include(CMakePackageConfigHelpers)
 
-  install(TARGETS
-          ${PROJECT_NAME}
-          ${PROJECT_NAME}-compile-options
-          EXPORT ${PROJECT_NAME}-targets
-  )
+    install(TARGETS
+            ${PROJECT_NAME}
+            ${PROJECT_NAME}-compile-options
+            EXPORT ${PROJECT_NAME}-targets
+    )
 
-  install(DIRECTORY
-          "${CMAKE_CURRENT_SOURCE_DIR}/include/"
-          DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-          FILES_MATCHING PATTERN "*.hpp"
-  )
+    install(DIRECTORY
+            "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+            DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+            FILES_MATCHING PATTERN "*.hpp"
+    )
 
-  install(FILES
-          "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp"
-          DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}"
-  )
+    install(FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp"
+            DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}"
+    )
 
-  install(EXPORT ${PROJECT_NAME}-targets
-          FILE ${PROJECT_NAME}-targets.cmake
-          NAMESPACE ${PROJECT_NAME}::
-          DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-  )
+    install(EXPORT ${PROJECT_NAME}-targets
+            FILE ${PROJECT_NAME}-targets.cmake
+            NAMESPACE ${PROJECT_NAME}::
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    )
 
-  configure_package_config_file(
-          cmake/${PROJECT_NAME}-config.cmake.in
-          "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
-          INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-  )
+    configure_package_config_file(
+            cmake/${PROJECT_NAME}-config.cmake.in
+            "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
+            INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    )
 
-  # Write a version file for strict version checking
-  write_basic_package_version_file(
-          "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake"
-          COMPATIBILITY SameMajorVersion
-  )
+    # Write a version file for strict version checking
+    write_basic_package_version_file(
+            "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake"
+            COMPATIBILITY SameMajorVersion
+    )
 
-  install(FILES
-          "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
-          "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake"
-          DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-  )
+    install(FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake"
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    )
 endif ()
