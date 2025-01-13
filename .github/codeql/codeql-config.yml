@@ -8,3 +8,4 @@ paths:
     - "**/example/**"
     - "**/benchmark/**"
     - "**/tools/**"
+    - "**/deps/**"
