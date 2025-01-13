@@ -26,7 +26,14 @@ TYPED_TEST_SUITE(CcmathFmanipTests, TestTypes);
 
 TYPED_TEST(CcmathFmanipTests, LdexpStaticAssert)
 {
+#if defined(__clang__) // long double does not really work on static_assert for clang. This is due to how __builtin_bit_cast works on clang.
+	if constexpr (!std::is_same_v<long double, TypeParam>)
+	{
+		static_assert(ccm::ldexp(static_cast<TypeParam>(1.0), 0) == ccm::ldexp(static_cast<TypeParam>(1.0), 0));
+	}
+#else
 	static_assert(ccm::ldexp(static_cast<TypeParam>(1.0), 0) == ccm::ldexp(static_cast<TypeParam>(1.0), 0));
+#endif
 }
 
 TYPED_TEST(CcmathFmanipTests, LdexpBasic)

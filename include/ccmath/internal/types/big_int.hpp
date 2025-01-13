@@ -194,10 +194,7 @@ namespace ccm::types
 			}
 #endif
 #ifdef CCM_TYPES_HAS_INT128
-			else if constexpr (std::is_same_v<word, std::uint64_t>)
-			{
-				return split<__uint128_t>(static_cast<__uint128_t>(lhs) * static_cast<__uint128_t>(rhs));
-			}
+			else if constexpr (std::is_same_v<word, std::uint64_t>) { return split<__uint128_t>(__uint128_t(lhs) * __uint128_t(rhs)); }
 #endif
 			else
 			{
@@ -725,7 +722,7 @@ namespace ccm::types
 		 */
 		[[nodiscard]] constexpr bool is_neg() const { return SIGNED && get_msb(); }
 
-		template <size_t OtherBits, bool OtherSigned, typename OtherWordType>
+		template <std::size_t OtherBits, bool OtherSigned, typename OtherWordType>
 		constexpr explicit operator BigInt<OtherBits, OtherSigned, OtherWordType>() const
 		{
 			return BigInt<OtherBits, OtherSigned, OtherWordType>(this);
@@ -1491,7 +1488,7 @@ namespace ccm::support
 		(sizeof(To) == sizeof(From)) && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From> && types::is_big_int<To>::value, To>
 	bit_cast(const From & from)
 	{
-		To out;
+		To out{};
 		using Storage = decltype(out.val);
 		out.val		  = support::bit_cast<Storage>(from);
 		return out;

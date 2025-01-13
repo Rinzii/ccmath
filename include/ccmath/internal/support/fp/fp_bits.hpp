@@ -32,7 +32,6 @@ namespace ccm::support::fp
 	/// All supported floating point types
 	enum class FPType : std::uint8_t
 	{
-		eBinary16, // TODO: Currently don't handle float16 but might in the future
 		eBinary32,
 		eBinary64,
 		eBinary80,
@@ -47,16 +46,6 @@ namespace ccm::support::fp
 		template <FPType>
 		struct FPLayout
 		{
-		};
-
-		template <>
-		struct FPLayout<FPType::eBinary16>
-		{
-			using storage_type									  = std::uint16_t;
-			static constexpr std::int_fast32_t sign_length		  = 1;
-			static constexpr std::int_fast32_t exponent_length	  = 5;
-			static constexpr std::int_fast32_t significand_length = 10;
-			static constexpr std::int_fast32_t fraction_length	  = significand_length;
 		};
 
 		template <>
@@ -827,9 +816,6 @@ namespace ccm::support::fp
 			else if constexpr (LDBL_MANT_DIG == 64) { return FPType::eBinary80; }	// long double is 80-bits
 			else if constexpr (LDBL_MANT_DIG == 113) { return FPType::eBinary128; } // long double is 128-bits
 		}
-#if defined(CCM_TYPES_HAS_FLOAT128)
-		else if constexpr (std::is_same_v<UnqualT, types::float128>) { return FPType::eBinary128; }
-#endif
 		else { static_assert(support::always_false<UnqualT>, "Unsupported type"); }
 		return FPType::eBinary32; // This will never be reached due to assert. Only here to appease the compiler.
 	}
@@ -841,7 +827,7 @@ namespace ccm::support::fp
 	template <typename T>
 	struct FPBits final : internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>
 	{
-		static_assert(std::is_floating_point_v<T>, "FPBits instantiated with invalid type.");
+		static_assert(support::traits::ccm_is_floating_point_v<T>, "FPBits instantiated with invalid type.");
 		using BASE		   = internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>;
 		using storage_type = typename BASE::storage_type;
 
@@ -850,7 +836,7 @@ namespace ccm::support::fp
 		template <typename XType>
 		inline constexpr explicit FPBits(XType x)
 		{
-			using UnQual = std::remove_cv_t<XType>;
+			using UnQual = typename std::remove_cv_t<XType>;
 			if constexpr (std::is_same_v<UnQual, T>) { BASE::bits = support::bit_cast<storage_type>(x); }
 			else if constexpr (std::is_same_v<UnQual, storage_type>) { BASE::bits = x; }
 			else

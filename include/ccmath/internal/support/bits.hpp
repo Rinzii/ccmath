@@ -30,7 +30,7 @@ namespace ccm::support
 {
 
 	template <typename To, typename From>
-	inline constexpr std::enable_if_t<
+	constexpr std::enable_if_t<
 		sizeof(To) == sizeof(From) && std::is_trivially_constructible_v<To> && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From>, To>
 	bit_cast(const From & from)
 	{
