@@ -31,7 +31,7 @@ namespace ccm::support::helpers
 		fp::FPBits<T> bits(x);
 		if (CCM_UNLIKELY((exp == 0) || bits.is_zero() || bits.is_inf_or_nan())) { return x; }
 
-		constexpr int exponent_limit = fp::FPBits<T>::max_biased_exponent + support::fp::FPBits<T>::fraction_length + 1;
+		constexpr int exponent_limit = fp::FPBits<T>::max_biased_exponent + fp::FPBits<T>::fraction_length + 1;
 		static_assert(exponent_limit <= INT_MAX && -exponent_limit >= INT_MIN);
 
 		// Make sure that we can safely cast exp to int when not returning early.
@@ -70,6 +70,6 @@ namespace ccm::support::helpers
 		// For all other values, NormalFloat to T conversion handles it the right way.
 		types::DyadicFloat<fp::FPBits<T>::storage_length> normal(bits.get_val());
 		normal.exponent += static_cast<int>(exp);
-		return normal.template as<T, /*ShouldRaiseExceptions=*/true>();
+		return normal.template as<T, false>();
 	}
 } // namespace ccm::support::helpers

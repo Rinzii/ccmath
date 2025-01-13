@@ -25,7 +25,6 @@
 #include "ccmath/internal/support/math_support.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
 
-#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -794,10 +793,13 @@ namespace ccm::types
 		 *
 		 * @return True if all parts of the BigInt are zero, false otherwise.
 		 */
-		[[nodiscard]] constexpr bool is_zero() const
+		constexpr bool is_zero() const
 		{
-			// If at any point this operation see's a value that is not zero, it will return false.
-			return std::none_of(val.begin(), val.end(), [](auto part) { return part != 0; });
+			for (auto part : val)
+			{
+				if (part != 0) { return false; }
+			}
+			return true;
 		}
 
 		/**
@@ -1483,14 +1485,15 @@ namespace ccm::types
 /// Specialization of the bits.hpp header for BigInt types.
 namespace ccm::support
 {
+
 	template <typename To, typename From>
 	constexpr std::enable_if_t<
-		(sizeof(To) == sizeof(From)) && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From> && ccm::types::is_big_int<To>::value, To>
+		(sizeof(To) == sizeof(From)) && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From> && types::is_big_int<To>::value, To>
 	bit_cast(const From & from)
 	{
 		To out;
 		using Storage = decltype(out.val);
-		out.val		  = ccm::support::bit_cast<Storage>(from);
+		out.val		  = support::bit_cast<Storage>(from);
 		return out;
 	}
 

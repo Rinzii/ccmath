@@ -30,7 +30,7 @@
 //     actually support __int128.
 #ifdef CCM_TYPES_HAS_INT128
 	#error CCM_TYPES_HAS_INT128 cannot be directly set
-#elif defined(__SIZEOF_INT128__)
+#elif defined(__SIZEOF_INT128__) && !defined(_WIN32)
 	#if (defined(__clang__) && !defined(_WIN32)) || (defined(__CUDACC__) && __CUDACC_VER_MAJOR__ >= 9) ||                                                      \
 		(defined(__GNUC__) && !defined(__clang__) && !defined(__CUDACC__))
 		#define CCM_TYPES_HAS_INT128 1

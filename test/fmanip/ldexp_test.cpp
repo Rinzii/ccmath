@@ -16,6 +16,9 @@
 
 // NOLINTBEGIN
 
+static_assert(ccm::support::helpers::internal_ldexp(static_cast<float>(1.0), 2) == ccm::support::helpers::internal_ldexp(static_cast<float>(1.0), 2),
+			  "ldexp failed static_assert test");
+
 template <typename T>
 class CcmathFmanipTests : public ::testing::Test
 {
@@ -28,7 +31,6 @@ TYPED_TEST(CcmathFmanipTests, LdexpStaticAssert)
 {
 	// TODO: IanP: Figure out why this static_assert fails
 	// EXPECT_EQ(ccm::ldexp(static_cast<TypeParam>(1.0), 0), 3.0);
-	// static_assert(ccm::ldexp(static_cast<TypeParam>(1.0), 0) == ccm::ldexp(static_cast<TypeParam>(1.0), 0), "ldexp failed static_assert test");
 }
 
 TYPED_TEST(CcmathFmanipTests, LdexpBasic)

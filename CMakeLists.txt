@@ -66,6 +66,9 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
             -Wextra
             -Wconversion
             -Wpedantic
+            #-Wwrite-strings
+            -fpermissive # TODO: Figure out how to best remove this
+            -g3
             # Define NOMINMAX only on Windows to avoid conflicts with min/max macros
             $<$<BOOL:${WIN32}>:-DNOMINMAX>
     )

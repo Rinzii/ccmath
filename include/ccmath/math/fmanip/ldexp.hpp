@@ -95,7 +95,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/ldexp
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T ldexp(T num, int exp) noexcept
+	constexpr T ldexp(T num, int exp)
 	{
 		if constexpr (ccm::builtin::has_constexpr_ldexp<T>) { return builtin::ldexp(num, exp); }
 		else { return support::helpers::internal_ldexp(num, exp); }
@@ -129,7 +129,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/ldexp
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double ldexp(Integer num, int exp) noexcept
+	constexpr double ldexp(Integer num, int exp)
 	{
 		return ccm::ldexp<double>(static_cast<double>(num), exp);
 	}

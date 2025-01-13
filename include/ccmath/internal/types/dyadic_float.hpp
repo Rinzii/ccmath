@@ -82,8 +82,8 @@ namespace ccm::types
 
 		constexpr DyadicFloat() = default;
 
-		template <typename T, std::enable_if_t<ccm::support::traits::ccm_is_floating_point_v<T>, bool> = true>
-		constexpr explicit DyadicFloat(T x)
+		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+		constexpr DyadicFloat(T x)
 		{
 			static_assert(support::fp::FPBits<T>::fraction_length < Bits);
 			support::fp::FPBits<T> x_bits(x);
@@ -107,7 +107,7 @@ namespace ccm::types
 		{
 			if (!mantissa.is_zero())
 			{
-				int shift_length = support::countl_zero(mantissa);
+				const int shift_length = support::countl_zero(mantissa);
 				exponent -= shift_length;
 				mantissa <<= static_cast<std::size_t>(shift_length);
 			}
@@ -194,7 +194,7 @@ namespace ccm::types
 		 */
 
 		template <typename T, bool ShouldSignalExceptions,
-				  typename = std::enable_if_t<ccm::support::traits::ccm_is_floating_point_v<T> && (support::fp::FPBits<T>::fraction_length < Bits), void>>
+				  typename = std::enable_if_t<std::is_floating_point_v<T> && (support::fp::FPBits<T>::fraction_length < Bits), void>>
 		constexpr T fast_as() const
 		{
 			if (CCM_UNLIKELY(mantissa.is_zero())) { return support::fp::FPBits<T>::zero(sign).get_val(); }
@@ -251,7 +251,7 @@ namespace ccm::types
 			const bool sticky_bit = !(mantissa & sticky_mask).is_zero();
 			int round_and_sticky  = (static_cast<int>(round_bit) * 2) + static_cast<int>(sticky_bit);
 
-			T d_lo;
+			T d_lo{}; // GCC will lose its mind if {} is not used here.
 
 			if (CCM_UNLIKELY(exp_lo <= 0))
 			{
@@ -346,18 +346,7 @@ namespace ccm::types
 			return as<T, /*ShouldSignalExceptions=*/false>();
 		}
 
-		/**
-		 * @brief Converts this DyadicFloat to its underlying mantissa type with exponent adjustments.
-		 *
-		 * Interprets the DyadicFloat as an integer-like value by applying the exponent shift
-		 * and sign bit. In other words, it shifts the mantissa left (or right) by \c exponent,
-		 * and if the sign is negative, it converts the result to its two's complement form.
-		 * This can be used to retrieve the raw integer representation implied by the DyadicFloat.
-		 *
-		 * @return The \c mantissa_type value derived from the floating-point-like representation.
-		 *         Returns 0 if the internal mantissa is zero.
-		 */
-		explicit constexpr operator mantissa_type() const
+		constexpr mantissa_type as_mantissa_type() const
 		{
 			if (mantissa.is_zero()) { return 0; }
 

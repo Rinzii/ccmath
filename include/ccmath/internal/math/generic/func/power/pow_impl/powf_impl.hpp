@@ -470,7 +470,7 @@ namespace ccm::gen::impl
 			}
 
 			// Scale lower part of 2^(hi + mid)
-			DoubleDouble exp2_hi_mid_dd;
+			DoubleDouble exp2_hi_mid_dd{};
 			exp2_hi_mid_dd.lo =
 				(idx_y != 0) ? support::bit_cast<double>(exp_hi_i + support::bit_cast<int64_t>(support::constants::EXP2_MID1.at(idx_y).mid)) : 0.0;
 			exp2_hi_mid_dd.hi = exp2_hi_mid;

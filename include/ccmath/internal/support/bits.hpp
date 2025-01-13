@@ -28,11 +28,11 @@
 
 namespace ccm::support
 {
+
 	template <typename To, typename From>
-	[[nodiscard]] constexpr std::enable_if_t<
+	inline constexpr std::enable_if_t<
 		sizeof(To) == sizeof(From) && std::is_trivially_constructible_v<To> && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From>, To>
-	// ReSharper disable once CppDFAUnreachableFunctionCall
-	bit_cast(const From & from) noexcept
+	bit_cast(const From & from)
 	{
 		return __builtin_bit_cast(To, from);
 	}
@@ -45,6 +45,7 @@ namespace ccm::support
 	}
 
 	// TODO: Have the below function replace all other top_bits func.
+	// TODO: Remove all usages of bit grabbing functions
 
 	template <typename T, std::size_t TopBitsToTake, std::enable_if_t<std::is_floating_point_v<T> && !std::is_same_v<T, long double>, bool> = true>
 	constexpr std::uint32_t top_bits(T x) noexcept

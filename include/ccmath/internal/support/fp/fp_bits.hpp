@@ -848,7 +848,7 @@ namespace ccm::support::fp
 		constexpr FPBits() = default;
 
 		template <typename XType>
-		constexpr explicit FPBits(XType x)
+		inline constexpr explicit FPBits(XType x)
 		{
 			using UnQual = std::remove_cv_t<XType>;
 			if constexpr (std::is_same_v<UnQual, T>) { BASE::bits = support::bit_cast<storage_type>(x); }
