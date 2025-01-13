@@ -1,12 +1,11 @@
-
 name: "CodeQL"
 
 on:
   push:
-    branches: ["main", "dev"]
+    branches: [ "main", "dev" ]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: ["main", "dev"]
+    branches: [ "main", "dev" ]
   schedule:
     - cron: "0 0 * * 1"
 
@@ -25,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ["cpp", "python"]
+        language: [ "cpp", "python" ]
         # CodeQL supports [ $supported-codeql-languages ]
         # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
 
@@ -43,6 +42,7 @@ jobs:
         uses: github/codeql-action/init@ea9e4e37992a54ee68a9622e985e60c8e8f12d9f # v3.27.4
         with:
           languages: ${{ matrix.language }}
+          config-file: .github/codeql/codeql-config.yml
           # If you wish to specify custom queries, you can do so here or in a config file.
           # By default, queries listed here will override any specified in a config file.
           # Prefix the list here with "+" to use these queries and those in the config file.

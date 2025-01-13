@@ -1,0 +1,10 @@
+# Exclude dependencies from CodeQL analysis
+paths:
+  exclude:
+    - "**/thirdparty/**"
+    - "**/out/**"
+    - "**/build/**"
+    - "**/test/**"
+    - "**/example/**"
+    - "**/benchmark/**"
+    - "**/tools/**"
