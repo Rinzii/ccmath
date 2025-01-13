@@ -12,6 +12,7 @@
 
 // ReSharper disable once CppUnusedIncludeDirective
 #include "ccmath/internal/math/generic/builtins/builtin_helpers.hpp"
+#include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/always_false.hpp"
 
 // Checks if the cpu supports FMA instructions.
@@ -51,7 +52,7 @@ namespace ccm::builtin
 	 */
 	template <typename T>
 	inline constexpr bool has_fma =
-		#if defined(__builtin_fma) || defined(__builtin_fmaf) || defined(__builtin_fmal)
+		#if CCM_HAS_BUILTIN(__builtin_fma) || CCM_HAS_BUILTIN(__builtin_fmaf) || CCM_HAS_BUILTIN(__builtin_fmal)
 			is_valid_builtin_type<T>;
 		#else
 			false;

@@ -309,7 +309,7 @@ namespace ccm::support
 		if (x < 2) { return 1; }
 
 		// Assume we got a good input
-		const unsigned n = std::numeric_limits<T>::digits - countl_zero(static_cast<T>(x - 1U));
+		const unsigned n = static_cast<unsigned>(std::numeric_limits<T>::digits - countl_zero(static_cast<T>(x - 1U)));
 
 		if constexpr (sizeof(T) >= sizeof(unsigned)) { return T{1} << n; }
 		else
