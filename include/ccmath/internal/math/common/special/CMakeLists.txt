@@ -1,0 +1,23 @@
+ccm_add_headers(
+        assoc_laguerre.hpp
+        assoc_legendre.hpp
+        beta.hpp
+        comp_ellint_1.hpp
+        comp_ellint_2.hpp
+        comp_ellint_3.hpp
+        cyl_bessel_i.hpp
+        cyl_bessel_j.hpp
+        cyl_bessel_k.hpp
+        cyl_neumann.hpp
+        ellint_1.hpp
+        ellint_2.hpp
+        ellint_3.hpp
+        expint.hpp
+        hermite.hpp
+        laguerre.hpp
+        legendre.hpp
+        riemann_zeta.hpp
+        sph_bessel.hpp
+        sph_legendre.hpp
+        sph_neumann.hpp
+)

@@ -12,7 +12,7 @@
 
 #include <type_traits>
 
-namespace ccm::type
+namespace ccm::types
 {
 	template <typename T>
 	struct NumberPair
@@ -31,4 +31,4 @@ namespace ccm::type
 		result.hi = x >> half_bits_width;
 		return result;
 	}
-} // namespace ccm::type
+} // namespace ccm::types

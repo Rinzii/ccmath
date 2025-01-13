@@ -53,7 +53,7 @@
 		#define CCM_DISABLE_CLANG_WARNING(w)                                                                                                                  \
 			_Pragma("clang diagnostic push") _Pragma(CCM_CLANG_WHELP2(-Wunknown-warning-option)) _Pragma(CCM_CLANG_WHELP2(w))
 	// clang-format on
-#else
+	#else
 	// If not on Clang, this macro does nothing.
 	// Must be called before CCM_RESTORE_CLANG_WARNING().
 		#define CCM_DISABLE_CLANG_WARNING(w)
@@ -117,9 +117,9 @@
 #ifndef CCM_ENABLE_CLANG_WARNING_AS_ERROR
 	#if defined(__clang__)
 		// Helper macros
-		#define CCM_CLANG_WERROR_HELP0(x) #x												 // Helper macros - do not use directly
+		#define CCM_CLANG_WERROR_HELP0(x) #x											   // Helper macros - do not use directly
 		#define CCM_CLANG_WERROR_HELP1(x) CCM_CLANG_WERROR_HELP0(clang diagnostic error x) // Helper macros - do not use directly
-		#define CCM_CLANG_WERROR_HELP2(x) CCM_CLANG_WERROR_HELP1(#x)						 // Helper macros - do not use directly
+		#define CCM_CLANG_WERROR_HELP2(x) CCM_CLANG_WERROR_HELP1(#x)					   // Helper macros - do not use directly
 
 		// This will enable a warning as an error for clang. This should be written as -Wwarning-name and not as a string.
 		// Must be called before CCM_DISABLE_CLANG_WARNING_AS_ERROR().

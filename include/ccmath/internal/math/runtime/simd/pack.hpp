@@ -26,9 +26,9 @@ namespace ccm::intrin
 	template <int N>
 	struct simd_mask<float, abi::pack<N>>
 	{
-		using value_type					 = bool;
-		using simd_type						 = simd<float, abi::pack<N>>;
-		using abi_type						 = abi::pack<N>;
+		using value_type			  = bool;
+		using simd_type				  = simd<float, abi::pack<N>>;
+		using abi_type				  = abi::pack<N>;
 		CCM_ALWAYS_INLINE simd_mask() = default;
 		[[nodiscard]] static constexpr int size() { return N; }
 		CCM_ALWAYS_INLINE explicit simd_mask(bool value)
@@ -75,9 +75,9 @@ namespace ccm::intrin
 	template <int N>
 	struct simd_mask<double, abi::pack<N>>
 	{
-		using value_type					 = bool;
-		using simd_type						 = simd<double, abi::pack<N>>;
-		using abi_type						 = abi::pack<N>;
+		using value_type			  = bool;
+		using simd_type				  = simd<double, abi::pack<N>>;
+		using abi_type				  = abi::pack<N>;
 		CCM_ALWAYS_INLINE simd_mask() = default;
 		[[nodiscard]] static constexpr int size() { return N; }
 		CCM_ALWAYS_INLINE explicit simd_mask(bool value)
@@ -147,10 +147,10 @@ namespace ccm::intrin
 	struct simd<T, abi::pack<N>>
 	{
 
-		using value_type				= T;
-		using abi_type					= abi::pack<N>;
-		using mask_type					= simd_mask<T, abi_type>;
-		using storage_type				= simd_storage<T, abi_type>;
+		using value_type		 = T;
+		using abi_type			 = abi::pack<N>;
+		using mask_type			 = simd_mask<T, abi_type>;
+		using storage_type		 = simd_storage<T, abi_type>;
 		CCM_ALWAYS_INLINE simd() = default;
 		[[nodiscard]] static constexpr int size() { return N; }
 		CCM_ALWAYS_INLINE explicit simd(T value)
@@ -257,7 +257,7 @@ namespace ccm::intrin
 
 	template <class T, int N>
 	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, abi::pack<N>> choose(simd_mask<T, abi::pack<N>> const & a, simd<T, abi::pack<N>> const & b,
-																			  simd<T, abi::pack<N>> const & c)
+																	   simd<T, abi::pack<N>> const & c)
 	{
 		simd<T, abi::pack<N>> result;
 		CCM_SIMD_VECTORIZE for (int i = 0; i < a.size(); ++i)

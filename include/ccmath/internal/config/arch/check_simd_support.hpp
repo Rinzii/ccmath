@@ -11,13 +11,9 @@
 /*
  * Currently identifiable SIMD instruction sets:
  * 		x86:
- * 			- SSE
  * 			- SSE2
- * 			- SSE3
- * 			- SSSE3
  * 			- SSE4.1
  * 			- SSE4.2
- * 			- AVX
  * 			- AVX2
  *
  * 		ARM:
@@ -34,22 +30,6 @@
 			#define CCMATH_HAS_SIMD 1
 		#endif
 		#define CCMATH_HAS_SIMD_SSE2 1
-	#endif
-
-// Streaming SIMD Extensions 3 (SSE3)
-	#if defined(__SSE3__) || defined(CCM_CONFIG_RT_SIMD_HAS_SSE3)
-		#ifndef CCMATH_HAS_SIMD
-			#define CCMATH_HAS_SIMD 1
-		#endif
-		#define CCMATH_HAS_SIMD_SSE3 1
-	#endif
-
-// Supplemental Streaming SIMD Extensions 3 (SSSE3)
-	#if defined(__SSSE3__) || defined(CCM_CONFIG_RT_SIMD_HAS_SSSE3)
-		#ifndef CCMATH_HAS_SIMD
-			#define CCMATH_HAS_SIMD 1
-		#endif
-		#define CCMATH_HAS_SIMD_SSSE3 1
 	#endif
 
 // Streaming SIMD Extensions 4.1 (SSE4.1)
@@ -74,14 +54,6 @@
 			#define CCMATH_HAS_SIMD 1
 		#endif
 		#define CCMATH_HAS_SIMD_SSE4 1
-	#endif
-
-// Advanced Vector Extensions (AVX)
-	#if defined(__AVX__) || defined(CCM_CONFIG_RT_SIMD_HAS_AVX)
-		#ifndef CCMATH_HAS_SIMD
-			#define CCMATH_HAS_SIMD 1
-		#endif
-		#define CCMATH_HAS_SIMD_AVX 1
 	#endif
 
 // Advanced Vector Extensions 2 (AVX2)
@@ -116,8 +88,6 @@
 		#endif
 		#define CCMATH_HAS_SIMD_NEON 1
 	#endif
-
-
 
 // ARM Scalable Vector Extension (SVE)
 /* TODO: At some point add proper SVE support.

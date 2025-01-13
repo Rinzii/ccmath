@@ -16,7 +16,7 @@
 namespace ccm::intrin
 {
 	template <class T>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, abi::scalar> pow(simd<T, abi::scalar> const& a, simd<T, abi::scalar> const& b)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, abi::scalar> pow(simd<T, abi::scalar> const & a, simd<T, abi::scalar> const & b)
 	{
 		return simd<T, abi::scalar>(gen::pow_gen(a.get(), b.get()));
 	}

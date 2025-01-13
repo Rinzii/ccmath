@@ -10,7 +10,7 @@
 
 #pragma once
 
-namespace ccm::type
+namespace ccm::types
 {
 	struct TripleDouble
 	{
@@ -18,4 +18,4 @@ namespace ccm::type
 		double mid{0.0};
 		double hi{0.0};
 	};
-} // namespace ccm::type
+} // namespace ccm::types

@@ -22,12 +22,12 @@ namespace ccm::ext
 	 * @param a The value to use to interpolate between x and y.
 	 * @return The interpolated value.
 	 */
-    template <typename T>
-    constexpr T mix(T x, T y, T a) noexcept
+	template <typename T>
+	constexpr T mix(T x, T y, T a) noexcept
 	{
 		// ReSharper disable once CppRedundantParentheses
 		return (x * (1 - a)) + (y * a);
-    }
+	}
 
 	/**
 	 * @brief Performs a linear interpolation between x and y using a to weight between them.
@@ -41,7 +41,7 @@ namespace ccm::ext
 	 */
 	template <typename TStart, typename TEnd, typename TAplha>
 	constexpr std::common_type_t<TStart, TEnd, TAplha> mix(TStart x, TEnd y, TAplha a) noexcept
-    {
-        return (x * (1 - a)) + (y * a);
-    }
+	{
+		return (x * (1 - a)) + (y * a);
+	}
 } // namespace ccm::ext
