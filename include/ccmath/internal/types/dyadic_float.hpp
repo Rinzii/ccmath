@@ -220,7 +220,7 @@ namespace ccm::types
 				//		also raise FE_OVERFLOW and set ERANGE is debatable.
 				// TODO: Check what MSVC does for this case to match them when compiling with MSVC.
 				// This behavior matches Clang.
-				if (ShouldSignalExceptions && support::fp::FPBits<T>(r).is_inf()) { support::fenv::set_errno_if_required(ERANGE); }
+				if constexpr (ShouldSignalExceptions && support::fp::FPBits<T>(r).is_inf()) { support::fenv::set_errno_if_required(ERANGE); }
 
 				return r;
 			}
@@ -291,7 +291,7 @@ namespace ccm::types
 					// "tininess" before or after rounding for base-2 formats, as long as
 					// the same choice is made for all operations.
 					// Our choice to check after rounding might not be the same as the hardware's.
-					if (ShouldSignalExceptions && round_and_sticky)
+					if constexpr (ShouldSignalExceptions && round_and_sticky)
 					{
 						support::fenv::set_errno_if_required(ERANGE);
 						support::fenv::raise_except_if_required(FE_UNDERFLOW);
@@ -343,7 +343,7 @@ namespace ccm::types
 		template <typename T, typename = std::enable_if_t<std::is_floating_point_v<T> && (support::fp::FPBits<T>::fraction_length < Bits), void>>
 		explicit constexpr operator T() const
 		{
-			return as<T, /*ShouldSignalExceptions=*/false>();
+			return as<T, false>();
 		}
 
 		constexpr mantissa_type as_mantissa_type() const
