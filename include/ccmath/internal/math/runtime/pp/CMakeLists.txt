@@ -1,3 +1,13 @@
 ccm_add_headers(
-        simd_old.hpp
+        simd.hpp
+        const_eval.hpp
+        debug_print.hpp
+        detail.hpp
+        may_alias.hpp
+        simd_intrinsic.hpp
+        trap.hpp
+        constexpr_wrapper.hpp
+        fwddecl.hpp
+        simd_meta.hpp
+        x86_include.hpp
 )

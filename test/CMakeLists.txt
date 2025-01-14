@@ -9,13 +9,12 @@ endif ()
 # Apply super lenient compiler warnings for testing
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     add_compile_options(
-            -Wall                # Basic warnings
-            -Wextra              # Some additional warnings
             -Wno-unused-function # Suppress unused function warnings
             -Wno-unused-variable # Suppress unused variable warnings
             -Wno-pedantic        # Disable pedantic warnings
             -Wno-sign-compare    # Disable warnings about signed/unsigned comparisons
             -Wno-overflow        # Disable warnings about overflow # TODO: Fix test cases that cause actual oflow
+            -Wno-sign-conversion # Disable warnings about sign conversion
     )
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     add_compile_options(
