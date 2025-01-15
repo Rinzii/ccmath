@@ -19,23 +19,9 @@
 /// \param w The warning to disable as an error. This should be written as -Wwarning-name and not as a string.
 /// \note Only one warning can be disabled per statement, due to how clang works.
 ///
-/// WARNING: You have to disable clang-format temporarily when passing flags
-///			 to this function as clang-format likes to put spaces between the hyphens in flags
-///          like the following: -Wunknown - warning - option
-///
-/// WARNING EXAMPLE:
-///	 // clang-format off
-///	 CCM_DISABLE_CLANG_WARNING(-Wuninitialized)
-///	 // clang-format on
-///  <code>
-///	 CCM_RESTORE_CLANG_WARNING()
-///
-///
 /// Example usage of macro:
-///	    // clang-format off
 ///     CCM_DISABLE_CLANG_WARNING(-Wuninitialized)
 ///     CCM_DISABLE_CLANG_WARNING(-Wunused)
-///	    // clang-format on
 ///     <code>
 ///     CCM_RESTORE_CLANG_WARNING()
 ///     CCM_RESTORE_CLANG_WARNING()
@@ -67,10 +53,8 @@
 /// \note Only one warning can be disabled per statement, due to how clang works.
 ///
 /// Example usage of macro:
-///	    // clang-format off
 ///     CCM_DISABLE_CLANG_WARNING(-Wuninitialized)
 ///     CCM_DISABLE_CLANG_WARNING(-Wunused)
-///	    // clang-format on
 ///     <code>
 ///     CCM_RESTORE_CLANG_WARNING()
 ///     CCM_RESTORE_CLANG_WARNING()
@@ -93,23 +77,9 @@
 /// \param w The warning to enable as an error. This should be written as -Wwarning-name and not as a string.
 /// \note Only one warning can be treated as an error per statement, due to how clang works.
 ///
-/// WARNING: You have to disable clang-format temporarily when passing flags
-///			 to this function as clang-format likes to put spaces between the hyphens in flags
-///          like the following: -Wunknown - warning - option
-///
-/// WARNING EXAMPLE:
-///	 // clang-format off
-///	 CCM_ENABLE_CLANG_WARNING_AS_ERROR(-Wuninitialized)
-///	 // clang-format on
-///  <code>
-///	 CCM_DISABLE_CLANG_WARNING_AS_ERROR()
-///
-///
 /// Example usage of macro:
-///	    // clang-format off
 ///     CCM_ENABLE_CLANG_WARNING_AS_ERROR(-Wuninitialized)
 ///     CCM_ENABLE_CLANG_WARNING_AS_ERROR(-Wunused)
-///	    // clang-format on
 ///     <code>
 ///     CCM_DISABLE_CLANG_WARNING_AS_ERROR()
 ///     CCM_DISABLE_CLANG_WARNING_AS_ERROR()
@@ -137,10 +107,8 @@
 /// \note Only one warning can be treated as an error per statement, due to how clang works.
 ///
 /// Example usage of macro:
-///	    // clang-format off
 ///     CCM_ENABLE_CLANG_WARNING_AS_ERROR(-Wuninitialized)
 ///     CCM_ENABLE_CLANG_WARNING_AS_ERROR(-Wunused)
-///	    // clang-format on
 ///     <code>
 ///     CCM_DISABLE_CLANG_WARNING_AS_ERROR()
 ///     CCM_DISABLE_CLANG_WARNING_AS_ERROR()

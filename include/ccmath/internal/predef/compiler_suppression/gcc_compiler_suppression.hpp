@@ -16,26 +16,12 @@
 /// \def CCM_DISABLE_GCC_WARNING(w)
 /// \brief Disables a warning for GCC.
 /// \param w The warning to disable as an error. This should be written as -Wwarning-name and not as a string.
-/// \note Only one warning can be disabled per statement, due to how gcc works.
+/// \note Only one warning can be disabled per statement due to how gcc works.
 /// \note This macro must be called before CCM_RESTORE_GCC_WARNING().
 ///
-/// WARNING: You have to disable clang-format temporarily when passing flags
-///			 to this function as clang-format likes to put spaces between the hyphens in flags
-///          like the following: -Wunknown - warning - option
-///
-/// WARNING EXAMPLE:
-///	 // clang-format off
-///	 CCM_DISABLE_GCC_WARNING(-Wunknown-warning-option)
-///	 // clang-format on
-///  <code>
-///	 CCM_RESTORE_GCC_WARNING()
-///
-///
 /// Example usage of macro:
-///	    // clang-format off
 ///     CCM_DISABLE_GCC_WARNING(-Wuninitialized)
 ///     CCM_DISABLE_GCC_WARNING(-Wunused)
-///	    // clang-format on
 ///     <code>
 ///     CCM_RESTORE_GCC_WARNING()
 ///     CCM_RESTORE_GCC_WARNING()
@@ -59,15 +45,13 @@
 
 ///
 /// \def CCM_RESTORE_GCC_WARNING()
-/// \brief Restore a warning for GCC. Warnings are restored in a stack based manner.
-/// \note Only one warning can be disabled per statement, due to how gcc works.
+/// \brief Restore a warning for GCC. Warnings are restored in a stack-based manner.
+/// \note Only one warning can be disabled per statement due to how gcc works.
 /// \note This macro must be called after CCM_DISABLE_GCC_WARNING(w).
 ///
 /// Example usage of macro:
-///	    // clang-format off
 ///     CCM_DISABLE_GCC_WARNING(-Wuninitialized)
 ///     CCM_DISABLE_GCC_WARNING(-Wunused)
-///	    // clang-format on
 ///     <code>
 ///     CCM_RESTORE_GCC_WARNING()
 ///     CCM_RESTORE_GCC_WARNING()
@@ -88,26 +72,12 @@
 /// \def CCM_ENABLE_GCC_WARNING_AS_ERROR(w)
 /// \brief This will enable a warning as an error for GCC.
 /// \param w The warning to enable as an error. This should be written as -Wwarning-name and not as a string.
-/// \note Only one warning can be treated as an error per statement, due to how GCC works
+/// \note Only one warning can be treated as an error per statement due to how GCC works.
 /// \note This macro must be called before CCM_DISABLE_GCC_WARNING_AS_ERROR().
 ///
-/// WARNING: You have to disable clang-format temporarily when passing flags
-///			 to this function as clang-format likes to put spaces between the hyphens in flags
-///          like the following: -Wunknown - warning - option
-///
-/// WARNING EXAMPLE:
-///	 // clang-format off
-///	 CCM_ENABLE_GCC_WARNING_AS_ERROR(-Wunknown-warning-option)
-///	 // clang-format on
-///  <code>
-///	 CCM_DISABLE_GCC_WARNING_AS_ERROR()
-///
-///
 /// Example usage of macro:
-///	    // clang-format off
 ///     CCM_ENABLE_GCC_WARNING_AS_ERROR(-Wuninitialized)
 ///     CCM_ENABLE_GCC_WARNING_AS_ERROR(-Wunused)
-///	    // clang-format on
 ///     <code>
 ///     CCM_DISABLE_GCC_WARNING_AS_ERROR()
 ///     CCM_DISABLE_GCC_WARNING_AS_ERROR()
@@ -134,10 +104,8 @@
 /// \note Only one warning can be treated as an error per statement, due to how GCC works
 ///
 /// Example usage of macro:
-///	    // clang-format off
 ///     CCM_ENABLE_GCC_WARNING_AS_ERROR(-Wuninitialized)
 ///     CCM_ENABLE_GCC_WARNING_AS_ERROR(-Wunused)
-///	    // clang-format on
 ///     <code>
 ///     CCM_DISABLE_GCC_WARNING_AS_ERROR()
 ///     CCM_DISABLE_GCC_WARNING_AS_ERROR()
@@ -158,32 +126,14 @@
 /// \def CCM_ENABLE_IGNORE_GCC_WARNING(w)
 /// \brief This will enable the suppression of a warning on GCC.
 /// \param w The warning to enable as an error. This should be written as -Wwarning-name and not as a string.
-/// \note Only one warning can be treated as an error per statement, due to how GCC works
-///
-/// WARNING: You have to disable clang-format temporarily when passing flags
-///			 to this function as clang-format likes to put spaces between the hyphens in flags
-///          like the following: -Wunknown - warning - option
-///
-/// WARNING EXAMPLE:
-///	 // clang-format off
-///	 CCM_ENABLE_IGNORE_GCC_WARNING(-Wuninitialized)
-///	 // clang-format on
-///  <code>
-///	 // clang-format off
-///	 CCM_DISABLE_IGNORE_GCC_WARNING(-Wuninitialized)
-///	 // clang-format on
-///
+/// \note Only one warning can be treated as an error per statement, due to how GCC works.
 ///
 /// Example usage of macro:
-///	    // clang-format off
 ///     CCM_ENABLE_IGNORE_GCC_WARNING(-Wuninitialized)
 ///     CCM_ENABLE_IGNORE_GCC_WARNING(-Wunused)
-///	    // clang-format on
 ///     <code>
-///	    // clang-format off
 ///     CCM_DISABLE_IGNORE_GCC_WARNING(-Wuninitialized)
 ///     CCM_DISABLE_IGNORE_GCC_WARNING(-Wunused)
-///	 // clang-format on
 ///
 #ifndef CCM_ENABLE_IGNORE_GCC_WARNING
 	#if defined(__GNUC__) && !defined(__clang__)
@@ -203,12 +153,11 @@
 
 ///
 /// \def CCM_DISABLE_IGNORE_GCC_WARNING(w)
-/// \brief This will re-enable a ignored warning for GCC.
-/// \param w The warning to re-enable as an warning. This should be written as -Wwarning-name and not as a string.
+/// \brief This will re-enable an ignored warning for GCC.
+/// \param w The warning to re-enable as a warning. This should be written as -Wwarning-name and not as a string.
 /// \note Only one warning can be treated as an error per statement, due to how GCC works
 ///
 /// Example usage of macro:
-///	    // clang-format off
 ///     CCM_ENABLE_IGNORE_GCC_WARNING(-Wuninitialized)
 ///     CCM_ENABLE_IGNORE_GCC_WARNING(-Wunused)
 ///     <code>
