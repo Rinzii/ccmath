@@ -19,9 +19,7 @@
 
 #include "ccmath/internal/predef/compiler_suppression/gcc_compiler_suppression.hpp"
 
-// clang-format off
-CCM_DISABLE_GCC_WARNING(-Wpedantic)
-// clang-format on
+// CCM_DISABLE_GCC_WARNING(-Wpedantic)
 
 namespace ccm::support
 {
@@ -258,4 +256,4 @@ namespace ccm::support
 
 } // namespace ccm::support
 
-CCM_RESTORE_GCC_WARNING()
+// CCM_RESTORE_GCC_WARNING()
