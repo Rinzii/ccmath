@@ -43,7 +43,7 @@ namespace ccm
 		if (CCM_UNLIKELY(x == 0 || y == 0 || z == 0)) { return x * y + z; }
 
 		// If x is zero and y is infinity, or if y is zero and x is infinity and...
-		if ((x == static_cast<T>(0) && ccm::isinf(y)) || (y == T{0} && ccm::isinf(x)))
+		if ((x == static_cast<T>(0) && ccm::isinf(y)) || (y == T{ 0 } && ccm::isinf(x)))
 		{
 			// ...z is NaN, return +NaN...
 			if (ccm::isnan(z)) { return std::numeric_limits<T>::quiet_NaN(); }
@@ -98,8 +98,10 @@ namespace ccm
 		using epsilon_type = std::common_type_t<decltype(TCommon), decltype(UCommon), decltype(VCommon)>;
 
 		using shared_type = std::conditional_t<
-			TCommon <= std::numeric_limits<epsilon_type>::epsilon() && TCommon <= UCommon, T,
-			std::conditional_t<UCommon <= std::numeric_limits<epsilon_type>::epsilon() && UCommon <= TCommon, U,
+			TCommon <= std::numeric_limits<epsilon_type>::epsilon() && TCommon <= UCommon,
+			T,
+			std::conditional_t<UCommon <= std::numeric_limits<epsilon_type>::epsilon() && UCommon <= TCommon,
+							   U,
 							   std::conditional_t<VCommon <= std::numeric_limits<epsilon_type>::epsilon() && VCommon <= UCommon, V, epsilon_type>>>;
 
 		return ccm::fma<shared_type>(static_cast<shared_type>(x), static_cast<shared_type>(y), static_cast<shared_type>(z));

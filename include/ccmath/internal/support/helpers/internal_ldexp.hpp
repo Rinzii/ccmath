@@ -15,13 +15,13 @@
 
 #pragma once
 
-#include <cfenv>
-
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/types/dyadic_float.hpp"
+
+#include <cfenv>
 
 namespace ccm::support::helpers
 {

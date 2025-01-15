@@ -10,14 +10,13 @@
 
 #pragma once
 
+#include "ccmath/internal/predef/compiler_suppression/gcc_compiler_suppression.hpp"
 #include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
 
 #include <climits>
-
-#include "ccmath/internal/predef/compiler_suppression/gcc_compiler_suppression.hpp"
 
 // CCM_DISABLE_GCC_WARNING(-Wpedantic)
 

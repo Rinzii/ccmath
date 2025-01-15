@@ -13,9 +13,10 @@
 #if LDBL_MANT_DIG == 53 && LDBL_MAX_EXP == 1024
 	#include "ccmath/math/fmanip/impl/scalbn_double_impl.hpp"
 #elif (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113) && LDBL_MAX_EXP == 16384
-	#include <limits>
 	#include "ccmath/math/compare/isinf.hpp"
 	#include "ccmath/math/compare/isnan.hpp"
+
+	#include <limits>
 #endif
 
 namespace ccm::internal

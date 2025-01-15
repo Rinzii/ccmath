@@ -11,13 +11,12 @@
 #pragma once
 
 #include "ccmath/internal/support/multiply_add.hpp"
+#include "ccmath/internal/support/poly_eval.hpp"
 #include "ccmath/internal/types/double_double.hpp"
 #include "ccmath/internal/types/triple_double.hpp"
 #include "ccmath/math/expo/log2.hpp"
 
 #include <array>
-
-#include "ccmath/internal/support/poly_eval.hpp"
 
 namespace ccm::support::helpers
 {
@@ -63,13 +62,13 @@ namespace ccm::support::helpers
 		{
 			// Taylor polynomial.
 			constexpr std::array<DoubleDouble, 7> COEFFS = {
-				DoubleDouble{0, 0x1p0},
-				DoubleDouble{-0x1.f48ad494e927bp-53, 0x1.26bb1bbb55516p1},
-				DoubleDouble{-0x1.e2bfab3191cd2p-53, 0x1.53524c73cea69p1},
-				DoubleDouble{0x1.80fb65ec3b503p-53, 0x1.0470591de2ca4p1},
-				DoubleDouble{0x1.338fc05e21e55p-54, 0x1.2bd7609fd98c4p0},
-				DoubleDouble{0x1.d4ea116818fbp-56, 0x1.1429ffd519865p-1},
-				DoubleDouble{-0x1.872a8ff352077p-57, 0x1.a7ed70847c8b3p-3},
+				DoubleDouble{ 0, 0x1p0 },
+				DoubleDouble{ -0x1.f48ad494e927bp-53, 0x1.26bb1bbb55516p1 },
+				DoubleDouble{ -0x1.e2bfab3191cd2p-53, 0x1.53524c73cea69p1 },
+				DoubleDouble{ 0x1.80fb65ec3b503p-53, 0x1.0470591de2ca4p1 },
+				DoubleDouble{ 0x1.338fc05e21e55p-54, 0x1.2bd7609fd98c4p0 },
+				DoubleDouble{ 0x1.d4ea116818fbp-56, 0x1.1429ffd519865p-1 },
+				DoubleDouble{ -0x1.872a8ff352077p-57, 0x1.a7ed70847c8b3p-3 },
 			};
 
 			const DoubleDouble p = support::polyeval(x, COEFFS[0], COEFFS[1], COEFFS[2], COEFFS[3], COEFFS[4], COEFFS[5], COEFFS[6]);

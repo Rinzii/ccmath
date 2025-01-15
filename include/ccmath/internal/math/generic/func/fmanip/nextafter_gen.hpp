@@ -17,7 +17,8 @@
 
 namespace ccm::gen
 {
-	template <class TFrom, class TTo,
+	template <class TFrom,
+			  class TTo,
 			  std::enable_if_t<std::is_floating_point_v<TFrom> && std::is_floating_point_v<TTo> && (sizeof(TFrom) <= sizeof(TTo)), bool> = true>
 	[[nodiscard]] constexpr TFrom nextafter_gen(TFrom from, TTo to) noexcept
 	{

@@ -10,10 +10,9 @@
 
 #pragma once
 
+#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/helpers/digit_to_int.hpp"
-
-#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
 
 #include <cstdint>
 #include <limits>
@@ -36,8 +35,8 @@ namespace ccm::internal::impl
 		return std::numeric_limits<double>::quiet_NaN(); // Default NaN
 #endif
 
-		std::uint64_t dbl_bits{0};
-		bool has_hex_been_detected{false};
+		std::uint64_t dbl_bits{ 0 };
+		bool has_hex_been_detected{ false };
 
 		if (arg == nullptr)
 		{

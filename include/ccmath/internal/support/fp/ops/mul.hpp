@@ -15,8 +15,6 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include "ccmath/internal/math/generic/func/basic/max_gen.hpp"
 #include "ccmath/internal/math/generic/func/basic/min_gen.hpp"
 #include "ccmath/internal/support/bits.hpp"
@@ -24,6 +22,8 @@
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/types/dyadic_float.hpp"
+
+#include <type_traits>
 
 namespace ccm::support::fp::op
 {

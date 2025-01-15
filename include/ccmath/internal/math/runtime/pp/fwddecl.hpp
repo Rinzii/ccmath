@@ -15,14 +15,12 @@
 
 // ReSharper disable once CppUnusedIncludeDirective
 #include "ccmath/internal/predef/attributes/always_inline.hpp"
+#include "ccmath/internal/support/type_traits.hpp"
 
 #include <cstdint>
-#include <stdfloat>
-
 #include <functional>
+#include <stdfloat>
 #include <type_traits>
-
-#include "ccmath/internal/support/type_traits.hpp"
 
 namespace ccm::pp
 {
@@ -307,87 +305,91 @@ namespace ccm::pp
 	} // namespace detail
 
 	template <size_t B, typename Abi>
-	CCM_ALWAYS_INLINE constexpr bool all_of(const basic_simd_mask<B, Abi> & mask) noexcept;
+	CCM_ALWAYS_INLINE constexpr bool all_of(const basic_simd_mask<B, Abi> &mask) noexcept;
 
 	template <typename Bool, std::enable_if_t<std::is_same_v<Bool, bool>, int> = 0>
 	CCM_ALWAYS_INLINE constexpr bool all_of(Bool x) noexcept;
 
 	template <size_t B, typename Abi>
-	CCM_ALWAYS_INLINE constexpr bool any_of(const basic_simd_mask<B, Abi> & mask) noexcept;
+	CCM_ALWAYS_INLINE constexpr bool any_of(const basic_simd_mask<B, Abi> &mask) noexcept;
 
 	template <typename Bool, std::enable_if_t<std::is_same_v<Bool, bool>, int> = 0>
 	CCM_ALWAYS_INLINE constexpr bool any_of(Bool value) noexcept;
 
 	template <size_t B, typename Abi>
-	CCM_ALWAYS_INLINE constexpr bool none_of(const basic_simd_mask<B, Abi> & mask) noexcept;
+	CCM_ALWAYS_INLINE constexpr bool none_of(const basic_simd_mask<B, Abi> &mask) noexcept;
 
 	template <typename Bool, std::enable_if_t<std::is_same_v<Bool, bool>, int> = 0>
 	CCM_ALWAYS_INLINE constexpr bool none_of(Bool value) noexcept;
 
 	template <size_t B, typename Abi>
-	CCM_ALWAYS_INLINE constexpr detail::SimdSizeType reduce_count(const basic_simd_mask<B, Abi> & mask) noexcept;
+	CCM_ALWAYS_INLINE constexpr detail::SimdSizeType reduce_count(const basic_simd_mask<B, Abi> &mask) noexcept;
 
 	template <typename Bool, std::enable_if_t<std::is_same_v<Bool, bool>, int> = 0>
 	CCM_ALWAYS_INLINE constexpr detail::SimdSizeType reduce_count(Bool value) noexcept;
 
 	template <size_t B, typename Abi>
-	CCM_ALWAYS_INLINE constexpr detail::SimdSizeType reduce_min_index(const basic_simd_mask<B, Abi> & mask);
+	CCM_ALWAYS_INLINE constexpr detail::SimdSizeType reduce_min_index(const basic_simd_mask<B, Abi> &mask);
 
 	template <typename Bool, std::enable_if_t<std::is_same_v<Bool, bool>, int> = 0>
 	CCM_ALWAYS_INLINE constexpr detail::SimdSizeType reduce_min_index(Bool value) noexcept;
 
 	template <size_t B, typename Abi>
-	CCM_ALWAYS_INLINE constexpr detail::SimdSizeType reduce_max_index(const basic_simd_mask<B, Abi> & mask);
+	CCM_ALWAYS_INLINE constexpr detail::SimdSizeType reduce_max_index(const basic_simd_mask<B, Abi> &mask);
 
 	template <typename Bool, std::enable_if_t<std::is_same_v<Bool, bool>, int> = 0>
 	CCM_ALWAYS_INLINE constexpr detail::SimdSizeType reduce_max_index(Bool value) noexcept;
 
 	template <typename VecType, typename ScalarType, typename Abi>
-	CCM_ALWAYS_INLINE constexpr auto simd_split(const basic_simd<ScalarType, Abi> & vec) noexcept;
+	CCM_ALWAYS_INLINE constexpr auto simd_split(const basic_simd<ScalarType, Abi> &vec) noexcept;
 
 	template <typename MaskType, size_t B, typename Abi>
-	CCM_ALWAYS_INLINE constexpr auto simd_split(const basic_simd_mask<B, Abi> & mask) noexcept;
+	CCM_ALWAYS_INLINE constexpr auto simd_split(const basic_simd_mask<B, Abi> &mask) noexcept;
 
 	template <typename T, typename... Abis>
-	CCM_ALWAYS_INLINE constexpr simd<T, (simd_size_v<T, Abis> + ...)> simd_cat(const basic_simd<T, Abis> &... xs) noexcept;
+	CCM_ALWAYS_INLINE constexpr simd<T, (simd_size_v<T, Abis> + ...)> simd_cat(const basic_simd<T, Abis> &...xs) noexcept;
 
 	template <size_t B, typename... Abis>
 	CCM_ALWAYS_INLINE constexpr simd_mask<detail::mask_integer_from<B>, (basic_simd_mask<B, Abis>::size.value + ...)>
-	simd_cat(const basic_simd_mask<B, Abis> &... xs) noexcept;
+	simd_cat(const basic_simd_mask<B, Abis> &...xs) noexcept;
 
-	template <typename T, typename Abi, typename BinaryOperation = std::plus<>,
-			  typename = std::enable_if_t<std::is_invocable_v<BinaryOperation, simd<T, 1>, simd<T, 1>>>>
-	constexpr T reduce(const basic_simd<T, Abi> & x, BinaryOperation binary_op = {});
+	template <typename T,
+			  typename Abi,
+			  typename BinaryOperation = std::plus<>,
+			  typename				   = std::enable_if_t<std::is_invocable_v<BinaryOperation, simd<T, 1>, simd<T, 1>>>>
+	constexpr T reduce(const basic_simd<T, Abi> &x, BinaryOperation binary_op = {});
 
 	template <typename T, typename Abi, typename BinaryOperation = std::plus<>, typename = std::enable_if_t<std::is_invocable_v<BinaryOperation, T, T>>>
-	constexpr T reduce(const basic_simd<T, Abi> & x, const typename basic_simd<T, Abi>::mask_type & k, support::traits::type_identity_t<T> identity_element,
+	constexpr T reduce(const basic_simd<T, Abi> &x,
+					   const typename basic_simd<T, Abi>::mask_type &k,
+					   support::traits::type_identity_t<T> identity_element,
 					   BinaryOperation binary_op = {});
 
 	template <typename T, typename Abi>
-	constexpr T reduce(const basic_simd<T, Abi> & x, const typename basic_simd<T, Abi>::mask_type & k, std::plus<> binary_op = {}) noexcept;
+	constexpr T reduce(const basic_simd<T, Abi> &x, const typename basic_simd<T, Abi>::mask_type &k, std::plus<> binary_op = {}) noexcept;
 
 	template <typename T, typename Abi>
-	constexpr T reduce(const basic_simd<T, Abi> & x, const typename basic_simd<T, Abi>::mask_type & k, std::multiplies<> binary_op) noexcept;
+	constexpr T reduce(const basic_simd<T, Abi> &x, const typename basic_simd<T, Abi>::mask_type &k, std::multiplies<> binary_op) noexcept;
 
 	template <typename T, typename Abi, typename = std::enable_if_t<std::is_integral_v<T>>>
-	constexpr T reduce(const basic_simd<T, Abi> & x, const typename basic_simd<T, Abi>::mask_type & k, std::bit_and<> binary_op) noexcept;
+	constexpr T reduce(const basic_simd<T, Abi> &x, const typename basic_simd<T, Abi>::mask_type &k, std::bit_and<> binary_op) noexcept;
 
 	template <typename T, typename Abi, typename = std::enable_if_t<std::is_integral_v<T>>>
-	constexpr T reduce(const basic_simd<T, Abi> & x, const typename basic_simd<T, Abi>::mask_type & k, std::bit_or<> binary_op) noexcept;
+	constexpr T reduce(const basic_simd<T, Abi> &x, const typename basic_simd<T, Abi>::mask_type &k, std::bit_or<> binary_op) noexcept;
 
 	template <typename T, typename Abi, typename = std::enable_if_t<std::is_integral_v<T>>>
-	constexpr T reduce(const basic_simd<T, Abi> & x, const typename basic_simd<T, Abi>::mask_type & k, std::bit_xor<> binary_op) noexcept;
+	constexpr T reduce(const basic_simd<T, Abi> &x, const typename basic_simd<T, Abi>::mask_type &k, std::bit_xor<> binary_op) noexcept;
 
 	template <typename T, typename Abi, typename = std::enable_if_t<detail::is_totally_ordered<T>::value>>
-	constexpr T reduce_min(const basic_simd<T, Abi> & x) noexcept;
+	constexpr T reduce_min(const basic_simd<T, Abi> &x) noexcept;
 
 	template <typename T, typename Abi, typename = std::enable_if_t<detail::is_totally_ordered<T>::value>>
-	constexpr T reduce_min(const basic_simd<T, Abi> & x, const typename basic_simd<T, Abi>::mask_type & k) noexcept;
+	constexpr T reduce_min(const basic_simd<T, Abi> &x, const typename basic_simd<T, Abi>::mask_type &k) noexcept;
 
 	template <typename T, typename Abi, typename = std::enable_if_t<detail::is_totally_ordered<T>::value>>
-	constexpr T reduce_max(const basic_simd<T, Abi> & x) noexcept;
+	constexpr T reduce_max(const basic_simd<T, Abi> &x) noexcept;
 
 	template <typename T, typename Abi, typename = std::enable_if_t<detail::is_totally_ordered<T>::value>>
-	constexpr T reduce_max(const basic_simd<T, Abi> & x, const typename basic_simd<T, Abi>::mask_type & k) noexcept;
+	constexpr T reduce_max(const basic_simd<T, Abi> &x, const typename basic_simd<T, Abi>::mask_type &k) noexcept;
 
 } // namespace ccm::pp

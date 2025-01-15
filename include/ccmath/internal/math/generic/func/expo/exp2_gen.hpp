@@ -14,16 +14,15 @@
 #include "ccmath/internal/support/fp/bit_mask_traits.hpp"
 #include "ccmath/internal/support/fp/directional_rounding_utils.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
+#include "ccmath/internal/support/poly_eval.hpp"
 #include "ccmath/internal/support/unreachable.hpp"
 #include "ccmath/internal/types/big_int.hpp"
+#include "ccmath/internal/types/double_double.hpp"
 #include "ccmath/math/basic/fabs.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/power/sqrt.hpp"
 
 #include <limits>
-
-#include "ccmath/internal/support/poly_eval.hpp"
-#include "ccmath/internal/types/double_double.hpp"
 
 namespace ccm::gen
 {
@@ -86,13 +85,13 @@ namespace ccm::gen
 		{
 			// Taylor polynomial coefficients
 			constexpr std::array<DoubleDouble, 7> COEFFS = {
-				DoubleDouble{0, 0x1p0},
-				DoubleDouble{0x1.abc9e3b39824p-56, 0x1.62e42fefa39efp-1},
-				DoubleDouble{-0x1.5e43a53e4527bp-57, 0x1.ebfbdff82c58fp-3},
-				DoubleDouble{-0x1.d37963a9444eep-59, 0x1.c6b08d704a0cp-5},
-				DoubleDouble{0x1.4eda1a81133dap-62, 0x1.3b2ab6fba4e77p-7},
-				DoubleDouble{-0x1.c53fd1ba85d14p-64, 0x1.5d87fe7a265a5p-10},
-				DoubleDouble{0x1.d89250b013eb8p-70, 0x1.430912f86cb8ep-13},
+				DoubleDouble{ 0, 0x1p0 },
+				DoubleDouble{ 0x1.abc9e3b39824p-56, 0x1.62e42fefa39efp-1 },
+				DoubleDouble{ -0x1.5e43a53e4527bp-57, 0x1.ebfbdff82c58fp-3 },
+				DoubleDouble{ -0x1.d37963a9444eep-59, 0x1.c6b08d704a0cp-5 },
+				DoubleDouble{ 0x1.4eda1a81133dap-62, 0x1.3b2ab6fba4e77p-7 },
+				DoubleDouble{ -0x1.c53fd1ba85d14p-64, 0x1.5d87fe7a265a5p-10 },
+				DoubleDouble{ 0x1.d89250b013eb8p-70, 0x1.430912f86cb8ep-13 },
 			};
 
 			const DoubleDouble p = support::polyeval(dx, COEFFS[0], COEFFS[1], COEFFS[2], COEFFS[3], COEFFS[4], COEFFS[5], COEFFS[6]);
@@ -106,11 +105,14 @@ namespace ccm::gen
 		inline Float128 poly_approx_f128(const Float128 & dx)
 		{
 			constexpr std::array<Float128, 8> COEFFS_128{
-				Float128{Sign::POS, -127, 0x80000000'00000000'00000000'00000000_u128}, // 1.0
-				Float128{Sign::POS, -128, 0xb17217f7'd1cf79ab'c9e3b398'03f2f6af_u128}, Float128{Sign::POS, -128, 0x3d7f7bff'058b1d50'de2d60dd'9c9a1d9f_u128},
-				Float128{Sign::POS, -132, 0xe35846b8'2505fc59'9d3b15d9'e7fb6897_u128}, Float128{Sign::POS, -134, 0x9d955b7d'd273b94e'184462f6'bcd2b9e7_u128},
-				Float128{Sign::POS, -137, 0xaec3ff3c'53398883'39ea1bb9'64c51a89_u128}, Float128{Sign::POS, -138, 0x2861225f'345c396a'842c5341'8fa8ae61_u128},
-				Float128{Sign::POS, -144, 0xffe5fe2d'109a319d'7abeb5ab'd5ad2079_u128},
+				Float128{ Sign::POS, -127, 0x80000000'00000000'00000000'00000000_u128 }, // 1.0
+				Float128{ Sign::POS, -128, 0xb17217f7'd1cf79ab'c9e3b398'03f2f6af_u128 },
+				Float128{ Sign::POS, -128, 0x3d7f7bff'058b1d50'de2d60dd'9c9a1d9f_u128 },
+				Float128{ Sign::POS, -132, 0xe35846b8'2505fc59'9d3b15d9'e7fb6897_u128 },
+				Float128{ Sign::POS, -134, 0x9d955b7d'd273b94e'184462f6'bcd2b9e7_u128 },
+				Float128{ Sign::POS, -137, 0xaec3ff3c'53398883'39ea1bb9'64c51a89_u128 },
+				Float128{ Sign::POS, -138, 0x2861225f'345c396a'842c5341'8fa8ae61_u128 },
+				Float128{ Sign::POS, -144, 0xffe5fe2d'109a319d'7abeb5ab'd5ad2079_u128 },
 			};
 
 			const Float128 p =

@@ -15,10 +15,11 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include "ccmath/internal/math/generic/builtins/basic/fma.hpp"
+#include "ccmath/internal/math/generic/builtins/power/sqrt.hpp"
 #include "ccmath/internal/math/generic/func/power/pow_impl/powf_data.hpp"
+#include "ccmath/internal/math/generic/func/power/sqrt_gen.hpp"
+#include "ccmath/internal/math/runtime/func/power/sqrt_rt.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/common_math_constants.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
@@ -28,11 +29,8 @@
 #include "ccmath/internal/types/double_double.hpp"
 #include "ccmath/internal/types/triple_double.hpp"
 
-#include "ccmath/internal/math/generic/builtins/power/sqrt.hpp"
-#include "ccmath/internal/math/generic/func/power/sqrt_gen.hpp"
-#include "ccmath/internal/math/runtime/func/power/sqrt_rt.hpp"
-
 #include <optional>
+#include <type_traits>
 
 namespace ccm::gen::impl
 {
@@ -93,19 +91,19 @@ namespace ccm::gen::impl
 			//     dirtyinfnorm(log2(1 + x)/x - P, [-0x1.3ffcp-15, 0x1.3e3dp-15]) = 0x1.8be5...p-96
 			//   - The coefficients for the polynomial are stored in the array `COEFFS`.
 			constexpr std::array<DoubleDouble, 6> COEFFS = {
-				DoubleDouble{0x1.777d0ffda25ep-56, 0x1.71547652b82fep0},	DoubleDouble{-0x1.777d101cf0a84p-57, -0x1.71547652b82fep-1},
-				DoubleDouble{0x1.ce04b5140d867p-56, 0x1.ec709dc3a03fdp-2},	DoubleDouble{0x1.137b47e635be5p-56, -0x1.71547652b82fbp-2},
-				DoubleDouble{-0x1.b5a30b3bdb318p-58, 0x1.2776c516a92a2p-2}, DoubleDouble{0x1.2d2fbd081e657p-57, -0x1.ec70af1929ca6p-3},
+				DoubleDouble{ 0x1.777d0ffda25ep-56, 0x1.71547652b82fep0 },	  DoubleDouble{ -0x1.777d101cf0a84p-57, -0x1.71547652b82fep-1 },
+				DoubleDouble{ 0x1.ce04b5140d867p-56, 0x1.ec709dc3a03fdp-2 },  DoubleDouble{ 0x1.137b47e635be5p-56, -0x1.71547652b82fbp-2 },
+				DoubleDouble{ -0x1.b5a30b3bdb318p-58, 0x1.2776c516a92a2p-2 }, DoubleDouble{ 0x1.2d2fbd081e657p-57, -0x1.ec70af1929ca6p-3 },
 			};
 
-			const DoubleDouble dx_dd({0.0, dx2});
+			const DoubleDouble dx_dd({ 0.0, dx2 });
 			const DoubleDouble p = support::polyeval(dx_dd, COEFFS[0], COEFFS[1], COEFFS[2], COEFFS[3], COEFFS[4], COEFFS[5]);
 
 			// log2(1 + dx2) ~ dx2 * P(dx2)
 			const DoubleDouble log2_x_lo = quick_mult(dx2, p);
 
 			// Lower parts of (e_x - log2(r1)) of the first range reduction constant
-			const DoubleDouble log2_x_mid({LOG2_R_TD.at(idx_x).lo, LOG2_R_TD.at(idx_x).mid});
+			const DoubleDouble log2_x_mid({ LOG2_R_TD.at(idx_x).lo, LOG2_R_TD.at(idx_x).mid });
 
 			// -log2(r2) + lower part of (e_x - log2(r1))
 			const DoubleDouble log2_x_m = add(LOG2_R2_DD.at(idx2), log2_x_mid);
@@ -114,7 +112,7 @@ namespace ccm::gen::impl
 			// Since we don't know which one has larger exponent to apply Fast2Sum
 			// algorithm, we need to check them before calling double-double addition.
 			const DoubleDouble log2_x = larger_exponent(log2_x_m.hi, log2_x_lo.hi) ? add(log2_x_m, log2_x_lo) : add(log2_x_lo, log2_x_m);
-			const DoubleDouble lo6_hi_dd({0.0, lo6_hi});
+			const DoubleDouble lo6_hi_dd({ 0.0, lo6_hi });
 
 			// 2^6 * y * (log2(1 + dx2) - log2(r2) + lower part of (e_x - log2(r1)))
 			const DoubleDouble prod = quick_mult(y6, log2_x);
@@ -122,20 +120,29 @@ namespace ccm::gen::impl
 			// 2^6 * (y * log2(x) - (hi + mid)) = 2^6 * lo
 			DoubleDouble lo6								   = larger_exponent(prod.hi, lo6_hi) ? add(prod, lo6_hi_dd) : add(lo6_hi_dd, prod);
 			constexpr std::array<DoubleDouble, 10> EXP2_COEFFS = {
-				DoubleDouble{0, 0x1p0},
-				DoubleDouble{0x1.abc9e3b398024p-62, 0x1.62e42fefa39efp-7},
-				DoubleDouble{-0x1.5e43a5429bddbp-69, 0x1.ebfbdff82c58fp-15},
-				DoubleDouble{-0x1.d33162491268fp-77, 0x1.c6b08d704a0cp-23},
-				DoubleDouble{0x1.4fb32d240a14ep-86, 0x1.3b2ab6fba4e77p-31},
-				DoubleDouble{0x1.e84e916be83ep-97, 0x1.5d87fe78a6731p-40},
-				DoubleDouble{-0x1.9a447bfddc5e6p-103, 0x1.430912f86bfb8p-49},
-				DoubleDouble{-0x1.31a55719de47fp-113, 0x1.ffcbfc588ded9p-59},
-				DoubleDouble{-0x1.0ba57164eb36bp-122, 0x1.62c034beb8339p-68},
-				DoubleDouble{-0x1.8483eabd9642dp-132, 0x1.b5251ff97bee1p-78},
+				DoubleDouble{ 0, 0x1p0 },
+				DoubleDouble{ 0x1.abc9e3b398024p-62, 0x1.62e42fefa39efp-7 },
+				DoubleDouble{ -0x1.5e43a5429bddbp-69, 0x1.ebfbdff82c58fp-15 },
+				DoubleDouble{ -0x1.d33162491268fp-77, 0x1.c6b08d704a0cp-23 },
+				DoubleDouble{ 0x1.4fb32d240a14ep-86, 0x1.3b2ab6fba4e77p-31 },
+				DoubleDouble{ 0x1.e84e916be83ep-97, 0x1.5d87fe78a6731p-40 },
+				DoubleDouble{ -0x1.9a447bfddc5e6p-103, 0x1.430912f86bfb8p-49 },
+				DoubleDouble{ -0x1.31a55719de47fp-113, 0x1.ffcbfc588ded9p-59 },
+				DoubleDouble{ -0x1.0ba57164eb36bp-122, 0x1.62c034beb8339p-68 },
+				DoubleDouble{ -0x1.8483eabd9642dp-132, 0x1.b5251ff97bee1p-78 },
 			};
 
-			DoubleDouble pp		  = support::polyeval(lo6, EXP2_COEFFS[0], EXP2_COEFFS[1], EXP2_COEFFS[2], EXP2_COEFFS[3], EXP2_COEFFS[4], EXP2_COEFFS[5],
-													  EXP2_COEFFS[6], EXP2_COEFFS[7], EXP2_COEFFS[8], EXP2_COEFFS[9]);
+			DoubleDouble pp		  = support::polyeval(lo6,
+												  EXP2_COEFFS[0],
+												  EXP2_COEFFS[1],
+												  EXP2_COEFFS[2],
+												  EXP2_COEFFS[3],
+												  EXP2_COEFFS[4],
+												  EXP2_COEFFS[5],
+												  EXP2_COEFFS[6],
+												  EXP2_COEFFS[7],
+												  EXP2_COEFFS[8],
+												  EXP2_COEFFS[9]);
 			const DoubleDouble rr = quick_mult(exp2_hi_mid, pp);
 
 			// Make sure the sum is normalized:
@@ -153,8 +160,13 @@ namespace ccm::gen::impl
 			return ccm::support::bit_cast<double>(r_bits);
 		}
 
-		constexpr std::optional<float> handle_exceptional_cases(float & x, float & y, support::fp::FPBits<float> & xbits, support::fp::FPBits<float> & ybits,
-																const std::uint32_t & x_u, int & exponent, std::uint64_t & sign)
+		constexpr std::optional<float> handle_exceptional_cases(float & x,
+																float & y,
+																support::fp::FPBits<float> & xbits,
+																support::fp::FPBits<float> & ybits,
+																const std::uint32_t & x_u,
+																int & exponent,
+																std::uint64_t & sign)
 		{
 			using FloatBits = support::fp::FPBits<float>;
 
@@ -346,8 +358,8 @@ namespace ccm::gen::impl
 			// > P = fpminimax(log2(1 + x)/x, 5, [|D...|], [-2^-8, 2^-7]);
 			// > dirtyinfnorm(log2(1 + x)/x - P, [-2^-8, 2^-7]);
 			//   0x1.653...p-52
-			constexpr std::array<double, 6> COEFFS = {0x1.71547652b82fep0,	 -0x1.71547652b7a07p-1, 0x1.ec709dc458db1p-2,
-													  -0x1.715479c2266c9p-2, 0x1.2776ae1ddf8fp-2,	-0x1.e7b2178870157p-3};
+			constexpr std::array<double, 6> COEFFS = { 0x1.71547652b82fep0,	  -0x1.71547652b7a07p-1, 0x1.ec709dc458db1p-2,
+													   -0x1.715479c2266c9p-2, 0x1.2776ae1ddf8fp-2,	 -0x1.e7b2178870157p-3 };
 
 			const double dx2 = dx * dx; // Exact
 			const double c0	 = support::multiply_add(dx, COEFFS[1], COEFFS[0]);
@@ -436,7 +448,8 @@ namespace ccm::gen::impl
 			// > dirtyinfnorm(2^(x/64) - P, [-0.5, 0.5]);
 			// 0x1.a2b77e618f5c4c176fd11b7659016cde5de83cb72p-60
 			constexpr std::array<double, 6> EXP2_COEFFS = {
-				0x1p0, 0x1.62e42fefa39efp-7, 0x1.ebfbdff82a23ap-15, 0x1.c6b08d7076268p-23, 0x1.3b2ad33f8b48bp-31, 0x1.5d870c4d84445p-40};
+				0x1p0, 0x1.62e42fefa39efp-7, 0x1.ebfbdff82a23ap-15, 0x1.c6b08d7076268p-23, 0x1.3b2ad33f8b48bp-31, 0x1.5d870c4d84445p-40
+			};
 
 			const double lo6_sqr = lo6 * lo6;
 			const double d0		 = support::multiply_add(lo6, EXP2_COEFFS[1], EXP2_COEFFS[0]);

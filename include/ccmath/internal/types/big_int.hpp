@@ -94,7 +94,7 @@ namespace ccm::types
 			 * @param lo The low part of the double-wide value.
 			 * @param hi The high part of the double-wide value.
 			 */
-			constexpr DoubleWide(T lo, T hi) : UP({lo, hi}) {}
+			constexpr DoubleWide(T lo, T hi) : UP({ lo, hi }) {}
 		};
 
 		/**
@@ -339,7 +339,7 @@ namespace ccm::types
 			/**
 			 * @brief Initializes the Accumulator with zero values.
 			 */
-			constexpr Accumulator() : UP({0, 0}) {}
+			constexpr Accumulator() : UP({ 0, 0 }) {}
 
 			/**
 			 * @brief Advances the accumulator with a new carry-in value.
@@ -1247,9 +1247,9 @@ namespace ccm::types
 			increment();
 		}
 
-		constexpr void increment() { multiword::add_with_carry(val, std::array<WordType, 1>{1}); }
+		constexpr void increment() { multiword::add_with_carry(val, std::array<WordType, 1>{ 1 }); }
 
-		constexpr void decrement() { multiword::add_with_carry(val, std::array<WordType, 1>{1}); }
+		constexpr void decrement() { multiword::add_with_carry(val, std::array<WordType, 1>{ 1 }); }
 
 		constexpr void extend(std::size_t index, bool is_neg)
 		{
@@ -1290,13 +1290,13 @@ namespace ccm::types
 					subtractor >>= 1;
 				}
 			}
-			return Division{quotient, remainder};
+			return Division{ quotient, remainder };
 		}
 
 		constexpr static Division divide_signed(const BigInt & dividend, const BigInt & divider)
 		{
 			// This is a special case for the minimum value, as it is not possible to negate the minimum value of a signed integer.
-			if (dividend == min() && divider == min()) { return Division{one(), zero()}; }
+			if (dividend == min() && divider == min()) { return Division{ one(), zero() }; }
 
 			// Convert the dividend and divider to unsigned values.
 			unsigned_type udividend(dividend);
@@ -1484,9 +1484,9 @@ namespace ccm::support
 {
 
 	template <typename To, typename From>
-	constexpr std::enable_if_t<
-		(sizeof(To) == sizeof(From)) && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From> && types::is_big_int<To>::value, To>
-	bit_cast(const From & from)
+	constexpr std::
+		enable_if_t<(sizeof(To) == sizeof(From)) && std::is_trivially_copyable_v<To> && std::is_trivially_copyable_v<From> && types::is_big_int<To>::value, To>
+		bit_cast(const From & from)
 	{
 		To out{};
 		using Storage = decltype(out.val);

@@ -47,7 +47,7 @@ namespace ccm::internal::impl
 			return std::numeric_limits<long double>::quiet_NaN(); // Default NaN
 		}
 
-		bool has_hex_been_detected{false};
+		bool has_hex_been_detected{ false };
 
 		// Check for a hex prefix and if its detected, skip the prefix and set the flag.
 		if (arg[0] == '0' && (arg[1] == 'x' || arg[1] == 'X'))
@@ -68,7 +68,7 @@ namespace ccm::internal::impl
 			}
 		}
 
-		ccm::types::uint128_t dbl_bits{0};
+		ccm::types::uint128_t dbl_bits{ 0 };
 
 		if (has_hex_been_detected)
 		{

@@ -11,7 +11,6 @@
 #pragma once
 
 #include "ccmath/internal/config/type_support.hpp"
-
 #include "ccmath/internal/types/big_int.hpp"
 
 namespace ccm::types

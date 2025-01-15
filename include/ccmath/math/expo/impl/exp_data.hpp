@@ -33,8 +33,8 @@ namespace ccm::internal
 	template <>
 	struct exp_data<float>
 	{
-		double invln2_scaled{0x1.71547652b82fep0 * (1 << k_exp_table_bits_flt)};
-		double shift{0x1.8p+52};
+		double invln2_scaled{ 0x1.71547652b82fep0 * (1 << k_exp_table_bits_flt) };
+		double shift{ 0x1.8p+52 };
 		std::array<std::uint64_t, (1 << k_exp_table_bits_flt)> tab = {
 			0x3ff0000000000000, 0x3fefd9b0d3158574, 0x3fefb5586cf9890f, 0x3fef9301d0125b51, 0x3fef72b83c7d517b, 0x3fef54873168b9aa, 0x3fef387a6e756238,
 			0x3fef1e9df51fdee1, 0x3fef06fe0a31b715, 0x3feef1a7373aa9cb, 0x3feedea64c123422, 0x3feece086061892d, 0x3feebfdad5362a27, 0x3feeb42b569d4f82,
@@ -53,10 +53,10 @@ namespace ccm::internal
 	template <>
 	struct exp_data<double>
 	{
-		double invln2N{0x1.71547652b82fep0 * (1 << k_exp_table_bits_dbl)}; // N/ln2
-		double shift{0x1.8p52};
-		double negln2hiN{-0x1.62e42fefa0000p-8};
-		double negln2loN{-0x1.cf79abc9e3b3ap-47};
+		double invln2N{ 0x1.71547652b82fep0 * (1 << k_exp_table_bits_dbl) }; // N/ln2
+		double shift{ 0x1.8p52 };
+		double negln2hiN{ -0x1.62e42fefa0000p-8 };
+		double negln2loN{ -0x1.cf79abc9e3b3ap-47 };
 
 		// Last four coefficients.
 		// abs error: 1.555*2^-66

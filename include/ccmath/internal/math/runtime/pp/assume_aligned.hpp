@@ -1,9 +1,9 @@
 
 #pragma once
 
-#include <cstddef>
-
 #include "ccmath/internal/predef/attributes/always_inline.hpp"
+
+#include <cstddef>
 
 #if defined(_MSC_VER) && !defined(__clang__)
 	#include <cstdint>

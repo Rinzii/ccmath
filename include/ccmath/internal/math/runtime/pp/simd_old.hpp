@@ -280,12 +280,12 @@ namespace ccm::pp
 		// ctors
 
 		template <class U>
-		constexpr basic_simd(U && value) noexcept
+		constexpr basic_simd(U &&value) noexcept
 		{
 		}
 
 		template <class U, class UAbi>
-		constexpr CCM_CPP20_EXPLICIT(true) basic_simd(basic_simd<U, UAbi> const & value) noexcept
+		constexpr CCM_CPP20_EXPLICIT(true) basic_simd(basic_simd<U, UAbi> const &value) noexcept
 		{
 		}
 	};

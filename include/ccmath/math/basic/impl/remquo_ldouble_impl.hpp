@@ -10,13 +10,13 @@
 
 #pragma once
 
-#include <cstdint>
-#include <limits>
-
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/math/basic/fabs.hpp"
 #include "ccmath/math/basic/fmod.hpp"
+
+#include <cstdint>
+#include <limits>
 
 namespace ccm::internal
 {

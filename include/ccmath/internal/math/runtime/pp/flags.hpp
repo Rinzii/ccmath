@@ -40,7 +40,7 @@ namespace ccm::pp
 		struct Aligned : LoadStoreTag
 		{
 			template <typename T, typename U>
-			CCM_SIMD_INTRINSIC static constexpr U * adjust_pointer(U * ptr)
+			CCM_SIMD_INTRINSIC static constexpr U *adjust_pointer(U *ptr)
 			{
 				return static_cast<U *>(pp::assume_aligned<simd_alignment_v<T, U>>(ptr));
 			}
@@ -52,7 +52,7 @@ namespace ccm::pp
 			static_assert(support::has_single_bit(N));
 
 			template <typename, typename U>
-			CCM_SIMD_INTRINSIC static constexpr U * adjust_pointer(U * ptr)
+			CCM_SIMD_INTRINSIC static constexpr U *adjust_pointer(U *ptr)
 			{
 				return static_cast<U *>(pp::assume_aligned<N>(ptr));
 			}
@@ -66,7 +66,7 @@ namespace ccm::pp
 		struct Prefetch : LoadStoreTag
 		{
 			template <typename, typename U>
-			CCM_ALWAYS_INLINE static U * adjust_pointer(U * ptr)
+			CCM_ALWAYS_INLINE static U *adjust_pointer(U *ptr)
 			{
 				// one read: 0, 0
 				// L1: 0, 1
@@ -143,13 +143,13 @@ namespace ccm::pp
 		}
 
 		template <typename F0, typename Tp, typename Ptr>
-		static constexpr void apply_adjust_pointer(Ptr & ptr)
+		static constexpr void apply_adjust_pointer(Ptr &ptr)
 		{
 			if constexpr (std::is_same_v<decltype(F0::template adjust_pointer<Tp>(ptr)), void>) { ptr = F0::template adjust_pointer<Tp>(ptr); }
 		}
 
 		template <typename Tp, typename Up>
-		static constexpr Up * adjust_pointer(Up * ptr)
+		static constexpr Up *adjust_pointer(Up *ptr)
 		{
 			(apply_adjust_pointer<Flags, Tp>(ptr), ...);
 			return ptr;
@@ -164,8 +164,7 @@ namespace ccm::pp
 	inline constexpr simd_flags<detail::Aligned> simd_flag_aligned;
 
 	template <std::size_t N>
-		requires(support::has_single_bit(N))
-	inline constexpr simd_flags<detail::Overaligned<N>> simd_flag_overaligned;
+	requires(support::has_single_bit(N)) inline constexpr simd_flags<detail::Overaligned<N>> simd_flag_overaligned;
 
 	// extensions
 	template <typename T>

@@ -16,6 +16,7 @@
 #include <ccmath/math/compare/isnan.hpp>
 #include <ccmath/math/compare/signbit.hpp>
 #include <ccmath/math/nearest/trunc.hpp>
+
 #include <type_traits>
 
 namespace ccm
@@ -29,7 +30,7 @@ namespace ccm
 	template <class T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T nearbyint(T num) noexcept
 	{
-		constexpr auto rounding_mode{ccm::support::fenv::get_rounding_mode()};
+		constexpr auto rounding_mode{ ccm::support::fenv::get_rounding_mode() };
 		return ccm::support::fp::directional_round(num, rounding_mode);
 	}
 

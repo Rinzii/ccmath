@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include "ccmath/internal/math/generic/func/basic/fdim_gen.hpp"
+
+#include <type_traits>
 
 namespace ccm::func
 {

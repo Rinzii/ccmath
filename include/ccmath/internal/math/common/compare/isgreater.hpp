@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include "ccmath/internal/math/generic/builtins/compare/isgreater.hpp"
 #include "ccmath/math/compare/isunordered.hpp"
+
+#include <type_traits>
 
 namespace ccm
 {

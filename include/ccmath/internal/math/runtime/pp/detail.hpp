@@ -10,21 +10,18 @@
 
 #pragma once
 
-#include <climits>
-
-#include "constexpr_wrapper.hpp"
-#include "fwddecl.hpp"
-#include "x86_detail.hpp"
-
 #include "assert_unreachable.hpp"
-#include "const_eval.hpp"
-#include "debug_print.hpp"
-#include "may_alias.hpp"
-#include "trap.hpp"
-
 #include "ccmath/internal/predef/attributes/always_inline.hpp"
 #include "ccmath/internal/support/bits.hpp"
+#include "const_eval.hpp"
+#include "constexpr_wrapper.hpp"
+#include "debug_print.hpp"
+#include "fwddecl.hpp"
+#include "may_alias.hpp"
+#include "trap.hpp"
+#include "x86_detail.hpp"
 
+#include <climits>
 #include <cstdint>
 #include <limits>
 #include <tuple>
@@ -56,7 +53,7 @@ namespace ccm::pp::detail
 	inline constexpr PrivateInit private_init = PrivateInit{};
 
 	template <typename T, typename F>
-	CCM_SIMD_INTRINSIC static void bit_iteration(T mask, F && func)
+	CCM_SIMD_INTRINSIC static void bit_iteration(T mask, F &&func)
 	{
 		static_assert(sizeof(0ULL) >= sizeof(T));
 		using ConditionalType = std::conditional_t<sizeof(T) <= sizeof(0u), unsigned, unsigned long long>;
@@ -69,7 +66,7 @@ namespace ccm::pp::detail
 	}
 
 	template <size_t Np, bool Sanitized, typename F>
-	CCM_SIMD_INTRINSIC static void bit_iteration(BitMask<Np, Sanitized> mask, F && func)
+	CCM_SIMD_INTRINSIC static void bit_iteration(BitMask<Np, Sanitized> mask, F &&func)
 	{
 		bit_iteration(mask.sanitized().to_bits(), func);
 	}
@@ -186,7 +183,7 @@ namespace ccm::pp::detail
 	using build_flags = BuildFlags<FloatingPointFlags, MachineFlags>;
 
 	template <typename... Args>
-	[[noreturn]] CCM_ALWAYS_INLINE void invoke_ub([[maybe_unused]] const char * msg, [[maybe_unused]] const Args &... args)
+	[[noreturn]] CCM_ALWAYS_INLINE void invoke_ub([[maybe_unused]] const char *msg, [[maybe_unused]] const Args &...args)
 	{
 #ifdef CCMATH_CONFIG_DEBUG_UB
 		CCM_DEBUG_PRINT(msg, args...);
@@ -201,10 +198,10 @@ namespace ccm::pp::detail
 	{
 		struct Unusable
 		{
-			Unusable()							   = delete;
-			Unusable(const Unusable &)			   = delete;
-			Unusable & operator=(const Unusable &) = delete;
-			~Unusable()							   = delete;
+			Unusable()							  = delete;
+			Unusable(const Unusable &)			  = delete;
+			Unusable &operator=(const Unusable &) = delete;
+			~Unusable()							  = delete;
 		};
 
 		template <typename>
@@ -340,7 +337,9 @@ namespace ccm::pp::detail
 	 */
 	template <typename T0, typename T1>
 	struct nopromot_common_type<
-		T0, T1, std::enable_if_t<std::is_integral_v<T0> && std::is_integral_v<T1> && !std::is_same_v<T0, T1> && (std::is_signed_v<T0> == std::is_signed_v<T1>)>>
+		T0,
+		T1,
+		std::enable_if_t<std::is_integral_v<T0> && std::is_integral_v<T1> && !std::is_same_v<T0, T1> && (std::is_signed_v<T0> == std::is_signed_v<T1>)>>
 	{
 		using type = std::conditional_t<higher_integer_rank_than<T0, T1>, T0, T1>;
 	};
@@ -357,7 +356,9 @@ namespace ccm::pp::detail
 	 */
 	template <typename T0, typename T1>
 	struct nopromot_common_type<
-		T0, T1, std::enable_if_t<std::is_integral_v<T0> && std::is_integral_v<T1> && !std::is_same_v<T0, T1> && (std::is_signed_v<T0> != std::is_signed_v<T1>)>>
+		T0,
+		T1,
+		std::enable_if_t<std::is_integral_v<T0> && std::is_integral_v<T1> && !std::is_same_v<T0, T1> && (std::is_signed_v<T0> != std::is_signed_v<T1>)>>
 	{
 		using UnsignedType = std::conditional_t<std::is_signed_v<T0>, T1, T0>;
 		using SignedType   = std::conditional_t<std::is_signed_v<T0>, T0, T1>;
@@ -376,7 +377,9 @@ namespace ccm::pp::detail
 	 */
 	template <typename T0, typename T1>
 	struct nopromot_common_type<
-		T0, T1, std::enable_if_t<!std::is_integral_v<T0> || !std::is_integral_v<T1> || (!higher_integer_rank_than<T0, T1> && std::is_same_v<T0, T1>)>>
+		T0,
+		T1,
+		std::enable_if_t<!std::is_integral_v<T0> || !std::is_integral_v<T1> || (!higher_integer_rank_than<T0, T1> && std::is_same_v<T0, T1>)>>
 		: std::common_type<T0, T1>
 	{
 	};
@@ -400,18 +403,18 @@ namespace ccm::pp::detail
 		using SimdSizeType = std::size_t;
 
 		SimdSizeType index;
-		Up & obj;
+		Up &obj;
 
 		CCM_SIMD_INTRINSIC constexpr ValueType read() const noexcept { return Accessor::get(obj, index); }
 
 		template <typename Tp>
-		CCM_SIMD_INTRINSIC constexpr void write(Tp && x) const
+		CCM_SIMD_INTRINSIC constexpr void write(Tp &&x) const
 		{
 			Accessor::set(obj, index, std::forward<Tp>(x));
 		}
 
 	public:
-		CCM_SIMD_INTRINSIC constexpr SmartReference(Up & o, SimdSizeType i) noexcept : index(i), obj(o) {}
+		CCM_SIMD_INTRINSIC constexpr SmartReference(Up &o, SimdSizeType i) noexcept : index(i), obj(o) {}
 
 		using value_type = ValueType;
 
@@ -420,19 +423,19 @@ namespace ccm::pp::detail
 		CCM_SIMD_INTRINSIC constexpr operator value_type() const noexcept { return read(); }
 
 		template <typename Tp>
-		CCM_SIMD_INTRINSIC constexpr SmartReference operator=(Tp && x) &&
+		CCM_SIMD_INTRINSIC constexpr SmartReference operator=(Tp &&x) &&
 		{
 			write(std::forward<Tp>(x));
-			return {obj, index};
+			return { obj, index };
 		}
 
 #define CCM_SIMD_OP(op)                                                                                                                                        \
 	template <typename Tp>                                                                                                                                     \
-	CCM_SIMD_INTRINSIC constexpr SmartReference operator op##=(Tp && x) &&                                                                                \
+	CCM_SIMD_INTRINSIC constexpr SmartReference operator op##=(Tp &&x) &&                                                                                      \
 	{                                                                                                                                                          \
-		const value_type & lhs = read();                                                                                                                       \
+		const value_type &lhs = read();                                                                                                                        \
 		write(lhs op std::forward<Tp>(x));                                                                                                                     \
-		return {obj, index};                                                                                                                                   \
+		return { obj, index };                                                                                                                                 \
 	}
 
 		CCM_SIMD_OP(+)
@@ -453,7 +456,7 @@ namespace ccm::pp::detail
 		{
 			value_type x = read();
 			write(++x);
-			return {obj, index};
+			return { obj, index };
 		}
 
 		template <typename Tp = void, typename = decltype(std::declval<std::conditional_t<true, value_type, Tp> &>()++)>
@@ -470,7 +473,7 @@ namespace ccm::pp::detail
 		{
 			value_type x = read();
 			write(--x);
-			return {obj, index};
+			return { obj, index };
 		}
 
 		template <typename Tp = void, typename = decltype(std::declval<std::conditional_t<true, value_type, Tp> &>()--)>
@@ -482,7 +485,7 @@ namespace ccm::pp::detail
 			return r;
 		}
 
-		CCM_SIMD_INTRINSIC friend constexpr void swap(SmartReference && a, SmartReference && b) noexcept(
+		CCM_SIMD_INTRINSIC friend constexpr void swap(SmartReference &&a, SmartReference &&b) noexcept(
 			std::conjunction_v<std::is_nothrow_constructible<value_type, SmartReference &&>, std::is_nothrow_assignable<SmartReference &&, value_type &&>>)
 		{
 			value_type tmp					= std::forward<SmartReference>(a);
@@ -490,18 +493,20 @@ namespace ccm::pp::detail
 			std::forward<SmartReference>(b) = std::move(tmp);
 		}
 
-		CCM_SIMD_INTRINSIC friend constexpr void swap(value_type & a, SmartReference && b) noexcept(
-			std::conjunction_v<std::is_nothrow_constructible<value_type, value_type &&>, std::is_nothrow_assignable<value_type &, value_type &&>,
-							   std::is_nothrow_assignable<SmartReference &&, value_type &&>>)
+		CCM_SIMD_INTRINSIC friend constexpr void
+		swap(value_type &a, SmartReference &&b) noexcept(std::conjunction_v<std::is_nothrow_constructible<value_type, value_type &&>,
+																			std::is_nothrow_assignable<value_type &, value_type &&>,
+																			std::is_nothrow_assignable<SmartReference &&, value_type &&>>)
 		{
 			value_type tmp(std::move(a));
 			a								= static_cast<value_type>(b);
 			std::forward<SmartReference>(b) = std::move(tmp);
 		}
 
-		CCM_SIMD_INTRINSIC friend constexpr void swap(SmartReference && a, value_type & b) noexcept(
-			std::conjunction_v<std::is_nothrow_constructible<value_type, SmartReference &&>, std::is_nothrow_assignable<value_type &, value_type &&>,
-							   std::is_nothrow_assignable<SmartReference &&, value_type &&>>)
+		CCM_SIMD_INTRINSIC friend constexpr void swap(SmartReference &&a,
+													  value_type &b) noexcept(std::conjunction_v<std::is_nothrow_constructible<value_type, SmartReference &&>,
+																								 std::is_nothrow_assignable<value_type &, value_type &&>,
+																								 std::is_nothrow_assignable<SmartReference &&, value_type &&>>)
 		{
 			value_type tmp(a);
 			std::forward<SmartReference>(a) = std::move(b);

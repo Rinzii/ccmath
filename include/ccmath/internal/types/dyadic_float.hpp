@@ -193,7 +193,8 @@ namespace ccm::types
 		 *         this DyadicFloat to \p T.
 		 */
 
-		template <typename T, bool ShouldSignalExceptions,
+		template <typename T,
+				  bool ShouldSignalExceptions,
 				  typename = std::enable_if_t<std::is_floating_point_v<T> && (support::fp::FPBits<T>::fraction_length < Bits), void>>
 		constexpr T fast_as() const
 		{
@@ -240,7 +241,8 @@ namespace ccm::types
 
 			mantissa_type m_hi = shift >= mantissa_type::BITS ? mantissa_type(0) : mantissa >> shift;
 
-			T d_hi = support::fp::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_hi),
+			T d_hi = support::fp::FPBits<T>::create_value(sign,
+														  static_cast<output_bits_t>(exp_hi),
 														  (static_cast<output_bits_t>(m_hi) & support::fp::FPBits<T>::significand_mask) | implicit_mask)
 						 .get_val();
 
@@ -320,7 +322,8 @@ namespace ccm::types
 		 *
 		 * @return A floating-point value of type \p T that reflects the conversion.
 		 */
-		template <typename T, bool ShouldSignalExceptions,
+		template <typename T,
+				  bool ShouldSignalExceptions,
 				  typename = std::enable_if_t<std::is_floating_point_v<T> && (support::fp::FPBits<T>::fraction_length < Bits), void>>
 		constexpr T as() const
 		{

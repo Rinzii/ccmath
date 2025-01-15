@@ -256,8 +256,8 @@ namespace ccm::intrin
 	};
 
 	template <class T, int N>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, abi::pack<N>> choose(simd_mask<T, abi::pack<N>> const & a, simd<T, abi::pack<N>> const & b,
-																	   simd<T, abi::pack<N>> const & c)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, abi::pack<N>>
+	choose(simd_mask<T, abi::pack<N>> const & a, simd<T, abi::pack<N>> const & b, simd<T, abi::pack<N>> const & c)
 	{
 		simd<T, abi::pack<N>> result;
 		CCM_SIMD_VECTORIZE for (int i = 0; i < a.size(); ++i)

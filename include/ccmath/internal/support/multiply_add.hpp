@@ -20,7 +20,7 @@ namespace ccm::support
 	// Simple wrapper for fma
 
 	template <typename T>
-	constexpr std::enable_if_t<(sizeof(T) > sizeof(void *)), T> multiply_add(const T & x, const T & y, const T & z)
+	constexpr std::enable_if_t<(sizeof(T) > sizeof(void *)), T> multiply_add(const T &x, const T &y, const T &z)
 	{
 		return (x * y) + z;
 	}

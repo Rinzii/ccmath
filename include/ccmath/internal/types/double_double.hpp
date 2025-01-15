@@ -25,7 +25,7 @@ namespace ccm
 		// if assumption: |a| >= |b|, or a = 0.
 		constexpr DoubleDouble exact_add(double a, double b)
 		{
-			DoubleDouble r{0.0, 0.0};
+			DoubleDouble r{ 0.0, 0.0 };
 			r.hi		   = a + b;
 			const double t = r.hi - a;
 			r.lo		   = b - t;
@@ -50,7 +50,7 @@ namespace ccm
 		// Velkamp's Splitting for double precision.
 		constexpr DoubleDouble split(double a)
 		{
-			DoubleDouble r{0.0, 0.0};
+			DoubleDouble r{ 0.0, 0.0 };
 			// Splitting constant = 2^ceil(prec(double)/2) + 1 = 2^27 + 1.
 			constexpr double C = 0x1.0p27 + 1.0;
 			const double t1	   = C * a;
@@ -62,7 +62,7 @@ namespace ccm
 
 		constexpr DoubleDouble exact_mult(double a, double b)
 		{
-			DoubleDouble r{0.0, 0.0};
+			DoubleDouble r{ 0.0, 0.0 };
 
 // If we have builtin FMA, we can use it to get the exact product.
 #if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
@@ -105,8 +105,8 @@ namespace ccm
 	{
 		// Assuming |c| >= |a * b|.
 		template <>
-		constexpr types::DoubleDouble multiply_add<types::DoubleDouble>(const types::DoubleDouble & x, const types::DoubleDouble & y,
-																		const types::DoubleDouble & z)
+		constexpr types::DoubleDouble
+		multiply_add<types::DoubleDouble>(const types::DoubleDouble & x, const types::DoubleDouble & y, const types::DoubleDouble & z)
 		{
 			return add(z, quick_mult(x, y));
 		}

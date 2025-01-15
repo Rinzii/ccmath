@@ -28,10 +28,10 @@ namespace ccm::intrin
 		// The cmake performs a test validating if the compiler supports SVML.
 		// As far as I'm aware, this is the only reliable way to check.
 		#if CCMATH_HAS_SIMD_SVML
-		return {_mm_pow_ps(a.get(), b.get())};
+		return { _mm_pow_ps(a.get(), b.get()) };
 		#else
 		// TODO: Replace this with a refined solution. For the time being this is temporary.
-		return {gen::pow_gen(a.convert(), b.convert())};
+		return { gen::pow_gen(a.convert(), b.convert()) };
 		#endif
 	}
 
@@ -40,10 +40,10 @@ namespace ccm::intrin
 		// The cmake performs a test validating if the compiler supports SVML.
 		// As far as I'm aware, this is the only reliable way to check.
 		#if CCMATH_HAS_SIMD_SVML
-		return {_mm_pow_pd(a.get(), b.get())};
+		return { _mm_pow_pd(a.get(), b.get()) };
 		#else
 		// TODO: Replace this with a refined solution. For the time being this is temporary.
-		return {gen::pow_gen(a.convert(), b.convert())};
+		return { gen::pow_gen(a.convert(), b.convert()) };
 		#endif
 	}
 } // namespace ccm::intrin

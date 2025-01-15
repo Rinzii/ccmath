@@ -31,8 +31,8 @@ namespace ccm::internal::impl
 		return std::numeric_limits<float>::quiet_NaN(); // Default NaN
 #endif
 
-		std::uint32_t flt_bits{0};
-		bool has_hex_been_detected{false};
+		std::uint32_t flt_bits{ 0 };
+		bool has_hex_been_detected{ false };
 
 		// NOLINTBEGIN
 
