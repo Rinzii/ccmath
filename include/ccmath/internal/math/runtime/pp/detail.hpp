@@ -20,7 +20,6 @@
 #include "const_eval.hpp"
 #include "debug_print.hpp"
 #include "may_alias.hpp"
-#include "simd_intrinsic.hpp"
 #include "trap.hpp"
 
 #include "ccmath/internal/predef/attributes/always_inline.hpp"
@@ -57,7 +56,7 @@ namespace ccm::pp::detail
 	inline constexpr PrivateInit private_init = PrivateInit{};
 
 	template <typename T, typename F>
-	CCM_ATTR_SIMD_INTRINSIC static void bit_iteration(T mask, F && func)
+	CCM_SIMD_INTRINSIC static void bit_iteration(T mask, F && func)
 	{
 		static_assert(sizeof(0ULL) >= sizeof(T));
 		using ConditionalType = std::conditional_t<sizeof(T) <= sizeof(0u), unsigned, unsigned long long>;
@@ -70,7 +69,7 @@ namespace ccm::pp::detail
 	}
 
 	template <size_t Np, bool Sanitized, typename F>
-	CCM_ATTR_SIMD_INTRINSIC static void bit_iteration(BitMask<Np, Sanitized> mask, F && func)
+	CCM_SIMD_INTRINSIC static void bit_iteration(BitMask<Np, Sanitized> mask, F && func)
 	{
 		bit_iteration(mask.sanitized().to_bits(), func);
 	}
@@ -270,13 +269,13 @@ namespace ccm::pp::detail
 	}();
 
 	template <typename Integral, std::enable_if_t<std::is_integral_v<Integral>, int> = 0>
-	CCM_ATTR_SIMD_INTRINSIC SimdSizeType lowest_bit(Integral bits)
+	CCM_SIMD_INTRINSIC SimdSizeType lowest_bit(Integral bits)
 	{
 		return ccm::support::ctz(bits);
 	}
 
 	template <typename Integral, std::enable_if_t<std::is_integral_v<Integral>, int> = 0>
-	CCM_ATTR_SIMD_INTRINSIC SimdSizeType highest_bit(Integral bits)
+	CCM_SIMD_INTRINSIC SimdSizeType highest_bit(Integral bits)
 	{
 		if constexpr (sizeof(bits) <= sizeof(int)) { return sizeof(int) * CHAR_BIT - 1 - ccm::support::countl_zero(bits); }
 		else if constexpr (sizeof(bits) <= sizeof(long)) { return sizeof(long) * CHAR_BIT - 1 - ccm::support::countl_zero(bits); }
@@ -403,25 +402,25 @@ namespace ccm::pp::detail
 		SimdSizeType index;
 		Up & obj;
 
-		CCM_ATTR_SIMD_INTRINSIC constexpr ValueType read() const noexcept { return Accessor::get(obj, index); }
+		CCM_SIMD_INTRINSIC constexpr ValueType read() const noexcept { return Accessor::get(obj, index); }
 
 		template <typename Tp>
-		CCM_ATTR_SIMD_INTRINSIC constexpr void write(Tp && x) const
+		CCM_SIMD_INTRINSIC constexpr void write(Tp && x) const
 		{
 			Accessor::set(obj, index, std::forward<Tp>(x));
 		}
 
 	public:
-		CCM_ATTR_SIMD_INTRINSIC constexpr SmartReference(Up & o, SimdSizeType i) noexcept : index(i), obj(o) {}
+		CCM_SIMD_INTRINSIC constexpr SmartReference(Up & o, SimdSizeType i) noexcept : index(i), obj(o) {}
 
 		using value_type = ValueType;
 
 		SmartReference(const SmartReference &) = delete;
 
-		CCM_ATTR_SIMD_INTRINSIC constexpr operator value_type() const noexcept { return read(); }
+		CCM_SIMD_INTRINSIC constexpr operator value_type() const noexcept { return read(); }
 
 		template <typename Tp>
-		CCM_ATTR_SIMD_INTRINSIC constexpr SmartReference operator=(Tp && x) &&
+		CCM_SIMD_INTRINSIC constexpr SmartReference operator=(Tp && x) &&
 		{
 			write(std::forward<Tp>(x));
 			return {obj, index};
@@ -429,7 +428,7 @@ namespace ccm::pp::detail
 
 #define CCM_SIMD_OP(op)                                                                                                                                        \
 	template <typename Tp>                                                                                                                                     \
-	CCM_ATTR_SIMD_INTRINSIC constexpr SmartReference operator op##=(Tp && x) &&                                                                                \
+	CCM_SIMD_INTRINSIC constexpr SmartReference operator op##=(Tp && x) &&                                                                                \
 	{                                                                                                                                                          \
 		const value_type & lhs = read();                                                                                                                       \
 		write(lhs op std::forward<Tp>(x));                                                                                                                     \
@@ -450,7 +449,7 @@ namespace ccm::pp::detail
 #undef CCM_SIMD_OP
 
 		template <typename Tp = void, typename = decltype(++std::declval<std::conditional_t<true, value_type, Tp> &>())>
-		CCM_ATTR_SIMD_INTRINSIC constexpr SmartReference operator++() &&
+		CCM_SIMD_INTRINSIC constexpr SmartReference operator++() &&
 		{
 			value_type x = read();
 			write(++x);
@@ -458,7 +457,7 @@ namespace ccm::pp::detail
 		}
 
 		template <typename Tp = void, typename = decltype(std::declval<std::conditional_t<true, value_type, Tp> &>()++)>
-		CCM_ATTR_SIMD_INTRINSIC constexpr value_type operator++(int) &&
+		CCM_SIMD_INTRINSIC constexpr value_type operator++(int) &&
 		{
 			const value_type r = read();
 			value_type x	   = r;
@@ -467,7 +466,7 @@ namespace ccm::pp::detail
 		}
 
 		template <typename Tp = void, typename = decltype(--std::declval<std::conditional_t<true, value_type, Tp> &>())>
-		CCM_ATTR_SIMD_INTRINSIC constexpr SmartReference operator--() &&
+		CCM_SIMD_INTRINSIC constexpr SmartReference operator--() &&
 		{
 			value_type x = read();
 			write(--x);
@@ -475,7 +474,7 @@ namespace ccm::pp::detail
 		}
 
 		template <typename Tp = void, typename = decltype(std::declval<std::conditional_t<true, value_type, Tp> &>()--)>
-		CCM_ATTR_SIMD_INTRINSIC constexpr value_type operator--(int) &&
+		CCM_SIMD_INTRINSIC constexpr value_type operator--(int) &&
 		{
 			const value_type r = read();
 			value_type x	   = r;
@@ -483,7 +482,7 @@ namespace ccm::pp::detail
 			return r;
 		}
 
-		CCM_ATTR_SIMD_INTRINSIC friend constexpr void swap(SmartReference && a, SmartReference && b) noexcept(
+		CCM_SIMD_INTRINSIC friend constexpr void swap(SmartReference && a, SmartReference && b) noexcept(
 			std::conjunction_v<std::is_nothrow_constructible<value_type, SmartReference &&>, std::is_nothrow_assignable<SmartReference &&, value_type &&>>)
 		{
 			value_type tmp					= std::forward<SmartReference>(a);
@@ -491,7 +490,7 @@ namespace ccm::pp::detail
 			std::forward<SmartReference>(b) = std::move(tmp);
 		}
 
-		CCM_ATTR_SIMD_INTRINSIC friend constexpr void swap(value_type & a, SmartReference && b) noexcept(
+		CCM_SIMD_INTRINSIC friend constexpr void swap(value_type & a, SmartReference && b) noexcept(
 			std::conjunction_v<std::is_nothrow_constructible<value_type, value_type &&>, std::is_nothrow_assignable<value_type &, value_type &&>,
 							   std::is_nothrow_assignable<SmartReference &&, value_type &&>>)
 		{
@@ -500,7 +499,7 @@ namespace ccm::pp::detail
 			std::forward<SmartReference>(b) = std::move(tmp);
 		}
 
-		CCM_ATTR_SIMD_INTRINSIC friend constexpr void swap(SmartReference && a, value_type & b) noexcept(
+		CCM_SIMD_INTRINSIC friend constexpr void swap(SmartReference && a, value_type & b) noexcept(
 			std::conjunction_v<std::is_nothrow_constructible<value_type, SmartReference &&>, std::is_nothrow_assignable<value_type &, value_type &&>,
 							   std::is_nothrow_assignable<SmartReference &&, value_type &&>>)
 		{

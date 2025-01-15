@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) Ian Pike
  * Copyright (c) CCMath contributors
