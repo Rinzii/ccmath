@@ -97,7 +97,7 @@ namespace ccm::gen::impl
 			};
 
 			const DoubleDouble dx_dd({ 0.0, dx2 });
-			const DoubleDouble p = support::polyeval(dx_dd, COEFFS[0], COEFFS[1], COEFFS[2], COEFFS[3], COEFFS[4], COEFFS[5]);
+			const DoubleDouble p = ::ccm::support::polyeval(dx_dd, COEFFS[0], COEFFS[1], COEFFS[2], COEFFS[3], COEFFS[4], COEFFS[5]);
 
 			// log2(1 + dx2) ~ dx2 * P(dx2)
 			const DoubleDouble log2_x_lo = quick_mult(dx2, p);
@@ -132,7 +132,7 @@ namespace ccm::gen::impl
 				DoubleDouble{ -0x1.8483eabd9642dp-132, 0x1.b5251ff97bee1p-78 },
 			};
 
-			DoubleDouble pp		  = support::polyeval(lo6,
+			DoubleDouble pp		  = ::ccm::support::polyeval(lo6,
 												  EXP2_COEFFS[0],
 												  EXP2_COEFFS[1],
 												  EXP2_COEFFS[2],
@@ -194,8 +194,8 @@ namespace ccm::gen::impl
 					if (x == 0.0F && y_u == 0xff80'0000)
 					{
 						// pow(+/-0, -inf) = +inf and raise FE_DIVBYZERO
-						support::fenv::set_errno_if_required(EDOM);
-						support::fenv::raise_except_if_required(FE_DIVBYZERO);
+						::ccm::support::fenv::set_errno_if_required(EDOM);
+						::ccm::support::fenv::raise_except_if_required(FE_DIVBYZERO);
 						return FloatBits::inf().get_val();
 					}
 					return ((x_abs < 0x3f80'0000) == (y_u == 0xff80'0000)) ? FloatBits::inf().get_val() : 0.0F;
@@ -366,7 +366,7 @@ namespace ccm::gen::impl
 			const double c1	 = support::multiply_add(dx, COEFFS[3], COEFFS[2]);
 			const double c2	 = support::multiply_add(dx, COEFFS[5], COEFFS[4]);
 
-			const double p = support::polyeval(dx2, c0, c1, c2);
+			const double p = ::ccm::support::polyeval(dx2, c0, c1, c2);
 
 			//////////////////////////////////////////////////////////////////////////////
 			// NOTE: For some reason, this is significantly less efficient than above!
@@ -455,7 +455,7 @@ namespace ccm::gen::impl
 			const double d0		 = support::multiply_add(lo6, EXP2_COEFFS[1], EXP2_COEFFS[0]);
 			const double d1		 = support::multiply_add(lo6, EXP2_COEFFS[3], EXP2_COEFFS[2]);
 			const double d2		 = support::multiply_add(lo6, EXP2_COEFFS[5], EXP2_COEFFS[4]);
-			const double pp		 = support::polyeval(lo6_sqr, d0, d1, d2);
+			const double pp		 = ::ccm::support::polyeval(lo6_sqr, d0, d1, d2);
 
 			const double r = pp * exp2_hi_mid;
 
