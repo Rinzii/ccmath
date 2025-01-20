@@ -26,6 +26,7 @@
 #include "ccmath/internal/support/fp/nearest_integer.hpp"
 #include "ccmath/internal/support/fp/ops/add.hpp"
 #include "ccmath/internal/support/fp/ops/mul.hpp"
+#include "ccmath/internal/support/poly_eval.hpp"
 #include "ccmath/internal/types/double_double.hpp"
 #include "ccmath/internal/types/triple_double.hpp"
 
