@@ -133,16 +133,16 @@ namespace ccm::gen::impl
 			};
 
 			DoubleDouble pp		  = ::ccm::support::polyeval(lo6,
-												  EXP2_COEFFS[0],
-												  EXP2_COEFFS[1],
-												  EXP2_COEFFS[2],
-												  EXP2_COEFFS[3],
-												  EXP2_COEFFS[4],
-												  EXP2_COEFFS[5],
-												  EXP2_COEFFS[6],
-												  EXP2_COEFFS[7],
-												  EXP2_COEFFS[8],
-												  EXP2_COEFFS[9]);
+														 EXP2_COEFFS[0],
+														 EXP2_COEFFS[1],
+														 EXP2_COEFFS[2],
+														 EXP2_COEFFS[3],
+														 EXP2_COEFFS[4],
+														 EXP2_COEFFS[5],
+														 EXP2_COEFFS[6],
+														 EXP2_COEFFS[7],
+														 EXP2_COEFFS[8],
+														 EXP2_COEFFS[9]);
 			const DoubleDouble rr = quick_mult(exp2_hi_mid, pp);
 
 			// Make sure the sum is normalized:
