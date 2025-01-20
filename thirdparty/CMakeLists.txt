@@ -70,13 +70,13 @@ endif ()
 FetchContent_MakeAvailable(benchmark)
 
 # Create the INTERFACE library
-add_library(${PROJECT_NAME} INTERFACE)
-add_library(ccmath::ext ALIAS ${PROJECT_NAME})
+add_library(ccmath-ext INTERFACE)
+add_library(ccmath::ext ALIAS ccmath-ext)
 
 # Link GTest only if tests are enabled
 if (CCMATH_BUILD_TESTS)
-    target_link_libraries(${PROJECT_NAME} INTERFACE gtest::gtest)
-    target_link_libraries(${PROJECT_NAME} INTERFACE absl::base absl::debugging re2::re2)
+    target_link_libraries(ccmath-ext INTERFACE gtest::gtest)
+    target_link_libraries(ccmath-ext INTERFACE absl::base absl::debugging re2::re2)
     if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         target_compile_options(gtest INTERFACE -Wno-everything -Wno-sign-conversion)
     endif ()
@@ -85,7 +85,7 @@ endif ()
 
 # Link Google Benchmark only if benchmarks are enabled
 if (CCMATH_BUILD_BENCHMARKS)
-    target_link_libraries(${PROJECT_NAME} INTERFACE benchmark::benchmark)
+    target_link_libraries(ccmath-ext INTERFACE benchmark::benchmark)
 endif ()
 
 

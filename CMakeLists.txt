@@ -32,8 +32,8 @@ message(STATUS "CCMath: Version: ${PROJECT_VERSION}")
 #
 include(cmake/config/UserOptions.cmake) # To see the options, look at this file
 
-add_library(${PROJECT_NAME}-compile-options INTERFACE)
-add_library(${PROJECT_NAME}::${PROJECT_NAME}-compile-options ALIAS ${PROJECT_NAME}-compile-options)
+add_library(ccmath-compile-options INTERFACE)
+add_library(ccmath::ccmath-compile-options ALIAS ccmath-compile-options)
 
 #
 # Compiler Flags and Conditions
@@ -42,7 +42,7 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME}-compile-options ALIAS ${PROJECT_NAM
 # MSVC Compiler Options
 if (MSVC)
     # Set MSVC-specific compilation flags
-    target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+    target_compile_options(ccmath-compile-options INTERFACE
             /W4              # Enable high warning level
             /permissive-     # Enforce standard C++ conformance
             /Zc:__cplusplus  # Properly define __cplusplus macro for the compiler version
@@ -51,12 +51,12 @@ if (MSVC)
 
     # Define NOMINMAX on Windows platforms to avoid macro conflicts with std::min/std::max
     if (WIN32)
-        target_compile_definitions(${PROJECT_NAME}-compile-options INTERFACE NOMINMAX)
+        target_compile_definitions(ccmath-compile-options INTERFACE NOMINMAX)
     endif ()
 
     # Treat warnings as errors if CCMATH_STRICT_WARNINGS is set
     if (CCMATH_STRICT_WARNINGS)
-        target_compile_options(${PROJECT_NAME}-compile-options INTERFACE /WX) # Warnings as errors
+        target_compile_options(ccmath-compile-options INTERFACE /WX) # Warnings as errors
     endif ()
 
     # Clang, GCC, and IntelLLVM Compiler Options
@@ -64,7 +64,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|IntelLLVM")
 
 
     # Generic options for Clang, GCC, and IntelLLVM
-    target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+    target_compile_options(ccmath-compile-options INTERFACE
             -Wall           # Enable common warnings
             -Wextra         # Enable additional warnings
             -Wconversion    # Warn on implicit type conversions
@@ -75,14 +75,14 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|IntelLLVM")
 
     # Add Clang-specific options
     if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+        target_compile_options(ccmath-compile-options INTERFACE
                 -Wpedantic-macros  # Warn about non-standard macro usage
         )
     endif ()
 
     # Treat specific warnings as errors if CCMATH_STRICT_WARNINGS is set
     if (CCMATH_STRICT_WARNINGS)
-        target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+        target_compile_options(ccmath-compile-options INTERFACE
                 -Werror=return-type  # Treat missing return type warnings as errors
         )
     endif ()
@@ -91,12 +91,12 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|IntelLLVM")
     if (CCMATH_DEV_AGGRESIVE_DEBUG)
         if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|IntelLLVM")
 
-            target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+            target_compile_options(ccmath-compile-options INTERFACE
                     -Wwrite-strings  # Warn about writeable string literals
                     -g3              # Maximum debug information
             )
         elseif (MSVC)
-            target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+            target_compile_options(ccmath-compile-options INTERFACE
                     /Zi  # Generate full debugging information
             )
         endif ()
@@ -104,7 +104,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|IntelLLVM")
 
     # TODO: Decide if we plan to delete this or not
     #  if (CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
-    #    target_compile_options(${PROJECT_NAME}-compile-options INTERFACE
+    #    target_compile_options(ccmath-compile-options INTERFACE
     #            -Wno-tautological-constant-compare
     #    )
     #  endif()
@@ -113,8 +113,8 @@ else ()
     message(WARNING "CCMath: Unknown compiler. No specific flags applied.")
 endif ()
 
-add_library(${PROJECT_NAME} INTERFACE)
-add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+add_library(ccmath INTERFACE)
+add_library(ccmath::ccmath ALIAS ccmath)
 
 include(cmake/helpers/CcmAddHeaders.cmake)
 
@@ -127,21 +127,21 @@ include(cmake/config/features/GetAllSupportedFeatures.cmake)
 
 
 # Ensure proper include directories for consumers
-target_include_directories(${PROJECT_NAME} INTERFACE
+target_include_directories(ccmath INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-target_link_libraries(${PROJECT_NAME} INTERFACE
-        ${PROJECT_NAME}::${PROJECT_NAME}-compile-options
+target_link_libraries(ccmath INTERFACE
+        ccmath::ccmath-compile-options
 )
 
 if (CCMATH_ENABLE_RUNTIME_SIMD)
-    target_compile_definitions(${PROJECT_NAME} INTERFACE CCM_CONFIG_USE_RT_SIMD)
+    target_compile_definitions(ccmath INTERFACE CCM_CONFIG_USE_RT_SIMD)
 endif ()
 
 if (NOT CCMATH_ENABLE_USER_DEFINED_OPTIMIZATION_MACROS)
-    target_compile_definitions(${PROJECT_NAME} INTERFACE
+    target_compile_definitions(ccmath INTERFACE
             $<$<CONFIG:Debug>:CCM_CONFIG_DEBUG>
             $<$<CONFIG:RelWithDebInfo>:CCM_CONFIG_OPTIMIZE>
             $<$<CONFIG:Release>:CCM_CONFIG_AGGRESSIVELY_OPTIMIZE>
@@ -150,7 +150,7 @@ if (NOT CCMATH_ENABLE_USER_DEFINED_OPTIMIZATION_MACROS)
 endif ()
 
 if (CCMATH_DISABLE_ERRNO)
-    target_compile_definitions(${PROJECT_NAME} INTERFACE CCM_CONFIG_DISABLE_ERRNO)
+    target_compile_definitions(ccmath INTERFACE CCM_CONFIG_DISABLE_ERRNO)
 endif ()
 
 # Generate version header
@@ -185,9 +185,9 @@ if (CCMATH_INSTALL)
     include(CMakePackageConfigHelpers)
 
     install(TARGETS
-            ${PROJECT_NAME}
-            ${PROJECT_NAME}-compile-options
-            EXPORT ${PROJECT_NAME}-targets
+            ccmath
+            ccmath-compile-options
+            EXPORT ccmath-targets
     )
 
     install(DIRECTORY
@@ -197,31 +197,31 @@ if (CCMATH_INSTALL)
     )
 
     install(FILES
-            "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.hpp"
-            DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}"
+            "${CMAKE_CURRENT_BINARY_DIR}/include/ccmath/version.hpp"
+            DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/ccmath"
     )
 
-    install(EXPORT ${PROJECT_NAME}-targets
-            FILE ${PROJECT_NAME}-targets.cmake
-            NAMESPACE ${PROJECT_NAME}::
-            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    install(EXPORT ccmath-targets
+            FILE ccmath-targets.cmake
+            NAMESPACE ccmath::
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/ccmath"
     )
 
     configure_package_config_file(
-            cmake/${PROJECT_NAME}-config.cmake.in
-            "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
-            INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+            cmake/ccmath-config.cmake.in
+            "${CMAKE_CURRENT_BINARY_DIR}/ccmath-config.cmake"
+            INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/ccmath"
     )
 
     # Write a version file for strict version checking
     write_basic_package_version_file(
-            "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/ccmath-config-version.cmake"
             COMPATIBILITY SameMajorVersion
     )
 
     install(FILES
-            "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
-            "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake"
-            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+            "${CMAKE_CURRENT_BINARY_DIR}/ccmath-config.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/ccmath-config-version.cmake"
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/ccmath"
     )
 endif ()
