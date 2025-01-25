@@ -8,19 +8,19 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
-
 #include "ccmath/ccmath.hpp"
+
+#include <gtest/gtest.h>
 
 #include <cmath>
 #include <limits>
 
-namespace {
-	// Equivelant to EXPECT_EQ but allows for NaN values to be equal.
-	bool IsNanOrEquivalent(double a, double b) {
-		return (std::isnan(a) && std::isnan(b)) || (a == b);
-	}
-}
+// namespace {
+//	// Equivelant to EXPECT_EQ but allows for NaN values to be equal.
+//	bool IsNanOrEquivalent(double a, double b) {
+//		return (std::isnan(a) && std::isnan(b)) || (a == b);
+//	}
+// }
 
 /*
 TEST(CcmathPowerTests, Pow_Double_SpecialCases)

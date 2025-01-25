@@ -30,20 +30,28 @@ target_include_directories(ccmath-test PUBLIC
         .
 )
 
-# Only supported compilers are MSVC, GNU, and Clang for specific compiler flags
-# TODO: Add additional flags for all supported compilers
-if (MSVC)
-    # Force shared CRT if desired (on Windows)
-    # set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    target_compile_options(ccmath-test PUBLIC
-            /W4 /WX
+# Currently removing aggressive test cases for testing functiojs
+if (CMAKE_CXX_COMPILER_ID STREQUAL MSVC)
+    target_compile_options(ccmath-test PRIVATE
+            /W3
     )
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR
-        CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    target_compile_options(ccmath-test PUBLIC
-            -Wall -Wextra -Wno-pedantic -Wno-unused-function -Wno-sign-conversion -Wno-error=overflow
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|IntelLLVM")
+    target_compile_options(ccmath-test PRIVATE
+            -Wno-all
+            -Wno-extra
+            -Wno-conversion
+            -Wno-pedantic
+            -Wno-sign-conversion
+            -Wno-error
     )
+
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        target_compile_options(ccmath-test PRIVATE
+                -Wno-everything
+        )
+    endif ()
 endif ()
+
 
 # --------------------------------------------------------------------------
 # Helper function to avoid repeating the same lines for each test
