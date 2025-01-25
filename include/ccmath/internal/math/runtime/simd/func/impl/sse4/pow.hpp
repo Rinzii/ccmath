@@ -15,7 +15,7 @@
 #ifdef CCMATH_HAS_SIMD
 	#ifdef CCMATH_HAS_SIMD_SSE4
 
-		#if CCMATH_HAS_SIMD_SVML
+		#ifdef CCMATH_HAS_SIMD_SVML
 			#include <immintrin.h>
 		#else
 			#include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
