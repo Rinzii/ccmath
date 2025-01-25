@@ -41,7 +41,7 @@ if (MSVC)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR
         CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     target_compile_options(ccmath-test PUBLIC
-            -Wall -Wextra -Wno-pedantic -Wno-unused-function -Wno-sign-conversion
+            -Wall -Wextra -Wno-pedantic -Wno-unused-function -Wno-sign-conversion -Wno-error=overflow
     )
 endif ()
 
