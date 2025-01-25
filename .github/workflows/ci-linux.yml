@@ -93,7 +93,7 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -yqq --no-install-recommends ninja-build
 
       - name: Configure
-        run: cmake --preset="${{ matrix.configurePreset }}" -DCMAKE_CXX_STANDARD="${{ matrix.cxx_version }}"
+        run: cmake --preset="${{ matrix.configurePreset }}" -DCCMATH_DESIRED_CXX_STANDARD="cxx_std_${{ matrix.cxx_version }}"
 
       - name: Build
         run: cmake --build --preset="${{ matrix.buildPreset }}"
