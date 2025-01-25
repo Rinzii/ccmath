@@ -12,19 +12,17 @@
 // https://github.com/actions/runner-images/issues/10004#
 // NOLINTNEXTLINE
 
-#include <gtest/gtest.h>
-
 #include "ccmath/ccmath.hpp"
+
+#include <gtest/gtest.h>
 
 #include <cmath>
 #include <limits>
 
-/*
 TEST(CcmathPowerTests, Sqrt_StaticAssert)
 {
-	//static_assert(ccm::sqrt(2.0) == ccm::sqrt(2.0), "ccm::sqrt is not a compile time constant!");
+	static_assert(ccm::sqrt(2.0) == ccm::sqrt(2.0), "ccm::sqrt is not a compile time constant!");
 }
-*/
 
 TEST(CcmathPowerTests, Sqrt_Double_CheckCCM)
 {
