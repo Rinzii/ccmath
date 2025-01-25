@@ -11,13 +11,10 @@
 #pragma once
 
 #include "ccmath/internal/config/type_support.hpp"
-#include "ccmath/internal/math/runtime/simd/simd_vectorize.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
-#include "ccmath/internal/support/always_false.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
-#include "ccmath/internal/support/is_constant_evaluated.hpp"
 
 #include <type_traits>
 
@@ -174,7 +171,7 @@ namespace ccm::gen
 			{
 				using FPBits_t			   = support::fp::FPBits<T>;
 				using storage_type		   = typename FPBits_t::storage_type;
-				constexpr storage_type one = storage_type(1) << FPBits_t::fraction_length;
+				constexpr storage_type one = static_cast<storage_type>(1) << FPBits_t::fraction_length;
 
 				int x_exp			= bits.get_exponent();
 				storage_type x_mant = bits.get_mantissa();
@@ -197,30 +194,14 @@ namespace ccm::gen
 				storage_type y = one;
 				storage_type r = x_mant - one;
 
-				if (ccm::support::is_constant_evaluated())
+				for (storage_type current_bit = one >> 1; current_bit; current_bit >>= 1)
 				{
-					for (storage_type current_bit = one >> 1; current_bit; current_bit >>= 1)
+					r <<= 1;
+					const storage_type tmp = (y << 1) + current_bit; // 2*y(n - 1) + 2^(-n-1)
+					if (r >= tmp)
 					{
-						r <<= 1;
-						const storage_type tmp = (y << 1) + current_bit; // 2*y(n - 1) + 2^(-n-1)
-						if (r >= tmp)
-						{
-							r -= tmp;
-							y += current_bit;
-						}
-					}
-				}
-				else // If we are not in a constant evaluated context, we can vectorize the loop.
-				{
-					CCM_SIMD_VECTORIZE for (storage_type current_bit = one >> 1; current_bit; current_bit >>= 1)
-					{
-						r <<= 1;
-						const storage_type tmp = (y << 1) + current_bit; // 2 * y(n - 1) + 2^(-n-1)
-						if (r >= tmp)
-						{
-							r -= tmp;
-							y += current_bit;
-						}
+						r -= tmp;
+						y += current_bit;
 					}
 				}
 
@@ -278,7 +259,7 @@ namespace ccm::gen
 					if (CCM_UNLIKELY(bits.is_neg())) { return -flt_nan; }
 
 					// If we didn't encounter any special cases, we can calculate the square root normally.
-					return sqrt_calc_bits(bits);
+					return sqrt_calc_bits<T>(bits);
 				}
 			}
 		} // namespace impl
