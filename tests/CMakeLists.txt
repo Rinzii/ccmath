@@ -22,10 +22,7 @@ add_library(ccmath::test ALIAS ccmath-test)
 target_link_libraries(ccmath-test
         PUBLIC
         ccmath::ccmath # target library to test e.g. CCMath :)
-
-        ${Abseil_LIBRARIES}
-        gtest::gtest
-        re2::re2
+        ccmath::ext
 )
 
 target_include_directories(ccmath-test PUBLIC
