@@ -25,7 +25,6 @@ namespace ccm::gen
 {
 	namespace internal
 	{
-
 		template <typename T>
 		struct Is80BitLongDouble
 		{

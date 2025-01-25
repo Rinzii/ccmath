@@ -83,7 +83,7 @@ namespace ccm::gen::impl
 			//   - The output range of dx2 is bounded by:
 			//     -0x1.3ffcp-15 <= dx2 <= 0x1.3e3dp-15
 			const int idx2	 = static_cast<int>(support::fp::nearest_integer(support::multiply_add(dx, 0x1.0p14, 0x1.0p6)));
-			const double dx2 = support::multiply_add(1.0 + dx, support::constants::R2.at(idx2), -1.0); // Exact
+			const double dx2 = support::multiply_add(1.0 + dx, support::constants::R2.at(static_cast<std::size_t>(idx2)), -1.0); // Exact
 
 			// Degree-5 polynomial approximation for log2(1 + x)/x in double-double precision:
 			//   - Generated using Sollya with the command:
@@ -104,10 +104,10 @@ namespace ccm::gen::impl
 			const DoubleDouble log2_x_lo = quick_mult(dx2, p);
 
 			// Lower parts of (e_x - log2(r1)) of the first range reduction constant
-			const DoubleDouble log2_x_mid({ LOG2_R_TD.at(idx_x).lo, LOG2_R_TD.at(idx_x).mid });
+			const DoubleDouble log2_x_mid({ LOG2_R_TD.at(static_cast<std::size_t>(idx_x)).lo, LOG2_R_TD.at(static_cast<std::size_t>(idx_x)).mid });
 
 			// -log2(r2) + lower part of (e_x - log2(r1))
-			const DoubleDouble log2_x_m = add(LOG2_R2_DD.at(idx2), log2_x_mid);
+			const DoubleDouble log2_x_m = add(LOG2_R2_DD.at(static_cast<std::size_t>(idx2)), log2_x_mid);
 
 			// log2(1 + dx2) - log2(r2) + lower part of (e_x - log2(r1))
 			// Since we don't know which one has larger exponent to apply Fast2Sum
@@ -348,9 +348,9 @@ namespace ccm::gen::impl
 			//   log2(m_x) = log2( (1 + dx) / r )
 			//             = log2(1 + dx) - log2(r).
 #ifdef CCMATH_TARGET_CPU_HAS_FMA
-			const double dx = static_cast<double>(support::multiply_add(m_x, support::constants::R.at(idx_x), -1.0F)); // Exact
+			const double dx = static_cast<double>(support::multiply_add(m_x, support::constants::R.at(static_cast<std::size_t>(idx_x)), -1.0F)); // Exact
 #else
-			const double dx = support::multiply_add(static_cast<double>(m_x), support::constants::RD.at(idx_x), -1.0); // Exact
+			const double dx = support::multiply_add(static_cast<double>(m_x), support::constants::RD.at(static_cast<std::size_t>(idx_x)), -1.0); // Exact
 #endif // LIBC_TARGET_CPU_HAS_FMA
 
 			// Degree-5 polynomial approximation:
@@ -391,7 +391,7 @@ namespace ccm::gen::impl
 			//                 = ulp(e_x) + 2^-7 * 2^-51
 			//                 < 2^8 * 2^-52 + 2^-7 * 2^-43
 			//                 ~ 2^-44 + 2^-50
-			const double s = support::multiply_add(dx, p, support::constants::LOG2_R.at(idx_x) + e_x);
+			const double s = support::multiply_add(dx, p, support::constants::LOG2_R.at(static_cast<std::size_t>(idx_x)) + e_x);
 
 			// To compute 2^(y * log2(x)), we break the exponent into 3 parts:
 			//   y * log(2) = hi + mid + lo, where
@@ -416,11 +416,11 @@ namespace ccm::gen::impl
 			const auto y6	= static_cast<double>(y * 0x1.0p6F); // Exact.
 			const double hm = support::fp::nearest_integer(s * y6);
 			// lo6 = 2^6 * lo.
-			const double lo6_hi = support::multiply_add(y6, e_x + LOG2_R_TD.at(idx_x).hi, -hm); // Exact
+			const double lo6_hi = support::multiply_add(y6, e_x + LOG2_R_TD.at(static_cast<std::size_t>(idx_x)).hi, -hm); // Exact
 			// Error bounds:
 			//   | (y*log2(x) - hm * 2^-6 - lo) / y| < err(dx * p) + err(LOG2_R_DD.lo)
 			//                                       < 2^-51 + 2^-75
-			const double lo6 = support::multiply_add(y6, support::multiply_add(dx, p, LOG2_R_TD.at(idx_x).mid), lo6_hi);
+			const double lo6 = support::multiply_add(y6, support::multiply_add(dx, p, LOG2_R_TD.at(static_cast<std::size_t>(idx_x)).mid), lo6_hi);
 
 			// |2^(hi + mid) - exp2_hi_mid| <= ulp(exp2_hi_mid) / 2
 			// Clamp the exponent part into a smaller range that fits double precision.
@@ -436,7 +436,8 @@ namespace ccm::gen::impl
 
 			// 2^mid
 			// NOLINTNEXTLINE(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
-			const std::int64_t exp_mid_i = support::bit_cast<std::uint64_t>(support::constants::EXP2_MID1.at(idx_y).hi);
+			const std::int64_t exp_mid_i =
+				static_cast<std::int64_t>(support::bit_cast<std::uint64_t>(support::constants::EXP2_MID1.at(static_cast<std::size_t>(idx_y)).hi));
 
 			// (-1)^sign * 2^hi * 2^mid
 			// Error <= 2^hi * 2^-53
@@ -486,7 +487,9 @@ namespace ccm::gen::impl
 			// Scale lower part of 2^(hi + mid)
 			DoubleDouble exp2_hi_mid_dd{};
 			exp2_hi_mid_dd.lo =
-				(idx_y != 0) ? support::bit_cast<double>(exp_hi_i + support::bit_cast<int64_t>(support::constants::EXP2_MID1.at(idx_y).mid)) : 0.0;
+				(idx_y != 0)
+					? support::bit_cast<double>(exp_hi_i + support::bit_cast<int64_t>(support::constants::EXP2_MID1.at(static_cast<std::size_t>(idx_y)).mid))
+					: 0.0;
 			exp2_hi_mid_dd.hi = exp2_hi_mid;
 
 			const double r_dd = powf_double_double(idx_x, dx, y6, lo6_hi, exp2_hi_mid_dd);
