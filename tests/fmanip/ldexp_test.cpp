@@ -11,6 +11,7 @@
 #include "ccmath/ccmath.hpp"
 
 #include <gtest/gtest.h>
+
 #include <cmath>
 #include <limits>
 
@@ -21,8 +22,20 @@ class CcmathFmanipTests : public ::testing::Test
 {
 };
 
-typedef ::testing::Types<float, double, long double> TestTypes;
-TYPED_TEST_SUITE(CcmathFmanipTests, TestTypes);
+class FPNameGenerator
+{
+public:
+	template <typename T>
+	static std::string GetName(float)
+	{
+		if constexpr (std::is_same_v<T, float>) return "float";
+		if constexpr (std::is_same_v<T, double>) return "double";
+		if constexpr (std::is_same_v<T, long double>) return "longDouble";
+	}
+};
+
+using TestTypes = ::testing::Types<float, double, long double>;
+TYPED_TEST_SUITE(CcmathFmanipTests, TestTypes, FPNameGenerator);
 
 TYPED_TEST(CcmathFmanipTests, LdexpStaticAssert)
 {
