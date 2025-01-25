@@ -28,14 +28,8 @@ if (CCMATH_PROJECT_IS_TOP_LEVEL)
         # Enable colored output for C++ compilers
         if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
             SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
-        elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+        elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM")
             SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics")
-        endif ()
-        # Enable colored output for C compilers
-        if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
-            SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fdiagnostics-color=always")
-        elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
-            SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcolor-diagnostics")
         endif ()
     endif ()
 endif ()
@@ -52,7 +46,7 @@ include(cmake/config/UserOptions.cmake)
 # Collect common warning flags for various compilers and conditions.
 set(
         ccmath_warning_options
-        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wconversion -Wpedantic -Werror=return-type -Wundef -Wshadow -Wnull-dereference>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wconversion -Wpedantic -Werror=return-type -Wundef -Wnull-dereference>
         $<$<CXX_COMPILER_ID:Clang>:-Wpedantic-macros>
         $<$<CXX_COMPILER_ID:MSVC>:/W4 /permissive- /we4715>
 )
