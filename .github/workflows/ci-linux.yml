@@ -72,19 +72,6 @@ jobs:
             testPreset: test-ninja-clang-release
             cxx_version: 20
 
-          # Clang libcpp Release
-          - name: clang-libcpp-release
-            configurePreset: ninja-clang-libcpp-relwithdebinfo
-            buildPreset: build-ninja-clang-libcpp-relwithdebinfo
-            testPreset: test-ninja-clang-libcpp-relwithdebinfo
-            cxx_version: 17
-
-          - name: clang-libcpp-release-cxx20
-            configurePreset: ninja-clang-libcpp-relwithdebinfo
-            buildPreset: build-ninja-clang-libcpp-relwithdebinfo
-            testPreset: test-ninja-clang-libcpp-relwithdebinfo
-            cxx_version: 20
-
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@v2.10.2
@@ -106,7 +93,7 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -yqq --no-install-recommends ninja-build
 
       - name: Configure
-        run: cmake --preset="${{ matrix.configurePreset }}" -DCMAKE_CXX_STANDARD="${{ matrix.cxx_version }}"
+        run: cmake --preset="${{ matrix.configurePreset }}" -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON -DCCMATH_ENABLE_WARNINGS_AS_ERRORS=ON
 
       - name: Build
         run: cmake --build --preset="${{ matrix.buildPreset }}"

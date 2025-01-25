@@ -8,8 +8,10 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-// Code borrowed from LLVM with heavy modifications done for ccmath to allow for both cross-platform and cross-compiler support.
-// https://github.com/llvm/llvm-project/
+// Portions of this code was borrowed from the LLVM Project,
+// under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 #pragma once
 
@@ -49,41 +51,46 @@ namespace ccm::support::fp
 		template <>
 		struct FPLayout<FPType::eBinary32>
 		{
-			using storage_type						= std::uint32_t;
-			static constexpr std::int_fast32_t sign_length		= 1;
-			static constexpr std::int_fast32_t exponent_length	= 8;
+			using storage_type									  = std::uint32_t;
+			static constexpr std::int_fast32_t sign_length		  = 1;
+			static constexpr std::int_fast32_t exponent_length	  = 8;
 			static constexpr std::int_fast32_t significand_length = 23;
-			static constexpr std::int_fast32_t fraction_length	= significand_length;
+			static constexpr std::int_fast32_t fraction_length	  = significand_length;
 		};
 
 		template <>
 		struct FPLayout<FPType::eBinary64>
 		{
-			using storage_type						= std::uint64_t;
-			static constexpr std::int_fast32_t sign_length		= 1;
-			static constexpr std::int_fast32_t exponent_length	= 11;
+			using storage_type									  = std::uint64_t;
+			static constexpr std::int_fast32_t sign_length		  = 1;
+			static constexpr std::int_fast32_t exponent_length	  = 11;
 			static constexpr std::int_fast32_t significand_length = 52;
-			static constexpr std::int_fast32_t fraction_length	= significand_length;
+			static constexpr std::int_fast32_t fraction_length	  = significand_length;
 		};
 
 		template <>
 		struct FPLayout<FPType::eBinary80>
 		{
-			using storage_type						= types::uint128_t;
-			static constexpr std::int_fast32_t sign_length		= 1;
-			static constexpr std::int_fast32_t exponent_length	= 15;
+			// Special case for 96-bit long double on x86
+#if __SIZEOF_LONG_DOUBLE__ == 12
+			using StorageType = types::UInt<__SIZEOF_LONG_DOUBLE__ * CHAR_BIT>;
+#else
+			using storage_type = types::uint128_t;
+#endif
+			static constexpr std::int_fast32_t sign_length		  = 1;
+			static constexpr std::int_fast32_t exponent_length	  = 15;
 			static constexpr std::int_fast32_t significand_length = 64;
-			static constexpr std::int_fast32_t fraction_length	= significand_length - 1;
+			static constexpr std::int_fast32_t fraction_length	  = significand_length - 1;
 		};
 
 		template <>
 		struct FPLayout<FPType::eBinary128>
 		{
-			using storage_type						= types::uint128_t;
-			static constexpr std::int_fast32_t sign_length		= 1;
-			static constexpr std::int_fast32_t exponent_length	= 15;
+			using storage_type									  = types::uint128_t;
+			static constexpr std::int_fast32_t sign_length		  = 1;
+			static constexpr std::int_fast32_t exponent_length	  = 15;
 			static constexpr std::int_fast32_t significand_length = 112;
-			static constexpr std::int_fast32_t fraction_length	= significand_length;
+			static constexpr std::int_fast32_t fraction_length	  = significand_length;
 		};
 
 		template <FPType fp_type>
@@ -631,7 +638,7 @@ namespace ccm::support::fp
 			using BASE::sign_mask;
 			using BASE::significand_length;
 			using BASE::significand_mask;
-			static constexpr int MAX_BIASED_EXPONENT = (1 << BASE::exponent_length) - 1;
+			static constexpr int max_biased_exponent = (1 << BASE::exponent_length) - 1;
 
 			/// Constructors
 
@@ -809,9 +816,6 @@ namespace ccm::support::fp
 			else if constexpr (LDBL_MANT_DIG == 64) { return FPType::eBinary80; }	// long double is 80-bits
 			else if constexpr (LDBL_MANT_DIG == 113) { return FPType::eBinary128; } // long double is 128-bits
 		}
-#if defined(CCM_TYPES_HAS_FLOAT128)
-		else if constexpr (std::is_same_v<UnqualT, types::float128>) { return FPType::eBinary128; }
-#endif
 		else { static_assert(support::always_false<UnqualT>, "Unsupported type"); }
 		return FPType::eBinary32; // This will never be reached due to assert. Only here to appease the compiler.
 	}
@@ -823,16 +827,16 @@ namespace ccm::support::fp
 	template <typename T>
 	struct FPBits final : internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>
 	{
-		static_assert(std::is_floating_point_v<T>, "FPBits instantiated with invalid type.");
+		static_assert(support::traits::ccm_is_floating_point_v<T>, "FPBits instantiated with invalid type.");
 		using BASE		   = internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>;
 		using storage_type = typename BASE::storage_type;
 
 		constexpr FPBits() = default;
 
 		template <typename XType>
-		constexpr explicit FPBits(XType x)
+		inline constexpr explicit FPBits(XType x)
 		{
-			using UnQual = std::remove_cv_t<XType>;
+			using UnQual = typename std::remove_cv_t<XType>;
 			if constexpr (std::is_same_v<UnQual, T>) { BASE::bits = support::bit_cast<storage_type>(x); }
 			else if constexpr (std::is_same_v<UnQual, storage_type>) { BASE::bits = x; }
 			else

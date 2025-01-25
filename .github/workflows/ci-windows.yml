@@ -62,7 +62,7 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.name }}
 
       - name: Configure
-        run: cmake --preset="${{ matrix.configurePreset }}" -DCMAKE_CXX_STANDARD="${{ matrix.cxx_version }}"
+        run: cmake --preset="${{ matrix.configurePreset }}" -DCCMATH_DESIRED_CXX_STANDARD="cxx_std_${{ matrix.cxx_version }}" -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON -DCCMATH_ENABLE_WARNINGS_AS_ERRORS=ON
 
       - name: Build
         run: cmake --build --preset="${{ matrix.buildPreset }}"

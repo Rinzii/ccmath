@@ -1,4 +1,7 @@
-# CCMath - A C++17 Compile Time CMath Library
+<img src="docs/resources/ccmath_logo_white.png" style="width: 35%;" alt="CCMath Logo">
+
+# CCMath - A Modern, Compile-Time `<cmath>` Alternative
+
 [![image](https://github.com/Rinzii/ccmath/workflows/ci-windows/badge.svg)](https://github.com/Rinzii/ccmath/actions?query=workflow%3Aci-windows)
 [![image](https://github.com/Rinzii/ccmath/workflows/ci-linux/badge.svg)](https://github.com/Rinzii/ccmath/actions?query=workflow%3Aci-linux)
 [![image](https://github.com/Rinzii/ccmath/workflows/ci-macos/badge.svg)](https://github.com/Rinzii/ccmath/actions?query=workflow%3Aci-macos)
@@ -8,207 +11,115 @@
 https://opensource.org/licenses/Apache-2.0)
 [![Discord](https://img.shields.io/discord/1286067628456284244?label=Discord)](https://discord.gg/p3mVxAbdmc)
 
+**CCMath** is a C++17 library designed to provide a reimplementation of the standard <cmath> library, emphasizing
+comprehensive constexpr support.
 
-**CCMath** is a C++17 library that provides a re-implementation of the standard `<cmath>` library with all features made `constexpr`.
-This enables compile-time evaluation of mathematical functions,
-improving performance and allows for more efficient code in scenarios where constant expressions are required.
+## Key Features
 
-## Features
-
-- **Full constexpr Compatibility**: All functions provided by CCMath are implemented as `constexpr` along with an active effort made to ensure all functions work within `static_assert`. The primary goal is to ensure every function can be evaluated at compile time.
-
-- **Drop-in Replacement for the Standard Math Library**: CCMath provides a comprehensive set of mathematical functions that are 1:1 compatible with the C++ standard library `<cmath>`. The goal of CCMath is to effectively be a drop-in replacement for `<cmath>` with little to no discernible difference between the two. This includes trigonometric, exponential, logarithmic, and other common mathematical operations. If `<cmath>` has it then it is likely CCMath has implemented it.
-
-- **Performance Optimization**: Besides all the functions being able to be evaluated at compile time, CCMath was also built with speed in mind. We strive to have speeds nearly as fast as the standard implementation.
-
-- **Optimized Runtime Evaluation**: In all instances where a function cannot be evaluated at compile time, CCMath has been optimized to provide the fastest runtime evaluation possible and aims to be as fast as the standard library.
-
-- **Cross-Platform Compatibility**: CCMath is designed to work on all major platforms and compilers. It has been tested on Windows, macOS, and Linux with compilers such as GCC, Clang, and MSVC.
-
-- **No External Dependencies**: CCMath has no external dependencies and only requires a modern C++17-compliant compiler.
-
-- **Header-Only Library**: CCMath is a header-only library, making it easy to integrate into your projects.
+- **Full `constexpr` Compatibility**: Every function in CCMath is implemented as `constexpr`, ensuring compatibility
+  with `static_assert` and enabling robust compile-time evaluations.
+- **Seamless `<cmath>` Replacement**: CCMath replicates the functionality of the standard `<cmath>` library, offering 1:
+  1 API compatibility. CCMath covers the vast majority of mathematical operations, including trigonometric, exponential,
+  logarithmic, and more that are provided by the standard library.
+- **Performance-Focused Design**: All implemented functions are optimized for both compile-time and runtime performance,
+  providing
+  comparable or faster execution than standard library implementations.
+- **Cross-Platform Support**: Tested on major platforms (Windows, macOS, Linux) with GCC, Clang, MSVC, and more, CCMath
+  ensures compatibility across diverse environments.
+- **No External Dependencies**: The library requires only a modern C++17-compliant compiler, with no additional
+  dependencies.
+- **Header-Only Library**: Integration is straightforward—just include the headers in your project and start using
+  CCMath.
 
 ## Usage
 
-To use CCMath in your projects, include the `<ccmath/ccmath.hpp>` header file and start using the provided functions.
-Here's a basic example:
+Include CCMath in your project by adding the `<ccmath/ccmath.hpp>` header file. Here's a simple example:
 
 ```cpp
-
-#include <ccmath/ccmath.hpp> // Monolithic header file that includes all functions. Similar to including <cmath>
-// #include <ccmath/power/sqrt.hpp> // You can also directly include the functions you require without bringing in extra functions!
-
-
-#include <iostream> // For std::cout
+#include <ccmath/ccmath.hpp> // Monolithic header that includes all functions like <cmath>
+#include <iostream>
 
 int main() {
-    constexpr double x = ccm::sqrt(25.0);  // Compile-time evaluation of square root
-    std::cout << "Square root of 25: " << x << std::endl;
+    constexpr double result = ccm::sqrt(25.0); // Compile-time evaluation
+    std::cout << "Square root of 25: " << result << std::endl;
     return 0;
 }
 ```
 
-## Adding CCMath to your project
+or if you prefer to include only specific functions:
 
-CCMath has a comprehensive cmake setup and can be easily included in your project using fetchcontent like so:
+```cpp
+#include <ccmath/expo/log.hpp> // Function-specific header for free-standing functions
+#include <iostream>
+
+int main() {
+    constexpr double result = ccm::log(12.0); // Compile-time evaluation
+    std::cout << "Log of 12: " << result << std::endl;
+    return 0;
+}
+```
+
+### Adding CCMath via CMake
+
+CCMath includes a comprehensive CMake setup for easy integration. Use `FetchContent` as shown below:
 
 ```cmake
-cmake_minimum_required(VERSION 3.18)
-
 include(FetchContent)
 FetchContent_Declare(
         ccmath
         GIT_REPOSITORY https://github.com/Rinzii/ccmath.git
-        GIT_TAG v0.2.0 # Replace with the version you want to use
+        GIT_TAG main # Or replace with a specific version (e.g., v0.2.0)
 )
 FetchContent_MakeAvailable(ccmath)
 
 target_link_libraries(main PRIVATE ccmath::ccmath)
 ```
 
-CCMath is also designed with functions being freestanding and header only so you can also just drop the headers directly into your project!
+Alternatively, you can directly include the headers in your project.
 
-## Compiler Support
-* GCC 11.1+
-* Clang 9.0.0+
-* AppleClang 14.0.3+ (Lowest tested version)
-* MSVC 19.26+
-* Intel DPC++ 2022.0.0+
-* Nvidia HPC SDK 22.7+ (Lowest tested version)
+## Supported Compilers
+
+- GCC 11.1+
+- Clang 9.0.0+
+- AppleClang 14.0.3+
+- MSVC 19.26+
+- Intel DPC++ 2022.0.0+
+- Nvidia HPC SDK 22.7+
+
+> [!ATTENTION]
+> Listed compilers may not be the actual supported versions as development is still ongoing.
 
 > [!NOTE]
 > Currently working on finding manners to lower these requirements.
 
+## Contributing
+
+CCMath is an open-source project, and contributions are always welcome! Whether you want to report bugs, suggest
+features, or contribute code, check out our [contribution guidelines](CONTRIBUTING.md).
+
 ## Join Our Discord!
 
-If you have any questions, suggestions, or just want to chat, feel free to join our Discord server!
+Have questions, ideas, or just want to chat? Join our Discord server—we’d love to hear from you!
 
 [![Discord Banner](https://discord.com/api/guilds/1286067628456284244/widget.png?style=banner2)](https://discord.gg/p3mVxAbdmc)
 
-## Contributing
+## Implementation Status
 
-CCmath is an open-source project, and it needs your help to go on growing and improving. If you want to get involved and suggest some additional features, file a bug report or submit a patch, please have a look at the [contribution guidelines](CONTRIBUTING.md)!
+For details on the current progress of the library, including completed features and planned additions, refer to
+the [implementation status](docs/STATUS.md) document.
 
-## Implementation Progress (Modules)
-| Module                   | % done | In Progress? | Notes? | Planned Completion Version |
-|--------------------------|--------|--------------|--------|----------------------------|
-| Basic                    | 100    |              |        | v0.1.0 (Released)          |
-| Compare                  | 100    |              |        | v0.2.0 (Released)          |
-| Exponential              | 57     |              |        | maybe v0.3.0 or v0.4.0     |              
-| Float Manipulation       | 25     |              |        |                            |
-| Hyperbolic               | 0      |              |        |                            |
-| Nearest                  | 33     |              |        |                            |
-| Power                    | 5      | ✓            |        | maybe v0.3.0 or v0.4.0     |
-| Special Functions        | 0      |              |        |                            |
-| Trigonometric            | 0      |              |        |                            |
-| Misc Functions           | 30     |              |        |                            |
-| Total Library Completion | 37     |              |        |                            |
+## Projects Using CCMath
 
-> Last Updated: Aug 31, 2024
+- [Fornani](https://github.com/swagween/fornani) - A 2D action-adventure game in development.
+- [KittyOS](https://github.com/kitty-os/kitty-os/) - A whimsical, non-Unix operating system for cat lovers.
 
-## Implementation Progress (Functions)
-
-| Feature        | % done | TODO                                                                                                        |
-|----------------|--------|-------------------------------------------------------------------------------------------------------------|
-| abs            | 100    |                                                                                                             |
-| fdim           | 100    |                                                                                                             |
-| fma            | 100    | Functional. Need to add proper runtime specific speed up.                                                   |
-| (f)max         | 100    |                                                                                                             |
-| (f)min         | 100    |                                                                                                             |
-| remainder      | 100    |                                                                                                             |
-| remquo         | 100    |                                                                                                             |
-| nan            | 100    | The nan function is still quite brittle, but it has reached a point of functionality.                       |
-| fpclassify     | 100    |                                                                                                             |
-| isfinite       | 100    |                                                                                                             |
-| isgreater      | 100    |                                                                                                             |
-| isgreaterequal | 100    |                                                                                                             |
-| isinf          | 100    |                                                                                                             |
-| isless         | 100    |                                                                                                             |
-| islessequal    | 100    |                                                                                                             |
-| islessgreater  | 100    |                                                                                                             |
-| isnan          | 100    |                                                                                                             |
-| isnormal       | 100    |                                                                                                             |
-| isunordered    | 100    |                                                                                                             |
-| signbit        | 100    | Desire to find a manner of implementing signbit on lower versions of MSVC.                                  |
-| exp            | 100    | Needs to be modernized to current CCMath standards                                                          |
-| exp2           | 100    | Needs to be modernized to current CCMath standards                                                          |
-| expm1          | 0      | Implement function                                                                                          |
-| log            | 100    | Needs to be modernized to current CCMath standards                                                          |
-| log1p          | 0      | Implement function                                                                                          |
-| log2           | 100    | Needs to be modernized to current CCMath standards                                                          |
-| log10          | 0      | Implement function                                                                                          |
-| copysign       | 100    |                                                                                                             |
-| frexp          | 0      | Implement function                                                                                          |
-| ilogb          | 0      | Implement function                                                                                          |
-| ldexp          | 100    |                                                                                                             |
-| logb           | 0      | Implement function                                                                                          |
-| modf           | 0      | Implement function                                                                                          |
-| nextafter      | 0      | Implement function                                                                                          |
-| scalbn         | 100    | Needs to be modernized to current CCMath standards also long double implementation is slow, but functional. |
-| acosh          | 0      | Implement function                                                                                          |
-| asinh          | 0      | Implement function                                                                                          |
-| atanh          | 0      | Implement function                                                                                          |
-| cosh           | 0      | Implement function                                                                                          |
-| sinh           | 0      | Implement function                                                                                          |
-| tanh           | 0      | Implement function                                                                                          |
-| ceil           | 0      | Implement function                                                                                          |
-| floor          | 100    |                                                                                                             |
-| nearbyint      | 0      | Implement function                                                                                          |
-| rint           | 0      | Implement function                                                                                          |
-| round          | 0      | Implement function                                                                                          |
-| trunc          | 100    |                                                                                                             |
-| cbrt           | 0      | Implement function                                                                                          |
-| hypot          | 0      | Implement function                                                                                          |
-| pow            | 30     | Continue implementation process and add documentation and tests                                             |
-| sqrt           | 100    |                                                                                                             |
-| assoc_laguerre | 0      | Implement function                                                                                          |
-| assoc_legendre | 0      | Implement function                                                                                          |
-| beta           | 0      | Implement function                                                                                          |
-| comp_ellint_1  | 0      | Implement function                                                                                          |
-| comp_ellint_2  | 0      | Implement function                                                                                          |
-| comp_ellint_3  | 0      | Implement function                                                                                          |
-| cyl_bessel_i   | 0      | Implement function                                                                                          |
-| cyl_bessel_j   | 0      | Implement function                                                                                          |
-| cyl_bessel_k   | 0      | Implement function                                                                                          |
-| cyl_neumann    | 0      | Implement function                                                                                          |
-| ellint_1       | 0      | Implement function                                                                                          |
-| ellint_2       | 0      | Implement function                                                                                          |
-| ellint_3       | 0      | Implement function                                                                                          |
-| expint         | 0      | Implement function                                                                                          |
-| hermite        | 0      | Implement function                                                                                          |
-| laguerre       | 0      | Implement function                                                                                          |
-| legendre       | 0      | Implement function                                                                                          |
-| riemann_zeta   | 0      | Implement function                                                                                          |
-| sph_bessel     | 0      | Implement function                                                                                          |
-| sph_legendre   | 0      | Implement function                                                                                          |
-| sph_neumann    | 0      | Implement function                                                                                          |
-| acos           | 0      | Implement function                                                                                          |
-| asin           | 0      | Implement function                                                                                          |
-| atan           | 0      | Implement function                                                                                          |
-| atan2          | 0      | Implement function                                                                                          |
-| cos            | 0      | Implement function                                                                                          |
-| sin            | 0      | Implement function                                                                                          |
-| tan            | 0      | Implement function                                                                                          |
-| gamma          | 0      | Implement function                                                                                          |
-| lerp           | 90     | Nearly finished, just need to test the function further and validate full compliance.                       |
-| lgamma         | 0      | Implement function                                                                                          |
-
-> Last Updated: Aug 31, 2024
-
-## Projects using CCMath!
-
-- [KittyOS](https://github.com/kitty-os/kitty-os/) - KittyOS is meant to be a silly non-unix operating system for cat lovers and cats themselves.
-
-_(Are you using CCMath in your project? Let us know!)_
+_(Are you using CCMath? Let us know!)_
 
 ## License
 
-CCMath is distributed under the Apache-2.0 WITH LLVM-exception. See the LICENSE file for more information.
-
+CCMath is licensed under the Apache-2.0 WITH LLVM-exception. See the LICENSE file for more details.
 
 ## Special Thanks
 
-Thanks a lot to LLVM, GCC,
-and LibM for a lot of insights and inspiration for many different tough issues
-encountered throughout the development of CCMath!
+A special thanks to LLVM, GCC, and the many public LibM's for providing inspiration and insights during the development
+of CCMath.

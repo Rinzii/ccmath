@@ -1,0 +1,4 @@
+# TODO: Implement fuzzing with libFuzzer
+# libFuzzer's command is as follows: -fsanitize=fuzzer
+# We should also couple it with -fsanitize=address and -fsanitize=undefined to detect memory errors and undefined behavior
+# More info here: https://llvm.org/docs/LibFuzzer.html

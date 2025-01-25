@@ -18,4 +18,4 @@
 	#else
 		#define CCM_SUPPRESS(x)
 	#endif // _MSC_VER
-#endif // __clang__
+#endif	   // __clang__

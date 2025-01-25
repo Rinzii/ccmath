@@ -10,13 +10,12 @@
 
 #pragma once
 
-#include "ccmath/internal/support/helpers/digit_to_int.hpp"
 #include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/support/helpers/digit_to_int.hpp"
 #include "ccmath/internal/types/int128_types.hpp"
 
 #include <cstdint>
 #include <limits>
-
 
 namespace ccm::internal::impl
 {
@@ -26,19 +25,16 @@ namespace ccm::internal::impl
 	constexpr long double nan_ldouble_impl(const char * arg) noexcept
 	{
 
-		if constexpr (!std::numeric_limits<long double>::is_iec559)
-		{
-			return 0.0;
-		}
+		if constexpr (!std::numeric_limits<long double>::is_iec559) { return 0.0; }
 
-#if defined(_MSC_VER) && !defined(__clang__)
+	#if defined(_MSC_VER) && !defined(__clang__)
 		// Currently, MSVC always returns a Quiet NaN no matter if a payload is
 		// provided or not. This is different from GCC and Clang which do allow payloads to be set.
 		// So if we detect we are using MSVC without Clang-CL then
 		// we can just return NaN and not bother doing any extra work.
 		// To properly mimic the behavior of MSVC.
 		return std::numeric_limits<long double>::quiet_NaN(); // Default NaN
-#endif
+	#endif
 
 		if (arg == nullptr)
 		{
@@ -51,7 +47,7 @@ namespace ccm::internal::impl
 			return std::numeric_limits<long double>::quiet_NaN(); // Default NaN
 		}
 
-		bool has_hex_been_detected{false};
+		bool has_hex_been_detected{ false };
 
 		// Check for a hex prefix and if its detected, skip the prefix and set the flag.
 		if (arg[0] == '0' && (arg[1] == 'x' || arg[1] == 'X'))
@@ -72,7 +68,7 @@ namespace ccm::internal::impl
 			}
 		}
 
-		ccm::types::uint128_t dbl_bits{0};
+		ccm::types::uint128_t dbl_bits{ 0 };
 
 		if (has_hex_been_detected)
 		{

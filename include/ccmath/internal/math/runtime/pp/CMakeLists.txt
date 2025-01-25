@@ -1,3 +1,17 @@
 ccm_add_headers(
+        arm_detail.hpp
+        assume_aligned.hpp
+        const_eval.hpp
+        constexpr_wrapper.hpp
+        debug_print.hpp
+        detail.hpp
+        flags.hpp
+        fwddecl.hpp
+        may_alias.hpp
         simd.hpp
+        simd_config.hpp
+        simd_meta.hpp
+        trap.hpp
+        vec_detail.hpp
+        x86_include.hpp
 )

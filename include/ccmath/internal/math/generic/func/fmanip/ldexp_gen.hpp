@@ -38,7 +38,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T ldexp(T num, int exp) noexcept
 	{
-		//NOLINTNEXTLINE
+		// NOLINTNEXTLINE
 #if defined(CCMATH_HAS_CONSTEXPR_BUILTIN_LDEXP) || CCM_HAS_CONST_BUILTIN(__builtin_ldexp)
 		if constexpr (std::is_same_v<T, float>) { return __builtin_ldexpf(num, exp); }
 		if constexpr (std::is_same_v<T, double>) { return __builtin_ldexp(num, exp); }

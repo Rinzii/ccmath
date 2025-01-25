@@ -11,7 +11,6 @@
 #pragma once
 
 #include "ccmath/internal/config/arch/check_simd_support.hpp"
-
 #include "ccmath/internal/math/runtime/simd/instructions/scalar.hpp"
 #include "common.hpp"
 #include "pack.hpp"
@@ -22,20 +21,8 @@
 		#include "instructions/sse2.hpp"
 	#endif
 
-	#ifdef CCMATH_HAS_SIMD_SSE3
-		#include "instructions/sse3.hpp"
-	#endif
-
-	#ifdef CCMATH_HAS_SIMD_SSSE3
-		#include "instructions/ssse3.hpp"
-	#endif
-
 	#ifdef CCMATH_HAS_SIMD_SSE4
 		#include "instructions/sse4.hpp"
-	#endif
-
-	#ifdef CCMATH_HAS_SIMD_AVX
-		#include "instructions/avx.hpp"
 	#endif
 
 	#ifdef CCMATH_HAS_SIMD_AVX2
@@ -51,18 +38,10 @@ namespace ccm::intrin
 {
 	namespace abi
 	{
-#if defined(CCMATH_HAS_SIMD_AVX512F)
-		using native = avx512;
-#elif defined(CCMATH_HAS_SIMD_AVX2)
+#if defined(CCMATH_HAS_SIMD_AVX2)
 		using native = avx2;
-#elif defined(CCMATH_HAS_SIMD_AVX)
-		using native = avx;
 #elif defined(CCMATH_HAS_SIMD_SSE4)
 		using native = sse4;
-#elif defined(CCMATH_HAS_SIMD_SSSE3)
-		using native = ssse3;
-#elif defined(CCMATH_HAS_SIMD_SSE3)
-		using native = sse3;
 #elif defined(CCMATH_HAS_SIMD_SSE2)
 		using native = sse2;
 #elif defined(CCMATH_HAS_SIMD_NEON) && !defined(__ARM_FEATURE_SVE_BITS) && !defined(__ARM_FEATURE_SVE)
@@ -78,7 +57,7 @@ namespace ccm::intrin
 		#endif
 	#endif
 #else
-		using native = pack<8>;
+		using native = scalar;
 #endif
 	} // namespace abi
 
