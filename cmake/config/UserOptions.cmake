@@ -60,20 +60,18 @@ option(CCMATH_DISABLE_CMAKE_BUILTIN_CHECKS
         "Disable the ability for CCMath to check for builtin functions at the CMake level"
         OFF)
 
+option(CCMATH_ENABLE_AGGRESSIVE_WARNINGS
+        "Enforce extremely aggressive warnings."
+        OFF
+)
+
+option(CCMATH_ENABLE_WARNINGS_AS_ERRORS
+        "All warnings should be treated as errors."
+        OFF
+)
+
 # Project-specific development options (Only enable if we are the root project)
 include(CMakeDependentOption)
-
-# Enforce aggressive warnings (enabled by default for the root project)
-cmake_dependent_option(CCMATH_ENABLE_AGGRESSIVE_WARNINGS
-        "Enforce extremely aggressive warnings." ON
-        "CCMATH_PROJECT_IS_TOP_LEVEL" ON
-)
-
-# Treat warnings as errors (enabled by default for the root project)
-cmake_dependent_option(CCMATH_ENABLE_WARNINGS_AS_ERRORS
-        "All warnings should be treated as errors." ON
-        "CCMATH_PROJECT_IS_TOP_LEVEL" ON
-)
 
 # Enable heightened debug information (disabled by default)
 cmake_dependent_option(CCMATH_ENABLE_DEBUG_INFO
