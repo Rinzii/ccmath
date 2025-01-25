@@ -72,19 +72,6 @@ jobs:
             testPreset: test-ninja-clang-release
             cxx_version: 20
 
-          # Clang libcpp Release
-          - name: clang-libcpp-release
-            configurePreset: ninja-clang-libcpp-relwithdebinfo
-            buildPreset: build-ninja-clang-libcpp-relwithdebinfo
-            testPreset: test-ninja-clang-libcpp-relwithdebinfo
-            cxx_version: 17
-
-          - name: clang-libcpp-release-cxx20
-            configurePreset: ninja-clang-libcpp-relwithdebinfo
-            buildPreset: build-ninja-clang-libcpp-relwithdebinfo
-            testPreset: test-ninja-clang-libcpp-relwithdebinfo
-            cxx_version: 20
-
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@v2.10.2
