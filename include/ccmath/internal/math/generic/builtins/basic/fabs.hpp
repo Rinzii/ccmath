@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "ccmath/internal/support/always_false.hpp"
+
 #include <type_traits>
 
 /// CCMATH_HAS_CONSTEXPR_BUILTIN_ABS
@@ -48,6 +50,9 @@
 namespace ccm::builtin
 {
 	// clang-format off
+	/**
+	 * @internal
+	 */
 	template <typename T>
 	inline constexpr bool has_constexpr_abs =
 		#ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_ABS
@@ -59,6 +64,7 @@ namespace ccm::builtin
 	// clang-format on
 
 	/**
+	 * @internal
 	 * Wrapper for constexpr __builtin_abs functions.
 	 * This should be used internally and always be wrapped in an if constexpr statement.
 	 * It exists only to allow for usage of __builtin_abs functions without triggering a compiler error
@@ -76,8 +82,12 @@ namespace ccm::builtin
 		{
 			return x; // Absolute value of unsigned is the value itself
 		}
-		// This should never be reached
-		return T{};
+		else
+		{
+			// This should never be reached
+			static_assert(support::always_false<T>, "Unsupported type for __builtin_abs");
+			return T{};
+		}
 	}
 } // namespace ccm::builtin
 

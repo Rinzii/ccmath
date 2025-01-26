@@ -1,6 +1,7 @@
 ccm_add_headers(
         always_false.hpp
         bits.hpp
+        common_math_constants.hpp
         ctz.hpp
         endian.hpp
         floating_point_traits.hpp

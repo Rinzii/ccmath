@@ -22,4 +22,3 @@ namespace ccm::types
 	{
 	};
 } // namespace ccm::types
-

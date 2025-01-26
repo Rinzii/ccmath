@@ -10,12 +10,11 @@
 
 #pragma once
 
+#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
 #include "ccmath/math/expo/impl/exp2_data.hpp"
-
-#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
 
 #include <cstdint>
 #include <limits>

@@ -27,12 +27,8 @@ namespace ccm::ext
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T ping_pong(T a, T b) noexcept
 	{
-		if (b == 0)
-		{
-			return T(0);
-		}
+		if (b == 0) { return T(0); }
 
 		return ccm::abs((ccm::ext::fract((a - b) / (b * 2.0)) * b * 2.0) - b);
-
 	}
 } // namespace ccm::ext
