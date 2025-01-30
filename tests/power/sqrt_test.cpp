@@ -40,16 +40,12 @@ TEST(CcmathPowerTests, Sqrt_Double_CheckSTD)
 	EXPECT_EQ(std::sqrt(0.0), std::sqrt(0.0));
 }
 
-/*
 TEST(CcmathPowerTests, Sqrt_Double)
 {
 	// Test values that are 2^x
 
-	//simd::sqrt<T, simd::abi::native>(num);
-	//rt::internal_sqrt_rt
-
-
-
+	// simd::sqrt<T, simd::abi::native>(num);
+	// rt::internal_sqrt_rt
 
 	EXPECT_EQ(ccm::sqrt(0.0), ccm::sqrt(0.0));
 
@@ -69,9 +65,7 @@ TEST(CcmathPowerTests, Sqrt_Double)
 	EXPECT_EQ(ccm::sqrt(0.3), std::sqrt(0.3));
 	EXPECT_EQ(ccm::sqrt(0.4), std::sqrt(0.4));
 	EXPECT_EQ(ccm::sqrt(0.5), std::sqrt(0.5));
-
 }
-
 
 TEST(CcmathPowerTests, Sqrt_Double_EdgeCases)
 {
@@ -79,10 +73,10 @@ TEST(CcmathPowerTests, Sqrt_Double_EdgeCases)
 	EXPECT_EQ(ccm::sqrt(std::numeric_limits<double>::min()), std::sqrt(std::numeric_limits<double>::min()));
 	EXPECT_EQ(ccm::sqrt(std::numeric_limits<double>::max()), std::sqrt(std::numeric_limits<double>::max()));
 
-
-	//EXPECT_EQ(ccm::sqrt(std::numeric_limits<double>::lowest()), std::sqrt(std::numeric_limits<double>::lowest()));
+	// EXPECT_EQ(ccm::sqrt(std::numeric_limits<double>::lowest()), std::sqrt(std::numeric_limits<double>::lowest()));
 }
 
+/*
 TEST(CcmathPowerTests, Sqrt_LDouble)
 {
 	// Test values that are 2^x
