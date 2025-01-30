@@ -26,8 +26,8 @@ namespace ccm::internal::impl
 	{
 		if constexpr (!std::numeric_limits<double>::is_iec559) { return 0.0; }
 
-#if defined(_MSC_VER) && !defined(__clang__)
-		// Currently, MSVC always returns a Quiet NaN no matter if a payload is
+#if (defined(_MSC_VER) && !defined(__clang__)) || (defined(_MSC_VER) && defined(__clang__))
+		// Currently, MSVC, along with Clang-cl who mimics msvc, always returns a Quiet NaN no matter if a payload is
 		// provided or not. This is different from GCC and Clang which do allow payloads to be set.
 		// So if we detect we are using MSVC without Clang-CL then
 		// we can just return NaN and not bother doing any extra work.

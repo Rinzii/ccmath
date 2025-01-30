@@ -27,7 +27,7 @@ namespace ccm::support::helpers
 {
 	struct floating_point_defines
 	{
-#if defined(CCMATH_COMPILER_MSVC) // Mirrors the corecrt definitions
+#if defined(CCMATH_COMPILER_MSVC) || defined(CCMATH_COMPILER_CLANG_CL) // Mirrors the corecrt definitions
 		static constexpr int eFP_NAN	   = 2;
 		static constexpr int eFP_INFINITE  = 1;
 		static constexpr int eFP_ZERO	   = 0;
