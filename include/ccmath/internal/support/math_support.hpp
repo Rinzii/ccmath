@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "ccmath/internal/predef/compiler_suppression/clang_compiler_suppression.hpp"
 #include "ccmath/internal/predef/compiler_suppression/gcc_compiler_suppression.hpp"
 #include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
@@ -162,6 +163,7 @@ namespace ccm::support
 	// Please be careful that UB is not introduced by using this function and that you know this
 	// function will never be called with a count that is too big.
 	CCM_DISABLE_MSVC_WARNING(4293)
+	CCM_DISABLE_CLANG_WARNING(-Wshift-count-overflow) // Disabled for same reasons stated above
 
 	// Create a bitmask with the count right-most bits set to 1, and all other bits
 	// set to 0.  Only unsigned types are allowed.
@@ -174,6 +176,7 @@ namespace ccm::support
 	}
 
 	CCM_RESTORE_MSVC_WARNING()
+	CCM_RESTORE_CLANG_WARNING()
 
 	// Create a bitmask with the count left-most bits set to 1, and all other bits
 	// set to 0.  Only unsigned types are allowed.
