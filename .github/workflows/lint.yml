@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
       - name: Install clang-format
-        uses: aminya/setup-cpp@290824452986e378826155f3379d31bce8753d76 # v0.37.0
+        uses: aminya/setup-cpp@3aac37c3fbde6cb1d2fa0a0a7e945b63b10561d5 # v1.1.0
         with:
           clangformat: 17.0.5
 
