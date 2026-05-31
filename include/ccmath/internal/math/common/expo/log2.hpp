@@ -12,6 +12,7 @@
 
 #include "ccmath/internal/config/compiler.hpp"
 #include "ccmath/internal/math/generic/builtins/expo/log2.hpp"
+#include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/compare/signbit.hpp"
 #include "ccmath/math/expo/impl/log2_double_impl.hpp"
@@ -40,7 +41,12 @@ namespace ccm
 		else
 		{
 			// If the argument is ±0, -∞ is returned
-			if (num == static_cast<T>(0)) { return -std::numeric_limits<T>::infinity(); }
+			if (num == static_cast<T>(0))
+			{
+				ccm::support::fenv::set_errno_if_required(ERANGE);
+				ccm::support::fenv::raise_except_if_required(FE_DIVBYZERO);
+				return -std::numeric_limits<T>::infinity();
+			}
 
 			// If the argument is 1, +0 is returned.
 			if (num == static_cast<T>(1)) { return 0; }
@@ -50,9 +56,19 @@ namespace ccm
 
 // If the argument is negative, -NaN is returned
 #ifdef CCMATH_COMPILER_APPLE_CLANG // Apple clang returns +qNaN
-			if (ccm::signbit(num)) { return std::numeric_limits<T>::quiet_NaN(); }
+			if (ccm::signbit(num))
+			{
+				ccm::support::fenv::set_errno_if_required(EDOM);
+				ccm::support::fenv::raise_except_if_required(FE_INVALID);
+				return std::numeric_limits<T>::quiet_NaN();
+			}
 #else // All other major compilers return -qNaN
-			if (ccm::signbit(num)) { return -std::numeric_limits<T>::quiet_NaN(); }
+			if (ccm::signbit(num))
+			{
+				ccm::support::fenv::set_errno_if_required(EDOM);
+				ccm::support::fenv::raise_except_if_required(FE_INVALID);
+				return -std::numeric_limits<T>::quiet_NaN();
+			}
 #endif
 
 			// We cannot handle long double at this time due to problems

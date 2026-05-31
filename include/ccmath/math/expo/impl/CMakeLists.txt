@@ -5,6 +5,9 @@ ccm_add_headers(
         exp_data.hpp
         exp_double_impl.hpp
         exp_float_impl.hpp
+        log10_impl.hpp
+        log1p_impl.hpp
+        expm1_impl.hpp
         log2_data.hpp
         log2_double_impl.hpp
         log2_float_impl.hpp

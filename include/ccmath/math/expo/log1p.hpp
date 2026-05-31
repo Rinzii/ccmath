@@ -11,21 +11,22 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/expo/log1p.hpp"
+#include "ccmath/math/expo/impl/log1p_impl.hpp"
 
 #include <type_traits>
 
 namespace ccm
 {
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T log1p([[maybe_unused]] T num)
+	constexpr T log1p(T num)
 	{
 		if constexpr (ccm::builtin::has_constexpr_log1p<T>) { return ccm::builtin::log1p(num); }
 		else
 		{
-			if constexpr (std::is_same_v<T, float>) { return 0; }
-			if constexpr (std::is_same_v<T, double>) { return 0; }
-			if constexpr (std::is_same_v<T, long double>) { return 0; }
-			return 0;
+			if constexpr (std::is_same_v<T, float>) { return internal::log1p_float(num); }
+			if constexpr (std::is_same_v<T, double>) { return internal::log1p_double(num); }
+			if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::log1p_double(static_cast<double>(num))); }
+			return static_cast<T>(internal::log1p_double(static_cast<double>(num)));
 		}
 	}
 
@@ -40,8 +41,8 @@ namespace ccm
 		return ccm::log1p<float>(num);
 	}
 
-	constexpr long double log1pl(double num)
+	constexpr long double log1pl(long double num)
 	{
-		return ccm::log1p<double>(num);
+		return ccm::log1p<long double>(num);
 	}
 } // namespace ccm

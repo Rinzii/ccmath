@@ -12,6 +12,7 @@
 
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/support/fp/directional_rounding_utils.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
 #include "ccmath/math/expo/impl/log2_data.hpp"
 
@@ -32,8 +33,8 @@ namespace ccm::internal
 		{
 			std::uint32_t intX = support::float_to_uint32(x);
 
-			// If x == 1 then fix the result to 0 with downward rounding
-			if (CCM_UNLIKELY(intX == 0x3f800000)) { return 0; }
+			// log2(1) handled in public log2(). Keep impl path consistent for direct calls.
+			if (CCM_UNLIKELY(intX == 0x3f800000)) { return ccm::support::fp::signed_zero_for_current_mode<float>(); }
 
 			if (CCM_UNLIKELY(intX - 0x00800000 >= 0x7f800000 - 0x00800000))
 			{
@@ -59,7 +60,7 @@ namespace ccm::internal
 			const std::uint32_t top		= tmp & 0xff800000;
 			const std::uint32_t intNorm = intX - top;
 			// NOLINTNEXTLINE
-			const int expo					   = tmp >> 23; // Arithmetic shift.
+			const int expo					   = static_cast<std::int32_t>(tmp) >> 23;
 			const ccm::double_t inverseCoeff   = log2_tab_values_flt.at(static_cast<unsigned long>(i)).invc;
 			const ccm::double_t logarithmCoeff = log2_tab_values_flt.at(static_cast<unsigned long>(i)).logc;
 			const auto normVal				   = static_cast<ccm::double_t>(support::uint32_to_float(intNorm));

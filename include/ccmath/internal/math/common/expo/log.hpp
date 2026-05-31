@@ -11,7 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/expo/log.hpp"
-#include "ccmath/internal/math/generic/func/expo/log_gen.hpp"
+#include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "ccmath/math/expo/impl/log_double_impl.hpp"
 #include "ccmath/math/expo/impl/log_float_impl.hpp"
 
@@ -38,10 +38,20 @@ namespace ccm
 			if (num == static_cast<T>(1)) { return static_cast<T>(0); }
 
 			// If the argument is ±0, -∞ is returned.
-			if (num == static_cast<T>(0)) { return -std::numeric_limits<T>::infinity(); }
+			if (num == static_cast<T>(0))
+			{
+				ccm::support::fenv::set_errno_if_required(ERANGE);
+				ccm::support::fenv::raise_except_if_required(FE_DIVBYZERO);
+				return -std::numeric_limits<T>::infinity();
+			}
 
 			// If the argument is negative, -NaN is returned.
-			if (num < static_cast<T>(0)) { return -std::numeric_limits<T>::quiet_NaN(); }
+			if (num < static_cast<T>(0))
+			{
+				ccm::support::fenv::set_errno_if_required(EDOM);
+				ccm::support::fenv::raise_except_if_required(FE_INVALID);
+				return -std::numeric_limits<T>::quiet_NaN();
+			}
 
 			// If the argument is +∞, +∞ is returned.
 			if (CCM_UNLIKELY(num == std::numeric_limits<T>::infinity())) { return std::numeric_limits<T>::infinity(); }
@@ -49,11 +59,10 @@ namespace ccm
 			// If the argument is NaN, NaN is returned.
 			if (CCM_UNLIKELY(ccm::isnan(num))) { return std::numeric_limits<T>::quiet_NaN(); }
 
-			// Select the correct implementation based on the type.
 			if constexpr (std::is_same_v<T, float>) { return internal::log_float(num); }
 			if constexpr (std::is_same_v<T, double>) { return internal::log_double(num); }
 			if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::log_double(static_cast<double>(num))); }
-			return static_cast<T>(internal::log_double(num));
+			return static_cast<T>(internal::log_double(static_cast<double>(num)));
 		}
 	}
 
@@ -84,9 +93,9 @@ namespace ccm
 	 * @param num A floating-point value to find the natural logarithm of.
 	 * @return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
 	 */
-	constexpr double logl(const double num) noexcept
+	constexpr long double logl(long double num) noexcept
 	{
-		return ccm::log<double>(num);
+		return ccm::log<long double>(num);
 	}
 } // namespace ccm
 

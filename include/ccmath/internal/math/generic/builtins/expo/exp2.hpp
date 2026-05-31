@@ -43,6 +43,14 @@ namespace ccm::builtin
 	#endif
 	// clang-format on
 
+	template <typename T>
+	inline constexpr bool has_runtime_exp2 =
+#if defined(__GNUC__) || defined(__clang__)
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_exp2 functions.
@@ -59,6 +67,19 @@ namespace ccm::builtin
 		else
 		{
 			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_exp2");
+			return T{};
+		}
+	}
+
+	template <typename T>
+	auto runtime_exp2(T x) -> std::enable_if_t<has_runtime_exp2<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>) { return __builtin_exp2f(x); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_exp2(x); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_exp2l(x); }
+		else
+		{
 			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_exp2");
 			return T{};
 		}
