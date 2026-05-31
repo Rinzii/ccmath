@@ -12,10 +12,58 @@
 
 #include <cmath>
 #include <limits>
+
 #include "ccmath/ccmath.hpp"
+#include "utils/std_compare.hpp"
 
-TEST(CcmathFmanipTests, Frexp)
+TEST(CcmathFmanipTests, FrexpBasic)
 {
+	int exp{};
 
+	ccm::test::ExpectFrexpMatchesStd(12.0);
+	ccm::frexp(12.0, exp);
+	EXPECT_EQ(exp, 4);
+
+	ccm::test::ExpectFrexpMatchesStd(-12.0);
+	ccm::frexp(-12.0, exp);
+	EXPECT_EQ(exp, 4);
+
+	ccm::test::ExpectFrexpMatchesStd(0.0);
+	ccm::frexp(0.0, exp);
+	EXPECT_EQ(exp, 0);
+	ccm::test::ExpectFrexpMatchesStd(-0.0);
+	ccm::frexp(-0.0, exp);
+	EXPECT_EQ(exp, 0);
 }
 
+TEST(CcmathFmanipTests, FrexpFloat)
+{
+	int exp{};
+
+	ccm::test::ExpectFrexpMatchesStd(3.5F);
+	ccm::frexp(3.5F, exp);
+	EXPECT_EQ(exp, 2);
+
+	ccm::test::ExpectFrexpMatchesStd(0.125F);
+	ccm::frexp(0.125F, exp);
+	EXPECT_EQ(exp, -2);
+}
+
+TEST(CcmathFmanipTests, FrexpSpecialValues)
+{
+	int exp = 123;
+
+	ccm::test::ExpectFrexpMatchesStd(std::numeric_limits<double>::quiet_NaN());
+	ccm::test::ExpectFrexpMatchesStd(std::numeric_limits<double>::infinity());
+	ccm::test::ExpectFrexpMatchesStd(-std::numeric_limits<double>::infinity());
+}
+
+TEST(CcmathFmanipTests, FrexpSubnormal)
+{
+	int exp{};
+	int std_exp{};
+
+	const double x = std::numeric_limits<double>::denorm_min();
+	ccm::test::ExpectSameAsStd(ccm::frexp(x, exp), std::frexp(x, &std_exp));
+	EXPECT_EQ(exp, std_exp);
+}

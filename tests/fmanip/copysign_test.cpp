@@ -13,19 +13,14 @@
 #include <cmath>
 #include <limits>
 #include "ccmath/ccmath.hpp"
+#include "utils/std_compare.hpp"
 
 TEST(CcmathFmanipTests, Copysign)
 {
-	EXPECT_EQ(ccm::copysign(1.0, +2.0), std::copysign(1.0, +2.0));
-	EXPECT_EQ(ccm::copysign(1.0, -2.0), std::copysign(1.0, -2.0));
-	EXPECT_EQ(ccm::copysign(std::numeric_limits<double>::infinity(), -2.0), std::copysign(std::numeric_limits<double>::infinity(), -2.0));
-
-	bool isCcmCopysignNan = std::isnan(ccm::copysign(std::numeric_limits<double>::quiet_NaN(), -2.0));
-	bool isStdCopysignNan = std::isnan(std::copysign(std::numeric_limits<double>::quiet_NaN(), -2.0));
-	bool isCcmCopysignNanNegative = std::signbit(ccm::copysign(std::numeric_limits<double>::quiet_NaN(), -2.0));
-	bool isStdCopysignNanNegative = std::signbit(std::copysign(std::numeric_limits<double>::quiet_NaN(), -2.0));
-	EXPECT_EQ(isCcmCopysignNan, isStdCopysignNan);
-	EXPECT_EQ(isCcmCopysignNanNegative, isStdCopysignNanNegative);
+	ccm::test::ExpectSameAsStd(ccm::copysign(1.0, +2.0), std::copysign(1.0, +2.0));
+	ccm::test::ExpectSameAsStd(ccm::copysign(1.0, -2.0), std::copysign(1.0, -2.0));
+	ccm::test::ExpectSameAsStd(ccm::copysign(std::numeric_limits<double>::infinity(), -2.0), std::copysign(std::numeric_limits<double>::infinity(), -2.0));
+	ccm::test::ExpectFpEq(ccm::copysign(std::numeric_limits<double>::quiet_NaN(), -2.0), std::copysign(std::numeric_limits<double>::quiet_NaN(), -2.0));
 
 	// TODO: Add more tests
 }

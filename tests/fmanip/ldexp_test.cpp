@@ -15,6 +15,8 @@
 #include <cmath>
 #include <limits>
 
+#include "utils/std_compare.hpp"
+
 // NOLINTBEGIN
 
 template <typename T>
@@ -51,35 +53,35 @@ TYPED_TEST(CcmathFmanipTests, LdexpStaticAssert)
 
 TYPED_TEST(CcmathFmanipTests, LdexpBasic)
 {
-	EXPECT_EQ(std::ldexp(static_cast<TypeParam>(5.0), 4), ccm::ldexp(static_cast<TypeParam>(5.0), 4));
-	EXPECT_EQ(std::ldexp(static_cast<TypeParam>(-5.0), -4), ccm::ldexp(static_cast<TypeParam>(-5.0), -4));
-	EXPECT_EQ(std::ldexp(static_cast<TypeParam>(0.0), 1), ccm::ldexp(static_cast<TypeParam>(0.0), 1));
-	EXPECT_EQ(std::ldexp(static_cast<TypeParam>(-0.0), 1), ccm::ldexp(static_cast<TypeParam>(-0.0), 1));
-	EXPECT_EQ(std::ldexp(static_cast<TypeParam>(720.32), 22), ccm::ldexp(static_cast<TypeParam>(720.32), 22));
+	ccm::test::ExpectSameAsStd(ccm::ldexp(static_cast<TypeParam>(5.0), 4), std::ldexp(static_cast<TypeParam>(5.0), 4));
+	ccm::test::ExpectSameAsStd(ccm::ldexp(static_cast<TypeParam>(-5.0), -4), std::ldexp(static_cast<TypeParam>(-5.0), -4));
+	ccm::test::ExpectSameAsStd(ccm::ldexp(static_cast<TypeParam>(0.0), 1), std::ldexp(static_cast<TypeParam>(0.0), 1));
+	ccm::test::ExpectSameAsStd(ccm::ldexp(static_cast<TypeParam>(-0.0), 1), std::ldexp(static_cast<TypeParam>(-0.0), 1));
+	ccm::test::ExpectSameAsStd(ccm::ldexp(static_cast<TypeParam>(720.32), 22), std::ldexp(static_cast<TypeParam>(720.32), 22));
 }
 
 TYPED_TEST(CcmathFmanipTests, LdexpExtremeValues)
 {
-	EXPECT_EQ(std::ldexp(static_cast<TypeParam>(1), -1074), ccm::ldexp(static_cast<TypeParam>(1), -1074));
-	EXPECT_EQ(std::ldexp(static_cast<TypeParam>(1), 1024), ccm::ldexp(static_cast<TypeParam>(1), 1024));
-	EXPECT_EQ(std::ldexp(std::numeric_limits<TypeParam>::max(), std::numeric_limits<int>::max()),
-			  ccm::ldexp(std::numeric_limits<TypeParam>::max(), std::numeric_limits<int>::max()));
-	EXPECT_EQ(std::ldexp(std::numeric_limits<TypeParam>::min(), std::numeric_limits<int>::min()),
-			  ccm::ldexp(std::numeric_limits<TypeParam>::min(), std::numeric_limits<int>::min()));
-	EXPECT_EQ(std::ldexp(std::numeric_limits<TypeParam>::min(), std::numeric_limits<int>::max()),
-			  ccm::ldexp(std::numeric_limits<TypeParam>::min(), std::numeric_limits<int>::max()));
-	EXPECT_EQ(std::ldexp(std::numeric_limits<TypeParam>::max(), std::numeric_limits<int>::min()),
-			  ccm::ldexp(std::numeric_limits<TypeParam>::max(), std::numeric_limits<int>::min()));
+	ccm::test::ExpectSameAsStd(ccm::ldexp(static_cast<TypeParam>(1), -1074), std::ldexp(static_cast<TypeParam>(1), -1074));
+	ccm::test::ExpectSameAsStd(ccm::ldexp(static_cast<TypeParam>(1), 1024), std::ldexp(static_cast<TypeParam>(1), 1024));
+	ccm::test::ExpectSameAsStd(ccm::ldexp(std::numeric_limits<TypeParam>::max(), std::numeric_limits<int>::max()),
+							   std::ldexp(std::numeric_limits<TypeParam>::max(), std::numeric_limits<int>::max()));
+	ccm::test::ExpectSameAsStd(ccm::ldexp(std::numeric_limits<TypeParam>::min(), std::numeric_limits<int>::min()),
+							   std::ldexp(std::numeric_limits<TypeParam>::min(), std::numeric_limits<int>::min()));
+	ccm::test::ExpectSameAsStd(ccm::ldexp(std::numeric_limits<TypeParam>::min(), std::numeric_limits<int>::max()),
+							   std::ldexp(std::numeric_limits<TypeParam>::min(), std::numeric_limits<int>::max()));
+	ccm::test::ExpectSameAsStd(ccm::ldexp(std::numeric_limits<TypeParam>::max(), std::numeric_limits<int>::min()),
+							   std::ldexp(std::numeric_limits<TypeParam>::max(), std::numeric_limits<int>::min()));
 }
 
 TYPED_TEST(CcmathFmanipTests, LdexpSpecialValues)
 {
-	EXPECT_EQ(ccm::ldexp(std::numeric_limits<TypeParam>::infinity(), 10), std::ldexp(std::numeric_limits<TypeParam>::infinity(), 10));
+	ccm::test::ExpectSameAsStd(ccm::ldexp(std::numeric_limits<TypeParam>::infinity(), 10), std::ldexp(std::numeric_limits<TypeParam>::infinity(), 10));
 
 	// Test for NaN propagation
 	auto ccm_nan = ccm::ldexp(std::numeric_limits<TypeParam>::quiet_NaN(), 10);
 	auto std_nan = std::ldexp(std::numeric_limits<TypeParam>::quiet_NaN(), 10);
-	EXPECT_TRUE(std::isnan(ccm_nan) == std::isnan(std_nan));
+	ccm::test::ExpectSameAsStd(ccm_nan, std_nan);
 }
 
 // NOLINTEND
