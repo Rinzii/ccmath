@@ -5,8 +5,4 @@ ccm_add_headers(
         sqrt_gen.hpp
 )
 
-# TODO: Move this to its own folder at some point
-ccm_add_headers(
-        pow_impl.hpp
-        powf_impl.hpp
-)
+add_subdirectory(pow_impl) # ccm::pow()

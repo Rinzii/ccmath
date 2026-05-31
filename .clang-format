@@ -1,61 +1,84 @@
 ---
-Language: Cpp
-BasedOnStyle: LLVM
 AccessModifierOffset: -4
 AlignConsecutiveAssignments: Consecutive
 AlignConsecutiveMacros: Consecutive
 AlignEscapedNewlines: Right
 AlignTrailingComments:
-    Kind: Always
-AllowShortEnumsOnASingleLine: true
-AllowShortCaseLabelsOnASingleLine: true
-AllowShortFunctionsOnASingleLine: InlineOnly
-AllowShortLambdasOnASingleLine: All
+  Kind: Always
 AllowShortBlocksOnASingleLine: Always
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortEnumsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: InlineOnly
 AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLambdasOnASingleLine: All
 AllowShortLoopsOnASingleLine: true
+AlwaysBreakBeforeMultilineStrings: true
 AlwaysBreakTemplateDeclarations: Yes
+BasedOnStyle: LLVM
+BinPackArguments: false
+BinPackParameters: false
 BraceWrapping:
-    AfterCaseLabel: true
-    AfterClass: true
-    AfterControlStatement: Always
-    AfterEnum: true
-    AfterFunction: true
-    AfterNamespace: true
-    AfterStruct: true
-    AfterUnion: true
-    AfterExternBlock: false
-    BeforeCatch: false
-    BeforeElse: false
-    BeforeLambdaBody: false
-    BeforeWhile: false
-    IndentBraces: true
-    SplitEmptyFunction: true
-    SplitEmptyRecord: true
-    SplitEmptyNamespace: true
+  AfterCaseLabel: true
+  AfterClass: true
+  AfterControlStatement: Always
+  AfterEnum: true
+  AfterExternBlock: false
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: false
+  BeforeElse: false
+  BeforeLambdaBody: false
+  BeforeWhile: false
+  IndentBraces: true
+  SplitEmptyFunction: true
+  SplitEmptyNamespace: true
+  SplitEmptyRecord: true
 BreakAfterAttributes: Never
 BreakBeforeBraces: Allman
 ColumnLimit: 160
 CompactNamespaces: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+Cpp11BracedListStyle: false
+DerivePointerAlignment: true
 FixNamespaceComments: true
+IncludeBlocks: Regroup
+IncludeCategories:
+  # Headers in "" with .h extension.
+  - Regex: '"([A-Za-z0-9\/-_])+\.h"'
+    Priority: 10
+  # Headers in "" with .hpp extension.
+  - Regex: '"([A-Za-z0-9\/-_])+\.hpp"'
+    Priority: 20
+  # Headers in <> with .h extension.
+  - Regex: '<([A-Za-z0-9\/-_])+\.h>'
+    Priority: 30
+  # Headers in <> with .hpp extension.
+  - Regex: '<([A-Za-z0-9\/-_])+\.hpp>'
+    Priority: 40
+  # Headers in <> without an extension.
+  - Regex: '<([A-Za-z0-9\/-_])+>'
+    Priority: 50
 IndentPPDirectives: BeforeHash
 IndentWidth: 4
-IncludeCategories:
-    # Headers in <> with .h extension.
-    - Regex: '<([A-Za-z0-9\/-_])+\.h>'
-      Priority: 10
-    # Headers in <> with .hpp extension.
-    - Regex: '<([A-Za-z0-9\/-_])+\.hpp>'
-      Priority: 20
-    # Headers in <> without an extension.
-    - Regex: '<([A-Za-z0-9\/-_])+>'
-      Priority: 30
+Language: Cpp
 NamespaceIndentation: All
 PointerAlignment: Middle
+SortIncludes: CaseInsensitive
 SpaceAfterTemplateKeyword: true
-Standard: c++20
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+SpacesInParentheses: false
+Standard: c++17
 TabWidth: 4
 UseTab: Always
-
-
-
+WhitespaceSensitiveMacros:
+  # Specific macros that suffer from formatting issues with white spaces
+  - CCM_DISABLE_CLANG_WARNING
+  - CCM_ENABLE_CLANG_WARNING_AS_ERROR
+  - CCM_DISABLE_GCC_WARNING
+  - CCM_ENABLE_GCC_WARNING_AS_ERROR
+  - CCM_ENABLE_IGNORE_GCC_WARNING
+  - CCM_DISABLE_IGNORE_GCC_WARNING
+...

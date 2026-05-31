@@ -23,17 +23,17 @@
 
 // Visual Studio 2019 and later supports __builtin_is_constant_evaluated
 #if defined(_MSC_FULL_VER) && (_MSC_FULL_VER >= 192528326)
-	#  define CCMATH_HAS_BUILTIN_IS_CONSTANT_EVALUATED
+	#define CCMATH_HAS_BUILTIN_IS_CONSTANT_EVALUATED
 #endif
 
 namespace ccm::support
 {
 	constexpr bool is_constant_evaluated() noexcept
 	{
-		#if defined(CCMATH_HAS_BUILTIN_IS_CONSTANT_EVALUATED)
+#if defined(CCMATH_HAS_BUILTIN_IS_CONSTANT_EVALUATED)
 		return __builtin_is_constant_evaluated();
-		#else
+#else
 		return false;
-		#endif
+#endif
 	}
 } // namespace ccm::support

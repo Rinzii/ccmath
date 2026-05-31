@@ -10,26 +10,22 @@
 
 #pragma once
 
-// TODO: Implement pow for neon
-
+#include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
 #include "ccmath/internal/math/runtime/simd/simd.hpp"
 
 #ifdef CCMATH_HAS_SIMD
 	#ifdef CCMATH_HAS_SIMD_NEON
 namespace ccm::intrin
 {
-	CCM_ALWAYS_INLINE simd<float, abi::neon> sqrt(simd<float, abi::neon> const & a)
+	CCM_ALWAYS_INLINE simd<float, abi::neon> pow(simd<float, abi::neon> const & a, simd<float, abi::neon> const & b)
 	{
-		// NOLINTNEXTLINE(modernize-return-braced-init-list)
-		return simd<float, abi::neon>(vsqrtq_f32(a.get()));
+		return simd<float, abi::neon>(gen::pow_gen(a.convert(), b.convert()));
 	}
 
-	CCM_ALWAYS_INLINE simd<double, abi::neon> sqrt(simd<double, abi::neon> const & a)
+	CCM_ALWAYS_INLINE simd<double, abi::neon> pow(simd<double, abi::neon> const & a, simd<double, abi::neon> const & b)
 	{
-		// NOLINTNEXTLINE(modernize-return-braced-init-list)
-		return simd<double, abi::neon>(vsqrtq_f64(a.get()));
+		return simd<double, abi::neon>(gen::pow_gen(a.convert(), b.convert()));
 	}
 } // namespace ccm::intrin
-
-	#endif // CCMATH_HAS_SIMD_NEON
-#endif	   // CCMATH_HAS_SIMD
+	#endif
+#endif

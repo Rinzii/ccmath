@@ -10,8 +10,11 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/basic/remainder.hpp"
+#include "ccmath/internal/math/runtime/func/basic/remainder_rt.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/nearest/trunc.hpp"
 
 namespace ccm
@@ -22,10 +25,13 @@ namespace ccm
 	 * @param x Dividend.
 	 * @param y Divisor.
 	 * @return The remainder of the division of x by y.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/remainder
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T remainder(T x, T y)
 	{
+		if (!ccm::support::is_constant_evaluated()) { return ccm::rt::remainder_rt(x, y); }
+
 		using FPBits_t = typename ccm::support::fp::FPBits<T>;
 		const FPBits_t x_bits(x);
 		const FPBits_t y_bits(y);
@@ -51,6 +57,7 @@ namespace ccm
 	 * @param x Dividend.
 	 * @param y Divisor.
 	 * @return The remainder of the division of x by y as a double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/remainder
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double remainder(Integer x, Integer y)
@@ -63,6 +70,7 @@ namespace ccm
 	 * @param x Dividend.
 	 * @param y Divisor.
 	 * @return The remainder of the division of x by y.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/remainder
 	 */
 	constexpr float remainderf(float x, float y)
 	{
@@ -74,6 +82,7 @@ namespace ccm
 	 * @param x Dividend.
 	 * @param y Divisor.
 	 * @return The remainder of the division of x by y.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/remainder
 	 */
 	constexpr long double remainderl(long double x, long double y)
 	{

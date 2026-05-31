@@ -10,9 +10,12 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/nearest/floor.hpp"
+#include "ccmath/internal/math/runtime/func/nearest/floor_rt.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
-#include "ccmath/internal/math/generic/builtins/nearest/floor.hpp"
+#include "ccmath/math/nearest/trunc.hpp"
 
 #include <limits>
 #include <type_traits>
@@ -73,27 +76,30 @@ namespace ccm
 		}
 	} // namespace internal::impl
 
-
 	/**
 	 * @brief Computes the largest integer value not greater than num.
 	 * @tparam T The type of the number.
 	 * @param num A floating-point or integer value.
 	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/floor
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T floor(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_floor<T>) { return ccm::builtin::floor(num); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_floor<T>)
+		{
+			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::floor(num); }
+		}
 		{
 			// If num is NaN, NaN is returned.
 			// If num is ±∞ or ±0, num is returned, unmodified.
 			if (ccm::isinf(num) || num == static_cast<T>(0) || ccm::isnan(num)) { return num; }
 
-			// TODO: This approach should work with long double perfectly, but is slow.
-			//		 at some consider adding a faster approach that is just as consistent.
-			if (num > 0) { return internal::impl::floor_pos_impl(num); }
-			return internal::impl::floor_neg_impl(num);
+			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::floor_rt(num); }
+
+			const T truncated = ccm::trunc(num);
+			if (truncated == num || num > static_cast<T>(0)) { return truncated; }
+			return truncated - static_cast<T>(1);
 		}
 	}
 
@@ -101,6 +107,7 @@ namespace ccm
 	 * @brief Computes the largest integer value not greater than num.
 	 * @param num A integer value.
 	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/floor
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double floor(Integer num) noexcept
@@ -112,6 +119,7 @@ namespace ccm
 	 * @brief Computes the largest integer value not greater than num.
 	 * @param num A floating-point value.
 	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/floor
 	 */
 	constexpr float floorf(float num) noexcept
 	{
@@ -122,6 +130,7 @@ namespace ccm
 	 * @brief Computes the largest integer value not greater than num.
 	 * @param num A floating-point value.
 	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/floor
 	 */
 	constexpr double floorl(double num) noexcept
 	{

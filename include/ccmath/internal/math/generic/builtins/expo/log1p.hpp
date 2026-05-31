@@ -1,5 +1,5 @@
 /*
-* Copyright (c) Ian Pike
+ * Copyright (c) Ian Pike
  * Copyright (c) CCMath contributors
  *
  * CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
@@ -10,25 +10,30 @@
 
 #pragma once
 
+// ReSharper disable once CppUnusedIncludeDirective
 #include "ccmath/internal/math/generic/builtins/builtin_helpers.hpp"
+#include "ccmath/internal/support/always_false.hpp"
 
 #include <type_traits>
 
 /// CCMATH_HAS_CONSTEXPR_BUILTIN_LOG1P
-/// This is a macro that is defined if the compiler has constexpr __builtin functions for log1p that allow static_assert
+/// This is a macro that is defined if the compiler has constexpr __builtin_functions for log1p that allow static_assert
 ///
 /// Compilers with Support:
 /// - GCC 5.1+
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_LOG1P
-#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
-#define CCMATH_HAS_CONSTEXPR_BUILTIN_LOG1P
-#endif
+	#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_LOG1P
+	#endif
 #endif
 
 namespace ccm::builtin
 {
 	// clang-format off
+	/**
+	 * @internal
+	 */
 	template <typename T>
 	inline constexpr bool has_constexpr_log1p =
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_LOG1P
@@ -39,28 +44,24 @@ namespace ccm::builtin
 	// clang-format on
 
 	/**
-	 * Wrapper for constexpr __builtin log1p functions.
+	 * @internal
+	 * Wrapper for constexpr __builtin_log1p functions.
 	 * This should be used internally and always be wrapped in an if constexpr statement.
-	 * It exists only to allow for usage of __builtin log1p functions without triggering a compiler error
+	 * It exists only to allow for usage of __builtin_log1p functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
 	constexpr auto log1p(T x) -> std::enable_if_t<has_constexpr_log1p<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>)
+		if constexpr (std::is_same_v<T, float>) { return __builtin_log1pf(x); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_log1p(x); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_log1pl(x); }
+		else
 		{
-			return __builtin_log1pf(x);
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_log1p");
+			return T{};
 		}
-		else if constexpr (std::is_same_v<T, double>)
-		{
-			return __builtin_log1p(x);
-		}
-		else if constexpr (std::is_same_v<T, long double>)
-		{
-			return __builtin_log1pl(x);
-		}
-		// This should never be reached
-		return T{};
 	}
 } // namespace ccm::builtin
 

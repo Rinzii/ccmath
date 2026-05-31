@@ -24,7 +24,7 @@ namespace ccm::ext
 	 * @param t The interpolation value.
 	 * @return The interpolated value.
 	 */
-	template<typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T cubic(T y0, T y1, T y2, T y3, T t)
 	{
 		const T a0 = y3 - y2 - y0 + y1;

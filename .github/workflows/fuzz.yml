@@ -1,0 +1,38 @@
+name: fuzz
+
+on:
+  push:
+    tags-ignore:
+      - v*.*
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+permissions:
+  contents: read
+
+jobs:
+  libfuzzer-smoke:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Install dependencies
+        run: brew install ninja llvm lld
+
+      - name: Configure fuzz targets
+        run: |
+          LLVM_PREFIX="$(brew --prefix llvm)"
+          cmake --preset=ninja-fuzz-debug \
+            -DCMAKE_C_COMPILER="${LLVM_PREFIX}/bin/clang" \
+            -DCMAKE_CXX_COMPILER="${LLVM_PREFIX}/bin/clang++" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld"
+
+      - name: Build fuzz targets
+        run: cmake --build --preset=build-ninja-fuzz-debug
+
+      - name: Fuzz smoke tests
+        run: ctest --preset=test-ninja-fuzz-debug -C Debug --output-on-failure

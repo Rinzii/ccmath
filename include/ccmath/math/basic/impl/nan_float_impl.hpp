@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "ccmath/internal/support/helpers/digit_to_int.hpp"
 #include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/support/helpers/digit_to_int.hpp"
 
 #include <cstdint>
 #include <limits>
@@ -20,10 +20,7 @@ namespace ccm::internal::impl
 {
 	constexpr float nan_float_impl(const char * arg) noexcept
 	{
-		if constexpr (!std::numeric_limits<float>::is_iec559)
-		{
-			return 0.0F;
-		}
+		if constexpr (!std::numeric_limits<float>::is_iec559) { return 0.0F; }
 
 #if defined(_MSC_VER) && !defined(__clang__)
 		// Currently, MSVC always returns a Quiet NaN no matter if a payload is
@@ -34,8 +31,8 @@ namespace ccm::internal::impl
 		return std::numeric_limits<float>::quiet_NaN(); // Default NaN
 #endif
 
-		std::uint32_t flt_bits{0};
-		bool has_hex_been_detected{false};
+		std::uint32_t flt_bits{ 0 };
+		bool has_hex_been_detected{ false };
 
 		// NOLINTBEGIN
 

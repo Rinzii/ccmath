@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "ccmath/internal/math/generic/func/power/pow_impl.hpp"
-#include "ccmath/internal/math/generic/func/power/powf_impl.hpp"
+#include "ccmath/internal/math/generic/func/power/pow_impl/pow_impl.hpp"
+#include "ccmath/internal/math/generic/func/power/pow_impl/powf_impl.hpp"
 
 #include <type_traits>
 

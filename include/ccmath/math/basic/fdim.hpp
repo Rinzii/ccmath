@@ -10,12 +10,10 @@
 
 #pragma once
 
-#include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/math/common/basic/fdim.hpp"
 #include "ccmath/internal/math/generic/builtins/basic/fdim.hpp"
-#include "ccmath/internal/support/fp/fp_bits.hpp"
-
-#include <limits>
-#include <type_traits>
+#include "ccmath/internal/math/runtime/func/basic/fdim_rt.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 
 namespace ccm
 {
@@ -25,26 +23,14 @@ namespace ccm
 	 * @param x A floating-point or integer values
 	 * @param y A floating-point or integer values
 	 * @return If successful, returns the positive difference between x and y.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/fdim
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T fdim(T x, T y)
 	{
-		if constexpr (builtin::has_constexpr_fdim<T>)
-		{
-			return builtin::fdim(x, y);
-		}
-		else
-		{
-			using FPBits_t = typename ccm::support::fp::FPBits<T>;
-			const FPBits_t x_bits(x);
-			const FPBits_t y_bits(y);
-
-			if (CCM_UNLIKELY(x_bits.is_nan())) { return x; }
-			if (CCM_UNLIKELY(y_bits.is_nan())) { return y; }
-			if (x <= y) { return static_cast<T>(+0.0); }
-			if (y < static_cast<T>(0.0) && x > std::numeric_limits<T>::max() + y) { return std::numeric_limits<T>::infinity(); }
-			return x - y;
-		}
+		if constexpr (ccm::builtin::has_constexpr_fdim<T>) { return ccm::builtin::fdim(x, y); }
+		else if (ccm::support::is_constant_evaluated()) { return func::fdim(x, y); }
+		else { return ccm::rt::fdim_rt(x, y); }
 	}
 
 	/**
@@ -54,6 +40,7 @@ namespace ccm
 	 * @param x A floating-point value.
 	 * @param y A floating-point value.
 	 * @return If successful, returns the positive difference between x and y.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/fdim
 	 */
 	template <typename T, typename U, std::enable_if_t<std::is_floating_point_v<T> && std::is_floating_point_v<U>, bool> = true>
 	constexpr auto fdim(T x, U y)
@@ -71,6 +58,7 @@ namespace ccm
 	 * @param x An integral value.
 	 * @param y An integral value.
 	 * @return If successful, returns the positive difference between x and y.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/fdim
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double fdim(Integer x, Integer y)
@@ -83,6 +71,7 @@ namespace ccm
 	 * @param x A floating-point value.
 	 * @param y A floating-point value.
 	 * @return If successful, returns the positive difference between x and y.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/fdim
 	 */
 	constexpr float fdimf(float x, float y)
 	{
@@ -94,6 +83,7 @@ namespace ccm
 	 * @param x A floating-point value.
 	 * @param y A floating-point value.
 	 * @return If successful, returns the positive difference between x and y.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/fdim
 	 */
 	constexpr long double fdiml(long double x, long double y)
 	{

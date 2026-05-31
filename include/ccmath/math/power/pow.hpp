@@ -10,16 +10,23 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/power/pow.hpp"
 #include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
 #include "ccmath/internal/math/runtime/func/power/pow_rt.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
-#include "ccmath/internal/math/generic/builtins/power/pow.hpp"
-
 
 #include <type_traits>
 
 namespace ccm
 {
+	/**
+	 * @brief Raises a floating-point base to a floating-point exponent.
+	 * @tparam T Floating-point type.
+	 * @param base Base value.
+	 * @param exp Exponent value.
+	 * @return base raised to exp.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/pow
+	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T pow(T base, T exp)
 	{
@@ -33,6 +40,14 @@ namespace ccm
 		}
 	}
 
+	/**
+	 * @brief Raises an integer base to an integer exponent via floating-point promotion.
+	 * @tparam Integer Integral type.
+	 * @param base Base value.
+	 * @param exp Exponent value.
+	 * @return base raised to exp as double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/pow
+	 */
 	template <typename Integer, std::enable_if_t<!std::is_floating_point_v<Integer>, bool> = true>
 	constexpr double pow(Integer base, Integer exp)
 	{

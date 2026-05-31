@@ -127,8 +127,17 @@ namespace ccm::support::traits
 
 	/// is_unsigned
 
-	template <typename T> struct ccm_is_unsigned : and_<ccm_is_arithmetic<T>, not_<ccm_is_signed<T>>>::type {};
-	template <typename T> constexpr bool ccm_is_unsigned_v = ccm_is_unsigned<T>::value;
+	//template <typename T> struct ccm_is_unsigned : and_<ccm_is_arithmetic<T>, not_<ccm_is_signed<T>>>::type {};
+	//template <typename T> constexpr bool ccm_is_unsigned_v = ccm_is_unsigned<T>::value;
+
+	template <typename T>
+struct ccm_is_unsigned : std::bool_constant<(ccm_is_arithmetic_v<T> && (T(-1) > T(0)))> {
+		constexpr operator bool() const { return ccm_is_unsigned::value; }
+		constexpr bool operator()() const { return ccm_is_unsigned::value; }
+	};
+	template <typename T>
+	constexpr bool ccm_is_unsigned_v = ccm_is_unsigned<T>::value;
+
 
 
 	/// is_unsigned_integer custom trait
@@ -171,9 +180,7 @@ template <>	struct ccm_make_signed<__int128_t> : type_identity<__int128_t> {};
 template <>	struct ccm_make_signed<__uint128_t> : type_identity<__int128_t> {};
 #endif
 template <typename T> using ccm_make_signed_t = typename ccm_make_signed<T>::type;
-	
 
 	// clang-format on
-
 
 } // namespace ccm::support::traits

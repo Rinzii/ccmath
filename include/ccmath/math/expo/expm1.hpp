@@ -11,37 +11,71 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/expo/expm1.hpp"
+#include "ccmath/internal/math/runtime/func/expo/expm1_rt.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
+#include "ccmath/math/expo/impl/expm1_impl.hpp"
 
 #include <type_traits>
 
-// TODO: Implement this.
+#if defined(_MSC_VER) && !defined(__clang__)
+	#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+CCM_DISABLE_MSVC_WARNING(4702)
+#endif
 
 namespace ccm
 {
+	/**
+	 * @brief Computes exp(num) - 1 with improved accuracy near zero.
+	 * @tparam T Floating-point type.
+	 * @param num Floating-point value.
+	 * @return exp(num) - 1.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/expm1
+	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T expm1([[maybe_unused]] T num)
+	constexpr T expm1(T num)
 	{
 		if constexpr (ccm::builtin::has_constexpr_expm1<T>) { return ccm::builtin::expm1(num); }
 		else
 		{
-			if constexpr (std::is_same_v<T, float>) { return 0; }
-			if constexpr (std::is_same_v<T, double>) { return 0; }
-			if constexpr (std::is_same_v<T, long double>) { return 0; }
-			return 0;
+			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::expm1_rt(num); }
+
+			if constexpr (std::is_same_v<T, float>) { return internal::expm1_float(num); }
+			if constexpr (std::is_same_v<T, double>) { return internal::expm1_double(num); }
+			if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::expm1_double(static_cast<double>(num))); }
+			return static_cast<T>(internal::expm1_double(static_cast<double>(num)));
 		}
 	}
 
+	/**
+	 * @brief Computes exp(num) - 1 after promoting an integer input to double.
+	 * @tparam Integer Integral type.
+	 * @param num Integer value.
+	 * @return exp(num) - 1 as double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/expm1
+	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double expm1(Integer num)
 	{
 		return ccm::expm1<double>(static_cast<double>(num));
 	}
 
+	/**
+	 * @brief Computes exp(num) - 1 for float.
+	 * @param num Floating-point value.
+	 * @return exp(num) - 1 as float.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/expm1
+	 */
 	constexpr float expm1f(float num)
 	{
 		return ccm::expm1<float>(num);
 	}
 
+	/**
+	 * @brief Computes exp(num) - 1 for long double.
+	 * @param num Floating-point value.
+	 * @return exp(num) - 1 as long double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/expm1
+	 */
 	constexpr long double expm1l(long double num)
 	{
 		return ccm::expm1<long double>(num);

@@ -24,7 +24,7 @@ namespace ccm::ext
 	 * @param max The maximum value of the range.
 	 * @return The normalized value.
 	 */
-	template<typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T normalize(T value, T min = T(0), T max = T(1))
 	{
 		return ext::clamp((value - min) / (max - min), static_cast<T>(0), static_cast<T>(1));

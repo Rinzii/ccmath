@@ -10,12 +10,16 @@
 
 #pragma once
 
+#include "ccmath/internal/math/runtime/func/nearest/nearbyint_rt.hpp"
+
 #include <ccmath/internal/support/fenv/rounding_mode.hpp>
 #include <ccmath/internal/support/fp/directional_rounding_utils.hpp>
+#include <ccmath/internal/support/is_constant_evaluated.hpp>
 #include <ccmath/math/compare/isinf.hpp>
 #include <ccmath/math/compare/isnan.hpp>
 #include <ccmath/math/compare/signbit.hpp>
 #include <ccmath/math/nearest/trunc.hpp>
+
 #include <type_traits>
 
 namespace ccm
@@ -25,11 +29,14 @@ namespace ccm
 	 * @tparam T The type of the number.
 	 * @param num A floating-point value.
 	 * @return If no errors occur, the rounded floating point value. Otherwise, returns the input floating point value unmodified.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/nearbyint
 	 */
 	template <class T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T nearbyint(T num) noexcept
 	{
-		constexpr auto rounding_mode{ccm::support::fenv::get_rounding_mode()};
+		if (!ccm::support::is_constant_evaluated()) { return ccm::rt::nearbyint_rt(num); }
+
+		constexpr auto rounding_mode{ ccm::support::fenv::get_rounding_mode() };
 		return ccm::support::fp::directional_round(num, rounding_mode);
 	}
 
@@ -38,6 +45,7 @@ namespace ccm
 	 * @tparam Integer The type of the number.
 	 * @param num An integral value.
 	 * @return If no errors occur, the rounded floating point value. Otherwise, returns the input integer value unmodified.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/nearbyint
 	 */
 	template <class Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double nearbyint(Integer num) noexcept
@@ -49,6 +57,7 @@ namespace ccm
 	 * @brief The nearest integer value to num, according to the rounding mode FE_TONEAREST, is returned.
 	 * @param num A float value.
 	 * @return If no errors occur, the rounded floating point value. Otherwise, returns the input integer value unmodified.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/nearbyint
 	 */
 	constexpr float nearbyintf(float num) noexcept
 	{
@@ -59,6 +68,7 @@ namespace ccm
 	 * @brief The nearest integer value to num, according to the rounding mode FE_TONEAREST, is returned.
 	 * @param num A long double value.
 	 * @return If no errors occur, the rounded floating point value. Otherwise, returns the input integer value unmodified.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/nearbyint
 	 */
 	constexpr long double nearbyintl(long double num) noexcept
 	{

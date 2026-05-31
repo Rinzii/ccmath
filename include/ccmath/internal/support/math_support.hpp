@@ -10,13 +10,16 @@
 
 #pragma once
 
+#include "ccmath/internal/predef/compiler_suppression/clang_compiler_suppression.hpp"
+#include "ccmath/internal/predef/compiler_suppression/gcc_compiler_suppression.hpp"
 #include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
 
-
 #include <climits>
+
+// CCM_DISABLE_GCC_WARNING(-Wpedantic)
 
 namespace ccm::support
 {
@@ -97,7 +100,7 @@ namespace ccm::support
 	}
 
 #define RETURN_IF(TYPE, BUILTIN)                                                                                                                               \
-	if constexpr (std::is_same_v<T, TYPE>) return BUILTIN(a, b, carry_in, carry_out);
+	if constexpr (std::is_same_v<T, TYPE>) { return BUILTIN(a, b, carry_in, &carry_out); }
 
 	// Returns the result of 'a + b' taking into account 'carry_in'.
 	// The carry out is stored in 'carry_out' it not 'nullptr', dropped otherwise.
@@ -105,7 +108,7 @@ namespace ccm::support
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> add_with_carry(T a, T b, T carry_in, T & carry_out)
 	{
-		if (!is_constant_evaluated())
+		if constexpr (!is_constant_evaluated())
 		{
 #if CCM_HAS_BUILTIN(__builtin_addcb)
 			RETURN_IF(unsigned char, __builtin_addcb)
@@ -127,10 +130,10 @@ namespace ccm::support
 	}
 
 	// Returns the result of 'a - b' taking into account 'carry_in'.
-	// The carry out is stored in 'carry_out' it not 'nullptr', dropped otherwise.
+	// The carry out is stored in 'carry_out' if not 'nullptr', dropped otherwise.
 	// We keep the pass by pointer interface for consistency with the intrinsic.
 	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> sub_with_borrow(T a, T b, T carry_in, T & carry_out)
+	[[nodiscard]] inline constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> sub_with_borrow(T a, T b, T carry_in, T & carry_out)
 	{
 		if (!is_constant_evaluated())
 		{
@@ -160,6 +163,7 @@ namespace ccm::support
 	// Please be careful that UB is not introduced by using this function and that you know this
 	// function will never be called with a count that is too big.
 	CCM_DISABLE_MSVC_WARNING(4293)
+	CCM_DISABLE_CLANG_WARNING(-Wshift-count-overflow) // Disabled for same reasons stated above
 
 	// Create a bitmask with the count right-most bits set to 1, and all other bits
 	// set to 0.  Only unsigned types are allowed.
@@ -172,6 +176,7 @@ namespace ccm::support
 	}
 
 	CCM_RESTORE_MSVC_WARNING()
+	CCM_RESTORE_CLANG_WARNING()
 
 	// Create a bitmask with the count left-most bits set to 1, and all other bits
 	// set to 0.  Only unsigned types are allowed.
@@ -218,7 +223,7 @@ namespace ccm::support
 	 * @param b
 	 */
 
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+	template <typename T, std::enable_if_t<traits::ccm_is_floating_point_v<T>, bool> = true>
 	static constexpr void fast_two_sum(T & hi, T & lo, T a, T b)
 	{
 		hi		  = a + b;
@@ -227,7 +232,7 @@ namespace ccm::support
 	}
 
 	/* Algorithm 2 from https://hal.science/hal-01351529 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+	template <typename T, std::enable_if_t<traits::ccm_is_floating_point_v<T>, bool> = true>
 	static constexpr void two_sum(T & s, T & t, T a, T b)
 	{
 		s				= a + b;
@@ -252,3 +257,5 @@ namespace ccm::support
 	}
 
 } // namespace ccm::support
+
+// CCM_RESTORE_GCC_WARNING()

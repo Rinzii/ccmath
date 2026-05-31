@@ -30,16 +30,14 @@ namespace ccm::gen
 	{
 		constexpr float log_impl([[maybe_unused]] float num) noexcept
 		{
-			//constexpr double ln2 = 0x1.62e42fefa39efp-1;
-			//using FPBits_t = typename support::fp::FPBits<float>;
+			// constexpr double ln2 = 0x1.62e42fefa39efp-1;
+			// using FPBits_t = typename support::fp::FPBits<float>;
 
-			//FPBits_t num_bits(num);
+			// FPBits_t num_bits(num);
 
-			//std::uint32_t num_bits_storage = num_bits.uintval();
+			// std::uint32_t num_bits_storage = num_bits.uintval();
 
-			//int m = -FPBits_t::exponent_bias;
-
-
+			// int m = -FPBits_t::exponent_bias;
 
 			return 0;
 		}
@@ -53,7 +51,6 @@ namespace ccm::gen
 		{
 			return 0;
 		}
-
 
 	} // namespace internal::impl
 
