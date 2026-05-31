@@ -32,6 +32,7 @@ namespace ccm
 	 * @tparam T Floating-point or integer type
 	 * @param num Floating-point or integer value
 	 * @return If no errors occur, the base-2 exponential of num (2^num) is returned.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp2
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T exp2(T num)
@@ -53,6 +54,7 @@ namespace ccm
 	 * @tparam Integer Integer type
 	 * @param num Integer value
 	 * @return If no errors occur, the base-2 exponential of num (2^num) is returned as a double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp2
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double exp2(Integer num)
@@ -64,6 +66,7 @@ namespace ccm
 	 * @brief Returns 2 raised to the given power (2^x)
 	 * @param num Floating-point value
 	 * @return If no errors occur, the base-2 exponential of num (2^num) is returned as a float.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp2
 	 */
 	constexpr float exp2f(float num)
 	{
@@ -74,6 +77,7 @@ namespace ccm
 	 * @brief Returns 2 raised to the given power (2^x)
 	 * @param num Floating-point value
 	 * @return If no errors occur, the base-2 exponential of num (2^num) is returned as a double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp2
 	 */
 	constexpr long double exp2l(long double num)
 	{

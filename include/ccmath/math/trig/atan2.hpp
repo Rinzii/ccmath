@@ -19,6 +19,14 @@
 
 namespace ccm
 {
+	/**
+	 * @brief Computes the principal value of the arc tangent of y/x, using signs to determine quadrant.
+	 * @tparam T Floating-point type.
+	 * @param y Numerator component.
+	 * @param x Denominator component.
+	 * @return Angle in radians in the correct quadrant.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/atan2
+	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T atan2(T y, T x)
 	{
@@ -32,11 +40,25 @@ namespace ccm
 		else { return ccm::rt::atan2_rt(y, x); }
 	}
 
+	/**
+	 * @brief Computes two-argument arc tangent for float inputs.
+	 * @param y Numerator component.
+	 * @param x Denominator component.
+	 * @return Angle in radians as float.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/atan2
+	 */
 	constexpr float atan2f(float y, float x)
 	{
 		return ccm::atan2<float>(y, x);
 	}
 
+	/**
+	 * @brief Computes two-argument arc tangent for long double inputs.
+	 * @param y Numerator component.
+	 * @param x Denominator component.
+	 * @return Angle in radians as long double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/atan2
+	 */
 	constexpr long double atan2l(long double y, long double x)
 	{
 		return ccm::atan2<long double>(y, x);

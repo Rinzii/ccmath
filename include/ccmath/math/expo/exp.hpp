@@ -28,6 +28,7 @@ namespace ccm
 	 * @tparam T floating-point or integer type
 	 * @param num floating-point or integer value
 	 * @return If no errors occur, the base-e exponential of num (e^num) is returned.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T exp(T num)
@@ -49,6 +50,7 @@ namespace ccm
 	 * @tparam Integer integer type
 	 * @param num integer value
 	 * @return If no errors occur, the base-e exponential of num (e^num) is returned as double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double exp(Integer num)
@@ -60,6 +62,7 @@ namespace ccm
 	 * @brief Computes e raised to the given power
 	 * @param num floating-point value
 	 * @return If no errors occur, the base-e exponential of num (e^num) is returned as float.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp
 	 */
 	constexpr float expf(float num)
 	{
@@ -70,6 +73,7 @@ namespace ccm
 	 * @brief Computes e raised to the given power
 	 * @param num floating-point value
 	 * @return If no errors occur, the base-e exponential of num (e^num) is returned as double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp
 	 */
 	constexpr long double expl(long double num)
 	{

@@ -19,6 +19,13 @@
 
 namespace ccm
 {
+	/**
+	 * @brief Extracts the unbiased exponent of a floating-point value as a floating-point result.
+	 * @tparam T Floating-point type.
+	 * @param num Floating-point value.
+	 * @return Unbiased exponent of num in the return type T.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/logb
+	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T logb(T num) noexcept
 	{
@@ -32,11 +39,23 @@ namespace ccm
 		else { return ccm::rt::logb_rt(num); }
 	}
 
+	/**
+	 * @brief Extracts the unbiased exponent of a float.
+	 * @param num Floating-point value.
+	 * @return Unbiased exponent as float.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/logb
+	 */
 	constexpr float logbf(float num) noexcept
 	{
 		return ccm::logb(num);
 	}
 
+	/**
+	 * @brief Extracts the unbiased exponent of a long double.
+	 * @param num Floating-point value.
+	 * @return Unbiased exponent as long double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/logb
+	 */
 	constexpr long double logbl(long double num) noexcept
 	{
 		return ccm::logb(num);

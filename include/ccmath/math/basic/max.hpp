@@ -28,6 +28,7 @@ namespace ccm
 	 * @param x Left-hand side of the comparison.
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/fmax
 	 */
 	template <typename T>
 	constexpr T max(T x, T y) noexcept
@@ -47,7 +48,8 @@ namespace ccm
 	 * @tparam U Type of right-hand side of the comparison.
 	 * @param x Left-hand side of the comparison.
 	 * @param y Right-hand side of the comparison.
-	 * @return
+	 * @return Larger of x and y after converting both values to their common type.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/fmax
 	 */
 	template <typename T, typename U>
 	constexpr auto max(T x, U y) noexcept
@@ -65,6 +67,7 @@ namespace ccm
 	 * @param x Left-hand side of the comparison.
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/fmax
 	 */
 	template <typename T>
 	constexpr T fmax(T x, T y) noexcept
@@ -79,6 +82,7 @@ namespace ccm
 	 * @param x Left-hand side of the comparison.
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/fmax
 	 */
 	template <typename T, typename U>
 	constexpr auto fmax(T x, U y) noexcept
@@ -95,6 +99,7 @@ namespace ccm
 	 * @param x Left-hand side of the comparison.
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/fmax
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double fmax(Integer x, Integer y) noexcept
@@ -107,6 +112,7 @@ namespace ccm
 	 * @param x Left-hand side of the comparison.
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/fmax
 	 */
 	constexpr float fmaxf(float x, float y) noexcept
 	{
@@ -118,6 +124,7 @@ namespace ccm
 	 * @param x Left-hand side of the comparison.
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/fmax
 	 */
 	constexpr long double fmaxl(long double x, long double y) noexcept
 	{

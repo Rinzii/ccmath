@@ -19,6 +19,13 @@
 
 namespace ccm
 {
+	/**
+	 * @brief Computes the cosine of an angle in radians.
+	 * @tparam T Floating-point type.
+	 * @param num Angle in radians.
+	 * @return Cosine of num.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/cos
+	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T cos(T num)
 	{
@@ -30,17 +37,36 @@ namespace ccm
 		}
 	}
 
+	/**
+	 * @brief Computes the cosine of an integral angle value after promotion to double.
+	 * @tparam Integer Integral type.
+	 * @param num Angle in radians.
+	 * @return Cosine of num as double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/cos
+	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double cos(Integer num)
 	{
 		return ccm::cos<double>(static_cast<double>(num));
 	}
 
+	/**
+	 * @brief Computes the cosine of a float angle in radians.
+	 * @param num Angle in radians.
+	 * @return Cosine as float.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/cos
+	 */
 	constexpr float cosf(float num)
 	{
 		return ccm::cos<float>(num);
 	}
 
+	/**
+	 * @brief Computes the cosine of a long double angle in radians.
+	 * @param num Angle in radians.
+	 * @return Cosine as long double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/cos
+	 */
 	constexpr long double cosl(long double num)
 	{
 		return ccm::cos<long double>(num);

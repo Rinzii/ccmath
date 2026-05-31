@@ -19,6 +19,14 @@
 
 namespace ccm
 {
+	/**
+	 * @brief Decomposes a floating-point value into a normalized fraction and a base-2 exponent.
+	 * @tparam T Floating-point type.
+	 * @param x Floating-point value to decompose.
+	 * @param exp Reference that receives the extracted exponent.
+	 * @return Normalized fraction in the range [-1, -0.5) or [0.5, 1), or zero when x is zero.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/frexp
+	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T frexp(T x, int & exp)
 	{
@@ -29,11 +37,25 @@ namespace ccm
 		else { return static_cast<T>(internal::impl::frexp_impl(static_cast<double>(x), exp)); }
 	}
 
+	/**
+	 * @brief Decomposes a float into a normalized fraction and a base-2 exponent.
+	 * @param x Floating-point value to decompose.
+	 * @param exp Reference that receives the extracted exponent.
+	 * @return Normalized fraction for x.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/frexp
+	 */
 	constexpr float frexpf(float x, int & exp)
 	{
 		return ccm::frexp(x, exp);
 	}
 
+	/**
+	 * @brief Decomposes a long double into a normalized fraction and a base-2 exponent.
+	 * @param x Floating-point value to decompose.
+	 * @param exp Reference that receives the extracted exponent.
+	 * @return Normalized fraction for x.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/frexp
+	 */
 	constexpr long double frexpl(long double x, int & exp)
 	{
 		return ccm::frexp(x, exp);

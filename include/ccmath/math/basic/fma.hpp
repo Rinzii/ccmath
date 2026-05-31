@@ -31,6 +31,7 @@ namespace ccm
 	 * @param z Floating-point or integer value.
 	 * @return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
 	 * calculated as a single ternary floating-point operation).
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/fma
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T fma(T x, T y, T z) noexcept
@@ -73,6 +74,15 @@ namespace ccm
 #endif
 	}
 
+	/**
+	 * @brief Computes x * y + z for integral operands.
+	 * @tparam Integer Integral type.
+	 * @param x Multiplicand.
+	 * @param y Multiplier.
+	 * @param z Addend.
+	 * @return Exact integer result of (x * y) + z in type Integer.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/fma
+	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr Integer fma(Integer x, Integer y, Integer z) noexcept
 	{

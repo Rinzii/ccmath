@@ -19,6 +19,13 @@
 
 namespace ccm
 {
+	/**
+	 * @brief Computes the principal value of the inverse sine in radians.
+	 * @tparam T Floating-point type.
+	 * @param num Floating-point value, typically in [-1, 1].
+	 * @return Inverse sine of num in radians.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/asin
+	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T asin(T num)
 	{
@@ -32,17 +39,36 @@ namespace ccm
 		else { return ccm::rt::asin_rt(num); }
 	}
 
+	/**
+	 * @brief Computes inverse sine of an integer input after promotion to double.
+	 * @tparam Integer Integral type.
+	 * @param num Input value.
+	 * @return Inverse sine in radians as double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/asin
+	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double asin(Integer num)
 	{
 		return ccm::asin<double>(static_cast<double>(num));
 	}
 
+	/**
+	 * @brief Computes inverse sine for float.
+	 * @param num Input value.
+	 * @return Inverse sine in radians as float.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/asin
+	 */
 	constexpr float asinf(float num)
 	{
 		return ccm::asin<float>(num);
 	}
 
+	/**
+	 * @brief Computes inverse sine for long double.
+	 * @param num Input value.
+	 * @return Inverse sine in radians as long double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/asin
+	 */
 	constexpr long double asinl(long double num)
 	{
 		return ccm::asin<long double>(num);

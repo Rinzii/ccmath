@@ -19,6 +19,13 @@
 
 namespace ccm
 {
+	/**
+	 * @brief Computes the cube root of a floating-point value.
+	 * @tparam T Floating-point type.
+	 * @param num Floating-point value.
+	 * @return Cube root of num.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/cbrt
+	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T cbrt(T num) noexcept
 	{
@@ -32,11 +39,23 @@ namespace ccm
 		else { return ccm::rt::cbrt_rt(num); }
 	}
 
+	/**
+	 * @brief Computes the cube root of a float.
+	 * @param num Floating-point value.
+	 * @return Cube root of num as float.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/cbrt
+	 */
 	constexpr float cbrtf(float num) noexcept
 	{
 		return ccm::cbrt(num);
 	}
 
+	/**
+	 * @brief Computes the cube root of a long double.
+	 * @param num Floating-point value.
+	 * @return Cube root of num as long double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/cbrt
+	 */
 	constexpr long double cbrtl(long double num) noexcept
 	{
 		return ccm::cbrt(num);

@@ -19,6 +19,13 @@
 
 namespace ccm
 {
+	/**
+	 * @brief Computes the tangent of an angle in radians.
+	 * @tparam T Floating-point type.
+	 * @param num Angle in radians.
+	 * @return Tangent of num.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/tan
+	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T tan(T num)
 	{
@@ -30,17 +37,36 @@ namespace ccm
 		}
 	}
 
+	/**
+	 * @brief Computes the tangent of an integral angle value after promotion to double.
+	 * @tparam Integer Integral type.
+	 * @param num Angle in radians.
+	 * @return Tangent of num as double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/tan
+	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double tan(Integer num)
 	{
 		return ccm::tan<double>(static_cast<double>(num));
 	}
 
+	/**
+	 * @brief Computes the tangent of a float angle in radians.
+	 * @param num Angle in radians.
+	 * @return Tangent as float.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/tan
+	 */
 	constexpr float tanf(float num)
 	{
 		return ccm::tan<float>(num);
 	}
 
+	/**
+	 * @brief Computes the tangent of a long double angle in radians.
+	 * @param num Angle in radians.
+	 * @return Tangent as long double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/tan
+	 */
 	constexpr long double tanl(long double num)
 	{
 		return ccm::tan<long double>(num);
