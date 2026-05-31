@@ -39,6 +39,12 @@ message(STATUS "CCMath: Version: ${CCMATH_BUILD_VERSION}")
 # Load user-configurable options (e.g., BUILD_EXAMPLES, BUILD_TESTS, etc.)
 include(cmake/config/UserOptions.cmake)
 
+if (CCMATH_DISABLE_RUNTIME_SIMD)
+    set(CCMATH_ENABLE_RUNTIME_SIMD OFF)
+else ()
+    set(CCMATH_ENABLE_RUNTIME_SIMD ON)
+endif ()
+
 
 # ----------------------------------------------------------------------
 # Compiler Warning Options
