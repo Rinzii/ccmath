@@ -35,6 +35,7 @@
 
 #include "ccmath/internal/config/builtin/ldexp_support.hpp"
 #include "ccmath/internal/math/generic/builtins/fmanip/ldexp.hpp"
+#include "ccmath/internal/math/runtime/func/fmanip/ldexp_rt.hpp"
 #include "ccmath/internal/support/helpers/internal_ldexp.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 
@@ -102,6 +103,7 @@ namespace ccm
 		{
 			if (ccm::support::is_constant_evaluated()) { return builtin::ldexp(num, exp); }
 		}
+		if (!ccm::support::is_constant_evaluated()) { return ccm::rt::ldexp_rt(num, exp); }
 		return support::helpers::internal_ldexp(num, exp);
 	}
 

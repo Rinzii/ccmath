@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "ccmath/internal/math/runtime/func/nearest/rint_rt.hpp"
 #include <ccmath/internal/support/fenv/fenv_support.hpp>
 #include <ccmath/internal/support/fenv/rounding_mode.hpp>
 #include <ccmath/internal/support/fp/directional_rounding_utils.hpp>
@@ -31,12 +32,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T rint(T num) noexcept
 	{
-		if (!ccm::support::is_constant_evaluated())
-		{
-			const T result = ccm::support::fp::directional_round(num, ccm::support::fenv::get_rounding_mode());
-			if (!ccm::isnan(num) && result != num) { ccm::support::fenv::raise_except_if_required(FE_INEXACT); }
-			return result;
-		}
+		if (!ccm::support::is_constant_evaluated()) { return ccm::rt::rint_rt(num); }
 
 		constexpr auto rounding_mode{ ccm::support::fenv::get_rounding_mode() };
 		return ccm::support::fp::directional_round(num, rounding_mode);

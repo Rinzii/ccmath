@@ -11,6 +11,8 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/fmanip/scalbn.hpp"
+#include "ccmath/internal/math/runtime/func/fmanip/scalbn_rt.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/fmanip/impl/scalbn_double_impl.hpp"
 #include "ccmath/math/fmanip/impl/scalbn_float_impl.hpp"
 #include "ccmath/math/fmanip/impl/scalbn_ldouble_impl.hpp"
@@ -35,6 +37,8 @@ namespace ccm
 		if constexpr (ccm::builtin::has_constexpr_scalbn<T>) { return ccm::builtin::scalbn(num, exp); }
 		else
 		{
+			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::scalbn_rt(num, exp); }
+
 			if constexpr (std::is_same_v<T, float>) { return internal::scalbn_float(num, exp); }
 			if constexpr (std::is_same_v<T, double>) { return internal::scalbn_double(num, exp); }
 			if constexpr (std::is_same_v<T, long double>) { return internal::scalbn_ldouble(num, exp); }
@@ -55,6 +59,8 @@ namespace ccm
 		if constexpr (ccm::builtin::has_constexpr_scalbn<T>) { return ccm::builtin::scalbn(num, exp); }
 		else
 		{
+			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::scalbn_rt(num, static_cast<int>(exp)); }
+
 			if constexpr (std::is_same_v<T, float>) { return internal::scalbn_float(num, exp); }
 			if constexpr (std::is_same_v<T, double>) { return internal::scalbn_double(num, exp); }
 			if constexpr (std::is_same_v<T, long double>) { return internal::scalbn_ldouble(num, exp); }

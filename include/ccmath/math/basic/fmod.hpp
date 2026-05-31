@@ -11,6 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/basic/fmod.hpp"
+#include "ccmath/internal/math/runtime/func/basic/fmod_rt.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
@@ -26,9 +27,9 @@ namespace ccm
 		template <typename T>
 		constexpr T fmod_impl_check(T x, T y) noexcept
 		{
-			if (!ccm::support::is_constant_evaluated())
+			if constexpr (std::is_floating_point_v<T>)
 			{
-				if constexpr (ccm::builtin::has_runtime_fmod<T>) { return ccm::builtin::runtime_fmod(x, y); }
+				if (!ccm::support::is_constant_evaluated()) { return ccm::rt::fmod_rt(x, y); }
 			}
 
 			// Special edge cases for floating-point types.

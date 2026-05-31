@@ -11,6 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/expo/exp.hpp"
+#include "ccmath/internal/math/runtime/func/expo/exp_rt.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/expo/impl/exp_double_impl.hpp"
 #include "ccmath/math/expo/impl/exp_float_impl.hpp"
@@ -34,10 +35,7 @@ namespace ccm
 		if constexpr (ccm::builtin::has_constexpr_exp<T>) { return ccm::builtin::exp(num); }
 		else
 		{
-			if (!ccm::support::is_constant_evaluated())
-			{
-				if constexpr (ccm::builtin::has_runtime_exp<T>) { return ccm::builtin::runtime_exp(num); }
-			}
+			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::exp_rt(num); }
 
 			if constexpr (std::is_same_v<T, float>) { return internal::impl::exp_float_impl(num); }
 			if constexpr (std::is_same_v<T, double>) { return internal::impl::exp_double_impl(num); }

@@ -12,7 +12,9 @@
 
 #include "ccmath/internal/math/generic/builtins/basic/fmax.hpp"
 #include "ccmath/internal/math/generic/func/basic/max_gen.hpp"
+#include "ccmath/internal/math/runtime/func/basic/fmax_rt.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 
 #include <limits>
@@ -31,6 +33,11 @@ namespace ccm
 	constexpr T max(T x, T y) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_fmax<T>) { return ccm::builtin::fmax(x, y); }
+		else if constexpr (std::is_floating_point_v<T>)
+		{
+			if (ccm::support::is_constant_evaluated()) { return ccm::gen::max(x, y); }
+			return ccm::rt::fmax_rt(x, y);
+		}
 		else { return ccm::gen::max(x, y); }
 	}
 

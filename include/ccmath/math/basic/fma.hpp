@@ -11,7 +11,9 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/basic/fma.hpp"
+#include "ccmath/internal/math/runtime/func/basic/fma_rt.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/compare/signbit.hpp"
@@ -33,6 +35,8 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T fma(T x, T y, T z) noexcept
 	{
+		if (!ccm::support::is_constant_evaluated()) { return ccm::rt::fma_rt(x, y, z); }
+
 // Check for GCC 6.1 or later
 #if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
 		if constexpr (std::is_same_v<T, float>) { return __builtin_fmaf(x, y, z); }

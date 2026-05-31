@@ -11,6 +11,8 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/fmanip/copysign.hpp"
+#include "ccmath/internal/math/runtime/func/fmanip/copysign_rt.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/basic/fabs.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/compare/signbit.hpp"
@@ -35,6 +37,8 @@ namespace ccm
 				if (ccm::signbit(sgn)) { return -std::numeric_limits<T>::quiet_NaN(); }
 				return std::numeric_limits<T>::quiet_NaN();
 			}
+
+			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::copysign_rt(mag, sgn); }
 
 			T sign_bit = ccm::signbit(sgn) ? T(-1) : T(1);
 			return ccm::abs(mag) * sign_bit;

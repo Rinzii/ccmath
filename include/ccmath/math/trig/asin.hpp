@@ -11,6 +11,8 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/trig/asin.hpp"
+#include "ccmath/internal/math/runtime/func/trig/asin_rt.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/trig/impl/inv_trig_impl.hpp"
 
 #include <type_traits>
@@ -21,9 +23,13 @@ namespace ccm
 	constexpr T asin(T num)
 	{
 		if constexpr (ccm::builtin::has_constexpr_asin<T>) { return ccm::builtin::asin(num); }
-		else if constexpr (std::is_same_v<T, float>) { return internal::impl::asin_float(num); }
-		else if constexpr (std::is_same_v<T, double>) { return internal::impl::asin_double(num); }
-		else { return static_cast<long double>(internal::impl::asin_double(static_cast<double>(num))); }
+		else if (ccm::support::is_constant_evaluated())
+		{
+			if constexpr (std::is_same_v<T, float>) { return internal::impl::asin_float(num); }
+			else if constexpr (std::is_same_v<T, double>) { return internal::impl::asin_double(num); }
+			else { return static_cast<long double>(internal::impl::asin_double(static_cast<double>(num))); }
+		}
+		else { return ccm::rt::asin_rt(num); }
 	}
 
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>

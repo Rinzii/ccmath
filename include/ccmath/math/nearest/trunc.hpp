@@ -11,8 +11,10 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/nearest/trunc.hpp"
+#include "ccmath/internal/math/runtime/func/nearest/trunc_rt.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 
 namespace ccm
 {
@@ -26,7 +28,7 @@ namespace ccm
 	constexpr T trunc(T num) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_trunc<T>) { return ccm::builtin::trunc(num); }
-		else
+		else if (ccm::support::is_constant_evaluated())
 		{
 			using FPBits_t	= ccm::support::fp::FPBits<T>;
 			using Storage_t = typename FPBits_t::storage_type;
@@ -54,6 +56,7 @@ namespace ccm
 			bits.set_mantissa(truncated_mantissa);
 			return bits.get_val();
 		}
+		else { return ccm::rt::trunc_rt(num); }
 	}
 
 	/**

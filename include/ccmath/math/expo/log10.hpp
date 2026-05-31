@@ -11,9 +11,11 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/expo/log10.hpp"
+#include "ccmath/internal/math/runtime/func/expo/log10_rt.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "ccmath/internal/support/fp/directional_rounding_utils.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/expo/impl/log10_impl.hpp"
 
@@ -43,6 +45,8 @@ namespace ccm
 			}
 			if (CCM_UNLIKELY(num == std::numeric_limits<T>::infinity())) { return std::numeric_limits<T>::infinity(); }
 			if (CCM_UNLIKELY(ccm::isnan(num))) { return std::numeric_limits<T>::quiet_NaN(); }
+
+			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::log10_rt(num); }
 
 			if constexpr (std::is_same_v<T, float>) { return internal::log10_float(num); }
 			if constexpr (std::is_same_v<T, double>) { return internal::log10_double(num); }

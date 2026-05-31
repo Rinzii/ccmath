@@ -11,6 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/misc/tgamma.hpp"
+#include "ccmath/internal/math/runtime/func/misc/gamma_rt.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/misc/impl/gamma_impl.hpp"
 
@@ -30,10 +31,7 @@ namespace ccm
 		if constexpr (ccm::builtin::has_constexpr_gamma<T>) { return ccm::builtin::gamma(num); }
 		else
 		{
-			if (!ccm::support::is_constant_evaluated())
-			{
-				if constexpr (ccm::builtin::has_runtime_gamma<T>) { return ccm::builtin::runtime_gamma(num); }
-			}
+			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::gamma_rt(num); }
 
 			if constexpr (std::is_same_v<T, float>) { return internal::gamma_float(num); }
 			if constexpr (std::is_same_v<T, double>) { return internal::gamma_double(num); }

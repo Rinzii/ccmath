@@ -11,7 +11,9 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/nearest/round.hpp"
+#include "ccmath/internal/math/runtime/func/nearest/round_rt.hpp"
 #include "ccmath/internal/support/fp/directional_rounding_utils.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 
@@ -34,6 +36,8 @@ namespace ccm
 			// If num is NaN, NaN is returned.
 			// If num is ±∞ or ±0, num is returned, unmodified.
 			if (ccm::isinf(num) || num == static_cast<T>(0) || ccm::isnan(num)) { return num; }
+
+			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::round_rt(num); }
 
 			constexpr int round_mode = static_cast<int>(ccm::support::fp::rounding_mode::eFE_TONEARESTFROMZERO);
 			return ccm::support::fp::directional_round(num, round_mode);

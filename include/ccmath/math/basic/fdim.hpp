@@ -11,6 +11,9 @@
 #pragma once
 
 #include "ccmath/internal/math/common/basic/fdim.hpp"
+#include "ccmath/internal/math/generic/builtins/basic/fdim.hpp"
+#include "ccmath/internal/math/runtime/func/basic/fdim_rt.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 
 namespace ccm
 {
@@ -24,7 +27,9 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T fdim(T x, T y)
 	{
-		return func::fdim(x, y);
+		if constexpr (ccm::builtin::has_constexpr_fdim<T>) { return ccm::builtin::fdim(x, y); }
+		else if (ccm::support::is_constant_evaluated()) { return func::fdim(x, y); }
+		else { return ccm::rt::fdim_rt(x, y); }
 	}
 
 	/**

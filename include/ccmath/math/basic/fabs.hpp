@@ -11,6 +11,8 @@
 #pragma once
 
 #include "ccmath/internal/math/common/basic/fabs.hpp"
+#include "ccmath/internal/math/runtime/func/basic/fabs_rt.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 
 #include <type_traits>
 
@@ -25,6 +27,7 @@ namespace ccm
 	template <typename T>
 	constexpr auto abs(T num) -> std::enable_if_t<std::is_floating_point_v<T> && std::is_signed_v<T>, T>
 	{
+		if (!ccm::support::is_constant_evaluated()) { return ccm::rt::fabs_rt(num); }
 		return func::fabs(num);
 	}
 

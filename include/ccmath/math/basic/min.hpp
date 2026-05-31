@@ -12,7 +12,9 @@
 
 #include "ccmath/internal/math/generic/builtins/basic/fmin.hpp"
 #include "ccmath/internal/math/generic/func/basic/min_gen.hpp"
+#include "ccmath/internal/math/runtime/func/basic/fmin_rt.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 
 #include <type_traits>
@@ -30,6 +32,11 @@ namespace ccm
 	constexpr T min(const T x, const T y) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_fmin<T>) { return ccm::builtin::fmin(x, y); }
+		else if constexpr (std::is_floating_point_v<T>)
+		{
+			if (ccm::support::is_constant_evaluated()) { return ccm::gen::min(x, y); }
+			return ccm::rt::fmin_rt(x, y);
+		}
 		else { return ccm::gen::min(x, y); }
 	}
 

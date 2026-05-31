@@ -11,6 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/misc/lgamma.hpp"
+#include "ccmath/internal/math/runtime/func/misc/lgamma_rt.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/misc/impl/lgamma_impl.hpp"
 
@@ -27,10 +28,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T lgamma(T num)
 	{
-		if (!ccm::support::is_constant_evaluated())
-		{
-			if constexpr (ccm::builtin::has_runtime_lgamma<T>) { return ccm::builtin::runtime_lgamma(num); }
-		}
+		if (!ccm::support::is_constant_evaluated()) { return ccm::rt::lgamma_rt(num); }
 
 		if constexpr (std::is_same_v<T, float>) { return internal::lgamma_float(num); }
 		if constexpr (std::is_same_v<T, double>) { return internal::lgamma_double(num); }

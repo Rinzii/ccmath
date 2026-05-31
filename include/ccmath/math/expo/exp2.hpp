@@ -12,6 +12,7 @@
 
 #include "ccmath/internal/config/builtin/exp2_support.hpp"
 #include "ccmath/internal/math/generic/builtins/expo/exp2.hpp"
+#include "ccmath/internal/math/runtime/func/expo/exp2_rt.hpp"
 #include "ccmath/internal/predef/has_const_builtin.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/expo/impl/exp2_double_impl.hpp"
@@ -38,10 +39,7 @@ namespace ccm
 		if constexpr (ccm::builtin::has_constexpr_exp2<T>) { return ccm::builtin::exp2(num); }
 		else
 		{
-			if (!ccm::support::is_constant_evaluated())
-			{
-				if constexpr (ccm::builtin::has_runtime_exp2<T>) { return ccm::builtin::runtime_exp2(num); }
-			}
+			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::exp2_rt(num); }
 
 			if constexpr (std::is_same_v<T, float>) { return internal::exp2_float(num); }
 			if constexpr (std::is_same_v<T, double>) { return internal::exp2_double(num); }

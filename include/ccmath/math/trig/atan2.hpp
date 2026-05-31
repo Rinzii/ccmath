@@ -11,6 +11,8 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/trig/atan2.hpp"
+#include "ccmath/internal/math/runtime/func/trig/atan2_rt.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/trig/impl/inv_trig_impl.hpp"
 
 #include <type_traits>
@@ -21,9 +23,13 @@ namespace ccm
 	constexpr T atan2(T y, T x)
 	{
 		if constexpr (ccm::builtin::has_constexpr_atan2<T>) { return ccm::builtin::atan2(y, x); }
-		else if constexpr (std::is_same_v<T, float>) { return internal::impl::atan2_float(y, x); }
-		else if constexpr (std::is_same_v<T, double>) { return internal::impl::atan2_double(y, x); }
-		else { return static_cast<long double>(internal::impl::atan2_double(static_cast<double>(y), static_cast<double>(x))); }
+		else if (ccm::support::is_constant_evaluated())
+		{
+			if constexpr (std::is_same_v<T, float>) { return internal::impl::atan2_float(y, x); }
+			else if constexpr (std::is_same_v<T, double>) { return internal::impl::atan2_double(y, x); }
+			else { return static_cast<long double>(internal::impl::atan2_double(static_cast<double>(y), static_cast<double>(x))); }
+		}
+		else { return ccm::rt::atan2_rt(y, x); }
 	}
 
 	constexpr float atan2f(float y, float x)

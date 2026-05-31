@@ -11,6 +11,8 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/nearest/ceil.hpp"
+#include "ccmath/internal/math/runtime/func/nearest/ceil_rt.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/nearest/trunc.hpp"
@@ -35,6 +37,8 @@ namespace ccm
 			// If num is NaN, NaN is returned.
 			// If num is ±∞ or ±0, num is returned, unmodified.
 			if (ccm::isinf(num) || num == static_cast<T>(0) || ccm::isnan(num)) { return num; }
+
+			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::ceil_rt(num); }
 
 			const T truncated = ccm::trunc(num);
 			if (truncated == num || num < static_cast<T>(0)) { return truncated; }

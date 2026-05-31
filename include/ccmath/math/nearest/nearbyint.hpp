@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "ccmath/internal/math/runtime/func/nearest/nearbyint_rt.hpp"
 #include <ccmath/internal/support/fenv/rounding_mode.hpp>
 #include <ccmath/internal/support/fp/directional_rounding_utils.hpp>
 #include <ccmath/internal/support/is_constant_evaluated.hpp>
@@ -31,7 +32,7 @@ namespace ccm
 	template <class T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T nearbyint(T num) noexcept
 	{
-		if (!ccm::support::is_constant_evaluated()) { return ccm::support::fp::directional_round(num, ccm::support::fenv::get_rounding_mode()); }
+		if (!ccm::support::is_constant_evaluated()) { return ccm::rt::nearbyint_rt(num); }
 
 		constexpr auto rounding_mode{ ccm::support::fenv::get_rounding_mode() };
 		return ccm::support::fp::directional_round(num, rounding_mode);

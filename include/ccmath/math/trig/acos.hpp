@@ -11,6 +11,8 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/trig/acos.hpp"
+#include "ccmath/internal/math/runtime/func/trig/acos_rt.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/trig/impl/inv_trig_impl.hpp"
 
 #include <type_traits>
@@ -21,9 +23,13 @@ namespace ccm
 	constexpr T acos(T num)
 	{
 		if constexpr (ccm::builtin::has_constexpr_acos<T>) { return ccm::builtin::acos(num); }
-		else if constexpr (std::is_same_v<T, float>) { return internal::impl::acos_float(num); }
-		else if constexpr (std::is_same_v<T, double>) { return internal::impl::acos_double(num); }
-		else { return static_cast<long double>(internal::impl::acos_double(static_cast<double>(num))); }
+		else if (ccm::support::is_constant_evaluated())
+		{
+			if constexpr (std::is_same_v<T, float>) { return internal::impl::acos_float(num); }
+			else if constexpr (std::is_same_v<T, double>) { return internal::impl::acos_double(num); }
+			else { return static_cast<long double>(internal::impl::acos_double(static_cast<double>(num))); }
+		}
+		else { return ccm::rt::acos_rt(num); }
 	}
 
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>

@@ -12,6 +12,8 @@
 
 #include "ccmath/internal/math/generic/builtins/fmanip/nextafter.hpp"
 #include "ccmath/internal/math/generic/func/fmanip/nextafter_gen.hpp"
+#include "ccmath/internal/math/runtime/func/fmanip/nextafter_rt.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 
 #include <type_traits>
 
@@ -22,7 +24,8 @@ namespace ccm
 	{
 		// TODO: Better define how this interacts with the builtin.
 		if constexpr (ccm::builtin::has_constexpr_nextafter<T>) { return ccm::builtin::nextafter(from, to); }
-		else { return gen::nextafter_gen(from, to); }
+		else if (ccm::support::is_constant_evaluated()) { return gen::nextafter_gen(from, to); }
+		else { return ccm::rt::nextafter_rt(from, to); }
 	}
 
 	template <typename Arithmetic1, typename Arithmetic2, std::enable_if_t<std::is_arithmetic_v<Arithmetic1> && std::is_arithmetic_v<Arithmetic2>, bool> = true>

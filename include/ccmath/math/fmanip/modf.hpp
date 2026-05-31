@@ -11,6 +11,8 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/fmanip/modf.hpp"
+#include "ccmath/internal/math/runtime/func/fmanip/modf_rt.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/fmanip/impl/modf_impl.hpp"
 
 #include <type_traits>
@@ -21,6 +23,13 @@ namespace ccm
 	constexpr T modf(T x, T * iptr) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_modf<T>) { return ccm::builtin::modf(x, iptr); }
+		else if (!ccm::support::is_constant_evaluated())
+		{
+			T integer_part{};
+			const T fractional = ccm::rt::modf_rt(x, integer_part);
+			*iptr = integer_part;
+			return fractional;
+		}
 		else if constexpr (std::is_same_v<T, float>) { return internal::impl::modf_impl(x, iptr); }
 		else if constexpr (std::is_same_v<T, double>) { return internal::impl::modf_impl(x, iptr); }
 		else
