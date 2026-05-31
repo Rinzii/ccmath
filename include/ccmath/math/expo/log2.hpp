@@ -57,8 +57,11 @@ namespace ccm
 			if (num == static_cast<T>(1))
 			{
 				if (ccm::support::is_constant_evaluated()) { return static_cast<T>(0); }
-#if defined(CCMATH_COMPILER_APPLE_CLANG) || (defined(_MSC_VER) && !defined(__clang__))
+#if defined(CCMATH_COMPILER_APPLE_CLANG)
 				return ccm::support::fp::signed_zero_for_current_mode<T>();
+#elif defined(_MSC_VER) && !defined(__clang__)
+				if constexpr (std::is_same_v<T, float>) { return static_cast<T>(0); }
+				else { return ccm::support::fp::signed_zero_for_current_mode<T>(); }
 #else
 				return static_cast<T>(0);
 #endif
