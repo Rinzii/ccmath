@@ -25,7 +25,8 @@ namespace
 	{
 		const T actual	 = ccm_fn(input);
 		const T expected = std_fn(input);
-		const T scale	 = std::fabs(expected) > T(1) ? std::fabs(expected) : T(1);
+		if (actual == expected) { return; }
+		const T scale = std::fabs(expected) > T(1) ? std::fabs(expected) : T(1);
 		EXPECT_NEAR(actual, expected, rel_tol * scale);
 	}
 } // namespace

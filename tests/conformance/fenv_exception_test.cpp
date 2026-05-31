@@ -19,6 +19,13 @@
 
 namespace
 {
+	void SkipMsvcFenvExceptions()
+	{
+#if defined(_MSC_VER) && !defined(__clang__)
+		GTEST_SKIP() << "fenv exception flags are not reliable under MSVC";
+#endif
+	}
+
 	template <typename T>
 	void consume(T value)
 	{
@@ -36,6 +43,7 @@ namespace
 
 TEST(CcmathFenvExceptionTests, DomainErrorsRaiseInvalidLikeStd)
 {
+	SkipMsvcFenvExceptions();
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::sqrt(runtime_value(-1.0))); }, [] { consume(std::sqrt(runtime_value(-1.0))); }, FE_INVALID);
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::log(runtime_value(-1.0))); }, [] { consume(std::log(runtime_value(-1.0))); }, FE_INVALID);
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::log1p(runtime_value(-2.0))); }, [] { consume(std::log1p(runtime_value(-2.0))); }, FE_INVALID);
@@ -67,6 +75,7 @@ TEST(CcmathFenvExceptionTests, DomainErrorsRaiseInvalidLikeStd)
 
 TEST(CcmathFenvExceptionTests, DomainErrorsIndependentOfRoundingMode)
 {
+	SkipMsvcFenvExceptions();
 	ccm::test::ForEachRoundingModeOrSkip(
 		[&](int mode)
 		{
@@ -78,6 +87,7 @@ TEST(CcmathFenvExceptionTests, DomainErrorsIndependentOfRoundingMode)
 
 TEST(CcmathFenvExceptionTests, PoleErrorsRaiseDivByZeroLikeStd)
 {
+	SkipMsvcFenvExceptions();
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::log(runtime_value(0.0))); }, [] { consume(std::log(runtime_value(0.0))); }, FE_DIVBYZERO);
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::log2(runtime_value(0.0))); }, [] { consume(std::log2(runtime_value(0.0))); }, FE_DIVBYZERO);
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::log10(runtime_value(0.0))); }, [] { consume(std::log10(runtime_value(0.0))); }, FE_DIVBYZERO);
@@ -91,6 +101,7 @@ TEST(CcmathFenvExceptionTests, PoleErrorsRaiseDivByZeroLikeStd)
 
 TEST(CcmathFenvExceptionTests, RangeErrorsRaiseOverflowOrUnderflowLikeStd)
 {
+	SkipMsvcFenvExceptions();
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::exp(runtime_value(std::numeric_limits<double>::max()))); },
 									   [] { consume(std::exp(runtime_value(std::numeric_limits<double>::max()))); },
 									   FE_OVERFLOW);
