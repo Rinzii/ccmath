@@ -7,7 +7,6 @@
  */
 
 #include "ccmath/ccmath.hpp"
-#include <cmath>
 #include <iostream>
 
 void try_all_ccm_basic_funcs();

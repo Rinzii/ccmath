@@ -49,7 +49,7 @@ int main() {
 or if you prefer to include only specific functions:
 
 ```cpp
-#include <ccmath/expo/log.hpp> // Function-specific header for free-standing functions
+#include <ccmath/math/expo/log.hpp> // Function-specific header for free-standing functions
 #include <iostream>
 
 int main() {
