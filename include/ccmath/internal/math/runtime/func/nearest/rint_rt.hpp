@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "ccmath/internal/config/compiler.hpp"
 #include "ccmath/internal/math/runtime/func/rt_dispatch.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
@@ -22,7 +23,7 @@ namespace ccm::rt
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] inline T rint_rt(T num) noexcept
 	{
-#if CCM_HAS_BUILTIN(__builtin_rint) || defined(__builtin_rint)
+#if (CCM_HAS_BUILTIN(__builtin_rint) || defined(__builtin_rint)) && !defined(CCMATH_COMPILER_GCC)
 		if constexpr (std::is_same_v<T, float>) { return __builtin_rintf(num); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_rint(num); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_rintl(num); }

@@ -40,8 +40,10 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T log2(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_log2<T>) { return ccm::builtin::log2(num); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_log2<T>)
+		{
+			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::log2(num); }
+		}
 		{
 			// If the argument is ±0, -∞ is returned
 			if (num == static_cast<T>(0))

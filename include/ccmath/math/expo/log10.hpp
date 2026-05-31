@@ -28,8 +28,10 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T log10(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_log10<T>) { return ccm::builtin::log10(num); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_log10<T>)
+		{
+			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::log10(num); }
+		}
 		{
 			if (num == static_cast<T>(1))
 			{
