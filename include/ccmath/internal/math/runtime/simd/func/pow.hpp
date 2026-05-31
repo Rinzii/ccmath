@@ -28,9 +28,8 @@
 		#include "impl/avx2/pow.hpp"
 	#endif
 
-// TODO: NEON does not have any builtin intrinsic for pow.
-//		 Need to implement this later.
-// #ifdef CCMATH_HAS_SIMD_NEON
-//	#include "impl/neon/pow.hpp"
-// #endif
+	#ifdef CCMATH_HAS_SIMD_NEON
+		#include "impl/neon/pow.hpp"
+		#include "impl/neon/sqrt.hpp"
+	#endif
 #endif
