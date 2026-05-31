@@ -90,7 +90,7 @@ namespace ccm::gen::impl
 			//     P = fpminimax(log2(1 + x)/x, 5, [|DD...|], [-0x1.3ffcp-15, 0x1.3e3dp-15])
 			//   - The maximum error between log2(1 + x)/x and the polynomial approximation is:
 			//     dirtyinfnorm(log2(1 + x)/x - P, [-0x1.3ffcp-15, 0x1.3e3dp-15]) = 0x1.8be5...p-96
-			//   - The coefficients for the polynomial are stored in the array `COEFFS`.
+			//   - The coefficients for the polynomial are stored in the array COEFFS.
 			constexpr std::array<DoubleDouble, 6> COEFFS = {
 				DoubleDouble{ 0x1.777d0ffda25ep-56, 0x1.71547652b82fep0 },	  DoubleDouble{ -0x1.777d101cf0a84p-57, -0x1.71547652b82fep-1 },
 				DoubleDouble{ 0x1.ce04b5140d867p-56, 0x1.ec709dc3a03fdp-2 },  DoubleDouble{ 0x1.137b47e635be5p-56, -0x1.71547652b82fbp-2 },
