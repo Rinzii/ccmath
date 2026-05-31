@@ -27,8 +27,11 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T trunc(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_trunc<T>) { return ccm::builtin::trunc(num); }
-		else if (ccm::support::is_constant_evaluated())
+		if constexpr (ccm::builtin::has_constexpr_trunc<T>)
+		{
+			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::trunc(num); }
+		}
+		if (ccm::support::is_constant_evaluated())
 		{
 			using FPBits_t	= ccm::support::fp::FPBits<T>;
 			using Storage_t = typename FPBits_t::storage_type;

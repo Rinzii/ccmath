@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "ccmath/internal/config/compiler.hpp"
 #include "ccmath/internal/math/runtime/func/detail/trunc_scalar.hpp"
 #include "ccmath/internal/math/runtime/func/rt_dispatch.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
@@ -21,7 +22,7 @@ namespace ccm::rt
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] inline T trunc_rt(T num) noexcept
 	{
-#if CCM_HAS_BUILTIN(__builtin_trunc) || defined(__builtin_trunc)
+#if (CCM_HAS_BUILTIN(__builtin_trunc) || defined(__builtin_trunc)) && !defined(CCMATH_COMPILER_GCC)
 		if constexpr (std::is_same_v<T, float>) { return __builtin_truncf(num); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_trunc(num); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_truncl(num); }
