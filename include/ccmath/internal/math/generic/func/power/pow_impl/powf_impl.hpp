@@ -19,7 +19,6 @@
 #include "ccmath/internal/math/generic/builtins/power/sqrt.hpp"
 #include "ccmath/internal/math/generic/func/power/pow_impl/powf_data.hpp"
 #include "ccmath/internal/math/generic/func/power/sqrt_gen.hpp"
-#include "ccmath/internal/math/runtime/func/power/sqrt_rt.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/common_math_constants.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
@@ -206,8 +205,7 @@ namespace ccm::gen::impl
 					{
 					case 0x3f00'0000: // y = 0.5f
 						if (CCM_UNLIKELY(x == 0.0F || x_u == 0xff80'0000)) { return x * x; }
-						if (ccm::support::is_constant_evaluated()) { return ccm::gen::sqrt_gen<float>(x); }
-						return ccm::rt::sqrt_rt<float>(x);
+						return ccm::gen::sqrt_gen<float>(x);
 					case 0x3f80'0000: // y = 1.0f
 						return x;
 					case 0x4000'0000: // y = 2.0f

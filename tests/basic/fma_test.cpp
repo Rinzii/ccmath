@@ -8,31 +8,35 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "utils/std_compare.hpp"
+
 #include <gtest/gtest.h>
 
 #include <ccmath/ccmath.hpp>
+
 #include <cmath>
 #include <limits>
-
-#include "utils/std_compare.hpp"
 
 TEST(CcmathBasicTests, Fma)
 {
 	// Test that fma works with static_assert
 	static_assert(ccm::fma(1, 2, 3) == 5, "fma has failed testing that it is static_assert-able!");
 
-	ccm::test::ExpectTernaryMatchesStd(1.0, 2.0, 3.0, ccm::fma<double>, static_cast<double (*)(double, double, double)>(std::fma));
-	ccm::test::ExpectTernaryMatchesStd(1.0F, 2.0F, 3.0F, ccm::fma<float>, static_cast<float (*)(float, float, float)>(std::fma));
-	ccm::test::ExpectTernaryMatchesStd(1.0L, 2.0L, 3.0L, ccm::fma<long double>,
-									   static_cast<long double (*)(long double, long double, long double)>(std::fma));
+	const auto ccm_fma_double	   = [](double x, double y, double z) { return ccm::fma(x, y, z); };
+	const auto ccm_fma_float	   = [](float x, float y, float z) { return ccm::fma(x, y, z); };
+	const auto ccm_fma_long_double = [](long double x, long double y, long double z) { return ccm::fma(x, y, z); };
+
+	ccm::test::ExpectTernaryMatchesStd(1.0, 2.0, 3.0, ccm_fma_double, static_cast<double (*)(double, double, double)>(std::fma));
+	ccm::test::ExpectTernaryMatchesStd(1.0F, 2.0F, 3.0F, ccm_fma_float, static_cast<float (*)(float, float, float)>(std::fma));
+	ccm::test::ExpectTernaryMatchesStd(1.0L, 2.0L, 3.0L, ccm_fma_long_double, static_cast<long double (*)(long double, long double, long double)>(std::fma));
 
 	EXPECT_DOUBLE_EQ(std::fma(2.0, 3.0, 4.0), 10.0);  // 2.0 * 3.0 + 4.0 = 10.0
 	EXPECT_DOUBLE_EQ(std::fma(-2.5, 4.0, 1.5), -8.5); // -2.5 * 4.0 + 1.5 = -8.5
 	EXPECT_DOUBLE_EQ(std::fma(0.0, 5.0, 6.0), 6.0);	  // 0.0 * 5.0 + 6.0 = 6.0
 
 	// Test edge cases
-	ccm::test::ExpectTernaryMatchesStd(0.0, 0.0, 0.0, ccm::fma<double>, static_cast<double (*)(double, double, double)>(std::fma));
-	ccm::test::ExpectTernaryMatchesStd(-0.0, -0.0, -0.0, ccm::fma<double>, static_cast<double (*)(double, double, double)>(std::fma));
+	ccm::test::ExpectTernaryMatchesStd(0.0, 0.0, 0.0, ccm_fma_double, static_cast<double (*)(double, double, double)>(std::fma));
+	ccm::test::ExpectTernaryMatchesStd(-0.0, -0.0, -0.0, ccm_fma_double, static_cast<double (*)(double, double, double)>(std::fma));
 
 	/* TODO: Add these test back in once the implementation is complete
 

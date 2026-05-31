@@ -12,10 +12,10 @@
 
 #include "ccmath/internal/config/arch/check_simd_support.hpp"
 #include "ccmath/internal/math/runtime/simd/func/impl/scalar/map.hpp"
-#include "ccmath/internal/math/runtime/simd/func/impl/scalar/sqrt.hpp"
 #include "ccmath/internal/math/runtime/simd/func/impl/scalar/pow.hpp"
-#include "ccmath/internal/math/runtime/simd/func/sqrt.hpp"
+#include "ccmath/internal/math/runtime/simd/func/impl/scalar/sqrt.hpp"
 #include "ccmath/internal/math/runtime/simd/func/pow.hpp"
+#include "ccmath/internal/math/runtime/simd/func/sqrt.hpp"
 #include "ccmath/internal/math/runtime/simd/func/svml_ops.hpp"
 
 #ifdef CCMATH_HAS_SIMD

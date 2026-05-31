@@ -32,8 +32,8 @@ namespace ccm
 		{
 			if (num == static_cast<T>(1))
 			{
-				if (!ccm::support::is_constant_evaluated()) { return ccm::rt::log10_rt(num); }
-				return static_cast<T>(0);
+				if (ccm::support::is_constant_evaluated()) { return static_cast<T>(0); }
+				return ccm::support::fp::signed_zero_for_current_mode<T>();
 			}
 			if (num == static_cast<T>(0))
 			{
@@ -61,17 +61,11 @@ namespace ccm
 
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double log10(Integer num)
-	{
-		return ccm::log10<double>(static_cast<double>(num));
-	}
+	{ return ccm::log10<double>(static_cast<double>(num)); }
 
 	constexpr float log10f(float num)
-	{
-		return ccm::log10<float>(num);
-	}
+	{ return ccm::log10<float>(num); }
 
 	constexpr long double log10l(long double num)
-	{
-		return ccm::log10<long double>(num);
-	}
+	{ return ccm::log10<long double>(num); }
 } // namespace ccm

@@ -15,7 +15,6 @@
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/expo/impl/exp2_double_impl.hpp"
 #include "ccmath/math/expo/impl/log2_double_impl.hpp"
-#include "ccmath/math/nearest/floor.hpp"
 
 #include <limits>
 #include <type_traits>
@@ -34,6 +33,16 @@ namespace ccm::gen::impl
 			return (x_e + lsb == unit_exponent);
 		}
 
+		constexpr bool is_integer(double val) noexcept
+		{
+			using FPBits_t						 = support::fp::FPBits<double>;
+			const std::uint64_t x_u				 = ccm::support::bit_cast<std::uint64_t>(val);
+			const auto x_e						 = static_cast<std::int32_t>((x_u & FPBits_t::exponent_mask) >> FPBits_t::fraction_length);
+			const std::int32_t lsb				 = support::countr_zero(x_u | FPBits_t::exponent_mask);
+			constexpr std::int32_t unit_exponent = FPBits_t::exponent_bias + static_cast<std::int32_t>(FPBits_t::fraction_length);
+			return (x_e + lsb >= unit_exponent);
+		}
+
 		constexpr double pow_impl(double base, double exp) noexcept
 		{
 			if (exp == 0.0) { return 1.0; }
@@ -47,7 +56,7 @@ namespace ccm::gen::impl
 				return 0.0;
 			}
 
-			if (base < 0.0 && exp != ccm::floor(exp)) { return std::numeric_limits<double>::quiet_NaN(); }
+			if (base < 0.0 && !is_integer(exp)) { return std::numeric_limits<double>::quiet_NaN(); }
 
 			if (base == std::numeric_limits<double>::infinity()) { return exp < 0.0 ? 0.0 : std::numeric_limits<double>::infinity(); }
 

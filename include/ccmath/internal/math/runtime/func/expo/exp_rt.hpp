@@ -29,9 +29,8 @@ namespace ccm::rt
 		{
 			const auto scalar = [](T value)
 			{ return detail::dispatch_float_double(value, ccm::internal::impl::exp_float_impl, ccm::internal::impl::exp_double_impl); };
-#ifdef CCMATH_HAS_SIMD_SVML
-			return detail::unary_svml_or_impl(
-				num, [](auto v) { return intrin::exp(v); }, scalar);
+#if defined(CCMATH_HAS_SIMD) && defined(CCMATH_HAS_SIMD_SVML)
+			return detail::unary_svml_or_impl(num, [](auto v) { return intrin::exp(v); }, scalar);
 #else
 			return simd_impl::unary_via_scalar_abi(num, scalar);
 #endif

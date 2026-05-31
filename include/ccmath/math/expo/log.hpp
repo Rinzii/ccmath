@@ -37,11 +37,11 @@ namespace ccm
 		if constexpr (ccm::builtin::has_constexpr_log<T>) { return ccm::builtin::log(num); }
 		else
 		{
-			// If the argument is 1, +0 is returned.
+			// If the argument is 1, exact zero is returned.
 			if (num == static_cast<T>(1))
 			{
-				if (!ccm::support::is_constant_evaluated()) { return ccm::rt::log_rt(num); }
-				return static_cast<T>(0);
+				if (ccm::support::is_constant_evaluated()) { return static_cast<T>(0); }
+				return ccm::support::fp::signed_zero_for_current_mode<T>();
 			}
 
 			// If the argument is ±0, -∞ is returned.
@@ -83,9 +83,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double log(const Integer num) noexcept
-	{
-		return ccm::log<double>(static_cast<double>(num));
-	}
+	{ return ccm::log<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Computes the natural (base e) logarithm (lnx) of a number.
@@ -93,9 +91,7 @@ namespace ccm
 	 * @return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
 	 */
 	constexpr float logf(const float num) noexcept
-	{
-		return ccm::log<float>(num);
-	}
+	{ return ccm::log<float>(num); }
 
 	/**
 	 * @brief Computes the natural (base e) logarithm (lnx) of a number.
@@ -103,9 +99,7 @@ namespace ccm
 	 * @return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
 	 */
 	constexpr long double logl(long double num) noexcept
-	{
-		return ccm::log<long double>(num);
-	}
+	{ return ccm::log<long double>(num); }
 } // namespace ccm
 
 #if defined(_MSC_VER) && !defined(__clang__)
