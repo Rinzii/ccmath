@@ -75,7 +75,7 @@ namespace ccm
 	 * <b>Example</b>
 	 * \code{.cpp}
 	 * #include <cstdio>
-	 * #include <ccmath/math/basic/ldexp.hpp>
+	 * #include <ccmath/math/fmanip/ldexp.hpp>
 	 *
 	 * int main() {
 	 *     double val = 1.75;

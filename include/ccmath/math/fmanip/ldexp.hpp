@@ -36,6 +36,7 @@
 #include "ccmath/internal/config/builtin/ldexp_support.hpp"
 #include "ccmath/internal/math/generic/builtins/fmanip/ldexp.hpp"
 #include "ccmath/internal/support/helpers/internal_ldexp.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 
 /**
  * @brief global ccm namespace
@@ -75,7 +76,7 @@ namespace ccm
 	 * <b>Example</b>
 	 * \code{.cpp}
 	 * #include <cstdio>
-	 * #include <ccmath/math/basic/ldexp.hpp>
+	 * #include <ccmath/math/fmanip/ldexp.hpp>
 	 *
 	 * int main() {
 	 *     double val = 1.75;
@@ -97,8 +98,11 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T ldexp(T num, int exp)
 	{
-		if constexpr (ccm::builtin::has_constexpr_ldexp<T>) { return builtin::ldexp(num, exp); }
-		else { return support::helpers::internal_ldexp(num, exp); }
+		if constexpr (ccm::builtin::has_constexpr_ldexp<T>)
+		{
+			if (ccm::support::is_constant_evaluated()) { return builtin::ldexp(num, exp); }
+		}
+		return support::helpers::internal_ldexp(num, exp);
 	}
 
 	/**

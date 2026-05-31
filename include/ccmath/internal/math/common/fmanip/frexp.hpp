@@ -11,26 +11,31 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/fmanip/frexp.hpp"
-#include "ccmath/internal/support/fp/fp_bits.hpp"
+#include "ccmath/math/fmanip/impl/frexp_impl.hpp"
 
-// TODO: Finish implementing.
+#include <type_traits>
 
 namespace ccm
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T frexp(T x, int & exp)
 	{
 		if constexpr (ccm::builtin::has_constexpr_frexp<T>) { return ccm::builtin::frexp(x, &exp); }
+		else if constexpr (std::is_same_v<T, float>) { return internal::impl::frexp_impl(x, exp); }
+		else if constexpr (std::is_same_v<T, double>) { return internal::impl::frexp_impl(x, exp); }
 		else
 		{
-			support::fp::FPBits<T> bits(x);
-			if (bits.is_inf_or_nan()) { return x; }
-			if (bits.is_zero())
-			{
-				exp = 0;
-				return x;
-			}
+			return static_cast<T>(internal::impl::frexp_impl(static_cast<double>(x), exp));
 		}
 	}
 
+	constexpr float frexpf(float x, int & exp)
+	{
+		return ccm::frexp(x, exp);
+	}
+
+	constexpr long double frexpl(long double x, int & exp)
+	{
+		return ccm::frexp(x, exp);
+	}
 } // namespace ccm
