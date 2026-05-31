@@ -8,14 +8,14 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "ccmath/ccmath.hpp"
+#include "utils/math_samples.hpp"
+#include "utils/ulp_suite.hpp"
+
 #include <gtest/gtest.h>
 
 #include <cmath>
 #include <limits>
-
-#include "ccmath/ccmath.hpp"
-#include "utils/math_samples.hpp"
-#include "utils/ulp_suite.hpp"
 
 TEST(CcmathTrigonometricTests, InverseTrigConstexprSmoke)
 {
@@ -31,10 +31,10 @@ TEST(CcmathTrigonometricTests, InverseTrigTypedAliases)
 	EXPECT_FLOAT_EQ(ccm::asinf(0.5F), ccm::asin(0.5F));
 	EXPECT_FLOAT_EQ(ccm::atanf(1.0F), ccm::atan(1.0F));
 	EXPECT_FLOAT_EQ(ccm::atan2f(1.0F, 1.0F), ccm::atan2(1.0F, 1.0F));
-	EXPECT_DOUBLE_EQ(ccm::acosl(0.5L), ccm::acos(0.5L));
-	EXPECT_DOUBLE_EQ(ccm::asinl(0.5L), ccm::asin(0.5L));
-	EXPECT_DOUBLE_EQ(ccm::atanl(1.0L), ccm::atan(1.0L));
-	EXPECT_DOUBLE_EQ(ccm::atan2l(1.0L, 1.0L), ccm::atan2(1.0L, 1.0L));
+	EXPECT_EQ(ccm::acosl(0.5L), ccm::acos(0.5L));
+	EXPECT_EQ(ccm::asinl(0.5L), ccm::asin(0.5L));
+	EXPECT_EQ(ccm::atanl(1.0L), ccm::atan(1.0L));
+	EXPECT_EQ(ccm::atan2l(1.0L, 1.0L), ccm::atan2(1.0L, 1.0L));
 }
 
 TEST(CcmathTrigonometricTests, InverseTrigIntegralPromotion)
@@ -80,7 +80,9 @@ TEST(CcmathTrigonometricTests, Atan2QuadrantsDouble)
 	{
 		SCOPED_TRACE(ccm::test::samples::kAtan2YDouble[i]);
 		SCOPED_TRACE(ccm::test::samples::kAtan2XDouble[i]);
-		ccm::test::ExpectUlpBinaryVsStd(ccm::test::samples::kAtan2YDouble[i], ccm::test::samples::kAtan2XDouble[i], ccm::atan2<double>,
+		ccm::test::ExpectUlpBinaryVsStd(ccm::test::samples::kAtan2YDouble[i],
+										ccm::test::samples::kAtan2XDouble[i],
+										ccm::atan2<double>,
 										static_cast<double (*)(double, double)>(std::atan2));
 	}
 }

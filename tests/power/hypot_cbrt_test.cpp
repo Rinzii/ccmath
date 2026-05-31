@@ -8,15 +8,15 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
-
-#include <cmath>
-#include <limits>
-
 #include "ccmath/ccmath.hpp"
 #include "utils/math_samples.hpp"
 #include "utils/std_compare.hpp"
 #include "utils/ulp_suite.hpp"
+
+#include <gtest/gtest.h>
+
+#include <cmath>
+#include <limits>
 
 TEST(CcmathPowerTests, HypotMatchesStdGrid)
 {
@@ -55,7 +55,7 @@ TEST(CcmathPowerTests, HypotEdgeCases)
 TEST(CcmathPowerTests, HypotTypedAliases)
 {
 	EXPECT_DOUBLE_EQ(ccm::hypotf(3.0F, 4.0F), ccm::hypot(3.0F, 4.0F));
-	EXPECT_DOUBLE_EQ(ccm::hypotl(3.0L, 4.0L), ccm::hypot(3.0L, 4.0L));
+	EXPECT_EQ(ccm::hypotl(3.0L, 4.0L), ccm::hypot(3.0L, 4.0L));
 }
 
 TEST(CcmathPowerTests, CbrtMatchesStdGrid)
@@ -88,7 +88,7 @@ TEST(CcmathPowerTests, CbrtEdgeCases)
 TEST(CcmathPowerTests, CbrtTypedAliases)
 {
 	EXPECT_FLOAT_EQ(ccm::cbrtf(27.0F), ccm::cbrt(27.0F));
-	EXPECT_DOUBLE_EQ(ccm::cbrtl(27.0L), ccm::cbrt(27.0L));
+	EXPECT_EQ(ccm::cbrtl(27.0L), ccm::cbrt(27.0L));
 }
 
 TEST(CcmathPowerTests, HypotCbrtCompileTime)

@@ -73,7 +73,7 @@ namespace ccm::internal::impl
 			{
 				if (x == -1.0F) { return -std::numeric_limits<float>::infinity(); }
 
-				return (x - x) / 0.0F;
+				return -std::numeric_limits<float>::quiet_NaN();
 			}
 
 			if ((ix << 1U) < (0x33800000U << 1U)) { return x; }
@@ -146,7 +146,7 @@ namespace ccm::internal::impl
 			{
 				if (x == -1.0) { return -std::numeric_limits<double>::infinity(); }
 
-				return (x - x) / 0.0;
+				return -std::numeric_limits<double>::quiet_NaN();
 			}
 
 			if ((hx << 1U) < (0x3ca00000U << 1U)) { return x; }

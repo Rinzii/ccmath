@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "ccmath/internal/config/compiler.hpp"
 #include "ccmath/internal/math/generic/builtins/expo/log10.hpp"
 #include "ccmath/internal/math/runtime/func/expo/log10_rt.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
@@ -33,7 +34,11 @@ namespace ccm
 			if (num == static_cast<T>(1))
 			{
 				if (ccm::support::is_constant_evaluated()) { return static_cast<T>(0); }
+#ifdef CCMATH_COMPILER_APPLE_CLANG
 				return ccm::support::fp::signed_zero_for_current_mode<T>();
+#else
+				return static_cast<T>(0);
+#endif
 			}
 			if (num == static_cast<T>(0))
 			{

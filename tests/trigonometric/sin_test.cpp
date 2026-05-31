@@ -8,14 +8,14 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "ccmath/ccmath.hpp"
+#include "utils/conformance_suite.hpp"
+#include "utils/ulp_suite.hpp"
+
 #include <gtest/gtest.h>
 
 #include <cmath>
 #include <limits>
-
-#include "ccmath/ccmath.hpp"
-#include "utils/conformance_suite.hpp"
-#include "utils/ulp_suite.hpp"
 
 TEST(CcmathTrigonometricTests, ConstexprSmoke)
 {
@@ -29,9 +29,9 @@ TEST(CcmathTrigonometricTests, TypedAliases)
 	EXPECT_FLOAT_EQ(ccm::sinf(1.0f), ccm::sin(1.0f));
 	EXPECT_FLOAT_EQ(ccm::cosf(1.0f), ccm::cos(1.0f));
 	EXPECT_FLOAT_EQ(ccm::tanf(1.0f), ccm::tan(1.0f));
-	EXPECT_DOUBLE_EQ(ccm::sinl(1.0L), ccm::sin(1.0L));
-	EXPECT_DOUBLE_EQ(ccm::cosl(1.0L), ccm::cos(1.0L));
-	EXPECT_DOUBLE_EQ(ccm::tanl(1.0L), ccm::tan(1.0L));
+	EXPECT_EQ(ccm::sinl(1.0L), ccm::sin(1.0L));
+	EXPECT_EQ(ccm::cosl(1.0L), ccm::cos(1.0L));
+	EXPECT_EQ(ccm::tanl(1.0L), ccm::tan(1.0L));
 }
 
 TEST(CcmathTrigonometricTests, IntegralPromotion)
@@ -43,8 +43,8 @@ TEST(CcmathTrigonometricTests, IntegralPromotion)
 
 TEST(CcmathTrigonometricTests, DomainEdgeCasesMatchLibm)
 {
-	const float nan_f = std::numeric_limits<float>::quiet_NaN();
-	const float inf_f = std::numeric_limits<float>::infinity();
+	const float nan_f  = std::numeric_limits<float>::quiet_NaN();
+	const float inf_f  = std::numeric_limits<float>::infinity();
 	const double nan_d = std::numeric_limits<double>::quiet_NaN();
 	const double inf_d = std::numeric_limits<double>::infinity();
 

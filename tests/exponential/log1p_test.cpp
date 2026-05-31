@@ -8,15 +8,15 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
-
-#include <cmath>
-#include <limits>
-
 #include "ccmath/ccmath.hpp"
 #include "utils/math_samples.hpp"
 #include "utils/std_compare.hpp"
 #include "utils/ulp_suite.hpp"
+
+#include <gtest/gtest.h>
+
+#include <cmath>
+#include <limits>
 
 TEST(CcmathExponentialTests, Log1pIdentityAtZero)
 {
@@ -33,7 +33,7 @@ TEST(CcmathExponentialTests, Log1pMatchesLibm)
 
 TEST(CcmathExponentialTests, Log1pTypedAliases)
 {
-	EXPECT_DOUBLE_EQ(ccm::log1pl(0.1L), ccm::log1p(0.1L));
+	EXPECT_EQ(ccm::log1pl(0.1L), ccm::log1p(0.1L));
 	EXPECT_FLOAT_EQ(ccm::log1pf(0.1F), ccm::log1p(0.1F));
 }
 

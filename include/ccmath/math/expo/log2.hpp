@@ -55,7 +55,11 @@ namespace ccm
 			if (num == static_cast<T>(1))
 			{
 				if (ccm::support::is_constant_evaluated()) { return static_cast<T>(0); }
+#ifdef CCMATH_COMPILER_APPLE_CLANG
 				return ccm::support::fp::signed_zero_for_current_mode<T>();
+#else
+				return static_cast<T>(0);
+#endif
 			}
 
 			// If the argument is NaN, NaN is returned.
