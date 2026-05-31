@@ -111,7 +111,6 @@ the [implementation status](docs/STATUS.md) document.
 ## Projects Using CCMath
 
 - [Fornani](https://github.com/swagween/fornani) - A 2D action-adventure game in development.
-- [KittyOS](https://github.com/kitty-os/kitty-os/) - A whimsical, non-Unix operating system for cat lovers.
 
 _(Are you using CCMath? Let us know!)_
 
