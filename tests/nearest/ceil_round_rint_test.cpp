@@ -8,15 +8,15 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "ccmath/ccmath.hpp"
+#include "utils/math_samples.hpp"
+#include "utils/std_compare.hpp"
+
 #include <gtest/gtest.h>
 
 #include <cmath>
 #include <limits>
 #include <vector>
-
-#include "ccmath/ccmath.hpp"
-#include "utils/math_samples.hpp"
-#include "utils/std_compare.hpp"
 
 #ifdef __clang__
 	#ifdef __linux__
@@ -40,22 +40,22 @@ namespace
 	const std::vector<NearestUnaryParams<T>> & BasicNearestParams()
 	{
 		static const std::vector<NearestUnaryParams<T>> params{
-			{static_cast<T>(1.0), StdFn(static_cast<T>(1.0))},
-			{static_cast<T>(1.5), StdFn(static_cast<T>(1.5))},
-			{static_cast<T>(1.9), StdFn(static_cast<T>(1.9))},
-			{static_cast<T>(-1.0), StdFn(static_cast<T>(-1.0))},
-			{static_cast<T>(-1.5), StdFn(static_cast<T>(-1.5))},
-			{static_cast<T>(-1.9), StdFn(static_cast<T>(-1.9))},
-			{static_cast<T>(0.0), StdFn(static_cast<T>(0.0))},
-			{static_cast<T>(-0.0), StdFn(static_cast<T>(-0.0))},
-			{static_cast<T>(0.5), StdFn(static_cast<T>(0.5))},
-			{static_cast<T>(-0.5), StdFn(static_cast<T>(-0.5))},
-			{static_cast<T>(0.9999999999999999), StdFn(static_cast<T>(0.9999999999999999))},
-			{static_cast<T>(-0.9999999999999999), StdFn(static_cast<T>(-0.9999999999999999))},
-			{std::numeric_limits<T>::infinity(), StdFn(std::numeric_limits<T>::infinity())},
-			{-std::numeric_limits<T>::infinity(), StdFn(-std::numeric_limits<T>::infinity())},
-			{std::numeric_limits<T>::denorm_min(), StdFn(std::numeric_limits<T>::denorm_min())},
-			{-std::numeric_limits<T>::denorm_min(), StdFn(-std::numeric_limits<T>::denorm_min())},
+			{ static_cast<T>(1.0), StdFn(static_cast<T>(1.0)) },
+			{ static_cast<T>(1.5), StdFn(static_cast<T>(1.5)) },
+			{ static_cast<T>(1.9), StdFn(static_cast<T>(1.9)) },
+			{ static_cast<T>(-1.0), StdFn(static_cast<T>(-1.0)) },
+			{ static_cast<T>(-1.5), StdFn(static_cast<T>(-1.5)) },
+			{ static_cast<T>(-1.9), StdFn(static_cast<T>(-1.9)) },
+			{ static_cast<T>(0.0), StdFn(static_cast<T>(0.0)) },
+			{ static_cast<T>(-0.0), StdFn(static_cast<T>(-0.0)) },
+			{ static_cast<T>(0.5), StdFn(static_cast<T>(0.5)) },
+			{ static_cast<T>(-0.5), StdFn(static_cast<T>(-0.5)) },
+			{ static_cast<T>(0.9999999999999999), StdFn(static_cast<T>(0.9999999999999999)) },
+			{ static_cast<T>(-0.9999999999999999), StdFn(static_cast<T>(-0.9999999999999999)) },
+			{ std::numeric_limits<T>::infinity(), StdFn(std::numeric_limits<T>::infinity()) },
+			{ -std::numeric_limits<T>::infinity(), StdFn(-std::numeric_limits<T>::infinity()) },
+			{ std::numeric_limits<T>::denorm_min(), StdFn(std::numeric_limits<T>::denorm_min()) },
+			{ -std::numeric_limits<T>::denorm_min(), StdFn(-std::numeric_limits<T>::denorm_min()) },
 		};
 		return params;
 	}
@@ -65,15 +65,15 @@ namespace
 	{
 	};
 
-#define INSTANTIATE_NEAREST_UNARY_TEST(SuiteName, Type, StdFn, CcmFn)                                                         \
-	class SuiteName##Type##Tests : public NearestUnaryTest<Type, StdFn, CcmFn>                                                \
-	{                                                                                                                         \
-	};                                                                                                                        \
-	INSTANTIATE_TEST_SUITE_P(SuiteName##Type, SuiteName##Type##Tests, ValuesIn(BasicNearestParams<Type, StdFn>()));          \
-	TEST_P(SuiteName##Type##Tests, MatchesStd)                                                                                \
-	{                                                                                                                         \
-		const auto param = GetParam();                                                                                        \
-		ccm::test::ExpectSameAsStd(CcmFn(param.input), param.expected);                                                       \
+#define INSTANTIATE_NEAREST_UNARY_TEST(SuiteName, Type, StdFn, CcmFn)                                                                                          \
+	class SuiteName##Type##Tests : public NearestUnaryTest<Type, StdFn, CcmFn>                                                                                 \
+	{                                                                                                                                                          \
+	};                                                                                                                                                         \
+	INSTANTIATE_TEST_SUITE_P(SuiteName##Type, SuiteName##Type##Tests, ValuesIn(BasicNearestParams<Type, StdFn>()));                                            \
+	TEST_P(SuiteName##Type##Tests, MatchesStd)                                                                                                                 \
+	{                                                                                                                                                          \
+		const auto param = GetParam();                                                                                                                         \
+		ccm::test::ExpectSameAsStd(CcmFn(param.input), param.expected);                                                                                        \
 	}
 
 	INSTANTIATE_NEAREST_UNARY_TEST(CcmCeil, double, std::ceil, ccm::ceil)
@@ -99,7 +99,7 @@ namespace
 TEST(CcmathNearestCeilRoundRintTests, CeilNanPropagation)
 {
 	ExpectNearestNanPropagation<double, ccm::ceil, std::ceil>();
-	ExpectNearestNanPropagation<float, ccm::ceilf, std::ceilf>();
+	ExpectNearestNanPropagation<float, ccm::ceilf, std::ceil>();
 }
 
 TEST(CcmathNearestCeilRoundRintTests, RoundHalfwayMatchesStd)
@@ -134,13 +134,13 @@ TEST(CcmathNearestCeilRoundRintTests, CeilLargeNegativeFiniteMatchesStd)
 TEST(CcmathNearestCeilRoundRintTests, RoundNanPropagation)
 {
 	ExpectNearestNanPropagation<double, ccm::round, std::round>();
-	ExpectNearestNanPropagation<float, ccm::roundf, std::roundf>();
+	ExpectNearestNanPropagation<float, ccm::roundf, std::round>();
 }
 
 TEST(CcmathNearestCeilRoundRintTests, RintNanPropagation)
 {
 	ExpectNearestNanPropagation<double, ccm::rint, std::rint>();
-	ExpectNearestNanPropagation<float, ccm::rintf, std::rintf>();
+	ExpectNearestNanPropagation<float, ccm::rintf, std::rint>();
 }
 
 TEST(CcmathNearestCeilRoundRintTests, CeilCompileTime)
