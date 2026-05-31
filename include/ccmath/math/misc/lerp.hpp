@@ -11,16 +11,23 @@
 #pragma once
 
 #include "ccmath/math/basic/fma.hpp"
+#include "ccmath/math/compare/isnan.hpp"
 
 namespace ccm
 {
 	template <typename T>
 	constexpr T lerp(T a, T b, T t) noexcept
 	{
-		// Optimized version of lerp
-		// https://developer.nvidia.com/blog/lerp-faster-cuda/
-		// TODO: Validate this works for all cases of a lerp.
-		return ccm::fma(t, b, ccm::fma(-t, a, a));
+		if (ccm::isnan(a) || ccm::isnan(b) || ccm::isnan(t)) { return a + b + t; }
+
+		if ((a <= 0 && b >= 0) || (a >= 0 && b <= 0)) { return t * b + (1 - t) * a; }
+
+		if (t == 1) { return b; }
+
+		const T x = a + t * (b - a);
+		if ((t > 1) == (b > a)) { return b < x ? x : b; }
+
+		return x < b ? x : b;
 	}
 
 	template <typename T, typename U, typename V>

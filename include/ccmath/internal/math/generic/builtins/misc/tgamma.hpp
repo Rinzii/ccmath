@@ -17,7 +17,7 @@
 #include <type_traits>
 
 /// CCMATH_HAS_CONSTEXPR_BUILTIN_GAMMA
-/// This is a macro that is defined if the compiler has constexpr __builtin functions for gamma that allow static_assert
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for tgamma that allow static_assert
 ///
 /// Compilers with Support:
 /// - GCC 5.1+
@@ -43,27 +43,46 @@ namespace ccm::builtin
 	#endif
 	// clang-format on
 
+	template <typename T>
+	inline constexpr bool has_runtime_gamma =
+#if defined(__GNUC__) || defined(__clang__)
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
-	 * Wrapper for constexpr __builtin_gamma functions.
+	 * Wrapper for constexpr __builtin_tgamma functions.
 	 * This should be used internally and always be wrapped in an if constexpr statement.
-	 * It exists only to allow for usage of __builtin_gamma functions without triggering a compiler error
+	 * It exists only to allow for usage of __builtin_tgamma functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
 	constexpr auto gamma(T x) -> std::enable_if_t<has_constexpr_gamma<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_gammaf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_gamma(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_gammal(x); }
+		if constexpr (std::is_same_v<T, float>) { return __builtin_tgammaf(x); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_tgamma(x); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_tgammal(x); }
 		else
 		{
-			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_gamma");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_tgamma");
+			return T{};
+		}
+	}
+
+	template <typename T>
+	auto runtime_gamma(T x) -> std::enable_if_t<has_runtime_gamma<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>) { return __builtin_tgammaf(x); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_tgamma(x); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_tgammal(x); }
+		else
+		{
+			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_tgamma");
 			return T{};
 		}
 	}
 } // namespace ccm::builtin
 
-// Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_GAMMA

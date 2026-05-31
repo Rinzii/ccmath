@@ -3,3 +3,5 @@ ccm_add_headers(
         lgamma.hpp
         lerp.hpp
 )
+
+add_subdirectory(impl)
