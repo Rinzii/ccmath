@@ -39,26 +39,19 @@ int64_t ulp_difference(T a, T b)
 	}
 
 	using UIntType = typename FPBits_t::storage_type;
+	constexpr UIntType sign_mask = UIntType{ 1 } << (sizeof(UIntType) * 8 - 1);
 
-	// Handle subnormals
-	if (fp_a.is_subnormal() || fp_b.is_subnormal())
-	{
-		if (fp_a.is_subnormal() && fp_b.is_subnormal())
-		{
-			return (fp_a.uintval() > fp_b.uintval()) ? fp_a.uintval() - fp_b.uintval() : fp_b.uintval() - fp_a.uintval();
-		}
+	auto ordered_bits = [=](FPBits_t bits) {
+		const UIntType raw = bits.uintval();
+		if ((raw & sign_mask) != 0) { return sign_mask - (raw & ~sign_mask); }
+		return sign_mask + raw;
+	};
 
-		// Transition from subnormal to normal
-		if (fp_a.is_subnormal()) { return fp_a.uintval() + (fp_b.uintval() - FPBits(FPBits_t::min_normal()).uintval()); }
-		if (fp_b.is_subnormal()) { return fp_b.uintval() + (fp_a.uintval() - FPBits(FPBits_t::min_normal()).uintval()); }
-	}
-
-	// Normalize the bit representations by flipping the sign bit
-	UIntType const a_bits = fp_a.uintval();
-	UIntType const b_bits = fp_b.uintval();
-
-	// Return the absolute difference using unsigned arithmetic
-	return (a_bits > b_bits) ? a_bits - b_bits : b_bits - a_bits;
+	UIntType const a_bits = ordered_bits(fp_a);
+	UIntType const b_bits = ordered_bits(fp_b);
+	UIntType const diff = (a_bits > b_bits) ? a_bits - b_bits : b_bits - a_bits;
+	if (diff > static_cast<UIntType>(std::numeric_limits<int64_t>::max())) { return std::numeric_limits<int64_t>::max(); }
+	return static_cast<int64_t>(diff);
 }
 
 template <typename T>
