@@ -58,19 +58,19 @@ namespace ccm::internal::impl
 			const DoubleDouble pm = types::exact_mult(x_reduced, data::EIGHT_OVER_PI[idx][1]);
 			const DoubleDouble pl = types::exact_mult(x_reduced, data::EIGHT_OVER_PI[idx][2]);
 
-			const float sum_hi = ph.lo + pm.hi;
+			const float sum_hi = static_cast<float>(ph.lo + pm.hi);
 			const float k	   = support::fp::nearest_integer(sum_hi);
 
-			const float y_hi = (ph.lo - k) + pm.hi;
+			const float y_hi = static_cast<float>((ph.lo - k) + pm.hi);
 			const DoubleDouble y_mid = types::exact_add(pm.lo, pl.hi);
-			const float y_lo		 = pl.lo;
+			const float y_lo		 = static_cast<float>(pl.lo);
 
 			const float y_l = support::multiply_add(x_reduced, data::EIGHT_OVER_PI[idx][3], y_lo);
 			const DoubleDouble y = types::exact_add(y_hi, y_mid.hi);
 			DoubleDouble y_total = y;
 			y_total.lo += (y_mid.lo + y_l);
 
-			u = support::multiply_add(y_total.hi, data::PI_OVER_8.hi, y_total.lo * data::PI_OVER_8.hi);
+			u = static_cast<float>(support::multiply_add(y_total.hi, data::PI_OVER_8.hi, y_total.lo * data::PI_OVER_8.hi));
 
 			return static_cast<unsigned>(static_cast<int>(k));
 		}

@@ -43,7 +43,6 @@ namespace ccm::internal::impl
 		{
 			const double inv_x  = 1.0 / x;
 			const double inv_x2 = inv_x * inv_x;
-			const double inv_x4 = inv_x2 * inv_x2;
 			const double corr =
 				inv_x * (0x1.5555555555555p-3 + inv_x2 * (-0x1.6c16c16c16c17p-7 + inv_x2 * 0x1.00a01a01a01a1p-7));
 			return (x - 0.5) * ccm::log(x) - x + 0.5 * ccm::log(2.0 * ccm::numbers::pi_v<double>) + corr;
@@ -119,7 +118,6 @@ namespace ccm::internal::impl
 
 		if (CCM_UNLIKELY(x < 0.0))
 		{
-			const double ax = ccm::fabs(x);
 			return ccm::log(ccm::numbers::pi_v<double>) - lgamma_detail::log_abs(x) - lgamma_detail::log_abs(ccm::sin(ccm::numbers::pi_v<double> * x))
 				   - lgamma_double_impl(-x);
 		}

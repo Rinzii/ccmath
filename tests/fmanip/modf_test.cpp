@@ -51,8 +51,6 @@ TEST(CcmathFmanipTests, ModfIntegerValue)
 
 TEST(CcmathFmanipTests, ModfSpecialValues)
 {
-	double iptr{};
-
 	ccm::test::ExpectModfMatchesStd(std::numeric_limits<double>::quiet_NaN());
 	ccm::test::ExpectModfMatchesStd(std::numeric_limits<double>::infinity());
 	ccm::test::ExpectModfMatchesStd(0.0);

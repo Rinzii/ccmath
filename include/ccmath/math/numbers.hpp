@@ -23,43 +23,43 @@ namespace ccm::numbers
 	// These are added here to still offer support for c++17.
 
 	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, bool> = true>
-	inline constexpr Real e_v = Real{ 2.718281828459045235360287471352662 };
+	inline constexpr Real e_v = static_cast<Real>(2.718281828459045235360287471352662L);
 
 	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, bool> = true>
-	inline constexpr Real log2e_v = Real{ 1.442695040888963407359924681001892 };
+	inline constexpr Real log2e_v = static_cast<Real>(1.442695040888963407359924681001892L);
 
 	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, bool> = true>
-	inline constexpr Real log10e_v = Real{ 0.434294481903251827651128918916605 };
+	inline constexpr Real log10e_v = static_cast<Real>(0.434294481903251827651128918916605L);
 
 	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, bool> = true>
-	inline constexpr Real pi_v = Real{ 3.141592653589793238462643383279502 };
+	inline constexpr Real pi_v = static_cast<Real>(3.141592653589793238462643383279502L);
 
 	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, bool> = true>
-	inline constexpr Real inv_pi_v = Real{ 0.318309886183790671537767526745028 };
+	inline constexpr Real inv_pi_v = static_cast<Real>(0.318309886183790671537767526745028L);
 
 	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, bool> = true>
-	inline constexpr Real inv_sqrtpi_v = Real{ 0.564189583547756286948079451560772 };
+	inline constexpr Real inv_sqrtpi_v = static_cast<Real>(0.564189583547756286948079451560772L);
 
 	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, bool> = true>
-	inline constexpr Real ln2_v = Real{ 0.693147180559945309417232121458176 };
+	inline constexpr Real ln2_v = static_cast<Real>(0.693147180559945309417232121458176L);
 
 	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, bool> = true>
-	inline constexpr Real ln10_v = Real{ 2.302585092994045684017991454684364 };
+	inline constexpr Real ln10_v = static_cast<Real>(2.302585092994045684017991454684364L);
 
 	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, bool> = true>
-	inline constexpr Real sqrt2_v = Real{ 1.414213562373095048801688724209698 };
+	inline constexpr Real sqrt2_v = static_cast<Real>(1.414213562373095048801688724209698L);
 
 	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, bool> = true>
-	inline constexpr Real sqrt3_v = Real{ 1.732050807568877293527446341505872 };
+	inline constexpr Real sqrt3_v = static_cast<Real>(1.732050807568877293527446341505872L);
 
 	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, bool> = true>
-	inline constexpr Real inv_sqrt3_v = Real{ 0.577350269189625764509148780501957 };
+	inline constexpr Real inv_sqrt3_v = static_cast<Real>(0.577350269189625764509148780501957L);
 
 	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, bool> = true>
-	inline constexpr Real egamma_v = Real{ 0.577215664901532860606512090082402 };
+	inline constexpr Real egamma_v = static_cast<Real>(0.577215664901532860606512090082402L);
 
 	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, bool> = true>
-	inline constexpr Real phi_v = Real{ 1.618033988749894848204586834365638 };
+	inline constexpr Real phi_v = static_cast<Real>(1.618033988749894848204586834365638L);
 
 	inline constexpr double e		   = e_v<double>;
 	inline constexpr double log2e	   = log2e_v<double>;

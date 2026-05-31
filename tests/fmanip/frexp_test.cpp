@@ -51,8 +51,6 @@ TEST(CcmathFmanipTests, FrexpFloat)
 
 TEST(CcmathFmanipTests, FrexpSpecialValues)
 {
-	int exp = 123;
-
 	ccm::test::ExpectFrexpMatchesStd(std::numeric_limits<double>::quiet_NaN());
 	ccm::test::ExpectFrexpMatchesStd(std::numeric_limits<double>::infinity());
 	ccm::test::ExpectFrexpMatchesStd(-std::numeric_limits<double>::infinity());
