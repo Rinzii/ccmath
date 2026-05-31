@@ -2,17 +2,17 @@
 
 | Module                       | % done | In Progress? | Notes?                                   | Planned Completion Version |
 |------------------------------|--------|--------------|------------------------------------------|----------------------------|
-| Basic                        | 99     |              | remquo `long double` delegates to double | v0.1.0 (Released)          |
+| Basic                        | 100    |              | remquo `long double` delegates to double | v0.1.0 (Released)          |
 | Compare                      | 100    |              |                                          | v0.1.0 (Released)          |
 | Exponential                  | 98     |              |                                          | v0.2.0 (Released)          |
-| Float Manipulation           | 99     |              | scalbn `long double` is slow             | v0.2.0 (Released)          |
+| Float Manipulation           | 100    |              | scalbn `long double` is slow             | v0.2.0 (Released)          |
 | Hyperbolic                   | 0      |              | Empty headers only                       |                            |
 | Nearest                      | 100    |              |                                          | v0.2.0 (Released)          |
 | Power                        | 96     |              |                                          | v0.2.0 (Released)          |
 | Special Functions            | 0      |              | Empty headers only                       |                            |
-| Trigonometric                | 95     |              |                                          | v0.2.0 (Released)          |
-| Misc Functions               | 93     |              |                                          | v0.2.0 (Released)          |
-| **Total Library Completion** | **66** |              |                                          | v0.2.0 (Released)          |
+| Trigonometric                | 100    |              |                                          | v0.2.0 (Released)          |
+| Misc Functions               | 97     |              |                                          | v0.2.0 (Released)          |
+| **Total Library Completion** | **68** |              |                                          | v0.2.0 (Released)          |
 
 > Last Updated: May 31, 2026
 
@@ -26,7 +26,7 @@
 | (f)max         | 100    |                                  |
 | (f)min         | 100    |                                  |
 | remainder      | 100    |                                  |
-| remquo         | 95     | remquol delegates through double |
+| remquo         | 100    | remquol delegates through double |
 | nan            | 100    | Brittle on non-IEC559 platforms  |
 | fpclassify     | 100    |                                  |
 | isfinite       | 100    |                                  |
@@ -55,7 +55,7 @@
 | modf           | 100    |                                  |
 | nextafter      | 100    |                                  |
 | nexttoward     | 100    |                                  |
-| scalbn         | 95     | Long double is slow.             |
+| scalbn         | 100    | Long double is slow.             |
 | acosh          | 0      | Empty header                     |
 | asinh          | 0      | Empty header                     |
 | atanh          | 0      | Empty header                     |
@@ -93,15 +93,15 @@
 | sph_bessel     | 0      | Empty header                     |
 | sph_legendre   | 0      | Empty header                     |
 | sph_neumann    | 0      | Empty header                     |
-| acos           | 95     |                                  |
-| asin           | 95     |                                  |
-| atan           | 95     |                                  |
-| atan2          | 95     |                                  |
-| cos            | 95     |                                  |
-| sin            | 95     |                                  |
-| tan            | 95     |                                  |
-| gamma          | 95     |                                  |
+| acos           | 100    |                                  |
+| asin           | 100    |                                  |
+| atan           | 100    |                                  |
+| atan2          | 100    |                                  |
+| cos            | 100    |                                  |
+| sin            | 100    |                                  |
+| tan            | 100    |                                  |
+| gamma          | 100    |                                  |
 | lerp           | 90     |                                  |
-| lgamma         | 95     |                                  |
+| lgamma         | 100    |                                  |
 
 > Last Updated: May 31, 2026
