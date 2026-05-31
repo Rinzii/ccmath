@@ -31,8 +31,10 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T ceil(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_ceil<T>) { return ccm::builtin::ceil(num); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_ceil<T>)
+		{
+			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::ceil(num); }
+		}
 		{
 			// If num is NaN, NaN is returned.
 			// If num is ±∞ or ±0, num is returned, unmodified.
