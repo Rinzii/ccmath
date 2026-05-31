@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "ccmath/internal/config/compiler.hpp"
 #include "ccmath/internal/math/runtime/func/rt_dispatch.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/fp/directional_rounding_utils.hpp"
@@ -23,7 +24,7 @@ namespace ccm::rt
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] inline T round_rt(T num) noexcept
 	{
-#if CCM_HAS_BUILTIN(__builtin_round) || defined(__builtin_round)
+#if (CCM_HAS_BUILTIN(__builtin_round) || defined(__builtin_round)) && !defined(CCMATH_COMPILER_GCC)
 		if constexpr (std::is_same_v<T, float>) { return __builtin_roundf(num); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_round(num); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_roundl(num); }
