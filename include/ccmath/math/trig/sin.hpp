@@ -10,7 +10,41 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/trig/sin.hpp"
+#include "ccmath/internal/math/generic/func/trig/sin_gen.hpp"
+#include "ccmath/internal/math/runtime/func/trig/sin_rt.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
+
+#include <type_traits>
+
 namespace ccm
 {
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
+	constexpr T sin(T num)
+	{
+		if constexpr (ccm::builtin::has_constexpr_sin<T>) { return ccm::builtin::sin(num); }
+		else
+		{
+			if (ccm::support::is_constant_evaluated()) { return ccm::gen::sin_gen(num); }
+			return ccm::rt::sin_rt(num);
+		}
+	}
 
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
+	constexpr double sin(Integer num)
+	{
+		return ccm::sin<double>(static_cast<double>(num));
+	}
+
+	constexpr float sinf(float num)
+	{
+		return ccm::sin<float>(num);
+	}
+
+	constexpr long double sinl(long double num)
+	{
+		return ccm::sin<long double>(num);
+	}
 } // namespace ccm
+
+/// @ingroup trig
