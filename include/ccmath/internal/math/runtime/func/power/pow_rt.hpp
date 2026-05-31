@@ -11,7 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
-#include "ccmath/internal/math/runtime/simd/func/pow.hpp"
+#include "ccmath/internal/math/runtime/simd/func/catalog.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"

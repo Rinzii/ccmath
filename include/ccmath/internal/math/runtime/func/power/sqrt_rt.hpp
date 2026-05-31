@@ -12,7 +12,7 @@
 
 #include "ccmath/internal/config/type_support.hpp"
 #include "ccmath/internal/math/generic/func/power/sqrt_gen.hpp"
-#include "ccmath/internal/math/runtime/simd/func/sqrt.hpp"
+#include "ccmath/internal/math/runtime/simd/func/catalog.hpp"
 #include "ccmath/internal/support/always_false.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
