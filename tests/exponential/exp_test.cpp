@@ -14,19 +14,15 @@
 #include <limits>
 #include "../../include/ccmath/math/numbers.hpp"
 #include "ccmath/ccmath.hpp"
+#include "utils/std_compare.hpp"
 
 TEST(CcmathExponentialTests, Exp)
 {
 	// ccm::exp(1.0) is equivalent to the mathematical constant e
 	static_assert(ccm::exp(1.0) == ccm::numbers::e, "ccm::exp is not working with static_assert!");
 
-	EXPECT_EQ(ccm::exp(1.0), std::exp(1.0));
-	EXPECT_EQ(ccm::exp(2.0), std::exp(2.0));
-	EXPECT_EQ(ccm::exp(4.0), std::exp(4.0));
-	EXPECT_EQ(ccm::exp(8.0), std::exp(8.0));
-	EXPECT_EQ(ccm::exp(16.0), std::exp(16.0));
-	EXPECT_EQ(ccm::exp(32.0), std::exp(32.0));
-	EXPECT_EQ(ccm::exp(64.0), std::exp(64.0));
+	constexpr double double_inputs[] = { 1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 256.0, 512.0, 1024.0, 2048.0, 4096.0 };
+	for (double input : double_inputs) { ccm::test::ExpectUnaryMatchesStd(input, ccm::exp<double>, static_cast<double (*)(double)>(std::exp)); }
 	/*
 	 * For some reason with MSVC on Windows the following tests fails with the output:
 	 *      ccm::exp(128.0)
@@ -39,59 +35,23 @@ TEST(CcmathExponentialTests, Exp)
 	 * The same test passes on GCC and Clang on both Linux and MacOS without issue so I am allowing this test to fail.
 	 */
 	//EXPECT_EQ(ccm::exp(128.0), std::exp(128.0));
-	EXPECT_EQ(ccm::exp(256.0), std::exp(256.0));
-	EXPECT_EQ(ccm::exp(512.0), std::exp(512.0));
-	EXPECT_EQ(ccm::exp(1024.0), std::exp(1024.0));
-	EXPECT_EQ(ccm::exp(2048.0), std::exp(2048.0));
-	EXPECT_EQ(ccm::exp(4096.0), std::exp(4096.0));
-
-
-	EXPECT_EQ(ccm::exp(4096.0) * ccm::exp(4096.0), std::exp(4096.0) * std::exp(4096.0));
+	ccm::test::ExpectSameAsStd(ccm::exp(4096.0) * ccm::exp(4096.0), std::exp(4096.0) * std::exp(4096.0));
 
 
 	// Test Edge Cases
 
-	EXPECT_EQ(ccm::exp(0.0), std::exp(0.0));
-	EXPECT_EQ(ccm::exp(-0.0), std::exp(-0.0));
-	EXPECT_EQ(ccm::exp(std::numeric_limits<double>::infinity()), std::exp(std::numeric_limits<double>::infinity()));
-	EXPECT_EQ(ccm::exp(-std::numeric_limits<double>::infinity()), std::exp(-std::numeric_limits<double>::infinity()));
-
-	bool testCcmExpThatNanReturnsNan = std::isnan(ccm::exp(std::numeric_limits<double>::quiet_NaN()));
-	bool testStdExpThatNanReturnsNan = std::isnan(std::exp(std::numeric_limits<double>::quiet_NaN()));
-	bool testCcmExpThatNanIsPositive = std::signbit(ccm::exp(std::numeric_limits<double>::quiet_NaN()));
-	bool testStdExpThatNanIsPositive = std::signbit(std::exp(std::numeric_limits<double>::quiet_NaN()));
-	EXPECT_EQ(testCcmExpThatNanReturnsNan, testStdExpThatNanReturnsNan);
-	EXPECT_EQ(testCcmExpThatNanIsPositive, testStdExpThatNanIsPositive);
+	constexpr double double_edges[] = { 0.0, -0.0, std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(),
+										std::numeric_limits<double>::quiet_NaN() };
+	for (double input : double_edges) { ccm::test::ExpectUnaryMatchesStd(input, ccm::exp<double>, static_cast<double (*)(double)>(std::exp)); }
 
 	// Now test floats
 
-	EXPECT_EQ(ccm::exp(1.0F), std::exp(1.0F));
-	EXPECT_EQ(ccm::exp(2.0F), std::exp(2.0F));
-	EXPECT_EQ(ccm::exp(4.0F), std::exp(4.0F));
-	EXPECT_EQ(ccm::exp(8.0F), std::exp(8.0F));
-	EXPECT_EQ(ccm::exp(16.0F), std::exp(16.0F));
-	EXPECT_EQ(ccm::exp(32.0F), std::exp(32.0F));
-	EXPECT_EQ(ccm::exp(64.0F), std::exp(64.0F));
+	constexpr float float_inputs[] = { 1.0F, 2.0F, 4.0F, 8.0F, 16.0F, 32.0F, 64.0F, 256.0F, 512.0F, 1024.0F, 2048.0F, 4096.0F };
+	for (float input : float_inputs) { ccm::test::ExpectUnaryMatchesStd(input, ccm::exp<float>, static_cast<float (*)(float)>(std::exp)); }
 	//EXPECT_EQ(ccm::exp(128.0F), std::exp(128.0F)); // See above.
-	EXPECT_EQ(ccm::exp(256.0F), std::exp(256.0F));
-	EXPECT_EQ(ccm::exp(512.0F), std::exp(512.0F));
-	EXPECT_EQ(ccm::exp(1024.0F), std::exp(1024.0F));
-	EXPECT_EQ(ccm::exp(2048.0F), std::exp(2048.0F));
-	EXPECT_EQ(ccm::exp(4096.0F), std::exp(4096.0F));
-
-	// Test Edge Cases
-
-	EXPECT_EQ(ccm::exp(0.0F), std::exp(0.0F));
-	EXPECT_EQ(ccm::exp(-0.0F), std::exp(-0.0F));
-	EXPECT_EQ(ccm::exp(std::numeric_limits<float>::infinity()), std::exp(std::numeric_limits<float>::infinity()));
-	EXPECT_EQ(ccm::exp(-std::numeric_limits<float>::infinity()), std::exp(-std::numeric_limits<float>::infinity()));
-
-	bool testCcmExpThatNanReturnsNanF = std::isnan(ccm::exp(std::numeric_limits<float>::quiet_NaN()));
-	bool testStdExpThatNanReturnsNanF = std::isnan(std::exp(std::numeric_limits<float>::quiet_NaN()));
-	bool testCcmExpThatNanIsPositiveF = std::signbit(ccm::exp(std::numeric_limits<float>::quiet_NaN()));
-	bool testStdExpThatNanIsPositiveF = std::signbit(std::exp(std::numeric_limits<float>::quiet_NaN()));
-	EXPECT_EQ(testCcmExpThatNanReturnsNanF, testStdExpThatNanReturnsNanF);
-	EXPECT_EQ(testCcmExpThatNanIsPositiveF, testStdExpThatNanIsPositiveF);
+	constexpr float float_edges[] = { 0.0F, -0.0F, std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity(),
+									  std::numeric_limits<float>::quiet_NaN() };
+	for (float input : float_edges) { ccm::test::ExpectUnaryMatchesStd(input, ccm::exp<float>, static_cast<float (*)(float)>(std::exp)); }
 
 
 }

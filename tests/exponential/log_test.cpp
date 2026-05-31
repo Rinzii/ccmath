@@ -13,6 +13,7 @@
 #include <cmath>
 #include <limits>
 #include "ccmath/ccmath.hpp"
+#include "utils/std_compare.hpp"
 
 
 TEST(CcmathExponentialTests, Log)
@@ -21,39 +22,17 @@ TEST(CcmathExponentialTests, Log)
 	// 1.3862943611198906 was generated with std::log(4.0)
 	static_assert(ccm::log(4.0) == 1.3862943611198906, "log has failed testing that it is static_assert-able!");
 
-	EXPECT_EQ(ccm::log(1.0), std::log(1.0));
-	EXPECT_EQ(ccm::log(2.0), std::log(2.0));
-	EXPECT_EQ(ccm::log(4.0), std::log(4.0));
-	EXPECT_EQ(ccm::log(8.0), std::log(8.0));
-	EXPECT_EQ(ccm::log(16.0), std::log(16.0));
-	EXPECT_EQ(ccm::log(32.0), std::log(32.0));
-	EXPECT_EQ(ccm::log(64.0), std::log(64.0));
-	EXPECT_EQ(ccm::log(128.0), std::log(128.0));
-	EXPECT_EQ(ccm::log(256.0), std::log(256.0));
-	EXPECT_EQ(ccm::log(512.0), std::log(512.0));
-	EXPECT_EQ(ccm::log(1024.0), std::log(1024.0));
-	EXPECT_EQ(ccm::log(2048.0), std::log(2048.0));
-	EXPECT_EQ(ccm::log(4096.0), std::log(4096.0));
-	EXPECT_EQ(ccm::log(8192.0), std::log(8192.0));
-	EXPECT_EQ(ccm::log(16384.0), std::log(16384.0));
-	EXPECT_EQ(ccm::log(32768.0), std::log(32768.0));
-	EXPECT_EQ(ccm::log(65536.0), std::log(65536.0));
-	EXPECT_EQ(ccm::log(131072.0), std::log(131072.0));
-	EXPECT_EQ(ccm::log(262144.0), std::log(262144.0));
-	EXPECT_EQ(ccm::log(524288.0), std::log(524288.0));
-	EXPECT_EQ(ccm::log(1048576.0), std::log(1048576.0));
+	constexpr double inputs[] = { 1.0,	 2.0,	4.0,	 8.0,	  16.0,	  32.0,	   64.0,	128.0,	256.0,	 512.0, 1024.0,
+								  2048.0, 4096.0, 8192.0, 16384.0, 32768.0, 65536.0, 131072.0, 262144.0, 524288.0, 1048576.0 };
+	for (double input : inputs) { ccm::test::ExpectUnaryMatchesStd(input, ccm::log<double>, static_cast<double (*)(double)>(std::log)); }
 
 
 	// Check for edge cases
-	bool ccmCheckForNan = std::isnan(ccm::log(std::numeric_limits<double>::quiet_NaN()));
-	bool stdCheckForNan = std::isnan(std::log(std::numeric_limits<double>::quiet_NaN()));
-	EXPECT_EQ(ccmCheckForNan, stdCheckForNan);
-	EXPECT_EQ(ccm::log(std::numeric_limits<double>::infinity()), std::log(std::numeric_limits<double>::infinity()));
-	bool ccmCheckForNegativeNan = std::isnan(ccm::log(-1.0));
-	bool stdCheckForNegativeNan = std::isnan(std::log(-1.0));
-	EXPECT_EQ(ccmCheckForNegativeNan, stdCheckForNegativeNan);
-	EXPECT_EQ(ccm::log(0.0), std::log(0.0));
-	EXPECT_EQ(ccm::log(-0.0), std::log(-0.0));
+	ccm::test::ExpectUnaryMatchesStd(std::numeric_limits<double>::quiet_NaN(), ccm::log<double>, static_cast<double (*)(double)>(std::log));
+	ccm::test::ExpectUnaryMatchesStd(std::numeric_limits<double>::infinity(), ccm::log<double>, static_cast<double (*)(double)>(std::log));
+	ccm::test::ExpectCcmNegativeDomainNaN(-1.0, ccm::log<double>);
+	ccm::test::ExpectUnaryMatchesStd(0.0, ccm::log<double>, static_cast<double (*)(double)>(std::log));
+	ccm::test::ExpectUnaryMatchesStd(-0.0, ccm::log<double>, static_cast<double (*)(double)>(std::log));
 
 
 }

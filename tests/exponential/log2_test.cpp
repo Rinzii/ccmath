@@ -13,60 +13,24 @@
 #include <cmath>
 #include <limits>
 #include "ccmath/ccmath.hpp"
+#include "utils/std_compare.hpp"
 
 TEST(CcmathExponentialTests, Log2)
 {
 	static_assert(ccm::log2(1.0) == 0.0, "log2 has failed testing that it is static_assert-able!"); // Check that we can use static_assert with this function
 
-	EXPECT_EQ(ccm::log2(1.0), std::log2(1.0));
-	EXPECT_EQ(ccm::log2(2.0), std::log2(2.0));
-	EXPECT_EQ(ccm::log2(4.0), std::log2(4.0));
-	EXPECT_EQ(ccm::log2(8.0), std::log2(8.0));
-	EXPECT_EQ(ccm::log2(16.0), std::log2(16.0));
-	EXPECT_EQ(ccm::log2(32.0), std::log2(32.0));
-	EXPECT_EQ(ccm::log2(64.0), std::log2(64.0));
-	EXPECT_EQ(ccm::log2(128.0), std::log2(128.0));
-	EXPECT_EQ(ccm::log2(256.0), std::log2(256.0));
-	EXPECT_EQ(ccm::log2(512.0), std::log2(512.0));
-	EXPECT_EQ(ccm::log2(1024.0), std::log2(1024.0));
-	EXPECT_EQ(ccm::log2(2048.0), std::log2(2048.0));
-	EXPECT_EQ(ccm::log2(4096.0), std::log2(4096.0));
+	constexpr double double_inputs[] = { 1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0, 1024.0, 2048.0, 4096.0 };
+	for (double input : double_inputs) { ccm::test::ExpectUnaryMatchesStd(input, ccm::log2<double>, static_cast<double (*)(double)>(std::log2)); }
 
 	// Test floating point precision
-	EXPECT_EQ(ccm::log2(1.0F), std::log2(1.0F));
-	EXPECT_EQ(ccm::log2(2.0F), std::log2(2.0F));
-	EXPECT_EQ(ccm::log2(4.0F), std::log2(4.0F));
-	EXPECT_EQ(ccm::log2(8.0F), std::log2(8.0F));
-	EXPECT_EQ(ccm::log2(16.0F), std::log2(16.0F));
-	EXPECT_EQ(ccm::log2(32.0F), std::log2(32.0F));
-	EXPECT_EQ(ccm::log2(64.0F), std::log2(64.0F));
-	EXPECT_EQ(ccm::log2(128.0F), std::log2(128.0F));
-	EXPECT_EQ(ccm::log2(256.0F), std::log2(256.0F));
-	EXPECT_EQ(ccm::log2(512.0F), std::log2(512.0F));
-	EXPECT_EQ(ccm::log2(1024.0F), std::log2(1024.0F));
-	EXPECT_EQ(ccm::log2(2048.0F), std::log2(2048.0F));
-	EXPECT_EQ(ccm::log2(4096.0F), std::log2(4096.0F));
+	constexpr float float_inputs[] = { 1.0F, 2.0F, 4.0F, 8.0F, 16.0F, 32.0F, 64.0F, 128.0F, 256.0F, 512.0F, 1024.0F, 2048.0F, 4096.0F };
+	for (float input : float_inputs) { ccm::test::ExpectUnaryMatchesStd(input, ccm::log2<float>, static_cast<float (*)(float)>(std::log2)); }
 
 	// Test edge cases
-	EXPECT_EQ(ccm::log2(0.0), std::log2(0.0));
-	EXPECT_EQ(ccm::log2(-0.0), std::log2(-0.0));
-	EXPECT_EQ(ccm::log2(std::numeric_limits<double>::infinity()), std::log2(std::numeric_limits<double>::infinity()));
-
-	bool testCcmLog2ThatNegInfReturnsNan = std::isnan(ccm::log2(-std::numeric_limits<double>::infinity()));
-	bool testStdLog2ThatNegInfReturnsNan = std::isnan(std::log2(-std::numeric_limits<double>::infinity()));
-	EXPECT_EQ(testCcmLog2ThatNegInfReturnsNan, testStdLog2ThatNegInfReturnsNan);
-
-	bool testCcmLog2ThatQuietNanReturnsNan = std::isnan(ccm::log2(std::numeric_limits<double>::quiet_NaN()));
-	bool testStdLog2ThatQuietNanReturnsNan = std::isnan(std::log2(std::numeric_limits<double>::quiet_NaN()));
-	bool testCcmLog2ThatPosQuietNanHasSameSign = std::signbit(ccm::log2(std::numeric_limits<double>::quiet_NaN()));
-	bool testStdLog2ThatPosQuietNanHasSameSign = std::signbit(std::log2(std::numeric_limits<double>::quiet_NaN()));
-	EXPECT_EQ(testCcmLog2ThatQuietNanReturnsNan, testStdLog2ThatQuietNanReturnsNan);
-	EXPECT_EQ(testCcmLog2ThatPosQuietNanHasSameSign, testStdLog2ThatPosQuietNanHasSameSign);
-
-	bool testCcmLog2ThatNegQuietNanReturnsNan = std::isnan(ccm::log2(-std::numeric_limits<double>::quiet_NaN()));
-	bool testStdLog2ThatNegQuietNanReturnsNan = std::isnan(std::log2(-std::numeric_limits<double>::quiet_NaN()));
-	bool testCcmLog2ThatNegQuietNanIsNegative = std::signbit(ccm::log2(-std::numeric_limits<double>::quiet_NaN()));
-	bool testStdLog2ThatNegQuietNanIsNegative = std::signbit(std::log2(-std::numeric_limits<double>::quiet_NaN()));
-	EXPECT_EQ(testCcmLog2ThatNegQuietNanReturnsNan, testStdLog2ThatNegQuietNanReturnsNan);
-	EXPECT_EQ(testCcmLog2ThatNegQuietNanIsNegative, testStdLog2ThatNegQuietNanIsNegative);
+	ccm::test::ExpectUnaryMatchesStd(0.0, ccm::log2<double>, static_cast<double (*)(double)>(std::log2));
+	ccm::test::ExpectUnaryMatchesStd(-0.0, ccm::log2<double>, static_cast<double (*)(double)>(std::log2));
+	ccm::test::ExpectUnaryMatchesStd(std::numeric_limits<double>::infinity(), ccm::log2<double>, static_cast<double (*)(double)>(std::log2));
+	ccm::test::ExpectUnaryMatchesStd(-std::numeric_limits<double>::infinity(), ccm::log2<double>, static_cast<double (*)(double)>(std::log2));
+	ccm::test::ExpectUnaryMatchesStd(std::numeric_limits<double>::quiet_NaN(), ccm::log2<double>, static_cast<double (*)(double)>(std::log2));
+	ccm::test::ExpectUnaryMatchesStd(-std::numeric_limits<double>::quiet_NaN(), ccm::log2<double>, static_cast<double (*)(double)>(std::log2));
 }
