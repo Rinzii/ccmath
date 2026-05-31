@@ -6,8 +6,7 @@
 .vs/*
 .vscode/*
 build/*
-out/*
-out*/
+/out/
 .cache
 .DS_Store
 
@@ -70,8 +69,4 @@ fuzzing/leak-*
 fuzzing/oom-*
 fuzzing/slow-unit-*
 fuzzing/minimize-crash-*
-
-# Local scratch repros and ad-hoc fuzz runs
-out/tmp/
-out/fuzztest/
 
