@@ -14,6 +14,8 @@
 #include <cmath>
 #include <limits>
 
+#include "utils/std_compare.hpp"
+
 
 constexpr double get_ccm_rem(double x, double y)
 {
@@ -54,16 +56,13 @@ TEST(CcmathBasicTests, Remquo)
 	static_assert(sa_remainder == 1, "sa_quotient == 1");
 
 	// Test with positive values
-	EXPECT_EQ(get_ccm_quo(7.0, 2.0), get_std_quo(7.0, 2.0));
-	EXPECT_EQ(get_ccm_rem(7.0, 2.0), get_std_rem(7.0, 2.0));
+	ccm::test::ExpectRemquoMatchesStd(7.0, 2.0);
 
 	// Test with negative values
-	EXPECT_EQ(get_ccm_quo(-7.0, 2.0), get_std_quo(-7.0, 2.0));
-	EXPECT_EQ(get_ccm_rem(-7.0, 2.0), get_std_rem(-7.0, 2.0));
+	ccm::test::ExpectRemquoMatchesStd(-7.0, 2.0);
 
 	// Test with zero values
-	EXPECT_EQ(get_ccm_quo(0.0, 2.0), get_std_quo(0.0, 2.0));
-	EXPECT_EQ(get_ccm_rem(0.0, 2.0), get_std_rem(0.0, 2.0));
+	ccm::test::ExpectRemquoMatchesStd(0.0, 2.0);
 
 	/* TODO: These test are failing on the CI, but not on my local machine. Investigate why.
 	// Test with infinity

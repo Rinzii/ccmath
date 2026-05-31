@@ -14,6 +14,8 @@
 #include <cmath>
 #include <limits>
 
+#include "utils/std_compare.hpp"
+
 namespace
 {
 
@@ -136,16 +138,7 @@ TEST_P(CcmathFDimDoubleTests, FDimWithDoubleReturnsApropriateValue)
 	// Act
 	const auto actual{ccm::fdim(param.x, param.y)};
 
-	// Assert
-	if (std::isnan(param.expected))
-	{
-		EXPECT_TRUE(std::isnan(actual)) << "ccm::fdim(" << param.x << ", " << param.y << ") expected to be NaN. Instead got " << actual << ".";
-	}
-	else
-	{
-		EXPECT_EQ(actual, param.expected) << "ccm::fdim(" << param.x << ", " << param.y << ") expected to equal " << param.expected << ". Instead got "
-										  << actual << ".";
-	}
+	ccm::test::ExpectSameAsStd(actual, param.expected);
 }
 
 TEST_P(CcmathFDimFloatTests, FDimWithFloatReturnsAppropriateValue)
@@ -156,16 +149,7 @@ TEST_P(CcmathFDimFloatTests, FDimWithFloatReturnsAppropriateValue)
 	// Act
 	const auto actual{ccm::fdim(param.x, param.y)};
 
-	// Assert
-	if (std::isnan(param.expected))
-	{
-		EXPECT_TRUE(std::isnan(actual)) << "ccm::fdim(" << param.x << ", " << param.y << ") expected to be NaN. Instead got " << actual << ".";
-	}
-	else
-	{
-		EXPECT_EQ(actual, param.expected) << "ccm::fdim(" << param.x << ", " << param.y << ") expected to equal " << param.expected << ". Instead got "
-										  << actual << ".";
-	}
+	ccm::test::ExpectSameAsStd(actual, param.expected);
 }
 
 TEST_P(CcmathFDimLongDoubleTests, FDimWithLongDoubleReturnsAppropriateValue)
@@ -176,16 +160,7 @@ TEST_P(CcmathFDimLongDoubleTests, FDimWithLongDoubleReturnsAppropriateValue)
 	// Act
 	const auto actual{ccm::fdim(param.x, param.y)};
 
-	// Assert
-	if (std::isnan(param.expected))
-	{
-		EXPECT_TRUE(std::isnan(actual)) << "ccm::fdim(" << param.x << ", " << param.y << ") expected to be NaN. Instead got " << actual << ".";
-	}
-	else
-	{
-		EXPECT_EQ(actual, param.expected) << "ccm::fdim(" << param.x << ", " << param.y << ") expected to equal " << param.expected << ". Instead got "
-										  << actual << ".";
-	}
+	ccm::test::ExpectSameAsStd(actual, param.expected);
 }
 
 TEST(CcmathBasicTests, FdimCanBeEvaluatedAtCompileTime)

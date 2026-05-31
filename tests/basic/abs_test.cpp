@@ -15,6 +15,8 @@
 #include <cmath>
 #include <limits>
 
+#include "utils/std_compare.hpp"
+
 // NOLINTBEGIN
 
 #include <ccmath/internal/predef/compiler_suppression/gcc_compiler_suppression.hpp>
@@ -207,9 +209,7 @@ TEST_P(CcmathAbsDoubleTests, AbsWithDoubleReturnsAppropriateValue)
 	// Act
 	const auto actual{ ccm::abs(param.input) };
 
-	// Assert
-	if (std::isnan(param.expected)) { EXPECT_TRUE(std::isnan(actual)) << "ccm::abs(" << param.input << ") expected to be NaN. Instead got " << actual << "."; }
-	else { EXPECT_EQ(actual, param.expected) << "ccm::abs(" << param.input << ") expected to equal " << param.expected << ". Instead got " << actual << "."; }
+	ccm::test::ExpectSameAsStd(actual, param.expected);
 }
 
 TEST_P(CcmathAbsFloatTests, AbsWithFloatReturnsAppropriateValue)
@@ -220,9 +220,7 @@ TEST_P(CcmathAbsFloatTests, AbsWithFloatReturnsAppropriateValue)
 	// Act
 	const auto actual{ ccm::abs(param.input) };
 
-	// Assert
-	if (std::isnan(param.expected)) { EXPECT_TRUE(std::isnan(actual)) << "ccm::abs(" << param.input << ") expected to be NaN. Instead got " << actual << "."; }
-	else { EXPECT_EQ(actual, param.expected) << "ccm::abs(" << param.input << ") expected to equal " << param.expected << ". Instead got " << actual << "."; }
+	ccm::test::ExpectSameAsStd(actual, param.expected);
 }
 
 TEST_P(CcmathAbsLongDoubleTests, AbsWithLongDoubleReturnsAppropriateValue)
@@ -233,9 +231,7 @@ TEST_P(CcmathAbsLongDoubleTests, AbsWithLongDoubleReturnsAppropriateValue)
 	// Act
 	const auto actual{ ccm::abs(param.input) };
 
-	// Assert
-	if (std::isnan(param.expected)) { EXPECT_TRUE(std::isnan(actual)) << "ccm::abs(" << param.input << ") expected to be NaN. Instead got " << actual << "."; }
-	else { EXPECT_EQ(actual, param.expected) << "ccm::abs(" << param.input << ") expected to equal " << param.expected << ". Instead got " << actual << "."; }
+	ccm::test::ExpectSameAsStd(actual, param.expected);
 }
 
 TEST_P(CcmathAbsIntTests, AbsWithIntReturnsAppropriateValue)
@@ -246,8 +242,7 @@ TEST_P(CcmathAbsIntTests, AbsWithIntReturnsAppropriateValue)
 	// Act
 	const auto actual{ ccm::abs(param.input) };
 
-	// Assert
-	EXPECT_EQ(actual, param.expected) << "ccm::abs(" << param.input << ") expected to equal " << param.expected << ". Instead got " << actual << ".";
+	ccm::test::ExpectSameAsStd(actual, param.expected);
 }
 
 TEST(CcmathBasicTests, CcmAbsCanBeEvaluatedAtCompileTime)

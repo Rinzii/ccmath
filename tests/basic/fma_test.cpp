@@ -14,22 +14,25 @@
 #include <cmath>
 #include <limits>
 
+#include "utils/std_compare.hpp"
+
 TEST(CcmathBasicTests, Fma)
 {
 	// Test that fma works with static_assert
 	static_assert(ccm::fma(1, 2, 3) == 5, "fma has failed testing that it is static_assert-able!");
 
-	EXPECT_EQ(ccm::fma(1.0, 2.0, 3.0), std::fma(1.0, 2.0, 3.0));
-	EXPECT_EQ(ccm::fma(1.0F, 2.0F, 3.0F), std::fma(1.0F, 2.0F, 3.0F));
-	EXPECT_EQ(ccm::fma(1.0L, 2.0L, 3.0L), std::fma(1.0L, 2.0L, 3.0L));
+	ccm::test::ExpectTernaryMatchesStd(1.0, 2.0, 3.0, ccm::fma<double>, static_cast<double (*)(double, double, double)>(std::fma));
+	ccm::test::ExpectTernaryMatchesStd(1.0F, 2.0F, 3.0F, ccm::fma<float>, static_cast<float (*)(float, float, float)>(std::fma));
+	ccm::test::ExpectTernaryMatchesStd(1.0L, 2.0L, 3.0L, ccm::fma<long double>,
+									   static_cast<long double (*)(long double, long double, long double)>(std::fma));
 
 	EXPECT_DOUBLE_EQ(std::fma(2.0, 3.0, 4.0), 10.0);  // 2.0 * 3.0 + 4.0 = 10.0
 	EXPECT_DOUBLE_EQ(std::fma(-2.5, 4.0, 1.5), -8.5); // -2.5 * 4.0 + 1.5 = -8.5
 	EXPECT_DOUBLE_EQ(std::fma(0.0, 5.0, 6.0), 6.0);	  // 0.0 * 5.0 + 6.0 = 6.0
 
 	// Test edge cases
-	EXPECT_EQ(ccm::fma(0.0, 0.0, 0.0), std::fma(0.0, 0.0, 0.0));
-	EXPECT_EQ(ccm::fma(-0.0, -0.0, -0.0), std::fma(-0.0, -0.0, -0.0));
+	ccm::test::ExpectTernaryMatchesStd(0.0, 0.0, 0.0, ccm::fma<double>, static_cast<double (*)(double, double, double)>(std::fma));
+	ccm::test::ExpectTernaryMatchesStd(-0.0, -0.0, -0.0, ccm::fma<double>, static_cast<double (*)(double, double, double)>(std::fma));
 
 	/* TODO: Add these test back in once the implementation is complete
 

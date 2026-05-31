@@ -14,6 +14,8 @@
 #include <cmath>
 #include <limits>
 
+#include "utils/std_compare.hpp"
+
 
 TEST(CcmathBasicTests, Min)
 {
@@ -21,30 +23,30 @@ TEST(CcmathBasicTests, Min)
 	static_assert(ccm::min(1, 2) == 1, "min has failed testing that it is static_assert-able!");
 
 	// Test the ccm::abs function against std::abs
-	EXPECT_EQ(ccm::min(1, 2), std::min(1, 2));
-	EXPECT_EQ(ccm::min(2, 1), std::min(2, 1));
-	EXPECT_EQ(ccm::min(1, 1), std::min(1, 1));
-	EXPECT_EQ(ccm::min(0, 0), std::min(0, 0));
-	EXPECT_EQ(ccm::min(-1, 0), std::min(-1, 0));
-	EXPECT_EQ(ccm::min(0, -1), std::min(0, -1));
-	EXPECT_EQ(ccm::min(-1, -1), std::min(-1, -1));
+	ccm::test::ExpectSameAsStd(ccm::min(1, 2), std::min(1, 2));
+	ccm::test::ExpectSameAsStd(ccm::min(2, 1), std::min(2, 1));
+	ccm::test::ExpectSameAsStd(ccm::min(1, 1), std::min(1, 1));
+	ccm::test::ExpectSameAsStd(ccm::min(0, 0), std::min(0, 0));
+	ccm::test::ExpectSameAsStd(ccm::min(-1, 0), std::min(-1, 0));
+	ccm::test::ExpectSameAsStd(ccm::min(0, -1), std::min(0, -1));
+	ccm::test::ExpectSameAsStd(ccm::min(-1, -1), std::min(-1, -1));
 
 	// now floats
-	EXPECT_EQ(ccm::min(1.0f, 2.0f), std::min(1.0f, 2.0f));
-	EXPECT_EQ(ccm::min(2.0f, 1.0f), std::min(2.0f, 1.0f));
-	EXPECT_EQ(ccm::min(1.0f, 1.0f), std::min(1.0f, 1.0f));
-	EXPECT_EQ(ccm::min(0.0f, 0.0f), std::min(0.0f, 0.0f));
-	EXPECT_EQ(ccm::min(-1.0f, 0.0f), std::min(-1.0f, 0.0f));
-	EXPECT_EQ(ccm::min(0.0f, -1.0f), std::min(0.0f, -1.0f));
-	EXPECT_EQ(ccm::min(-1.0f, -1.0f), std::min(-1.0f, -1.0f));
+	ccm::test::ExpectSameAsStd(ccm::min(1.0F, 2.0F), std::min(1.0F, 2.0F));
+	ccm::test::ExpectSameAsStd(ccm::min(2.0F, 1.0F), std::min(2.0F, 1.0F));
+	ccm::test::ExpectSameAsStd(ccm::min(1.0F, 1.0F), std::min(1.0F, 1.0F));
+	ccm::test::ExpectSameAsStd(ccm::min(0.0F, 0.0F), std::min(0.0F, 0.0F));
+	ccm::test::ExpectSameAsStd(ccm::min(-1.0F, 0.0F), std::min(-1.0F, 0.0F));
+	ccm::test::ExpectSameAsStd(ccm::min(0.0F, -1.0F), std::min(0.0F, -1.0F));
+	ccm::test::ExpectSameAsStd(ccm::min(-1.0F, -1.0F), std::min(-1.0F, -1.0F));
 
 	// Now mix and match types
-	EXPECT_EQ(ccm::fmin(1, 2.0f), std::fmin(1, 2.0f));
-	EXPECT_EQ(ccm::fmin(2.0f, 1), std::fmin(2.0f, 1));
-	EXPECT_EQ(ccm::fmin(1, 1.0f), std::fmin(1, 1.0f));
-	EXPECT_EQ(ccm::fmin(0.0f, 0), std::fmin(0.0f, 0));
-	EXPECT_EQ(ccm::fmin(-1, 0.0f), std::fmin(-1, 0.0f));
-	EXPECT_EQ(ccm::fmin(0.0f, -1), std::fmin(0.0f, -1));
-	EXPECT_EQ(ccm::fmin(-1.0f, -1), std::fmin(-1.0f, -1));
+	ccm::test::ExpectSameAsStd(ccm::fmin(1, 2.0F), std::fmin(1, 2.0F));
+	ccm::test::ExpectSameAsStd(ccm::fmin(2.0F, 1), std::fmin(2.0F, 1));
+	ccm::test::ExpectSameAsStd(ccm::fmin(1, 1.0F), std::fmin(1, 1.0F));
+	ccm::test::ExpectSameAsStd(ccm::fmin(0.0F, 0), std::fmin(0.0F, 0));
+	ccm::test::ExpectSameAsStd(ccm::fmin(-1, 0.0F), std::fmin(-1, 0.0F));
+	ccm::test::ExpectSameAsStd(ccm::fmin(0.0F, -1), std::fmin(0.0F, -1));
+	ccm::test::ExpectSameAsStd(ccm::fmin(-1.0F, -1), std::fmin(-1.0F, -1));
 
 }
