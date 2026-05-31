@@ -112,6 +112,7 @@ ccmath_add_test(ccmath-test-exponential
         exponential/log2_test.cpp
         exponential/log10_test.cpp
         exponential/log_test.cpp
+        exponential/ulp_accuracy_test.cpp
 )
 
 # Floating manipulation tests
@@ -129,6 +130,7 @@ ccmath_add_test(ccmath-test-fmanip
 
 # Nearest tests
 ccmath_add_test(ccmath-test-nearest
+        nearest/ceil_round_rint_test.cpp
         nearest/floor_test.cpp
         nearest/nearbyint_test.cpp
         nearest/trunc_test.cpp
@@ -136,22 +138,44 @@ ccmath_add_test(ccmath-test-nearest
 
 # Power tests
 ccmath_add_test(ccmath-test-power
+        power/hypot_cbrt_test.cpp
         power/pow_test.cpp
         power/sqrt_test.cpp
+        power/ulp_accuracy_test.cpp
+)
+
+# Trigonometric tests
+ccmath_add_test(ccmath-test-trigonometric
+        trigonometric/inverse_trig_test.cpp
+        trigonometric/sin_test.cpp
+        trigonometric/ulp_accuracy_test.cpp
 )
 
 # Misc tests (handling std::lerp, version dependent)
 if (CMAKE_CXX_STANDARD GREATER_EQUAL 20)
     ccmath_add_test(ccmath-test-misc
             misc/lerp_test_std.cpp
+            misc/gamma_test.cpp
+            misc/lgamma_test.cpp
     )
 else ()
     ccmath_add_test(ccmath-test-misc
             misc/lerp_test_no_std.cpp
+            misc/gamma_test.cpp
+            misc/lgamma_test.cpp
     )
 endif ()
 
 # Internal test(s)
 ccmath_add_test(ccmath-test-internal-types
         internal/types/big_int_test.cpp
+)
+
+# Conformance tests (rounding modes, fenv probes, all-modes ULP)
+ccmath_add_test(ccmath-test-conformance
+        conformance/fenv_exception_test.cpp
+        conformance/fenv_probe_test.cpp
+        conformance/rounding_conformance_test.cpp
+        conformance/ulp_all_modes_test.cpp
+        conformance/worst_case_ulp_test.cpp
 )
