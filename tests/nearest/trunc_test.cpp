@@ -15,6 +15,8 @@
 #include <cmath>
 #include <limits>
 
+#include "utils/std_compare.hpp"
+
 // Disabling test case ccm::truncl if run on clang linux.
 #ifdef __clang__
 #ifdef __linux__
@@ -145,44 +147,29 @@ TEST_P(CcmathTruncDoubleTests, Trunc)
 {
 	const auto param{GetParam()};
 	const auto actual{ccm::trunc(param.input)};
-	EXPECT_EQ(actual, param.expected) << "ccm::trunc(" << param.input << ") expected to equal " << param.expected << ". Instead got " << actual << ".";
+	ccm::test::ExpectSameAsStd(actual, param.expected);
 }
 
 TEST_P(CcmathTruncFloatTests, TruncF)
 {
 	const auto param{GetParam()};
 	const auto actual{ccm::truncf(param.input)};
-	EXPECT_EQ(actual, param.expected) << "ccm::truncf(" << param.input << ") expected to equal " << param.expected << ". Instead got " << actual << ".";
+	ccm::test::ExpectSameAsStd(actual, param.expected);
 }
 
 TEST_P(CcmathTruncLongDoubleTests, TruncL)
 {
 	const auto param{GetParam()};
 	const auto actual{ccm::truncl(param.input)};
-	EXPECT_EQ(actual, param.expected) << "ccm::truncl(" << param.input << ") expected to equal " << param.expected << ". Instead got " << actual << ".";
+	ccm::test::ExpectSameAsStd(actual, param.expected);
 }
 
 TEST(CcmathNearestTests, CcmTruncTestNanValues)
 {
-	// Check if ccm::trunc and std::trunc return NaN for positive NaN
-	EXPECT_EQ(std::isnan(ccm::trunc(std::numeric_limits<double>::quiet_NaN())), std::isnan(std::trunc(std::numeric_limits<double>::quiet_NaN())));
-
-	// Check if ccm::trunc and std::trunc have the same sign bit for positive NaN
-	EXPECT_EQ(std::signbit(ccm::trunc(std::numeric_limits<double>::quiet_NaN())), std::signbit(std::trunc(std::numeric_limits<double>::quiet_NaN())));
-
-	// Check if ccm::trunc and std::trunc return NaN for negative NaN
-	EXPECT_EQ(std::isnan(ccm::trunc(-std::numeric_limits<double>::quiet_NaN())), std::isnan(std::trunc(-std::numeric_limits<double>::quiet_NaN())));
-
-	// Check if ccm::trunc and std::trunc have the same sign bit for negative NaN
-	EXPECT_EQ(std::signbit(ccm::trunc(-std::numeric_limits<double>::quiet_NaN())), std::signbit(std::trunc(-std::numeric_limits<double>::quiet_NaN())));
-
-	// Google Test is apparently incapable of comparing NaNs or I do not know enough about gtest to find a solution. I've though personally validated that
-	// ccm::signbit handles NaNs correctly
-	// EXPECT_EQ(ccm::trunc(std::numeric_limits<double>::quiet_NaN()), std::trunc(std::numeric_limits<double>::quiet_NaN()));
-	// EXPECT_EQ(ccm::trunc(-std::numeric_limits<double>::quiet_NaN()), std::trunc(-std::numeric_limits<double>::quiet_NaN()));
-
-	EXPECT_TRUE(std::isnan(ccm::trunc(std::nan(""))));
-	EXPECT_TRUE(std::isnan(ccm::trunc(-std::nan(""))));
+	ccm::test::ExpectUnaryMatchesStd(std::numeric_limits<double>::quiet_NaN(), ccm::trunc<double>, static_cast<double (*)(double)>(std::trunc));
+	ccm::test::ExpectUnaryMatchesStd(-std::numeric_limits<double>::quiet_NaN(), ccm::trunc<double>, static_cast<double (*)(double)>(std::trunc));
+	ccm::test::ExpectUnaryMatchesStd(std::nan(""), ccm::trunc<double>, static_cast<double (*)(double)>(std::trunc));
+	ccm::test::ExpectUnaryMatchesStd(-std::nan(""), ccm::trunc<double>, static_cast<double (*)(double)>(std::trunc));
 }
 
 TEST(CcmathNearestTests, CcmTruncCanBeEvaluatedAtCompileTime)

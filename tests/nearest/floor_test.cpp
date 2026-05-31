@@ -13,6 +13,7 @@
 #include <cmath>
 #include <limits>
 #include "ccmath/ccmath.hpp"
+#include "utils/std_compare.hpp"
 
 namespace
 {
@@ -65,26 +66,25 @@ TEST_P(CcmathFloorTests, Floor)
 {
 	const auto param{GetParam()};
 	const auto actual{ccm::floor(param.input)};
-	EXPECT_EQ(actual, param.expected) << "ccm::floor(" << param.input << ") expected to equal " << param.expected << ". Instead got " << actual << ".";
+	ccm::test::ExpectSameAsStd(actual, param.expected);
 }
 
 TEST(CcmathNearestTests, CcmFloorTestNanValues)
 {
-	// Check if ccm::floor and std::floor return NaN for positive NaN
-	EXPECT_EQ(std::isnan(ccm::floor(std::numeric_limits<double>::quiet_NaN())), std::isnan(std::floor(std::numeric_limits<double>::quiet_NaN())));
-
-	// Check if ccm::floor and std::floor have the same sign bit for positive NaN
-	EXPECT_EQ(std::signbit(ccm::floor(std::numeric_limits<double>::quiet_NaN())), std::signbit(std::floor(std::numeric_limits<double>::quiet_NaN())));
-
-	// Check if ccm::floor and std::floor return NaN for negative NaN
-	EXPECT_EQ(std::isnan(ccm::floor(-std::numeric_limits<double>::quiet_NaN())), std::isnan(std::floor(-std::numeric_limits<double>::quiet_NaN())));
-
-	// Check if ccm::floor and std::floor have the same sign bit for negative NaN
-	EXPECT_EQ(std::signbit(ccm::floor(-std::numeric_limits<double>::quiet_NaN())), std::signbit(std::floor(-std::numeric_limits<double>::quiet_NaN())));
+	ccm::test::ExpectUnaryMatchesStd(std::numeric_limits<double>::quiet_NaN(), ccm::floor<double>, static_cast<double (*)(double)>(std::floor));
+	ccm::test::ExpectUnaryMatchesStd(-std::numeric_limits<double>::quiet_NaN(), ccm::floor<double>, static_cast<double (*)(double)>(std::floor));
 }
 
 TEST(CcmathNearestTests, CcmFloorCanBeEvaluatedAtCompileTime)
 {
 	constexpr auto floor{ccm::floor(1.0)};
 	static_assert(floor == 1.0);
+}
+
+TEST(CcmathNearestTests, CcmFloorHandlesLargeNegativeFiniteValues)
+{
+	constexpr double input = -std::numeric_limits<double>::max();
+	constexpr double actual = ccm::floor(input);
+	static_assert(actual == input);
+	ccm::test::ExpectSameAsStd(actual, std::floor(input));
 }

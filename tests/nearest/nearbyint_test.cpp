@@ -15,6 +15,8 @@
 #include <cmath>
 #include <vector>
 
+#include "utils/std_compare.hpp"
+
 // Disabling test case ccm::nearbyintl if run on clang linux.
 #ifdef __clang__
 	#ifdef __linux__
@@ -60,7 +62,7 @@ namespace
 	const std::vector<NearbyIntTestParams<float>> kNearbyIntFloatTestParams{
 		// Zero values
 		{0.0f, std::nearbyint(0.0f)},
-		{-0.0f, std::nearbyint(0.0f)},
+		{-0.0f, std::nearbyint(-0.0f)},
 
 		// Positive values
 		{0.05f, std::nearbyint(0.05f)},
@@ -95,7 +97,7 @@ namespace
 	const std::vector<NearbyIntTestParams<double>> kNearbyIntDoubleTestParams{
 		// Zero values
 		{0.0, std::nearbyint(0.0)},
-		{-0.0, std::nearbyint(0.0)},
+		{-0.0, std::nearbyint(-0.0)},
 
 		// Positive values
 		{0.05, std::nearbyint(0.05)},
@@ -130,7 +132,7 @@ namespace
 	const std::vector<NearbyIntTestParams<long double>> kNearbyIntLongDoubleTestParams{
 		// Zero values
 		{0.0L, std::nearbyint(0.0L)},
-		{-0.0L, std::nearbyint(0.0L)},
+		{-0.0L, std::nearbyint(-0.0L)},
 
 		// Positive values
 		{0.05L, std::nearbyint(0.05L)},
@@ -193,12 +195,7 @@ TEST_P(CcmathNearbyIntIntegerTests, NearbyIntForIntegerReturnsExpectedValue)
 	// Act
 	const auto actual{ccm::nearbyint(param.input)};
 
-	// Assert
-	if (std::isnan(param.expected)) { EXPECT_TRUE(std::isnan(actual)); }
-	else
-	{
-		EXPECT_EQ(param.expected, actual) << "ccm::nearbyint(" << param.input << ") expected to equal " << param.expected << ". Instead got " << actual << ".";
-	}
+	ccm::test::ExpectSameAsStd(actual, param.expected);
 }
 
 TEST_P(CcmathNearbyIntDoubleTests, NearbyIntForDoubleReturnsExpectedValue)
@@ -209,12 +206,7 @@ TEST_P(CcmathNearbyIntDoubleTests, NearbyIntForDoubleReturnsExpectedValue)
 	// Act
 	const auto actual{ccm::nearbyint(param.input)};
 
-	// Assert
-	if (std::isnan(param.expected)) { EXPECT_TRUE(std::isnan(actual)); }
-	else
-	{
-		EXPECT_EQ(param.expected, actual) << "ccm::nearbyint(" << param.input << ") expected to equal " << param.expected << ". Instead got " << actual << ".";
-	}
+	ccm::test::ExpectSameAsStd(actual, param.expected);
 }
 
 TEST_P(CcmathNearbyIntFloatTests, NearbyIntForFloatReturnsExpectedValue)
@@ -225,12 +217,7 @@ TEST_P(CcmathNearbyIntFloatTests, NearbyIntForFloatReturnsExpectedValue)
 	// Act
 	const auto actual{ccm::nearbyint(param.input)};
 
-	// Assert
-	if (std::isnan(param.expected)) { EXPECT_TRUE(std::isnan(actual)); }
-	else
-	{
-		EXPECT_EQ(param.expected, actual) << "ccm::nearbyint(" << param.input << ") expected to equal " << param.expected << ". Instead got " << actual << ".";
-	}
+	ccm::test::ExpectSameAsStd(actual, param.expected);
 }
 
 TEST_P(CcmathNearbyIntFloatTests, NearbyIntFForFloatReturnsExpectedValue)
@@ -241,12 +228,7 @@ TEST_P(CcmathNearbyIntFloatTests, NearbyIntFForFloatReturnsExpectedValue)
 	// Act
 	const auto actual{ccm::nearbyintf(param.input)};
 
-	// Assert
-	if (std::isnan(param.expected)) { EXPECT_TRUE(std::isnan(actual)); }
-	else
-	{
-		EXPECT_EQ(param.expected, actual) << "ccm::nearbyintf(" << param.input << ") expected to equal " << param.expected << ". Instead got " << actual << ".";
-	}
+	ccm::test::ExpectSameAsStd(actual, param.expected);
 }
 
 TEST_P(CcmathNearbyIntLongDoubleTests, NearbyIntForLongDoubleReturnsExpectedValue)
@@ -257,12 +239,7 @@ TEST_P(CcmathNearbyIntLongDoubleTests, NearbyIntForLongDoubleReturnsExpectedValu
 	// Act
 	const auto actual{ccm::nearbyint(param.input)};
 
-	// Assert
-	if (std::isnan(param.expected)) { EXPECT_TRUE(std::isnan(actual)); }
-	else
-	{
-		EXPECT_EQ(param.expected, actual) << "ccm::nearbyint(" << param.input << ") expected to equal " << param.expected << ". Instead got " << actual << ".";
-	}
+	ccm::test::ExpectSameAsStd(actual, param.expected);
 }
 
 TEST_P(CcmathNearbyIntLongDoubleTests, NearbyIntLForLongDoubleReturnsExpectedValue)
@@ -273,12 +250,7 @@ TEST_P(CcmathNearbyIntLongDoubleTests, NearbyIntLForLongDoubleReturnsExpectedVal
 	// Act
 	const auto actual{ccm::nearbyintl(param.input)};
 
-	// Assert
-	if (std::isnan(param.expected)) { EXPECT_TRUE(std::isnan(actual)); }
-	else
-	{
-		EXPECT_EQ(param.expected, actual) << "ccm::nearbyintl(" << param.input << ") expected to equal " << param.expected << ". Instead got " << actual << ".";
-	}
+	ccm::test::ExpectSameAsStd(actual, param.expected);
 }
 
 TEST(CcmathNearestTests, CcmNearbyIntCanBeEvaluatedAtCompileTime)
