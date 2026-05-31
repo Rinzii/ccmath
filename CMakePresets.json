@@ -140,7 +140,9 @@
         "CCMATH_BUILD_FUZZING": "ON",
         "CCMATH_BUILD_TESTS": "OFF",
         "CCMATH_BUILD_EXAMPLES": "OFF",
-        "CCMATH_BUILD_BENCHMARKS": "OFF"
+        "CCMATH_BUILD_BENCHMARKS": "OFF",
+        "CMAKE_C_FLAGS_DEBUG": "-O1",
+        "CMAKE_CXX_FLAGS_DEBUG": "-O1"
       }
     },
     {

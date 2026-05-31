@@ -29,9 +29,9 @@ namespace ccm::internal::impl
 {
 	namespace sincos_float_detail
 	{
-		using FPBits		 = support::fp::FPBits<float>;
-		using DoubleDouble	 = types::DoubleDouble;
-		namespace data		 = sincos_float_data;
+		using FPBits	   = support::fp::FPBits<float>;
+		using DoubleDouble = types::DoubleDouble;
+		namespace data	   = sincos_float_data;
 
 		constexpr unsigned sincosf_range_reduction_small(float x, float & u)
 		{
@@ -48,8 +48,8 @@ namespace ccm::internal::impl
 		{
 			FPBits xbits(x);
 
-			const int x_e_m32 = xbits.get_biased_exponent() - (FPBits::exponent_bias + 32);
-			const unsigned idx	= static_cast<unsigned>((x_e_m32 >> 3) + 2);
+			const int x_e_m32  = xbits.get_biased_exponent() - (FPBits::exponent_bias + 32);
+			const unsigned idx = static_cast<unsigned>((x_e_m32 >> 3) + 2);
 
 			xbits.set_biased_exponent((x_e_m32 & 7) + FPBits::exponent_bias + 32);
 			const float x_reduced = xbits.get_val();
@@ -61,11 +61,11 @@ namespace ccm::internal::impl
 			const float sum_hi = static_cast<float>(ph.lo + pm.hi);
 			const float k	   = support::fp::nearest_integer(sum_hi);
 
-			const float y_hi = static_cast<float>((ph.lo - k) + pm.hi);
+			const float y_hi		 = static_cast<float>((ph.lo - k) + pm.hi);
 			const DoubleDouble y_mid = types::exact_add(pm.lo, pl.hi);
 			const float y_lo		 = static_cast<float>(pl.lo);
 
-			const float y_l = support::multiply_add(x_reduced, data::EIGHT_OVER_PI[idx][3], y_lo);
+			const float y_l		 = support::multiply_add(x_reduced, data::EIGHT_OVER_PI[idx][3], y_lo);
 			const DoubleDouble y = types::exact_add(y_hi, y_mid.hi);
 			DoubleDouble y_total = y;
 			y_total.lo += (y_mid.lo + y_l);

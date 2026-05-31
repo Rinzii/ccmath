@@ -30,7 +30,11 @@ namespace ccm
 		if constexpr (ccm::builtin::has_constexpr_log10<T>) { return ccm::builtin::log10(num); }
 		else
 		{
-			if (num == static_cast<T>(1)) { return ccm::support::fp::signed_zero_for_current_mode<T>(); }
+			if (num == static_cast<T>(1))
+			{
+				if (!ccm::support::is_constant_evaluated()) { return ccm::rt::log10_rt(num); }
+				return static_cast<T>(0);
+			}
 			if (num == static_cast<T>(0))
 			{
 				ccm::support::fenv::set_errno_if_required(ERANGE);

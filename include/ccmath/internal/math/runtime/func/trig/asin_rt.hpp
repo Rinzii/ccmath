@@ -27,9 +27,7 @@ namespace ccm::rt
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_asinl(num); }
 		else { return static_cast<T>(__builtin_asinl(static_cast<long double>(num))); }
 #else
-		const auto scalar = [](T value) {
-			return detail::dispatch_float_double(value, internal::impl::asin_float, internal::impl::asin_double);
-		};
+		const auto scalar = [](T value) { return detail::dispatch_float_double(value, internal::impl::asin_float, internal::impl::asin_double); };
 		return simd_impl::unary_via_scalar_abi(num, scalar);
 #endif
 	}

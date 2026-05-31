@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/expo/impl/exp2_double_impl.hpp"
 #include "ccmath/math/expo/impl/log2_double_impl.hpp"
@@ -26,10 +26,10 @@ namespace ccm::gen::impl
 	{
 		constexpr bool is_odd_integer(double val) noexcept
 		{
-			using FPBits_t					= support::fp::FPBits<double>;
-			const std::uint64_t x_u			= ccm::support::bit_cast<std::uint64_t>(val);
-			const auto x_e					= static_cast<std::int32_t>((x_u & FPBits_t::exponent_mask) >> FPBits_t::fraction_length);
-			const std::int32_t lsb			= support::countr_zero(x_u | FPBits_t::exponent_mask);
+			using FPBits_t						 = support::fp::FPBits<double>;
+			const std::uint64_t x_u				 = ccm::support::bit_cast<std::uint64_t>(val);
+			const auto x_e						 = static_cast<std::int32_t>((x_u & FPBits_t::exponent_mask) >> FPBits_t::fraction_length);
+			const std::int32_t lsb				 = support::countr_zero(x_u | FPBits_t::exponent_mask);
 			constexpr std::int32_t unit_exponent = FPBits_t::exponent_bias + static_cast<std::int32_t>(FPBits_t::fraction_length);
 			return (x_e + lsb == unit_exponent);
 		}
@@ -49,14 +49,11 @@ namespace ccm::gen::impl
 
 			if (base < 0.0 && exp != ccm::floor(exp)) { return std::numeric_limits<double>::quiet_NaN(); }
 
-			if (base == std::numeric_limits<double>::infinity())
-			{
-				return exp < 0.0 ? 0.0 : std::numeric_limits<double>::infinity();
-			}
+			if (base == std::numeric_limits<double>::infinity()) { return exp < 0.0 ? 0.0 : std::numeric_limits<double>::infinity(); }
 
 			if (exp == std::numeric_limits<double>::infinity())
 			{
-				using FPBits = support::fp::FPBits<double>;
+				using FPBits		= support::fp::FPBits<double>;
 				const auto base_abs = FPBits(FPBits(base).abs()).uintval();
 				if (base_abs == FPBits(1.0).uintval()) { return 1.0; }
 				return (base_abs < FPBits(1.0).uintval()) == (exp < 0.0) ? 0.0 : std::numeric_limits<double>::infinity();
@@ -64,7 +61,7 @@ namespace ccm::gen::impl
 
 			if (exp == -std::numeric_limits<double>::infinity())
 			{
-				using FPBits = support::fp::FPBits<double>;
+				using FPBits		= support::fp::FPBits<double>;
 				const auto base_abs = FPBits(FPBits(base).abs()).uintval();
 				if (base_abs == FPBits(1.0).uintval()) { return 1.0; }
 				return (base_abs < FPBits(1.0).uintval()) ? std::numeric_limits<double>::infinity() : 0.0;

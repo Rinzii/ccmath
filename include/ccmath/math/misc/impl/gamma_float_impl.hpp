@@ -62,10 +62,7 @@ namespace ccm::internal::impl
 
 		const double result = gamma_double_impl(static_cast<double>(x));
 
-		if (CCM_UNLIKELY(!xbits.is_neg() && ccm::support::fp::FPBits<double>(result).is_inf()))
-		{
-			return fp_bits::max_normal().get_val();
-		}
+		if (CCM_UNLIKELY(!xbits.is_neg() && ccm::support::fp::FPBits<double>(result).is_inf())) { return fp_bits::max_normal().get_val(); }
 
 		if (CCM_UNLIKELY(xbits.is_neg() && result != 0.0 && fp_bits(static_cast<float>(result)).is_zero()))
 		{

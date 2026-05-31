@@ -27,7 +27,7 @@ namespace ccm
 		{
 			T integer_part{};
 			const T fractional = ccm::rt::modf_rt(x, integer_part);
-			*iptr = integer_part;
+			*iptr			   = integer_part;
 			return fractional;
 		}
 		else if constexpr (std::is_same_v<T, float>) { return internal::impl::modf_impl(x, iptr); }
@@ -36,7 +36,7 @@ namespace ccm
 		{
 			double integer_part{};
 			const double fractional = internal::impl::modf_impl(static_cast<double>(x), &integer_part);
-			*iptr = static_cast<T>(integer_part);
+			*iptr					= static_cast<T>(integer_part);
 			return static_cast<T>(fractional);
 		}
 	}

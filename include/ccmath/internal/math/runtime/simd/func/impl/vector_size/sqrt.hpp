@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "ccmath/internal/math/runtime/simd/func/impl/scalar/map.hpp"
 #include "ccmath/internal/math/generic/func/power/sqrt_gen.hpp"
+#include "ccmath/internal/math/runtime/simd/func/impl/scalar/map.hpp"
 #include "ccmath/internal/math/runtime/simd/simd.hpp"
 
 #ifdef CCMATH_HAS_SIMD

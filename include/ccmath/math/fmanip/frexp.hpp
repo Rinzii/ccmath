@@ -26,10 +26,7 @@ namespace ccm
 		else if (!ccm::support::is_constant_evaluated()) { return ccm::rt::frexp_rt(x, exp); }
 		else if constexpr (std::is_same_v<T, float>) { return internal::impl::frexp_impl(x, exp); }
 		else if constexpr (std::is_same_v<T, double>) { return internal::impl::frexp_impl(x, exp); }
-		else
-		{
-			return static_cast<T>(internal::impl::frexp_impl(static_cast<double>(x), exp));
-		}
+		else { return static_cast<T>(internal::impl::frexp_impl(static_cast<double>(x), exp)); }
 	}
 
 	constexpr float frexpf(float x, int & exp)

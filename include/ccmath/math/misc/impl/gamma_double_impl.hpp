@@ -35,17 +35,17 @@ namespace ccm::internal::impl
 
 		constexpr bool is_integer(double x) noexcept
 		{
-			const std::uint64_t x_u = ccm::support::bit_cast<std::uint64_t>(x);
-			const auto          x_e = static_cast<std::int32_t>((x_u & fp_bits::exponent_mask) >> fp_bits::fraction_length);
-			const std::int32_t  lsb = ccm::support::countr_zero(x_u | fp_bits::exponent_mask);
+			const std::uint64_t x_u				 = ccm::support::bit_cast<std::uint64_t>(x);
+			const auto x_e						 = static_cast<std::int32_t>((x_u & fp_bits::exponent_mask) >> fp_bits::fraction_length);
+			const std::int32_t lsb				 = ccm::support::countr_zero(x_u | fp_bits::exponent_mask);
 			constexpr std::int32_t unit_exponent = fp_bits::exponent_bias + static_cast<std::int32_t>(fp_bits::fraction_length);
 			return x_e + lsb >= unit_exponent;
 		}
 
 		constexpr double gamma_polynomial(double d) noexcept
 		{
-			const double d2 = d * d;
-			const double d4 = d2 * d2;
+			const double d2	 = d * d;
+			const double d4	 = d2 * d2;
 			const double p01 = ccm::support::multiply_add(d, data::k_gamma_coeffs[1], data::k_gamma_coeffs[0]);
 			const double p23 = ccm::support::multiply_add(d, data::k_gamma_coeffs[3], data::k_gamma_coeffs[2]);
 			const double p45 = ccm::support::multiply_add(d, data::k_gamma_coeffs[5], data::k_gamma_coeffs[4]);
@@ -57,12 +57,12 @@ namespace ccm::internal::impl
 
 		constexpr double gamma_reduce(double xd, double &w_out) noexcept
 		{
-			const double m    = xd - data::k_gamma_base;
-			const double i    = ccm::support::fp::nearest_integer(m);
+			const double m	  = xd - data::k_gamma_base;
+			const double i	  = ccm::support::fp::nearest_integer(m);
 			const double step = fp_bits(i).is_neg() ? -1.0 : 1.0;
-			const auto   jm   = static_cast<std::int32_t>(i < 0.0 ? -i : i);
-			const double d    = m - i;
-			const double f    = gamma_polynomial(d);
+			const auto jm	  = static_cast<std::int32_t>(i < 0.0 ? -i : i);
+			const double d	  = m - i;
+			const double f	  = gamma_polynomial(d);
 
 			double z = xd;
 			double w = 1.0;
@@ -151,18 +151,15 @@ namespace ccm::internal::impl
 			if (k >= 1 && k <= 170) { return detail::positive_factorial(k); }
 		}
 
-		double       w{};
-		const double f = detail::gamma_reduce(x, w);
+		double w{};
+		const double f		= detail::gamma_reduce(x, w);
 		const double result = f * w;
 		if (CCM_UNLIKELY(fp_bits(result).is_inf()))
 		{
 			ccm::support::fenv::raise_except_if_required(FE_OVERFLOW | FE_INEXACT);
 			ccm::support::fenv::set_errno_if_required(ERANGE);
 		}
-		else if (CCM_UNLIKELY(result == 0.0 && !xbits.is_neg()))
-		{
-			ccm::support::fenv::set_errno_if_required(ERANGE);
-		}
+		else if (CCM_UNLIKELY(result == 0.0 && !xbits.is_neg())) { ccm::support::fenv::set_errno_if_required(ERANGE); }
 		return result;
 	}
 } // namespace ccm::internal::impl

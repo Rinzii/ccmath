@@ -29,7 +29,11 @@ namespace ccm
 		if constexpr (ccm::builtin::has_constexpr_log1p<T>) { return ccm::builtin::log1p(num); }
 		else
 		{
-			if (num == static_cast<T>(0)) { return internal::log1p_zero_result(num); }
+			if (num == static_cast<T>(0))
+			{
+				if (!ccm::support::is_constant_evaluated()) { return ccm::rt::log1p_rt(num); }
+				return internal::log1p_zero_result(num);
+			}
 
 			if (CCM_UNLIKELY(ccm::isnan(num))) { return std::numeric_limits<T>::quiet_NaN(); }
 

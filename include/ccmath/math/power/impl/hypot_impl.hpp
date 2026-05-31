@@ -36,7 +36,12 @@ namespace ccm::internal::impl
 
 		if (CCM_UNLIKELY(x == static_cast<T>(0) && y == static_cast<T>(0))) { return static_cast<T>(0); }
 
-		if (y > x) { const T tmp = x; x = y; y = tmp; }
+		if (y > x)
+		{
+			const T tmp = x;
+			x			= y;
+			y			= tmp;
+		}
 
 		const T ratio = y / x;
 		return x * ccm::sqrt(static_cast<T>(1) + ratio * ratio);

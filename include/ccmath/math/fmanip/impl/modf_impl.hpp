@@ -44,10 +44,7 @@ namespace ccm::internal::impl
 		*iptr		 = ccm::trunc(x);
 		T fractional = x - *iptr;
 
-		if (fractional == T{})
-		{
-			fractional = fp_bits_t::zero(fp_bits_t(x).sign()).get_val();
-		}
+		if (fractional == T{}) { fractional = fp_bits_t::zero(fp_bits_t(x).sign()).get_val(); }
 
 		return fractional;
 	}

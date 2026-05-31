@@ -10,9 +10,8 @@
 
 #pragma once
 
-#include "fp_bits.hpp"
-
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
+#include "fp_bits.hpp"
 
 #include <cfenv>
 #include <cstdint>

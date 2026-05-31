@@ -30,11 +30,12 @@ namespace ccm::rt
 		else { return static_cast<T>(__builtin_cosl(static_cast<long double>(num))); }
 #else
 		const auto scalar = [](T value) { return gen::cos_gen(value); };
-#ifdef CCMATH_HAS_SIMD_SVML
-		return detail::unary_trig_svml_or_impl(num, [](auto v) { return intrin::cos(v); }, scalar);
-#else
+	#ifdef CCMATH_HAS_SIMD_SVML
+		return detail::unary_trig_svml_or_impl(
+			num, [](auto v) { return intrin::cos(v); }, scalar);
+	#else
 		return simd_impl::unary_via_scalar_abi(num, scalar);
-#endif
+	#endif
 #endif
 	}
 } // namespace ccm::rt

@@ -34,7 +34,7 @@ namespace ccm::internal
 			std::uint32_t intX = support::float_to_uint32(x);
 
 			// log2(1) handled in public log2(). Keep impl path consistent for direct calls.
-			if (CCM_UNLIKELY(intX == 0x3f800000)) { return ccm::support::fp::signed_zero_for_current_mode<float>(); }
+			if (CCM_UNLIKELY(intX == 0x3f800000)) { return 0.0F; }
 
 			if (CCM_UNLIKELY(intX - 0x00800000 >= 0x7f800000 - 0x00800000))
 			{

@@ -27,7 +27,7 @@ namespace ccm
 		{
 			double integer_part{};
 			const double fractional = internal::impl::modf_impl(static_cast<double>(x), &integer_part);
-			*iptr = static_cast<T>(integer_part);
+			*iptr					= static_cast<T>(integer_part);
 			return static_cast<T>(fractional);
 		}
 	}

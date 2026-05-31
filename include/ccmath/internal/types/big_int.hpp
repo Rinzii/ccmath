@@ -564,7 +564,7 @@ namespace ccm::types
 		DECLARE_COUNTBIT(countr_one, i)			 // iterating forward
 		DECLARE_COUNTBIT(countl_zero, N - i - 1) // iterating backward
 		DECLARE_COUNTBIT(countl_one, N - i - 1)	 // iterating backward
-	} // namespace multiword
+	}											 // namespace multiword
 
 	template <std::size_t Bits, bool Signed, typename WordType = std::uint64_t>
 	struct BigInt // NOLINT(cppcoreguidelines-special-member-functions)

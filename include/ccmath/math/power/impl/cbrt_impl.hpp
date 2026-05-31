@@ -37,9 +37,9 @@ namespace ccm::internal::impl
 		if (CCM_UNLIKELY(bits.is_zero())) { return x; }
 
 		const bool negative = bits.is_neg();
-		const T    ax		  = ccm::fabs(x);
+		const T ax			= ccm::fabs(x);
 
-		T y = ccm::exp(ccm::log(ax) / static_cast<T>(3));
+		T y			 = ccm::exp(ccm::log(ax) / static_cast<T>(3));
 		const T y_sq = y * y;
 		y			 = (static_cast<T>(2) * y + ax / y_sq) / static_cast<T>(3);
 

@@ -35,7 +35,7 @@ namespace ccm::internal::impl
 		if (CCM_UNLIKELY(bits.is_subnormal()))
 		{
 			exponent = bits.get_explicit_exponent();
-			T value = bits.get_val();
+			T value	 = bits.get_val();
 			while (bits.is_subnormal())
 			{
 				value *= static_cast<T>(2.0);

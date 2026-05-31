@@ -51,8 +51,12 @@ namespace ccm
 				return -std::numeric_limits<T>::infinity();
 			}
 
-			// log2(1) is ±0. Sign depends on rounding mode.
-			if (num == static_cast<T>(1)) { return ccm::support::fp::signed_zero_for_current_mode<T>(); }
+			// If the argument is 1, +0 is returned.
+			if (num == static_cast<T>(1))
+			{
+				if (!ccm::support::is_constant_evaluated()) { return ccm::rt::log2_rt(num); }
+				return static_cast<T>(0);
+			}
 
 			// If the argument is NaN, NaN is returned.
 			if (ccm::isnan(num) || num == std::numeric_limits<T>::infinity()) { return num; }

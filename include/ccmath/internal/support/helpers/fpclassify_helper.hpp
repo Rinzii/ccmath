@@ -39,13 +39,13 @@ namespace ccm::support::helpers
 		static constexpr int eFP_ZERO	   = 3;
 		static constexpr int eFP_SUBNORMAL = 5;
 		static constexpr int eFP_NORMAL	   = 4;
-#elif defined(CCMATH_COMPILER_NVIDIA_HPC)  // Nvidia HPC SDK has a different set of defines than GCC
+#elif defined(CCMATH_COMPILER_NVIDIA_HPC)	  // Nvidia HPC SDK has a different set of defines than GCC
 		static constexpr int eFP_NAN	   = 0;
 		static constexpr int eFP_INFINITE  = 1;
 		static constexpr int eFP_ZERO	   = 2;
 		static constexpr int eFP_SUBNORMAL = 2;
 		static constexpr int eFP_NORMAL	   = 4;
-#elif defined(CCMATH_COMPILER_INTEL)	   // Intel OneAPI DPC++ has a different set of defines than Clang
+#elif defined(CCMATH_COMPILER_INTEL)		  // Intel OneAPI DPC++ has a different set of defines than Clang
 		static constexpr int eFP_NAN	   = 2;
 		static constexpr int eFP_INFINITE  = 1;
 		static constexpr int eFP_ZERO	   = 0;

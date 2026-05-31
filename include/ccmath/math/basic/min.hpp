@@ -14,8 +14,8 @@
 #include "ccmath/internal/math/generic/func/basic/min_gen.hpp"
 #include "ccmath/internal/math/runtime/func/basic/fmin_rt.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
-#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 
 #include <type_traits>
 

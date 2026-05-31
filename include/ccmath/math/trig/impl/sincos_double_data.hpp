@@ -10,9 +10,8 @@
 
 #pragma once
 
-#include "ccmath/math/trig/impl/sincos_float_data.hpp"
-
 #include "ccmath/internal/types/double_double.hpp"
+#include "ccmath/math/trig/impl/sincos_float_data.hpp"
 
 #include <array>
 #include <cstddef>
@@ -35,10 +34,10 @@ namespace ccm::internal::sincos_double_data
 
 	constexpr double ONE_OVER_PI = static_cast<double>(sincos_float_data::ONE_OVER_PI);
 
-	constexpr DoubleDouble PI_OVER_8 = { static_cast<double>(sincos_float_data::PI_OVER_8.hi),
-										 static_cast<double>(sincos_float_data::PI_OVER_8.lo) };
+	constexpr DoubleDouble PI_OVER_8 = { static_cast<double>(sincos_float_data::PI_OVER_8.hi), static_cast<double>(sincos_float_data::PI_OVER_8.lo) };
 
-	constexpr std::array<std::array<double, 4>, 14> EIGHT_OVER_PI = []() {
+	constexpr std::array<std::array<double, 4>, 14> EIGHT_OVER_PI = []()
+	{
 		std::array<std::array<double, 4>, 14> dst{};
 		for (std::size_t i = 0; i < 14; ++i)
 		{

@@ -13,8 +13,8 @@
 #include "ccmath/internal/math/generic/builtins/basic/remainder.hpp"
 #include "ccmath/internal/math/runtime/func/basic/remainder_rt.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
-#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/nearest/trunc.hpp"
 
 namespace ccm

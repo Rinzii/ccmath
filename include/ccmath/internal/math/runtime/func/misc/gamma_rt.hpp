@@ -24,9 +24,7 @@ namespace ccm::rt
 		if constexpr (ccm::builtin::has_runtime_gamma<T>) { return ccm::builtin::runtime_gamma(num); }
 		else
 		{
-			const auto scalar = [](T value) {
-				return detail::dispatch_float_double(value, ccm::internal::gamma_float, ccm::internal::gamma_double);
-			};
+			const auto scalar = [](T value) { return detail::dispatch_float_double(value, ccm::internal::gamma_float, ccm::internal::gamma_double); };
 			return simd_impl::unary_via_scalar_abi(num, scalar);
 		}
 	}

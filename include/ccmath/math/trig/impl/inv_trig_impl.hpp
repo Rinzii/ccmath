@@ -74,10 +74,10 @@ namespace ccm::internal::impl
 
 			fp_bits_t pos_bits(ax);
 			const T xd = pos_bits.get_val();
-			const T u	= ccm::support::multiply_add(static_cast<T>(-0.5), xd, static_cast<T>(0.5));
+			const T u  = ccm::support::multiply_add(static_cast<T>(-0.5), xd, static_cast<T>(0.5));
 			const T cv = static_cast<T>(2) * ccm::sqrt(u);
 			const T r3 = asin_eval<T>(u);
-			const T r	= ccm::support::multiply_add(cv * u, r3, cv);
+			const T r  = ccm::support::multiply_add(cv * u, r3, cv);
 			return x < static_cast<T>(0) ? static_cast<T>(k_pi) - r : r;
 		}
 		template <typename T>
@@ -89,7 +89,7 @@ namespace ccm::internal::impl
 
 			if constexpr (sizeof(T) == sizeof(float))
 			{
-				const double dx  = static_cast<double>(x);
+				const double dx	 = static_cast<double>(x);
 				const double xsq = dx * dx;
 				const double r	 = asin_eval<double>(xsq);
 				return static_cast<T>(dx + dx * xsq * r);
@@ -148,9 +148,12 @@ namespace ccm::internal::impl
 		if (x == static_cast<T>(0)) { return x; }
 
 		const bool neg = x < static_cast<T>(0);
-		const T	 ax	 = ccm::fabs(x);
+		const T ax	   = ccm::fabs(x);
 
-		if (CCM_UNLIKELY(ccm::isinf(ax))) { return neg ? -static_cast<T>(ccm::numbers::pi_v<T>) / static_cast<T>(2) : static_cast<T>(ccm::numbers::pi_v<T>) / static_cast<T>(2); }
+		if (CCM_UNLIKELY(ccm::isinf(ax)))
+		{
+			return neg ? -static_cast<T>(ccm::numbers::pi_v<T>) / static_cast<T>(2) : static_cast<T>(ccm::numbers::pi_v<T>) / static_cast<T>(2);
+		}
 
 		if (ax > static_cast<T>(1))
 		{
@@ -171,7 +174,7 @@ namespace ccm::internal::impl
 		if (ax < static_cast<T>(0x1.0p-14))
 		{
 			const T ax_sq = ax * ax;
-			const T val	= ax + ax_sq * ax * static_cast<T>(-0x1.5555555555555p-2);
+			const T val	  = ax + ax_sq * ax * static_cast<T>(-0x1.5555555555555p-2);
 			return neg ? -val : val;
 		}
 
@@ -238,7 +241,7 @@ namespace ccm::internal::impl
 		}
 
 		const T ratio = y / x;
-		T       angle = atan_impl(ratio);
+		T angle		  = atan_impl(ratio);
 
 		if (x < static_cast<T>(0))
 		{

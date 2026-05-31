@@ -29,9 +29,9 @@ namespace ccm::internal::impl
 {
 	namespace sincos_double_detail
 	{
-		using FPBits		 = support::fp::FPBits<double>;
-		using DoubleDouble	 = types::DoubleDouble;
-		namespace data		 = sincos_double_data;
+		using FPBits	   = support::fp::FPBits<double>;
+		using DoubleDouble = types::DoubleDouble;
+		namespace data	   = sincos_double_data;
 
 		constexpr unsigned sincos_range_reduction_small(double x, double & u)
 		{
@@ -66,7 +66,7 @@ namespace ccm::internal::impl
 			const DoubleDouble y_mid = types::exact_add(pm.lo, pl.hi);
 			const double y_lo		 = pl.lo;
 
-			const double y_l = support::multiply_add(x_reduced, data::EIGHT_OVER_PI[idx][3], y_lo);
+			const double y_l	 = support::multiply_add(x_reduced, data::EIGHT_OVER_PI[idx][3], y_lo);
 			const DoubleDouble y = types::exact_add(y_hi, y_mid.hi);
 			DoubleDouble y_total = y;
 			y_total.lo += (y_mid.lo + y_l);

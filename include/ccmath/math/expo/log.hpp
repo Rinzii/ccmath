@@ -37,8 +37,12 @@ namespace ccm
 		if constexpr (ccm::builtin::has_constexpr_log<T>) { return ccm::builtin::log(num); }
 		else
 		{
-			// log(1) is ±0. Sign depends on rounding mode.
-			if (num == static_cast<T>(1)) { return ccm::support::fp::signed_zero_for_current_mode<T>(); }
+			// If the argument is 1, +0 is returned.
+			if (num == static_cast<T>(1))
+			{
+				if (!ccm::support::is_constant_evaluated()) { return ccm::rt::log_rt(num); }
+				return static_cast<T>(0);
+			}
 
 			// If the argument is ±0, -∞ is returned.
 			if (num == static_cast<T>(0))

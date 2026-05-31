@@ -27,11 +27,11 @@ namespace ccm::rt
 		if constexpr (ccm::builtin::has_runtime_exp<T>) { return ccm::builtin::runtime_exp(num); }
 		else
 		{
-			const auto scalar = [](T value) {
-				return detail::dispatch_float_double(value, ccm::internal::impl::exp_float_impl, ccm::internal::impl::exp_double_impl);
-			};
+			const auto scalar = [](T value)
+			{ return detail::dispatch_float_double(value, ccm::internal::impl::exp_float_impl, ccm::internal::impl::exp_double_impl); };
 #ifdef CCMATH_HAS_SIMD_SVML
-			return detail::unary_svml_or_impl(num, [](auto v) { return intrin::exp(v); }, scalar);
+			return detail::unary_svml_or_impl(
+				num, [](auto v) { return intrin::exp(v); }, scalar);
 #else
 			return simd_impl::unary_via_scalar_abi(num, scalar);
 #endif

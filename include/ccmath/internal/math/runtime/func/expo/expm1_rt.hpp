@@ -24,9 +24,7 @@ namespace ccm::rt
 		if constexpr (ccm::builtin::has_runtime_expm1<T>) { return ccm::builtin::runtime_expm1(num); }
 		else
 		{
-			const auto scalar = [](T value) {
-				return detail::dispatch_float_double(value, ccm::internal::expm1_float, ccm::internal::expm1_double);
-			};
+			const auto scalar = [](T value) { return detail::dispatch_float_double(value, ccm::internal::expm1_float, ccm::internal::expm1_double); };
 			return simd_impl::unary_via_scalar_abi(num, scalar);
 		}
 	}

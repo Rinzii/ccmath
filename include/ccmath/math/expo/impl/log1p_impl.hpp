@@ -17,9 +17,9 @@
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
 #include "ccmath/math/compare/isnan.hpp"
+#include "ccmath/math/expo/impl/log_data.hpp"
 #include "ccmath/math/expo/impl/log_double_impl.hpp"
 #include "ccmath/math/expo/impl/log_float_impl.hpp"
-#include "ccmath/math/expo/impl/log_data.hpp"
 
 #include <limits>
 
@@ -55,7 +55,7 @@ namespace ccm::internal::impl
 		}
 
 		std::uint32_t ix = ccm::support::float_to_uint32(x);
-		int k			   = 1;
+		int k			 = 1;
 		ccm::double_t f{};
 		ccm::double_t c{};
 		ccm::double_t s{};
@@ -85,14 +85,11 @@ namespace ccm::internal::impl
 				f = x;
 			}
 		}
-		else if (ix >= 0x7f800000U)
-		{
-			return x;
-		}
+		else if (ix >= 0x7f800000U) { return x; }
 
 		if (k != 0)
 		{
-			const float u = 1.0F + x;
+			const float u	 = 1.0F + x;
 			std::uint32_t iu = ccm::support::float_to_uint32(u);
 			iu += 0x3f800000U - 0x3f3504f3U;
 			k = static_cast<int>(iu >> 23) - 0x7f;
@@ -101,10 +98,7 @@ namespace ccm::internal::impl
 				c = k >= 2 ? static_cast<ccm::double_t>(1.0F - (u - x)) : static_cast<ccm::double_t>(x - (u - 1.0F));
 				c /= u;
 			}
-			else
-			{
-				c = 0.0;
-			}
+			else { c = 0.0; }
 
 			iu = (iu & 0x007fffffU) + 0x3f3504f3U;
 			f  = ccm::support::uint32_to_float(iu) - 1.0F;
@@ -134,7 +128,7 @@ namespace ccm::internal::impl
 
 		std::uint64_t ix = ccm::support::double_to_uint64(x);
 		std::uint32_t hx = static_cast<std::uint32_t>(ix >> 32);
-		int k			   = 1;
+		int k			 = 1;
 		ccm::double_t f{};
 		ccm::double_t c{};
 		ccm::double_t s{};
@@ -164,14 +158,11 @@ namespace ccm::internal::impl
 				f = x;
 			}
 		}
-		else if (hx >= 0x7ff00000U)
-		{
-			return x;
-		}
+		else if (hx >= 0x7ff00000U) { return x; }
 
 		if (k != 0)
 		{
-			const double u = 1.0 + x;
+			const double u	 = 1.0 + x;
 			std::uint64_t iu = ccm::support::double_to_uint64(u);
 			std::uint32_t hu = static_cast<std::uint32_t>(iu >> 32);
 			hu += 0x3ff00000U - 0x3fe6a09eU;
@@ -181,10 +172,7 @@ namespace ccm::internal::impl
 				c = k >= 2 ? 1.0 - (u - x) : x - (u - 1.0);
 				c /= u;
 			}
-			else
-			{
-				c = 0.0;
-			}
+			else { c = 0.0; }
 
 			hu = (hu & 0x000fffffU) + 0x3fe6a09eU;
 			iu = (static_cast<std::uint64_t>(hu) << 32) | (iu & 0xffffffffULL);
@@ -209,8 +197,7 @@ namespace ccm::internal
 	template <typename T>
 	constexpr T log1p_zero_result(T num) noexcept
 	{
-		if (ccm::support::fp::FPBits<T>(num).is_neg()) { return num; }
-		return ccm::support::fp::signed_zero_for_current_mode<T>();
+		return num;
 	}
 
 	constexpr float log1p_float(float num) noexcept

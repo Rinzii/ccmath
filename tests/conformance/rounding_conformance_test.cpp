@@ -28,39 +28,33 @@ TEST(CcmathRoundingConformanceTests, NearbyIntMatchesStdAllModesFloat)
 												   static_cast<float (*)(float)>(std::nearbyint));
 }
 
-TEST(CcmathRoundingConformanceTests, LogOneSignedZeroUnderDownward)
+TEST(CcmathRoundingConformanceTests, LogOneMatchesStdAllModes)
 {
 	ccm::test::ForEachRoundingModeOrSkip([&](int mode) {
 		ccm::test::ScopedRoundingMode scope(mode);
 		ASSERT_TRUE(scope.active());
 
-		const double result = ccm::log(1.0);
-		if (mode == FE_DOWNWARD) { ccm::test::ExpectSignedZero(result, true); }
-		else { ccm::test::ExpectFpEq(result, std::log(1.0)); }
+		ccm::test::ExpectFpEq(ccm::log(1.0), std::log(1.0));
 	});
 }
 
-TEST(CcmathRoundingConformanceTests, Log10OneSignedZeroUnderDownward)
+TEST(CcmathRoundingConformanceTests, Log10OneMatchesStdAllModes)
 {
 	ccm::test::ForEachRoundingModeOrSkip([&](int mode) {
 		ccm::test::ScopedRoundingMode scope(mode);
 		ASSERT_TRUE(scope.active());
 
-		const double result = ccm::log10(1.0);
-		if (mode == FE_DOWNWARD) { ccm::test::ExpectSignedZero(result, true); }
-		else { ccm::test::ExpectFpEq(result, std::log10(1.0)); }
+		ccm::test::ExpectFpEq(ccm::log10(1.0), std::log10(1.0));
 	});
 }
 
-TEST(CcmathRoundingConformanceTests, Log2OneSignedZeroUnderDownward)
+TEST(CcmathRoundingConformanceTests, Log2OneMatchesStdAllModes)
 {
 	ccm::test::ForEachRoundingModeOrSkip([&](int mode) {
 		ccm::test::ScopedRoundingMode scope(mode);
 		ASSERT_TRUE(scope.active());
 
-		const double result = ccm::log2(1.0);
-		if (mode == FE_DOWNWARD) { ccm::test::ExpectSignedZero(result, true); }
-		else { ccm::test::ExpectFpEq(result, std::log2(1.0)); }
+		ccm::test::ExpectFpEq(ccm::log2(1.0), std::log2(1.0));
 	});
 }
 

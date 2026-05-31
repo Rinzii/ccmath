@@ -27,7 +27,8 @@ namespace ccm::rt
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_atan2l(y, x); }
 		else { return static_cast<T>(__builtin_atan2l(static_cast<long double>(y), static_cast<long double>(x))); }
 #else
-		const auto scalar = [](T yv, T xv) {
+		const auto scalar = [](T yv, T xv)
+		{
 			return detail::dispatch_float_double(
 				yv,
 				[&](float yf) { return internal::impl::atan2_float(yf, static_cast<float>(xv)); },

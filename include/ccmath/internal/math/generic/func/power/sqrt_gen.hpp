@@ -263,7 +263,7 @@ namespace ccm::gen
 				}
 			}
 		} // namespace impl
-	} // namespace internal
+	}	  // namespace internal
 
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T sqrt_gen(T num)

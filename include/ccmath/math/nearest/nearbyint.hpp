@@ -11,6 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/math/runtime/func/nearest/nearbyint_rt.hpp"
+
 #include <ccmath/internal/support/fenv/rounding_mode.hpp>
 #include <ccmath/internal/support/fp/directional_rounding_utils.hpp>
 #include <ccmath/internal/support/is_constant_evaluated.hpp>
