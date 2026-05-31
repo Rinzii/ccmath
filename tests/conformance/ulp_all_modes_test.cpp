@@ -17,22 +17,34 @@
 #include <cmath>
 
 TEST(CcmathAllModesUlpTests, ExpDouble)
-{ ccm::test::ExpectUlpUnaryOverAllRoundingModes(ccm::test::samples::kAllModesProbeDouble, ccm::exp<double>, static_cast<double (*)(double)>(std::exp)); }
+{
+	ccm::test::ExpectUlpUnaryOverAllRoundingModes(ccm::test::samples::kAllModesProbeDouble, ccm::exp<double>, static_cast<double (*)(double)>(std::exp));
+}
 
 TEST(CcmathAllModesUlpTests, LogDouble)
-{ ccm::test::ExpectUlpUnaryOverAllRoundingModes(ccm::test::samples::kAllModesProbeDouble, ccm::log<double>, static_cast<double (*)(double)>(std::log)); }
+{
+	ccm::test::ExpectUlpUnaryOverAllRoundingModes(ccm::test::samples::kAllModesProbeDouble, ccm::log<double>, static_cast<double (*)(double)>(std::log));
+}
 
 TEST(CcmathAllModesUlpTests, Log2Double)
-{ ccm::test::ExpectUlpUnaryOverAllRoundingModes(ccm::test::samples::kAllModesProbeDouble, ccm::log2<double>, static_cast<double (*)(double)>(std::log2)); }
+{
+	ccm::test::ExpectUlpUnaryOverAllRoundingModes(ccm::test::samples::kAllModesProbeDouble, ccm::log2<double>, static_cast<double (*)(double)>(std::log2));
+}
 
 TEST(CcmathAllModesUlpTests, Log10Double)
-{ ccm::test::ExpectUlpUnaryOverAllRoundingModes(ccm::test::samples::kAllModesProbeDouble, ccm::log10<double>, static_cast<double (*)(double)>(std::log10)); }
+{
+	ccm::test::ExpectUlpUnaryOverAllRoundingModes(ccm::test::samples::kAllModesProbeDouble, ccm::log10<double>, static_cast<double (*)(double)>(std::log10));
+}
 
 TEST(CcmathAllModesUlpTests, SinDouble)
-{ ccm::test::ExpectUlpUnaryOverAllRoundingModes(ccm::test::samples::kAllModesProbeDouble, ccm::sin<double>, static_cast<double (*)(double)>(std::sin)); }
+{
+	ccm::test::ExpectUlpUnaryOverAllRoundingModes(ccm::test::samples::kAllModesProbeDouble, ccm::sin<double>, static_cast<double (*)(double)>(std::sin));
+}
 
 TEST(CcmathAllModesUlpTests, CosDouble)
-{ ccm::test::ExpectUlpUnaryOverAllRoundingModes(ccm::test::samples::kAllModesProbeDouble, ccm::cos<double>, static_cast<double (*)(double)>(std::cos)); }
+{
+	ccm::test::ExpectUlpUnaryOverAllRoundingModes(ccm::test::samples::kAllModesProbeDouble, ccm::cos<double>, static_cast<double (*)(double)>(std::cos));
+}
 
 TEST(CcmathAllModesUlpTests, PowDouble)
 {
@@ -41,10 +53,16 @@ TEST(CcmathAllModesUlpTests, PowDouble)
 }
 
 TEST(CcmathAllModesUlpTests, Expm1Double)
-{ ccm::test::ExpectUlpUnaryOverAllRoundingModes(ccm::test::samples::kAllModesProbeDouble, ccm::expm1<double>, static_cast<double (*)(double)>(std::expm1)); }
+{
+	ccm::test::ExpectUlpUnaryOverAllRoundingModes(ccm::test::samples::kAllModesProbeDouble, ccm::expm1<double>, static_cast<double (*)(double)>(std::expm1));
+}
 
 TEST(CcmathAllModesUlpTests, Log1pDouble)
-{ ccm::test::ExpectUlpUnaryOverAllRoundingModes(ccm::test::samples::kAllModesProbeDouble, ccm::log1p<double>, static_cast<double (*)(double)>(std::log1p)); }
+{
+	ccm::test::ExpectUlpUnaryOverAllRoundingModes(ccm::test::samples::kAllModesProbeDouble, ccm::log1p<double>, static_cast<double (*)(double)>(std::log1p));
+}
 
 TEST(CcmathAllModesUlpTests, Log2Float)
-{ ccm::test::ExpectUlpUnaryOverAllRoundingModes(ccm::test::samples::kExpoFloat, ccm::log2<float>, static_cast<float (*)(float)>(std::log2)); }
+{
+	ccm::test::ExpectUlpUnaryOverAllRoundingModes(ccm::test::samples::kExpoFloat, ccm::log2<float>, static_cast<float (*)(float)>(std::log2));
+}

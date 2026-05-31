@@ -102,10 +102,14 @@ TEST(CcmathRoundingConformanceTests, SqrtMatchesStdAllModes)
 }
 
 TEST(CcmathRoundingConformanceTests, RintMatchesStdAllModesDouble)
-{ ccm::test::ExpectFpUnaryOverMatchesStdAllModes(ccm::test::samples::kNearbyIntProbeDouble, ccm::rint<double>, static_cast<double (*)(double)>(std::rint)); }
+{
+	ccm::test::ExpectFpUnaryOverMatchesStdAllModes(ccm::test::samples::kNearbyIntProbeDouble, ccm::rint<double>, static_cast<double (*)(double)>(std::rint));
+}
 
 TEST(CcmathRoundingConformanceTests, RintMatchesStdAllModesFloat)
-{ ccm::test::ExpectFpUnaryOverMatchesStdAllModes(ccm::test::samples::kNearbyIntProbeFloat, ccm::rint<float>, static_cast<float (*)(float)>(std::rint)); }
+{
+	ccm::test::ExpectFpUnaryOverMatchesStdAllModes(ccm::test::samples::kNearbyIntProbeFloat, ccm::rint<float>, static_cast<float (*)(float)>(std::rint));
+}
 
 TEST(CcmathRoundingConformanceTests, CeilTruncRoundFloorIndependentOfMode)
 {

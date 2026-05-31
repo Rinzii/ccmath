@@ -61,11 +61,17 @@ namespace ccm
 
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double log10(Integer num)
-	{ return ccm::log10<double>(static_cast<double>(num)); }
+	{
+		return ccm::log10<double>(static_cast<double>(num));
+	}
 
 	constexpr float log10f(float num)
-	{ return ccm::log10<float>(num); }
+	{
+		return ccm::log10<float>(num);
+	}
 
 	constexpr long double log10l(long double num)
-	{ return ccm::log10<long double>(num); }
+	{
+		return ccm::log10<long double>(num);
+	}
 } // namespace ccm

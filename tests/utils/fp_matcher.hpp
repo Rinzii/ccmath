@@ -13,6 +13,8 @@
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 
 #include <gtest/gtest.h>
+
+#include <cmath>
 #include <type_traits>
 
 namespace ccm::test
