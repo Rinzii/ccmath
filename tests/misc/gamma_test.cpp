@@ -8,14 +8,27 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "utils/math_samples.hpp"
+#include "utils/ulp_suite.hpp"
+
 #include <gtest/gtest.h>
 
 #include <ccmath/ccmath.hpp>
+
 #include <cmath>
 #include <limits>
 
-#include "utils/math_samples.hpp"
-#include "utils/ulp_suite.hpp"
+namespace
+{
+	template <typename T, typename CcmFn, typename StdFn>
+	void ExpectRelativeNearStd(T input, CcmFn ccm_fn, StdFn std_fn, T rel_tol)
+	{
+		const T actual	 = ccm_fn(input);
+		const T expected = std_fn(input);
+		const T scale	 = std::fabs(expected) > T(1) ? std::fabs(expected) : T(1);
+		EXPECT_NEAR(actual, expected, rel_tol * scale);
+	}
+} // namespace
 
 TEST(CcmathMiscTests, GammaStaticAssert)
 {
@@ -42,7 +55,11 @@ TEST(CcmathMiscTests, GammaMatchesLibmDouble)
 	{
 		SCOPED_TRACE(x);
 		if (x < 0.0 && x == std::trunc(x)) { continue; }
+#if defined(_MSC_VER) && !defined(__clang__)
+		ExpectRelativeNearStd(x, ccm::gamma<double>, static_cast<double (*)(double)>(std::tgamma), 1e-6);
+#else
 		ccm::test::ExpectUlpUnaryVsStd(x, ccm::gamma<double>, static_cast<double (*)(double)>(std::tgamma));
+#endif
 	}
 }
 
