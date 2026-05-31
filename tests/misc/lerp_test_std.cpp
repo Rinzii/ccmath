@@ -12,6 +12,9 @@
 
 #include <ccmath/ccmath.hpp>
 #include <cmath>
+#include <limits>
+
+#include "utils/std_compare.hpp"
 
 TEST(CcmathBasicTests, LerpStaticAssert)
 {
@@ -20,11 +23,14 @@ TEST(CcmathBasicTests, LerpStaticAssert)
 
 TEST(CcmathBasicTests, LerpFloat)
 {
-    EXPECT_EQ(ccm::lerp(1.0F, 2.0F, 0.0F), std::lerp(1.0F, 2.0F, 0.0F));
-	EXPECT_EQ(ccm::lerp(1.0F, 2.0F, 1.0F), std::lerp(1.0F, 2.0F, 1.0F));
-	EXPECT_EQ(ccm::lerp(4.0F, 4.0F, 0.5F), std::lerp(4.0F, 4.0F, 0.5F));
+	ccm::test::ExpectTernaryMatchesStd(1.0F, 2.0F, 0.0F, ccm::lerp<float>, static_cast<float (*)(float, float, float)>(std::lerp));
+	ccm::test::ExpectTernaryMatchesStd(1.0F, 2.0F, 1.0F, ccm::lerp<float>, static_cast<float (*)(float, float, float)>(std::lerp));
+	ccm::test::ExpectTernaryMatchesStd(4.0F, 4.0F, 0.5F, ccm::lerp<float>, static_cast<float (*)(float, float, float)>(std::lerp));
+	ccm::test::ExpectTernaryMatchesStd(8.457017397928852e37F, 8.457017397928852e37F, 8.457017397928852e37F, ccm::lerp<float>,
+									   static_cast<float (*)(float, float, float)>(std::lerp));
+	EXPECT_TRUE(std::isnan(ccm::lerp(std::numeric_limits<float>::quiet_NaN(), 0.0F, 3.857427150267069e-39F)));
 
-	EXPECT_EQ(ccm::lerp(1e8F, 1.0F, 0.5F), std::lerp(1e8F, 1.0F, 0.5F));
+	ccm::test::ExpectTernaryMatchesStd(1e8F, 1.0F, 0.5F, ccm::lerp<float>, static_cast<float (*)(float, float, float)>(std::lerp));
 
 
 	// NOLINTBEGIN
@@ -32,7 +38,7 @@ TEST(CcmathBasicTests, LerpFloat)
 	{
 		// Testing extrapolation
 		// Expected values are: -5 -2.5 0 2.5 5 7.5 10 12.5 15
-		EXPECT_EQ(ccm::lerp(5.0, 10.0, t), std::lerp(5.0, 10.0, t)) << "ccm::lerp and std::lerp are not the same with t = " << t;
+		ccm::test::ExpectTernaryMatchesStd(5.0, 10.0, static_cast<double>(t), ccm::lerp<double>, static_cast<double (*)(double, double, double)>(std::lerp));
 	}
 	// NOLINTEND
 }
