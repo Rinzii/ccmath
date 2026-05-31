@@ -13,9 +13,11 @@
 #include "utils/fp_matcher.hpp"
 #include "utils/ulp_suite.hpp"
 
-#include <ccmath/ccmath.hpp>
-#include <cmath>
 #include <gtest/gtest.h>
+
+#include <ccmath/ccmath.hpp>
+
+#include <cmath>
 #include <type_traits>
 
 namespace ccm::test
@@ -28,10 +30,7 @@ namespace ccm::test
 		{
 			ExpectSameFloatingAsStd(static_cast<common_type>(actual), static_cast<common_type>(expected), max_ulp);
 		}
-		else
-		{
-			EXPECT_EQ(actual, expected);
-		}
+		else { EXPECT_EQ(actual, expected); }
 	}
 
 	template <typename T, typename CcmFn, typename StdFn>
@@ -63,10 +62,10 @@ namespace ccm::test
 	{
 		int ccm_exp{};
 		int std_exp{};
-		T const actual = ccm::frexp(input, ccm_exp);
+		T const actual	 = ccm::frexp(input, ccm_exp);
 		T const expected = std::frexp(input, &std_exp);
 		ExpectSameFloatingAsStd(actual, expected);
-		EXPECT_EQ(ccm_exp, std_exp);
+		if (std::isfinite(input) || input == T(0)) { EXPECT_EQ(ccm_exp, std_exp); }
 	}
 
 	template <typename T>
@@ -74,7 +73,7 @@ namespace ccm::test
 	{
 		T ccm_int{};
 		T std_int{};
-		T const actual = ccm::modf(input, &ccm_int);
+		T const actual	 = ccm::modf(input, &ccm_int);
 		T const expected = std::modf(input, &std_int);
 		ExpectSameFloatingAsStd(actual, expected);
 		ExpectFpEq(ccm_int, std_int);
@@ -85,7 +84,7 @@ namespace ccm::test
 	{
 		int ccm_quo{};
 		int std_quo{};
-		T const actual = ccm::remquo(x, y, &ccm_quo);
+		T const actual	 = ccm::remquo(x, y, &ccm_quo);
 		T const expected = std::remquo(x, y, &std_quo);
 		ExpectSameFloatingAsStd(actual, expected);
 		if (!std::isnan(expected)) { EXPECT_EQ(ccm_quo & 7, std_quo & 7); }

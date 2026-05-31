@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "ccmath/internal/math/runtime/func/detail/msvc_libm.hpp"
 #include "ccmath/internal/math/runtime/func/detail/trunc_scalar.hpp"
 #include "ccmath/internal/math/runtime/func/rt_dispatch.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
@@ -24,12 +25,15 @@ namespace ccm::rt
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] inline T remainder_rt(T x, T y) noexcept
 	{
-#if CCM_HAS_BUILTIN(__builtin_remainder) || defined(__builtin_remainder)
+#if defined(_MSC_VER) && !defined(__clang__)
+		return detail::msvc_libm::remainder_call(x, y);
+#else
+	#if CCM_HAS_BUILTIN(__builtin_remainder) || defined(__builtin_remainder)
 		if constexpr (std::is_same_v<T, float>) { return __builtin_remainderf(x, y); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_remainder(x, y); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_remainderl(x, y); }
 		else { return static_cast<T>(__builtin_remainderl(static_cast<long double>(x), static_cast<long double>(y))); }
-#else
+	#else
 		using FPBits_t = typename ccm::support::fp::FPBits<T>;
 		const FPBits_t x_bits(x);
 		const FPBits_t y_bits(y);
@@ -40,6 +44,7 @@ namespace ccm::rt
 			return -std::numeric_limits<T>::quiet_NaN();
 		}
 		return static_cast<T>(x - (detail::trunc_scalar<T>(x / y) * y));
+	#endif
 #endif
 	}
 } // namespace ccm::rt
