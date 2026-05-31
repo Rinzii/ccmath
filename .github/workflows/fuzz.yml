@@ -1,0 +1,42 @@
+name: fuzz
+
+on:
+  push:
+    tags-ignore:
+      - v*.*
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+permissions:
+  contents: read
+
+jobs:
+  libfuzzer-smoke:
+    runs-on: macos-latest
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2.11.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@v4
+
+      - name: Install Ninja and LLVM
+        run: brew install ninja llvm
+
+      - name: Configure fuzz targets
+        run: |
+          LLVM_PREFIX="$(brew --prefix llvm)"
+          cmake --preset=ninja-fuzz-debug \
+            -DCMAKE_C_COMPILER="${LLVM_PREFIX}/bin/clang" \
+            -DCMAKE_CXX_COMPILER="${LLVM_PREFIX}/bin/clang++"
+
+      - name: Build fuzz targets
+        run: cmake --build --preset=build-ninja-fuzz-debug
+
+      - name: Fuzz smoke tests
+        run: ctest --preset=test-ninja-fuzz-debug -C Debug --output-on-failure

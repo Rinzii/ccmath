@@ -134,6 +134,16 @@
       }
     },
     {
+      "name": "fuzz",
+      "hidden": true,
+      "cacheVariables": {
+        "CCMATH_BUILD_FUZZING": "ON",
+        "CCMATH_BUILD_TESTS": "OFF",
+        "CCMATH_BUILD_EXAMPLES": "OFF",
+        "CCMATH_BUILD_BENCHMARKS": "OFF"
+      }
+    },
+    {
       "name": "ninja-gcc-debug",
       "inherits": [
         "base",
@@ -169,6 +179,15 @@
         "Debug"
       ],
       "description": "Ninja Multi-config + Clang (Debug)"
+    },
+    {
+      "name": "ninja-fuzz-debug",
+      "inherits": [
+        "base",
+        "Debug",
+        "fuzz"
+      ],
+      "description": "Ninja Multi-config + libFuzzer (Debug)"
     },
     {
       "name": "ninja-clang-release",
@@ -282,6 +301,14 @@
       ]
     },
     {
+      "name": "build-ninja-fuzz-debug",
+      "configurePreset": "ninja-fuzz-debug",
+      "configuration": "Debug",
+      "targets": [
+        "all"
+      ]
+    },
+    {
       "name": "build-ninja-clang-release",
       "configurePreset": "ninja-clang-release",
       "configuration": "Release",
@@ -378,6 +405,17 @@
       "configurePreset": "ninja-clang-debug",
       "configuration": "Debug",
       "inheritConfigureEnvironment": true
+    },
+    {
+      "name": "test-ninja-fuzz-debug",
+      "configurePreset": "ninja-fuzz-debug",
+      "configuration": "Debug",
+      "inheritConfigureEnvironment": true,
+      "filter": {
+        "include": {
+          "name": "ccmath-fuzz-.*-smoke"
+        }
+      }
     },
     {
       "name": "test-ninja-clang-release",

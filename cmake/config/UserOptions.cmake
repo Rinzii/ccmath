@@ -16,6 +16,10 @@ option(CCMATH_BUILD_TESTS "Build ccmath tests" ${CCMATH_PROJECT_IS_TOP_LEVEL})
 # Enable building of ccmath benchmarks. If OFF, benchmarks are skipped.
 option(CCMATH_BUILD_BENCHMARKS "Build ccmath benchmarks" OFF)
 
+# CCMATH_BUILD_FUZZING:
+# Build libFuzzer targets (Clang only). Couples fuzzer with ASan and UBSan.
+option(CCMATH_BUILD_FUZZING "Build libFuzzer fuzz targets (Clang only)" OFF)
+
 # CCMATH_FIND_GTEST_PACKAGE:
 # Look for gtest package rather than downloading it if needed.
 option(CCMATH_FIND_GTEST_PACKAGE "Enable finding of gtest package" OFF)
