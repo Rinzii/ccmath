@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "fp_bits.hpp"
 
 #include <cfenv>
@@ -18,6 +19,13 @@
 
 namespace ccm::support::fp
 {
+	/// Exact zero with sign per the current rounding mode (downward yields −0).
+	template <typename T>
+	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> signed_zero_for_current_mode() noexcept
+	{
+		if (ccm::support::fenv::get_rounding_mode() == FE_DOWNWARD) { return T(-0.0); }
+		return T(0.0);
+	}
 
 	// NOLINTNEXTLINE
 	enum class rounding_mode
@@ -75,7 +83,7 @@ namespace ccm::support::fp
 		}
 
 		auto trimming_length = static_cast<std::uint32_t>(FPBits_t::fraction_length - exponent);
-		FPBits_t new_bits			  = bits;
+		FPBits_t new_bits	 = bits;
 		new_bits.set_mantissa((bits.get_mantissa() >> trimming_length) << trimming_length);
 		T truncated_value = new_bits.get_val();
 
@@ -112,13 +120,17 @@ namespace ccm::support::fp
 	}
 
 	// Helper func to set results for exceptional cases.
-	template <typename T> constexpr T round_result_slightly_down(T value_rn) {
+	template <typename T>
+	constexpr T round_result_slightly_down(T value_rn)
+	{
 		volatile T tmp = value_rn;
 		tmp -= FPBits<T>::min_normal().get_val();
 		return tmp;
 	}
 
-	template <typename T> constexpr T round_result_slightly_up(T value_rn) {
+	template <typename T>
+	constexpr T round_result_slightly_up(T value_rn)
+	{
 		volatile T tmp = value_rn;
 		tmp += FPBits<T>::min_normal().get_val();
 		return tmp;

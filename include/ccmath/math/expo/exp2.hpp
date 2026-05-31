@@ -11,16 +11,17 @@
 #pragma once
 
 #include "ccmath/internal/config/builtin/exp2_support.hpp"
+#include "ccmath/internal/math/generic/builtins/expo/exp2.hpp"
+#include "ccmath/internal/math/runtime/func/expo/exp2_rt.hpp"
 #include "ccmath/internal/predef/has_const_builtin.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/expo/impl/exp2_double_impl.hpp"
 #include "ccmath/math/expo/impl/exp2_float_impl.hpp"
-#include "ccmath/internal/math/generic/builtins/expo/exp2.hpp"
-
 
 #include <type_traits>
 
 #if defined(_MSC_VER) && !defined(__clang__)
-#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+	#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
 CCM_DISABLE_MSVC_WARNING(4702) // 4702: unreachable code
 #endif
 
@@ -31,6 +32,7 @@ namespace ccm
 	 * @tparam T Floating-point or integer type
 	 * @param num Floating-point or integer value
 	 * @return If no errors occur, the base-2 exponential of num (2^num) is returned.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp2
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T exp2(T num)
@@ -38,6 +40,8 @@ namespace ccm
 		if constexpr (ccm::builtin::has_constexpr_exp2<T>) { return ccm::builtin::exp2(num); }
 		else
 		{
+			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::exp2_rt(num); }
+
 			if constexpr (std::is_same_v<T, float>) { return internal::exp2_float(num); }
 			if constexpr (std::is_same_v<T, double>) { return internal::exp2_double(num); }
 			if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::exp2_double(static_cast<double>(num))); }
@@ -50,6 +54,7 @@ namespace ccm
 	 * @tparam Integer Integer type
 	 * @param num Integer value
 	 * @return If no errors occur, the base-2 exponential of num (2^num) is returned as a double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp2
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double exp2(Integer num)
@@ -61,6 +66,7 @@ namespace ccm
 	 * @brief Returns 2 raised to the given power (2^x)
 	 * @param num Floating-point value
 	 * @return If no errors occur, the base-2 exponential of num (2^num) is returned as a float.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp2
 	 */
 	constexpr float exp2f(float num)
 	{
@@ -71,6 +77,7 @@ namespace ccm
 	 * @brief Returns 2 raised to the given power (2^x)
 	 * @param num Floating-point value
 	 * @return If no errors occur, the base-2 exponential of num (2^num) is returned as a double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp2
 	 */
 	constexpr long double exp2l(long double num)
 	{
@@ -81,4 +88,3 @@ namespace ccm
 #if defined(_MSC_VER) && !defined(__clang__)
 CCM_RESTORE_MSVC_WARNING()
 #endif
-

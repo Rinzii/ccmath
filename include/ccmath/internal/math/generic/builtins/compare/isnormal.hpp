@@ -10,7 +10,9 @@
 
 #pragma once
 
+// ReSharper disable once CppUnusedIncludeDirective
 #include "ccmath/internal/math/generic/builtins/builtin_helpers.hpp"
+#include "ccmath/internal/support/always_false.hpp"
 
 #include <type_traits>
 
@@ -50,6 +52,9 @@
 namespace ccm::builtin
 {
 	// clang-format off
+    /**
+     * @internal
+     */
     template <typename T>
     inline constexpr bool has_constexpr_isnormal =
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_ISNORMAL
@@ -60,19 +65,16 @@ namespace ccm::builtin
 	// clang-format on
 
 	/**
-	 * Wrapper for constexpr __builtin isnormal functions.
+	 * @internal
+	 * Wrapper for constexpr __builtin_isnormal functions.
 	 * This should be used internally and always be wrapped in an if constexpr statement.
-	 * It exists only to allow for usage of __builtin isnormal functions without triggering a compiler error
+	 * It exists only to allow for usage of __builtin_isnormal functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
 	constexpr auto isnormal(T x) -> std::enable_if_t<has_constexpr_isnormal<T>, bool>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_isnormal(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_isnormal(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_isnormal(x); }
-		// This should never be reached
-		return false;
+		return __builtin_isnormal(x);
 	}
 } // namespace ccm::builtin
 

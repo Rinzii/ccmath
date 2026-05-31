@@ -1,0 +1,20 @@
+/*
+ * Copyright (c) Ian Pike
+ * Copyright (c) CCMath contributors
+ *
+ * CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
+ * See LICENSE for more information.
+ *
+ * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+ */
+
+#ifndef CCMATH_VERSION_HPP
+#define CCMATH_VERSION_HPP
+
+#define CCMATH_VERSION_MAJOR @CCMATH_VERSION_MAJOR@
+#define CCMATH_VERSION_MINOR @CCMATH_VERSION_MINOR@
+#define CCMATH_VERSION_PATCH @CCMATH_VERSION_PATCH@
+#define CCMATH_TO_VERSION(MAJOR, MINOR, PATCH) ((MAJOR) * 10000 + (MINOR) * 100 + (PATCH))
+#define CCMATH_VERSION CCMATH_TO_VERSION(CCMATH_VERSION_MAJOR, CCMATH_VERSION_MINOR, CCMATH_VERSION_PATCH)
+
+#endif // CCMATH_VERSION_HPP

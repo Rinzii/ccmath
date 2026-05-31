@@ -10,10 +10,9 @@
 
 #pragma once
 
-#include "ccmath/internal/support/helpers/digit_to_int.hpp"
-#include "ccmath/internal/support/bits.hpp"
-
 #include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+#include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/support/helpers/digit_to_int.hpp"
 
 #include <cstdint>
 #include <limits>
@@ -25,13 +24,10 @@ namespace ccm::internal::impl
 
 	constexpr double nan_double_impl(const char * arg) noexcept
 	{
-		if constexpr (!std::numeric_limits<double>::is_iec559)
-		{
-            return 0.0;
-        }
+		if constexpr (!std::numeric_limits<double>::is_iec559) { return 0.0; }
 
-#if defined(_MSC_VER) && !defined(__clang__)
-		// Currently, MSVC always returns a Quiet NaN no matter if a payload is
+#if (defined(_MSC_VER) && !defined(__clang__)) || (defined(_MSC_VER) && defined(__clang__))
+		// Currently, MSVC, along with Clang-cl who mimics msvc, always returns a Quiet NaN no matter if a payload is
 		// provided or not. This is different from GCC and Clang which do allow payloads to be set.
 		// So if we detect we are using MSVC without Clang-CL then
 		// we can just return NaN and not bother doing any extra work.
@@ -39,8 +35,8 @@ namespace ccm::internal::impl
 		return std::numeric_limits<double>::quiet_NaN(); // Default NaN
 #endif
 
-		std::uint64_t dbl_bits{0};
-		bool has_hex_been_detected{false};
+		std::uint64_t dbl_bits{ 0 };
+		bool has_hex_been_detected{ false };
 
 		if (arg == nullptr)
 		{

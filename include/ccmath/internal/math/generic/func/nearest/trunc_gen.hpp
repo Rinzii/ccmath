@@ -45,7 +45,7 @@ namespace ccm
 		if (exponent <= -1) { return FPBits_t::zero(bits.sign()).get_val(); }
 
 		// Perform the truncation
-		const int trimming_size = FPBits_t::fraction_length - exponent;
+		const int trimming_size		  = FPBits_t::fraction_length - exponent;
 		const auto truncated_mantissa = static_cast<Storage_t>((bits.get_mantissa() >> trimming_size) << trimming_size);
 		bits.set_mantissa(truncated_mantissa);
 		return bits.get_val();

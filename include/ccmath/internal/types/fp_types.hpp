@@ -15,21 +15,21 @@
 // Mirror float_t and double_t from <cmath> to avoid having a dependency of <cmath>.
 
 #ifdef FLT_EVAL_METHOD
-	# if FLT_EVAL_METHOD == -1
-		#  define CCM_FLT_EVAL_METHOD	2
-	# else
-		#  define CCM_FLT_EVAL_METHOD	FLT_EVAL_METHOD
-	# endif
+	#if FLT_EVAL_METHOD == -1
+		#define CCM_FLT_EVAL_METHOD 2
+	#else
+		#define CCM_FLT_EVAL_METHOD FLT_EVAL_METHOD
+	#endif
 #elif defined __x86_64__
-	# define CCM_FLT_EVAL_METHOD	0
+	#define CCM_FLT_EVAL_METHOD 0
 #else
-	# define CCM_FLT_EVAL_METHOD	2
+	#define CCM_FLT_EVAL_METHOD 2
 #endif
 
 namespace ccm
 {
 #if CCM_FLT_EVAL_METHOD == 0 || CCM_FLT_EVAL_METHOD == 16
-	using float_t = float;
+	using float_t  = float;
 	using double_t = double;
 #elif CCM_FLT_EVAL_METHOD == 1
 	typedef double float_t;
@@ -37,7 +37,7 @@ namespace ccm
 #elif CCM_FLT_EVAL_METHOD == 2
 	typedef long double float_t;
 	typedef long double double_t;
-# else
-	#  error "Unknown CCM_FLT_EVAL_METHOD"
-# endif
+#else
+	#error "Unknown CCM_FLT_EVAL_METHOD"
+#endif
 } // namespace ccm

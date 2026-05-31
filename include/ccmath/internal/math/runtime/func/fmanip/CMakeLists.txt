@@ -1,0 +1,11 @@
+ccm_add_headers(
+        copysign_rt.hpp
+        nextafter_rt.hpp
+        nexttoward_rt.hpp
+        ilogb_rt.hpp
+        logb_rt.hpp
+        scalbn_rt.hpp
+        ldexp_rt.hpp
+        frexp_rt.hpp
+        modf_rt.hpp
+)

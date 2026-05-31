@@ -11,13 +11,14 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/fmanip/scalbn.hpp"
+#include "ccmath/internal/math/runtime/func/fmanip/scalbn_rt.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/fmanip/impl/scalbn_double_impl.hpp"
 #include "ccmath/math/fmanip/impl/scalbn_float_impl.hpp"
 #include "ccmath/math/fmanip/impl/scalbn_ldouble_impl.hpp"
 
-
 #if defined(_MSC_VER) && !defined(__clang__)
-#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+	#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
 CCM_DISABLE_MSVC_WARNING(4702) // 4702: unreachable code
 #endif
 
@@ -29,6 +30,7 @@ namespace ccm
 	 * @param num Floating-point or integer value.
 	 * @param exp Integer value.
 	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/scalbn
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T scalbn(T num, int exp) noexcept
@@ -36,6 +38,8 @@ namespace ccm
 		if constexpr (ccm::builtin::has_constexpr_scalbn<T>) { return ccm::builtin::scalbn(num, exp); }
 		else
 		{
+			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::scalbn_rt(num, exp); }
+
 			if constexpr (std::is_same_v<T, float>) { return internal::scalbn_float(num, exp); }
 			if constexpr (std::is_same_v<T, double>) { return internal::scalbn_double(num, exp); }
 			if constexpr (std::is_same_v<T, long double>) { return internal::scalbn_ldouble(num, exp); }
@@ -49,6 +53,7 @@ namespace ccm
 	 * @param num Floating-point or integer value.
 	 * @param exp Integer value.
 	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/scalbn
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T scalbn(T num, long exp) noexcept
@@ -56,6 +61,8 @@ namespace ccm
 		if constexpr (ccm::builtin::has_constexpr_scalbn<T>) { return ccm::builtin::scalbn(num, exp); }
 		else
 		{
+			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::scalbn_rt(num, static_cast<int>(exp)); }
+
 			if constexpr (std::is_same_v<T, float>) { return internal::scalbn_float(num, exp); }
 			if constexpr (std::is_same_v<T, double>) { return internal::scalbn_double(num, exp); }
 			if constexpr (std::is_same_v<T, long double>) { return internal::scalbn_ldouble(num, exp); }
@@ -69,6 +76,7 @@ namespace ccm
 	 * @param num Integer value.
 	 * @param exp Integer value.
 	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/scalbn
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double scalbn(Integer num, int exp) noexcept
@@ -82,6 +90,7 @@ namespace ccm
 	 * @param num Integer value.
 	 * @param exp Integer value.
 	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/scalbn
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double scalbn(Integer num, long exp) noexcept
@@ -94,6 +103,7 @@ namespace ccm
 	 * @param num Floating-point value.
 	 * @param exp Integer value.
 	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a float.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/scalbn
 	 */
 	constexpr float scalbnf(float num, int exp) noexcept
 	{
@@ -105,6 +115,7 @@ namespace ccm
 	 * @param num Floating-point value.
 	 * @param exp Integer value.
 	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a float.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/scalbn
 	 */
 	constexpr float scalbnf(float num, long exp) noexcept
 	{
@@ -116,6 +127,7 @@ namespace ccm
 	 * @param num Floating-point value.
 	 * @param exp Integer value.
 	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a long double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/scalbn
 	 */
 	constexpr long double scalbnl(long double num, int exp) noexcept
 	{
@@ -127,6 +139,7 @@ namespace ccm
 	 * @param num Floating-point value.
 	 * @param exp Integer value.
 	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a long double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/scalbn
 	 */
 	constexpr long double scalbnl(long double num, long exp) noexcept
 	{

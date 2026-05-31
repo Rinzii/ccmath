@@ -10,23 +10,17 @@
 
 #pragma once
 
-#include "ccmath/internal/support/fp/fp_bits.hpp"
+#include "ccmath/math/fmanip/impl/frexp_impl.hpp"
 
-// TODO: Finish implementing.
+#include <type_traits>
 
-namespace ccm
+namespace ccm::gen
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
-constexpr T frexp(T x, int &exp) {
-		support::fp::FPBits<T> bits(x);
-		if (bits.is_inf_or_nan()) {
-			return x;
-}
-		if (bits.is_zero()) {
-			exp = 0;
-			return x;
-		}
-
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+	constexpr T frexp_gen(T x, int & exp)
+	{
+		if constexpr (std::is_same_v<T, float>) { return internal::impl::frexp_impl(x, exp); }
+		if constexpr (std::is_same_v<T, double>) { return internal::impl::frexp_impl(x, exp); }
+		return static_cast<T>(internal::impl::frexp_impl(static_cast<double>(x), exp));
 	}
-
-} // namespace ccm
+} // namespace ccm::gen

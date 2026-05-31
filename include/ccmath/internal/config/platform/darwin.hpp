@@ -10,7 +10,6 @@
 
 #pragma once
 
-
 #if defined(__APPLE__) || defined(__MACH__)
 	#include <TargetConditionals.h>
 
@@ -35,7 +34,7 @@
 		#ifdef CCM_TARGET_PLATFORM_IPHONE
 			#undef CCM_TARGET_PLATFORM_IPHONE
 		#endif
-		#define CCM_TARGET_PLATFORM_IPHONE 1
+		#define CCM_TARGET_PLATFORM_IPHONE		   1
 		#define CCM_TARGET_POSIX_THREADS_AVAILABLE 1
 
 		#ifdef CCM_TARGET_PLATFORM_MOBILE
@@ -58,8 +57,8 @@
 			#undef CCM_TARGET_PLATFORM_POSIX
 		#endif
 
-		#define CCM_TARGET_PLATFORM_OSX 1
-		#define CCM_TARGET_PLATFORM_UNIX 1
+		#define CCM_TARGET_PLATFORM_OSX	  1
+		#define CCM_TARGET_PLATFORM_UNIX  1
 		#define CCM_TARGET_PLATFORM_POSIX 1
 
 		#ifdef CCM_TARGET_PLATFORM_DESKTOP

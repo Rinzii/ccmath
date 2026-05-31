@@ -10,10 +10,12 @@
 
 #pragma once
 
-#include "ccmath/internal/support/helpers/exp_helpers.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/support/helpers/exp_helpers.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
+#include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/expo/impl/exp_data.hpp"
+
 #include <cstdint>
 #include <limits>
 
@@ -140,5 +142,92 @@ namespace ccm::internal::impl
 
 		// Note: tmp == 0 or |tmp| > 2^-65 and scale > 2^-739, so there is no spurious underflow here.
 		return scale + scale * tmp;
+	}
+
+	constexpr double expm1_series(double x)
+	{
+		const double x2 = x * x;
+		return x + x2 * (0.5 + x * (1.0 / 6.0 + x * (1.0 / 24.0 + x * (1.0 / 120.0 + x * (1.0 / 720.0 + x * (1.0 / 5040.0 + x * (1.0 / 40320.0)))))));
+	}
+
+	constexpr double expm1_kernel(double x)
+	{
+		std::uint32_t abs_top{};
+		std::uint64_t expo_int64{};
+		std::uint64_t index{};
+		std::uint64_t top{};
+		std::uint64_t sign_bits{};
+
+		ccm::double_t expo{};
+		ccm::double_t scaled_input{};
+		ccm::double_t rem{};
+		ccm::double_t remSqr{};
+		ccm::double_t scale{};
+		ccm::double_t tail{};
+		ccm::double_t tmp{};
+
+		abs_top = ccm::support::top12_bits_of_double(x) & 0x7ff;
+		if (CCM_UNLIKELY(abs_top - ccm::support::top12_bits_of_double(0x1p-54) >=
+						 ccm::support::top12_bits_of_double(512.0) - ccm::support::top12_bits_of_double(0x1p-54)))
+		{
+			if (abs_top - support::top12_bits_of_double(0x1p-54) >= 0x80000000) { return x; }
+
+			if (abs_top >= support::top12_bits_of_double(1024.0))
+			{
+				if (support::double_to_uint64(x) == support::double_to_uint64(-std::numeric_limits<double>::infinity())) { return -1.0; }
+
+				if (abs_top >= support::top12_bits_of_double(std::numeric_limits<double>::infinity())) { return x + x; }
+
+				if ((support::double_to_uint64(x) >> 63) != 0U) { return -1.0; }
+
+				return 0x1p769 * 0x1p769;
+			}
+
+			abs_top = 0;
+		}
+
+		scaled_input = exp_invLn2N_dbl * x;
+		expo		 = support::helpers::narrow_eval(scaled_input + exp_shift_dbl);
+		expo_int64	 = support::double_to_uint64(expo);
+		expo -= exp_shift_dbl;
+
+		rem = x + expo * exp_negLn2HiN_dbl + expo * exp_negLn2LoN_dbl;
+
+		index = 2 * (expo_int64 % k_exp_table_n_dbl);
+		top	  = expo_int64 << (52 - k_exp_table_bits_dbl);
+		tail  = support::uint64_to_double(exp_tab_dbl.at(index));
+
+		sign_bits = exp_tab_dbl.at(index + 1) + top;
+
+		remSqr = rem * rem;
+
+		tmp = tail + rem + remSqr * (exp_poly_coeff_one_dbl + rem * exp_poly_coeff_two_dbl) +
+			  remSqr * remSqr * (exp_poly_coeff_three_dbl + rem * exp_poly_coeff_four_dbl);
+		if (CCM_UNLIKELY(abs_top == 0.0)) { return handle_special_case(tmp, sign_bits, expo_int64); }
+
+		scale = support::uint64_to_double(sign_bits);
+
+		return scale + scale * tmp - 1.0;
+	}
+
+	constexpr double expm1_double_impl(double x)
+	{
+		if (x == 0.0) { return x; }
+
+		if (CCM_UNLIKELY(ccm::isnan(x))) { return std::numeric_limits<double>::quiet_NaN(); }
+
+		if (x == std::numeric_limits<double>::infinity()) { return std::numeric_limits<double>::infinity(); }
+
+		if (x == -std::numeric_limits<double>::infinity()) { return -1.0; }
+
+		if (x >= 0.25 || x <= -0.25) { return expm1_kernel(x); }
+
+		if (x > 0.0625 || x < -0.0625)
+		{
+			const double t = expm1_series(x * 0.5);
+			return t * (t + 2.0);
+		}
+
+		return expm1_series(x);
 	}
 } // namespace ccm::internal::impl

@@ -10,7 +10,54 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/fmanip/logb.hpp"
+#include "ccmath/internal/math/runtime/func/fmanip/logb_rt.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
+#include "ccmath/math/fmanip/impl/logb_impl.hpp"
+
+#include <type_traits>
+
 namespace ccm
 {
+	/**
+	 * @brief Extracts the unbiased exponent of a floating-point value as a floating-point result.
+	 * @tparam T Floating-point type.
+	 * @param num Floating-point value.
+	 * @return Unbiased exponent of num in the return type T.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/logb
+	 */
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+	constexpr T logb(T num) noexcept
+	{
+		if constexpr (ccm::builtin::has_constexpr_logb<T>) { return ccm::builtin::logb(num); }
+		else if (ccm::support::is_constant_evaluated())
+		{
+			if constexpr (std::is_same_v<T, float>) { return internal::impl::logb_impl(num); }
+			else if constexpr (std::is_same_v<T, double>) { return internal::impl::logb_impl(num); }
+			else { return static_cast<long double>(internal::impl::logb_impl(static_cast<double>(num))); }
+		}
+		else { return ccm::rt::logb_rt(num); }
+	}
 
+	/**
+	 * @brief Extracts the unbiased exponent of a float.
+	 * @param num Floating-point value.
+	 * @return Unbiased exponent as float.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/logb
+	 */
+	constexpr float logbf(float num) noexcept
+	{
+		return ccm::logb(num);
+	}
+
+	/**
+	 * @brief Extracts the unbiased exponent of a long double.
+	 * @param num Floating-point value.
+	 * @return Unbiased exponent as long double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/logb
+	 */
+	constexpr long double logbl(long double num) noexcept
+	{
+		return ccm::logb(num);
+	}
 } // namespace ccm

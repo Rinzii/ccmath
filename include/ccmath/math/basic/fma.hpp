@@ -10,11 +10,13 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/basic/fma.hpp"
+#include "ccmath/internal/math/runtime/func/basic/fma_rt.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/compare/signbit.hpp"
-#include "ccmath/internal/math/generic/builtins/basic/fma.hpp"
 
 #include <limits>
 #include <type_traits>
@@ -29,37 +31,34 @@ namespace ccm
 	 * @param z Floating-point or integer value.
 	 * @return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
 	 * calculated as a single ternary floating-point operation).
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/fma
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T fma(T x, T y, T z) noexcept
 	{
-		// Check for GCC 6.1 or later
-		#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
+		if (!ccm::support::is_constant_evaluated()) { return ccm::rt::fma_rt(x, y, z); }
+
+// Check for GCC 6.1 or later
+#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
 		if constexpr (std::is_same_v<T, float>) { return __builtin_fmaf(x, y, z); }
 		if constexpr (std::is_same_v<T, double>) { return __builtin_fma(x, y, z); }
 		if constexpr (std::is_same_v<T, long double>) { return __builtin_fmal(x, y, z); }
 		return static_cast<T>(__builtin_fmal(x, y, z));
-		#else
+#else
 		if (CCM_UNLIKELY(x == 0 || y == 0 || z == 0)) { return x * y + z; }
 
 		// If x is zero and y is infinity, or if y is zero and x is infinity and...
-		if ((x == static_cast<T>(0) && ccm::isinf(y)) || (y == T{0} && ccm::isinf(x)))
+		if ((x == static_cast<T>(0) && ccm::isinf(y)) || (y == T{ 0 } && ccm::isinf(x)))
 		{
 			// ...z is NaN, return +NaN...
-			if (ccm::isnan(z))
-			{
-				return std::numeric_limits<T>::quiet_NaN();
-			}
+			if (ccm::isnan(z)) { return std::numeric_limits<T>::quiet_NaN(); }
 
 			// ...else return -NaN if Z is not NaN.
 			return -std::numeric_limits<T>::quiet_NaN();
 		}
 
 		// If x is a zero and y is an infinity, or if y is zero and x is an infinity and Z is NaN, then the result is -NaN.
-		if (ccm::isinf(x * y) && ccm::isinf(z) && ccm::signbit(x * y) != ccm::signbit(z))
-		{
-			return -std::numeric_limits<T>::quiet_NaN();
-		}
+		if (ccm::isinf(x * y) && ccm::isinf(z) && ccm::signbit(x * y) != ccm::signbit(z)) { return -std::numeric_limits<T>::quiet_NaN(); }
 
 		// If x or y are NaN, NaN is returned.
 		if (ccm::isnan(x) || ccm::isnan(y)) { return std::numeric_limits<T>::quiet_NaN(); }
@@ -75,6 +74,15 @@ namespace ccm
 #endif
 	}
 
+	/**
+	 * @brief Computes x * y + z for integral operands.
+	 * @tparam Integer Integral type.
+	 * @param x Multiplicand.
+	 * @param y Multiplier.
+	 * @param z Addend.
+	 * @return Exact integer result of (x * y) + z in type Integer.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/fma
+	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr Integer fma(Integer x, Integer y, Integer z) noexcept
 	{
@@ -104,8 +112,10 @@ namespace ccm
 		using epsilon_type = std::common_type_t<decltype(TCommon), decltype(UCommon), decltype(VCommon)>;
 
 		using shared_type = std::conditional_t<
-			TCommon <= std::numeric_limits<epsilon_type>::epsilon() && TCommon <= UCommon, T,
-			std::conditional_t<UCommon <= std::numeric_limits<epsilon_type>::epsilon() && UCommon <= TCommon, U,
+			TCommon <= std::numeric_limits<epsilon_type>::epsilon() && TCommon <= UCommon,
+			T,
+			std::conditional_t<UCommon <= std::numeric_limits<epsilon_type>::epsilon() && UCommon <= TCommon,
+							   U,
 							   std::conditional_t<VCommon <= std::numeric_limits<epsilon_type>::epsilon() && VCommon <= UCommon, V, epsilon_type>>>;
 
 		return ccm::fma<shared_type>(static_cast<shared_type>(x), static_cast<shared_type>(y), static_cast<shared_type>(z));

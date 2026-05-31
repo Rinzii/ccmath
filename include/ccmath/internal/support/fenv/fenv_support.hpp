@@ -21,7 +21,7 @@
 #include <cstdint>
 
 #if defined(_MSC_VER) && !defined(__clang__)
-#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+	#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
 CCM_DISABLE_MSVC_WARNING(4702) // 4702: unreachable code
 #endif
 
@@ -112,11 +112,11 @@ namespace ccm::support::fenv
 
 	constexpr bool is_errno_enabled()
 	{
-		#if defined(__FAST_MATH__) || defined(CCM_CONFIG_DISABLE_ERRNO)
+#if defined(__FAST_MATH__) || defined(CCM_CONFIG_DISABLE_ERRNO)
 		return false;
-		#else
+#else
 		return true;
-		#endif
+#endif
 	}
 
 	// Helper function to convert the enum class to an integer to enable bitwise operations.
@@ -124,8 +124,6 @@ namespace ccm::support::fenv
 	{
 		return static_cast<int>(mode);
 	}
-
-
 
 	constexpr int ccm_math_err_handling()
 	{
@@ -141,10 +139,10 @@ namespace ccm::support::fenv
 	}
 
 	// ReSharper disable once CppDFAConstantFunctionResult
-	inline int set_except_if_required(const int excepts)
+	constexpr int set_except_if_required(const int excepts)
 	{
-		// Now following the mentality that fenv exceptions will enforce a constexpr function must be evaluated at runtime.
-		//if (is_constant_evaluated()) { return 0; } // We cannot raise fenv exceptions in a constexpr context. So we return.
+		if (is_constant_evaluated()) { return 0; } // We cannot raise fenv exceptions in a constexpr context. So we return.
+
 		if constexpr (is_errno_enabled())
 		{
 			if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { return internal::set_except(excepts); }
@@ -153,10 +151,9 @@ namespace ccm::support::fenv
 		return 0;
 	}
 
-	inline int raise_except_if_required(const int excepts)
+	constexpr int raise_except_if_required(const int excepts)
 	{
-		// Now following the mentality that fenv exceptions will enforce a constexpr function must be evaluated at runtime.
-		//if (is_constant_evaluated()) { return 0; } // We cannot raise fenv exceptions in a constexpr context. So we return.
+		if (is_constant_evaluated()) { return 0; } // We cannot raise fenv exceptions in a constexpr context. So we return.
 		if constexpr (is_errno_enabled())
 		{
 			if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { return internal::raise_except(excepts); }
@@ -165,11 +162,14 @@ namespace ccm::support::fenv
 		return 0;
 	}
 
-	inline void set_errno_if_required(const int err)
+	constexpr void set_errno_if_required(const int err)
 	{
-		if constexpr (is_errno_enabled())
+		if (!is_constant_evaluated())
 		{
-			if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { errno = err; }
+			if constexpr (is_errno_enabled())
+			{
+				if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { errno = err; }
+			}
 		}
 	}
 } // namespace ccm::support::fenv

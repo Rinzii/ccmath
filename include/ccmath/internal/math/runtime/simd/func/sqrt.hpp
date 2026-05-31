@@ -20,28 +20,12 @@
 		#include "impl/sse2/sqrt.hpp"
 	#endif
 
-	#ifdef CCMATH_HAS_SIMD_SSE3
-		#include "impl/sse3/sqrt.hpp"
-	#endif
-
-	#ifdef CCMATH_HAS_SIMD_SSSE3
-		#include "impl/ssse3/sqrt.hpp"
-	#endif
-
 	#ifdef CCMATH_HAS_SIMD_SSE4
 		#include "impl/sse4/sqrt.hpp"
 	#endif
 
-	#ifdef CCMATH_HAS_SIMD_AVX
-		#include "impl/avx/sqrt.hpp"
-	#endif
-
 	#ifdef CCMATH_HAS_SIMD_AVX2
 		#include "impl/avx2/sqrt.hpp"
-	#endif
-
-	#ifdef CCMATH_HAS_SIMD_AVX512F
-		#include "impl/avx512/sqrt.hpp"
 	#endif
 
 	#ifdef CCMATH_HAS_SIMD_NEON

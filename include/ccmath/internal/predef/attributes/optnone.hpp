@@ -26,4 +26,3 @@
 #else
 	#define CCM_ATTR_OPTNONE
 #endif
-

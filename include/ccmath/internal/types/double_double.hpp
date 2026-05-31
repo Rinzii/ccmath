@@ -15,7 +15,7 @@
 
 namespace ccm
 {
-	namespace type
+	namespace types
 	{
 		using DoubleDouble = NumberPair<double>;
 
@@ -25,7 +25,7 @@ namespace ccm
 		// if assumption: |a| >= |b|, or a = 0.
 		constexpr DoubleDouble exact_add(double a, double b)
 		{
-			DoubleDouble r{0.0, 0.0};
+			DoubleDouble r{ 0.0, 0.0 };
 			r.hi		   = a + b;
 			const double t = r.hi - a;
 			r.lo		   = b - t;
@@ -50,7 +50,7 @@ namespace ccm
 		// Velkamp's Splitting for double precision.
 		constexpr DoubleDouble split(double a)
 		{
-			DoubleDouble r{0.0, 0.0};
+			DoubleDouble r{ 0.0, 0.0 };
 			// Splitting constant = 2^ceil(prec(double)/2) + 1 = 2^27 + 1.
 			constexpr double C = 0x1.0p27 + 1.0;
 			const double t1	   = C * a;
@@ -62,13 +62,13 @@ namespace ccm
 
 		constexpr DoubleDouble exact_mult(double a, double b)
 		{
-			DoubleDouble r{0.0, 0.0};
+			DoubleDouble r{ 0.0, 0.0 };
 
-			// If we have builtin FMA, we can use it to get the exact product.
-			#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
+// If we have builtin FMA, we can use it to get the exact product.
+#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
 			r.hi = a * b;
 			r.lo = support::multiply_add(a, b, -r.hi);
-			#else
+#else
 			// Dekker's Product.
 			const DoubleDouble as = split(a);
 			const DoubleDouble bs = split(b);
@@ -77,7 +77,7 @@ namespace ccm
 			const double t2		  = as.hi * bs.lo + t1;
 			const double t3		  = as.lo * bs.hi + t2;
 			r.lo				  = as.lo * bs.lo + t3;
-			#endif
+#endif
 
 			return r;
 		}
@@ -98,14 +98,15 @@ namespace ccm
 			return r;
 		}
 
-	} // namespace type
+	} // namespace types
 
 	// Specialization for DoubleDouble FMA.
 	namespace support
 	{
 		// Assuming |c| >= |a * b|.
 		template <>
-		constexpr type::DoubleDouble multiply_add<type::DoubleDouble>(const type::DoubleDouble & x, const type::DoubleDouble & y, const type::DoubleDouble & z)
+		constexpr types::DoubleDouble
+		multiply_add<types::DoubleDouble>(const types::DoubleDouble & x, const types::DoubleDouble & y, const types::DoubleDouble & z)
 		{
 			return add(z, quick_mult(x, y));
 		}

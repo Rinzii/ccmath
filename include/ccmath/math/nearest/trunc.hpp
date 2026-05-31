@@ -10,10 +10,11 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/nearest/trunc.hpp"
+#include "ccmath/internal/math/runtime/func/nearest/trunc_rt.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
-#include "ccmath/internal/math/generic/builtins/nearest/trunc.hpp"
-
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 
 namespace ccm
 {
@@ -22,12 +23,16 @@ namespace ccm
 	 * @tparam T The type of the input.
 	 * @param num The value to truncate.
 	 * @return Returns a truncated value.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/trunc
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T trunc(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_trunc<T>) { return ccm::builtin::trunc(num); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_trunc<T>)
+		{
+			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::trunc(num); }
+		}
+		if (ccm::support::is_constant_evaluated())
 		{
 			using FPBits_t	= ccm::support::fp::FPBits<T>;
 			using Storage_t = typename FPBits_t::storage_type;
@@ -50,11 +55,12 @@ namespace ccm
 			if (exponent <= -1) { return FPBits_t::zero(bits.sign()).get_val(); }
 
 			// Perform the truncation
-			const int trimming_size = FPBits_t::fraction_length - exponent;
+			const int trimming_size		  = FPBits_t::fraction_length - exponent;
 			const auto truncated_mantissa = static_cast<Storage_t>((bits.get_mantissa() >> trimming_size) << trimming_size);
 			bits.set_mantissa(truncated_mantissa);
 			return bits.get_val();
 		}
+		else { return ccm::rt::trunc_rt(num); }
 	}
 
 	/**
@@ -62,6 +68,7 @@ namespace ccm
 	 * @tparam Integer The type of the input.
 	 * @param num The value to truncate.
 	 * @return Returns a truncated value.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/trunc
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double trunc(Integer num) noexcept
@@ -73,6 +80,7 @@ namespace ccm
 	 * @brief Specialization for float that returns the integral value nearest to x with the magnitude of the integral value always less than or equal to x.
 	 * @param num The float to truncate.
 	 * @return Returns a truncated float.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/trunc
 	 */
 	constexpr float truncf(float num) noexcept
 	{
@@ -84,6 +92,7 @@ namespace ccm
 	 * x.
 	 * @param num The long double to truncate.
 	 * @return Returns a truncated long double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/trunc
 	 */
 	constexpr long double truncl(long double num) noexcept
 	{

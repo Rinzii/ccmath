@@ -105,7 +105,6 @@ namespace ccm::support
 			}
 			CCM_RESTORE_MSVC_WARNING()
 
-
 			// Adds a single character to this buffer.
 			constexpr void push(char c)
 			{
@@ -203,6 +202,11 @@ namespace ccm::support
 		}
 
 	} // namespace internal
+
+	constexpr ccm::types::UInt<96> operator""_u96(const char * x)
+	{
+		return internal::parse_with_prefix<ccm::types::UInt<96>>(x);
+	}
 
 	constexpr ccm::types::uint128_t operator""_u128(const char * x)
 	{

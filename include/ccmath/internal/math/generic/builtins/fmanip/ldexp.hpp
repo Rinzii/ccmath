@@ -10,7 +10,9 @@
 
 #pragma once
 
+// ReSharper disable once CppUnusedIncludeDirective
 #include "ccmath/internal/math/generic/builtins/builtin_helpers.hpp"
+#include "ccmath/internal/support/always_false.hpp"
 
 #include <type_traits>
 
@@ -21,14 +23,17 @@
 /// - GCC 5.1+
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_LDEXP
-#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
-#define CCMATH_HAS_CONSTEXPR_BUILTIN_LDEXP
-#endif
+	#if defined(__GNUC__) && (__GNUC__ > 5 || (__GNUC__ == 5 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER_MAJOR__)
+		#define CCMATH_HAS_CONSTEXPR_BUILTIN_LDEXP
+	#endif
 #endif
 
 namespace ccm::builtin
 {
-    // clang-format off
+	// clang-format off
+    /**
+     * @internal
+     */
     template <typename T>
     inline constexpr bool has_constexpr_ldexp =
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_LDEXP
@@ -36,32 +41,28 @@ namespace ccm::builtin
 #else
         false;
 #endif
-    // clang-format on
+	// clang-format on
 
-    /**
-     * Wrapper for constexpr __builtin ldexp functions.
-     * This should be used internally and always be wrapped in an if constexpr statement.
-     * It exists only to allow for usage of __builtin ldexp functions without triggering a compiler error
-     * when the compiler does not support them.
-     */
-    template <typename T>
-    constexpr auto ldexp(T x, int exp) -> std::enable_if_t<has_constexpr_ldexp<T>, T>
-    {
-        if constexpr (std::is_same_v<T, float>)
-        {
-            return __builtin_ldexpf(x, exp);
-        }
-        else if constexpr (std::is_same_v<T, double>)
-        {
-            return __builtin_ldexp(x, exp);
-        }
-        else if constexpr (std::is_same_v<T, long double>)
-        {
-            return __builtin_ldexpl(x, exp);
-        }
-        // This should never be reached
-        return T{};
-    }
+	/**
+	 * @internal
+	 * Wrapper for constexpr __builtin_ldexp functions.
+	 * This should be used internally and always be wrapped in an if constexpr statement.
+	 * It exists only to allow for usage of __builtin_ldexp functions without triggering a compiler error
+	 * when the compiler does not support them.
+	 */
+	template <typename T>
+	constexpr auto ldexp(T x, int exp) -> std::enable_if_t<has_constexpr_ldexp<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>) { return __builtin_ldexpf(x, exp); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_ldexp(x, exp); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_ldexpl(x, exp); }
+		else
+		{
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_ldexp");
+			return T{};
+		}
+	}
 } // namespace ccm::builtin
 
 // Cleanup the global namespace

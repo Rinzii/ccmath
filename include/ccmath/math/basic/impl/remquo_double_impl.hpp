@@ -46,11 +46,8 @@ namespace ccm::internal
 
 			// GCC and Clang do not like comparing signed and unsigned integers.
 			// The outcome of these comparisons is well-defined, so we can safely disable these warnings.
-			// Must disable clang-form here as clang-format likes to add spaces between the hyphens for flags
-			// clang-format off
 			CCM_DISABLE_GCC_WARNING(-Wsign-compare)
 			CCM_DISABLE_CLANG_WARNING(-Wsign-compare)
-			// clang-format on
 
 			// If x is not finite or y is NaN.
 			if (CCM_UNLIKELY(x_i64 >= 0x7ff0000000000000ULL || y_i64 > 0x7ff0000000000000ULL)) // NOLINT(readability-simplify-boolean-expr)

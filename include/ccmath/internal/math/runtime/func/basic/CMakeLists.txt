@@ -1,0 +1,9 @@
+ccm_add_headers(
+        fabs_rt.hpp
+        fdim_rt.hpp
+        fma_rt.hpp
+        fmod_rt.hpp
+        remainder_rt.hpp
+        fmax_rt.hpp
+        fmin_rt.hpp
+)

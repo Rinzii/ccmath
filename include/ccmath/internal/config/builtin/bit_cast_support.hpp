@@ -23,17 +23,18 @@
 /// - MSVC 19.27+
 
 // GCC 11.1+ has __builtin_bit_cast
-#if defined(__GNUC__) && (__GNUC__ > 11 || (__GNUC__ == 11 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER) && !defined(__NVCOMPILER_LLVM__) && !defined(__CUDACC__)
-    #ifndef CCMATH_HAS_BUILTIN_BIT_CAST
-        #define CCMATH_HAS_BUILTIN_BIT_CAST
-    #endif
+#if defined(__GNUC__) && (__GNUC__ > 11 || (__GNUC__ == 11 && __GNUC_MINOR__ >= 1)) && !defined(__clang__) && !defined(__NVCOMPILER) &&                        \
+	!defined(__NVCOMPILER_LLVM__) && !defined(__CUDACC__)
+	#ifndef CCMATH_HAS_BUILTIN_BIT_CAST
+		#define CCMATH_HAS_BUILTIN_BIT_CAST
+	#endif
 #endif
 
 // Clang 9.0.0+ has __builtin_bit_cast
-#if defined(__clang__) && !defined(__apple_build_version__)  && __clang_major__ >= 9
-    #ifndef CCMATH_HAS_BUILTIN_BIT_CAST
-        #define CCMATH_HAS_BUILTIN_BIT_CAST
-    #endif
+#if defined(__clang__) && !defined(__apple_build_version__) && __clang_major__ >= 9
+	#ifndef CCMATH_HAS_BUILTIN_BIT_CAST
+		#define CCMATH_HAS_BUILTIN_BIT_CAST
+	#endif
 #endif
 
 // Apple Clang 9.0.0+ has __builtin_bit_cast
@@ -53,10 +54,10 @@
 #endif
 
 // DPC++ 2021.1.2+ has __builtin_bit_cast
-#if (defined(SYCL_LANGUAGE_VERSION) || defined(__INTEL_LLVM_COMPILER))  && (__INTEL_LLVM_COMPILER >= 20210102)
-    #ifndef CCMATH_HAS_BUILTIN_BIT_CAST
-        #define CCMATH_HAS_BUILTIN_BIT_CAST
-    #endif
+#if (defined(SYCL_LANGUAGE_VERSION) || defined(__INTEL_LLVM_COMPILER)) && (__INTEL_LLVM_COMPILER >= 20210102)
+	#ifndef CCMATH_HAS_BUILTIN_BIT_CAST
+		#define CCMATH_HAS_BUILTIN_BIT_CAST
+	#endif
 #endif
 
 // NVIDIA HPC 22.7+ has __builtin_bit_cast (Maybe lower? This is as low as I can test currently)
@@ -68,7 +69,7 @@
 
 // MSVC 19.27+ has __builtin_bit_cast
 #if defined(_MSC_VER) && !defined(__clang__) && (_MSC_VER >= 1927)
-    #ifndef CCMATH_HAS_BUILTIN_BIT_CAST
-        #define CCMATH_HAS_BUILTIN_BIT_CAST
-    #endif
+	#ifndef CCMATH_HAS_BUILTIN_BIT_CAST
+		#define CCMATH_HAS_BUILTIN_BIT_CAST
+	#endif
 #endif
