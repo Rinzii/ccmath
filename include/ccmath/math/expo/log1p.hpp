@@ -21,6 +21,11 @@
 #include <limits>
 #include <type_traits>
 
+#if defined(_MSC_VER) && !defined(__clang__)
+	#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
+CCM_DISABLE_MSVC_WARNING(4702)
+#endif
+
 namespace ccm
 {
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
