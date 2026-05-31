@@ -10,7 +10,9 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/basic/remainder.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/math/nearest/trunc.hpp"
 
@@ -26,6 +28,11 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T remainder(T x, T y)
 	{
+		if (!ccm::support::is_constant_evaluated())
+		{
+			if constexpr (ccm::builtin::has_runtime_remainder<T>) { return ccm::builtin::runtime_remainder(x, y); }
+		}
+
 		using FPBits_t = typename ccm::support::fp::FPBits<T>;
 		const FPBits_t x_bits(x);
 		const FPBits_t y_bits(y);

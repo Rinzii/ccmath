@@ -60,8 +60,6 @@ namespace ccm
 				}
 			}
 
-			// Calculate the remainder of the division of x by y.
-			// Static_cast is required to prevent the compiler from complaining about narrowing with integer types.
 			return static_cast<T>(x - (ccm::trunc<T>(x / y) * y));
 		}
 

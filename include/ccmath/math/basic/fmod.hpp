@@ -10,8 +10,10 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/basic/fmod.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/nearest/trunc.hpp"
 
 #include <limits>
@@ -24,6 +26,11 @@ namespace ccm
 		template <typename T>
 		constexpr T fmod_impl_check(T x, T y) noexcept
 		{
+			if (!ccm::support::is_constant_evaluated())
+			{
+				if constexpr (ccm::builtin::has_runtime_fmod<T>) { return ccm::builtin::runtime_fmod(x, y); }
+			}
+
 			// Special edge cases for floating-point types.
 			if constexpr (std::numeric_limits<T>::is_iec559)
 			{
@@ -60,8 +67,6 @@ namespace ccm
 				}
 			}
 
-			// Calculate the remainder of the division of x by y.
-			// Static_cast is required to prevent the compiler from complaining about narrowing with integer types.
 			return static_cast<T>(x - (ccm::trunc<T>(x / y) * y));
 		}
 
