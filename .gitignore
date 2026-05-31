@@ -60,3 +60,18 @@ compile_commands.json
 # If the user did not configure there project properly then this is here to prevent an accidental push of these files
 cmake-build-*/
 
+# libFuzzer corpus, seeds, and crash artifacts (build tree only)
+fuzzing/corpus/
+fuzzing/seeds/
+fuzzing/artifacts/
+fuzzing/crash-*
+fuzzing/timeout-*
+fuzzing/leak-*
+fuzzing/oom-*
+fuzzing/slow-unit-*
+fuzzing/minimize-crash-*
+
+# Local scratch repros and ad-hoc fuzz runs
+out/tmp/
+out/fuzztest/
+
