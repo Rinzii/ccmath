@@ -12,12 +12,21 @@
 
 #include "fp_bits.hpp"
 
+#include "ccmath/internal/support/fenv/rounding_mode.hpp"
+
 #include <cfenv>
 #include <cstdint>
 #include <type_traits>
 
 namespace ccm::support::fp
 {
+	/// Exact zero with sign per the current rounding mode (downward yields −0).
+	template <typename T>
+	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> signed_zero_for_current_mode() noexcept
+	{
+		if (ccm::support::fenv::get_rounding_mode() == FE_DOWNWARD) { return T(-0.0); }
+		return T(0.0);
+	}
 
 	// NOLINTNEXTLINE
 	enum class rounding_mode

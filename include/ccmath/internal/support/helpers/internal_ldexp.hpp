@@ -70,6 +70,12 @@ namespace ccm::support::helpers
 		// For all other values, NormalFloat to T conversion handles it the right way.
 		types::DyadicFloat<fp::FPBits<T>::storage_length> normal(bits.get_val());
 		normal.exponent += static_cast<int>(exp);
-		return normal.template as<T, false>();
+		T const result = normal.template as<T, false>();
+		if (exp < 0 && fp::FPBits<T>(result).is_zero())
+		{
+			fenv::set_errno_if_required(ERANGE);
+			fenv::raise_except_if_required(FE_UNDERFLOW);
+		}
+		return result;
 	}
 } // namespace ccm::support::helpers

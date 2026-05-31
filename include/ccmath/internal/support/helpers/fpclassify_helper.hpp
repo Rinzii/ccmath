@@ -33,7 +33,7 @@ namespace ccm::support::helpers
 		static constexpr int eFP_ZERO	   = 0;
 		static constexpr int eFP_SUBNORMAL = -2;
 		static constexpr int eFP_NORMAL	   = -1;
-#elif defined(CCMATH_COMPILER_APPLE_CLANG) // Apple Clang has a different set of defines than Clang
+#elif defined(__APPLE__) && defined(__MACH__) // Darwin has a different set of defines than generic Clang.
 		static constexpr int eFP_NAN	   = 1;
 		static constexpr int eFP_INFINITE  = 2;
 		static constexpr int eFP_ZERO	   = 3;
