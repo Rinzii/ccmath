@@ -10,7 +10,51 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/nearest/round.hpp"
+#include "ccmath/internal/support/fp/directional_rounding_utils.hpp"
+#include "ccmath/math/compare/isinf.hpp"
+#include "ccmath/math/compare/isnan.hpp"
+
+#include <type_traits>
+
 namespace ccm
 {
+	/**
+	 * @brief Rounds num to the nearest integer, with halfway cases away from zero.
+	 * @tparam T The type of the number.
+	 * @param num A floating-point or integer value.
+	 * @return The rounded value.
+	 */
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
+	constexpr T round(T num) noexcept
+	{
+		if constexpr (ccm::builtin::has_constexpr_round<T>) { return ccm::builtin::round(num); }
+		else
+		{
+			// If num is NaN, NaN is returned.
+			// If num is ±∞ or ±0, num is returned, unmodified.
+			if (ccm::isinf(num) || num == static_cast<T>(0) || ccm::isnan(num)) { return num; }
 
+			constexpr int round_mode = static_cast<int>(ccm::support::fp::rounding_mode::eFE_TONEARESTFROMZERO);
+			return ccm::support::fp::directional_round(num, round_mode);
+		}
+	}
+
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
+	constexpr double round(Integer num) noexcept
+	{
+		return static_cast<double>(num);
+	}
+
+	constexpr float roundf(float num) noexcept
+	{
+		return ccm::round<float>(num);
+	}
+
+	constexpr double roundl(double num) noexcept
+	{
+		return ccm::round<double>(num);
+	}
 } // namespace ccm
+
+/// @ingroup nearest

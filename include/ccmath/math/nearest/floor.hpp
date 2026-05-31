@@ -13,6 +13,7 @@
 #include "ccmath/internal/math/generic/builtins/nearest/floor.hpp"
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
+#include "ccmath/math/nearest/trunc.hpp"
 
 #include <limits>
 #include <type_traits>
@@ -89,10 +90,9 @@ namespace ccm
 			// If num is ±∞ or ±0, num is returned, unmodified.
 			if (ccm::isinf(num) || num == static_cast<T>(0) || ccm::isnan(num)) { return num; }
 
-			// TODO: This approach should work with long double perfectly, but is slow.
-			//		 at some consider adding a faster approach that is just as consistent.
-			if (num > 0) { return internal::impl::floor_pos_impl(num); }
-			return internal::impl::floor_neg_impl(num);
+			const T truncated = ccm::trunc(num);
+			if (truncated == num || num > static_cast<T>(0)) { return truncated; }
+			return truncated - static_cast<T>(1);
 		}
 	}
 
