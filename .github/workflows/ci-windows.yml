@@ -50,7 +50,7 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Cache build
         uses: actions/cache@v4

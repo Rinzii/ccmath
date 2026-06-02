@@ -12,7 +12,7 @@ jobs:
   format_code:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install clang-format
         uses: aminya/setup-cpp@3aac37c3fbde6cb1d2fa0a0a7e945b63b10561d5 # v1.1.0
