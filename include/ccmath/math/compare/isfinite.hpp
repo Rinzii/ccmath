@@ -41,7 +41,7 @@ namespace ccm
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr bool isfinite(Integer /* x */)
 	{
-		return false; // All integers are finite
+		return true; // All integers are finite
 	}
 
 } // namespace ccm
