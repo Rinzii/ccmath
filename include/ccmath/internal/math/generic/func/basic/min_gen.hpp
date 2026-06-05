@@ -39,6 +39,10 @@ namespace ccm::gen
 
 			if (CCM_UNLIKELY(x_is_nan)) { return y; }
 			if (CCM_UNLIKELY(y_is_nan)) { return x; }
+
+			// Preserve IEC 60559 signed-zero behavior for fmin: if both are zero,
+			// return -0 when either argument is -0.
+			if (CCM_UNLIKELY(x_bits.is_zero() && y_bits.is_zero())) { return x_bits.is_neg() ? x : y; }
 		}
 
 		return (x < y) ? x : y;
