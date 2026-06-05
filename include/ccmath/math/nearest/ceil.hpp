@@ -79,9 +79,9 @@ namespace ccm
 	 * @return Smallest integer value not less than num, as double.
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/ceil
 	 */
-	constexpr double ceill(double num) noexcept
+	constexpr long double ceill(long double num) noexcept
 	{
-		return ccm::ceil<double>(num);
+		return ccm::ceil<long double>(num);
 	}
 } // namespace ccm
 

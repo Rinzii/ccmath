@@ -16,6 +16,7 @@
 
 #include <cmath>
 #include <limits>
+#include <type_traits>
 #include <vector>
 
 #ifdef __clang__
@@ -165,6 +166,13 @@ TEST(CcmathNearestCeilRoundRintTests, CeilIntegralPromotion)
 {
 	EXPECT_DOUBLE_EQ(ccm::ceil(2), std::ceil(2.0));
 	EXPECT_DOUBLE_EQ(ccm::ceil(-2), std::ceil(-2.0));
+}
+
+TEST(CcmathNearestCeilRoundRintTests, LongDoubleAliasesHaveStandardSignatures)
+{
+	static_assert(std::is_same_v<decltype(&ccm::ceill), long double (*)(long double) noexcept>);
+	static_assert(std::is_same_v<decltype(&ccm::floorl), long double (*)(long double) noexcept>);
+	static_assert(std::is_same_v<decltype(&ccm::roundl), long double (*)(long double) noexcept>);
 }
 
 #ifdef CLANG_LINUX
