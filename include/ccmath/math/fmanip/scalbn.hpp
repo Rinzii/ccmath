@@ -98,6 +98,18 @@ namespace ccm
 		return ccm::scalbn<double>(static_cast<double>(num), exp);
 	}
 
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
+	constexpr T scalbln(T num, long int exp) noexcept
+	{
+		return ccm::scalbn(num, exp);
+	}
+
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
+	constexpr double scalbln(Integer num, long int exp) noexcept
+	{
+		return ccm::scalbn<double>(static_cast<double>(num), exp);
+	}
+
 	/**
 	 * @brief Multiplies a number by FLT_RADIX raised to a power
 	 * @param num Floating-point value.
@@ -144,6 +156,16 @@ namespace ccm
 	constexpr long double scalbnl(long double num, long exp) noexcept
 	{
 		return ccm::scalbn<long double>(num, exp);
+	}
+
+	constexpr float scalblnf(float num, long int exp) noexcept
+	{
+		return ccm::scalbln<float>(num, exp);
+	}
+
+	constexpr long double scalblnl(long double num, long int exp) noexcept
+	{
+		return ccm::scalbln<long double>(num, exp);
 	}
 } // namespace ccm
 

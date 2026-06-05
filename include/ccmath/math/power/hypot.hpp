@@ -41,6 +41,40 @@ namespace ccm
 	}
 
 	/**
+	 * @brief Computes the length of the three-dimensional hypotenuse.
+	 * @tparam T Floating-point type.
+	 * @param x First value.
+	 * @param y Second value.
+	 * @param z Third value.
+	 * @return sqrt(x*x + y*y + z*z) computed with the same scaling behavior as the 2-argument overload.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/hypot
+	 */
+	constexpr float hypot(float x, float y, float z) noexcept
+	{
+		return ccm::hypot(ccm::hypot(x, y), z);
+	}
+
+	constexpr double hypot(double x, double y, double z) noexcept
+	{
+		return ccm::hypot(ccm::hypot(x, y), z);
+	}
+
+	constexpr long double hypot(long double x, long double y, long double z) noexcept
+	{
+		return ccm::hypot(ccm::hypot(x, y), z);
+	}
+
+	template <typename Arithmetic1,
+			  typename Arithmetic2,
+			  typename Arithmetic3,
+			  std::enable_if_t<std::is_arithmetic_v<Arithmetic1> && std::is_arithmetic_v<Arithmetic2> && std::is_arithmetic_v<Arithmetic3>, bool> = true>
+	constexpr auto hypot(Arithmetic1 x, Arithmetic2 y, Arithmetic3 z) noexcept
+	{
+		using shared_type = std::common_type_t<Arithmetic1, Arithmetic2, Arithmetic3>;
+		return ccm::hypot(static_cast<shared_type>(x), static_cast<shared_type>(y), static_cast<shared_type>(z));
+	}
+
+	/**
 	 * @brief Computes the hypotenuse for float values.
 	 * @param x First value.
 	 * @param y Second value.

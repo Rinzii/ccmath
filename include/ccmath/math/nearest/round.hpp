@@ -77,9 +77,9 @@ namespace ccm
 	 * @return Rounded value as double.
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/round
 	 */
-	constexpr double roundl(double num) noexcept
+	constexpr long double roundl(long double num) noexcept
 	{
-		return ccm::round<double>(num);
+		return ccm::round<long double>(num);
 	}
 } // namespace ccm
 
