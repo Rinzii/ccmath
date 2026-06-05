@@ -58,6 +58,12 @@ TEST(CcmathPowerTests, HypotTypedAliases)
 	EXPECT_EQ(ccm::hypotl(3.0L, 4.0L), ccm::hypot(3.0L, 4.0L));
 }
 
+TEST(CcmathPowerTests, HypotThreeArgsMatchesStd)
+{
+	ccm::test::ExpectSameFloatingAsStd(ccm::hypot(2.0, 3.0, 6.0), std::hypot(2.0, 3.0, 6.0));
+	ccm::test::ExpectSameFloatingAsStd(ccm::hypot(2.0F, 3.0F, 6.0F), std::hypot(2.0F, 3.0F, 6.0F));
+}
+
 TEST(CcmathPowerTests, CbrtMatchesStdGrid)
 {
 	for (double input : ccm::test::samples::kCbrtDouble)
@@ -94,5 +100,6 @@ TEST(CcmathPowerTests, CbrtTypedAliases)
 TEST(CcmathPowerTests, HypotCbrtCompileTime)
 {
 	static_assert(ccm::hypot(3.0, 0.0) == 3.0);
+	static_assert(ccm::hypot(2.0, 3.0, 6.0) == 7.0);
 	static_assert(ccm::cbrt(8.0) == 2.0);
 }

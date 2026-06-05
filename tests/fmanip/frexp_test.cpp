@@ -36,6 +36,18 @@ TEST(CcmathFmanipTests, FrexpBasic)
 	EXPECT_EQ(exp, 0);
 }
 
+TEST(CcmathFmanipTests, FrexpPointerOverloadMatchesStd)
+{
+	int exp{};
+	int std_exp{};
+
+	const double ccm_value = ccm::frexp(12.0, &exp);
+	const double std_value = std::frexp(12.0, &std_exp);
+
+	EXPECT_EQ(ccm_value, std_value);
+	EXPECT_EQ(exp, std_exp);
+}
+
 TEST(CcmathFmanipTests, FrexpFloat)
 {
 	int exp{};

@@ -50,3 +50,9 @@ TEST(CcmathFmanipTests, ScalbnLongDouble)
     */
 }
 
+TEST(CcmathFmanipTests, ScalblnMatchesStd)
+{
+	EXPECT_EQ(ccm::scalbln(7.0, -4L), std::scalbln(7.0, -4L));
+	EXPECT_EQ(ccm::scalblnf(7.0F, -4L), std::scalbln(7.0F, -4L));
+	EXPECT_EQ(ccm::scalblnl(7.0L, -4L), std::scalbln(7.0L, -4L));
+}
