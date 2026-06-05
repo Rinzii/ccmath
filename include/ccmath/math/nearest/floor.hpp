@@ -132,9 +132,9 @@ namespace ccm
 	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/floor
 	 */
-	constexpr double floorl(double num) noexcept
+	constexpr long double floorl(long double num) noexcept
 	{
-		return ccm::floor<double>(num);
+		return ccm::floor<long double>(num);
 	}
 } // namespace ccm
 
