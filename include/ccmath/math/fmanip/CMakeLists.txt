@@ -6,7 +6,9 @@ ccm_add_headers(
         logb.hpp
         modf.hpp
         nextafter.hpp
+        nextdown.hpp
         nexttoward.hpp
+        nextup.hpp
         scalbn.hpp
 )
 
