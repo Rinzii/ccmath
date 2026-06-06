@@ -73,7 +73,7 @@ namespace ccm::support::fp
 		{
 			// Special case for 96-bit long double on x86
 #if __SIZEOF_LONG_DOUBLE__ == 12
-			using StorageType = types::UInt<__SIZEOF_LONG_DOUBLE__ * CHAR_BIT>;
+			using storage_type = types::UInt<__SIZEOF_LONG_DOUBLE__ * CHAR_BIT>;
 #else
 			using storage_type = types::uint128_t;
 #endif
