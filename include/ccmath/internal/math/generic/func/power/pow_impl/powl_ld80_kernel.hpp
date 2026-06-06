@@ -35,7 +35,7 @@ namespace ccm::gen::internal::impl::bit80
 {
 	namespace powl_ld80_detail
 	{
-		constexpr long double fma_dx(long double x, long double y, long double z) noexcept
+		inline long double fma_dx(long double x, long double y, long double z) noexcept
 		{
 	#if defined(CCMATH_TARGET_CPU_HAS_FMA)
 			return support::multiply_add(x, y, z);
@@ -225,10 +225,7 @@ namespace ccm::gen::internal::impl::bit80
 					support::fenv::raise_except_if_required(FE_UNDERFLOW);
 					final = 0.0L;
 				}
-				else
-				{
-					final = final_bits.abs().get_val();
-				}
+				else { final = final_bits.abs().get_val(); }
 			}
 			else if (scale == kScaleDown && final_bits.is_finite() && !final_bits.is_zero() && final_bits.abs().uintval() < FPBits_t::min_subnormal().uintval())
 			{
@@ -243,7 +240,9 @@ namespace ccm::gen::internal::impl::bit80
 	} // namespace powl_ld80_detail
 
 	constexpr long double powl_ld80_general_finite(long double base, long double exp) noexcept
-	{ return powl_ld80_detail::powl_ld80_general_finite(base, exp); }
+	{
+		return powl_ld80_detail::powl_ld80_general_finite(base, exp);
+	}
 
 } // namespace ccm::gen::internal::impl::bit80
 

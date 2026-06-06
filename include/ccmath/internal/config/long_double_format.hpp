@@ -27,9 +27,9 @@ namespace ccm::config
 		constexpr int digits	   = std::numeric_limits<long double>::digits;
 		constexpr int max_exponent = std::numeric_limits<long double>::max_exponent;
 
-		if (digits == 53 && max_exponent == 1024) { return LongDoubleFormat::Double; }
-		if (digits == 64 && max_exponent == 16384) { return LongDoubleFormat::X87Extended; }
-		if (digits == 113 && max_exponent == 16384) { return LongDoubleFormat::IEEEBinary128; }
+		if constexpr (digits == 53 && max_exponent == 1024) { return LongDoubleFormat::Double; }
+		else if constexpr (digits == 64 && max_exponent == 16384) { return LongDoubleFormat::X87Extended; }
+		else if constexpr (digits == 113 && max_exponent == 16384) { return LongDoubleFormat::IEEEBinary128; }
 		return LongDoubleFormat::Unknown;
 	}
 

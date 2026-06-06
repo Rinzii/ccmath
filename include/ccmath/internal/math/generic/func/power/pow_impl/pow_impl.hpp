@@ -38,7 +38,7 @@ namespace ccm::gen::impl
 	{
 		namespace pow_kernel_detail
 		{
-			constexpr double fma_dx(double x, double y, double z) noexcept
+			inline double fma_dx(double x, double y, double z) noexcept
 			{
 #if defined(CCMATH_TARGET_CPU_HAS_FMA)
 				return support::multiply_add(x, y, z);
@@ -311,6 +311,8 @@ namespace ccm::gen::impl
 	} // namespace internal::impl
 
 	constexpr double pow_impl(double base, double exp) noexcept
-	{ return internal::impl::pow_impl(base, exp); }
+	{
+		return internal::impl::pow_impl(base, exp);
+	}
 
 } // namespace ccm::gen::impl
