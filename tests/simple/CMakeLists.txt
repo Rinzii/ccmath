@@ -95,5 +95,6 @@ set_tests_properties(ccmath-simple-misc PROPERTIES LABELS simple)
 
 ccmath_add_test(ccmath-simple-internal-types
         ../math/internal/types/big_int_test.cpp
+        ../math/internal/types/dyadic_float_test.cpp
 )
 set_tests_properties(ccmath-simple-internal-types PROPERTIES LABELS simple)

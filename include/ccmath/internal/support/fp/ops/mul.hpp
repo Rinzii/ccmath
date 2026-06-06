@@ -32,12 +32,12 @@ namespace ccm::support::fp::op
 	mul(InType x, InType y)
 	{
 		using OutFPBits		 = FPBits<OutType>;
-		using OutStorageType = typename OutFPBits::StorageType;
+		using OutStorageType = typename OutFPBits::storage_type;
 		using InFPBits		 = FPBits<InType>;
-		using InStorageType	 = typename InFPBits::StorageType;
+		using InStorageType	 = typename InFPBits::storage_type;
 
 		// The product of two p-digit numbers is a 2p-digit number.
-		using DyadicFloat = types::DyadicFloat<ccm::support::bit_ceil(2 * static_cast<size_t>(InFPBits::SIG_LEN))>;
+		using DyadicFloat = types::DyadicFloat<ccm::support::bit_ceil(2 * static_cast<size_t>(InFPBits::significand_length))>;
 
 		InFPBits x_bits(x);
 		InFPBits y_bits(y);
@@ -98,7 +98,7 @@ namespace ccm::support::fp::op
 		DyadicFloat xd(x);
 		DyadicFloat yd(y);
 
-		DyadicFloat result = quick_mul(xd, yd);
+		types::DyadicFloat<ccm::support::bit_ceil(2 * static_cast<size_t>(InFPBits::significand_length))> result = types::quick_mul(xd, yd);
 		return result.template as<OutType, /*ShouldSignalExceptions=*/true>();
 	}
 } // namespace ccm::support::fp::op

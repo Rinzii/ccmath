@@ -609,20 +609,92 @@ namespace ccm::types
 		 * @tparam OtherSigned The signedness of the source BigInt.
 		 * @param other The source BigInt to construct from.
 		 */
-		template <size_t OtherBits, bool OtherSigned>
-		constexpr BigInt(const BigInt<OtherBits, OtherSigned, WordType> & other) // NOLINT(google-explicit-constructor)
+		template <size_t OtherBits, bool OtherSigned, typename OtherWordType = WordType>
+		constexpr BigInt(const BigInt<OtherBits, OtherSigned, OtherWordType> & other) // NOLINT(google-explicit-constructor)
 		{
-			if constexpr (OtherBits >= Bits)
+			using BigIntOther = BigInt<OtherBits, OtherSigned, OtherWordType>;
+			[[maybe_unused]] const bool should_sign_extend = Signed && other.is_neg();
+
+			static_assert(!(Bits == OtherBits && WORD_SIZE != BigIntOther::WORD_SIZE),
+						  "Casting between BigInts with the same bit width but different word sizes is untested.");
+
+			if constexpr (BigIntOther::WORD_SIZE < WORD_SIZE)
 			{
-				// Truncate the extra bits
-				for (size_t i = 0; i < WORD_COUNT; ++i) { val[i] = other[i]; }
+				constexpr std::size_t WORD_SIZE_RATIO = WORD_SIZE / BigIntOther::WORD_SIZE;
+				static_assert((WORD_SIZE % BigIntOther::WORD_SIZE) == 0,
+							  "Word types must be multiples of each other for correct conversion.");
+				if constexpr (OtherBits >= Bits)
+				{
+					for (std::size_t i = 0; i < WORD_COUNT; ++i)
+					{
+						WordType cur_word = 0;
+						for (std::size_t j = 0; j < WORD_SIZE_RATIO; ++j)
+						{
+							cur_word |= static_cast<WordType>(other[(i * WORD_SIZE_RATIO) + j]) << (BigIntOther::WORD_SIZE * j);
+						}
+						val[i] = cur_word;
+					}
+				}
+				else
+				{
+					std::size_t i	 = 0;
+					WordType cur_word = 0;
+					for (; i < BigIntOther::WORD_COUNT; ++i)
+					{
+						cur_word |= static_cast<WordType>(other[i]) << (BigIntOther::WORD_SIZE * (i % WORD_SIZE_RATIO));
+						if ((i % WORD_SIZE_RATIO) == WORD_SIZE_RATIO - 1)
+						{
+							val[i / WORD_SIZE_RATIO] = cur_word;
+							cur_word				 = 0;
+						}
+					}
+					const WordType extension_bits =
+						should_sign_extend ? std::numeric_limits<WordType>::max() : std::numeric_limits<WordType>::min();
+					if ((i % WORD_SIZE_RATIO) != 0)
+					{
+						cur_word |= static_cast<WordType>(extension_bits) << (BigIntOther::WORD_SIZE * (i % WORD_SIZE_RATIO));
+					}
+					val[i / WORD_SIZE_RATIO] = cur_word;
+					extend((i / WORD_SIZE_RATIO) + 1, should_sign_extend);
+				}
+			}
+			else if constexpr (BigIntOther::WORD_SIZE == WORD_SIZE)
+			{
+				if constexpr (OtherBits >= Bits)
+				{
+					for (std::size_t i = 0; i < WORD_COUNT; ++i) { val[i] = other[i]; }
+				}
+				else
+				{
+					std::size_t i = 0;
+					for (; i < BigIntOther::WORD_COUNT; ++i) { val[i] = other[i]; }
+					extend(i, should_sign_extend);
+				}
 			}
 			else
 			{
-				// Zero or sign extend based on the signedness
-				size_t i = 0;
-				for (; i < OtherBits / WORD_SIZE; ++i) { val[i] = other[i]; }
-				extend(i, Signed && other.is_neg());
+				constexpr std::size_t WORD_SIZE_RATIO = BigIntOther::WORD_SIZE / WORD_SIZE;
+				static_assert((BigIntOther::WORD_SIZE % WORD_SIZE) == 0,
+							  "Word types must be multiples of each other for correct conversion.");
+				if constexpr (OtherBits >= Bits)
+				{
+					for (std::size_t i = 0; i < WORD_COUNT; ++i)
+					{
+						val[i] = static_cast<WordType>(other[i / WORD_SIZE_RATIO] >> ((i % WORD_SIZE_RATIO) * WORD_SIZE));
+					}
+				}
+				else
+				{
+					std::size_t i = 0;
+					for (; i < BigIntOther::WORD_COUNT; ++i)
+					{
+						for (std::size_t j = 0; j < WORD_SIZE_RATIO; ++j)
+						{
+							val[(i * WORD_SIZE_RATIO) + j] = static_cast<WordType>(other[i] >> (j * WORD_SIZE));
+						}
+					}
+					extend(i * WORD_SIZE_RATIO, should_sign_extend);
+				}
 			}
 		}
 
@@ -1216,6 +1288,18 @@ namespace ccm::types
 
 		constexpr WordType & operator[](std::size_t i) { return val.at(i); }
 
+		[[nodiscard]] constexpr bool get_bit(std::size_t i) const
+		{
+			const std::size_t word_index = i / WORD_SIZE;
+			return (WordType(1) & (val[word_index] >> (i % WORD_SIZE))) != 0;
+		}
+
+		constexpr void set_bit(std::size_t i)
+		{
+			const std::size_t word_index = i / WORD_SIZE;
+			val[word_index] |= WordType(1) << (i % WORD_SIZE);
+		}
+
 	private:
 		friend constexpr int cmp(const BigInt & lhs, const BigInt & rhs)
 		{
@@ -1249,7 +1333,7 @@ namespace ccm::types
 
 		constexpr void increment() { multiword::add_with_carry(val, std::array<WordType, 1>{ 1 }); }
 
-		constexpr void decrement() { multiword::add_with_carry(val, std::array<WordType, 1>{ 1 }); }
+		constexpr void decrement() { multiword::sub_with_borrow(val, std::array<WordType, 1>{ 1 }); }
 
 		constexpr void extend(std::size_t index, bool is_neg)
 		{
@@ -1262,12 +1346,6 @@ namespace ccm::types
 		constexpr void set_msb() { val.back() |= support::mask_leading_ones<WordType, 1>(); }
 
 		constexpr void clear_msb() { val.back() &= support::mask_trailing_ones<WordType, WORD_SIZE - 1>(); }
-
-		constexpr void set_bit(std::size_t i)
-		{
-			const std::size_t word_index = i / WORD_SIZE;
-			val[word_index] |= WordType(1) << (i % WORD_SIZE);
-		}
 
 		constexpr static Division divide_unsigned(const BigInt & dividend, const BigInt & divider)
 		{
@@ -1377,26 +1455,15 @@ namespace ccm::types
 /// Specialization of std::numeric_limits for BigInt types.
 namespace std
 {
-	template <>
+	template <std::size_t Bits, bool Signed, typename WordType>
 	// ReSharper disable once CppMismatchedClassTags - Compilers are inconsistent with struct or class. Functionally the selection does not matter.
-	struct numeric_limits<ccm::types::UInt<128>>
+	struct numeric_limits<ccm::types::BigInt<Bits, Signed, WordType>>
 	{
 	public:
-		static constexpr ccm::types::UInt<128> max() { return ccm::types::UInt<128>::max(); }
-		static constexpr ccm::types::UInt<128> min() { return ccm::types::UInt<128>::min(); }
+		static constexpr ccm::types::BigInt<Bits, Signed, WordType> max() { return ccm::types::BigInt<Bits, Signed, WordType>::max(); }
+		static constexpr ccm::types::BigInt<Bits, Signed, WordType> min() { return ccm::types::BigInt<Bits, Signed, WordType>::min(); }
 
-		static constexpr int digits = 128;
-	};
-
-	template <>
-	// ReSharper disable once CppMismatchedClassTags - Compilers are inconsistent with struct or class. Functionally the selection does not matter.
-	struct numeric_limits<ccm::types::Int<128>>
-	{
-	public:
-		static constexpr ccm::types::Int<128> max() { return ccm::types::Int<128>::max(); }
-		static constexpr ccm::types::Int<128> min() { return ccm::types::Int<128>::min(); }
-
-		static constexpr int digits = 128;
+		static constexpr int digits = static_cast<int>(Bits - Signed);
 	};
 } // namespace std
 
