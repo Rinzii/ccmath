@@ -14,7 +14,7 @@
 #include "ccmath/internal/config/type_support.hpp"
 #include "ccmath/internal/math/generic/func/power/pow_impl/pow_impl.hpp"
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
-#include "ccmath/internal/math/generic/func/power/pow_impl/powl_ld80_kernel.hpp"
+	#include "ccmath/internal/math/generic/func/power/pow_impl/powl_ld80_kernel.hpp"
 #endif
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
@@ -36,9 +36,7 @@ namespace ccm::gen
 
 			template <typename Storage>
 			constexpr bool storage_is_zero(Storage value) noexcept
-			{
-				return value == Storage{};
-			}
+			{ return value == Storage{}; }
 
 			template <typename Storage>
 			constexpr int storage_countr_zero(Storage value) noexcept
@@ -69,7 +67,7 @@ namespace ccm::gen
 				if (bits.is_nan() || bits.is_inf()) { return false; }
 				if (bits.is_zero()) { return true; }
 
-				const int exponent = bits.get_explicit_exponent();
+				const int exponent							   = bits.get_explicit_exponent();
 				const typename FPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
 				if (storage_is_zero(mantissa)) { return true; }
 
@@ -82,9 +80,9 @@ namespace ccm::gen
 				if (!is_integer(bits)) { return false; }
 				if (bits.is_zero()) { return false; }
 
-				const int exponent = bits.get_explicit_exponent();
+				const int exponent							   = bits.get_explicit_exponent();
 				const typename FPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
-				const int trailing_zeros = storage_countr_zero(mantissa);
+				const int trailing_zeros					   = storage_countr_zero(mantissa);
 				return exponent + trailing_zeros == static_cast<int>(FPBits_t::fraction_length);
 			}
 
@@ -100,10 +98,10 @@ namespace ccm::gen
 				}
 				if (!is_integer(bits)) { return false; }
 
-				const int exponent = bits.get_explicit_exponent();
+				const int exponent						 = bits.get_explicit_exponent();
 				typename FPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
-				const int trailing_zeros = storage_countr_zero(mantissa);
-				const int scale = exponent + trailing_zeros - static_cast<int>(FPBits_t::fraction_length);
+				const int trailing_zeros				 = storage_countr_zero(mantissa);
+				const int scale							 = exponent + trailing_zeros - static_cast<int>(FPBits_t::fraction_length);
 				if (scale < 0) { return false; }
 
 				mantissa >>= static_cast<unsigned>(trailing_zeros);
@@ -117,36 +115,26 @@ namespace ccm::gen
 			}
 
 			constexpr bool is_integer(long double val) noexcept
-			{
-				return is_integer(FPBits_t(val));
-			}
+			{ return is_integer(FPBits_t(val)); }
 
 			constexpr bool is_odd_integer(long double val) noexcept
-			{
-				return is_odd_integer(FPBits_t(val));
-			}
+			{ return is_odd_integer(FPBits_t(val)); }
 
 			constexpr bool try_extract_int64(long double val, std::int64_t & out) noexcept
-			{
-				return try_extract_int64(FPBits_t(val), out);
-			}
+			{ return try_extract_int64(FPBits_t(val), out); }
 
 		} // namespace powl_bits
 
 		namespace impl
 		{
 			using FPBits_t = support::fp::FPBits<long double>;
-			using Sign = types::Sign;
+			using Sign	   = types::Sign;
 
 			constexpr long double powl_unsupported_result() noexcept
-			{
-				return std::numeric_limits<long double>::quiet_NaN();
-			}
+			{ return std::numeric_limits<long double>::quiet_NaN(); }
 
 			constexpr long double powl_reduced_precision_double_fallback(long double base, long double exp) noexcept
-			{
-				return static_cast<long double>(::ccm::gen::impl::pow_impl(static_cast<double>(base), static_cast<double>(exp)));
-			}
+			{ return static_cast<long double>(::ccm::gen::impl::pow_impl(static_cast<double>(base), static_cast<double>(exp))); }
 
 			constexpr long double powl_bounded_integer(long double base, std::int64_t exp) noexcept
 			{
@@ -155,7 +143,7 @@ namespace ccm::gen
 
 				long double result = 1.0L;
 				long double factor = base;
-				std::uint64_t e = static_cast<std::uint64_t>(exp);
+				std::uint64_t e	   = static_cast<std::uint64_t>(exp);
 				while (e > 0)
 				{
 					if ((e & 1U) != 0U) { result *= factor; }
@@ -212,7 +200,7 @@ namespace ccm::gen
 					if (exp_bits.is_inf())
 					{
 						const long double base_abs = base_bits.abs().get_val();
-						const long double one = 1.0L;
+						const long double one	   = 1.0L;
 
 						if (base_abs == one) { return 1.0L; }
 
@@ -229,8 +217,8 @@ namespace ccm::gen
 					}
 
 					long double working_base = base;
-					long double working_exp = exp;
-					bool result_is_neg = false;
+					long double working_exp	 = exp;
+					bool result_is_neg		 = false;
 
 					if (base_bits.is_neg())
 					{
@@ -248,10 +236,7 @@ namespace ccm::gen
 
 					const FPBits_t exp_abs_bits(exp);
 					const long double exp_abs = exp_abs_bits.abs().get_val();
-					if (exp_abs > kPowlHugeExponentThreshold)
-					{
-						working_exp = exp_abs_bits.is_neg() ? -0x1.0p100L : 0x1.0p100L;
-					}
+					if (exp_abs > kPowlHugeExponentThreshold) { working_exp = exp_abs_bits.is_neg() ? -0x1.0p100L : 0x1.0p100L; }
 
 					long double result = bit80::powl_ld80_general_finite(working_base, working_exp);
 					if (result_is_neg && result != 0.0L && !std::isinf(result) && !ccm::isnan(result)) { result = -result; }
@@ -283,8 +268,6 @@ namespace ccm::gen
 	} // namespace internal
 
 	constexpr long double powl_gen(long double base, long double exp) noexcept
-	{
-		return internal::impl::powl_impl(base, exp);
-	}
+	{ return internal::impl::powl_impl(base, exp); }
 
 } // namespace ccm::gen

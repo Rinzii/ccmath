@@ -12,42 +12,41 @@
 
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
 
-#include "ccmath/internal/math/generic/func/power/pow_impl/powl_ld80_tables.hpp"
-#include "ccmath/internal/support/fenv/fenv_support.hpp"
-#include "ccmath/internal/support/fp/fp_bits.hpp"
-#include "ccmath/internal/support/helpers/internal_ldexp.hpp"
-#include "ccmath/internal/support/fp/nearest_integer.hpp"
-#include "ccmath/internal/support/is_constant_evaluated.hpp"
-#include "ccmath/internal/support/multiply_add.hpp"
-#include "ccmath/internal/support/poly_eval.hpp"
-#include "ccmath/internal/types/number_pair.hpp"
+	#include "ccmath/internal/math/generic/func/power/pow_impl/powl_ld80_tables.hpp"
+	#include "ccmath/internal/support/fenv/fenv_support.hpp"
+	#include "ccmath/internal/support/fp/fp_bits.hpp"
+	#include "ccmath/internal/support/fp/nearest_integer.hpp"
+	#include "ccmath/internal/support/helpers/internal_ldexp.hpp"
+	#include "ccmath/internal/support/is_constant_evaluated.hpp"
+	#include "ccmath/internal/support/multiply_add.hpp"
+	#include "ccmath/internal/support/poly_eval.hpp"
+	#include "ccmath/internal/types/number_pair.hpp"
 
-#include <cfloat>
-#include <cmath>
-#include <cstdint>
-#include <limits>
+	#include <cfloat>
+	#include <cmath>
+	#include <cstdint>
+	#include <limits>
 
 namespace ccm::gen::internal::impl::bit80
 {
 	namespace powl_ld80_detail
 	{
-		using FPBits_t = support::fp::FPBits<long double>;
+		using FPBits_t		 = support::fp::FPBits<long double>;
 		using LongDoublePair = types::NumberPair<long double>;
-		namespace tables = ccm::gen::impl::internal::impl::powl_ld80_tables;
+		namespace tables	 = ccm::gen::impl::internal::impl::powl_ld80_tables;
 
-		inline constexpr long double kScaleUp = 0x1.0p512L;
-		inline constexpr long double kScaleDown = 0x1.0p-512L;
-		inline constexpr long double kUpperY6Bound = 512.0L * 64.0L;
-		inline constexpr long double kOverflowY6HiClamp = (static_cast<long double>(LDBL_MAX_EXP - 2) + 513.0L) * 64.0L;
-		inline constexpr long double kUnderflowY6HiClamp =
-			(static_cast<long double>(LDBL_MIN_EXP - (LDBL_MANT_DIG - 1)) + 512.0L) * 64.0L;
+		inline constexpr long double kScaleUp			 = 0x1.0p512L;
+		inline constexpr long double kScaleDown			 = 0x1.0p-512L;
+		inline constexpr long double kUpperY6Bound		 = 512.0L * 64.0L;
+		inline constexpr long double kOverflowY6HiClamp	 = (static_cast<long double>(LDBL_MAX_EXP - 2) + 513.0L) * 64.0L;
+		inline constexpr long double kUnderflowY6HiClamp = (static_cast<long double>(LDBL_MIN_EXP - (LDBL_MANT_DIG - 1)) + 512.0L) * 64.0L;
 
 		constexpr LongDoublePair exact_add(long double a, long double b) noexcept
 		{
 			LongDoublePair r{ 0.0L, 0.0L };
-			r.hi		   = a + b;
+			r.hi				= a + b;
 			const long double t = r.hi - a;
-			r.lo			   = b - t;
+			r.lo				= b - t;
 			return r;
 		}
 
@@ -64,16 +63,16 @@ namespace ccm::gen::internal::impl::bit80
 		{
 			LongDoublePair r{ 0.0L, 0.0L };
 			r.hi = a * b;
-#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
+	#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
 			r.lo = support::multiply_add(a, b, -r.hi);
-#else
+	#else
 			const LongDoublePair as = split(a);
 			const LongDoublePair bs = split(b);
 			const long double t1	= as.hi * bs.hi - r.hi;
 			const long double t2	= as.hi * bs.lo + t1;
 			const long double t3	= as.lo * bs.hi + t2;
 			r.lo					= as.lo * bs.lo + t3;
-#endif
+	#endif
 			return r;
 		}
 
@@ -90,7 +89,7 @@ namespace ccm::gen::internal::impl::bit80
 
 			if (base_bits.is_subnormal())
 			{
-				base = support::helpers::internal_ldexp(base, LDBL_MANT_DIG - 1);
+				base			= support::helpers::internal_ldexp(base, LDBL_MANT_DIG - 1);
 				base_bits		= FPBits_t(base);
 				exponent_adjust = -(LDBL_MANT_DIG - 1);
 			}
@@ -100,12 +99,10 @@ namespace ccm::gen::internal::impl::bit80
 			typename FPBits_t::storage_type sig = base_bits.get_mantissa();
 			if (base_bits.get_implicit_bit()) { sig |= FPBits_t::EXPLICIT_BIT_MASK; }
 
-			const unsigned idx_x =
-				static_cast<unsigned>((sig & FPBits_t::fraction_mask) >> (FPBits_t::fraction_length - 7));
+			const unsigned idx_x = static_cast<unsigned>((sig & FPBits_t::fraction_mask) >> (FPBits_t::fraction_length - 7));
 
 			const typename FPBits_t::storage_type m_sig = sig & FPBits_t::significand_mask;
-			const long double m_x =
-				FPBits_t::create_value(types::Sign::POS, FPBits_t::exponent_bias, m_sig | FPBits_t::EXPLICIT_BIT_MASK).get_val();
+			const long double m_x = FPBits_t::create_value(types::Sign::POS, FPBits_t::exponent_bias, m_sig | FPBits_t::EXPLICIT_BIT_MASK).get_val();
 
 			long double dx = 0.0L;
 			LongDoublePair dx_c0{ 0.0L, 0.0L };
@@ -113,43 +110,36 @@ namespace ccm::gen::internal::impl::bit80
 			if (support::is_constant_evaluated())
 			{
 				const typename FPBits_t::storage_type frac_mask_high =
-					FPBits_t::fraction_mask &
-					~((static_cast<typename FPBits_t::storage_type>(1) << (FPBits_t::fraction_length - 7)) - 1);
+					FPBits_t::fraction_mask & ~((static_cast<typename FPBits_t::storage_type>(1) << (FPBits_t::fraction_length - 7)) - 1);
 				const typename FPBits_t::storage_type c_sig = (FPBits_t(m_x).get_mantissa() & frac_mask_high) | FPBits_t::EXPLICIT_BIT_MASK;
-				const long double c =
-					FPBits_t::create_value(types::Sign::POS, FPBits_t::exponent_bias, c_sig).get_val();
-				dx = support::multiply_add(tables::RD.at(static_cast<std::size_t>(idx_x)), m_x - c,
-										   tables::CD.at(static_cast<std::size_t>(idx_x)));
+				const long double c							= FPBits_t::create_value(types::Sign::POS, FPBits_t::exponent_bias, c_sig).get_val();
+				dx	  = support::multiply_add(tables::RD.at(static_cast<std::size_t>(idx_x)), m_x - c, tables::CD.at(static_cast<std::size_t>(idx_x)));
 				dx_c0 = exact_mult(tables::POW_LOG2_COEFFS[0], dx);
 			}
 			else
 			{
-#ifdef CCMATH_TARGET_CPU_HAS_FMA
-				dx = support::multiply_add(tables::RD.at(static_cast<std::size_t>(idx_x)), m_x, -1.0L);
+	#ifdef CCMATH_TARGET_CPU_HAS_FMA
+				dx	  = support::multiply_add(tables::RD.at(static_cast<std::size_t>(idx_x)), m_x, -1.0L);
 				dx_c0 = exact_mult(tables::POW_LOG2_COEFFS[0], dx);
-#else
+	#else
 				const typename FPBits_t::storage_type frac_mask_high =
-					FPBits_t::fraction_mask &
-					~((static_cast<typename FPBits_t::storage_type>(1) << (FPBits_t::fraction_length - 7)) - 1);
+					FPBits_t::fraction_mask & ~((static_cast<typename FPBits_t::storage_type>(1) << (FPBits_t::fraction_length - 7)) - 1);
 				const typename FPBits_t::storage_type c_sig = (FPBits_t(m_x).get_mantissa() & frac_mask_high) | FPBits_t::EXPLICIT_BIT_MASK;
-				const long double c =
-					FPBits_t::create_value(types::Sign::POS, FPBits_t::exponent_bias, c_sig).get_val();
-				dx = support::multiply_add(tables::RD.at(static_cast<std::size_t>(idx_x)), m_x - c,
-										   tables::CD.at(static_cast<std::size_t>(idx_x)));
+				const long double c							= FPBits_t::create_value(types::Sign::POS, FPBits_t::exponent_bias, c_sig).get_val();
+				dx	  = support::multiply_add(tables::RD.at(static_cast<std::size_t>(idx_x)), m_x - c, tables::CD.at(static_cast<std::size_t>(idx_x)));
 				dx_c0 = exact_mult(tables::POW_LOG2_COEFFS[0], dx);
-#endif
+	#endif
 			}
 
 			const long double dx2 = dx * dx;
 			const long double c0  = support::multiply_add(dx, tables::POW_LOG2_COEFFS[2], tables::POW_LOG2_COEFFS[1]);
 			const long double c1  = support::multiply_add(dx, tables::POW_LOG2_COEFFS[4], tables::POW_LOG2_COEFFS[3]);
 			const long double c2  = support::multiply_add(dx, tables::POW_LOG2_COEFFS[6], tables::POW_LOG2_COEFFS[5]);
-			const long double p   = support::polyeval(dx2, c0, c1, c2);
+			const long double p	  = support::polyeval(dx2, c0, c1, c2);
 
-			const auto & log2_r = tables::LOG2_R_TD.at(static_cast<std::size_t>(idx_x));
-			LongDoublePair log2_x_hi = exact_add(static_cast<long double>(e_x) + log2_r.hi, dx_c0.hi);
-			const long double log2_x_lo =
-				support::multiply_add(dx2, p, dx_c0.lo + static_cast<long double>(log2_r.mid));
+			const auto & log2_r			= tables::LOG2_R_TD.at(static_cast<std::size_t>(idx_x));
+			LongDoublePair log2_x_hi	= exact_add(static_cast<long double>(e_x) + log2_r.hi, dx_c0.hi);
+			const long double log2_x_lo = support::multiply_add(dx2, p, dx_c0.lo + static_cast<long double>(log2_r.mid));
 
 			LongDoublePair log2_x = exact_add(log2_x_hi.hi, log2_x_lo);
 			log2_x.lo += log2_x_hi.lo + static_cast<long double>(log2_r.lo);
@@ -165,13 +155,13 @@ namespace ccm::gen::internal::impl::bit80
 			{
 				if (FPBits_t(y6_log2_x.hi).sign().is_pos())
 				{
-					scale		   = kScaleUp;
+					scale = kScaleUp;
 					y6_log2_x.hi -= 512.0L * 64.0L;
 					if (y6_log2_x.hi > kOverflowY6HiClamp) { y6_log2_x.hi = kOverflowY6HiClamp; }
 				}
 				else
 				{
-					scale		   = kScaleDown;
+					scale = kScaleDown;
 					y6_log2_x.hi += 512.0L * 64.0L;
 					if (y6_log2_x.hi < kUnderflowY6HiClamp)
 					{
@@ -186,14 +176,13 @@ namespace ccm::gen::internal::impl::bit80
 			const long double lo6_hi = y6_log2_x.hi - hm;
 			const long double lo6	 = lo6_hi + y6_log2_x.lo;
 
-			const int hm_i			 = static_cast<int>(hm);
-			const unsigned idx_y	 = static_cast<unsigned>(hm_i) & 0x3fU;
-			const int exp_hi		 = hm_i >> 6;
+			const int hm_i				 = static_cast<int>(hm);
+			const unsigned idx_y		 = static_cast<unsigned>(hm_i) & 0x3fU;
+			const int exp_hi			 = hm_i >> 6;
 			const long double exp_factor = support::helpers::internal_ldexp(1.0L, exp_hi);
 			const auto & mid			 = tables::EXP2_MID1.at(static_cast<std::size_t>(idx_y));
 			const long double exp2_hm_hi = exp_factor * static_cast<long double>(mid.hi);
-			const long double exp2_hm_lo =
-				idx_y != 0U ? exp_factor * static_cast<long double>(mid.mid) : 0.0L;
+			const long double exp2_hm_lo = idx_y != 0U ? exp_factor * static_cast<long double>(mid.mid) : 0.0L;
 
 			const long double lo6_sqr = lo6 * lo6;
 			const long double d0	  = support::multiply_add(lo6, tables::POW_EXP2_COEFFS[2], tables::POW_EXP2_COEFFS[1]);
@@ -220,8 +209,7 @@ namespace ccm::gen::internal::impl::bit80
 					final = 0.0L;
 				}
 			}
-			else if (scale == kScaleDown && final_bits.is_finite() && !final_bits.is_zero() &&
-					 final_bits.abs().uintval() < FPBits_t::min_subnormal().uintval())
+			else if (scale == kScaleDown && final_bits.is_finite() && !final_bits.is_zero() && final_bits.abs().uintval() < FPBits_t::min_subnormal().uintval())
 			{
 				support::fenv::set_errno_if_required(ERANGE);
 				support::fenv::raise_except_if_required(FE_UNDERFLOW);
@@ -234,9 +222,7 @@ namespace ccm::gen::internal::impl::bit80
 	} // namespace powl_ld80_detail
 
 	constexpr long double powl_ld80_general_finite(long double base, long double exp) noexcept
-	{
-		return powl_ld80_detail::powl_ld80_general_finite(base, exp);
-	}
+	{ return powl_ld80_detail::powl_ld80_general_finite(base, exp); }
 
 } // namespace ccm::gen::internal::impl::bit80
 

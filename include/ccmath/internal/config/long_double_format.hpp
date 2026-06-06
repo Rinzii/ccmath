@@ -24,7 +24,7 @@ namespace ccm::config
 
 	constexpr LongDoubleFormat detect_long_double_format() noexcept
 	{
-		constexpr int digits = std::numeric_limits<long double>::digits;
+		constexpr int digits	   = std::numeric_limits<long double>::digits;
 		constexpr int max_exponent = std::numeric_limits<long double>::max_exponent;
 
 		if (digits == 53 && max_exponent == 1024) { return LongDoubleFormat::Double; }
