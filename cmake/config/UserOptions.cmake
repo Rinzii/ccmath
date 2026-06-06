@@ -12,6 +12,43 @@ option(CCMATH_BUILD_EXAMPLES "Build ccmath examples" ${CCMATH_PROJECT_IS_TOP_LEV
 # Enable building of ccmath tests. If OFF, tests are skipped. Should only be used by ccmath developers.
 option(CCMATH_BUILD_TESTS "Build ccmath tests" ${CCMATH_PROJECT_IS_TOP_LEVEL})
 
+# CCMATH_BUILD_SIMPLE_TESTS:
+# Build the lightweight unit/regression suite intended for every developer and CI run.
+option(CCMATH_BUILD_SIMPLE_TESTS "Build the lightweight ccmath test project" ON)
+
+# CCMATH_BUILD_RIGOROUS_TESTS:
+# Build the heavier validation/oracle suite intended for post-merge, nightly, or release validation.
+option(CCMATH_BUILD_RIGOROUS_TESTS "Build the rigorous ccmath validation project" OFF)
+
+# CCMATH_ENABLE_MPFR_TESTS:
+# Enable MPFR-backed oracle validation binaries when MPFR and GMP are available.
+option(CCMATH_ENABLE_MPFR_TESTS "Enable MPFR-backed pow validation executables" OFF)
+
+# CCMATH_ENABLE_POW_SEARCH_TOOLS:
+# Build standalone pow adversarial-search tools.
+option(CCMATH_ENABLE_POW_SEARCH_TOOLS "Build standalone pow adversarial-search tools" OFF)
+
+# CCMATH_ENABLE_CROSS_LIBM_TESTS:
+# Build optional cross-libm differential pow validation tools.
+option(CCMATH_ENABLE_CROSS_LIBM_TESTS "Build optional cross-libm pow differential tools" OFF)
+
+# CCMATH_TEST_DISABLE_RUNTIME_BUILTIN:
+# Disable runtime __builtin_pow dispatch in pow_rt for validation builds.
+option(CCMATH_TEST_DISABLE_RUNTIME_BUILTIN "Disable runtime builtin pow in validation builds" OFF)
+
+# CCMATH_TEST_DISABLE_FMA:
+# Force non-FMA generic pow kernel branches in validation builds.
+option(CCMATH_TEST_DISABLE_FMA "Disable FMA pow kernel branches in validation builds" OFF)
+
+# CCMATH_TEST_FORCE_FMA:
+# Request FMA-capable compilation for validation builds when supported.
+option(CCMATH_TEST_FORCE_FMA "Force FMA-capable compilation for validation builds" OFF)
+
+# CCMATH_ENABLE_REDUCED_PRECISION_POWL:
+# Allow incomplete powl tiers to delegate to the double pow_impl path.
+# Default OFF. Reduced-precision fallback must not be mistaken for native long-double support.
+option(CCMATH_ENABLE_REDUCED_PRECISION_POWL "Allow reduced-precision double fallback for incomplete powl tiers" OFF)
+
 # CCMATH_BUILD_BENCHMARKS:
 # Enable building of ccmath benchmarks. If OFF, benchmarks are skipped.
 option(CCMATH_BUILD_BENCHMARKS "Build ccmath benchmarks" OFF)

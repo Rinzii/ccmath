@@ -12,7 +12,7 @@
 
 #include <cmath>
 #include <limits>
-#include "../../include/ccmath/math/numbers.hpp"
+#include "ccmath/math/numbers.hpp"
 #include "ccmath/ccmath.hpp"
 #include "utils/std_compare.hpp"
 

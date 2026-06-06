@@ -38,6 +38,18 @@ namespace
 			ccm::test::ExpectUlpBinaryVsStd(bases[i], exponents[i], ccm_fn, std_fn);
 		}
 	}
+
+	template <typename T, typename CcmFn, typename StdFn, std::size_t N>
+	void ExpectWorstCaseBinaryPairsOver(const std::array<ccm::test::worst_case::PowCase<T>, N> & cases, CcmFn ccm_fn, StdFn std_fn)
+	{
+		for (const auto & test_case : cases)
+		{
+			SCOPED_TRACE(test_case.base);
+			SCOPED_TRACE(test_case.exponent);
+			SCOPED_TRACE(test_case.provenance);
+			ccm::test::ExpectSameFloatingAsStd(ccm_fn(test_case.base, test_case.exponent), std_fn(test_case.base, test_case.exponent));
+		}
+	}
 } // namespace
 
 TEST(CcmathWorstCaseUlpTests, SinFloatExceptional)
@@ -135,10 +147,29 @@ TEST(CcmathWorstCaseUlpTests, SqrtDoubleHard)
 	ExpectWorstCaseUnaryOver(ccm::test::worst_case::kSqrtDoubleHard, ccm::sqrt<double>, static_cast<double (*)(double)>(std::sqrt));
 }
 
+// [c.math]/1: validates that the double overload tracks the C library semantics even on the known hardest pow inputs in this suite.
 TEST(CcmathWorstCaseUlpTests, PowDoubleHard)
 {
-	ExpectWorstCaseBinaryOver(ccm::test::worst_case::kPowDoubleHard, ccm::test::worst_case::kPowDoubleHard, ccm::pow<double>,
-							  static_cast<double (*)(double, double)>(std::pow));
+	ExpectWorstCaseBinaryPairsOver(
+		ccm::test::worst_case::kPowDoubleHard, ccm::pow<double>, static_cast<double (*)(double, double)>(std::pow));
+}
+
+TEST(CcmathWorstCaseUlpTests, PowFloatHard)
+{
+	ExpectWorstCaseBinaryPairsOver(
+		ccm::test::worst_case::kPowFloatHard, ccm::powf, static_cast<float (*)(float, float)>(std::pow));
+}
+
+TEST(CcmathWorstCaseUlpTests, PowLongDoubleHard)
+{
+	constexpr std::array<ccm::test::worst_case::PowCase<long double>, 3> kPowLongDoubleHard = { {
+		{ 0x1.0p-50L, 0x1.0p+50L, "long-double-shaped alias of the legacy tiny-base / huge-exponent case" },
+		{ -1.0L, 3.0L, "long-double-shaped odd-integer sign regression anchor" },
+		{ -1.0L, 1.5L, "long-double-shaped non-integer domain regression anchor" },
+	} };
+
+	ExpectWorstCaseBinaryPairsOver(
+		kPowLongDoubleHard, ccm::powl, static_cast<long double (*)(long double, long double)>(std::pow));
 }
 
 TEST(CcmathWorstCaseUlpTests, AsinDoubleHard)
