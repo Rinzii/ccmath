@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include "ccmath/internal/predef/attributes/never_inline.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 
@@ -33,7 +34,7 @@ extern "C" int *__errno_location(void) __attribute__((__nothrow__, __const__));
 
 namespace ccm::support::fenv::detail
 {
-	__attribute__((noinline)) inline void write_errno(int err) noexcept
+	CCM_NEVER_INLINE inline void write_errno(int err) noexcept
 	{
 #if defined(__FAST_MATH__) || defined(CCM_CONFIG_DISABLE_ERRNO)
 		(void)err;
