@@ -183,7 +183,12 @@ namespace ccm::gen::internal::impl::bit80
 				{
 					scale = kScaleUp;
 					y6_log2_x.hi -= 512.0L * 64.0L;
-					if (y6_log2_x.hi > kOverflowY6HiClamp) { y6_log2_x.hi = kOverflowY6HiClamp; }
+					if (y6_log2_x.hi > kOverflowY6HiClamp)
+					{
+						y6_log2_x.hi = kOverflowY6HiClamp;
+						// If hi is clamped, a huge tail would dominate lo6 and reconstruct a spurious finite.
+						y6_log2_x.lo = 0.0L;
+					}
 				}
 				else
 				{
@@ -235,6 +240,11 @@ namespace ccm::gen::internal::impl::bit80
 					final = 0.0L;
 				}
 				else { final = final_bits.abs().get_val(); }
+			}
+			else if (scale == kScaleUp && final_bits.is_inf() && final_bits.is_pos())
+			{
+				support::fenv::set_errno_if_required(ERANGE);
+				support::fenv::raise_except_if_required(FE_OVERFLOW);
 			}
 			else if (scale == kScaleDown && final_bits.is_finite() && !final_bits.is_zero() && final_bits.abs().uintval() < FPBits_t::min_subnormal().uintval())
 			{

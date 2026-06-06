@@ -72,10 +72,14 @@ namespace ccm::gen
 
 				using storage_type					 = PowlFPBits_t::storage_type;
 				const storage_type x_u				 = bits.uintval();
-				const auto x_e						 = static_cast<std::int32_t>((x_u & PowlFPBits_t::exponent_mask) >> PowlFPBits_t::significand_length);
+				const auto x_e						 = static_cast<std::int32_t>(bits.get_biased_exponent());
 				const int lsb						 = storage_countr_zero(x_u | PowlFPBits_t::exponent_mask);
 				constexpr std::int32_t unit_exponent = PowlFPBits_t::exponent_bias + static_cast<std::int32_t>(PowlFPBits_t::fraction_length);
-				return x_e + lsb >= unit_exponent;
+				const storage_type sig				 = bits.get_explicit_mantissa();
+
+				if (x_e + lsb >= unit_exponent) { return true; }
+				// x87 stores the unit bit explicitly, so odd integers at the 2^62 boundary use lsb == 0 with sig bit 0 set.
+				return x_e + lsb + 1 == unit_exponent && (sig & storage_type{1}) != 0;
 			}
 
 			constexpr bool is_odd_integer_float80_bits(const PowlFPBits_t & bits) noexcept
@@ -85,10 +89,13 @@ namespace ccm::gen
 
 				using storage_type					 = PowlFPBits_t::storage_type;
 				const storage_type x_u				 = bits.uintval();
-				const auto x_e						 = static_cast<std::int32_t>((x_u & PowlFPBits_t::exponent_mask) >> PowlFPBits_t::significand_length);
+				const auto x_e						 = static_cast<std::int32_t>(bits.get_biased_exponent());
 				const int lsb						 = storage_countr_zero(x_u | PowlFPBits_t::exponent_mask);
 				constexpr std::int32_t unit_exponent = PowlFPBits_t::exponent_bias + static_cast<std::int32_t>(PowlFPBits_t::fraction_length);
-				return x_e + lsb == unit_exponent;
+				const storage_type sig				 = bits.get_explicit_mantissa();
+
+				if (x_e + lsb == unit_exponent) { return true; }
+				return x_e + lsb + 1 == unit_exponent && (sig & storage_type{1}) != 0;
 			}
 
 			constexpr bool try_extract_int64(const PowlFPBits_t & bits, std::int64_t & out) noexcept;

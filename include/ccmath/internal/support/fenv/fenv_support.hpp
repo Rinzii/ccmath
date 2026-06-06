@@ -25,6 +25,26 @@
 CCM_DISABLE_MSVC_WARNING(4702) // 4702: unreachable code
 #endif
 
+namespace ccm::support::fenv::detail
+{
+	inline void write_errno(int err) noexcept
+	{
+#if defined(__FAST_MATH__) || defined(CCM_CONFIG_DISABLE_ERRNO)
+		(void)err;
+#else
+	#if defined(_GNU_SOURCE) || defined(__GLIBC__) || defined(__ANDROID__)
+		extern int * __errno_location() __attribute__((__nothrow__, __const__));
+		*__errno_location() = err;
+	#else
+		errno = err;
+	#endif
+	#if defined(__GNUC__) || defined(__clang__)
+		__asm__ __volatile__("" : : : "memory");
+	#endif
+#endif
+	}
+} // namespace ccm::support::fenv::detail
+
 namespace ccm::support::fenv::internal
 {
 	inline int clear_except(const int err_code)
@@ -162,18 +182,12 @@ namespace ccm::support::fenv
 		return 0;
 	}
 
-	constexpr void set_errno_if_required(const int err)
+	inline void set_errno_if_required(const int err)
 	{
-		if (!is_constant_evaluated())
+		if (is_constant_evaluated()) { return; }
+		if constexpr (is_errno_enabled())
 		{
-			if constexpr (is_errno_enabled())
-			{
-				if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrno)) != 0)
-				{
-					volatile int * errno_location = &errno;
-					*errno_location				  = err;
-				}
-			}
+			if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrno)) != 0) { detail::write_errno(err); }
 		}
 	}
 } // namespace ccm::support::fenv

@@ -15,6 +15,7 @@
 
 #include "ccmath/ccmath.hpp"
 #include "ccmath/internal/config/type_support.hpp"
+#include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
 #include "utils/ulp_suite.hpp"
 
 namespace
@@ -30,6 +31,22 @@ namespace
 	void ExpectNegativeBaseDomainError(T exponent)
 	{
 		const T actual = ccm::pow<T>(static_cast<T>(-2.0), exponent);
+		const T expected = static_cast<T>(std::pow(static_cast<T>(-2.0), exponent));
+		EXPECT_TRUE(std::isnan(actual));
+		ccm::test::ExpectSameFloatingAsStd(actual, expected);
+	}
+
+	template <typename T>
+	void ExpectGenParityResult(T exponent, T expected)
+	{
+		const T actual = ccm::gen::pow_gen(static_cast<T>(-1.0), exponent);
+		ccm::test::ExpectSameFloatingAsStd(actual, expected, 0);
+	}
+
+	template <typename T>
+	void ExpectGenNegativeBaseDomainError(T exponent)
+	{
+		const T actual = ccm::gen::pow_gen(static_cast<T>(-2.0), exponent);
 		const T expected = static_cast<T>(std::pow(static_cast<T>(-2.0), exponent));
 		EXPECT_TRUE(std::isnan(actual));
 		ccm::test::ExpectSameFloatingAsStd(actual, expected);
@@ -87,16 +104,16 @@ TEST(CcmathPowerIntegerBoundaryTests, LongDoubleParityThresholdsRespectPlatformS
 	ExpectParityResult(static_cast<long double>(0x1.0p53), static_cast<long double>(1.0));
 	ExpectNegativeBaseDomainError(static_cast<long double>(1.5));
 #elif defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
-	ExpectParityResult(static_cast<long double>(0x1.fffffffffffffp61), static_cast<long double>(-1.0));
-	ExpectParityResult(static_cast<long double>(0x1.0p62), static_cast<long double>(1.0));
-	ExpectParityResult(static_cast<long double>(0x1.0000000000001p62), static_cast<long double>(-1.0));
-	ExpectParityResult(static_cast<long double>(0x1.fffffffffffffp62), static_cast<long double>(-1.0));
-	ExpectParityResult(static_cast<long double>(0x1.0p63), static_cast<long double>(1.0));
-	ExpectParityResult(static_cast<long double>(0x1.0p64), static_cast<long double>(1.0));
-	ExpectParityResult(static_cast<long double>(0x1.0p65), static_cast<long double>(1.0));
-	ExpectParityResult(std::nextafter(static_cast<long double>(0x1.0p65L), std::numeric_limits<long double>::infinity()),
-						static_cast<long double>(std::pow(-1.0L, std::nextafter(0x1.0p65L, std::numeric_limits<long double>::infinity()))));
-	ExpectNegativeBaseDomainError(static_cast<long double>(1.5L));
+	ExpectGenParityResult(0x1.fffffffffffffp61L, -1.0L);
+	ExpectGenParityResult(0x1.0p62L, 1.0L);
+	ExpectGenParityResult(0x1.0000000000001p62L, -1.0L);
+	ExpectGenParityResult(0x1.fffffffffffffp62L, -1.0L);
+	ExpectGenParityResult(0x1.0p63L, 1.0L);
+	ExpectGenParityResult(0x1.0p64L, 1.0L);
+	ExpectGenParityResult(0x1.0p65L, 1.0L);
+	ExpectGenParityResult(std::nextafter(0x1.0p65L, std::numeric_limits<long double>::infinity()),
+						  std::pow(-1.0L, std::nextafter(0x1.0p65L, std::numeric_limits<long double>::infinity())));
+	ExpectGenNegativeBaseDomainError(1.5L);
 #elif defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT128)
 	const long double kLargeEven = std::nextafter(static_cast<long double>(0x1.0p64L), std::numeric_limits<long double>::infinity());
 	ExpectParityResult(static_cast<long double>(3.0L), static_cast<long double>(-1.0L));
