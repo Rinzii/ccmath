@@ -34,10 +34,7 @@ namespace ccm::support
 		template <typename To, typename From>
 		constexpr To bit_cast_float80_constexpr(const From & from) noexcept
 		{
-			if constexpr (std::is_same_v<To, long double> && !std::is_same_v<From, long double>)
-			{
-				return __builtin_bit_cast(To, from);
-			}
+			if constexpr (std::is_same_v<To, long double> && !std::is_same_v<From, long double>) { return __builtin_bit_cast(To, from); }
 
 			unsigned char buffer[sizeof(From)]{};
 			__builtin_memcpy(buffer, &from, sizeof(From));
@@ -56,7 +53,7 @@ namespace ccm::support
 #if defined(__clang__)
 		if constexpr (sizeof(long double) != sizeof(double))
 		{
-			if constexpr ((std::is_same_v<From, long double> || std::is_same_v<To, long double>) && sizeof(To) == sizeof(From))
+			if constexpr ((std::is_same_v<From, long double> || std::is_same_v<To, long double>)&&sizeof(To) == sizeof(From))
 			{
 				if (is_constant_evaluated()) { return detail::bit_cast_float80_constexpr<To>(from); }
 			}
