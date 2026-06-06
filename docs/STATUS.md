@@ -8,7 +8,7 @@
 | Float Manipulation           | 100    |              | scalbn `long double` is slow             | v0.2.0 (Released)          |
 | Hyperbolic                   | 0      |              | Empty headers only                       |                            |
 | Nearest                      | 100    |              |                                          | v0.2.0 (Released)          |
-| Power                        | 96     |              |                                          | v0.2.0 (Released)          |
+| Power                        | 96     |              | Path forcing, MPFR path-matrix, powf reduced domains, powl characterization, proof-smoke | v0.2.0 (Released)          |
 | Special Functions            | 0      |              | Empty headers only                       |                            |
 | Trigonometric                | 100    |              |                                          | v0.2.0 (Released)          |
 | Misc Functions               | 97     |              |                                          | v0.2.0 (Released)          |
@@ -70,7 +70,7 @@
 | trunc          | 100    |                                  |
 | cbrt           | 98     |                                  |
 | hypot          | 100    |                                  |
-| pow            | 88     |                                  |
+| pow            | 88     | Rigorous MPFR `public_default` campaigns, path-matrix tooling, powf reduced domains, powl characterization. Full binary64 proof and independent extended-precision `powl` validation remain open |
 | sqrt           | 100    |                                  |
 | assoc_laguerre | 0      | Empty header                     |
 | assoc_legendre | 0      | Empty header                     |
