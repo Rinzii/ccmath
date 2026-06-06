@@ -79,7 +79,7 @@ namespace ccm::gen
 
 				if (x_e + lsb >= unit_exponent) { return true; }
 				// x87 stores the unit bit explicitly, so odd integers at the 2^62 boundary use lsb == 0 with sig bit 0 set.
-				return x_e + lsb + 1 == unit_exponent && (sig & storage_type{1}) != 0;
+				return x_e + lsb + 1 == unit_exponent && (sig & storage_type{ 1 }) != 0;
 			}
 
 			constexpr bool is_odd_integer_float80_bits(const PowlFPBits_t & bits) noexcept
@@ -95,7 +95,7 @@ namespace ccm::gen
 				const storage_type sig				 = bits.get_explicit_mantissa();
 
 				if (x_e + lsb == unit_exponent) { return true; }
-				return x_e + lsb + 1 == unit_exponent && (sig & storage_type{1}) != 0;
+				return x_e + lsb + 1 == unit_exponent && (sig & storage_type{ 1 }) != 0;
 			}
 
 			constexpr bool try_extract_int64(const PowlFPBits_t & bits, std::int64_t & out) noexcept;
