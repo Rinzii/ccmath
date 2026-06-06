@@ -70,7 +70,7 @@ namespace ccm::gen
 				if (bits.is_nan() || bits.is_inf()) { return false; }
 				if (bits.is_zero()) { return true; }
 
-				const int exponent								  = bits.get_explicit_exponent();
+				const int exponent						= bits.get_explicit_exponent();
 				typename PowlFPBits_t::storage_type sig = bits.get_explicit_mantissa();
 				if (bits.get_implicit_bit()) { sig |= PowlFPBits_t::EXPLICIT_BIT_MASK; }
 				if (storage_is_zero(sig)) { return true; }
@@ -84,7 +84,7 @@ namespace ccm::gen
 				if (!is_integer_float80_bits(bits)) { return false; }
 				if (bits.is_zero()) { return false; }
 
-				const int exponent								  = bits.get_explicit_exponent();
+				const int exponent						= bits.get_explicit_exponent();
 				typename PowlFPBits_t::storage_type sig = bits.get_explicit_mantissa();
 				if (bits.get_implicit_bit()) { sig |= PowlFPBits_t::EXPLICIT_BIT_MASK; }
 				const int trailing_zeros = storage_countr_zero(sig);
@@ -157,11 +157,11 @@ namespace ccm::gen
 				typename PowlFPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
 				if (bits.get_implicit_bit()) { mantissa |= PowlFPBits_t::EXPLICIT_BIT_MASK; }
 				const int trailing_zeros = storage_countr_zero(mantissa);
-				const int scale = exponent + trailing_zeros - static_cast<int>(PowlFPBits_t::significand_length);
+				const int scale			 = exponent + trailing_zeros - static_cast<int>(PowlFPBits_t::significand_length);
 #else
 				typename PowlFPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
 				const int trailing_zeros					 = storage_countr_zero(mantissa);
-				const int scale = exponent + trailing_zeros - static_cast<int>(PowlFPBits_t::fraction_length);
+				const int scale								 = exponent + trailing_zeros - static_cast<int>(PowlFPBits_t::fraction_length);
 #endif
 				if (scale < 0) { return false; }
 
