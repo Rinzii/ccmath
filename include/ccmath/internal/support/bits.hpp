@@ -21,6 +21,7 @@
 #include "ccmath/internal/support/type_traits.hpp"
 
 #include <cstdint>
+#include <type_traits>
 
 #if defined(_MSC_VER) && !defined(__clang__)
 	#include <cstdlib>
@@ -28,6 +29,16 @@
 
 namespace ccm::support
 {
+	namespace detail
+	{
+		template <typename To, typename From>
+		constexpr To bit_cast_via_bytes(const From & from) noexcept
+		{
+			To to{};
+			__builtin_memcpy(&to, &from, sizeof(To));
+			return to;
+		}
+	} // namespace detail
 
 	template <typename To, typename From>
 	constexpr std::enable_if_t<sizeof(To) == sizeof(From) && std::is_trivially_constructible_v<To> && std::is_trivially_copyable_v<To> &&
@@ -35,6 +46,15 @@ namespace ccm::support
 							   To>
 	bit_cast(const From & from)
 	{
+#if defined(__clang__)
+		if constexpr (sizeof(long double) != sizeof(double))
+		{
+			if constexpr ((std::is_same_v<From, long double> || std::is_same_v<To, long double>) && sizeof(To) == sizeof(From))
+			{
+				if (is_constant_evaluated()) { return detail::bit_cast_via_bytes<To>(from); }
+			}
+		}
+#endif
 		return __builtin_bit_cast(To, from);
 	}
 

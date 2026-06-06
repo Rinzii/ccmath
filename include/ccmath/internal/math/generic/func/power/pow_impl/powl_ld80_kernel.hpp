@@ -27,7 +27,7 @@
 	#include <cstdint>
 	#include <limits>
 
-	#if defined(CCMATH_TARGET_CPU_HAS_FMA) || ((defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__)))
+	#if defined(CCMATH_TARGET_CPU_HAS_FMA)
 		#define CCMATH_POW_KERNEL_USE_FMA_DX 1
 	#endif
 
@@ -219,7 +219,7 @@ namespace ccm::gen::internal::impl::bit80
 					support::fenv::raise_except_if_required(FE_OVERFLOW);
 					final = FPBits_t::inf(types::Sign::POS).get_val();
 				}
-				else if (scale == kScaleDown || final_bits.abs().uintval() < FPBits_t::min_subnormal().uintval())
+				else if (final_bits.abs().uintval() < FPBits_t::min_subnormal().uintval())
 				{
 					support::fenv::set_errno_if_required(ERANGE);
 					support::fenv::raise_except_if_required(FE_UNDERFLOW);
