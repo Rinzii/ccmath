@@ -195,7 +195,14 @@ namespace ccm::gen
 						static_cast<std::uint64_t>(magnitude < 0 ? -magnitude : magnitude);
 					return (abs_mag & 1U) != 0U;
 				}
-				return __builtin_fmodl(__builtin_fabsl(val), 2.0L) != 0.0L;
+
+				const PowlFPBits_t bits(val);
+				if (bits.is_zero()) { return false; }
+				typename PowlFPBits_t::storage_type sig = bits.get_explicit_mantissa();
+				if (bits.get_implicit_bit()) { sig |= PowlFPBits_t::EXPLICIT_BIT_MASK; }
+				const int trailing_zeros = storage_countr_zero(sig);
+				sig >>= static_cast<unsigned>(trailing_zeros);
+				return (sig & typename PowlFPBits_t::storage_type(1)) != 0;
 			}
 #endif
 
@@ -224,7 +231,18 @@ namespace ccm::gen
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
 				if (!support::is_constant_evaluated())
 				{
-					return bit80::powl_ld80_general_finite(base, static_cast<long double>(exp));
+					constexpr std::int64_t kSquaringExponentMax = 62;
+					const PowlFPBits_t base_bits(base);
+					typename PowlFPBits_t::storage_type sig = base_bits.get_explicit_mantissa();
+					if (base_bits.get_implicit_bit()) { sig |= PowlFPBits_t::EXPLICIT_BIT_MASK; }
+					const bool base_is_pow2 =
+						sig != typename PowlFPBits_t::storage_type{} &&
+						(sig & (sig - typename PowlFPBits_t::storage_type(1))) == typename PowlFPBits_t::storage_type{};
+					const std::int64_t abs_exp = exp < 0 ? -exp : exp;
+					if (!base_is_pow2 || abs_exp > kSquaringExponentMax)
+					{
+						return bit80::powl_ld80_general_finite(base, static_cast<long double>(exp));
+					}
 				}
 #endif
 

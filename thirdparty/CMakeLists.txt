@@ -31,7 +31,15 @@ endif ()
 #
 if (CCMATH_BUILD_TESTS)
     # Abseil config
+    if (CCMATH_DESIRED_CXX_STANDARD AND NOT CMAKE_CXX_STANDARD)
+        string(REGEX REPLACE "cxx_std_" "" _ccmath_requested_cxx_std "${CCMATH_DESIRED_CXX_STANDARD}")
+        set(CMAKE_CXX_STANDARD "${_ccmath_requested_cxx_std}")
+        set(CMAKE_CXX_STANDARD_REQUIRED ON)
+        set(CMAKE_CXX_EXTENSIONS OFF)
+    endif ()
     set(ABSL_PROPAGATE_CXX_STD ON)
+    set(ABSL_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+    set(ABSL_BUILD_TEST_HELPERS OFF CACHE BOOL "" FORCE)
     set(ABSL_ENABLE_INSTALL ON)
 
     # GTest config
@@ -53,6 +61,7 @@ if (CCMATH_BUILD_TESTS)
     FetchContent_MakeAvailable(abseil)
 
     # --- RE2 ---
+    set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
     FetchContent_Declare(
             re2
             GIT_REPOSITORY https://github.com/google/re2.git

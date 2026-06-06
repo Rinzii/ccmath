@@ -81,18 +81,20 @@ namespace ccm::support
 		// Perform the subtraction
 		LargerType const lres = la - lb;
 
-		if constexpr (!std::is_signed_v<T>)
+		if constexpr (std::is_signed_v<T>)
+		{
+			bool overflow = false;
+			if ((b > 0 && a < std::numeric_limits<T>::min() + b) || (b < 0 && a > std::numeric_limits<T>::max() + b)) { overflow = true; }
+
+			if (!overflow) { res = static_cast<T>(lres); }
+
+			return overflow;
+		}
+		else
 		{
 			res = static_cast<T>(lres);
 			return a < b;
 		}
-
-		bool overflow = false;
-		if ((b > 0 && a < std::numeric_limits<T>::min() + b) || (b < 0 && a > std::numeric_limits<T>::max() + b)) { overflow = true; }
-
-		if (!overflow) { res = static_cast<T>(lres); }
-
-		return overflow;
 #endif
 	}
 
