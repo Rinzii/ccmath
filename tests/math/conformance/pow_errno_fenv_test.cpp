@@ -36,12 +36,14 @@ namespace
 		(void)sink;
 	}
 
-	template <typename Fn>
-	void ExpectErrno(Fn fn, int expected_errno)
+	__attribute__((noinline)) double invoke_pow_gen(double base, double exp)
 	{
-		errno = 0;
-		static_cast<void>(fn());
-		EXPECT_EQ(errno, expected_errno);
+		return ccm::gen::pow_gen(base, exp);
+	}
+
+	__attribute__((noinline)) float invoke_powf_gen(float base, float exp)
+	{
+		return ccm::gen::pow_gen(base, exp);
 	}
 } // namespace
 
@@ -53,10 +55,37 @@ TEST(CcmathPowErrnoTests, GenericPowSetsErrnoWhenRuntimeErrnoIsEnabled)
 		GTEST_SKIP() << "this build does not advertise errno-setting math error handling";
 	}
 
-	ExpectErrno([] { return ccm::gen::pow_gen(runtime_value(-1.0), runtime_value(0.5)); }, EDOM);
-	ExpectErrno([] { return ccm::gen::pow_gen(runtime_value(-1.0F), runtime_value(0.5F)); }, EDOM);
-	ExpectErrno([] { return ccm::gen::pow_gen(runtime_value(0.0), runtime_value(-1.0)); }, EDOM);
-	ExpectErrno([] { return ccm::gen::pow_gen(runtime_value(0.0F), runtime_value(-1.0F)); }, EDOM);
+	errno = 0;
+	{
+		volatile double base = -1.0;
+		volatile double exp	 = 0.5;
+		(void)invoke_pow_gen(base, exp);
+	}
+	EXPECT_EQ(errno, EDOM) << "double negative base domain error";
+
+	errno = 0;
+	{
+		volatile float base = -1.0F;
+		volatile float exp	= 0.5F;
+		(void)invoke_powf_gen(base, exp);
+	}
+	EXPECT_EQ(errno, EDOM) << "float negative base domain error";
+
+	errno = 0;
+	{
+		volatile double base = 0.0;
+		volatile double exp	 = -1.0;
+		(void)invoke_pow_gen(base, exp);
+	}
+	EXPECT_EQ(errno, EDOM) << "double pole error";
+
+	errno = 0;
+	{
+		volatile float base = 0.0F;
+		volatile float exp	= -1.0F;
+		(void)invoke_powf_gen(base, exp);
+	}
+	EXPECT_EQ(errno, EDOM) << "float pole error";
 }
 
 TEST(CcmathPowFenvTests, OverflowAndUnderflowFlagsMatchStdForPowPublicApi)

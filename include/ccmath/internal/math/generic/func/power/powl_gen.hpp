@@ -65,21 +65,24 @@ namespace ccm::gen
 			}
 
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+			constexpr typename PowlFPBits_t::storage_type float80_unit_mantissa(const PowlFPBits_t & bits) noexcept
+			{
+				typename PowlFPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
+				if (bits.get_implicit_bit()) { mantissa |= PowlFPBits_t::EXPLICIT_BIT_MASK; }
+				return mantissa;
+			}
+
 			constexpr bool is_integer_float80_bits(const PowlFPBits_t & bits) noexcept
 			{
 				if (bits.is_nan() || bits.is_inf()) { return false; }
 				if (bits.is_zero()) { return true; }
 
-				using storage_type					 = PowlFPBits_t::storage_type;
-				const storage_type x_u				 = bits.uintval();
-				const auto x_e						 = static_cast<std::int32_t>(bits.get_biased_exponent());
-				const int lsb						 = storage_countr_zero(x_u | PowlFPBits_t::exponent_mask);
-				constexpr std::int32_t unit_exponent = PowlFPBits_t::exponent_bias + static_cast<std::int32_t>(PowlFPBits_t::fraction_length);
-				const storage_type sig				 = bits.get_explicit_mantissa();
+				const typename PowlFPBits_t::storage_type mantissa = float80_unit_mantissa(bits);
+				if (storage_is_zero(mantissa)) { return true; }
 
-				if (x_e + lsb >= unit_exponent) { return true; }
-				// x87 stores the unit bit explicitly, so odd integers at the 2^62 boundary use lsb == 0 with sig bit 0 set.
-				return x_e + lsb + 1 == unit_exponent && (sig & storage_type{ 1 }) != 0;
+				const int exponent		 = bits.get_explicit_exponent();
+				const int trailing_zeros = storage_countr_zero(mantissa);
+				return exponent + trailing_zeros >= static_cast<int>(PowlFPBits_t::fraction_length);
 			}
 
 			constexpr bool is_odd_integer_float80_bits(const PowlFPBits_t & bits) noexcept
@@ -87,15 +90,10 @@ namespace ccm::gen
 				if (!is_integer_float80_bits(bits)) { return false; }
 				if (bits.is_zero()) { return false; }
 
-				using storage_type					 = PowlFPBits_t::storage_type;
-				const storage_type x_u				 = bits.uintval();
-				const auto x_e						 = static_cast<std::int32_t>(bits.get_biased_exponent());
-				const int lsb						 = storage_countr_zero(x_u | PowlFPBits_t::exponent_mask);
-				constexpr std::int32_t unit_exponent = PowlFPBits_t::exponent_bias + static_cast<std::int32_t>(PowlFPBits_t::fraction_length);
-				const storage_type sig				 = bits.get_explicit_mantissa();
-
-				if (x_e + lsb == unit_exponent) { return true; }
-				return x_e + lsb + 1 == unit_exponent && (sig & storage_type{ 1 }) != 0;
+				const typename PowlFPBits_t::storage_type mantissa = float80_unit_mantissa(bits);
+				const int exponent								   = bits.get_explicit_exponent();
+				const int trailing_zeros						   = storage_countr_zero(mantissa);
+				return exponent + trailing_zeros == static_cast<int>(PowlFPBits_t::fraction_length);
 			}
 
 			constexpr bool try_extract_int64(const PowlFPBits_t & bits, std::int64_t & out) noexcept;
@@ -121,6 +119,8 @@ namespace ccm::gen
 			constexpr bool is_odd_integer(const PowlFPBits_t & bits) noexcept
 			{
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+				std::int64_t magnitude = 0;
+				if (try_extract_int64(bits, magnitude)) { return (magnitude & 1) != 0; }
 				return is_odd_integer_float80_bits(bits);
 #else
 				if (!is_integer(bits)) { return false; }
@@ -200,19 +200,77 @@ namespace ccm::gen
 				return static_cast<long double>(::ccm::gen::impl::pow_impl(static_cast<double>(base), static_cast<double>(exp)));
 			}
 
+#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+			// Double-double (compensated) arithmetic for integer powers. Naive exponentiation by
+			// squaring loses the bits past the 64-bit significand on every multiply, which for large
+			// |exp| (e.g. 10^1000) drifts well past the 4 ULP budget. Accumulating the squaring in a
+			// long double pair keeps a ~128-bit running product and rounds once at the end.
+			namespace powl_dd
+			{
+				using Pair = types::NumberPair<long double>;
+
+				// The Veltkamp split inside exact_mult multiplies its operand by 2^33, which overflows
+				// to infinity once the operand approaches LDBL_MAX. Above this magnitude the running
+				// product is already saturating toward overflow/underflow where the compensation tail is
+				// irrelevant, so we fall back to a plain product to avoid NaN contamination.
+				inline constexpr long double kSplitSafe = 0x1.0p16300L;
+
+				constexpr long double abs_ld(long double x) noexcept
+				{
+					return x < 0.0L ? -x : x;
+				}
+
+				constexpr Pair mul(const Pair & a, const Pair & b) noexcept
+				{
+					const long double hi = a.hi * b.hi;
+					// Once the product overflows (or contaminates with NaN) the exact-mult split would
+					// produce inf - inf = NaN, so propagate a clean infinity instead.
+					if (ccm::isinf(hi) || ccm::isnan(hi)) { return Pair{ hi, 0.0L }; }
+					if (abs_ld(a.hi) >= kSplitSafe || abs_ld(b.hi) >= kSplitSafe) { return Pair{ hi, 0.0L }; }
+					Pair p = bit80::powl_ld80_detail::exact_mult(a.hi, b.hi);
+					p.lo += a.hi * b.lo + a.lo * b.hi;
+					return bit80::powl_ld80_detail::exact_add(p.hi, p.lo);
+				}
+
+				// base^e for e > 0, accumulated as a double-double.
+				constexpr Pair ipow(long double base, std::uint64_t e) noexcept
+				{
+					Pair result{ 1.0L, 0.0L };
+					Pair factor{ base, 0.0L };
+					while (e > 0U)
+					{
+						if ((e & 1U) != 0U) { result = mul(result, factor); }
+						e >>= 1U;
+						if (e > 0U) { factor = mul(factor, factor); }
+					}
+					return result;
+				}
+
+				// 1 / (p.hi + p.lo) refined to long double precision via one Newton step.
+				constexpr long double reciprocal(const Pair & p) noexcept
+				{
+					const long double r0 = 1.0L / p.hi;
+					if (r0 == 0.0L || ccm::isinf(r0) || ccm::isnan(r0)) { return r0; }
+					// p.hi near LDBL_MAX would overflow the split; r0 alone is already within an ULP.
+					if (abs_ld(p.hi) >= kSplitSafe) { return r0; }
+					const Pair pr		  = bit80::powl_ld80_detail::exact_mult(p.hi, r0);
+					const long double res = ((1.0L - pr.hi) - pr.lo) - p.lo * r0;
+					return r0 + r0 * res;
+				}
+			} // namespace powl_dd
+#endif
+
 			constexpr long double powl_bounded_integer(long double base, std::int64_t exp) noexcept
 			{
 				if (exp == 0) { return 1.0L; }
-				if (exp < 0) { return 1.0L / powl_bounded_integer(base, -exp); }
 
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
-				if (!support::is_constant_evaluated())
-				{
-					constexpr std::int64_t kSquaringExponentMax = 62;
-					const std::int64_t abs_exp					= exp < 0 ? -exp : exp;
-					if (abs_exp > kSquaringExponentMax) { return bit80::powl_ld80_general_finite(base, static_cast<long double>(exp)); }
-				}
-#endif
+				const std::uint64_t magnitude = exp < 0 ? static_cast<std::uint64_t>(-(exp + 1)) + 1U : static_cast<std::uint64_t>(exp);
+				const powl_dd::Pair p		  = powl_dd::ipow(base, magnitude);
+				if (exp < 0) { return powl_dd::reciprocal(p); }
+				return p.hi + p.lo;
+#else
+				if (exp < 0) { return 1.0L / powl_bounded_integer(base, -exp); }
 
 				long double result = 1.0L;
 				long double factor = base;
@@ -224,6 +282,7 @@ namespace ccm::gen
 					e >>= 1U;
 				}
 				return result;
+#endif
 			}
 
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
@@ -269,20 +328,6 @@ namespace ccm::gen
 						return out_is_neg ? -0.0L : 0.0L;
 					}
 
-					if (base_bits.is_inf())
-					{
-						if (base_bits.is_neg() && !powl_bits::is_integer(exp))
-						{
-							support::fenv::set_errno_if_required(EDOM);
-							support::fenv::raise_except_if_required(FE_INVALID);
-							return std::numeric_limits<long double>::quiet_NaN();
-						}
-
-						const bool out_is_neg = base_bits.is_neg() && powl_bits::is_odd_integer(exp);
-						if (exp < 0.0L) { return out_is_neg ? -0.0L : 0.0L; }
-						return PowlFPBits_t::inf(out_is_neg ? Sign::NEG : Sign::POS).get_val();
-					}
-
 					if (exp_bits.is_inf())
 					{
 						const long double base_abs = base_bits.abs().get_val();
@@ -293,6 +338,21 @@ namespace ccm::gen
 						if (exp_bits.is_neg()) { return base_abs < one ? std::numeric_limits<long double>::infinity() : 0.0L; }
 
 						return base_abs < one ? 0.0L : std::numeric_limits<long double>::infinity();
+					}
+
+					if (base_bits.is_inf())
+					{
+						if (base_bits.is_neg() && !powl_bits::is_integer(exp))
+						{
+							// glibc libm: |−inf|^y for non-integer y is +inf when y > 0 and +0 when y < 0.
+							if (exp > 0.0L) { return PowlFPBits_t::inf(Sign::POS).get_val(); }
+							if (exp < 0.0L) { return 0.0L; }
+							return std::numeric_limits<long double>::quiet_NaN();
+						}
+
+						const bool out_is_neg = base_bits.is_neg() && powl_bits::is_odd_integer(exp);
+						if (exp < 0.0L) { return out_is_neg ? -0.0L : 0.0L; }
+						return PowlFPBits_t::inf(out_is_neg ? Sign::NEG : Sign::POS).get_val();
 					}
 
 					if (base_bits.is_neg() && !powl_bits::is_integer(exp))
@@ -351,7 +411,7 @@ namespace ccm::gen
 			}
 
 		} // namespace impl
-	} // namespace internal
+	}	  // namespace internal
 
 	constexpr long double powl_gen(long double base, long double exp) noexcept
 	{

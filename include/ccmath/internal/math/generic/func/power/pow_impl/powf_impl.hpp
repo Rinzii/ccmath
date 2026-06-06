@@ -205,6 +205,12 @@ namespace ccm::gen::impl
 					{
 					case 0x3f00'0000: // y = 0.5f
 						if (CCM_UNLIKELY(x == 0.0F || x_u == 0xff80'0000)) { return x * x; }
+						if (x < 0.0F)
+						{
+							support::fenv::set_errno_if_required(EDOM);
+							support::fenv::raise_except_if_required(FE_INVALID);
+							return FloatBits::quiet_nan().get_val();
+						}
 						return ccm::gen::sqrt_gen<float>(x);
 					case 0x3f80'0000: // y = 1.0f
 						return x;
@@ -322,6 +328,13 @@ namespace ccm::gen::impl
 			if (auto exceptional_case = handle_exceptional_cases(x, y, xbits, ybits, x_u, ex, sign); CCM_UNLIKELY(exceptional_case.has_value()))
 			{
 				return *exceptional_case; // Return the handled value
+			}
+
+			if (x < 0.0F && !is_integer(y))
+			{
+				support::fenv::set_errno_if_required(EDOM);
+				support::fenv::raise_except_if_required(FE_INVALID);
+				return FloatBits::quiet_nan().get_val();
 			}
 
 			// x^y = 2^( y * log2(x) )

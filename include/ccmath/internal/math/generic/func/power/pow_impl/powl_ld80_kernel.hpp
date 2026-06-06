@@ -27,27 +27,10 @@
 	#include <cstdint>
 	#include <limits>
 
-	#if defined(CCMATH_TARGET_CPU_HAS_FMA)
-		#define CCMATH_POW_KERNEL_USE_FMA_DX 1
-	#endif
-
 namespace ccm::gen::internal::impl::bit80
 {
 	namespace powl_ld80_detail
 	{
-		inline long double fma_dx(long double x, long double y, long double z) noexcept
-		{
-	#if defined(CCMATH_TARGET_CPU_HAS_FMA)
-			return support::multiply_add(x, y, z);
-	#elif CCM_HAS_BUILTIN(__builtin_fmal)
-			return __builtin_fmal(x, y, z);
-	#elif CCM_HAS_BUILTIN(__builtin_fma)
-			return static_cast<long double>(__builtin_fma(static_cast<double>(x), static_cast<double>(y), static_cast<double>(z)));
-	#else
-			return support::multiply_add(x, y, z);
-	#endif
-		}
-
 		using FPBits_t		 = support::fp::FPBits<long double>;
 		using LongDoublePair = types::NumberPair<long double>;
 		namespace tables	 = ccm::gen::impl::internal::impl::powl_ld80_tables;
@@ -108,6 +91,8 @@ namespace ccm::gen::internal::impl::bit80
 			return x;
 		}
 
+		inline constexpr long double kScaleStep = 512.0L * 64.0L;
+
 		constexpr long double powl_ld80_general_finite(long double base, long double exp) noexcept
 		{
 			FPBits_t base_bits(base);
@@ -133,97 +118,126 @@ namespace ccm::gen::internal::impl::bit80
 			long double dx = 0.0L;
 			LongDoublePair dx_c0{ 0.0L, 0.0L };
 
-			if (support::is_constant_evaluated())
-			{
-				const typename FPBits_t::storage_type frac_mask_high =
-					FPBits_t::fraction_mask & ~((static_cast<typename FPBits_t::storage_type>(1) << (FPBits_t::fraction_length - 7)) - 1);
-				const typename FPBits_t::storage_type c_sig = (FPBits_t(m_x).get_mantissa() & frac_mask_high) | FPBits_t::EXPLICIT_BIT_MASK;
-				const long double c							= FPBits_t::create_value(types::Sign::POS, FPBits_t::exponent_bias, c_sig).get_val();
-				dx	  = support::multiply_add(tables::RD.at(static_cast<std::size_t>(idx_x)), m_x - c, tables::CD.at(static_cast<std::size_t>(idx_x)));
-				dx_c0 = exact_mult(tables::POW_LOG2_COEFFS[0], dx);
-			}
-			else
-			{
-	#ifdef CCMATH_POW_KERNEL_USE_FMA_DX
-				dx	  = fma_dx(tables::RD.at(static_cast<std::size_t>(idx_x)), m_x, -1.0L);
-				dx_c0 = exact_mult(tables::POW_LOG2_COEFFS[0], dx);
-	#else
-				const typename FPBits_t::storage_type frac_mask_high =
-					FPBits_t::fraction_mask & ~((static_cast<typename FPBits_t::storage_type>(1) << (FPBits_t::fraction_length - 7)) - 1);
-				const typename FPBits_t::storage_type c_sig = (FPBits_t(m_x).get_mantissa() & frac_mask_high) | FPBits_t::EXPLICIT_BIT_MASK;
-				const long double c							= FPBits_t::create_value(types::Sign::POS, FPBits_t::exponent_bias, c_sig).get_val();
-				dx	  = support::multiply_add(tables::RD.at(static_cast<std::size_t>(idx_x)), m_x - c, tables::CD.at(static_cast<std::size_t>(idx_x)));
-				dx_c0 = exact_mult(tables::POW_LOG2_COEFFS[0], dx);
-	#endif
-			}
+			const typename FPBits_t::storage_type frac_mask_high =
+				FPBits_t::fraction_mask & ~((static_cast<typename FPBits_t::storage_type>(1) << (FPBits_t::fraction_length - 7)) - 1);
+			const typename FPBits_t::storage_type c_sig = (FPBits_t(m_x).get_mantissa() & frac_mask_high) | FPBits_t::EXPLICIT_BIT_MASK;
+			const long double c							= FPBits_t::create_value(types::Sign::POS, FPBits_t::exponent_bias, c_sig).get_val();
+			dx	  = support::multiply_add(tables::RD.at(static_cast<std::size_t>(idx_x)), m_x - c, tables::CD.at(static_cast<std::size_t>(idx_x)));
+			dx_c0 = exact_mult(tables::POW_LOG2_COEFFS[0], dx);
 
 			const long double dx2 = dx * dx;
 			const long double c0  = support::multiply_add(dx, tables::POW_LOG2_COEFFS[2], tables::POW_LOG2_COEFFS[1]);
 			const long double c1  = support::multiply_add(dx, tables::POW_LOG2_COEFFS[4], tables::POW_LOG2_COEFFS[3]);
 			const long double c2  = support::multiply_add(dx, tables::POW_LOG2_COEFFS[6], tables::POW_LOG2_COEFFS[5]);
-			const long double p	  = support::polyeval(dx2, c0, c1, c2);
+			const long double p	  = support::polyeval(dx2, c0, c1, c2, tables::POW_LOG2_COEFFS[7]);
 
-			const auto & log2_r			= tables::LOG2_R_TD.at(static_cast<std::size_t>(idx_x));
-			LongDoublePair log2_x_hi	= exact_add(static_cast<long double>(e_x) + log2_r.hi, dx_c0.hi);
-			const long double log2_x_lo = support::multiply_add(dx2, p, dx_c0.lo + static_cast<long double>(log2_r.mid));
+			const long double log2_r_hi	 = tables::LOG2_R_HI.at(static_cast<std::size_t>(idx_x));
+			const long double log2_r_mid = tables::LOG2_R_MID.at(static_cast<std::size_t>(idx_x));
+			const long double log2_r_lo	 = tables::LOG2_R_LO.at(static_cast<std::size_t>(idx_x));
+			LongDoublePair log2_x_hi	 = exact_add(static_cast<long double>(e_x) + log2_r_hi, dx_c0.hi);
+			const long double log2_x_lo	 = support::multiply_add(dx2, p, dx_c0.lo + log2_r_mid);
 
 			LongDoublePair log2_x = exact_add(log2_x_hi.hi, log2_x_lo);
-			log2_x.lo += log2_x_hi.lo + static_cast<long double>(log2_r.lo);
+			log2_x.lo += log2_x_hi.lo + log2_r_lo;
 
-			const long double y6 = exp * 0x1.0p6L;
+			const LongDoublePair exp_split = split(exp);
+			const long double y6_hi		   = exp_split.hi * 0x1.0p6L;
+			const long double y6_lo		   = exp_split.lo * 0x1.0p6L;
 
-			LongDoublePair y6_log2_x = exact_mult(y6, log2_x.hi);
-			y6_log2_x.lo			 = support::multiply_add(y6, log2_x.lo, y6_log2_x.lo);
+			LongDoublePair y6_log2_hi = exact_mult(y6_hi, log2_x.hi);
+			y6_log2_hi.lo			  = support::multiply_add(y6_hi, log2_x.lo, y6_log2_hi.lo);
+			LongDoublePair y6_log2_lo = exact_mult(y6_lo, log2_x.hi);
+			y6_log2_lo.lo			  = support::multiply_add(y6_lo, log2_x.lo, y6_log2_lo.lo);
 
-			long double scale = 1.0L;
+			LongDoublePair y6_log2_x = exact_add(y6_log2_hi.hi, y6_log2_lo.hi);
+			y6_log2_x.lo += y6_log2_hi.lo + y6_log2_lo.lo;
 
-			if (FPBits_t(y6_log2_x.hi).abs().get_val() >= kUpperY6Bound)
+			int scale_exp512	  = 0;
+			bool forced_overflow  = false;
+			bool forced_underflow = false;
+			bool scaled_down	  = false;
+
+			while (FPBits_t(y6_log2_x.hi).abs().get_val() >= kUpperY6Bound)
 			{
 				if (FPBits_t(y6_log2_x.hi).sign().is_pos())
 				{
-					scale = kScaleUp;
-					y6_log2_x.hi -= 512.0L * 64.0L;
+					scale_exp512 += 512;
+					y6_log2_x.hi -= kScaleStep;
 					if (y6_log2_x.hi > kOverflowY6HiClamp)
 					{
-						y6_log2_x.hi = kOverflowY6HiClamp;
-						// If hi is clamped, a huge tail would dominate lo6 and reconstruct a spurious finite.
-						y6_log2_x.lo = 0.0L;
+						y6_log2_x.hi	= kOverflowY6HiClamp;
+						y6_log2_x.lo	= 0.0L;
+						forced_overflow = true;
+						break;
 					}
 				}
 				else
 				{
-					scale = kScaleDown;
-					y6_log2_x.hi += 512.0L * 64.0L;
+					scale_exp512 -= 512;
+					scaled_down = true;
+					y6_log2_x.hi += kScaleStep;
 					if (y6_log2_x.hi < kUnderflowY6HiClamp)
 					{
-						y6_log2_x.hi = kUnderflowY6HiClamp;
-						// If hi is clamped, a huge tail would dominate lo6 and reconstruct a spurious normal.
-						y6_log2_x.lo = 0.0L;
+						y6_log2_x.hi	 = kUnderflowY6HiClamp;
+						y6_log2_x.lo	 = 0.0L;
+						forced_underflow = true;
+						break;
 					}
 				}
 			}
 
-			const long double hm	 = nearest_integer(y6_log2_x.hi);
-			const long double lo6_hi = y6_log2_x.hi - hm;
-			const long double lo6	 = lo6_hi + y6_log2_x.lo;
+			if (forced_overflow)
+			{
+				support::fenv::set_errno_if_required(ERANGE);
+				support::fenv::raise_except_if_required(FE_OVERFLOW);
+				return FPBits_t::inf(types::Sign::POS).get_val();
+			}
 
-			const int hm_i				 = static_cast<int>(hm);
-			const unsigned idx_y		 = static_cast<unsigned>(hm_i) & 0x3fU;
-			const int exp_hi			 = hm_i >> 6;
-			const long double exp_factor = support::helpers::internal_ldexp(1.0L, exp_hi);
-			const auto & mid			 = tables::EXP2_MID1.at(static_cast<std::size_t>(idx_y));
-			const long double exp2_hm_hi = exp_factor * static_cast<long double>(mid.hi);
-			const long double exp2_hm_lo = idx_y != 0U ? exp_factor * static_cast<long double>(mid.mid) : 0.0L;
+			if (forced_underflow)
+			{
+				support::fenv::set_errno_if_required(ERANGE);
+				support::fenv::raise_except_if_required(FE_UNDERFLOW);
+				return FPBits_t::zero(types::Sign::POS).get_val();
+			}
+
+			// Extract the integer part from the high limb only: hm is near y6_log2_x.hi, so
+			// (hi - hm) is exact (Sterbenz) and the low limb is added separately. Collapsing
+			// hi + lo into a single long double first would round at the magnitude of hm and
+			// drop ~log2(hm) low bits of lo6, which dominates the error for large exponents.
+			const long double hm  = nearest_integer(y6_log2_x.hi);
+			const long double lo6 = (y6_log2_x.hi - hm) + y6_log2_x.lo;
+
+			const int hm_i = static_cast<int>(hm);
+
+			const unsigned idx_y							= static_cast<unsigned>(hm_i) & 0x3fU;
+			const typename FPBits_t::storage_type exp2_hi_i = static_cast<typename FPBits_t::storage_type>(static_cast<std::int64_t>(hm_i >> 6))
+															  << FPBits_t::significand_length;
+			const typename FPBits_t::storage_type exp2_mid_hi_i = FPBits_t(tables::EXP2_HI.at(static_cast<std::size_t>(idx_y))).uintval();
+			const typename FPBits_t::storage_type exp2_mid_lo_i =
+				idx_y != 0U ? FPBits_t(tables::EXP2_MID.at(static_cast<std::size_t>(idx_y))).uintval() : typename FPBits_t::storage_type{};
+
+			const typename FPBits_t::storage_type exp2_hm_hi_i = exp2_hi_i + exp2_mid_hi_i;
+			const typename FPBits_t::storage_type exp2_hm_lo_i = idx_y != 0U ? exp2_hi_i + exp2_mid_lo_i : typename FPBits_t::storage_type{};
+
+			const long double exp2_hm_hi = FPBits_t(exp2_hm_hi_i).get_val();
+			const long double exp2_hm_lo = idx_y != 0U ? FPBits_t(exp2_hm_lo_i).get_val() : 0.0L;
 
 			const long double lo6_sqr = lo6 * lo6;
 			const long double d0	  = support::multiply_add(lo6, tables::POW_EXP2_COEFFS[2], tables::POW_EXP2_COEFFS[1]);
 			const long double d1	  = support::multiply_add(lo6, tables::POW_EXP2_COEFFS[4], tables::POW_EXP2_COEFFS[3]);
-			const long double pp	  = support::polyeval(lo6_sqr, d0, d1, tables::POW_EXP2_COEFFS[5]);
+			const long double d2	  = support::multiply_add(lo6, tables::POW_EXP2_COEFFS[6], tables::POW_EXP2_COEFFS[5]);
+			const long double pp	  = support::polyeval(lo6_sqr, d0, d1, d2);
 
 			long double result = support::multiply_add(exp2_hm_hi * lo6, pp, exp2_hm_lo);
+			// exp2_hm_hi + exp2_hm_lo represents 2^(hm/64) to roughly twice the significand width, so
+			// the low limb must also be scaled by (2^(lo6/64) - 1) = lo6 * pp. Omitting this term (as
+			// the binary64 pow kernel does) leaks ~2^-60 of relative error, which is below a double ULP
+			// but reaches several long double ULP for large |lo6| with a non-zero exp2 mid entry.
+			result = support::multiply_add(exp2_hm_lo * lo6, pp, result);
 			result += exp2_hm_hi;
 
-			long double final = result * scale;
+			long double final = result;
+			if (scale_exp512 != 0) { final = support::helpers::internal_ldexp(final, scale_exp512); }
 			FPBits_t final_bits(final);
 			if (final_bits.sign().is_neg())
 			{
@@ -241,12 +255,12 @@ namespace ccm::gen::internal::impl::bit80
 				}
 				else { final = final_bits.abs().get_val(); }
 			}
-			else if (scale == kScaleUp && final_bits.is_inf() && final_bits.is_pos())
+			else if (scale_exp512 > 0 && final_bits.is_inf() && final_bits.is_pos())
 			{
 				support::fenv::set_errno_if_required(ERANGE);
 				support::fenv::raise_except_if_required(FE_OVERFLOW);
 			}
-			else if (scale == kScaleDown && final_bits.is_finite() && !final_bits.is_zero() && final_bits.abs().uintval() < FPBits_t::min_subnormal().uintval())
+			else if (scaled_down && final_bits.is_finite() && !final_bits.is_zero() && final_bits.abs().uintval() < FPBits_t::min_subnormal().uintval())
 			{
 				support::fenv::set_errno_if_required(ERANGE);
 				support::fenv::raise_except_if_required(FE_UNDERFLOW);

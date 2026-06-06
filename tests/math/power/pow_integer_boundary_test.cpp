@@ -104,10 +104,12 @@ TEST(CcmathPowerIntegerBoundaryTests, LongDoubleParityThresholdsRespectPlatformS
 	ExpectParityResult(static_cast<long double>(0x1.0p53), static_cast<long double>(1.0));
 	ExpectNegativeBaseDomainError(static_cast<long double>(1.5));
 #elif defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
-	ExpectGenParityResult(0x1.fffffffffffffp61L, -1.0L);
-	ExpectGenParityResult(0x1.0p62L, 1.0L);
-	ExpectGenParityResult(0x1.0000000000001p62L, -1.0L);
-	ExpectGenParityResult(0x1.fffffffffffffp62L, -1.0L);
+	const long double two_to_62 = 0x1.0p62L;
+	ExpectGenParityResult(two_to_62 - 1.0L, -1.0L);
+	ExpectGenParityResult(two_to_62, 1.0L);
+	ExpectGenParityResult(two_to_62 + 1.0L, -1.0L);
+	ExpectGenParityResult(two_to_62 + 2.0L, 1.0L);
+	ExpectGenParityResult(0x1.0p63L - 1.0L, -1.0L);
 	ExpectGenParityResult(0x1.0p63L, 1.0L);
 	ExpectGenParityResult(0x1.0p64L, 1.0L);
 	ExpectGenParityResult(0x1.0p65L, 1.0L);

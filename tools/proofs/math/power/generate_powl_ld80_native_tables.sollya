@@ -1,0 +1,34 @@
+// Generate ld80 table splits for cross-check against EXP2_MID1 and LOG2_R_TD.
+// Production headers use generate_powl_ld80_tables.py (full double literals, not truncated hex).
+// Split recipe: hi = round(x, 32, RN), mid/lo = round(..., double, RN).
+// Run: sollya tools/proofs/math/power/generate_powl_ld80_native_tables.sollya
+
+display = hexadecimal;
+
+split_hi = 64 - 24 - 8;
+
+procedure log2_a(i) {
+  var r;
+  r = 2^(-8) * ceil(2^8 * (1 - 2^(-8)) / (1 + i * 2^(-7)));
+  return -log2(r);
+};
+
+print("// LD80_EXP2_HI");
+for i from 0 to 63 do
+  if i == 0 then print("\t0x1p0L,") else print("\t", round(2^(i/64), split_hi, RN), "L,");
+
+print("// LD80_EXP2_MID");
+for i from 0 to 63 do
+  if i == 0 then print("\t0.0L,") else print("\t", round(2^(i/64) - round(2^(i/64), split_hi, RN), double, RN), "L,");
+
+print("// LD80_LOG2_R_HI");
+for i from 0 to 127 do
+  if i == 0 then print("\t0.0L,") else print("\t", round(log2_a(i), split_hi, RN), "L,");
+
+print("// LD80_LOG2_R_MID");
+for i from 0 to 127 do
+  if i == 0 then print("\t0.0L,") else print("\t", round(log2_a(i) - round(log2_a(i), split_hi, RN), double, RN), "L,");
+
+print("// LD80_LOG2_R_LO");
+for i from 0 to 127 do
+  if i == 0 then print("\t0.0L,") else print("\t", round(log2_a(i) - round(log2_a(i), split_hi, RN) - round(log2_a(i) - round(log2_a(i), split_hi, RN), double, RN), double, RN), "L,");

@@ -39,17 +39,21 @@ TEST(PowlLd80IntegerClass, ParityThresholdsAroundTwoTo62ThroughTwoTo65)
 {
 	REQUIRE_POWL_LD80();
 
-	ExpectInteger(0x1.fffffffffffffp61L, true, true);
-	ExpectInteger(0x1.0p62L, true, false);
-	ExpectInteger(0x1.0000000000001p62L, true, true);
-	ExpectInteger(0x1.fffffffffffffp62L, true, true);
-	ExpectInteger(0x1.0p63L, true, false);
+	const long double two_to_62 = 0x1.0p62L;
+	const long double two_to_63 = 0x1.0p63L;
+
+	ExpectInteger(two_to_62 - 1.0L, true, true);
+	ExpectInteger(two_to_62, true, false);
+	ExpectInteger(two_to_62 + 1.0L, true, true);
+	ExpectInteger(two_to_62 + 2.0L, true, false);
+	ExpectInteger(two_to_63 - 1.0L, true, true);
+	ExpectInteger(two_to_63, true, false);
 	ExpectInteger(0x1.0p64L, true, false);
 	ExpectInteger(0x1.0p65L, true, false);
 	ExpectInteger(std::nextafter(0x1.0p65L, std::numeric_limits<long double>::infinity()), true, false);
 
-	ExpectInteger(-0x1.fffffffffffffp61L, true, true);
-	ExpectInteger(-0x1.0p62L, true, false);
+	ExpectInteger(-(two_to_62 - 1.0L), true, true);
+	ExpectInteger(-two_to_62, true, false);
 }
 
 TEST(PowlLd80IntegerClass, HalfIntegersAreNonInteger)
@@ -74,7 +78,7 @@ TEST(PowlLd80IntegerClass, NegativeBaseParityMatchesStdPow)
 	expect_parity(3.0L, -1.0L);
 	expect_parity(4.0L, 1.0L);
 	expect_parity(0x1.0p62L, 1.0L);
-	expect_parity(0x1.0000000000001p62L, -1.0L);
+	expect_parity(0x1.0p62L + 1.0L, -1.0L);
 }
 
 TEST(PowlLd80IntegerClass, NonIntegerNegativeBaseIsDomainError)

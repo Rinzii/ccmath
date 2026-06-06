@@ -75,7 +75,7 @@ TEST(PowlLd80SpecialCases, InfiniteBaseAndExponent)
 	ExpectPowlMatchesStd(2.0L, std::numeric_limits<long double>::infinity());
 	ExpectPowlMatchesStd(0.5L, -std::numeric_limits<long double>::infinity());
 	ExpectPowlMatchesStd(2.0L, -std::numeric_limits<long double>::infinity());
-	EXPECT_TRUE(std::isnan(ccm::gen::pow_gen(-std::numeric_limits<long double>::infinity(), 0.5L)));
+	ExpectPowlMatchesStd(-std::numeric_limits<long double>::infinity(), 0.5L);
 	EXPECT_EQ(ccm::gen::pow_gen(1.0L, std::numeric_limits<long double>::infinity()), 1.0L);
 }
 

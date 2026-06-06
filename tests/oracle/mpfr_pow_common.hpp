@@ -16,8 +16,8 @@
 #include <cfenv>
 #include <chrono>
 #include <cmath>
-#include <ctime>
 #include <cstdint>
+#include <ctime>
 #include <fstream>
 #include <iomanip>
 #include <limits>
@@ -82,11 +82,11 @@ namespace ccm::test::oracle
 	template <typename T>
 	struct run_summary
 	{
-		std::size_t case_count = 0;
-		std::size_t skipped_count = 0;
-		std::size_t failure_count = 0;
+		std::size_t case_count				   = 0;
+		std::size_t skipped_count			   = 0;
+		std::size_t failure_count			   = 0;
 		std::size_t mpfr_policy_mismatch_count = 0;
-		std::uint64_t max_observed_ulp = 0;
+		std::uint64_t max_observed_ulp		   = 0;
 		T worst_base{};
 		T worst_exponent{};
 		T worst_actual{};
@@ -108,16 +108,16 @@ namespace ccm::test::oracle
 		std::vector<std::string> domains_covered;
 		std::vector<std::string> domains_skipped;
 		std::string oracle_policy;
-		std::size_t case_count = 0;
-		std::size_t skipped_count = 0;
-		std::size_t failure_count = 0;
+		std::size_t case_count				   = 0;
+		std::size_t skipped_count			   = 0;
+		std::size_t failure_count			   = 0;
 		std::size_t mpfr_policy_mismatch_count = 0;
-		std::uint64_t max_observed_ulp = 0;
+		std::uint64_t max_observed_ulp		   = 0;
 		std::string worst_base_bits;
 		std::string worst_exponent_bits;
 		std::string worst_actual_bits;
 		std::string worst_expected_bits;
-		std::uint64_t seed = 0;
+		std::uint64_t seed		 = 0;
 		std::uint64_t elapsed_ms = 0;
 		std::string timestamp;
 	};
@@ -203,7 +203,7 @@ namespace ccm::test::oracle
 
 	inline std::string utc_timestamp()
 	{
-		const auto now = std::chrono::system_clock::now();
+		const auto now	= std::chrono::system_clock::now();
 		const auto time = std::chrono::system_clock::to_time_t(now);
 		std::tm tm{};
 #if defined(_WIN32)
@@ -254,7 +254,10 @@ namespace ccm::test::oracle
 		switch (format)
 		{
 		case ccm::config::LongDoubleFormat::Double: return 256;
-		case ccm::config::LongDoubleFormat::X87Extended: return 128;
+		// 128 bits double-rounds when reducing to the 64-bit significand for values that sit within
+		// ~2^-128 of a rounding boundary (e.g. LDBL_MAX^0.5, which is just below 2^8192), producing
+		// spurious failures even for correctly rounded results. 256 bits matches the other formats.
+		case ccm::config::LongDoubleFormat::X87Extended: return 256;
 		case ccm::config::LongDoubleFormat::IEEEBinary128: return 256;
 		case ccm::config::LongDoubleFormat::Unknown: return 256;
 		}
@@ -275,7 +278,7 @@ namespace ccm::test::oracle
 	template <typename T>
 	inline std::string bits_hex(T value)
 	{
-		using fp_bits = ccm::support::fp::FPBits<T>;
+		using fp_bits	   = ccm::support::fp::FPBits<T>;
 		using storage_type = typename fp_bits::storage_type;
 
 		const storage_type bits = fp_bits(value).uintval();
@@ -357,7 +360,7 @@ namespace ccm::test::oracle
 	inline bool oracle_match(T actual, T expected, std::uint64_t max_ulp, std::uint64_t & ulp_distance, std::string & notes)
 	{
 		const auto distance = ccm::test::ulp::classify_distance(actual, expected);
-		ulp_distance = distance.distance;
+		ulp_distance		= distance.distance;
 
 		if (std::isnan(expected))
 		{
@@ -445,15 +448,15 @@ namespace ccm::test::oracle
 
 	template <typename T, typename Fn>
 	inline std::optional<failure_record<T>> evaluate_case(const pow_case<T> & test_case,
-															 std::string_view function_name,
-															 std::string_view path_name,
-															 ccm::test::pow_path::validation_path path,
-															 Fn fn,
-															 mpfr_prec_t oracle_precision,
-															 std::uint64_t max_ulp,
-															 run_summary<T> & summary,
-															 std::uint64_t seed = 0,
-															 std::string_view search_mode = {})
+														  std::string_view function_name,
+														  std::string_view path_name,
+														  ccm::test::pow_path::validation_path path,
+														  Fn fn,
+														  mpfr_prec_t oracle_precision,
+														  std::uint64_t max_ulp,
+														  run_summary<T> & summary,
+														  std::uint64_t seed		   = 0,
+														  std::string_view search_mode = {})
 	{
 		if (const auto skip = kernel_path_skip_reason(path, test_case.base, test_case.exponent))
 		{
@@ -464,11 +467,11 @@ namespace ccm::test::oracle
 		++summary.case_count;
 
 		const mpfr_rnd_t rounding = current_mpfr_rounding_mode();
-		const T actual = fn(test_case.base, test_case.exponent);
+		const T actual			  = fn(test_case.base, test_case.exponent);
 
 		if (!uses_public_mpfr_oracle(path))
 		{
-			const T std_ref = std::pow(test_case.base, test_case.exponent);
+			const T std_ref	 = std::pow(test_case.base, test_case.exponent);
 			const T mpfr_ref = mpfr_pow_reference(test_case.base, test_case.exponent, oracle_precision, rounding);
 
 			if (is_exceptional_or_zero_result(actual) || is_exceptional_or_zero_result(std_ref))
@@ -516,10 +519,10 @@ namespace ccm::test::oracle
 			if (distance >= summary.max_observed_ulp)
 			{
 				summary.max_observed_ulp = distance;
-				summary.worst_base = test_case.base;
-				summary.worst_exponent = test_case.exponent;
-				summary.worst_actual = actual;
-				summary.worst_expected = mpfr_ref;
+				summary.worst_base		 = test_case.base;
+				summary.worst_exponent	 = test_case.exponent;
+				summary.worst_actual	 = actual;
+				summary.worst_expected	 = mpfr_ref;
 			}
 			if (pass) { return std::nullopt; }
 
@@ -562,10 +565,10 @@ namespace ccm::test::oracle
 		if (distance >= summary.max_observed_ulp)
 		{
 			summary.max_observed_ulp = distance;
-			summary.worst_base = test_case.base;
-			summary.worst_exponent = test_case.exponent;
-			summary.worst_actual = actual;
-			summary.worst_expected = expected;
+			summary.worst_base		 = test_case.base;
+			summary.worst_exponent	 = test_case.exponent;
+			summary.worst_actual	 = actual;
+			summary.worst_expected	 = expected;
 		}
 		if (pass) { return std::nullopt; }
 
@@ -690,12 +693,9 @@ namespace ccm::test::oracle
 			std::string_view view = *raw;
 			while (!view.empty())
 			{
-				const std::size_t comma = view.find(',');
+				const std::size_t comma		 = view.find(',');
 				const std::string_view token = view.substr(0, comma);
-				if (auto parsed = ccm::test::pow_path::parse_path(token))
-				{
-					paths.push_back(*parsed);
-				}
+				if (auto parsed = ccm::test::pow_path::parse_path(token)) { paths.push_back(*parsed); }
 				if (comma == std::string_view::npos) { break; }
 				view.remove_prefix(comma + 1);
 			}
@@ -795,7 +795,7 @@ namespace ccm::test::oracle
 			if constexpr (std::is_same_v<T, float>)
 			{
 				const auto base_bits = static_cast<std::uint32_t>(rng());
-				const auto exp_bits = static_cast<std::uint32_t>(rng());
+				const auto exp_bits	 = static_cast<std::uint32_t>(rng());
 				cases.push_back(pow_case<T>{
 					ccm::support::bit_cast<float>(base_bits),
 					ccm::support::bit_cast<float>(exp_bits),
