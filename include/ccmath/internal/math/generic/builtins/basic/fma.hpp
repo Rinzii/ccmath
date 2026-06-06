@@ -18,7 +18,7 @@
 // Checks if the cpu supports FMA instructions.
 // This macro is allowed to be defined in the global namespace.
 #if defined(__ARM_FEATURE_FMA) || (defined(__AVX2__) && defined(__FMA__)) || defined(__NVPTX__) || defined(__AMDGPU__) ||                                      \
-	(defined(__riscv) && (__riscv_xlen == 64)) || defined(__x86_64__) || defined(_M_X64) || defined(__i386__)
+	(defined(__riscv) && (__riscv_xlen == 64))
 	#define CCMATH_TARGET_CPU_HAS_FMA
 #endif
 

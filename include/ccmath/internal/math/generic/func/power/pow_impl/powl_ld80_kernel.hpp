@@ -13,6 +13,7 @@
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
 
 	#include "ccmath/internal/math/generic/func/power/pow_impl/powl_ld80_tables.hpp"
+	#include "ccmath/internal/predef/has_builtin.hpp"
 	#include "ccmath/internal/support/fenv/fenv_support.hpp"
 	#include "ccmath/internal/support/fp/fp_bits.hpp"
 	#include "ccmath/internal/support/fp/nearest_integer.hpp"
@@ -23,14 +24,30 @@
 	#include "ccmath/internal/types/number_pair.hpp"
 
 	#include <cfloat>
-	#include <cmath>
 	#include <cstdint>
 	#include <limits>
+
+	#if defined(CCMATH_TARGET_CPU_HAS_FMA) || ((defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__)))
+		#define CCMATH_POW_KERNEL_USE_FMA_DX 1
+	#endif
 
 namespace ccm::gen::internal::impl::bit80
 {
 	namespace powl_ld80_detail
 	{
+		constexpr long double fma_dx(long double x, long double y, long double z) noexcept
+		{
+	#if defined(CCMATH_TARGET_CPU_HAS_FMA)
+			return support::multiply_add(x, y, z);
+	#elif CCM_HAS_BUILTIN(__builtin_fmal)
+			return __builtin_fmal(x, y, z);
+	#elif CCM_HAS_BUILTIN(__builtin_fma)
+			return static_cast<long double>(__builtin_fma(static_cast<double>(x), static_cast<double>(y), static_cast<double>(z)));
+	#else
+			return support::multiply_add(x, y, z);
+	#endif
+		}
+
 		using FPBits_t		 = support::fp::FPBits<long double>;
 		using LongDoublePair = types::NumberPair<long double>;
 		namespace tables	 = ccm::gen::impl::internal::impl::powl_ld80_tables;
@@ -118,8 +135,8 @@ namespace ccm::gen::internal::impl::bit80
 			}
 			else
 			{
-	#ifdef CCMATH_TARGET_CPU_HAS_FMA
-				dx	  = support::multiply_add(tables::RD.at(static_cast<std::size_t>(idx_x)), m_x, -1.0L);
+	#ifdef CCMATH_POW_KERNEL_USE_FMA_DX
+				dx	  = fma_dx(tables::RD.at(static_cast<std::size_t>(idx_x)), m_x, -1.0L);
 				dx_c0 = exact_mult(tables::POW_LOG2_COEFFS[0], dx);
 	#else
 				const typename FPBits_t::storage_type frac_mask_high =

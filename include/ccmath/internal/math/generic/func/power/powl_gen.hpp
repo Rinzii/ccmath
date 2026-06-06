@@ -19,10 +19,10 @@
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
+#include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 
 #include <cfloat>
-#include <cmath>
 #include <cstdint>
 #include <limits>
 
@@ -230,7 +230,7 @@ namespace ccm::gen
 					if (powl_bits::try_extract_int64(exp, int_exp))
 					{
 						long double result = powl_bounded_integer(working_base, int_exp);
-						if (result_is_neg && result != 0.0L && !std::isinf(result) && !ccm::isnan(result)) { result = -result; }
+						if (result_is_neg && result != 0.0L && !ccm::isinf(result) && !ccm::isnan(result)) { result = -result; }
 						return result;
 					}
 
@@ -239,7 +239,7 @@ namespace ccm::gen
 					if (exp_abs > kPowlHugeExponentThreshold) { working_exp = exp_abs_bits.is_neg() ? -0x1.0p100L : 0x1.0p100L; }
 
 					long double result = bit80::powl_ld80_general_finite(working_base, working_exp);
-					if (result_is_neg && result != 0.0L && !std::isinf(result) && !ccm::isnan(result)) { result = -result; }
+					if (result_is_neg && result != 0.0L && !ccm::isinf(result) && !ccm::isnan(result)) { result = -result; }
 					return result;
 				}
 			} // namespace bit80

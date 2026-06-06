@@ -6,9 +6,7 @@
 .vs/*
 .vscode/*
 build/*
-build-rigorous*/
-build-simple*/
-build-powl*/
+/build-*/
 /out/
 mpfr-pow*-summary.json
 mpfr-powf*-summary.json
@@ -19,6 +17,8 @@ path-matrix-json*/
 POW_PROOF.*
 .cache
 .DS_Store
+__pycache__/
+*.py[cod]
 
 # User Specific Configuration Files
 CMakeSettings.json

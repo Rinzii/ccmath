@@ -11,6 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/func/power/pow_impl/powf_data.hpp"
+#include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/common_math_constants.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
@@ -27,10 +28,28 @@
 #include <limits>
 #include <type_traits>
 
+#if defined(CCMATH_TARGET_CPU_HAS_FMA) || ((defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__)))
+	#define CCMATH_POW_KERNEL_USE_FMA_DX 1
+#endif
+
 namespace ccm::gen::impl
 {
 	namespace internal::impl
 	{
+		namespace pow_kernel_detail
+		{
+			constexpr double fma_dx(double x, double y, double z) noexcept
+			{
+#if defined(CCMATH_TARGET_CPU_HAS_FMA)
+				return support::multiply_add(x, y, z);
+#elif CCM_HAS_BUILTIN(__builtin_fma)
+				return __builtin_fma(x, y, z);
+#else
+				return support::multiply_add(x, y, z);
+#endif
+			}
+		} // namespace pow_kernel_detail
+
 		using ccm::types::DoubleDouble;
 
 		constexpr bool is_odd_integer(double val) noexcept
@@ -99,8 +118,8 @@ namespace ccm::gen::impl
 			}
 			else
 			{
-#ifdef CCMATH_TARGET_CPU_HAS_FMA
-				dx	  = support::multiply_add(support::constants::RD.at(static_cast<std::size_t>(idx_x)), m_x, -1.0);
+#ifdef CCMATH_POW_KERNEL_USE_FMA_DX
+				dx	  = pow_kernel_detail::fma_dx(support::constants::RD.at(static_cast<std::size_t>(idx_x)), m_x, -1.0);
 				dx_c0 = ccm::types::exact_mult(POW_LOG2_COEFFS[0], dx);
 #else
 				const typename FPBits_t::storage_type masked_mantissa = static_cast<typename FPBits_t::storage_type>(
