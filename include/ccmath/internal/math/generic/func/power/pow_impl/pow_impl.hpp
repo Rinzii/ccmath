@@ -28,7 +28,7 @@
 #include <limits>
 #include <type_traits>
 
-#if defined(CCMATH_TARGET_CPU_HAS_FMA)
+#if defined(CCMATH_TARGET_CPU_HAS_FMA) || ((defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__)))
 	#define CCMATH_POW_KERNEL_USE_FMA_DX 1
 #endif
 

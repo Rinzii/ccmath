@@ -178,6 +178,19 @@ namespace ccm::gen
 
 					if (ccm::isnan(base) || ccm::isnan(exp)) { return std::numeric_limits<long double>::quiet_NaN(); }
 
+					if (support::is_constant_evaluated() && base > 0.0L && !ccm::isinf(base))
+					{
+						const long double rounded_exp = static_cast<long double>(static_cast<std::int64_t>(exp));
+						if (exp == rounded_exp)
+						{
+							const std::int64_t int_exp = static_cast<std::int64_t>(exp);
+							if (int_exp >= -powl_bits::kBoundedExponentMax && int_exp <= powl_bits::kBoundedExponentMax)
+							{
+								return powl_bounded_integer(base, int_exp);
+							}
+						}
+					}
+
 					const PowlFPBits_t base_bits(base);
 					const PowlFPBits_t exp_bits(exp);
 

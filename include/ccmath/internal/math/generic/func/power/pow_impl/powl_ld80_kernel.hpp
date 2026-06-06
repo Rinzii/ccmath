@@ -219,7 +219,7 @@ namespace ccm::gen::internal::impl::bit80
 					support::fenv::raise_except_if_required(FE_OVERFLOW);
 					final = FPBits_t::inf(types::Sign::POS).get_val();
 				}
-				else if (final_bits.abs().uintval() < FPBits_t::min_subnormal().uintval())
+				else if (!final_bits.is_zero() && final_bits.abs().uintval() < FPBits_t::min_subnormal().uintval())
 				{
 					support::fenv::set_errno_if_required(ERANGE);
 					support::fenv::raise_except_if_required(FE_UNDERFLOW);
