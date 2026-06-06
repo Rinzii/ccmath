@@ -612,7 +612,7 @@ namespace ccm::types
 		template <size_t OtherBits, bool OtherSigned, typename OtherWordType = WordType>
 		constexpr BigInt(const BigInt<OtherBits, OtherSigned, OtherWordType> & other) // NOLINT(google-explicit-constructor)
 		{
-			using BigIntOther = BigInt<OtherBits, OtherSigned, OtherWordType>;
+			using BigIntOther							   = BigInt<OtherBits, OtherSigned, OtherWordType>;
 			[[maybe_unused]] const bool should_sign_extend = Signed && other.is_neg();
 
 			static_assert(!(Bits == OtherBits && WORD_SIZE != BigIntOther::WORD_SIZE),
@@ -621,8 +621,7 @@ namespace ccm::types
 			if constexpr (BigIntOther::WORD_SIZE < WORD_SIZE)
 			{
 				constexpr std::size_t WORD_SIZE_RATIO = WORD_SIZE / BigIntOther::WORD_SIZE;
-				static_assert((WORD_SIZE % BigIntOther::WORD_SIZE) == 0,
-							  "Word types must be multiples of each other for correct conversion.");
+				static_assert((WORD_SIZE % BigIntOther::WORD_SIZE) == 0, "Word types must be multiples of each other for correct conversion.");
 				if constexpr (OtherBits >= Bits)
 				{
 					for (std::size_t i = 0; i < WORD_COUNT; ++i)
@@ -637,7 +636,7 @@ namespace ccm::types
 				}
 				else
 				{
-					std::size_t i	 = 0;
+					std::size_t i	  = 0;
 					WordType cur_word = 0;
 					for (; i < BigIntOther::WORD_COUNT; ++i)
 					{
@@ -648,12 +647,8 @@ namespace ccm::types
 							cur_word				 = 0;
 						}
 					}
-					const WordType extension_bits =
-						should_sign_extend ? std::numeric_limits<WordType>::max() : std::numeric_limits<WordType>::min();
-					if ((i % WORD_SIZE_RATIO) != 0)
-					{
-						cur_word |= static_cast<WordType>(extension_bits) << (BigIntOther::WORD_SIZE * (i % WORD_SIZE_RATIO));
-					}
+					const WordType extension_bits = should_sign_extend ? std::numeric_limits<WordType>::max() : std::numeric_limits<WordType>::min();
+					if ((i % WORD_SIZE_RATIO) != 0) { cur_word |= static_cast<WordType>(extension_bits) << (BigIntOther::WORD_SIZE * (i % WORD_SIZE_RATIO)); }
 					val[i / WORD_SIZE_RATIO] = cur_word;
 					extend((i / WORD_SIZE_RATIO) + 1, should_sign_extend);
 				}
@@ -674,8 +669,7 @@ namespace ccm::types
 			else
 			{
 				constexpr std::size_t WORD_SIZE_RATIO = BigIntOther::WORD_SIZE / WORD_SIZE;
-				static_assert((BigIntOther::WORD_SIZE % WORD_SIZE) == 0,
-							  "Word types must be multiples of each other for correct conversion.");
+				static_assert((BigIntOther::WORD_SIZE % WORD_SIZE) == 0, "Word types must be multiples of each other for correct conversion.");
 				if constexpr (OtherBits >= Bits)
 				{
 					for (std::size_t i = 0; i < WORD_COUNT; ++i)

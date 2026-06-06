@@ -65,14 +65,10 @@ namespace ccm::types
 				return round_bit || (value << (Bits - rshift + 1)) != 0 ? +1 : -1;
 			}
 			return -1;
-		case FE_TOWARDZERO:
-			return -1;
-		case FE_DOWNWARD:
-			return logical_sign.is_neg() && (rshift < Bits && (value << (Bits - rshift)) != 0) ? +1 : -1;
-		case FE_UPWARD:
-			return logical_sign.is_pos() && (rshift < Bits && (value << (Bits - rshift)) != 0) ? +1 : -1;
-		default:
-			support::unreachable();
+		case FE_TOWARDZERO: return -1;
+		case FE_DOWNWARD: return logical_sign.is_neg() && (rshift < Bits && (value << (Bits - rshift)) != 0) ? +1 : -1;
+		case FE_UPWARD: return logical_sign.is_pos() && (rshift < Bits && (value << (Bits - rshift)) != 0) ? +1 : -1;
+		default: support::unreachable();
 		}
 	}
 
@@ -241,26 +237,23 @@ namespace ccm::types
 
 				switch (support::fenv::get_rounding_mode())
 				{
-				case FE_TONEAREST:
-					return FPBits::inf(sign).get_val();
-				case FE_TOWARDZERO:
-					return FPBits::max_normal(sign).get_val();
+				case FE_TONEAREST: return FPBits::inf(sign).get_val();
+				case FE_TOWARDZERO: return FPBits::max_normal(sign).get_val();
 				case FE_DOWNWARD:
 					if (sign.is_pos()) { return FPBits::max_normal(Sign::POS).get_val(); }
 					return FPBits::inf(Sign::NEG).get_val();
 				case FE_UPWARD:
 					if (sign.is_neg()) { return FPBits::max_normal(Sign::NEG).get_val(); }
 					return FPBits::inf(Sign::POS).get_val();
-				default:
-					support::unreachable();
+				default: support::unreachable();
 				}
 			}
 
 			StorageType out_biased_exp = 0;
-			StorageType out_mantissa	 = 0;
-			bool round					 = false;
-			bool sticky					 = false;
-			bool underflow				 = false;
+			StorageType out_mantissa   = 0;
+			bool round				   = false;
+			bool sticky				   = false;
+			bool underflow			   = false;
 
 			if (unbiased_exp < -FPBits::exponent_bias - FPBits::fraction_length)
 			{
@@ -269,8 +262,8 @@ namespace ccm::types
 			}
 			else if (unbiased_exp == -FPBits::exponent_bias - FPBits::fraction_length)
 			{
-				round	  = true;
-				underflow = true;
+				round							= true;
+				underflow						= true;
 				const mantissa_type sticky_mask = (mantissa_type(1) << (Bits - 1)) - 1;
 				sticky							= (mantissa & sticky_mask) != 0;
 			}
@@ -285,8 +278,8 @@ namespace ccm::types
 				}
 				else { out_biased_exp = static_cast<StorageType>(unbiased_exp + FPBits::exponent_bias); }
 
-				const mantissa_type round_mask = mantissa_type(1) << static_cast<std::size_t>(extra_fraction_len - 1);
-				round						   = (mantissa & round_mask) != 0;
+				const mantissa_type round_mask	= mantissa_type(1) << static_cast<std::size_t>(extra_fraction_len - 1);
+				round							= (mantissa & round_mask) != 0;
 				const mantissa_type sticky_mask = round_mask - 1;
 				sticky							= (mantissa & sticky_mask) != 0;
 
@@ -308,8 +301,7 @@ namespace ccm::types
 			case FE_UPWARD:
 				if (sign.is_pos() && (round || sticky)) { ++result; }
 				break;
-			default:
-				break;
+			default: break;
 			}
 
 			if constexpr (ShouldSignalExceptions)
@@ -411,7 +403,7 @@ namespace ccm::types
 														  (static_cast<output_bits_t>(m_hi) & support::fp::FPBits<T>::significand_mask) | implicit_mask)
 						 .get_val();
 
-			mantissa_type round_mask = (shift - 1) >= mantissa_type::BITS ? mantissa_type(0) : mantissa_type(1) << (shift - 1);
+			mantissa_type round_mask  = (shift - 1) >= mantissa_type::BITS ? mantissa_type(0) : mantissa_type(1) << (shift - 1);
 			mantissa_type sticky_mask = round_mask - mantissa_type(1);
 
 			const bool round_bit  = !(mantissa & round_mask).is_zero();
@@ -519,10 +511,7 @@ namespace ccm::types
 			if (mantissa.is_zero()) { return 0; }
 
 			mantissa_type new_mant = mantissa;
-			if (exponent > 0)
-			{
-				new_mant <<= exponent;
-			}
+			if (exponent > 0) { new_mant <<= exponent; }
 			else
 			{
 				const std::size_t shift = static_cast<std::size_t>(-static_cast<std::int64_t>(exponent));
@@ -538,28 +527,16 @@ namespace ccm::types
 		{
 			int round_dir = 0;
 			mantissa_type new_mant;
-			if (mantissa.is_zero())
-			{
-				new_mant = 0;
-			}
+			if (mantissa.is_zero()) { new_mant = 0; }
 			else
 			{
 				new_mant = mantissa;
-				if (exponent > 0)
-				{
-					new_mant <<= exponent;
-				}
+				if (exponent > 0) { new_mant <<= exponent; }
 				else if (exponent < 0)
 				{
 					const std::size_t shift = static_cast<std::size_t>(-static_cast<std::int64_t>(exponent));
-					if (shift >= Bits)
-					{
-						new_mant = 0;
-					}
-					else
-					{
-						new_mant >>= shift;
-					}
+					if (shift >= Bits) { new_mant = 0; }
+					else { new_mant >>= shift; }
 					round_dir = rounding_direction(mantissa, shift, sign);
 					if (round_dir > 0) { ++new_mant; }
 				}
@@ -625,8 +602,7 @@ namespace ccm::types
 				// Mantissa addition overflow.
 				result.shift_right(1);
 				result.mantissa.val[DyadicFloat<Bits>::mantissa_type::WORD_COUNT - 1] |=
-					(typename DyadicFloat<Bits>::mantissa_type::word_type(1)
-					 << (DyadicFloat<Bits>::mantissa_type::WORD_SIZE - 1));
+					(typename DyadicFloat<Bits>::mantissa_type::word_type(1) << (DyadicFloat<Bits>::mantissa_type::WORD_SIZE - 1));
 			}
 			// The result is already normalized.
 			return result;
@@ -685,9 +661,7 @@ namespace ccm::types
 			result.mantissa = a.mantissa.quick_mul_hi(b.mantissa);
 			// Check the leading bit directly, should be faster than using clz in
 			// normalize().
-			if (result.mantissa.val[DyadicFloat<Bits>::mantissa_type::WORD_COUNT - 1] >>
-					(DyadicFloat<Bits>::mantissa_type::WORD_SIZE - 1) ==
-				0)
+			if (result.mantissa.val[DyadicFloat<Bits>::mantissa_type::WORD_COUNT - 1] >> (DyadicFloat<Bits>::mantissa_type::WORD_SIZE - 1) == 0)
 			{
 				result.shift_left(1);
 			}
@@ -772,7 +746,7 @@ namespace ccm::types
 	template <size_t Bits>
 	constexpr DyadicFloat<Bits> rounded_mul(const DyadicFloat<Bits> & a, const DyadicFloat<Bits> & b)
 	{
-		using DblMant = UInt<(2 * Bits)>;
+		using DblMant			   = UInt<(2 * Bits)>;
 		const Sign result_sign	   = (a.sign != b.sign) ? Sign::NEG : Sign::POS;
 		int result_exponent		   = a.exponent + b.exponent + static_cast<int>(Bits);
 		const DblMant product	   = DblMant(a.mantissa) * DblMant(b.mantissa);
@@ -797,7 +771,7 @@ namespace ccm::types
 		std::size_t ok_bits = StartBits - 1;
 		while (ok_bits < Bits)
 		{
-			x = quick_mul(x, quick_sub(two, quick_mul(a, x)));
+			x		= quick_mul(x, quick_sub(two, quick_mul(a, x)));
 			ok_bits = (2 * ok_bits) - 1;
 		}
 

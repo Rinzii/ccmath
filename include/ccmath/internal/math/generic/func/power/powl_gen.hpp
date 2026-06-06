@@ -191,8 +191,7 @@ namespace ccm::gen
 				std::int64_t magnitude = 0;
 				if (try_extract_int64(val, magnitude))
 				{
-					const std::uint64_t abs_mag =
-						static_cast<std::uint64_t>(magnitude < 0 ? -magnitude : magnitude);
+					const std::uint64_t abs_mag = static_cast<std::uint64_t>(magnitude < 0 ? -magnitude : magnitude);
 					return (abs_mag & 1U) != 0U;
 				}
 
@@ -235,14 +234,10 @@ namespace ccm::gen
 					const PowlFPBits_t base_bits(base);
 					typename PowlFPBits_t::storage_type sig = base_bits.get_explicit_mantissa();
 					if (base_bits.get_implicit_bit()) { sig |= PowlFPBits_t::EXPLICIT_BIT_MASK; }
-					const bool base_is_pow2 =
-						sig != typename PowlFPBits_t::storage_type{} &&
-						(sig & (sig - typename PowlFPBits_t::storage_type(1))) == typename PowlFPBits_t::storage_type{};
+					const bool base_is_pow2 = sig != typename PowlFPBits_t::storage_type{} &&
+											  (sig & (sig - typename PowlFPBits_t::storage_type(1))) == typename PowlFPBits_t::storage_type{};
 					const std::int64_t abs_exp = exp < 0 ? -exp : exp;
-					if (!base_is_pow2 || abs_exp > kSquaringExponentMax)
-					{
-						return bit80::powl_ld80_general_finite(base, static_cast<long double>(exp));
-					}
+					if (!base_is_pow2 || abs_exp > kSquaringExponentMax) { return bit80::powl_ld80_general_finite(base, static_cast<long double>(exp)); }
 				}
 #endif
 
