@@ -91,8 +91,21 @@ namespace ccm::gen::internal::impl::bit80
 
 		constexpr long double nearest_integer(long double x) noexcept
 		{
-			// hm stays within exact-integer double range after y6 clamping.
-			return static_cast<long double>(support::fp::nearest_integer(static_cast<double>(x)));
+			if (!support::is_constant_evaluated())
+			{
+	#if CCM_HAS_BUILTIN(__builtin_roundl)
+				return __builtin_roundl(x);
+	#else
+				return static_cast<long double>(support::fp::nearest_integer(static_cast<double>(x)));
+	#endif
+			}
+
+			if (constexpr long double max_exact_int = 0x1.0p63L; x < max_exact_int && x > -max_exact_int)
+			{
+				constexpr long double round_offset = 0x1.0p62L;
+				return x < 0.0L ? (x - round_offset) + round_offset : (x + round_offset) - round_offset;
+			}
+			return x;
 		}
 
 		constexpr long double powl_ld80_general_finite(long double base, long double exp) noexcept

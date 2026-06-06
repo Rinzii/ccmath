@@ -84,11 +84,11 @@ namespace ccm::gen
 				if (!is_integer_float80_bits(bits)) { return false; }
 				if (bits.is_zero()) { return false; }
 
-				const int exponent						= bits.get_explicit_exponent();
 				typename PowlFPBits_t::storage_type sig = bits.get_explicit_mantissa();
 				if (bits.get_implicit_bit()) { sig |= PowlFPBits_t::EXPLICIT_BIT_MASK; }
 				const int trailing_zeros = storage_countr_zero(sig);
-				return exponent + trailing_zeros == static_cast<int>(PowlFPBits_t::significand_length);
+				sig >>= static_cast<unsigned>(trailing_zeros);
+				return (sig & typename PowlFPBits_t::storage_type(1)) != 0;
 			}
 
 			inline bool is_integer_float80_value(long double val) noexcept
@@ -96,14 +96,8 @@ namespace ccm::gen
 				return __builtin_floorl(val) == val;
 			}
 
-			inline bool is_odd_integer_float80_value(long double val) noexcept
-			{
-				if (!is_integer_float80_value(val)) { return false; }
-				const long double wy = __builtin_floorl(val);
-				const long double ya = __builtin_floorl(0.5L * __builtin_fabsl(val));
-				const long double yb = 0.5L * __builtin_fabsl(wy);
-				return ya != yb;
-			}
+			inline bool is_odd_integer_float80_value(long double val) noexcept;
+			constexpr bool try_extract_int64(const PowlFPBits_t & bits, std::int64_t & out) noexcept;
 #endif
 
 			constexpr bool is_integer(const PowlFPBits_t & bits) noexcept
@@ -190,6 +184,21 @@ namespace ccm::gen
 				return try_extract_int64(PowlFPBits_t(val), out);
 			}
 
+#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+			inline bool is_odd_integer_float80_value(long double val) noexcept
+			{
+				if (!is_integer_float80_value(val)) { return false; }
+				std::int64_t magnitude = 0;
+				if (try_extract_int64(val, magnitude))
+				{
+					const std::uint64_t abs_mag =
+						static_cast<std::uint64_t>(magnitude < 0 ? -magnitude : magnitude);
+					return (abs_mag & 1U) != 0U;
+				}
+				return __builtin_fmodl(__builtin_fabsl(val), 2.0L) != 0.0L;
+			}
+#endif
+
 		} // namespace powl_bits
 
 		namespace impl
@@ -207,10 +216,24 @@ namespace ccm::gen
 				return static_cast<long double>(::ccm::gen::impl::pow_impl(static_cast<double>(base), static_cast<double>(exp)));
 			}
 
+#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+			namespace bit80
+			{
+				long double powl_ld80_general_finite(long double base, long double exp) noexcept;
+			}
+#endif
+
 			constexpr long double powl_bounded_integer(long double base, std::int64_t exp) noexcept
 			{
 				if (exp == 0) { return 1.0L; }
 				if (exp < 0) { return 1.0L / powl_bounded_integer(base, -exp); }
+
+#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+				if (!support::is_constant_evaluated())
+				{
+					return bit80::powl_ld80_general_finite(base, static_cast<long double>(exp));
+				}
+#endif
 
 				long double result = 1.0L;
 				long double factor = base;

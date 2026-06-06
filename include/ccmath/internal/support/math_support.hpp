@@ -89,10 +89,10 @@ namespace ccm::support
 		}
 		else
 		{
-			if (a < b) { overflow = true; }
+			res = static_cast<T>(lres);
+			return a < b;
 		}
 
-		// Store the result if no overflow
 		if (!overflow) { res = static_cast<T>(lres); }
 
 		return overflow;
