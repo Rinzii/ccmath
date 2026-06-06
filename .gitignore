@@ -6,7 +6,17 @@
 .vs/*
 .vscode/*
 build/*
+build-rigorous*/
+build-simple*/
+build-powl*/
 /out/
+mpfr-pow*-summary.json
+mpfr-powf*-summary.json
+mpfr-powl-summary.json
+pow-search-results.json
+powl-platform.json
+path-matrix-json*/
+POW_PROOF.*
 .cache
 .DS_Store
 

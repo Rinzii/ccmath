@@ -93,10 +93,86 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -yqq --no-install-recommends ninja-build
 
       - name: Configure
-        run: cmake --preset="${{ matrix.configurePreset }}" -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON -DCCMATH_ENABLE_WARNINGS_AS_ERRORS=ON
+        run: >
+          cmake --preset="${{ matrix.configurePreset }}"
+          -DCCMATH_DESIRED_CXX_STANDARD="cxx_std_${{ matrix.cxx_version }}"
+          -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON
+          -DCCMATH_ENABLE_WARNINGS_AS_ERRORS=ON
+          -DCCMATH_BUILD_SIMPLE_TESTS=ON
+          -DCCMATH_BUILD_RIGOROUS_TESTS=OFF
+          -DCCMATH_ENABLE_MPFR_TESTS=OFF
+          -DCCMATH_ENABLE_POW_SEARCH_TOOLS=OFF
 
       - name: Build
         run: cmake --build --preset="${{ matrix.buildPreset }}"
 
       - name: Test
-        run: ctest --preset="${{ matrix.testPreset }}" --output-on-failure --schedule-random -F
+        run: ctest --preset="${{ matrix.testPreset }}" --output-on-failure --schedule-random -L simple -F
+
+  rigorous:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2.16.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@v4
+
+      - name: Cache build
+        uses: actions/cache@v4
+        with:
+          path: build-rigorous
+          key: ${{ runner.os }}-rigorous-build-${{ hashFiles('CMakeLists.txt', 'cmake/**', 'tests/**', 'include/**') }}
+
+      - name: Cache APT archives
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: ${{ runner.os }}-apt-mpfr-gmp-v1
+
+      - name: Install dependencies
+        run: sudo apt-get update -qq && sudo apt-get install -yqq --no-install-recommends ninja-build pkg-config libmpfr-dev libgmp-dev sollya gappa || sudo apt-get install -yqq --no-install-recommends ninja-build pkg-config libmpfr-dev libgmp-dev
+
+      - name: Configure rigorous validation
+        run: >
+          cmake -S . -B build-rigorous -G Ninja
+          -DCCMATH_BUILD_TESTS=ON
+          -DCCMATH_BUILD_SIMPLE_TESTS=OFF
+          -DCCMATH_BUILD_RIGOROUS_TESTS=ON
+          -DCCMATH_ENABLE_MPFR_TESTS=ON
+          -DCCMATH_ENABLE_POW_SEARCH_TOOLS=ON
+          -DCCMATH_DESIRED_CXX_STANDARD=cxx_std_20
+          -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON
+          -DCCMATH_ENABLE_WARNINGS_AS_ERRORS=ON
+
+      - name: Configure rigorous no-builtin validation
+        run: >
+          cmake -S . -B build-rigorous-nobuiltin -G Ninja
+          -DCCMATH_BUILD_TESTS=ON
+          -DCCMATH_BUILD_SIMPLE_TESTS=OFF
+          -DCCMATH_BUILD_RIGOROUS_TESTS=ON
+          -DCCMATH_ENABLE_MPFR_TESTS=ON
+          -DCCMATH_ENABLE_POW_SEARCH_TOOLS=ON
+          -DCCMATH_TEST_DISABLE_RUNTIME_BUILTIN=ON
+          -DCCMATH_DESIRED_CXX_STANDARD=cxx_std_20
+          -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON
+          -DCCMATH_ENABLE_WARNINGS_AS_ERRORS=ON
+
+      - name: Build rigorous validation
+        run: cmake --build build-rigorous --parallel
+
+      - name: Build rigorous no-builtin validation
+        run: cmake --build build-rigorous-nobuiltin --parallel
+
+      - name: Run rigorous validation
+        run: ctest --test-dir build-rigorous --output-on-failure -L rigorous
+
+      - name: Run rigorous no-builtin validation
+        run: ctest --test-dir build-rigorous-nobuiltin --output-on-failure -L rigorous
+
+      - name: Run pow proof smoke
+        continue-on-error: true
+        run: cmake --build build-rigorous --target ccmath-rigorous-pow-proof-smoke
