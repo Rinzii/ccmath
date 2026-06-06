@@ -6,20 +6,33 @@ on:
       - '**.hpp'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   format_code:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install clang-format
         uses: aminya/setup-cpp@3aac37c3fbde6cb1d2fa0a0a7e945b63b10561d5 # v1.1.0
         with:
           clangformat: 17.0.5
 
-      - name: Run clang-format
+      - name: Apply clang-format
+        run: find include -name '*.hpp' | xargs clang-format -i -style=file -fallback-style=none
+
+      - name: Commit and push format fixes
         run: |
-          find include -name '*.hpp' |  xargs clang-format -i -style=file -fallback-style=none
-          git diff --exit-code
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add include
+          if git diff --staged --quiet; then
+            echo "Formatting is up to date."
+          else
+            git commit -m "Apply clang-format."
+            git push origin "HEAD:${{ github.head_ref }}"
+          fi
