@@ -48,11 +48,9 @@ namespace ccm::rt
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	T pow_rt(T base, T exp)
 	{
-#if CCM_HAS_BUILTIN(__builtin_pow) || defined(__builtin_pow) // Prefer the builtins if available.
-		if constexpr (std::is_same_v<T, float>) { return __builtin_powf(base, exp); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_pow(base, exp); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_powl(base, exp); }
-		else { return static_cast<T>(__builtin_powl(static_cast<long double>(base), static_cast<long double>(exp))); }
+#if (CCM_HAS_BUILTIN(__builtin_pow) || defined(__builtin_pow)) && !defined(CCM_CONFIG_TEST_DISABLE_RUNTIME_BUILTIN_POW)
+		if constexpr (ccm::builtin::has_runtime_pow<T>) { return ccm::builtin::runtime_pow(base, exp); }
+		else { return gen::pow_gen<T>(base, exp); }
 #elif defined(CCMATH_HAS_SIMD)
 		// In the unlikely event, the rounding mode is not the default, use the runtime implementation instead.
 		if (CCM_UNLIKELY(ccm::support::fenv::get_rounding_mode() != FE_TONEAREST)) { return gen::pow_gen<T>(base, exp); }

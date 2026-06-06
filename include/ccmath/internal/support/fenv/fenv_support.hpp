@@ -168,7 +168,7 @@ namespace ccm::support::fenv
 		{
 			if constexpr (is_errno_enabled())
 			{
-				if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { errno = err; }
+				if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrno)) != 0) { errno = err; }
 			}
 		}
 	}

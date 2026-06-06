@@ -38,10 +38,18 @@ namespace ccm::builtin
 	inline constexpr bool has_constexpr_pow =
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_POW
 		is_valid_builtin_type<T>;
-	#else
+#else
 			false;
 	#endif
 	// clang-format on
+
+	template <typename T>
+	inline constexpr bool has_runtime_pow =
+#if defined(__GNUC__) || defined(__clang__)
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
 
 	/**
 	 * @internal
@@ -59,6 +67,19 @@ namespace ccm::builtin
 		else
 		{
 			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_pow");
+			return T{};
+		}
+	}
+
+	template <typename T>
+	auto runtime_pow(T x, T y) -> std::enable_if_t<has_runtime_pow<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>) { return __builtin_powf(x, y); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_pow(x, y); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_powl(x, y); }
+		else
+		{
 			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_pow");
 			return T{};
 		}

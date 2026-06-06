@@ -17,6 +17,26 @@
 
 #include <type_traits>
 
+namespace ccm::detail
+{
+	template <typename T>
+	using cmath_pow_argument_t = std::conditional_t<std::is_integral_v<std::remove_cv_t<T>>, double, std::remove_cv_t<T>>;
+
+	template <typename T, typename U>
+	struct cmath_pow_result
+	{
+		using left_type	 = cmath_pow_argument_t<T>;
+		using right_type = cmath_pow_argument_t<U>;
+
+		using type = std::conditional_t<std::is_same_v<left_type, long double> || std::is_same_v<right_type, long double>,
+										long double,
+										std::conditional_t<std::is_same_v<left_type, double> || std::is_same_v<right_type, double>, double, float>>;
+	};
+
+	template <typename T, typename U>
+	using cmath_pow_result_t = typename cmath_pow_result<T, U>::type;
+} // namespace ccm::detail
+
 namespace ccm
 {
 	/**
@@ -41,17 +61,46 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Raises an integer base to an integer exponent via floating-point promotion.
-	 * @tparam Integer Integral type.
+	 * @brief Raises arithmetic inputs to a power after applying the [c.math]/3 promotion rule.
+	 * @tparam Arithmetic1 Arithmetic type of the base.
+	 * @tparam Arithmetic2 Arithmetic type of the exponent.
 	 * @param base Base value.
 	 * @param exp Exponent value.
-	 * @return base raised to exp as double.
+	 * @return base raised to exp in the promoted floating-point type.
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/pow
 	 */
-	template <typename Integer, std::enable_if_t<!std::is_floating_point_v<Integer>, bool> = true>
-	constexpr double pow(Integer base, Integer exp)
+	template <typename Arithmetic1,
+			  typename Arithmetic2,
+			  std::enable_if_t<std::is_arithmetic_v<Arithmetic1> && std::is_arithmetic_v<Arithmetic2> &&
+								   !(std::is_floating_point_v<Arithmetic1> && std::is_same_v<std::remove_cv_t<Arithmetic1>, std::remove_cv_t<Arithmetic2>>),
+							   bool> = true>
+	constexpr auto pow(Arithmetic1 base, Arithmetic2 exp)
 	{
-		// TODO: Add integer specific optimization with exponentiation of a square
-		return ccm::pow<double>(static_cast<double>(base), static_cast<double>(exp));
+		using result_type = detail::cmath_pow_result_t<Arithmetic1, Arithmetic2>;
+		return ccm::pow<result_type>(static_cast<result_type>(base), static_cast<result_type>(exp));
+	}
+
+	/**
+	 * @brief Raises float inputs to a power.
+	 * @param base Base value.
+	 * @param exp Exponent value.
+	 * @return base raised to exp as float.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/pow
+	 */
+	constexpr float powf(float base, float exp)
+	{
+		return ccm::pow<float>(base, exp);
+	}
+
+	/**
+	 * @brief Raises long double inputs to a power.
+	 * @param base Base value.
+	 * @param exp Exponent value.
+	 * @return base raised to exp as long double.
+	 * @see https://en.cppreference.com/w/cpp/numeric/math/pow
+	 */
+	constexpr long double powl(long double base, long double exp)
+	{
+		return ccm::pow<long double>(base, exp);
 	}
 } // namespace ccm
