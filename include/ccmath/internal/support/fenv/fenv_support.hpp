@@ -28,10 +28,14 @@ CCM_DISABLE_MSVC_WARNING(4702) // 4702: unreachable code
 namespace ccm::support::fenv::internal
 {
 	inline int clear_except(const int err_code)
-	{ return std::feclearexcept(err_code); }
+	{
+		return std::feclearexcept(err_code);
+	}
 
 	inline int test_except(const int err_code)
-	{ return std::fetestexcept(err_code); }
+	{
+		return std::fetestexcept(err_code);
+	}
 
 	inline int get_except()
 	{
@@ -54,7 +58,9 @@ namespace ccm::support::fenv::internal
 	}
 
 	inline int raise_except(const int err_code)
-	{ return std::feraiseexcept(err_code); }
+	{
+		return std::feraiseexcept(err_code);
+	}
 
 	inline int enable_except([[maybe_unused]] int err_code)
 	{
@@ -76,16 +82,24 @@ namespace ccm::support::fenv::internal
 	}
 
 	inline int get_round()
-	{ return get_rounding_mode(); }
+	{
+		return get_rounding_mode();
+	}
 
 	inline int set_round(const int rounding_mode)
-	{ return std::fesetround(rounding_mode); }
+	{
+		return std::fesetround(rounding_mode);
+	}
 
 	inline int get_env(std::fenv_t * envp)
-	{ return std::fegetenv(envp); }
+	{
+		return std::fegetenv(envp);
+	}
 
 	inline int set_env(const std::fenv_t * envp)
-	{ return std::fesetenv(envp); }
+	{
+		return std::fesetenv(envp);
+	}
 } // namespace ccm::support::fenv::internal
 
 namespace ccm::support::fenv
@@ -107,7 +121,9 @@ namespace ccm::support::fenv
 
 	// Helper function to convert the enum class to an integer to enable bitwise operations.
 	constexpr int get_mode(ccm_math_err_mode mode)
-	{ return static_cast<int>(mode); }
+	{
+		return static_cast<int>(mode);
+	}
 
 	constexpr int ccm_math_err_handling()
 	{
