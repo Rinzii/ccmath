@@ -1,5 +1,5 @@
 #!/bin/bash
-# Check header formatting and apply clang-format only when needed.
+# Check header formatting; stop on the first failure.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-bash "${SCRIPT_DIR}/ensure_format.sh"
+exec bash "${SCRIPT_DIR}/ensure_format.sh"

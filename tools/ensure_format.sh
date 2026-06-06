@@ -19,16 +19,12 @@ if ! find include -name '*.hpp' -print -quit | grep -q .; then
     exit 0
 fi
 
-set +e
-find include -name '*.hpp' | xargs "${CLANG_FORMAT}" --dry-run --Werror "${STYLE_ARGS[@]}"
-check_status=$?
-set -e
+while IFS= read -r -d '' file; do
+    if ! "${CLANG_FORMAT}" --dry-run --Werror "${STYLE_ARGS[@]}" "${file}"; then
+        echo "Formatting check failed: ${file}"
+        echo "Run tools/apply_format.sh locally or fix headers manually."
+        exit 1
+    fi
+done < <(find include -name '*.hpp' -print0)
 
-if [ "${check_status}" -eq 0 ]; then
-    echo "Formatting is up to date."
-    exit 0
-fi
-
-echo "Formatting required. Applying clang-format..."
-find include -name '*.hpp' | xargs "${CLANG_FORMAT}" -i "${STYLE_ARGS[@]}"
-echo "Formatting applied."
+echo "Formatting is up to date."
