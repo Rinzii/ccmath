@@ -14,10 +14,10 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  build-cxx17:
     runs-on: macos-latest
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - name: clang-debug-cxx17
@@ -26,23 +26,11 @@ jobs:
             testPreset: test-ninja-clang-debug
             cxx_version: 17
 
-          - name: clang-debug-cxx20
-            configurePreset: ninja-clang-debug
-            buildPreset: build-ninja-clang-debug
-            testPreset: test-ninja-clang-debug
-            cxx_version: 20
-
           - name: clang-release-cxx17
             configurePreset: ninja-clang-release
             buildPreset: build-ninja-clang-release
             testPreset: test-ninja-clang-release
             cxx_version: 17
-
-          - name: clang-release-cxx20
-            configurePreset: ninja-clang-release
-            buildPreset: build-ninja-clang-release
-            testPreset: test-ninja-clang-release
-            cxx_version: 20
 
           - name: gcc-debug-cxx17
             configurePreset: ninja-gcc-debug
@@ -50,17 +38,73 @@ jobs:
             testPreset: test-ninja-gcc-debug
             cxx_version: 17
 
-          - name: gcc-debug-cxx20
-            configurePreset: ninja-gcc-debug
-            buildPreset: build-ninja-gcc-debug
-            testPreset: test-ninja-gcc-debug
-            cxx_version: 20
-
           - name: gcc-release-cxx17
             configurePreset: ninja-gcc-release
             buildPreset: build-ninja-gcc-release
             testPreset: test-ninja-gcc-release
             cxx_version: 17
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2.16.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@v4
+
+      - name: Cache build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ./**/CMakeFiles
+            ./**/CMakeCache.txt
+            ./**/out
+          key: ${{ runner.os }}-${{ matrix.name }}
+
+      - name: Install Ninja
+        run: brew install ninja
+
+      - name: Configure
+        run: >
+          cmake --preset="${{ matrix.configurePreset }}"
+          -DCCMATH_DESIRED_CXX_STANDARD="cxx_std_${{ matrix.cxx_version }}"
+          -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON
+          -DCCMATH_ENABLE_WARNINGS_AS_ERRORS=ON
+          -DCCMATH_BUILD_SIMPLE_TESTS=ON
+          -DCCMATH_BUILD_RIGOROUS_TESTS=OFF
+          -DCCMATH_ENABLE_MPFR_TESTS=OFF
+          -DCCMATH_ENABLE_POW_SEARCH_TOOLS=OFF
+
+      - name: Build
+        run: cmake --build --preset="${{ matrix.buildPreset }}"
+
+      - name: Test
+        run: ctest --preset="${{ matrix.testPreset }}" --output-on-failure --schedule-random -L simple -F
+
+  build-cxx20:
+    needs: build-cxx17
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: clang-debug-cxx20
+            configurePreset: ninja-clang-debug
+            buildPreset: build-ninja-clang-debug
+            testPreset: test-ninja-clang-debug
+            cxx_version: 20
+
+          - name: clang-release-cxx20
+            configurePreset: ninja-clang-release
+            buildPreset: build-ninja-clang-release
+            testPreset: test-ninja-clang-release
+            cxx_version: 20
+
+          - name: gcc-debug-cxx20
+            configurePreset: ninja-gcc-debug
+            buildPreset: build-ninja-gcc-debug
+            testPreset: test-ninja-gcc-debug
+            cxx_version: 20
 
           - name: gcc-release-cxx20
             configurePreset: ninja-gcc-release
@@ -106,7 +150,7 @@ jobs:
         run: ctest --preset="${{ matrix.testPreset }}" --output-on-failure --schedule-random -L simple -F
 
   rigorous:
-    needs: build
+    needs: build-cxx17
     runs-on: macos-latest
 
     steps:

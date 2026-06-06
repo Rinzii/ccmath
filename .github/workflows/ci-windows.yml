@@ -14,10 +14,10 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  build-cxx17:
     runs-on: windows-latest
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - name: vs22-debug-cxx17
@@ -26,17 +26,58 @@ jobs:
             testPreset: test-vs22-debug
             cxx_version: 17
 
-          - name: vs22-debug-cxx20
-            configurePreset: vs22-debug
-            buildPreset: build-vs22-debug
-            testPreset: test-vs22-debug
-            cxx_version: 20
-
           - name: vs22-release-cxx17
             configurePreset: vs22-release
             buildPreset: build-vs22-release
             testPreset: test-vs22-release
             cxx_version: 17
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2.16.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@v4
+
+      - name: Cache build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ./**/CMakeFiles
+            ./**/CMakeCache.txt
+            ./**/out
+          key: ${{ runner.os }}-${{ matrix.name }}
+
+      - name: Configure
+        run: >
+          cmake --preset="${{ matrix.configurePreset }}"
+          -DCCMATH_DESIRED_CXX_STANDARD="cxx_std_${{ matrix.cxx_version }}"
+          -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON
+          -DCCMATH_ENABLE_WARNINGS_AS_ERRORS=ON
+          -DCCMATH_BUILD_SIMPLE_TESTS=ON
+          -DCCMATH_BUILD_RIGOROUS_TESTS=OFF
+          -DCCMATH_ENABLE_MPFR_TESTS=OFF
+          -DCCMATH_ENABLE_POW_SEARCH_TOOLS=OFF
+
+      - name: Build
+        run: cmake --build --preset="${{ matrix.buildPreset }}"
+
+      - name: Test
+        run: ctest --preset="${{ matrix.testPreset }}" --output-on-failure --schedule-random -L simple -F
+
+  build-cxx20:
+    needs: build-cxx17
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: vs22-debug-cxx20
+            configurePreset: vs22-debug
+            buildPreset: build-vs22-debug
+            testPreset: test-vs22-debug
+            cxx_version: 20
 
           - name: vs22-release-cxx20
             configurePreset: vs22-release
