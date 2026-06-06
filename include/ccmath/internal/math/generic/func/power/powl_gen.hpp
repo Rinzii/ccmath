@@ -157,7 +157,7 @@ namespace ccm::gen
 				typename PowlFPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
 				if (bits.get_implicit_bit()) { mantissa |= PowlFPBits_t::EXPLICIT_BIT_MASK; }
 				const int trailing_zeros = storage_countr_zero(mantissa);
-				const int scale			 = exponent + trailing_zeros - static_cast<int>(PowlFPBits_t::significand_length);
+				const int scale			 = exponent + trailing_zeros - static_cast<int>(PowlFPBits_t::fraction_length);
 #else
 				typename PowlFPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
 				const int trailing_zeros					 = storage_countr_zero(mantissa);

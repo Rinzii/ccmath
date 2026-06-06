@@ -306,26 +306,29 @@ namespace ccm::types
 				if (sign.is_neg() && (round || sticky)) { ++result; }
 				break;
 			case FE_UPWARD:
-			 if (sign.is_pos() && (round || sticky)) { ++result; }
+				if (sign.is_pos() && (round || sticky)) { ++result; }
 				break;
 			default:
 				break;
 			}
 
-			if (ShouldSignalExceptions && (round || sticky))
+			if constexpr (ShouldSignalExceptions)
 			{
-				int excepts = FE_INEXACT;
-				if (FPBits(result).is_inf())
+				if (round || sticky)
 				{
-					support::fenv::set_errno_if_required(ERANGE);
-					excepts |= FE_OVERFLOW;
+					int excepts = FE_INEXACT;
+					if (FPBits(result).is_inf())
+					{
+						support::fenv::set_errno_if_required(ERANGE);
+						excepts |= FE_OVERFLOW;
+					}
+					else if (underflow)
+					{
+						support::fenv::set_errno_if_required(ERANGE);
+						excepts |= FE_UNDERFLOW;
+					}
+					support::fenv::raise_except_if_required(excepts);
 				}
-				else if (underflow)
-				{
-					support::fenv::set_errno_if_required(ERANGE);
-					excepts |= FE_UNDERFLOW;
-				}
-				support::fenv::raise_except_if_required(excepts);
 			}
 
 			return FPBits(result).get_val();
