@@ -71,7 +71,7 @@ namespace ccm::gen
 				if (bits.is_zero()) { return true; }
 
 				const typename PowlFPBits_t::storage_type x_u = bits.uintval();
-				const auto x_e = static_cast<std::int32_t>((x_u & PowlFPBits_t::exponent_mask) >> PowlFPBits_t::significand_length);
+				const auto x_e		   = static_cast<std::int32_t>((x_u & PowlFPBits_t::exponent_mask) >> PowlFPBits_t::significand_length);
 				const std::int32_t lsb = support::countr_zero(x_u | PowlFPBits_t::exponent_mask);
 				constexpr std::int32_t unit_exponent =
 					static_cast<std::int32_t>(PowlFPBits_t::exponent_bias) + static_cast<std::int32_t>(PowlFPBits_t::significand_length);
@@ -84,7 +84,7 @@ namespace ccm::gen
 				if (bits.is_zero()) { return false; }
 
 				const typename PowlFPBits_t::storage_type x_u = bits.uintval();
-				const auto x_e = static_cast<std::int32_t>((x_u & PowlFPBits_t::exponent_mask) >> PowlFPBits_t::significand_length);
+				const auto x_e		   = static_cast<std::int32_t>((x_u & PowlFPBits_t::exponent_mask) >> PowlFPBits_t::significand_length);
 				const std::int32_t lsb = support::countr_zero(x_u | PowlFPBits_t::exponent_mask);
 				constexpr std::int32_t unit_exponent =
 					static_cast<std::int32_t>(PowlFPBits_t::exponent_bias) + static_cast<std::int32_t>(PowlFPBits_t::significand_length);
