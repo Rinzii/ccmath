@@ -23,7 +23,7 @@ jobs:
           clangformat: 17.0.5
 
       - name: Ensure clang-format
-        run: ./tools/ensure_format.sh
+        run: bash tools/ensure_format.sh
 
       - name: Commit and push format fixes
         run: |
