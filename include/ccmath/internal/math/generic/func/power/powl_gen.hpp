@@ -411,7 +411,7 @@ namespace ccm::gen
 			}
 
 		} // namespace impl
-	}	  // namespace internal
+	} // namespace internal
 
 	constexpr long double powl_gen(long double base, long double exp) noexcept
 	{

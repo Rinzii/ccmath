@@ -40,10 +40,10 @@ namespace ccm::support::fenv::detail
 #else
 	#if defined(_GNU_SOURCE) || defined(__GLIBC__) || defined(__ANDROID__)
 		volatile int *const loc = __errno_location();
-		*loc				  = err;
+		*loc					= err;
 	#else
 		volatile int *const loc = &errno;
-		*loc				  = err;
+		*loc					= err;
 	#endif
 	#if defined(__GNUC__) || defined(__clang__)
 		__asm__ __volatile__("" : : "r"(loc) : "memory");
@@ -118,12 +118,12 @@ namespace ccm::support::fenv::internal
 		return std::fesetround(rounding_mode);
 	}
 
-	inline int get_env(std::fenv_t * envp)
+	inline int get_env(std::fenv_t *envp)
 	{
 		return std::fegetenv(envp);
 	}
 
-	inline int set_env(const std::fenv_t * envp)
+	inline int set_env(const std::fenv_t *envp)
 	{
 		return std::fesetenv(envp);
 	}
