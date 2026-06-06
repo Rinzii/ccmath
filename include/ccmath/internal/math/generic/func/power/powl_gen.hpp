@@ -65,37 +65,52 @@ namespace ccm::gen
 			}
 
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
-			constexpr bool is_integer_float80(const PowlFPBits_t & bits) noexcept
+			constexpr bool is_integer_float80_bits(const PowlFPBits_t & bits) noexcept
 			{
 				if (bits.is_nan() || bits.is_inf()) { return false; }
 				if (bits.is_zero()) { return true; }
 
-				const typename PowlFPBits_t::storage_type x_u = bits.uintval();
-				const auto x_e		   = static_cast<std::int32_t>((x_u & PowlFPBits_t::exponent_mask) >> PowlFPBits_t::significand_length);
-				const std::int32_t lsb = support::countr_zero(x_u | PowlFPBits_t::exponent_mask);
-				constexpr std::int32_t unit_exponent =
-					static_cast<std::int32_t>(PowlFPBits_t::exponent_bias) + static_cast<std::int32_t>(PowlFPBits_t::significand_length);
-				return (x_e + lsb >= unit_exponent);
+				const int exponent								  = bits.get_explicit_exponent();
+				typename PowlFPBits_t::storage_type sig = bits.get_explicit_mantissa();
+				if (bits.get_implicit_bit()) { sig |= PowlFPBits_t::EXPLICIT_BIT_MASK; }
+				if (storage_is_zero(sig)) { return true; }
+
+				const int trailing_zeros = storage_countr_zero(sig);
+				return exponent + trailing_zeros >= static_cast<int>(PowlFPBits_t::significand_length);
 			}
 
-			constexpr bool is_odd_integer_float80(const PowlFPBits_t & bits) noexcept
+			constexpr bool is_odd_integer_float80_bits(const PowlFPBits_t & bits) noexcept
 			{
-				if (!is_integer_float80(bits)) { return false; }
+				if (!is_integer_float80_bits(bits)) { return false; }
 				if (bits.is_zero()) { return false; }
 
-				const typename PowlFPBits_t::storage_type x_u = bits.uintval();
-				const auto x_e		   = static_cast<std::int32_t>((x_u & PowlFPBits_t::exponent_mask) >> PowlFPBits_t::significand_length);
-				const std::int32_t lsb = support::countr_zero(x_u | PowlFPBits_t::exponent_mask);
-				constexpr std::int32_t unit_exponent =
-					static_cast<std::int32_t>(PowlFPBits_t::exponent_bias) + static_cast<std::int32_t>(PowlFPBits_t::significand_length);
-				return (x_e + lsb == unit_exponent);
+				const int exponent								  = bits.get_explicit_exponent();
+				typename PowlFPBits_t::storage_type sig = bits.get_explicit_mantissa();
+				if (bits.get_implicit_bit()) { sig |= PowlFPBits_t::EXPLICIT_BIT_MASK; }
+				const int trailing_zeros = storage_countr_zero(sig);
+				return exponent + trailing_zeros == static_cast<int>(PowlFPBits_t::significand_length);
+			}
+
+			inline bool is_integer_float80_value(long double val) noexcept
+			{
+				return __builtin_floorl(val) == val;
+			}
+
+			inline bool is_odd_integer_float80_value(long double val) noexcept
+			{
+				if (!is_integer_float80_value(val)) { return false; }
+				const long double wy = __builtin_floorl(val);
+				const long double ya = __builtin_floorl(0.5L * __builtin_fabsl(val));
+				const long double yb = 0.5L * __builtin_fabsl(wy);
+				return ya != yb;
 			}
 #endif
 
 			constexpr bool is_integer(const PowlFPBits_t & bits) noexcept
 			{
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
-				return is_integer_float80(bits);
+				if (support::is_constant_evaluated()) { return is_integer_float80_bits(bits); }
+				return is_integer_float80_value(bits.get_val());
 #else
 				if (bits.is_nan() || bits.is_inf()) { return false; }
 				if (bits.is_zero()) { return true; }
@@ -112,7 +127,8 @@ namespace ccm::gen
 			constexpr bool is_odd_integer(const PowlFPBits_t & bits) noexcept
 			{
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
-				return is_odd_integer_float80(bits);
+				if (support::is_constant_evaluated()) { return is_odd_integer_float80_bits(bits); }
+				return is_odd_integer_float80_value(bits.get_val());
 #else
 				if (!is_integer(bits)) { return false; }
 				if (bits.is_zero()) { return false; }
@@ -136,10 +152,17 @@ namespace ccm::gen
 				}
 				if (!is_integer(bits)) { return false; }
 
-				const int exponent							 = bits.get_explicit_exponent();
+				const int exponent = bits.get_explicit_exponent();
+#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+				typename PowlFPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
+				if (bits.get_implicit_bit()) { mantissa |= PowlFPBits_t::EXPLICIT_BIT_MASK; }
+				const int trailing_zeros = storage_countr_zero(mantissa);
+				const int scale = exponent + trailing_zeros - static_cast<int>(PowlFPBits_t::significand_length);
+#else
 				typename PowlFPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
 				const int trailing_zeros					 = storage_countr_zero(mantissa);
-				const int scale								 = exponent + trailing_zeros - static_cast<int>(PowlFPBits_t::fraction_length);
+				const int scale = exponent + trailing_zeros - static_cast<int>(PowlFPBits_t::fraction_length);
+#endif
 				if (scale < 0) { return false; }
 
 				mantissa >>= static_cast<unsigned>(trailing_zeros);
