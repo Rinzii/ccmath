@@ -81,7 +81,7 @@ namespace ccm::gen::internal::impl::bit80
 			LongDoublePair r{ 0.0L, 0.0L };
 			const LongDoublePair as = split(a);
 			const LongDoublePair bs = split(b);
-			r.hi = a * b;
+			r.hi					= a * b;
 			const long double t1	= as.hi * bs.hi - r.hi;
 			const long double t2	= as.hi * bs.lo + t1;
 			const long double t3	= as.lo * bs.hi + t2;
