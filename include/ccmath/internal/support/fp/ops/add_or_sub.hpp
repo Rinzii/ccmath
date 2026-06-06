@@ -146,10 +146,7 @@ namespace ccm::support::fp::op
 			// min_bits must be subnormal too.
 
 			if (is_effectively_add) { result_mant = max_bits.get_mantissa() + min_bits.get_mantissa(); }
-			else
-			{
-				result_mant = max_bits.get_mantissa() - min_bits.get_mantissa();
-			}
+			else { result_mant = max_bits.get_mantissa() - min_bits.get_mantissa(); }
 
 			result_mant <<= guard_bits_length;
 		}
@@ -164,18 +161,12 @@ namespace ccm::support::fp::op
 
 			if (alignment <= 3) { aligned_min_mant_sticky = false; }
 			else if (alignment <= InFPBits::fraction_length + 3) { aligned_min_mant_sticky = (min_mant << (InFPBits::storage_length - alignment)) != 0; }
-			else
-			{
-				aligned_min_mant_sticky = true;
-			}
+			else { aligned_min_mant_sticky = true; }
 
 			InStorageType min_mant_sticky(static_cast<int>(aligned_min_mant_sticky));
 
 			if (is_effectively_add) { result_mant = max_mant + (aligned_min_mant | min_mant_sticky); }
-			else
-			{
-				result_mant = max_mant - (aligned_min_mant | min_mant_sticky);
-			}
+			else { result_mant = max_mant - (aligned_min_mant | min_mant_sticky); }
 		}
 
 		int result_exp = max_bits.get_exponent() - result_fraction_length;

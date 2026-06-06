@@ -32,10 +32,7 @@ namespace ccm::rt
 		if constexpr (std::is_same_v<T, float>) { return __builtin_logf(num); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_log(num); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_logl(num); }
-		else
-		{
-			return static_cast<T>(__builtin_logl(static_cast<long double>(num)));
-		}
+		else { return static_cast<T>(__builtin_logl(static_cast<long double>(num))); }
 	#else
 		const auto scalar = [](T value) { return detail::dispatch_float_double(value, ccm::internal::log_float, ccm::internal::log_double); };
 		#if defined(CCMATH_HAS_SIMD) && defined(CCMATH_HAS_SIMD_SVML) && !defined(_MSC_VER)

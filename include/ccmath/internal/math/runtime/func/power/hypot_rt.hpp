@@ -25,10 +25,7 @@ namespace ccm::rt
 		if constexpr (std::is_same_v<T, float>) { return __builtin_hypotf(x, y); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_hypot(x, y); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_hypotl(x, y); }
-		else
-		{
-			return static_cast<T>(__builtin_hypotl(static_cast<long double>(x), static_cast<long double>(y)));
-		}
+		else { return static_cast<T>(__builtin_hypotl(static_cast<long double>(x), static_cast<long double>(y))); }
 #else
 		const auto scalar = [](T lhs, T rhs) { return internal::impl::hypot_impl(lhs, rhs); };
 		return simd_impl::binary_via_scalar_abi(x, y, scalar);

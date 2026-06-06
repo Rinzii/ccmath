@@ -32,13 +32,19 @@ namespace ccm
 
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double sin(Integer num)
-	{ return ccm::sin<double>(static_cast<double>(num)); }
+	{
+		return ccm::sin<double>(static_cast<double>(num));
+	}
 
 	constexpr float sinf(float num)
-	{ return ccm::sin<float>(num); }
+	{
+		return ccm::sin<float>(num);
+	}
 
 	constexpr long double sinl(long double num)
-	{ return ccm::sin<long double>(num); }
+	{
+		return ccm::sin<long double>(num);
+	}
 } // namespace ccm
 
 /// @ingroup trig

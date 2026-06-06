@@ -17,10 +17,14 @@ namespace ccm::gen::impl
 	namespace internal::impl
 	{
 		constexpr double exp2f_impl([[maybe_unused]] double base, [[maybe_unused]] double exp) noexcept
-		{ return 0; }
+		{
+			return 0;
+		}
 	} // namespace internal::impl
 
 	constexpr double exp2f_impl(double base, double exp) noexcept
-	{ return internal::impl::exp2f_impl(base, exp); }
+	{
+		return internal::impl::exp2f_impl(base, exp);
+	}
 
 } // namespace ccm::gen::impl

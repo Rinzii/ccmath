@@ -58,7 +58,9 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double ceil(Integer num) noexcept
-	{ return static_cast<double>(num); }
+	{
+		return static_cast<double>(num);
+	}
 
 	/**
 	 * @brief Computes the ceiling of a float value.
@@ -67,7 +69,9 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/ceil
 	 */
 	constexpr float ceilf(float num) noexcept
-	{ return ccm::ceil<float>(num); }
+	{
+		return ccm::ceil<float>(num);
+	}
 
 	/**
 	 * @brief Computes the ceiling of a double value.
@@ -76,7 +80,9 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/ceil
 	 */
 	constexpr long double ceill(long double num) noexcept
-	{ return ccm::ceil<long double>(num); }
+	{
+		return ccm::ceil<long double>(num);
+	}
 } // namespace ccm
 
 /// @ingroup nearest

@@ -67,17 +67,23 @@ namespace ccm::pp::detail
 
 	template <size_t Np, bool Sanitized, typename F>
 	CCM_SIMD_INTRINSIC static void bit_iteration(BitMask<Np, Sanitized> mask, F &&func)
-	{ bit_iteration(mask.sanitized().to_bits(), func); }
+	{
+		bit_iteration(mask.sanitized().to_bits(), func);
+	}
 
 #ifdef math_errhandling
 	// Check if math functions need to account for floating-point exceptions.
 	// If math_errhandling expands to an extern symbol, we must assume floating-point exceptions are relevant.
 	template <int me = math_errhandling>
 	CCM_CONSTEVAL bool handle_fpexcept_impl(int)
-	{ return me & MATH_ERREXCEPT; }
+	{
+		return me & MATH_ERREXCEPT;
+	}
 
 	CCM_CONSTEVAL bool handle_fpexcept_impl(float)
-	{ return true; }
+	{
+		return true;
+	}
 #endif
 
 	struct FloatingPointFlags
@@ -261,7 +267,9 @@ namespace ccm::pp::detail
 
 	template <typename Integral, std::enable_if_t<std::is_integral_v<Integral>, int> = 0>
 	CCM_SIMD_INTRINSIC SimdSizeType lowest_bit(Integral bits)
-	{ return ccm::support::ctz(bits); }
+	{
+		return ccm::support::ctz(bits);
+	}
 
 	template <typename Integral, std::enable_if_t<std::is_integral_v<Integral>, int> = 0>
 	CCM_SIMD_INTRINSIC SimdSizeType highest_bit(Integral bits)
@@ -401,7 +409,9 @@ namespace ccm::pp::detail
 
 		template <typename Tp>
 		CCM_SIMD_INTRINSIC constexpr void write(Tp &&x) const
-		{ Accessor::set(obj, index, std::forward<Tp>(x)); }
+		{
+			Accessor::set(obj, index, std::forward<Tp>(x));
+		}
 
 	public:
 		CCM_SIMD_INTRINSIC constexpr SmartReference(Up &o, SimdSizeType i) noexcept : index(i), obj(o) {}
@@ -421,7 +431,7 @@ namespace ccm::pp::detail
 
 #define CCM_SIMD_OP(op)                                                                                                                                        \
 	template <typename Tp>                                                                                                                                     \
-	CCM_SIMD_INTRINSIC constexpr SmartReference operator op## = (Tp && x) &&                                                                                   \
+	CCM_SIMD_INTRINSIC constexpr SmartReference operator op##=(Tp &&x) &&                                                                                      \
 	{                                                                                                                                                          \
 		const value_type &lhs = read();                                                                                                                        \
 		write(lhs op std::forward<Tp>(x));                                                                                                                     \

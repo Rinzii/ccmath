@@ -49,10 +49,14 @@ namespace ccm::intrin
 	};
 
 	CCM_ALWAYS_INLINE bool all_of(simd_mask<float, abi::avx2> const &a)
-	{ return _mm256_testc_ps(a.get(), simd_mask<float, abi::avx2>(true).get()) != 0; }
+	{
+		return _mm256_testc_ps(a.get(), simd_mask<float, abi::avx2>(true).get()) != 0;
+	}
 
 	CCM_ALWAYS_INLINE bool any_of(simd_mask<float, abi::avx2> const &a)
-	{ return _mm256_testc_ps(simd_mask<float, abi::avx2>(false).get(), a.get()) == 0; }
+	{
+		return _mm256_testc_ps(simd_mask<float, abi::avx2>(false).get(), a.get()) == 0;
+	}
 
 	template <>
 	struct simd<float, abi::avx2>
@@ -98,7 +102,9 @@ namespace ccm::intrin
 	};
 
 	CCM_ALWAYS_INLINE simd<float, abi::avx2> choose(simd_mask<float, abi::avx2> const &a, simd<float, abi::avx2> const &b, simd<float, abi::avx2> const &c)
-	{ return { _mm256_blendv_ps(c.get(), b.get(), a.get()) }; }
+	{
+		return { _mm256_blendv_ps(c.get(), b.get(), a.get()) };
+	}
 
 	template <>
 	struct simd_mask<double, abi::avx2>
@@ -120,10 +126,14 @@ namespace ccm::intrin
 	};
 
 	CCM_ALWAYS_INLINE bool all_of(simd_mask<double, abi::avx2> const &a)
-	{ return _mm256_testc_pd(a.get(), simd_mask<double, abi::avx2>(true).get()) != 0; }
+	{
+		return _mm256_testc_pd(a.get(), simd_mask<double, abi::avx2>(true).get()) != 0;
+	}
 
 	CCM_ALWAYS_INLINE bool any_of(simd_mask<double, abi::avx2> const &a)
-	{ return _mm256_testc_pd(simd_mask<double, abi::avx2>(false).get(), a.get()) == 0; }
+	{
+		return _mm256_testc_pd(simd_mask<double, abi::avx2>(false).get(), a.get()) == 0;
+	}
 
 	template <>
 	struct simd<double, abi::avx2> // NOLINT
@@ -171,7 +181,9 @@ namespace ccm::intrin
 	};
 
 	CCM_ALWAYS_INLINE simd<double, abi::avx2> choose(simd_mask<double, abi::avx2> const &a, simd<double, abi::avx2> const &b, simd<double, abi::avx2> const &c)
-	{ return { _mm256_blendv_pd(c.get(), b.get(), a.get()) }; }
+	{
+		return { _mm256_blendv_pd(c.get(), b.get(), a.get()) };
+	}
 } // namespace ccm::intrin
 
 	#endif // CCMATH_HAS_SIMD_AVX2

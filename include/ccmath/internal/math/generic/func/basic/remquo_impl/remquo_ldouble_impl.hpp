@@ -47,5 +47,7 @@ namespace ccm::internal
 	} // namespace impl
 
 	constexpr long double remquo_ldouble(long double x, long double y, int * quo) noexcept
-	{ return impl::remquo_ldouble_impl(x, y, quo); }
+	{
+		return impl::remquo_ldouble_impl(x, y, quo);
+	}
 } // namespace ccm::internal

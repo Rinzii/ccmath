@@ -42,110 +42,77 @@ namespace ccm::rt::detail::msvc_libm
 	[[nodiscard]] inline T exp2_call(T x) noexcept
 	{
 		if constexpr (std::is_same_v<T, float>) { return exp2f(x); }
-		else
-		{
-			return static_cast<T>(exp2(static_cast<double>(x)));
-		}
+		else { return static_cast<T>(exp2(static_cast<double>(x))); }
 	}
 
 	template <typename T>
 	[[nodiscard]] inline T log_call(T x) noexcept
 	{
 		if constexpr (std::is_same_v<T, float>) { return logf(x); }
-		else
-		{
-			return static_cast<T>(log(static_cast<double>(x)));
-		}
+		else { return static_cast<T>(log(static_cast<double>(x))); }
 	}
 
 	template <typename T>
 	[[nodiscard]] inline T log2_call(T x) noexcept
 	{
 		if constexpr (std::is_same_v<T, float>) { return log2f(x); }
-		else
-		{
-			return static_cast<T>(log2(static_cast<double>(x)));
-		}
+		else { return static_cast<T>(log2(static_cast<double>(x))); }
 	}
 
 	template <typename T>
 	[[nodiscard]] inline T log10_call(T x) noexcept
 	{
 		if constexpr (std::is_same_v<T, float>) { return log10f(x); }
-		else
-		{
-			return static_cast<T>(log10(static_cast<double>(x)));
-		}
+		else { return static_cast<T>(log10(static_cast<double>(x))); }
 	}
 
 	template <typename T>
 	[[nodiscard]] inline T sin_call(T x) noexcept
 	{
 		if constexpr (std::is_same_v<T, float>) { return sinf(x); }
-		else
-		{
-			return static_cast<T>(sin(static_cast<double>(x)));
-		}
+		else { return static_cast<T>(sin(static_cast<double>(x))); }
 	}
 
 	template <typename T>
 	[[nodiscard]] inline T cos_call(T x) noexcept
 	{
 		if constexpr (std::is_same_v<T, float>) { return cosf(x); }
-		else
-		{
-			return static_cast<T>(cos(static_cast<double>(x)));
-		}
+		else { return static_cast<T>(cos(static_cast<double>(x))); }
 	}
 
 	template <typename T>
 	[[nodiscard]] inline T tan_call(T x) noexcept
 	{
 		if constexpr (std::is_same_v<T, float>) { return tanf(x); }
-		else
-		{
-			return static_cast<T>(tan(static_cast<double>(x)));
-		}
+		else { return static_cast<T>(tan(static_cast<double>(x))); }
 	}
 
 	template <typename T>
 	[[nodiscard]] inline T fmod_call(T x, T y) noexcept
 	{
 		if constexpr (std::is_same_v<T, float>) { return fmodf(x, y); }
-		else
-		{
-			return static_cast<T>(fmod(static_cast<double>(x), static_cast<double>(y)));
-		}
+		else { return static_cast<T>(fmod(static_cast<double>(x), static_cast<double>(y))); }
 	}
 
 	template <typename T>
 	[[nodiscard]] inline T remainder_call(T x, T y) noexcept
 	{
 		if constexpr (std::is_same_v<T, float>) { return remainderf(x, y); }
-		else
-		{
-			return static_cast<T>(remainder(static_cast<double>(x), static_cast<double>(y)));
-		}
+		else { return static_cast<T>(remainder(static_cast<double>(x), static_cast<double>(y))); }
 	}
 
 	template <typename T>
 	[[nodiscard]] inline T gamma_call(T x) noexcept
 	{
 		if constexpr (std::is_same_v<T, float>) { return tgammaf(x); }
-		else
-		{
-			return static_cast<T>(tgamma(static_cast<double>(x)));
-		}
+		else { return static_cast<T>(tgamma(static_cast<double>(x))); }
 	}
 
 	template <typename T>
 	[[nodiscard]] inline T lgamma_call(T x) noexcept
 	{
 		if constexpr (std::is_same_v<T, float>) { return lgammaf(x); }
-		else
-		{
-			return static_cast<T>(lgamma(static_cast<double>(x)));
-		}
+		else { return static_cast<T>(lgamma(static_cast<double>(x))); }
 	}
 #endif
 } // namespace ccm::rt::detail::msvc_libm

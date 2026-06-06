@@ -50,7 +50,9 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double copysign(Integer mag, Integer sgn)
-	{ return ccm::copysign<double>(static_cast<double>(mag), static_cast<double>(sgn)); }
+	{
+		return ccm::copysign<double>(static_cast<double>(mag), static_cast<double>(sgn));
+	}
 
 	/**
 	 * @brief Copies the sign of a floating point value.
@@ -59,7 +61,9 @@ namespace ccm
 	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
 	 */
 	constexpr float copysignf(float mag, float sgn)
-	{ return ccm::copysign<float>(mag, sgn); }
+	{
+		return ccm::copysign<float>(mag, sgn);
+	}
 
 	/**
 	 * @brief Copies the sign of a floating point value.
@@ -68,5 +72,7 @@ namespace ccm
 	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
 	 */
 	constexpr long double copysignl(long double mag, long double sgn)
-	{ return ccm::copysign<long double>(mag, sgn); }
+	{
+		return ccm::copysign<long double>(mag, sgn);
+	}
 } // namespace ccm

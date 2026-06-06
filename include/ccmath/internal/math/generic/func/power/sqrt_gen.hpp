@@ -50,7 +50,9 @@ namespace ccm::gen
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
 		template <>
 		constexpr void normalize<long double>(int& exponent, std::uint64_t& mantissa)
-		{ normalize<double>(exponent, mantissa); }
+		{
+			normalize<double>(exponent, mantissa);
+		}
 #elif defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
 		template <>
 		constexpr void normalize<long double>(int& exponent, support::fp::FPBits<long double>::storage_type& mantissa)
@@ -180,10 +182,7 @@ namespace ccm::gen
 					++x_exp; // ensure that x_exp is the correct exponent of one bit.
 					internal::normalize<T>(x_exp, x_mant);
 				}
-				else
-				{
-					x_mant |= one;
-				}
+				else { x_mant |= one; }
 
 				// Ensure that the exponent is even.
 				if (x_exp & 1)
@@ -268,6 +267,8 @@ namespace ccm::gen
 
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T sqrt_gen(T num)
-	{ return internal::impl::sqrt_impl(num); }
+	{
+		return internal::impl::sqrt_impl(num);
+	}
 
 } // namespace ccm::gen

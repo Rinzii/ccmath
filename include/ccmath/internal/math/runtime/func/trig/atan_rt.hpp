@@ -25,10 +25,7 @@ namespace ccm::rt
 		if constexpr (std::is_same_v<T, float>) { return __builtin_atanf(num); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_atan(num); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_atanl(num); }
-		else
-		{
-			return static_cast<T>(__builtin_atanl(static_cast<long double>(num)));
-		}
+		else { return static_cast<T>(__builtin_atanl(static_cast<long double>(num))); }
 #else
 		const auto scalar = [](T value) { return detail::dispatch_float_double(value, internal::impl::atan_float, internal::impl::atan_double); };
 		return simd_impl::unary_via_scalar_abi(num, scalar);

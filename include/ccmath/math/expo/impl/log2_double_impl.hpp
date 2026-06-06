@@ -120,14 +120,16 @@ namespace ccm::internal
 			const ccm::double_t polynomialTerm = log2_poly_values_dbl[0] + rem * log2_poly_values_dbl[1] +
 												 remSqr * (log2_poly_values_dbl[2] + rem * log2_poly_values_dbl[3]) +
 												 remQuad * (log2_poly_values_dbl[4] + rem * log2_poly_values_dbl[5]);
-			result							   = lowPart + remSqr * polynomialTerm + highPart;
+			result = lowPart + remSqr * polynomialTerm + highPart;
 
 			return result;
 		}
 	} // namespace impl
 
 	constexpr double log2_double(double num) noexcept
-	{ return impl::log2_double_impl(num); }
+	{
+		return impl::log2_double_impl(num);
+	}
 } // namespace ccm::internal
 
 CCM_RESTORE_MSVC_WARNING()

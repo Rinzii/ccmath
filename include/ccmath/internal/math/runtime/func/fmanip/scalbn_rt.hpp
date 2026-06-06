@@ -26,10 +26,7 @@ namespace ccm::rt
 		if constexpr (std::is_same_v<T, float>) { return __builtin_scalbnf(num, exp); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_scalbn(num, exp); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_scalbnl(num, exp); }
-		else
-		{
-			return static_cast<T>(__builtin_scalbnl(static_cast<long double>(num), exp));
-		}
+		else { return static_cast<T>(__builtin_scalbnl(static_cast<long double>(num), exp)); }
 #else
 		return detail::dispatch_float_double(
 			num, [&](float value) { return internal::scalbn_float(value, exp); }, [&](double value) { return internal::scalbn_double(value, exp); });

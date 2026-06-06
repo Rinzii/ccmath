@@ -58,10 +58,14 @@ namespace ccm::internal
 	} // namespace impl
 
 	constexpr float scalbn_float(float arg, int exp) noexcept
-	{ return impl::scalbn_float_impl(arg, exp); }
+	{
+		return impl::scalbn_float_impl(arg, exp);
+	}
 
 	constexpr float scalbn_float(float arg, long exp) noexcept
-	{ return impl::scalbn_float_impl(arg, static_cast<int>(exp)); }
+	{
+		return impl::scalbn_float_impl(arg, static_cast<int>(exp));
+	}
 } // namespace ccm::internal
 
 CCM_RESTORE_MSVC_WARNING()

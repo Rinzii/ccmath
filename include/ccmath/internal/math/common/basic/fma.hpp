@@ -71,7 +71,9 @@ namespace ccm
 
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr Integer fma(Integer x, Integer y, Integer z) noexcept
-	{ return (x * y) + z; }
+	{
+		return (x * y) + z;
+	}
 
 	/**
 	 * @brief Fused multiply-add operation.
@@ -132,7 +134,9 @@ namespace ccm
 	 * calculated as a single ternary floating-point operation).
 	 */
 	constexpr float fmaf(float x, float y, float z) noexcept
-	{ return ccm::fma<float>(x, y, z); }
+	{
+		return ccm::fma<float>(x, y, z);
+	}
 
 	/**
 	 * @brief Fused multiply-add operation.
@@ -143,7 +147,9 @@ namespace ccm
 	 * calculated as a single ternary floating-point operation).
 	 */
 	constexpr long double fmal(long double x, long double y, long double z) noexcept
-	{ return ccm::fma<long double>(x, y, z); }
+	{
+		return ccm::fma<long double>(x, y, z);
+	}
 } // namespace ccm
 
 /// @ingroup basic

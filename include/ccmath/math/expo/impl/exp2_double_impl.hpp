@@ -140,6 +140,8 @@ namespace ccm::internal
 	} // namespace impl
 
 	constexpr double exp2_double(double num)
-	{ return impl::exp2_double_impl(num); }
+	{
+		return impl::exp2_double_impl(num);
+	}
 
 } // namespace ccm::internal

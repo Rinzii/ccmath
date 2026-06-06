@@ -24,5 +24,7 @@ namespace ccm::ext
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T radians(T degrees) noexcept
-	{ return (ccm::numbers::pi_v<T> * degrees) / static_cast<T>(180); }
+	{
+		return (ccm::numbers::pi_v<T> * degrees) / static_cast<T>(180);
+	}
 } // namespace ccm::ext

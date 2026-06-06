@@ -65,7 +65,9 @@ namespace ccm
 
 		template <typename T, typename U, typename TC = std::common_type_t<T, U>>
 		constexpr TC fmod_impl_type_check(T x, U y) noexcept
-		{ return fmod_impl_check(static_cast<TC>(x), static_cast<TC>(y)); }
+		{
+			return fmod_impl_check(static_cast<TC>(x), static_cast<TC>(y));
+		}
 	} // namespace internal::impl
 	/// @endcond
 
@@ -79,7 +81,9 @@ namespace ccm
 	 */
 	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, bool> = true>
 	constexpr Real fmod(Real x, Real y)
-	{ return internal::impl::fmod_impl_check(x, y); }
+	{
+		return internal::impl::fmod_impl_check(x, y);
+	}
 
 	/**
 	 * @brief Returns the floating-point remainder of the division operation x/y.
@@ -90,7 +94,9 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double fmod(Integer x, Integer y)
-	{ return internal::impl::fmod_impl_type_check(x, y); }
+	{
+		return internal::impl::fmod_impl_type_check(x, y);
+	}
 
 	/**
 	 * @brief Returns the floating-point remainder of the division operation x/y.
@@ -102,7 +108,9 @@ namespace ccm
 	 */
 	template <typename T, typename U>
 	constexpr auto fmod(T x, T y)
-	{ return internal::impl::fmod_impl_type_check(x, y); }
+	{
+		return internal::impl::fmod_impl_type_check(x, y);
+	}
 
 	/**
 	 * @brief Returns the floating-point remainder of the division operation x/y.
@@ -111,7 +119,9 @@ namespace ccm
 	 * @return The floating-point remainder of the division operation x/y.
 	 */
 	constexpr float fmodf(float x, float y)
-	{ return fmod<float>(x, y); }
+	{
+		return fmod<float>(x, y);
+	}
 
 	/**
 	 * @brief Returns the floating-point remainder of the division operation x/y.
@@ -120,7 +130,9 @@ namespace ccm
 	 * @return The floating-point remainder of the division operation x/y.
 	 */
 	constexpr long double fmodl(long double x, long double y)
-	{ return fmod<long double>(x, y); }
+	{
+		return fmod<long double>(x, y);
+	}
 } // namespace ccm
 
 /// @ingroup basic

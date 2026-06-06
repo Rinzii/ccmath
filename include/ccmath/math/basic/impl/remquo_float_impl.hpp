@@ -109,5 +109,7 @@ namespace ccm::internal
 	} // namespace impl
 
 	constexpr float remquo_float(float x, float y, int * quo) noexcept
-	{ return impl::remquo_float_impl(x, y, quo); }
+	{
+		return impl::remquo_float_impl(x, y, quo);
+	}
 } // namespace ccm::internal

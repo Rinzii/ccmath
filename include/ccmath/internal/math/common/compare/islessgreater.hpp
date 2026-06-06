@@ -28,10 +28,7 @@ namespace ccm
 	constexpr bool islessgreater(T x, T y) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_islessgreater<T>) { return ccm::builtin::islessgreater(x, y); }
-		else
-		{
-			return !ccm::isunordered(x, y) && (x < y || x > y);
-		}
+		else { return !ccm::isunordered(x, y) && (x < y || x > y); }
 	}
 
 	/**

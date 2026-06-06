@@ -28,10 +28,7 @@ namespace ccm
 	constexpr bool isunordered(T x, T y) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_isunordered<T>) { return ccm::builtin::isunordered(x, y); }
-		else
-		{
-			return ccm::isnan(x) || ccm::isnan(y);
-		}
+		else { return ccm::isnan(x) || ccm::isnan(y); }
 	}
 
 	/**

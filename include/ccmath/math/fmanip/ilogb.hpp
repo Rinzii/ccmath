@@ -34,15 +34,9 @@ namespace ccm
 		{
 			if constexpr (std::is_same_v<T, float>) { return internal::impl::ilogb_impl(num); }
 			else if constexpr (std::is_same_v<T, double>) { return internal::impl::ilogb_impl(num); }
-			else
-			{
-				return internal::impl::ilogb_impl(static_cast<double>(num));
-			}
+			else { return internal::impl::ilogb_impl(static_cast<double>(num)); }
 		}
-		else
-		{
-			return ccm::rt::ilogb_rt(num);
-		}
+		else { return ccm::rt::ilogb_rt(num); }
 	}
 
 	/**
@@ -52,7 +46,9 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/ilogb
 	 */
 	constexpr int ilogbf(float num) noexcept
-	{ return ccm::ilogb(num); }
+	{
+		return ccm::ilogb(num);
+	}
 
 	/**
 	 * @brief Extracts the unbiased integer exponent of a long double.
@@ -61,5 +57,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/ilogb
 	 */
 	constexpr int ilogbl(long double num) noexcept
-	{ return ccm::ilogb(num); }
+	{
+		return ccm::ilogb(num);
+	}
 } // namespace ccm

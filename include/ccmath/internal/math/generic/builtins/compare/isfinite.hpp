@@ -65,7 +65,9 @@ namespace ccm::builtin
 	 */
 	template <typename T>
 	constexpr auto isfinite(T x) -> std::enable_if_t<has_constexpr_isfinite<T>, bool>
-	{ return __builtin_isfinite(x); }
+	{
+		return __builtin_isfinite(x);
+	}
 } // namespace ccm::builtin
 
 // Cleanup the global namespace

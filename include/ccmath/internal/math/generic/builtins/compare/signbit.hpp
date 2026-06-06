@@ -58,7 +58,9 @@ namespace ccm::builtin
 	 */
 	template <typename T>
 	constexpr auto signbit(T x) -> std::enable_if_t<has_constexpr_signbit<T>, bool>
-	{ return __builtin_signbit(x); }
+	{
+		return __builtin_signbit(x);
+	}
 } // namespace ccm::builtin
 
 // Cleanup the global namespace

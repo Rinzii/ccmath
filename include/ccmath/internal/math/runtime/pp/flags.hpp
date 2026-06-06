@@ -41,7 +41,9 @@ namespace ccm::pp
 		{
 			template <typename T, typename U>
 			CCM_SIMD_INTRINSIC static constexpr U *adjust_pointer(U *ptr)
-			{ return static_cast<U *>(pp::assume_aligned<simd_alignment_v<T, U>>(ptr)); }
+			{
+				return static_cast<U *>(pp::assume_aligned<simd_alignment_v<T, U>>(ptr));
+			}
 		};
 
 		template <std::size_t N>
@@ -51,7 +53,9 @@ namespace ccm::pp
 
 			template <typename, typename U>
 			CCM_SIMD_INTRINSIC static constexpr U *adjust_pointer(U *ptr)
-			{ return static_cast<U *>(pp::assume_aligned<N>(ptr)); }
+			{
+				return static_cast<U *>(pp::assume_aligned<N>(ptr));
+			}
 		};
 
 		struct Streaming : LoadStoreTag
@@ -96,11 +100,15 @@ namespace ccm::pp
 
 		template <typename... Other>
 		CCM_CONSTEVAL bool is_equal([[maybe_unused]] simd_flags<Other...> other) const
-		{ return std::is_same_v<simd_flags<>, decltype(xor_flags(other))>; }
+		{
+			return std::is_same_v<simd_flags<>, decltype(xor_flags(other))>;
+		}
 
 		template <typename... Other>
 		CCM_CONSTEVAL bool test(simd_flags<Other...> other) const noexcept
-		{ return other.is_equal(and_flags(other)); }
+		{
+			return other.is_equal(and_flags(other));
+		}
 
 		friend CCM_CONSTEVAL auto operator|(simd_flags, simd_flags<>) { return simd_flags{}; }
 
@@ -108,10 +116,7 @@ namespace ccm::pp
 		friend CCM_CONSTEVAL auto operator|(simd_flags, simd_flags<T0, More...>)
 		{
 			if constexpr ((std::is_same_v<Flags, T0> || ...)) { return simd_flags<Flags...>{} | simd_flags<More...>{}; }
-			else
-			{
-				return simd_flags<Flags..., T0>{} | simd_flags<More...>{};
-			}
+			else { return simd_flags<Flags..., T0>{} | simd_flags<More...>{}; }
 		}
 
 		// ReSharper disable once CppMemberFunctionMayBeStatic
@@ -121,10 +126,7 @@ namespace ccm::pp
 		CCM_CONSTEVAL auto and_flags(simd_flags<T0, More...>) const
 		{
 			if constexpr ((std::is_same_v<Flags, T0> || ...)) { return simd_flags<T0>{} | (simd_flags{}.and_flags(simd_flags<More...>{})); }
-			else
-			{
-				return simd_flags{}.and_flags(simd_flags<More...>{});
-			}
+			else { return simd_flags{}.and_flags(simd_flags<More...>{}); }
 		}
 
 		CCM_CONSTEVAL auto xor_flags(simd_flags<>) const { return simd_flags{}; }
@@ -137,10 +139,7 @@ namespace ccm::pp
 				constexpr auto removed = (std::conditional_t<std::is_same_v<Flags, T0>, simd_flags<>, simd_flags<Flags>>{} | ...);
 				return removed.xor_flags(simd_flags<More...>{});
 			}
-			else
-			{
-				return (simd_flags{} | simd_flags<T0>{}).xor_flags(simd_flags<More...>{});
-			}
+			else { return (simd_flags{} | simd_flags<T0>{}).xor_flags(simd_flags<More...>{}); }
 		}
 
 		template <typename F0, typename Tp, typename Ptr>

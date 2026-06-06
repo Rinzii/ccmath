@@ -20,19 +20,29 @@ namespace ccm::support::fenv
 	namespace internal
 	{
 		inline bool rt_rounding_mode_is_round_up()
-		{ return std::fegetround() == FE_UPWARD; }
+		{
+			return std::fegetround() == FE_UPWARD;
+		}
 
 		inline bool rt_rounding_mode_is_round_down()
-		{ return std::fegetround() == FE_DOWNWARD; }
+		{
+			return std::fegetround() == FE_DOWNWARD;
+		}
 
 		inline bool rt_rounding_mode_is_round_to_nearest()
-		{ return std::fegetround() == FE_TONEAREST; }
+		{
+			return std::fegetround() == FE_TONEAREST;
+		}
 
 		inline bool rt_rounding_mode_is_round_to_zero()
-		{ return std::fegetround() == FE_TOWARDZERO; }
+		{
+			return std::fegetround() == FE_TOWARDZERO;
+		}
 
 		inline int rt_get_rounding_mode()
-		{ return std::fegetround(); }
+		{
+			return std::fegetround();
+		}
 	} // namespace internal
 
 	/**

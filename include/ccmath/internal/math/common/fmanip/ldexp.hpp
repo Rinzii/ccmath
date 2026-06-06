@@ -98,10 +98,7 @@ namespace ccm
 	constexpr T ldexp(T num, int exp) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_ldexp<T>) { return builtin::ldexp(num, exp); }
-		else
-		{
-			return support::helpers::internal_ldexp(num, exp);
-		}
+		else { return support::helpers::internal_ldexp(num, exp); }
 	}
 
 	/**
@@ -133,7 +130,9 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double ldexp(Integer num, int exp) noexcept
-	{ return ccm::ldexp<double>(static_cast<double>(num), exp); }
+	{
+		return ccm::ldexp<double>(static_cast<double>(num), exp);
+	}
 
 	/**
 	 * @brief Multiplies a float \p num by 2 raised to the power \p exp.
@@ -157,7 +156,9 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/ldexp
 	 */
 	constexpr float ldexpf(float num, int exp) noexcept
-	{ return ccm::ldexp<float>(num, exp); }
+	{
+		return ccm::ldexp<float>(num, exp);
+	}
 
 	/**
 	 * @brief Multiplies a long double \p num by 2 raised to the power \p exp.
@@ -185,6 +186,8 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/ldexp
 	 */
 	constexpr long double ldexpl(long double num, int exp) noexcept
-	{ return ccm::ldexp<long double>(num, exp); }
+	{
+		return ccm::ldexp<long double>(num, exp);
+	}
 
 } // namespace ccm

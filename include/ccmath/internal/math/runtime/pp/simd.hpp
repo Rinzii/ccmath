@@ -63,7 +63,9 @@ namespace ccm::pp
 		// Conversion operator
 		template <typename U>
 		explicit operator U() const->std::enable_if_t<Traits::template is_simd_conversion<U>(), U>
-		{ return Traits::template SimdConversion<U>(data_); }
+		{
+			return Traits::template SimdConversion<U>(data_);
+		}
 
 		// Access data
 		auto operator[](std::size_t index) const -> T
@@ -81,7 +83,9 @@ namespace ccm::pp
 		// Store function
 		template <typename Iter>
 		auto store(Iter first) const -> std::enable_if_t<std::is_pointer<Iter>::value, void>
-		{ Traits::SimdStore(data_, first, type_tag); }
+		{
+			Traits::SimdStore(data_, first, type_tag);
+		}
 	};
 
 	template <typename T, typename Abi>
@@ -90,4 +94,4 @@ namespace ccm::pp
 	};
 
 } // namespace ccm::pp
-*/
+* /

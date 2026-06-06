@@ -26,16 +26,24 @@ namespace ccm::support
 {
 
 	constexpr std::uint8_t operator""_u8(unsigned long long value)
-	{ return static_cast<std::uint8_t>(value); }
+	{
+		return static_cast<std::uint8_t>(value);
+	}
 
 	constexpr std::uint16_t operator""_u16(unsigned long long value)
-	{ return static_cast<std::uint16_t>(value); }
+	{
+		return static_cast<std::uint16_t>(value);
+	}
 
 	constexpr std::uint32_t operator""_u32(unsigned long long value)
-	{ return static_cast<std::uint32_t>(value); }
+	{
+		return static_cast<std::uint32_t>(value);
+	}
 
 	constexpr std::uint64_t operator""_u64(unsigned long long value)
-	{ return static_cast<std::uint64_t>(value); }
+	{
+		return static_cast<std::uint64_t>(value);
+	}
 
 	namespace internal
 	{
@@ -196,13 +204,19 @@ namespace ccm::support
 	} // namespace internal
 
 	constexpr ccm::types::UInt<96> operator""_u96(const char * x)
-	{ return internal::parse_with_prefix<ccm::types::UInt<96>>(x); }
+	{
+		return internal::parse_with_prefix<ccm::types::UInt<96>>(x);
+	}
 
 	constexpr ccm::types::uint128_t operator""_u128(const char * x)
-	{ return internal::parse_with_prefix<ccm::types::uint128_t>(x); }
+	{
+		return internal::parse_with_prefix<ccm::types::uint128_t>(x);
+	}
 
 	constexpr auto operator""_u256(const char * x)
-	{ return internal::parse_with_prefix<ccm::types::UInt<256>>(x); }
+	{
+		return internal::parse_with_prefix<ccm::types::UInt<256>>(x);
+	}
 
 	template <typename T>
 	constexpr T parse_bigint_internal(std::string_view view)

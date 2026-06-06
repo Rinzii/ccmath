@@ -76,21 +76,33 @@ namespace ccm::support::helpers
 		}
 
 		constexpr double exp10_double_impl(double exp) noexcept
-		{ return 0; }
+		{
+			return 0;
+		}
 
 		constexpr double exp10_double_double_impl(double exp) noexcept
-		{ return 0; }
+		{
+			return 0;
+		}
 
 		constexpr float exp10_float_impl(float exp) noexcept
-		{ return 0; }
+		{
+			return 0;
+		}
 	} // namespace impl
 
 	constexpr double exp10_double(double exp) noexcept
-	{ return impl::exp10_double_impl(exp); }
+	{
+		return impl::exp10_double_impl(exp);
+	}
 
 	constexpr double exp10_double_double(double exp) noexcept
-	{ return impl::exp10_double_double_impl(exp); }
+	{
+		return impl::exp10_double_double_impl(exp);
+	}
 
 	constexpr float exp10_float(float exp) noexcept
-	{ return impl::exp10_float_impl(exp); }
+	{
+		return impl::exp10_float_impl(exp);
+	}
 } // namespace ccm::support::helpers

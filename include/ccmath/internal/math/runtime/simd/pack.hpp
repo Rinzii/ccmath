@@ -34,7 +34,9 @@ namespace ccm::intrin
 		CCM_ALWAYS_INLINE explicit simd_mask(bool value)
 		{
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
-			{ m_value[i] = value; }
+			{
+				m_value[i] = value;
+			}
 		}
 		constexpr bool operator[](int i) const { return m_value[i]; }
 		CCM_ALWAYS_INLINE int & operator[](int i) { return m_value[i]; }
@@ -42,21 +44,27 @@ namespace ccm::intrin
 		{
 			simd_mask result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
-			{ result.m_value[i] = m_value[i] || other.m_value[i]; }
+			{
+				result.m_value[i] = m_value[i] || other.m_value[i];
+			}
 			return result;
 		}
 		CCM_ALWAYS_INLINE simd_mask operator&&(simd_mask const & other) const
 		{
 			simd_mask result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
-			{ result.m_value[i] = m_value[i] && other.m_value[i]; }
+			{
+				result.m_value[i] = m_value[i] && other.m_value[i];
+			}
 			return result;
 		}
 		CCM_ALWAYS_INLINE simd_mask operator!() const
 		{
 			simd_mask result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
-			{ result.m_value[i] = !m_value[i]; }
+			{
+				result.m_value[i] = !m_value[i];
+			}
 			return result;
 		}
 
@@ -75,7 +83,9 @@ namespace ccm::intrin
 		CCM_ALWAYS_INLINE explicit simd_mask(bool value)
 		{
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
-			{ m_value[i] = value; }
+			{
+				m_value[i] = value;
+			}
 		}
 		constexpr bool operator[](int i) const { return m_value[i]; }
 		CCM_ALWAYS_INLINE std::int64_t & operator[](int i) { return m_value[i]; }
@@ -83,21 +93,27 @@ namespace ccm::intrin
 		{
 			simd_mask result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
-			{ result.m_value[i] = m_value[i] || other.m_value[i]; }
+			{
+				result.m_value[i] = m_value[i] || other.m_value[i];
+			}
 			return result;
 		}
 		CCM_ALWAYS_INLINE simd_mask operator&&(simd_mask const & other) const
 		{
 			simd_mask result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
-			{ result.m_value[i] = m_value[i] && other.m_value[i]; }
+			{
+				result.m_value[i] = m_value[i] && other.m_value[i];
+			}
 			return result;
 		}
 		CCM_ALWAYS_INLINE simd_mask operator!() const
 		{
 			simd_mask result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
-			{ result.m_value[i] = !m_value[i]; }
+			{
+				result.m_value[i] = !m_value[i];
+			}
 			return result;
 		}
 
@@ -110,7 +126,9 @@ namespace ccm::intrin
 	{
 		bool result = true;
 		CCM_SIMD_VECTORIZE for (int i = 0; i < a.size(); ++i)
-		{ result = result && a[i]; }
+		{
+			result = result && a[i];
+		}
 		return result;
 	}
 
@@ -119,7 +137,9 @@ namespace ccm::intrin
 	{
 		bool result = false;
 		CCM_SIMD_VECTORIZE for (int i = 0; i < a.size(); ++i)
-		{ result = result || a[i]; }
+		{
+			result = result || a[i];
+		}
 		return result;
 	}
 
@@ -136,7 +156,9 @@ namespace ccm::intrin
 		CCM_ALWAYS_INLINE explicit simd(T value)
 		{
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
-			{ m_value[i] = value; }
+			{
+				m_value[i] = value;
+			}
 		}
 		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE explicit simd(storage_type const & value) { copy_from(value.data(), element_aligned_tag()); }
 		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd & operator=(storage_type const & value)
@@ -146,40 +168,52 @@ namespace ccm::intrin
 		}
 		template <class Flags>
 		CCM_ALWAYS_INLINE simd(T const * ptr, Flags flags)
-		{ copy_from(ptr, flags); }
+		{
+			copy_from(ptr, flags);
+		}
 		CCM_ALWAYS_INLINE simd operator*(simd const & other) const
 		{
 			simd result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
-			{ result[i] = m_value[i] * other.m_value[i]; }
+			{
+				result[i] = m_value[i] * other.m_value[i];
+			}
 			return result;
 		}
 		CCM_ALWAYS_INLINE simd operator/(simd const & other) const
 		{
 			simd result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
-			{ result[i] = m_value[i] / other.m_value[i]; }
+			{
+				result[i] = m_value[i] / other.m_value[i];
+			}
 			return result;
 		}
 		CCM_ALWAYS_INLINE simd operator+(simd const & other) const
 		{
 			simd result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
-			{ result[i] = m_value[i] + other.m_value[i]; }
+			{
+				result[i] = m_value[i] + other.m_value[i];
+			}
 			return result;
 		}
 		CCM_ALWAYS_INLINE simd operator-(simd const & other) const
 		{
 			simd result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
-			{ result[i] = m_value[i] - other.m_value[i]; }
+			{
+				result[i] = m_value[i] - other.m_value[i];
+			}
 			return result;
 		}
 		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd operator-() const
 		{
 			simd result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
-			{ result[i] = -m_value[i]; }
+			{
+				result[i] = -m_value[i];
+			}
 			return result;
 		}
 		CCM_ALWAYS_INLINE void copy_from(T const * ptr, element_aligned_tag /*unused*/)
@@ -202,14 +236,18 @@ namespace ccm::intrin
 		{
 			simd_mask<T, abi::pack<N>> result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
-			{ result[i] = m_value[i] < other.m_value[i]; }
+			{
+				result[i] = m_value[i] < other.m_value[i];
+			}
 			return result;
 		}
 		CCM_ALWAYS_INLINE simd_mask<T, abi::pack<N>> operator==(simd const & other) const
 		{
 			simd_mask<T, abi::pack<N>> result;
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
-			{ result[i] = m_value[i] == other.m_value[i]; }
+			{
+				result[i] = m_value[i] == other.m_value[i];
+			}
 			return result;
 		}
 
@@ -223,7 +261,9 @@ namespace ccm::intrin
 	{
 		simd<T, abi::pack<N>> result;
 		CCM_SIMD_VECTORIZE for (int i = 0; i < a.size(); ++i)
-		{ result[i] = a[i] ? b[i] : c[i]; }
+		{
+			result[i] = a[i] ? b[i] : c[i];
+		}
 		return result;
 	}
 

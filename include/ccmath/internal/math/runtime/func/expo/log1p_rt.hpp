@@ -25,10 +25,7 @@ namespace ccm::rt
 		if constexpr (std::is_same_v<T, float>) { return __builtin_log1pf(num); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_log1p(num); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_log1pl(num); }
-		else
-		{
-			return static_cast<T>(__builtin_log1pl(static_cast<long double>(num)));
-		}
+		else { return static_cast<T>(__builtin_log1pl(static_cast<long double>(num))); }
 #else
 		const auto scalar = [](T value) { return detail::dispatch_float_double(value, ccm::internal::log1p_float, ccm::internal::log1p_double); };
 		return simd_impl::unary_via_scalar_abi(num, scalar);

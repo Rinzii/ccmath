@@ -128,10 +128,7 @@ namespace ccm::internal::impl
 				ccm::support::fenv::raise_except_if_required(FE_OVERFLOW | FE_INEXACT);
 				ccm::support::fenv::set_errno_if_required(ERANGE);
 			}
-			else
-			{
-				ccm::support::fenv::raise_except_if_required(FE_INEXACT);
-			}
+			else { ccm::support::fenv::raise_except_if_required(FE_INEXACT); }
 			return f;
 		}
 

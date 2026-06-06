@@ -29,10 +29,7 @@ namespace ccm::rt
 		if constexpr (std::is_same_v<T, float>) { return __builtin_fmodf(x, y); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_fmod(x, y); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fmodl(x, y); }
-		else
-		{
-			return static_cast<T>(__builtin_fmodl(static_cast<long double>(x), static_cast<long double>(y)));
-		}
+		else { return static_cast<T>(__builtin_fmodl(static_cast<long double>(x), static_cast<long double>(y))); }
 	#else
 		return static_cast<T>(x - (detail::trunc_scalar<T>(x / y) * y));
 	#endif

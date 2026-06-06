@@ -51,7 +51,9 @@ namespace ccm::builtin
 	 */
 	template <typename T>
 	constexpr auto isless(T x, T y) -> std::enable_if_t<has_constexpr_isless<T>, bool>
-	{ return __builtin_isless(x, y); }
+	{
+		return __builtin_isless(x, y);
+	}
 } // namespace ccm::builtin
 
 // Cleanup the global namespace

@@ -35,7 +35,9 @@ namespace ccm::internal::impl
 		using fp_bits = ccm::support::fp::FPBits<double>;
 
 		constexpr double log_abs(double x) noexcept
-		{ return ccm::log(ccm::fabs(x)); }
+		{
+			return ccm::log(ccm::fabs(x));
+		}
 
 		constexpr double stirling(double x) noexcept
 		{
@@ -120,5 +122,7 @@ namespace ccm::internal::impl
 	}
 
 	constexpr float lgamma_float_impl(float x) noexcept
-	{ return static_cast<float>(lgamma_double_impl(static_cast<double>(x))); }
+	{
+		return static_cast<float>(lgamma_double_impl(static_cast<double>(x)));
+	}
 } // namespace ccm::internal::impl

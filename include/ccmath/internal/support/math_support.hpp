@@ -181,19 +181,25 @@ namespace ccm::support
 	// set to 0.  Only unsigned types are allowed.
 	template <typename T, std::size_t count>
 	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_leading_ones()
-	{ return T(~mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>()); }
+	{
+		return T(~mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>());
+	}
 
 	// Create a bitmask with the count right-most bits set to 0, and all other bits
 	// set to 1.  Only unsigned types are allowed.
 	template <typename T, std::size_t count>
 	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_trailing_zeros()
-	{ return mask_leading_ones<T, CHAR_BIT * sizeof(T) - count>(); }
+	{
+		return mask_leading_ones<T, CHAR_BIT * sizeof(T) - count>();
+	}
 
 	// Create a bitmask with the count left-most bits set to 0, and all other bits
 	// set to 1.  Only unsigned types are allowed.
 	template <typename T, std::size_t count>
 	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_leading_zeros()
-	{ return mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>(); }
+	{
+		return mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>();
+	}
 
 	/**
 	 * @brief Add a + b, such that &hi + &lo approximates a + b.

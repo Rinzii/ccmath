@@ -315,6 +315,8 @@ namespace ccm::gen::impl
 	} // namespace internal::impl
 
 	constexpr double pow_impl(double base, double exp) noexcept
-	{ return internal::impl::pow_impl(base, exp); }
+	{
+		return internal::impl::pow_impl(base, exp);
+	}
 
 } // namespace ccm::gen::impl

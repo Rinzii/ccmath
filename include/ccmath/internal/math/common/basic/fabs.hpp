@@ -20,6 +20,8 @@ namespace ccm::func
 	 */
 	template <typename T>
 	constexpr auto fabs(T num) -> std::enable_if_t<std::is_arithmetic_v<T> && (std::is_floating_point_v<T> || std::is_signed_v<T> || std::is_unsigned_v<T>), T>
-	{ return gen::abs<T>(num); }
+	{
+		return gen::abs<T>(num);
+	}
 
 } // namespace ccm::func

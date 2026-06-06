@@ -28,19 +28,27 @@ namespace ccm::support
 
 	template <typename T>
 	constexpr std::enable_if_t<(sizeof(T) > sizeof(void *)), T> polyeval(const T & /*unused*/, const T &a0)
-	{ return a0; }
+	{
+		return a0;
+	}
 
 	template <typename T>
 	constexpr std::enable_if_t<(sizeof(T) <= sizeof(void *)), T> polyeval(T /*unused*/, T a0)
-	{ return a0; }
+	{
+		return a0;
+	}
 
 	template <typename T, typename... Ts>
 	constexpr std::enable_if_t<(sizeof(T) > sizeof(void *)), T> polyeval(const T &x, const T &a0, const Ts &...a)
-	{ return multiply_add(x, polyeval(x, a...), a0); }
+	{
+		return multiply_add(x, polyeval(x, a...), a0);
+	}
 
 	template <typename T, typename... Ts>
 	constexpr std::enable_if_t<(sizeof(T) <= sizeof(void *)), T> polyeval(T x, T a0, Ts... a)
-	{ return multiply_add(x, polyeval(x, a...), a0); }
+	{
+		return multiply_add(x, polyeval(x, a...), a0);
+	}
 
 	struct fp_helpers
 	{

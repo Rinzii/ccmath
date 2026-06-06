@@ -33,8 +33,12 @@ namespace ccm
 	}
 
 	constexpr float modff(float x, float * iptr) noexcept
-	{ return ccm::modf(x, iptr); }
+	{
+		return ccm::modf(x, iptr);
+	}
 
 	constexpr long double modfl(long double x, long double * iptr) noexcept
-	{ return ccm::modf(x, iptr); }
+	{
+		return ccm::modf(x, iptr);
+	}
 } // namespace ccm

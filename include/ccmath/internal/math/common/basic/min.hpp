@@ -30,10 +30,7 @@ namespace ccm
 	constexpr T min(const T x, const T y) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_fmin<T>) { return ccm::builtin::fmin(x, y); }
-		else
-		{
-			return ccm::gen::min(x, y);
-		}
+		else { return ccm::gen::min(x, y); }
 	}
 
 	/**
@@ -63,7 +60,9 @@ namespace ccm
 	 */
 	template <typename Real, std::enable_if_t<!std::is_integral_v<Real>, bool> = true>
 	constexpr Real fmin(const Real x, const Real y) noexcept
-	{ return min<Real>(x, y); }
+	{
+		return min<Real>(x, y);
+	}
 
 	/**
 	 * @brief Computes the smaller of the two values.
@@ -92,7 +91,9 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr Integer fmin(const Integer x, const Integer y) noexcept
-	{ return min<Integer>(x, y); }
+	{
+		return min<Integer>(x, y);
+	}
 } // namespace ccm
 
 /// @ingroup basic

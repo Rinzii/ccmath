@@ -28,10 +28,7 @@ namespace ccm::rt
 		if constexpr (std::is_same_v<T, float>) { return __builtin_roundf(num); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_round(num); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_roundl(num); }
-		else
-		{
-			return static_cast<T>(__builtin_roundl(static_cast<long double>(num)));
-		}
+		else { return static_cast<T>(__builtin_roundl(static_cast<long double>(num))); }
 #else
 		if (ccm::isinf(num) || num == static_cast<T>(0) || ccm::isnan(num)) { return num; }
 		constexpr int round_mode = static_cast<int>(ccm::support::fp::rounding_mode::eFE_TONEARESTFROMZERO);

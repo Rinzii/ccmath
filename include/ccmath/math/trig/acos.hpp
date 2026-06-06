@@ -34,15 +34,9 @@ namespace ccm
 		{
 			if constexpr (std::is_same_v<T, float>) { return internal::impl::acos_float(num); }
 			else if constexpr (std::is_same_v<T, double>) { return internal::impl::acos_double(num); }
-			else
-			{
-				return static_cast<long double>(internal::impl::acos_double(static_cast<double>(num)));
-			}
+			else { return static_cast<long double>(internal::impl::acos_double(static_cast<double>(num))); }
 		}
-		else
-		{
-			return ccm::rt::acos_rt(num);
-		}
+		else { return ccm::rt::acos_rt(num); }
 	}
 
 	/**
@@ -54,7 +48,9 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double acos(Integer num)
-	{ return ccm::acos<double>(static_cast<double>(num)); }
+	{
+		return ccm::acos<double>(static_cast<double>(num));
+	}
 
 	/**
 	 * @brief Computes inverse cosine for float.
@@ -63,7 +59,9 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/acos
 	 */
 	constexpr float acosf(float num)
-	{ return ccm::acos<float>(num); }
+	{
+		return ccm::acos<float>(num);
+	}
 
 	/**
 	 * @brief Computes inverse cosine for long double.
@@ -72,7 +70,9 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/acos
 	 */
 	constexpr long double acosl(long double num)
-	{ return ccm::acos<long double>(num); }
+	{
+		return ccm::acos<long double>(num);
+	}
 } // namespace ccm
 
 /// @ingroup trig

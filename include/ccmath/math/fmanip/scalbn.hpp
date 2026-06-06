@@ -80,7 +80,9 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double scalbn(Integer num, int exp) noexcept
-	{ return ccm::scalbn<double>(static_cast<double>(num), exp); }
+	{
+		return ccm::scalbn<double>(static_cast<double>(num), exp);
+	}
 
 	/**
 	 * @brief Multiplies a number by FLT_RADIX raised to a power
@@ -92,15 +94,21 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double scalbn(Integer num, long exp) noexcept
-	{ return ccm::scalbn<double>(static_cast<double>(num), exp); }
+	{
+		return ccm::scalbn<double>(static_cast<double>(num), exp);
+	}
 
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T scalbln(T num, long int exp) noexcept
-	{ return ccm::scalbn(num, exp); }
+	{
+		return ccm::scalbn(num, exp);
+	}
 
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double scalbln(Integer num, long int exp) noexcept
-	{ return ccm::scalbn<double>(static_cast<double>(num), exp); }
+	{
+		return ccm::scalbn<double>(static_cast<double>(num), exp);
+	}
 
 	/**
 	 * @brief Multiplies a number by FLT_RADIX raised to a power
@@ -110,7 +118,9 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/scalbn
 	 */
 	constexpr float scalbnf(float num, int exp) noexcept
-	{ return ccm::scalbn<float>(num, exp); }
+	{
+		return ccm::scalbn<float>(num, exp);
+	}
 
 	/**
 	 * @brief Multiplies a number by FLT_RADIX raised to a power
@@ -120,7 +130,9 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/scalbn
 	 */
 	constexpr float scalbnf(float num, long exp) noexcept
-	{ return ccm::scalbn<float>(num, exp); }
+	{
+		return ccm::scalbn<float>(num, exp);
+	}
 
 	/**
 	 * @brief Multiplies a number by FLT_RADIX raised to a power
@@ -130,7 +142,9 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/scalbn
 	 */
 	constexpr long double scalbnl(long double num, int exp) noexcept
-	{ return ccm::scalbn<long double>(num, exp); }
+	{
+		return ccm::scalbn<long double>(num, exp);
+	}
 
 	/**
 	 * @brief Multiplies a number by FLT_RADIX raised to a power
@@ -140,13 +154,19 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/scalbn
 	 */
 	constexpr long double scalbnl(long double num, long exp) noexcept
-	{ return ccm::scalbn<long double>(num, exp); }
+	{
+		return ccm::scalbn<long double>(num, exp);
+	}
 
 	constexpr float scalblnf(float num, long int exp) noexcept
-	{ return ccm::scalbln<float>(num, exp); }
+	{
+		return ccm::scalbln<float>(num, exp);
+	}
 
 	constexpr long double scalblnl(long double num, long int exp) noexcept
-	{ return ccm::scalbln<long double>(num, exp); }
+	{
+		return ccm::scalbln<long double>(num, exp);
+	}
 } // namespace ccm
 
 #if defined(_MSC_VER) && !defined(__clang__)

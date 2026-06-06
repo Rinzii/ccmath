@@ -193,10 +193,7 @@ namespace ccm::pp
 			if constexpr (Avx512Abi<Width>::template IsValid<T>::value) { return Avx512Abi<Width>(); }
 			else if constexpr (VecAbi<Width>::template IsValid<T>::value) { return VecAbi<Width>(); }
 			else if constexpr (B > sizeof(T)) { return native_abi_impl_recursive<B / 2, T>(); }
-			else
-			{
-				return make_dependent_t<ScalarAbi, T>();
-			}
+			else { return make_dependent_t<ScalarAbi, T>(); }
 		}
 
 		struct InvalidAbi
@@ -212,10 +209,7 @@ namespace ccm::pp
 				constexpr int one = sizeof(T) / sizeof(T);
 				return native_abi_impl_recursive<one * 256, T>();
 			}
-			else
-			{
-				return InvalidAbi();
-			}
+			else { return InvalidAbi(); }
 		}
 
 		template <typename T>

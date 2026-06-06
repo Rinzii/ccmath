@@ -65,7 +65,9 @@ namespace ccm::support
 	template <class T,
 			  std::enable_if_t<traits::ccm_is_integral_v<T> && traits::ccm_is_unsigned_v<T> && !traits::is_char_v<T> && !std::is_same_v<T, bool>, bool> = true>
 	constexpr bool has_single_bit(T x) noexcept
-	{ return x && !(x & (x - 1)); }
+	{
+		return x && !(x & (x - 1));
+	}
 
 	// TODO: Have the below function replace all other top_bits func.
 	// TODO: Remove all usages of bit grabbing functions
@@ -78,10 +80,7 @@ namespace ccm::support
 		{
 			return static_cast<std::uint32_t>(bit_cast<std::uint64_t>(x) >> (std::numeric_limits<std::uint64_t>::digits - TopBitsToTake));
 		}
-		else
-		{
-			return bit_cast<std::uint32_t>(x) >> (std::numeric_limits<std::uint32_t>::digits - TopBitsToTake);
-		}
+		else { return bit_cast<std::uint32_t>(x) >> (std::numeric_limits<std::uint32_t>::digits - TopBitsToTake); }
 	}
 
 	/**
@@ -90,37 +89,59 @@ namespace ccm::support
 	 * @return
 	 */
 	constexpr std::uint32_t top16_bits_of_double(double x) noexcept
-	{ return static_cast<std::uint32_t>(bit_cast<std::uint64_t>(x) >> 48); }
+	{
+		return static_cast<std::uint32_t>(bit_cast<std::uint64_t>(x) >> 48);
+	}
 
 	constexpr std::uint32_t top12_bits_of_double(double x) noexcept
-	{ return static_cast<std::uint32_t>(bit_cast<std::uint64_t>(x) >> 52); }
+	{
+		return static_cast<std::uint32_t>(bit_cast<std::uint64_t>(x) >> 52);
+	}
 
 	constexpr std::uint32_t top12_bits_of_float(float x) noexcept
-	{ return bit_cast<std::uint32_t>(x) >> 20; }
+	{
+		return bit_cast<std::uint32_t>(x) >> 20;
+	}
 
 	constexpr std::uint64_t double_to_uint64(double x) noexcept
-	{ return bit_cast<std::uint64_t>(x); }
+	{
+		return bit_cast<std::uint64_t>(x);
+	}
 
 	constexpr std::int64_t double_to_int64(double x) noexcept
-	{ return bit_cast<std::int64_t>(x); }
+	{
+		return bit_cast<std::int64_t>(x);
+	}
 
 	constexpr double uint64_to_double(std::uint64_t x) noexcept
-	{ return bit_cast<double>(x); }
+	{
+		return bit_cast<double>(x);
+	}
 
 	constexpr double int64_to_double(std::int64_t x) noexcept
-	{ return bit_cast<double>(x); }
+	{
+		return bit_cast<double>(x);
+	}
 
 	constexpr std::uint32_t float_to_uint32(float x) noexcept
-	{ return bit_cast<std::uint32_t>(x); }
+	{
+		return bit_cast<std::uint32_t>(x);
+	}
 
 	constexpr std::int32_t float_to_int32(float x) noexcept
-	{ return bit_cast<std::int32_t>(x); }
+	{
+		return bit_cast<std::int32_t>(x);
+	}
 
 	constexpr float uint32_to_float(std::uint32_t x) noexcept
-	{ return bit_cast<float>(x); }
+	{
+		return bit_cast<float>(x);
+	}
 
 	constexpr float int32_to_float(std::int32_t x) noexcept
-	{ return bit_cast<float>(x); }
+	{
+		return bit_cast<float>(x);
+	}
 
 	/**
 	 * @brief Rotates unsigned integer bits to the right.
@@ -252,10 +273,7 @@ namespace ccm::support
 			{
 				T tmp = value >> shift;
 				if (tmp) { value = tmp; }
-				else
-				{
-					zero_bits |= shift;
-				}
+				else { zero_bits |= shift; }
 			}
 		}
 		else
@@ -264,10 +282,7 @@ namespace ccm::support
 			{
 				T tmp = value >> shift;
 				if (tmp) { value = tmp; }
-				else
-				{
-					zero_bits |= shift;
-				}
+				else { zero_bits |= shift; }
 			}
 		}
 		return zero_bits;
@@ -291,15 +306,21 @@ namespace ccm::support
 
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countr_one(T value)
-	{ return support::countr_zero<T>(~value); }
+	{
+		return support::countr_zero<T>(~value);
+	}
 
 	template <typename T, std::enable_if_t<traits::is_unsigned_integer_v<T>, bool> = true>
 	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countl_one(T value)
-	{ return value != std::numeric_limits<T>::max() ? countl_zero(static_cast<T>(~value)) : std::numeric_limits<T>::digits; }
+	{
+		return value != std::numeric_limits<T>::max() ? countl_zero(static_cast<T>(~value)) : std::numeric_limits<T>::digits;
+	}
 
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> bit_width(T value)
-	{ return std::numeric_limits<T>::digits - countl_zero(value); }
+	{
+		return std::numeric_limits<T>::digits - countl_zero(value);
+	}
 
 	/**
 	 * @brief Returns the smallest power of 2 that is greater than or equal to x.

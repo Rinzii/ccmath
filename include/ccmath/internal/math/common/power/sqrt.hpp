@@ -45,7 +45,9 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<!std::is_floating_point_v<Integer>, bool> = true>
 	constexpr double sqrt(Integer num)
-	{ return ccm::sqrt<double>(static_cast<double>(num)); }
+	{
+		return ccm::sqrt<double>(static_cast<double>(num));
+	}
 
 	/**
 	 * @brief Calculates the square root of a number.
@@ -53,7 +55,9 @@ namespace ccm
 	 * @return If no errors occur, square root of num (√num), is returned.
 	 */
 	constexpr float sqrtf(float num)
-	{ return ccm::sqrt<float>(num); }
+	{
+		return ccm::sqrt<float>(num);
+	}
 
 	/**
 	 * @brief Calculates the square root of a number.
@@ -61,7 +65,9 @@ namespace ccm
 	 * @return If no errors occur, square root of num (√num), is returned.
 	 */
 	constexpr long double sqrtl(long double num)
-	{ return ccm::sqrt<long double>(num); }
+	{
+		return ccm::sqrt<long double>(num);
+	}
 } // namespace ccm
 
 /// @ingroup power

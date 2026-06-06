@@ -81,6 +81,8 @@ namespace ccm::internal
 	} // namespace impl
 
 	constexpr float exp2_float(float x)
-	{ return impl::exp2_float_impl(x); }
+	{
+		return impl::exp2_float_impl(x);
+	}
 } // namespace ccm::internal
 CCM_RESTORE_MSVC_WARNING()

@@ -50,29 +50,20 @@ namespace ccm::rt
 	{
 #if (CCM_HAS_BUILTIN(__builtin_pow) || defined(__builtin_pow)) && !defined(CCM_CONFIG_TEST_DISABLE_RUNTIME_BUILTIN_POW)
 		if constexpr (ccm::builtin::has_runtime_pow<T>) { return ccm::builtin::runtime_pow(base, exp); }
-		else
-		{
-			return gen::pow_gen<T>(base, exp);
-		}
+		else { return gen::pow_gen<T>(base, exp); }
 #elif defined(CCMATH_HAS_SIMD)
 		// In the unlikely event, the rounding mode is not the default, use the runtime implementation instead.
 		if (CCM_UNLIKELY(ccm::support::fenv::get_rounding_mode() != FE_TONEAREST)) { return gen::pow_gen<T>(base, exp); }
 	#if !defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64) // If long double is different from double, use the generic implementation instead.
 		if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>) { return simd_impl::pow_simd_impl(base, exp); }
-		else
-		{
-			return gen::pow_gen<T>(base, exp);
-		}
+		else { return gen::pow_gen<T>(base, exp); }
 	#else										   // If long double is the same as double, we can use the SIMD implementation instead.
 		if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>) { return simd_impl::pow_simd_impl(base, exp); }
 		else if constexpr (std::is_same_v<T, long double>)
 		{
 			return static_cast<long double>(simd_impl::pow_simd_impl(static_cast<double>(base), static_cast<double>(exp)));
 		}
-		else
-		{
-			return ccm::gen::pow_gen<T>(base, exp);
-		}
+		else { return ccm::gen::pow_gen<T>(base, exp); }
 	#endif
 #else // If we don't have a builtin or SIMD, use the generic implementation.
 		return gen::pow_gen<T>(base, exp);

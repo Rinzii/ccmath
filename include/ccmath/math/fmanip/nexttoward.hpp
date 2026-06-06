@@ -33,10 +33,7 @@ namespace ccm
 		// TODO: Better define how this interacts with the builtin.
 		if constexpr (ccm::builtin::has_constexpr_nexttoward<T>) { return ccm::builtin::nexttoward(from, to); }
 		else if (ccm::support::is_constant_evaluated()) { return gen::nextafter_gen(from, to); }
-		else
-		{
-			return ccm::rt::nexttoward_rt(from, to);
-		}
+		else { return ccm::rt::nexttoward_rt(from, to); }
 	}
 
 	/**
@@ -49,7 +46,9 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double nexttoward(Integer from, long double to) noexcept
-	{ return gen::nextafter_gen(from, to); }
+	{
+		return gen::nextafter_gen(from, to);
+	}
 
 	/**
 	 * @brief Returns the next representable float from from toward to.
@@ -59,7 +58,9 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/nextafter
 	 */
 	constexpr float nexttowardf(float from, long double to) noexcept
-	{ return gen::nextafter_gen(from, to); }
+	{
+		return gen::nextafter_gen(from, to);
+	}
 
 	/**
 	 * @brief Returns the next representable long double from from toward to.
@@ -69,6 +70,8 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/nextafter
 	 */
 	constexpr long double nexttowardl(long double from, long double to) noexcept
-	{ return gen::nextafter_gen(from, to); }
+	{
+		return gen::nextafter_gen(from, to);
+	}
 
 } // namespace ccm

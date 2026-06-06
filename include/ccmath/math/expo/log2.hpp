@@ -62,10 +62,7 @@ namespace ccm
 				return ccm::support::fp::signed_zero_for_current_mode<T>();
 #elif defined(_MSC_VER) && !defined(__clang__)
 				if constexpr (std::is_same_v<T, float>) { return static_cast<T>(0); }
-				else
-				{
-					return ccm::support::fp::signed_zero_for_current_mode<T>();
-				}
+				else { return ccm::support::fp::signed_zero_for_current_mode<T>(); }
 #else
 				return static_cast<T>(0);
 #endif
@@ -111,7 +108,9 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double log2(Integer num) noexcept
-	{ return ccm::log2<double>(static_cast<double>(num)); }
+	{
+		return ccm::log2<double>(static_cast<double>(num));
+	}
 
 	/**
 	 * @brief Returns the base 2 logarithm of a number.
@@ -120,7 +119,9 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/log2
 	 */
 	constexpr float log2f(float num)
-	{ return ccm::log2<float>(num); }
+	{
+		return ccm::log2<float>(num);
+	}
 
 	/**
 	 * @brief Returns the base 2 logarithm of a number.
@@ -129,7 +130,9 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/log2
 	 */
 	constexpr long double log2l(long double num)
-	{ return ccm::log2<long double>(num); }
+	{
+		return ccm::log2<long double>(num);
+	}
 } // namespace ccm
 
 #if defined(_MSC_VER) && !defined(__clang__)

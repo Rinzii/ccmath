@@ -57,7 +57,9 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/modf
 	 */
 	constexpr float modff(float x, float * iptr) noexcept
-	{ return ccm::modf(x, iptr); }
+	{
+		return ccm::modf(x, iptr);
+	}
 
 	/**
 	 * @brief Decomposes a long double into fractional and integral parts.
@@ -67,5 +69,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/modf
 	 */
 	constexpr long double modfl(long double x, long double * iptr) noexcept
-	{ return ccm::modf(x, iptr); }
+	{
+		return ccm::modf(x, iptr);
+	}
 } // namespace ccm

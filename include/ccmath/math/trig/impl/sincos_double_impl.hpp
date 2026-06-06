@@ -124,18 +124,26 @@ namespace ccm::internal::impl
 	} // namespace sincos_double_detail
 
 	constexpr double sin_double_impl(double x)
-	{ return sincos_double_detail::sincos_eval<true>(x); }
+	{
+		return sincos_double_detail::sincos_eval<true>(x);
+	}
 
 	constexpr double cos_double_impl(double x)
-	{ return sincos_double_detail::sincos_eval<false>(x); }
+	{
+		return sincos_double_detail::sincos_eval<false>(x);
+	}
 
 } // namespace ccm::internal::impl
 
 namespace ccm::internal
 {
 	constexpr double sin_double(double num) noexcept
-	{ return impl::sin_double_impl(num); }
+	{
+		return impl::sin_double_impl(num);
+	}
 
 	constexpr double cos_double(double num) noexcept
-	{ return impl::cos_double_impl(num); }
+	{
+		return impl::cos_double_impl(num);
+	}
 } // namespace ccm::internal

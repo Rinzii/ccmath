@@ -51,8 +51,8 @@ namespace ccm::builtin
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
-	constexpr auto nexttoward(T x, long double y)
-		-> std::enable_if_t<std::is_same_v<T, float> || std::is_same_v<T, double> || std::is_same_v<T, long double>, T>
+	constexpr auto nexttoward(T x,
+							  long double y) -> std::enable_if_t<std::is_same_v<T, float> || std::is_same_v<T, double> || std::is_same_v<T, long double>, T>
 	{
 		if constexpr (std::is_same_v<T, float>) { return __builtin_nexttowardf(x, y); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_nexttoward(x, y); }

@@ -26,10 +26,7 @@ namespace ccm::rt
 		if constexpr (std::is_same_v<T, float>) { return __builtin_truncf(num); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_trunc(num); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_truncl(num); }
-		else
-		{
-			return static_cast<T>(__builtin_truncl(static_cast<long double>(num)));
-		}
+		else { return static_cast<T>(__builtin_truncl(static_cast<long double>(num))); }
 #else
 		return detail::trunc_scalar(num);
 #endif
