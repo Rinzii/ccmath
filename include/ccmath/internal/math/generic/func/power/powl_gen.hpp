@@ -216,13 +216,6 @@ namespace ccm::gen
 				return static_cast<long double>(::ccm::gen::impl::pow_impl(static_cast<double>(base), static_cast<double>(exp)));
 			}
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
-			namespace bit80
-			{
-				long double powl_ld80_general_finite(long double base, long double exp) noexcept;
-			}
-#endif
-
 			constexpr long double powl_bounded_integer(long double base, std::int64_t exp) noexcept
 			{
 				if (exp == 0) { return 1.0L; }
