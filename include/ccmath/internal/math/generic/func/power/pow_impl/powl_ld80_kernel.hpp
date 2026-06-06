@@ -111,7 +111,7 @@ namespace ccm::gen::internal::impl::bit80
 				exponent_adjust = -(LDBL_MANT_DIG - 1);
 			}
 
-			const int e_x = base_bits.get_explicit_exponent() - static_cast<int>(FPBits_t::exponent_bias) + exponent_adjust;
+			const int e_x = static_cast<int>(base_bits.get_biased_exponent()) - static_cast<int>(FPBits_t::exponent_bias) + exponent_adjust;
 
 			typename FPBits_t::storage_type sig = base_bits.get_mantissa();
 			if (base_bits.get_implicit_bit()) { sig |= FPBits_t::EXPLICIT_BIT_MASK; }
