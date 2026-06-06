@@ -64,8 +64,39 @@ namespace ccm::gen
 				return static_cast<std::int64_t>(unit) << static_cast<unsigned>(scale);
 			}
 
+#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+			constexpr bool is_integer_float80(const PowlFPBits_t & bits) noexcept
+			{
+				if (bits.is_nan() || bits.is_inf()) { return false; }
+				if (bits.is_zero()) { return true; }
+
+				const typename PowlFPBits_t::storage_type x_u = bits.uintval();
+				const auto x_e = static_cast<std::int32_t>((x_u & PowlFPBits_t::exponent_mask) >> PowlFPBits_t::significand_length);
+				const std::int32_t lsb = support::countr_zero(x_u | PowlFPBits_t::exponent_mask);
+				constexpr std::int32_t unit_exponent =
+					static_cast<std::int32_t>(PowlFPBits_t::exponent_bias) + static_cast<std::int32_t>(PowlFPBits_t::significand_length);
+				return (x_e + lsb >= unit_exponent);
+			}
+
+			constexpr bool is_odd_integer_float80(const PowlFPBits_t & bits) noexcept
+			{
+				if (!is_integer_float80(bits)) { return false; }
+				if (bits.is_zero()) { return false; }
+
+				const typename PowlFPBits_t::storage_type x_u = bits.uintval();
+				const auto x_e = static_cast<std::int32_t>((x_u & PowlFPBits_t::exponent_mask) >> PowlFPBits_t::significand_length);
+				const std::int32_t lsb = support::countr_zero(x_u | PowlFPBits_t::exponent_mask);
+				constexpr std::int32_t unit_exponent =
+					static_cast<std::int32_t>(PowlFPBits_t::exponent_bias) + static_cast<std::int32_t>(PowlFPBits_t::significand_length);
+				return (x_e + lsb == unit_exponent);
+			}
+#endif
+
 			constexpr bool is_integer(const PowlFPBits_t & bits) noexcept
 			{
+#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+				return is_integer_float80(bits);
+#else
 				if (bits.is_nan() || bits.is_inf()) { return false; }
 				if (bits.is_zero()) { return true; }
 
@@ -75,10 +106,14 @@ namespace ccm::gen
 
 				const int trailing_zeros = storage_countr_zero(mantissa);
 				return exponent + trailing_zeros >= static_cast<int>(PowlFPBits_t::fraction_length);
+#endif
 			}
 
 			constexpr bool is_odd_integer(const PowlFPBits_t & bits) noexcept
 			{
+#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+				return is_odd_integer_float80(bits);
+#else
 				if (!is_integer(bits)) { return false; }
 				if (bits.is_zero()) { return false; }
 
@@ -86,6 +121,7 @@ namespace ccm::gen
 				const typename PowlFPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
 				const int trailing_zeros						   = storage_countr_zero(mantissa);
 				return exponent + trailing_zeros == static_cast<int>(PowlFPBits_t::fraction_length);
+#endif
 			}
 
 			inline constexpr std::int64_t kBoundedExponentMax = (std::int64_t{ 1 } << 62) - 1;
