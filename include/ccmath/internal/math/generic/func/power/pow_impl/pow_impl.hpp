@@ -262,6 +262,10 @@ namespace ccm::gen::impl
 
 			if (base_bits.is_inf())
 			{
+#if defined(_MSC_VER) && !defined(__clang__)
+				// MSVC libm returns +0 for pow(-inf, negative non-integer).
+				if (base_bits.sign().is_neg() && !is_integer(exp) && exp < 0.0) { return 0.0; }
+#endif
 				if (base_bits.sign().is_neg() && !is_integer(exp))
 				{
 					support::fenv::set_errno_if_required(EDOM);
