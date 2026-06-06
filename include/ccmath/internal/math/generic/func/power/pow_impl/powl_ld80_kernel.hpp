@@ -79,17 +79,13 @@ namespace ccm::gen::internal::impl::bit80
 		constexpr LongDoublePair exact_mult(long double a, long double b) noexcept
 		{
 			LongDoublePair r{ 0.0L, 0.0L };
-			r.hi = a * b;
-	#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
-			r.lo = support::multiply_add(a, b, -r.hi);
-	#else
 			const LongDoublePair as = split(a);
 			const LongDoublePair bs = split(b);
+			r.hi = a * b;
 			const long double t1	= as.hi * bs.hi - r.hi;
 			const long double t2	= as.hi * bs.lo + t1;
 			const long double t3	= as.lo * bs.hi + t2;
 			r.lo					= as.lo * bs.lo + t3;
-	#endif
 			return r;
 		}
 
