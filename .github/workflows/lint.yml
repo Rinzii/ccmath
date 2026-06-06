@@ -22,8 +22,8 @@ jobs:
         with:
           clangformat: 17.0.5
 
-      - name: Apply clang-format
-        run: find include -name '*.hpp' | xargs clang-format -i -style=file -fallback-style=none
+      - name: Ensure clang-format
+        run: ./tools/ensure_format.sh
 
       - name: Commit and push format fixes
         run: |
