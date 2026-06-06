@@ -32,7 +32,7 @@ namespace ccm::gen
 	{
 		namespace powl_bits
 		{
-			using FPBits_t = support::fp::FPBits<long double>;
+			using PowlFPBits_t = support::fp::FPBits<long double>;
 
 			template <typename Storage>
 			constexpr bool storage_is_zero(Storage value) noexcept
@@ -62,33 +62,33 @@ namespace ccm::gen
 				return static_cast<std::int64_t>(unit) << static_cast<unsigned>(scale);
 			}
 
-			constexpr bool is_integer(const FPBits_t & bits) noexcept
+			constexpr bool is_integer(const PowlFPBits_t & bits) noexcept
 			{
 				if (bits.is_nan() || bits.is_inf()) { return false; }
 				if (bits.is_zero()) { return true; }
 
-				const int exponent							   = bits.get_explicit_exponent();
-				const typename FPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
+				const int exponent								   = bits.get_explicit_exponent();
+				const typename PowlFPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
 				if (storage_is_zero(mantissa)) { return true; }
 
 				const int trailing_zeros = storage_countr_zero(mantissa);
-				return exponent + trailing_zeros >= static_cast<int>(FPBits_t::fraction_length);
+				return exponent + trailing_zeros >= static_cast<int>(PowlFPBits_t::fraction_length);
 			}
 
-			constexpr bool is_odd_integer(const FPBits_t & bits) noexcept
+			constexpr bool is_odd_integer(const PowlFPBits_t & bits) noexcept
 			{
 				if (!is_integer(bits)) { return false; }
 				if (bits.is_zero()) { return false; }
 
-				const int exponent							   = bits.get_explicit_exponent();
-				const typename FPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
-				const int trailing_zeros					   = storage_countr_zero(mantissa);
-				return exponent + trailing_zeros == static_cast<int>(FPBits_t::fraction_length);
+				const int exponent								   = bits.get_explicit_exponent();
+				const typename PowlFPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
+				const int trailing_zeros						   = storage_countr_zero(mantissa);
+				return exponent + trailing_zeros == static_cast<int>(PowlFPBits_t::fraction_length);
 			}
 
 			inline constexpr std::int64_t kBoundedExponentMax = (std::int64_t{ 1 } << 62) - 1;
 
-			constexpr bool try_extract_int64(const FPBits_t & bits, std::int64_t & out) noexcept
+			constexpr bool try_extract_int64(const PowlFPBits_t & bits, std::int64_t & out) noexcept
 			{
 				if (bits.is_nan() || bits.is_inf()) { return false; }
 				if (bits.is_zero())
@@ -98,10 +98,10 @@ namespace ccm::gen
 				}
 				if (!is_integer(bits)) { return false; }
 
-				const int exponent						 = bits.get_explicit_exponent();
-				typename FPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
-				const int trailing_zeros				 = storage_countr_zero(mantissa);
-				const int scale							 = exponent + trailing_zeros - static_cast<int>(FPBits_t::fraction_length);
+				const int exponent							 = bits.get_explicit_exponent();
+				typename PowlFPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
+				const int trailing_zeros					 = storage_countr_zero(mantissa);
+				const int scale								 = exponent + trailing_zeros - static_cast<int>(PowlFPBits_t::fraction_length);
 				if (scale < 0) { return false; }
 
 				mantissa >>= static_cast<unsigned>(trailing_zeros);
@@ -115,20 +115,20 @@ namespace ccm::gen
 			}
 
 			constexpr bool is_integer(long double val) noexcept
-			{ return is_integer(FPBits_t(val)); }
+			{ return is_integer(PowlFPBits_t(val)); }
 
 			constexpr bool is_odd_integer(long double val) noexcept
-			{ return is_odd_integer(FPBits_t(val)); }
+			{ return is_odd_integer(PowlFPBits_t(val)); }
 
 			constexpr bool try_extract_int64(long double val, std::int64_t & out) noexcept
-			{ return try_extract_int64(FPBits_t(val), out); }
+			{ return try_extract_int64(PowlFPBits_t(val), out); }
 
 		} // namespace powl_bits
 
 		namespace impl
 		{
-			using FPBits_t = support::fp::FPBits<long double>;
-			using Sign	   = types::Sign;
+			using PowlFPBits_t = support::fp::FPBits<long double>;
+			using Sign		   = types::Sign;
 
 			constexpr long double powl_unsupported_result() noexcept
 			{ return std::numeric_limits<long double>::quiet_NaN(); }
@@ -166,8 +166,8 @@ namespace ccm::gen
 
 					if (ccm::isnan(base) || ccm::isnan(exp)) { return std::numeric_limits<long double>::quiet_NaN(); }
 
-					const FPBits_t base_bits(base);
-					const FPBits_t exp_bits(exp);
+					const PowlFPBits_t base_bits(base);
+					const PowlFPBits_t exp_bits(exp);
 
 					if (base_bits.is_zero())
 					{
@@ -177,7 +177,7 @@ namespace ccm::gen
 						{
 							support::fenv::set_errno_if_required(EDOM);
 							support::fenv::raise_except_if_required(FE_DIVBYZERO);
-							return FPBits_t::inf(out_is_neg ? Sign::NEG : Sign::POS).get_val();
+							return PowlFPBits_t::inf(out_is_neg ? Sign::NEG : Sign::POS).get_val();
 						}
 
 						return out_is_neg ? -0.0L : 0.0L;
@@ -194,7 +194,7 @@ namespace ccm::gen
 
 						const bool out_is_neg = base_bits.is_neg() && powl_bits::is_odd_integer(exp);
 						if (exp < 0.0L) { return out_is_neg ? -0.0L : 0.0L; }
-						return FPBits_t::inf(out_is_neg ? Sign::NEG : Sign::POS).get_val();
+						return PowlFPBits_t::inf(out_is_neg ? Sign::NEG : Sign::POS).get_val();
 					}
 
 					if (exp_bits.is_inf())
@@ -234,7 +234,7 @@ namespace ccm::gen
 						return result;
 					}
 
-					const FPBits_t exp_abs_bits(exp);
+					const PowlFPBits_t exp_abs_bits(exp);
 					const long double exp_abs = exp_abs_bits.abs().get_val();
 					if (exp_abs > kPowlHugeExponentThreshold) { working_exp = exp_abs_bits.is_neg() ? -0x1.0p100L : 0x1.0p100L; }
 

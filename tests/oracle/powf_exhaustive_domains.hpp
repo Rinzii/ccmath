@@ -124,7 +124,7 @@ namespace ccm::test::oracle::powf_domains
 	}
 
 	template <typename AddCaseFn>
-	inline void add_negative_base(campaign_mode mode, AddCaseFn add_case, const std::set<std::string_view> & filter)
+	inline void add_negative_base([[maybe_unused]] campaign_mode mode, AddCaseFn add_case, const std::set<std::string_view> & filter)
 	{
 		if (!domain_enabled(filter, "negative-base")) { return; }
 

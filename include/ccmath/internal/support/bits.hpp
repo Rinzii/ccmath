@@ -213,7 +213,7 @@ namespace ccm::support
 			shift >>= 1;
 			mask >>= shift;
 		}
-		return zero_bits;
+		return static_cast<int>(zero_bits);
 	}
 #endif // CCM_HAS_BUILTIN(__builtin_ctzg)
 
