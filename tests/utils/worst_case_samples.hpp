@@ -12,9 +12,25 @@
 
 #include <array>
 #include <cstddef>
+#include <cstdint>
 
 namespace ccm::test::worst_case
 {
+	template <typename T>
+	struct PowCase
+	{
+		T base;
+		T exponent;
+		const char * provenance;
+	};
+
+	struct PowBitPatternCase
+	{
+		std::uint64_t base_bits;
+		std::uint64_t exponent_bits;
+		const char * provenance;
+	};
+
 	// LLVM-libc sinf exceptional values (reviews.llvm.org/D123154).
 	inline constexpr std::array<float, 6> kSinFloatExceptional = {
 		0x1.4f0654p0F,
@@ -144,12 +160,53 @@ namespace ccm::test::worst_case
 		0x1.800002p+0F,
 	};
 
-	inline constexpr std::array<double, 4> kPowDoubleHard = {
-		0x1.0p-50,
-		0x1.0p+50,
-		-0x1.0p+0,
-		0x1.8p+0,
-	};
+	// Non-builtin path-matrix underflow residual campaign, seed 0xC0DEC0FFEE.
+	inline constexpr std::array<PowBitPatternCase, 29> kPowDoubleUnderflowResidual = { {
+		{ 0x251d5d43f50d0108ULL, 0x729c2b90e3442eecULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x4da248bc6a915c1eULL, 0xca93fd094b629db9ULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x67add96f434533e9ULL, 0xd16be30ac7782b1aULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x4180947677866edfULL, 0xea29cdd38c9dafe5ULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x2d6e4b3263a700ddULL, 0x66e5e2b8b62dae73ULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x065feef2d691057dULL, 0x47261da68f57948eULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x5971deedd54a73feULL, 0xcab0e9312c710c18ULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x00094b5d5317c3e7ULL, 0x7dbb01075a511900ULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x3c77173d214943f7ULL, 0x67ebc39f38f67d55ULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x0699eec8834512a3ULL, 0x6e78eef508a9755bULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x47c517385e76859bULL, 0xe5bf5928decba611ULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x3d57779a52896ccdULL, 0x44f68ab37e9830bfULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x7890d582c1f40d45ULL, 0xcacc034085c17047ULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x5dd7f4c26c0f13e7ULL, 0xf962e2383aff1c74ULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x4bbae25fcc4bc621ULL, 0xccf980b7d3eae02dULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x103f8a410b76302dULL, 0x45602c8f1fc72c13ULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x710c9c44942091b3ULL, 0xef1e832952550adeULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x3cb43cb6ffca5ea2ULL, 0x5f1869450668b0b9ULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x5f07fbb85d4e5ce4ULL, 0xd6c16d495050197dULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x788b201b3728b3a8ULL, 0xfb15dbf2644b141dULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x3ec66615e45a70d0ULL, 0x51172a84d617a0daULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x40012e1f44115d27ULL, 0xd16d1b9e135d9410ULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x1a419635071c475dULL, 0x49e26e56b9615aeeULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x07aaea00b075a713ULL, 0x5d9713d520484d14ULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x6797251914607e72ULL, 0xe3ffce54797ed86aULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x70d0fc8216be69f1ULL, 0xfafd1b08bd0ea065ULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x1cd3cfb993f9c5feULL, 0x5b355f216cca5f15ULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x5b44c6a8ee131f1cULL, 0xc72897d5346718c8ULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+		{ 0x20c2356781a19392ULL, 0x6ee4a8fe064ac7adULL, "non-builtin path-matrix underflow residual case, seed 0xC0DEC0FFEE" },
+	} };
+
+	inline constexpr std::array<PowCase<double>, 5> kPowDoubleHard = { {
+		{ 0x1.0p-50, 0x1.0p+50, "legacy hard-case corpus: tiny base with huge positive exponent" },
+		{ -0x1.0p+0, 0x1.8p+0, "legacy hard-case corpus: negative base near non-integer exponent domain edge" },
+		{ 10.0, 4.0, "pow_gen regression case retained from PowGenDoubleRegressionCases" },
+		{ 30.637028068178267, -7.702539522452998, "pow_gen regression case retained from PowGenDoubleRegressionCases" },
+		{ 945971881662.053466796875, 15.38309228199631562, "pow_gen regression case retained from PowGenDoubleRegressionCases" },
+	} };
+
+	inline constexpr std::array<PowCase<float>, 4> kPowFloatHard = { {
+		{ 0x1.0p-20F, 0x1.0p+20F, "float analogue of the legacy tiny-base / huge-exponent stress case" },
+		{ -1.0F, 3.0F, "integer-parity sign propagation regression anchor" },
+		{ -1.0F, 4.0F, "integer-parity sign propagation regression anchor" },
+		{ -1.0F, 1.5F, "negative-base / non-integer exponent domain regression anchor" },
+	} };
 
 	// asin/acos: hard-to-round near ±1 and tiny (LLVM-libc / musl accuracy tables).
 	inline constexpr std::array<double, 6> kAsinDoubleHard = {

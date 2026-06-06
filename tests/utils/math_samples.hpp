@@ -43,6 +43,19 @@ namespace ccm::test::samples
 	inline constexpr std::array<float, 6> kPowFloatPairsBase = { 2.0F, 3.0F, 0.5F, 10.0F, 0.25F, 4.0F };
 	inline constexpr std::array<float, 6> kPowFloatPairsExp = { 0.0F, 1.0F, 2.0F, -1.0F, 0.5F, 3.0F };
 
+	// Exponent grid covering the full lo6 polynomial domain.  Values are chosen
+	// to spread y * log2(x) across many different fractional remainders so that
+	// lo6 = 64 * frac(y * log2(x)) samples the exp2 polynomial throughout [-0.5, 0.5].
+	inline constexpr std::array<double, 16> kPowExpGrid = {
+		-10.0, -5.0, -3.0, -2.0, -1.5, -1.0, -0.5, -0.1,
+		 0.1,   0.5,  1.0,  1.5,  2.0,  3.0,  5.0,  10.0,
+	};
+
+	inline constexpr std::array<float, 16> kPowExpGridFloat = {
+		-10.0F, -5.0F, -3.0F, -2.0F, -1.5F, -1.0F, -0.5F, -0.1F,
+		 0.1F,   0.5F,  1.0F,  1.5F,  2.0F,  3.0F,  5.0F,  10.0F,
+	};
+
 	// Small grids for all-rounding-mode ULP sweeps (keep test time bounded).
 	inline constexpr std::array<double, 6> kAllModesProbeDouble = { 0.5, 1.0, 1.25, 2.0, 3.0, 10.0 };
 	inline constexpr std::array<float, 5> kAllModesProbeFloat = { 0.5F, 1.0F, 1.5F, 2.0F, 4.0F };

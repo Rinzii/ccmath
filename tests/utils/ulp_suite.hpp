@@ -21,6 +21,9 @@
 
 namespace ccm::test
 {
+	// Current ccmath has an informal policy that all implementations should stay within 4 ULP of the
+	// corresponding standard-library result. Known exceptions should carry a
+	// TODO marker in the implementation and a regression test documenting it.
 	inline constexpr int64_t kMaxAllowedUlp = 4;
 
 	template <typename T>

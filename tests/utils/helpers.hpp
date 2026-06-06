@@ -1,57 +1,21 @@
+#include "utils/ulp_distance.hpp"
+
 #include <gtest/gtest.h>
+
 #include <cmath>
 #include <limits>
 #include <ostream>
 #include <type_traits>
-#include "ccmath/internal/support/fp/fp_bits.hpp"
 
 template <typename T>
 int64_t ulp_difference(T a, T b)
 {
 	static_assert(std::is_floating_point_v<T>, "T must be a floating-point type.");
 
-	using namespace ccm::support::fp;
-	using FPBits_t = FPBits<T>;
-
-	FPBits_t fp_a(a);
-	FPBits_t fp_b(b);
-
-	// Handle special cases like NaN or Infinity
-	if (fp_a.is_nan() && fp_b.is_nan())
-	{
-		return 0; // Both are NaN, considered equal
-	}
-	if (fp_a.is_nan() || fp_b.is_nan())
-	{
-		return std::numeric_limits<int64_t>::max(); // One is NaN, the other is not
-	}
-	if (fp_a.is_inf() && fp_b.is_inf())
-	{
-		if (fp_a.sign() == fp_b.sign())
-		{
-			return 0; // Both infinities with the same sign are considered equal
-		}
-		return std::numeric_limits<int64_t>::max(); // Opposite sign infinities
-	}
-	if (fp_a.is_inf() || fp_b.is_inf())
-	{
-		return std::numeric_limits<int64_t>::max(); // One is infinity, the other is not
-	}
-
-	using UIntType = typename FPBits_t::storage_type;
-	constexpr UIntType sign_mask = UIntType{ 1 } << (sizeof(UIntType) * 8 - 1);
-
-	auto ordered_bits = [=](FPBits_t bits) {
-		const UIntType raw = bits.uintval();
-		if ((raw & sign_mask) != 0) { return sign_mask - (raw & ~sign_mask); }
-		return sign_mask + raw;
-	};
-
-	UIntType const a_bits = ordered_bits(fp_a);
-	UIntType const b_bits = ordered_bits(fp_b);
-	UIntType const diff = (a_bits > b_bits) ? a_bits - b_bits : b_bits - a_bits;
-	if (diff > static_cast<UIntType>(std::numeric_limits<int64_t>::max())) { return std::numeric_limits<int64_t>::max(); }
-	return static_cast<int64_t>(diff);
+	const std::uint64_t distance = ccm::test::ulp::distance_or_max(a, b);
+	return (distance > static_cast<std::uint64_t>(std::numeric_limits<int64_t>::max()))
+			   ? std::numeric_limits<int64_t>::max()
+			   : static_cast<int64_t>(distance);
 }
 
 template <typename T>
