@@ -122,9 +122,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/floor
 	 */
 	constexpr float floorf(float num) noexcept
-	{
-		return ccm::floor<float>(num);
-	}
+	{ return ccm::floor<float>(num); }
 
 	/**
 	 * @brief Computes the largest integer value not greater than num.
@@ -133,9 +131,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/floor
 	 */
 	constexpr long double floorl(long double num) noexcept
-	{
-		return ccm::floor<long double>(num);
-	}
+	{ return ccm::floor<long double>(num); }
 } // namespace ccm
 
 /// @ingroup nearest

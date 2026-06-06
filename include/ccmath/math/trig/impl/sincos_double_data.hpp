@@ -21,7 +21,7 @@ namespace ccm::internal::sincos_double_data
 	using DoubleDouble = ccm::types::DoubleDouble;
 
 	template <typename T, std::size_t N>
-	constexpr std::array<T, N> promote_array(const std::array<float, N> & src)
+	constexpr std::array<T, N> promote_array(const std::array<float, N>& src)
 	{
 		std::array<T, N> dst{};
 		for (std::size_t i = 0; i < N; ++i) { dst[i] = static_cast<T>(src[i]); }

@@ -88,9 +88,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double log2(Integer num) noexcept
-	{
-		return ccm::log2<double>(static_cast<double>(num));
-	}
+	{ return ccm::log2<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Returns the base 2 logarithm of a number.
@@ -98,9 +96,7 @@ namespace ccm
 	 * @return The base 2 logarithm of the number as a float.
 	 */
 	constexpr float log2f(float num)
-	{
-		return ccm::log2<float>(num);
-	}
+	{ return ccm::log2<float>(num); }
 
 	/**
 	 * @brief Returns the base 2 logarithm of a number.
@@ -108,9 +104,7 @@ namespace ccm
 	 * @return The base 2 logarithm of the number as a double.
 	 */
 	constexpr long double log2l(long double num)
-	{
-		return ccm::log2<long double>(num);
-	}
+	{ return ccm::log2<long double>(num); }
 } // namespace ccm
 
 #if defined(_MSC_VER) && !defined(__clang__)

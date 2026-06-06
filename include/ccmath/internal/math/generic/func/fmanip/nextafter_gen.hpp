@@ -38,9 +38,15 @@ namespace ccm::gen
 		if (from != TFrom(0))
 		{
 			if ((static_cast<TTo>(from) < to) == (from > TFrom(0))) { from_bits = ccm::support::fp::FPBits<TFrom>(Storage_t(from_bits.uintval() + 1)); }
-			else { from_bits = ccm::support::fp::FPBits<TFrom>(Storage_t(from_bits.uintval() - 1)); }
+			else
+			{
+				from_bits = ccm::support::fp::FPBits<TFrom>(Storage_t(from_bits.uintval() - 1));
+			}
 		}
-		else { from_bits = ccm::support::fp::FPBits<TFrom>::min_subnormal(to_bits.sign()); }
+		else
+		{
+			from_bits = ccm::support::fp::FPBits<TFrom>::min_subnormal(to_bits.sign());
+		}
 
 		if (from_bits.is_subnormal()) { ccm::support::fenv::raise_except_if_required(FE_UNDERFLOW | FE_INEXACT); }
 		else if (from_bits.is_inf()) { ccm::support::fenv::raise_except_if_required(FE_OVERFLOW | FE_INEXACT); }
@@ -89,7 +95,10 @@ namespace ccm::gen
 					if (from_bits.is_inf()) { support::fenv::raise_except_if_required(FE_OVERFLOW | FE_INEXACT); }
 					return from_bits.get_val();
 				}
-				else { from_bits = FPBits_t(static_cast<Storage_t>(from_bits.uintval() + 1)); }
+				else
+				{
+					from_bits = FPBits_t(static_cast<Storage_t>(from_bits.uintval() + 1));
+				}
 			}
 			else // toward +Inf
 			{
@@ -106,7 +115,10 @@ namespace ccm::gen
 					from_bits.set_biased_exponent(from_bits.get_biased_exponent() - 1);
 					return from_bits.get_val();
 				}
-				else { from_bits = FPBits_t(static_cast<Storage_t>(from_bits.uintval() - 1)); }
+				else
+				{
+					from_bits = FPBits_t(static_cast<Storage_t>(from_bits.uintval() - 1));
+				}
 			}
 		}
 		else
@@ -121,7 +133,10 @@ namespace ccm::gen
 					from_bits.set_biased_exponent(from_bits.get_biased_exponent() - 1);
 					return from_bits.get_val();
 				}
-				else { from_bits = FPBits_t(static_cast<Storage_t>(from_bits.uintval() - 1)); }
+				else
+				{
+					from_bits = FPBits_t(static_cast<Storage_t>(from_bits.uintval() - 1));
+				}
 			}
 			else // toward +Inf
 			{
@@ -135,7 +150,10 @@ namespace ccm::gen
 					if (from_bits.is_inf()) { support::fenv::raise_except_if_required(FE_OVERFLOW | FE_INEXACT); }
 					return from_bits.get_val();
 				}
-				else { from_bits = FPBits_t(static_cast<Storage_t>(from_bits.uintval() + 1)); }
+				else
+				{
+					from_bits = FPBits_t(static_cast<Storage_t>(from_bits.uintval() + 1));
+				}
 			}
 		}
 

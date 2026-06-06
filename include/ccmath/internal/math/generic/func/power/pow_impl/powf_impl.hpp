@@ -70,7 +70,7 @@ namespace ccm::gen::impl
 			return DoubleBits(a).get_biased_exponent() >= DoubleBits(b).get_biased_exponent();
 		}
 
-		constexpr double powf_double_double(int idx_x, double dx, double y6, double lo6_hi, const DoubleDouble & exp2_hi_mid)
+		constexpr double powf_double_double(int idx_x, double dx, double y6, double lo6_hi, const DoubleDouble& exp2_hi_mid)
 		{
 			using DoubleBits = support::fp::FPBits<double>;
 
@@ -133,16 +133,16 @@ namespace ccm::gen::impl
 			};
 
 			DoubleDouble pp		  = ::ccm::support::polyeval(lo6,
-														 EXP2_COEFFS[0],
-														 EXP2_COEFFS[1],
-														 EXP2_COEFFS[2],
-														 EXP2_COEFFS[3],
-														 EXP2_COEFFS[4],
-														 EXP2_COEFFS[5],
-														 EXP2_COEFFS[6],
-														 EXP2_COEFFS[7],
-														 EXP2_COEFFS[8],
-														 EXP2_COEFFS[9]);
+															 EXP2_COEFFS[0],
+															 EXP2_COEFFS[1],
+															 EXP2_COEFFS[2],
+															 EXP2_COEFFS[3],
+															 EXP2_COEFFS[4],
+															 EXP2_COEFFS[5],
+															 EXP2_COEFFS[6],
+															 EXP2_COEFFS[7],
+															 EXP2_COEFFS[8],
+															 EXP2_COEFFS[9]);
 			const DoubleDouble rr = quick_mult(exp2_hi_mid, pp);
 
 			// Make sure the sum is normalized:
@@ -160,13 +160,13 @@ namespace ccm::gen::impl
 			return ccm::support::bit_cast<double>(r_bits);
 		}
 
-		constexpr std::optional<float> handle_exceptional_cases(float & x,
-																float & y,
-																support::fp::FPBits<float> & xbits,
-																support::fp::FPBits<float> & ybits,
-																const std::uint32_t & x_u,
-																int & exponent,
-																std::uint64_t & sign)
+		constexpr std::optional<float> handle_exceptional_cases(float& x,
+																float& y,
+																support::fp::FPBits<float>& xbits,
+																support::fp::FPBits<float>& ybits,
+																const std::uint32_t& x_u,
+																int& exponent,
+																std::uint64_t& sign)
 		{
 			using FloatBits = support::fp::FPBits<float>;
 

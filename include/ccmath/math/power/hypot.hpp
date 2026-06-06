@@ -35,9 +35,15 @@ namespace ccm
 		{
 			if constexpr (std::is_same_v<T, float>) { return internal::impl::hypot_impl(x, y); }
 			else if constexpr (std::is_same_v<T, double>) { return internal::impl::hypot_impl(x, y); }
-			else { return static_cast<long double>(internal::impl::hypot_impl(static_cast<double>(x), static_cast<double>(y))); }
+			else
+			{
+				return static_cast<long double>(internal::impl::hypot_impl(static_cast<double>(x), static_cast<double>(y)));
+			}
 		}
-		else { return ccm::rt::hypot_rt(x, y); }
+		else
+		{
+			return ccm::rt::hypot_rt(x, y);
+		}
 	}
 
 	/**
@@ -50,19 +56,13 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/hypot
 	 */
 	constexpr float hypot(float x, float y, float z) noexcept
-	{
-		return ccm::hypot(ccm::hypot(x, y), z);
-	}
+	{ return ccm::hypot(ccm::hypot(x, y), z); }
 
 	constexpr double hypot(double x, double y, double z) noexcept
-	{
-		return ccm::hypot(ccm::hypot(x, y), z);
-	}
+	{ return ccm::hypot(ccm::hypot(x, y), z); }
 
 	constexpr long double hypot(long double x, long double y, long double z) noexcept
-	{
-		return ccm::hypot(ccm::hypot(x, y), z);
-	}
+	{ return ccm::hypot(ccm::hypot(x, y), z); }
 
 	template <typename Arithmetic1,
 			  typename Arithmetic2,
@@ -82,9 +82,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/hypot
 	 */
 	constexpr float hypotf(float x, float y) noexcept
-	{
-		return ccm::hypot(x, y);
-	}
+	{ return ccm::hypot(x, y); }
 
 	/**
 	 * @brief Computes the hypotenuse for long double values.
@@ -94,9 +92,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/hypot
 	 */
 	constexpr long double hypotl(long double x, long double y) noexcept
-	{
-		return ccm::hypot(x, y);
-	}
+	{ return ccm::hypot(x, y); }
 } // namespace ccm
 
 /// @ingroup power

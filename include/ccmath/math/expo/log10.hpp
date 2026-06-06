@@ -87,9 +87,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double log10(Integer num)
-	{
-		return ccm::log10<double>(static_cast<double>(num));
-	}
+	{ return ccm::log10<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Computes the base-10 logarithm of a float.
@@ -98,9 +96,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/log10
 	 */
 	constexpr float log10f(float num)
-	{
-		return ccm::log10<float>(num);
-	}
+	{ return ccm::log10<float>(num); }
 
 	/**
 	 * @brief Computes the base-10 logarithm of a long double.
@@ -109,7 +105,5 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/log10
 	 */
 	constexpr long double log10l(long double num)
-	{
-		return ccm::log10<long double>(num);
-	}
+	{ return ccm::log10<long double>(num); }
 } // namespace ccm

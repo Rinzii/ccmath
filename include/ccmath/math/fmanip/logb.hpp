@@ -34,9 +34,15 @@ namespace ccm
 		{
 			if constexpr (std::is_same_v<T, float>) { return internal::impl::logb_impl(num); }
 			else if constexpr (std::is_same_v<T, double>) { return internal::impl::logb_impl(num); }
-			else { return static_cast<long double>(internal::impl::logb_impl(static_cast<double>(num))); }
+			else
+			{
+				return static_cast<long double>(internal::impl::logb_impl(static_cast<double>(num)));
+			}
 		}
-		else { return ccm::rt::logb_rt(num); }
+		else
+		{
+			return ccm::rt::logb_rt(num);
+		}
 	}
 
 	/**
@@ -46,9 +52,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/logb
 	 */
 	constexpr float logbf(float num) noexcept
-	{
-		return ccm::logb(num);
-	}
+	{ return ccm::logb(num); }
 
 	/**
 	 * @brief Extracts the unbiased exponent of a long double.
@@ -57,7 +61,5 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/logb
 	 */
 	constexpr long double logbl(long double num) noexcept
-	{
-		return ccm::logb(num);
-	}
+	{ return ccm::logb(num); }
 } // namespace ccm

@@ -51,9 +51,7 @@ namespace ccm::builtin
 	 */
 	template <typename T>
 	constexpr auto isunordered(T x, T y) -> std::enable_if_t<has_constexpr_isunordered<T>, bool>
-	{
-		return __builtin_isunordered(x, y);
-	}
+	{ return __builtin_isunordered(x, y); }
 } // namespace ccm::builtin
 
 // Cleanup the global namespace

@@ -51,14 +51,10 @@ namespace ccm::intrin
 	};
 
 	CCM_ALWAYS_INLINE bool all_of(simd_mask<float, abi::sse2> const &a)
-	{
-		return _mm_movemask_ps(a.get()) == 0xF;
-	}
+	{ return _mm_movemask_ps(a.get()) == 0xF; }
 
 	CCM_ALWAYS_INLINE bool any_of(simd_mask<float, abi::sse2> const &a)
-	{
-		return _mm_movemask_ps(a.get()) != 0x0;
-	}
+	{ return _mm_movemask_ps(a.get()) != 0x0; }
 
 	template <>
 	struct simd<float, abi::sse2>
@@ -93,13 +89,9 @@ namespace ccm::intrin
 		[[nodiscard]] CCM_ALWAYS_INLINE constexpr __m128 get() const { return m_value; }
 		[[nodiscard]] CCM_ALWAYS_INLINE float convert() const { return _mm_cvtss_f32(m_value); }
 		CCM_ALWAYS_INLINE simd_mask<float, abi::sse2> operator<(simd const &other) const
-		{
-			return simd_mask<float, abi::sse2>(_mm_cmplt_ps(m_value, other.m_value));
-		}
+		{ return simd_mask<float, abi::sse2>(_mm_cmplt_ps(m_value, other.m_value)); }
 		CCM_ALWAYS_INLINE simd_mask<float, abi::sse2> operator==(simd const &other) const
-		{
-			return simd_mask<float, abi::sse2>(_mm_cmpeq_ps(m_value, other.m_value));
-		}
+		{ return simd_mask<float, abi::sse2>(_mm_cmpeq_ps(m_value, other.m_value)); }
 
 	private:
 		__m128 m_value;
@@ -131,14 +123,10 @@ namespace ccm::intrin
 	};
 
 	CCM_ALWAYS_INLINE bool all_of(simd_mask<double, abi::sse2> const &a)
-	{
-		return _mm_movemask_pd(a.get()) == 0x3;
-	}
+	{ return _mm_movemask_pd(a.get()) == 0x3; }
 
 	CCM_ALWAYS_INLINE bool any_of(simd_mask<double, abi::sse2> const &a)
-	{
-		return _mm_movemask_pd(a.get()) != 0x0;
-	}
+	{ return _mm_movemask_pd(a.get()) != 0x0; }
 
 	template <>
 	struct simd<double, abi::sse2> // NOLINT
@@ -156,9 +144,7 @@ namespace ccm::intrin
 		CCM_ALWAYS_INLINE simd(double value) : m_value(_mm_set1_pd(value)) {} // NOLINT(google-explicit-constructor)
 		CCM_ALWAYS_INLINE simd(double a, double b) : m_value(_mm_setr_pd(a, b)) {}
 		CCM_ALWAYS_INLINE simd(storage_type const &value)
-		{
-			copy_from(value.data(), element_aligned_tag());
-		} // NOLINT(google-explicit-constructor, cppcoreguidelines-pro-type-member-init)
+		{ copy_from(value.data(), element_aligned_tag()); } // NOLINT(google-explicit-constructor, cppcoreguidelines-pro-type-member-init)
 		CCM_ALWAYS_INLINE simd &operator=(storage_type const &value)
 		{
 			copy_from(value.data(), element_aligned_tag());
@@ -181,13 +167,9 @@ namespace ccm::intrin
 		[[nodiscard]] CCM_ALWAYS_INLINE double convert() const { return _mm_cvtsd_f64(m_value); }
 
 		CCM_ALWAYS_INLINE simd_mask<double, abi::sse2> operator<(simd const &other) const
-		{
-			return simd_mask<double, abi::sse2>(_mm_cmplt_pd(m_value, other.m_value));
-		}
+		{ return simd_mask<double, abi::sse2>(_mm_cmplt_pd(m_value, other.m_value)); }
 		CCM_ALWAYS_INLINE simd_mask<double, abi::sse2> operator==(simd const &other) const
-		{
-			return simd_mask<double, abi::sse2>(_mm_cmpeq_pd(m_value, other.m_value));
-		}
+		{ return simd_mask<double, abi::sse2>(_mm_cmpeq_pd(m_value, other.m_value)); }
 
 	private:
 		__m128d m_value;

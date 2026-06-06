@@ -123,26 +123,18 @@ namespace ccm::internal::impl
 	} // namespace sincos_float_detail
 
 	constexpr float sin_float_impl(float x)
-	{
-		return sincos_float_detail::sincosf_eval<true>(x);
-	}
+	{ return sincos_float_detail::sincosf_eval<true>(x); }
 
 	constexpr float cos_float_impl(float x)
-	{
-		return sincos_float_detail::sincosf_eval<false>(x);
-	}
+	{ return sincos_float_detail::sincosf_eval<false>(x); }
 
 } // namespace ccm::internal::impl
 
 namespace ccm::internal
 {
 	constexpr float sin_float(float num) noexcept
-	{
-		return impl::sin_float_impl(num);
-	}
+	{ return impl::sin_float_impl(num); }
 
 	constexpr float cos_float(float num) noexcept
-	{
-		return impl::cos_float_impl(num);
-	}
+	{ return impl::cos_float_impl(num); }
 } // namespace ccm::internal

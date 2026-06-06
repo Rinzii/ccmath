@@ -51,9 +51,7 @@ namespace ccm::builtin
 	 */
 	template <typename T>
 	constexpr auto islessgreater(T x, T y) -> std::enable_if_t<has_constexpr_islessgreater<T>, bool>
-	{
-		return __builtin_islessgreater(x, y);
-	}
+	{ return __builtin_islessgreater(x, y); }
 } // namespace ccm::builtin
 
 // Cleanup the global namespace

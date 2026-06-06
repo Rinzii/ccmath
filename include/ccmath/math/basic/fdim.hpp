@@ -30,7 +30,10 @@ namespace ccm
 	{
 		if constexpr (ccm::builtin::has_constexpr_fdim<T>) { return ccm::builtin::fdim(x, y); }
 		else if (ccm::support::is_constant_evaluated()) { return func::fdim(x, y); }
-		else { return ccm::rt::fdim_rt(x, y); }
+		else
+		{
+			return ccm::rt::fdim_rt(x, y);
+		}
 	}
 
 	/**
@@ -62,9 +65,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double fdim(Integer x, Integer y)
-	{
-		return ccm::fdim<double>(static_cast<double>(x), static_cast<double>(y));
-	}
+	{ return ccm::fdim<double>(static_cast<double>(x), static_cast<double>(y)); }
 
 	/**
 	 * @brief Computes the positive difference of two floating point values (max(0,x−y))
@@ -74,9 +75,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/fdim
 	 */
 	constexpr float fdimf(float x, float y)
-	{
-		return ccm::fdim<float>(x, y);
-	}
+	{ return ccm::fdim<float>(x, y); }
 
 	/**
 	 * @brief Computes the positive difference of two floating point values (max(0,x−y))
@@ -86,9 +85,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/fdim
 	 */
 	constexpr long double fdiml(long double x, long double y)
-	{
-		return ccm::fdim<long double>(x, y);
-	}
+	{ return ccm::fdim<long double>(x, y); }
 } // namespace ccm
 
 /// @ingroup basic

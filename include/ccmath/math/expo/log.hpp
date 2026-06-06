@@ -90,9 +90,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double log(const Integer num) noexcept
-	{
-		return ccm::log<double>(static_cast<double>(num));
-	}
+	{ return ccm::log<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Computes the natural (base e) logarithm (lnx) of a number.
@@ -100,9 +98,7 @@ namespace ccm
 	 * @return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
 	 */
 	constexpr float logf(const float num) noexcept
-	{
-		return ccm::log<float>(num);
-	}
+	{ return ccm::log<float>(num); }
 
 	/**
 	 * @brief Computes the natural (base e) logarithm (lnx) of a number.
@@ -110,9 +106,7 @@ namespace ccm
 	 * @return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
 	 */
 	constexpr long double logl(long double num) noexcept
-	{
-		return ccm::log<long double>(num);
-	}
+	{ return ccm::log<long double>(num); }
 } // namespace ccm
 
 #if defined(_MSC_VER) && !defined(__clang__)

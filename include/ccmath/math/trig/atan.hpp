@@ -34,9 +34,15 @@ namespace ccm
 		{
 			if constexpr (std::is_same_v<T, float>) { return internal::impl::atan_float(num); }
 			else if constexpr (std::is_same_v<T, double>) { return internal::impl::atan_double(num); }
-			else { return static_cast<long double>(internal::impl::atan_double(static_cast<double>(num))); }
+			else
+			{
+				return static_cast<long double>(internal::impl::atan_double(static_cast<double>(num)));
+			}
 		}
-		else { return ccm::rt::atan_rt(num); }
+		else
+		{
+			return ccm::rt::atan_rt(num);
+		}
 	}
 
 	/**
@@ -48,9 +54,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double atan(Integer num)
-	{
-		return ccm::atan<double>(static_cast<double>(num));
-	}
+	{ return ccm::atan<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Computes inverse tangent for float.
@@ -59,9 +63,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/atan
 	 */
 	constexpr float atanf(float num)
-	{
-		return ccm::atan<float>(num);
-	}
+	{ return ccm::atan<float>(num); }
 
 	/**
 	 * @brief Computes inverse tangent for long double.
@@ -70,9 +72,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/atan
 	 */
 	constexpr long double atanl(long double num)
-	{
-		return ccm::atan<long double>(num);
-	}
+	{ return ccm::atan<long double>(num); }
 } // namespace ccm
 
 /// @ingroup trig

@@ -57,10 +57,10 @@ namespace ccm::internal
 				const ccm::double_t rem		 = x - 1.0;
 				const ccm::double_t remSqr	 = rem * rem;
 				const ccm::double_t remCubed = rem * remSqr;
-				result						 = remCubed * (log_poly1_values_dbl[1] + rem * log_poly1_values_dbl[2] + remSqr * log_poly1_values_dbl[3] +
-									   remCubed * (log_poly1_values_dbl[4] + rem * log_poly1_values_dbl[5] + remSqr * log_poly1_values_dbl[6] +
-												   remCubed * (log_poly1_values_dbl[7] + rem * log_poly1_values_dbl[8] + remSqr * log_poly1_values_dbl[9] +
-															   remCubed * log_poly1_values_dbl[10])));
+				result = remCubed * (log_poly1_values_dbl[1] + rem * log_poly1_values_dbl[2] + remSqr * log_poly1_values_dbl[3] +
+									 remCubed * (log_poly1_values_dbl[4] + rem * log_poly1_values_dbl[5] + remSqr * log_poly1_values_dbl[6] +
+												 remCubed * (log_poly1_values_dbl[7] + rem * log_poly1_values_dbl[8] + remSqr * log_poly1_values_dbl[9] +
+															 remCubed * log_poly1_values_dbl[10])));
 
 				// Additional error correction
 				// Worst-case error is around 0.507 ULP.
@@ -128,7 +128,5 @@ namespace ccm::internal
 	} // namespace impl
 
 	constexpr double log_double(double num) noexcept
-	{
-		return impl::log_double_impl(num);
-	}
+	{ return impl::log_double_impl(num); }
 } // namespace ccm::internal

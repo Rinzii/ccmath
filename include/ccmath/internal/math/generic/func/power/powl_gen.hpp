@@ -36,9 +36,7 @@ namespace ccm::gen
 
 			template <typename Storage>
 			constexpr bool storage_is_zero(Storage value) noexcept
-			{
-				return value == Storage{};
-			}
+			{ return value == Storage{}; }
 
 			template <typename Storage>
 			constexpr int storage_countr_zero(Storage value) noexcept
@@ -92,9 +90,7 @@ namespace ccm::gen
 			}
 
 			inline bool is_integer_float80_value(long double val) noexcept
-			{
-				return __builtin_floorl(val) == val;
-			}
+			{ return __builtin_floorl(val) == val; }
 
 			inline bool is_odd_integer_float80_value(long double val) noexcept;
 			constexpr bool try_extract_int64(const PowlFPBits_t & bits, std::int64_t & out) noexcept;
@@ -170,19 +166,13 @@ namespace ccm::gen
 			}
 
 			constexpr bool is_integer(long double val) noexcept
-			{
-				return is_integer(PowlFPBits_t(val));
-			}
+			{ return is_integer(PowlFPBits_t(val)); }
 
 			constexpr bool is_odd_integer(long double val) noexcept
-			{
-				return is_odd_integer(PowlFPBits_t(val));
-			}
+			{ return is_odd_integer(PowlFPBits_t(val)); }
 
 			constexpr bool try_extract_int64(long double val, std::int64_t & out) noexcept
-			{
-				return try_extract_int64(PowlFPBits_t(val), out);
-			}
+			{ return try_extract_int64(PowlFPBits_t(val), out); }
 
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
 			inline bool is_odd_integer_float80_value(long double val) noexcept
@@ -191,8 +181,7 @@ namespace ccm::gen
 				std::int64_t magnitude = 0;
 				if (try_extract_int64(val, magnitude))
 				{
-					const std::uint64_t abs_mag =
-						static_cast<std::uint64_t>(magnitude < 0 ? -magnitude : magnitude);
+					const std::uint64_t abs_mag = static_cast<std::uint64_t>(magnitude < 0 ? -magnitude : magnitude);
 					return (abs_mag & 1U) != 0U;
 				}
 
@@ -214,14 +203,10 @@ namespace ccm::gen
 			using Sign		   = types::Sign;
 
 			constexpr long double powl_unsupported_result() noexcept
-			{
-				return std::numeric_limits<long double>::quiet_NaN();
-			}
+			{ return std::numeric_limits<long double>::quiet_NaN(); }
 
 			constexpr long double powl_reduced_precision_double_fallback(long double base, long double exp) noexcept
-			{
-				return static_cast<long double>(::ccm::gen::impl::pow_impl(static_cast<double>(base), static_cast<double>(exp)));
-			}
+			{ return static_cast<long double>(::ccm::gen::impl::pow_impl(static_cast<double>(base), static_cast<double>(exp))); }
 
 			constexpr long double powl_bounded_integer(long double base, std::int64_t exp) noexcept
 			{
@@ -235,14 +220,10 @@ namespace ccm::gen
 					const PowlFPBits_t base_bits(base);
 					typename PowlFPBits_t::storage_type sig = base_bits.get_explicit_mantissa();
 					if (base_bits.get_implicit_bit()) { sig |= PowlFPBits_t::EXPLICIT_BIT_MASK; }
-					const bool base_is_pow2 =
-						sig != typename PowlFPBits_t::storage_type{} &&
-						(sig & (sig - typename PowlFPBits_t::storage_type(1))) == typename PowlFPBits_t::storage_type{};
+					const bool base_is_pow2	   = sig != typename PowlFPBits_t::storage_type{} &&
+												 (sig & (sig - typename PowlFPBits_t::storage_type(1))) == typename PowlFPBits_t::storage_type{};
 					const std::int64_t abs_exp = exp < 0 ? -exp : exp;
-					if (!base_is_pow2 || abs_exp > kSquaringExponentMax)
-					{
-						return bit80::powl_ld80_general_finite(base, static_cast<long double>(exp));
-					}
+					if (!base_is_pow2 || abs_exp > kSquaringExponentMax) { return bit80::powl_ld80_general_finite(base, static_cast<long double>(exp)); }
 				}
 #endif
 
@@ -383,11 +364,9 @@ namespace ccm::gen
 			}
 
 		} // namespace impl
-	}	  // namespace internal
+	} // namespace internal
 
 	constexpr long double powl_gen(long double base, long double exp) noexcept
-	{
-		return internal::impl::powl_impl(base, exp);
-	}
+	{ return internal::impl::powl_impl(base, exp); }
 
 } // namespace ccm::gen

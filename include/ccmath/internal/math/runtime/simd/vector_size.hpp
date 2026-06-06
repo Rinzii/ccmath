@@ -85,9 +85,7 @@ namespace ccm::intrin
 	{
 		bool result = true;
 		CCM_SIMD_VECTORIZE for (int i = 0; i < a.size(); ++i)
-		{
-			result = result && a.get()[i];
-		}
+		{ result = result && a.get()[i]; }
 		return result;
 	}
 
@@ -96,9 +94,7 @@ namespace ccm::intrin
 	{
 		bool result = false;
 		CCM_SIMD_VECTORIZE for (int i = 0; i < a.size(); ++i)
-		{
-			result = result || a.get()[i];
-		}
+		{ result = result || a.get()[i]; }
 		return result;
 	}
 
@@ -128,9 +124,7 @@ namespace ccm::intrin
 		}
 		template <class Flags>
 		CCM_ALWAYS_INLINE simd(T const *ptr, Flags flags)
-		{
-			copy_from(ptr, flags);
-		}
+		{ copy_from(ptr, flags); }
 		CCM_ALWAYS_INLINE simd operator*(simd const &other) const { return simd(m_value * other.m_value); }
 		CCM_ALWAYS_INLINE simd operator/(simd const &other) const { return simd(m_value / other.m_value); }
 		CCM_ALWAYS_INLINE simd operator+(simd const &other) const { return simd(m_value + other.m_value); }
@@ -155,13 +149,9 @@ namespace ccm::intrin
 		[[nodiscard]] CCM_ALWAYS_INLINE native_type const &get() const { return m_value; }
 		CCM_ALWAYS_INLINE native_type &get() { return m_value; }
 		CCM_ALWAYS_INLINE simd_mask<T, abi::vector_size<N>> operator<(simd const &other) const
-		{
-			return simd_mask<T, abi::vector_size<N>>(m_value < other.m_value);
-		}
+		{ return simd_mask<T, abi::vector_size<N>>(m_value < other.m_value); }
 		CCM_ALWAYS_INLINE simd_mask<T, abi::vector_size<N>> operator==(simd const &other) const
-		{
-			return simd_mask<T, abi::vector_size<N>>(m_value == other.m_value);
-		}
+		{ return simd_mask<T, abi::vector_size<N>>(m_value == other.m_value); }
 
 	private:
 		native_type m_value;
@@ -173,23 +163,17 @@ namespace ccm::intrin
 	{
 		simd<T, abi::vector_size<N>> result;
 		CCM_SIMD_VECTORIZE for (int i = 0; i < a.size(); ++i)
-		{
-			result.get()[i] = a.get()[i] ? b.get()[i] : c.get()[i];
-		}
+		{ result.get()[i] = a.get()[i] ? b.get()[i] : c.get()[i]; }
 		return result;
 	}
 
 	template <class T, int N>
 	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, abi::vector_size<N>> max(simd<T, abi::vector_size<N>> const &a, simd<T, abi::vector_size<N>> const &b)
-	{
-		return choose(b < a, a, b);
-	}
+	{ return choose(b < a, a, b); }
 
 	template <class T, int N>
 	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, abi::vector_size<N>> min(simd<T, abi::vector_size<N>> const &a, simd<T, abi::vector_size<N>> const &b)
-	{
-		return choose(a < b, a, b);
-	}
+	{ return choose(a < b, a, b); }
 
 } // namespace ccm::intrin
 

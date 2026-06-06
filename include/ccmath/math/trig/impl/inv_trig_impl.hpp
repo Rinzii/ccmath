@@ -166,7 +166,10 @@ namespace ccm::internal::impl
 				const T recip_sq = recip * recip;
 				small			 = recip + recip_sq * recip * static_cast<T>(-0x1.5555555555555p-2);
 			}
-			else { small = atan_impl(recip); }
+			else
+			{
+				small = atan_impl(recip);
+			}
 
 			return neg ? -pi_over_2 + small : pi_over_2 - small;
 		}
@@ -252,42 +255,26 @@ namespace ccm::internal::impl
 	}
 
 	inline constexpr float acos_float(float x) noexcept
-	{
-		return acos_impl(x);
-	}
+	{ return acos_impl(x); }
 
 	inline constexpr double acos_double(double x) noexcept
-	{
-		return acos_impl(x);
-	}
+	{ return acos_impl(x); }
 
 	inline constexpr float asin_float(float x) noexcept
-	{
-		return asin_impl(x);
-	}
+	{ return asin_impl(x); }
 
 	inline constexpr double asin_double(double x) noexcept
-	{
-		return asin_impl(x);
-	}
+	{ return asin_impl(x); }
 
 	inline constexpr float atan_float(float x) noexcept
-	{
-		return atan_impl(x);
-	}
+	{ return atan_impl(x); }
 
 	inline constexpr double atan_double(double x) noexcept
-	{
-		return atan_impl(x);
-	}
+	{ return atan_impl(x); }
 
 	inline constexpr float atan2_float(float y, float x) noexcept
-	{
-		return atan2_impl(y, x);
-	}
+	{ return atan2_impl(y, x); }
 
 	inline constexpr double atan2_double(double y, double x) noexcept
-	{
-		return atan2_impl(y, x);
-	}
+	{ return atan2_impl(y, x); }
 } // namespace ccm::internal::impl

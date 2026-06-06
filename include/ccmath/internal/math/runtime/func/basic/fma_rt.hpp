@@ -24,7 +24,10 @@ namespace ccm::rt
 		if constexpr (std::is_same_v<T, float>) { return __builtin_fmaf(x, y, z); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_fma(x, y, z); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fmal(x, y, z); }
-		else { return static_cast<T>(__builtin_fmal(static_cast<long double>(x), static_cast<long double>(y), static_cast<long double>(z))); }
+		else
+		{
+			return static_cast<T>(__builtin_fmal(static_cast<long double>(x), static_cast<long double>(y), static_cast<long double>(z)));
+		}
 #else
 		return (x * y) + z;
 #endif

@@ -28,7 +28,10 @@ namespace ccm
 	constexpr bool islessequal(T x, T y) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_islessequal<T>) { return ccm::builtin::islessequal(x, y); }
-		else { return !ccm::isunordered(x, y) && (x <= y); }
+		else
+		{
+			return !ccm::isunordered(x, y) && (x <= y);
+		}
 	}
 
 	/**

@@ -43,20 +43,14 @@ namespace ccm::gen
 		}
 
 		constexpr double log_impl([[maybe_unused]] double num) noexcept
-		{
-			return 0;
-		}
+		{ return 0; }
 
 		constexpr long double log_impl([[maybe_unused]] long double num) noexcept
-		{
-			return 0;
-		}
+		{ return 0; }
 
 	} // namespace internal::impl
 
 	template <typename T>
 	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> log_gen(T base, T exp) noexcept
-	{
-		return internal::impl::log_impl(base, exp);
-	}
+	{ return internal::impl::log_impl(base, exp); }
 } // namespace ccm::gen

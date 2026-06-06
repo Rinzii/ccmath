@@ -23,8 +23,6 @@ namespace ccm::func
 	 */
 	template <typename T>
 	constexpr auto fdim(T x, T y) -> std::enable_if_t<std::is_floating_point_v<T>, T>
-	{
-		return gen::fdim(x, y);
-	}
+	{ return gen::fdim(x, y); }
 
 } // namespace ccm::func

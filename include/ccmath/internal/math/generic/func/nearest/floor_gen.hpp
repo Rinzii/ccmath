@@ -108,9 +108,7 @@ namespace ccm
 	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
 	 */
 	constexpr float floorf(float num) noexcept
-	{
-		return ccm::floor<float>(num);
-	}
+	{ return ccm::floor<float>(num); }
 
 	/**
 	 * @brief Computes the largest integer value not greater than num.
@@ -118,9 +116,7 @@ namespace ccm
 	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
 	 */
 	constexpr double floorl(double num) noexcept
-	{
-		return ccm::floor<double>(num);
-	}
+	{ return ccm::floor<double>(num); }
 } // namespace ccm
 
 /// @ingroup nearest

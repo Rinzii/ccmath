@@ -58,9 +58,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double exp2(Integer num)
-	{
-		return ccm::exp2<double>(static_cast<double>(num));
-	}
+	{ return ccm::exp2<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Returns 2 raised to the given power (2^x)
@@ -69,9 +67,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp2
 	 */
 	constexpr float exp2f(float num)
-	{
-		return ccm::exp2<float>(num);
-	}
+	{ return ccm::exp2<float>(num); }
 
 	/**
 	 * @brief Returns 2 raised to the given power (2^x)
@@ -80,9 +76,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp2
 	 */
 	constexpr long double exp2l(long double num)
-	{
-		return ccm::exp2<long double>(num);
-	}
+	{ return ccm::exp2<long double>(num); }
 } // namespace ccm
 
 #if defined(_MSC_VER) && !defined(__clang__)

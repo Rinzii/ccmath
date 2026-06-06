@@ -34,9 +34,15 @@ namespace ccm
 		{
 			if constexpr (std::is_same_v<T, float>) { return internal::impl::cbrt_impl(num); }
 			else if constexpr (std::is_same_v<T, double>) { return internal::impl::cbrt_impl(num); }
-			else { return static_cast<long double>(internal::impl::cbrt_impl(static_cast<double>(num))); }
+			else
+			{
+				return static_cast<long double>(internal::impl::cbrt_impl(static_cast<double>(num)));
+			}
 		}
-		else { return ccm::rt::cbrt_rt(num); }
+		else
+		{
+			return ccm::rt::cbrt_rt(num);
+		}
 	}
 
 	/**
@@ -46,9 +52,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/cbrt
 	 */
 	constexpr float cbrtf(float num) noexcept
-	{
-		return ccm::cbrt(num);
-	}
+	{ return ccm::cbrt(num); }
 
 	/**
 	 * @brief Computes the cube root of a long double.
@@ -57,9 +61,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/cbrt
 	 */
 	constexpr long double cbrtl(long double num) noexcept
-	{
-		return ccm::cbrt(num);
-	}
+	{ return ccm::cbrt(num); }
 } // namespace ccm
 
 /// @ingroup power

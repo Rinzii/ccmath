@@ -25,7 +25,10 @@ namespace ccm::rt
 		if constexpr (std::is_same_v<T, float>) { return __builtin_fminf(x, y); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_fmin(x, y); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fminl(x, y); }
-		else { return static_cast<T>(__builtin_fminl(static_cast<long double>(x), static_cast<long double>(y))); }
+		else
+		{
+			return static_cast<T>(__builtin_fminl(static_cast<long double>(x), static_cast<long double>(y)));
+		}
 #else
 		return gen::min(x, y);
 #endif

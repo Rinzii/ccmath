@@ -25,9 +25,9 @@ namespace ccm::pp
 	struct basic_simd
 	{
 	private:
-		using Traits				  = detail::SimdTraits<T, Abi>;
-		using MemberType			  = typename Traits::SimdMember;
-		static constexpr T * type_tag = nullptr;
+		using Traits				 = detail::SimdTraits<T, Abi>;
+		using MemberType			 = typename Traits::SimdMember;
+		static constexpr T* type_tag = nullptr;
 
 		alignas(Traits::SimdAlign) MemberType data_;
 
@@ -43,7 +43,7 @@ namespace ccm::pp
 
 		// Copy constructor
 		template <typename U, typename UAbi>
-		explicit basic_simd(const basic_simd<U, UAbi> & other)
+		explicit basic_simd(const basic_simd<U, UAbi>& other)
 			->std::enable_if_t<Traits::template is_simd_ctor_arg<U>(), basic_simd> : data_(detail::SimdConverter<U, UAbi, T, Abi>()(other.data_))
 		{
 		}
@@ -63,9 +63,7 @@ namespace ccm::pp
 		// Conversion operator
 		template <typename U>
 		explicit operator U() const->std::enable_if_t<Traits::template is_simd_conversion<U>(), U>
-		{
-			return Traits::template SimdConversion<U>(data_);
-		}
+		{ return Traits::template SimdConversion<U>(data_); }
 
 		// Access data
 		auto operator[](std::size_t index) const -> T
@@ -78,14 +76,12 @@ namespace ccm::pp
 		auto operator-() const -> basic_simd { return basic_simd(Traits::UnaryMinus(data_)); }
 
 		// Binary operators
-		friend auto operator+(const basic_simd & lhs, const basic_simd & rhs) -> basic_simd { return basic_simd(Traits::Add(lhs.data_, rhs.data_)); }
+		friend auto operator+(const basic_simd& lhs, const basic_simd& rhs) -> basic_simd { return basic_simd(Traits::Add(lhs.data_, rhs.data_)); }
 
 		// Store function
 		template <typename Iter>
 		auto store(Iter first) const -> std::enable_if_t<std::is_pointer<Iter>::value, void>
-		{
-			Traits::SimdStore(data_, first, type_tag);
-		}
+		{ Traits::SimdStore(data_, first, type_tag); }
 	};
 
 	template <typename T, typename Abi>
@@ -94,4 +90,4 @@ namespace ccm::pp
 	};
 
 } // namespace ccm::pp
-* /
+*/

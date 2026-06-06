@@ -23,16 +23,15 @@ namespace ccm
 		if constexpr (ccm::builtin::has_constexpr_frexp<T>) { return ccm::builtin::frexp(x, &exp); }
 		else if constexpr (std::is_same_v<T, float>) { return internal::impl::frexp_impl(x, exp); }
 		else if constexpr (std::is_same_v<T, double>) { return internal::impl::frexp_impl(x, exp); }
-		else { return static_cast<T>(internal::impl::frexp_impl(static_cast<double>(x), exp)); }
+		else
+		{
+			return static_cast<T>(internal::impl::frexp_impl(static_cast<double>(x), exp));
+		}
 	}
 
 	constexpr float frexpf(float x, int & exp)
-	{
-		return ccm::frexp(x, exp);
-	}
+	{ return ccm::frexp(x, exp); }
 
 	constexpr long double frexpl(long double x, int & exp)
-	{
-		return ccm::frexp(x, exp);
-	}
+	{ return ccm::frexp(x, exp); }
 } // namespace ccm

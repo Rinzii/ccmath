@@ -25,7 +25,10 @@ namespace ccm::rt
 		if constexpr (std::is_same_v<T, float>) { return __builtin_ilogbf(num); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_ilogb(num); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_ilogbl(num); }
-		else { return __builtin_ilogbl(static_cast<long double>(num)); }
+		else
+		{
+			return __builtin_ilogbl(static_cast<long double>(num));
+		}
 #else
 		return internal::impl::ilogb_impl(num);
 #endif
