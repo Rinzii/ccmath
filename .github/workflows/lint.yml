@@ -20,7 +20,7 @@ jobs:
       - name: Install clang-format
         uses: aminya/setup-cpp@3aac37c3fbde6cb1d2fa0a0a7e945b63b10561d5 # v1.1.0
         with:
-          clangformat: 17.0.5
+          clangformat: 18.1.8
 
       - name: Ensure clang-format
         run: bash tools/ensure_format.sh
