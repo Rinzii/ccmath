@@ -364,7 +364,7 @@ def write_scenario_report(fn, scenario_name, arch_name, flags, compiler,
     }
 
     import cpu_knowledge as cpu_kb
-    report["cpu_knowledge"] = cpu_kb.annotate_scenario_report(report, pa, sdir)
+    report["cpu_notes"] = cpu_kb.annotate_scenario_report(report, pa, sdir)
 
     prov = prov_mod.collect(fn, flags, compiler, [arch_name])
     prov["scenario"] = scenario_name
@@ -460,9 +460,10 @@ def _render_scenario_md(report):
     lines.append("- ipc: %s" % sm.get("ipc"))
     lines.append("- instructions: %s" % sm.get("instructions"))
     lines.append("")
-    if report.get("cpu_knowledge"):
+    if report.get("cpu_notes") or report.get("cpu_knowledge"):
         import cpu_knowledge as cpu_kb
-        lines.extend(cpu_kb.render_knowledge_md(report["cpu_knowledge"]))
+        ann = report.get("cpu_notes") or report.get("cpu_knowledge")
+        lines.extend(cpu_kb.render_knowledge_md(ann))
     return "\n".join(lines)
 
 

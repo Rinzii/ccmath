@@ -212,7 +212,7 @@ def build_report(fn, results, flags, compiler, constexpr_result, prov):
         "harness_mode": target.get("harness_mode") or C.default_harness_mode(fn),
         "constexpr_behavior": constexpr_result,
         "variants": results,
-        "cpu_knowledge": cpu_by_arch,
+        "cpu_notes": cpu_by_arch,
     }
 
     md = []
@@ -867,7 +867,7 @@ def main(argv=None):
     p_val = sub.add_parser("validate"); add_common(p_val, source_map=True, deep=True)
     p_val.set_defaults(func=cmd_validate)
 
-    p_know = sub.add_parser("knowledge", help="CPU knowledge base")
+    p_know = sub.add_parser("knowledge", help="validate CPU note JSON files")
     know_sub = p_know.add_subparsers(dest="knowledge_cmd", required=True)
     p_kv = know_sub.add_parser("validate", help="validate knowledge JSON files")
     p_kv.set_defaults(func=cmd_knowledge_validate)

@@ -517,8 +517,9 @@ def compare_variant_scenario(fn, variant, scenario, arch, flags, compiler,
         or reg_score == "improved")
     benchmark_win = bench_h.get("benchmark_status") == "pass"
 
-    cpu_ann = cand_rep.get("cpu_knowledge") or cpu_kb.annotate_scenario_report(
-        cand_rep, cand_pa, cand_dir)
+    cpu_ann = (cand_rep.get("cpu_notes") or cand_rep.get("cpu_knowledge")
+               or cpu_kb.annotate_scenario_report(
+                   cand_rep, cand_pa, cand_dir))
 
     heuristics_for_decide = {
         "reject_candidate": reject,
@@ -565,7 +566,7 @@ def compare_variant_scenario(fn, variant, scenario, arch, flags, compiler,
         "accuracy": acc_h,
         "constexpr_status": "not_applicable",
         "decision": decision,
-        "cpu_knowledge_warnings": [
+        "note_warnings": [
             w.get("message") for w in (cpu_ann.get("warnings") or [])
         ],
         "m1_spill_ranking_suppressed": m1_spill_advisory,
@@ -671,7 +672,7 @@ def run_compare(fn, variants, scenarios, arch, flags, compiler,
 
     rejections = [
         {"variant": r["variant"], "scenario": r["scenario"], "decision": r["decision"],
-         "reason": r.get("path_signals") or r.get("cpu_knowledge_warnings")}
+         "reason": r.get("path_signals") or r.get("note_warnings")}
         for r in scenario_results
         if r.get("decision", "").startswith("reject")
     ]
@@ -719,11 +720,11 @@ def _recommendation(ranking, scenario_results, arch, fn):
     if top["decision"] == "incomplete":
         return "run missing benchmarks and rigorous accuracy gates before merge review"
     if top["decision"] == "static_only":
-        return "keep as advisory; static metrics improved without benchmark proof"
+        return "static metrics improved, run bench and candidate accuracy before merge"
     if any(r.get("m1_spill_ranking_suppressed") for r in scenario_results):
         return "M1 comparisons are scope-limited; prefer x86-64-v3 for spill ranking"
     if top["decision"] == "ready_for_review":
-        return "candidate ready for manual review after rigorous accuracy gate"
+        return "run rigorous gate then review the ranking table"
     return "review ranking table and run missing evidence"
 
 
@@ -803,7 +804,7 @@ def render_compare_md(report):
     lines.extend(["", "## CPU knowledge warnings", ""])
     cpu_warn = set()
     for r in report.get("scenario_results", []):
-        for w in r.get("cpu_knowledge_warnings") or []:
+        for w in r.get("note_warnings") or r.get("cpu_knowledge_warnings") or []:
             cpu_warn.add(w)
     if not cpu_warn:
         lines.append("- none")
