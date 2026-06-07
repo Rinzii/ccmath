@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "ccmath/internal/support/bits.hpp"
+
 #include <cstddef>
 #include <type_traits>
 
@@ -39,6 +41,7 @@ namespace ccm::ext
 	constexpr T align(T value) noexcept
 	{
 		static_assert(alignment != 0, "Alignment must be non-zero");
+		static_assert(support::has_single_bit(alignment), "Alignment must be a power of two");
 
 		if constexpr (mode == AR::Direction::eUP)
 		{
