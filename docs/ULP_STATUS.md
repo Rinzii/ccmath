@@ -576,38 +576,33 @@ The tables in this section are legacy engineering measurements. They are not pro
 
 **Structured test suites**
 
-| Precision   | Min ULP | Max ULP | Avg ULP  | Notes |
-|-------------|---------|---------|----------|-------|
-| float       | 0       | 0       | 0.000000 | Compared against platform `std::pow` on the simple regression corpus |
-| double      | 0       | 0       | 0.000000 | Compared against platform `std::pow` on the simple regression corpus |
+| Precision   | Min ULP | Max ULP | Avg ULP  | Notes                                                                             |
+|-------------|---------|---------|----------|-----------------------------------------------------------------------------------|
+| float       | 0       | 0       | 0.000000 | Compared against platform `std::pow` on the simple regression corpus              |
+| double      | 0       | 0       | 0.000000 | Compared against platform `std::pow` on the simple regression corpus              |
 | long double | 0       | 0       | 0.000000 | Compared against platform `std::pow`; not an independent extended-precision claim |
 
 **Random sweeps (200,000 pairs, `pow_gen`)**
 
-| Precision   | Min ULP | Max ULP | Avg ULP  | Notes |
-|-------------|---------|---------|----------|-------|
-| float       | 0       | 1       | 0.005570 | Empirical comparison against platform `std::pow`; not an oracle |
-| double      | 0       | 1       | 0.005370 | Empirical comparison against platform `std::pow`; not an oracle |
+| Precision   | Min ULP | Max ULP | Avg ULP  | Notes                                                                                                                             |
+|-------------|---------|---------|----------|-----------------------------------------------------------------------------------------------------------------------------------|
+| float       | 0       | 1       | 0.005570 | Empirical comparison against platform `std::pow`; not an oracle                                                                   |
+| double      | 0       | 1       | 0.005370 | Empirical comparison against platform `std::pow`; not an oracle                                                                   |
 | long double | 0       | 1       | 0.005370 | Empirical comparison against platform `std::pow`; `long double` aliases `double` on this platform (`sizeof == 8`, `digits == 53`) |
 
 **Rigorous MPFR quick campaigns**
 
-| Function | Path / configuration | Evidence type | Notes |
-|----------|----------------------|---------------|-------|
-| `ccm::pow` | `public_default` | MPFR quick campaign | Structured binary64 corpus. Observed max error `1` ULP on the current local run. |
-| `ccm::pow` | `runtime_no_builtin`, `generic_modeled_domain` | Path-matrix quick campaign (`rigorous` label, no-builtin build) | Kernel oracle policy; 0 failures on current corpus. Campaign JSON is a generated local artifact, not proof. |
-| `ccm::powf` | `public_default` | MPFR quick campaign | Structured binary32 corpus. Observed max error `1` ULP on the current local run. |
-| `ccm::powf` | Reduced domains | MPFR quick reduced campaign | Mantissa/subnormal domains in rigorous CI. |
-| `ccm::powl` | ld64 alias | MPFR conservative grid via `ccmath-rigorous-mpfr-powl` | Documented double-shaped alias, not independent extended precision |
-| `ccm::powl` | ld80 special + bounded int + general finite | MPFR ld80 corpora (native paths only), `std::pow` regression on native paths | Global ld80 ULP bound |
-| `ccm::powl` | ld128 / unknown strict | Detection and NaN policy tests | Any native binary128 powl claim |
-| `ccm::powl` | reduced-precision fallback | Only when `CCMATH_ENABLE_REDUCED_PRECISION_POWL=ON`, labeled in harness JSON | Independent extended-precision validation |
+| Function    | Path / configuration                           | Evidence type                                                                | Notes                                                                                                       |
+|-------------|------------------------------------------------|------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|
+| `ccm::pow`  | `public_default`                               | MPFR quick campaign                                                          | Structured binary64 corpus. Observed max error `1` ULP on the current local run.                            |
+| `ccm::pow`  | `runtime_no_builtin`, `generic_modeled_domain` | Path-matrix quick campaign (`rigorous` label, no-builtin build)              | Kernel oracle policy; 0 failures on current corpus. Campaign JSON is a generated local artifact, not proof. |
+| `ccm::powf` | `public_default`                               | MPFR quick campaign                                                          | Structured binary32 corpus. Observed max error `1` ULP on the current local run.                            |
+| `ccm::powf` | Reduced domains                                | MPFR quick reduced campaign                                                  | Mantissa/subnormal domains in rigorous CI.                                                                  |
+| `ccm::powl` | ld64 alias                                     | MPFR conservative grid via `ccmath-rigorous-mpfr-powl`                       | Documented double-shaped alias, not independent extended precision                                          |
+| `ccm::powl` | ld80 special + bounded int + general finite    | MPFR ld80 corpora (native paths only), `std::pow` regression on native paths | Global ld80 ULP bound                                                                                       |
+| `ccm::powl` | ld128 / unknown strict                         | Detection and NaN policy tests                                               | Any native binary128 powl claim                                                                             |
+| `ccm::powl` | reduced-precision fallback                     | Only when `CCMATH_ENABLE_REDUCED_PRECISION_POWL=ON`, labeled in harness JSON | Independent extended-precision validation                                                                   |
 
-**Proof-backed kernel bounds**
-
-- Modeled generic double/float polynomial kernels: proof-smoke against current source constants when Sollya/Gappa are available. Scope is `generic_non_fma_kernel`, not public API dispatch.
-
-See [POW_VALIDATION.md](POW_VALIDATION.md) for the simple/rigorous split, path scope, and release-gating policy.
 
 <a id="sqrt"></a>
 ### sqrt
