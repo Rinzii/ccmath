@@ -3,7 +3,7 @@
 # Copyright (c) CCMath contributors
 #
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-"""Deep analysis pipeline layered on source_map and emit artifacts."""
+"""Deep analyze passes built on source maps and emit output."""
 
 import json
 from pathlib import Path
@@ -11,7 +11,6 @@ from pathlib import Path
 import _asmlab_common as C
 import analysis_common as AC
 import cfg_analysis
-import history_track
 import mca_deep
 import microarch_model
 import opt_remarks
@@ -54,7 +53,7 @@ def emit_opt_record(variant_dir, fn, target, arch_name, flags_name, compiler,
 
 
 def run_deep_analysis(variant_dir, fn, target, arch_name, flags_name, compiler,
-                      baseline_dir=None, record_history=True, extra_include_dirs=None):
+                      baseline_dir=None, record_history=False, extra_include_dirs=None):
     """Run all deep analysis passes for one variant directory."""
     variant_dir = Path(variant_dir)
     source_map = _load_source_map(variant_dir)
@@ -105,10 +104,6 @@ def run_deep_analysis(variant_dir, fn, target, arch_name, flags_name, compiler,
         "spill_count": rp.get("spill_count"),
         "vectorized": vec.get("vectorized"),
         "semantic_classifications": [c["kind"] for c in semantic.get("classifications", [])],
-        "confidence_notes": [
-            "Deep analysis combines static models and compiler remarks.",
-            "Causal claims are correlation unless perf counters agree.",
-        ],
     }
     AC.write_artifact(variant_dir, "analysis_summary", summary, [
         "# Analysis summary",
@@ -122,15 +117,12 @@ def run_deep_analysis(variant_dir, fn, target, arch_name, flags_name, compiler,
         "",
     ])
 
-    if record_history:
-        history_track.append_history(fn, variant_dir, bundle)
-
     return bundle, None
 
 
 DEEP_ARTIFACT_NAMES = (
     "cfg", "mca", "opt_remarks", "reg_pressure", "microarch",
-    "vectorization", "semantic", "perf", "analysis_summary", "ast_schema",
+    "vectorization", "semantic", "perf", "analysis_summary",
 )
 
 

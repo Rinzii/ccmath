@@ -3,7 +3,7 @@
 # Copyright (c) CCMath contributors
 #
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-"""Historical regression tracking across commits and baselines."""
+"""Historical snapshots for deep analyze runs (optional)."""
 
 import json
 import subprocess
@@ -11,7 +11,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import _asmlab_common as C
-import analysis_common as AC
 
 
 def _git_head():
@@ -54,21 +53,4 @@ def append_history(fn, variant_dir, analysis_bundle, history_root=None):
     entries.append(entry)
 
     hist_path.write_text(json.dumps(entries, indent=2) + "\n")
-
-    md = [
-        "# Analysis history: %s" % fn,
-        "",
-        "- snapshots: %d" % len(entries),
-        "",
-        "## Recent",
-        "",
-    ]
-    for e in entries[-5:]:
-        s = e["summary"]
-        md.append("- %s @ %s insn=%s ipc=%s spills=%s" % (
-            e["commit"], e["arch"], s.get("instruction_count"),
-            s.get("mca_ipc"), s.get("spill_count")))
-    md.append("")
-
-    AC.write_artifact(history_root, fn + "_history", entries, md)
     return entries

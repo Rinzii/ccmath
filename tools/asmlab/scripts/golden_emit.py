@@ -60,7 +60,6 @@ def emit_golden(fn, arch_name, flags_name, compiler, source_map=True, deep_analy
     import classify as classify_mod
     import source_map as smod
     import analysis_pipeline as apipe
-    import ast_schema as ast_mod
 
     target = get_golden_target(fn)
     arch = C.resolve_arch(arch_name)

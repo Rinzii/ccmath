@@ -114,9 +114,7 @@ def emit_variant(fn, target, arch_name, flags_name, compiler, source_map=False, 
 
     if deep_analyze:
         import analysis_pipeline as apipe
-        import ast_schema as ast_mod
         apipe.run_deep_analysis(outdir, fn, target, arch_name, flags_name, compiler)
-        ast_mod.write_ast_schema(outdir)
 
     followed = meta["analyzed_symbol"] if meta["forwarder_followed"] else None
     note = (" (followed -> %s)" % followed) if followed else ""
