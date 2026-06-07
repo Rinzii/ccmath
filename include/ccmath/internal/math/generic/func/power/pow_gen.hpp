@@ -22,7 +22,6 @@ namespace ccm::gen
 	constexpr T pow_gen(T base, T exp) noexcept
 	{
 		// TODO: Maybe add more specific optimizations for integers?
-		// Currently we only support float and double for all rounding modes
 		if constexpr (std::is_same_v<T, float>) { return impl::powf_impl(base, exp); }
 		else if constexpr (std::is_same_v<T, double>) { return impl::pow_impl(base, exp); }
 		else if constexpr (std::is_same_v<T, long double>) { return powl_gen(base, exp); }

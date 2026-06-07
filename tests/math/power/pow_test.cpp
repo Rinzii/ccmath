@@ -242,7 +242,7 @@ TEST(CcmathPowerTests, PowNegativeBaseIntegerExponent)
 	ccm::test::ExpectSameFloatingAsStd(ccm::powf(-2.0F, 3.0F), std::pow(-2.0F, 3.0F));
 }
 
-// F.10.4.4(10,11): pow(|x| < 1, -inf) = +inf; pow(|x| > 1, -inf) = +0
+// F.10.4.4(10,11): pow(|x| < 1, -inf) = +inf. pow(|x| > 1, -inf) = +0
 TEST(CcmathPowerTests, PowFiniteBaseNegativeInfExponent)
 {
 	const double inf = std::numeric_limits<double>::infinity();
@@ -259,7 +259,7 @@ TEST(CcmathPowerTests, PowFiniteBaseNegativeInfExponent)
 	ccm::test::ExpectFpEq(ccm::powf(2.0F, -inff), 0.0F);
 }
 
-// F.10.4.4(12,13): pow(|x| < 1, +inf) = +0; pow(|x| > 1, +inf) = +inf
+// F.10.4.4(12,13): pow(|x| < 1, +inf) = +0. pow(|x| > 1, +inf) = +inf
 TEST(CcmathPowerTests, PowFiniteBasePositiveInfExponent)
 {
 	const double inf = std::numeric_limits<double>::infinity();
@@ -329,7 +329,7 @@ TEST(CcmathPowerTests, PowPosInfBasePositiveExponent)
 	EXPECT_EQ(ccm::powf(std::numeric_limits<float>::infinity(), 2.0F), std::numeric_limits<float>::infinity());
 }
 
-// C17 7.12.7.4: pow(x, NaN) = NaN for x != 1; pow(NaN, y) = NaN for y != 0
+// C17 7.12.7.4: pow(x, NaN) = NaN for x != 1. pow(NaN, y) = NaN for y != 0
 TEST(CcmathPowerTests, PowNaNPropagation)
 {
 	const double nan = std::numeric_limits<double>::quiet_NaN();

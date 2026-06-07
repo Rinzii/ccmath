@@ -10,8 +10,8 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/basic/fma.hpp"
 #include "ccmath/internal/math/generic/func/power/pow_impl/powf_data.hpp"
-#include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/common_math_constants.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
@@ -28,10 +28,6 @@
 #include <limits>
 #include <type_traits>
 
-#if defined(CCMATH_TARGET_CPU_HAS_FMA)
-	#define CCMATH_POW_KERNEL_USE_FMA_DX 1
-#endif
-
 namespace ccm::gen::impl
 {
 	namespace internal::impl
@@ -40,13 +36,13 @@ namespace ccm::gen::impl
 		{
 			inline double fma_dx(double x, double y, double z) noexcept
 			{
-#if defined(CCMATH_TARGET_CPU_HAS_FMA)
-				return support::multiply_add(x, y, z);
-#elif CCM_HAS_BUILTIN(__builtin_fma)
-				return __builtin_fma(x, y, z);
-#else
-				return support::multiply_add(x, y, z);
-#endif
+				if constexpr (ccm::builtin::has_constexpr_fma<double>) { return ccm::builtin::fma(x, y, z); }
+				else if constexpr (ccm::builtin::has_fma<double>)
+				{
+					if (support::is_constant_evaluated()) { return (x * y) + z; }
+					return ccm::builtin::fma(x, y, z);
+				}
+				else { return (x * y) + z; }
 			}
 		} // namespace pow_kernel_detail
 
@@ -118,17 +114,20 @@ namespace ccm::gen::impl
 			}
 			else
 			{
-#ifdef CCMATH_POW_KERNEL_USE_FMA_DX
-				dx	  = pow_kernel_detail::fma_dx(support::constants::RD.at(static_cast<std::size_t>(idx_x)), m_x, -1.0);
-				dx_c0 = ccm::types::exact_mult(POW_LOG2_COEFFS[0], dx);
-#else
-				const typename FPBits_t::storage_type masked_mantissa = static_cast<typename FPBits_t::storage_type>(
-					FPBits_t(m_x).uintval() & static_cast<typename FPBits_t::storage_type>(0x3fff'e000'0000'0000ULL));
-				const double c = FPBits_t(masked_mantissa).get_val();
-				dx			   = support::multiply_add(
-					support::constants::RD.at(static_cast<std::size_t>(idx_x)), m_x - c, support::constants::CD.at(static_cast<std::size_t>(idx_x)));
-				dx_c0 = ccm::types::exact_mult(POW_LOG2_COEFFS[0], dx);
-#endif
+				if constexpr (ccm::builtin::target_cpu_has_fma)
+				{
+					dx	  = pow_kernel_detail::fma_dx(support::constants::RD.at(static_cast<std::size_t>(idx_x)), m_x, -1.0);
+					dx_c0 = ccm::types::exact_mult(POW_LOG2_COEFFS[0], dx);
+				}
+				else
+				{
+					const typename FPBits_t::storage_type masked_mantissa = static_cast<typename FPBits_t::storage_type>(
+						FPBits_t(m_x).uintval() & static_cast<typename FPBits_t::storage_type>(0x3fff'e000'0000'0000ULL));
+					const double c = FPBits_t(masked_mantissa).get_val();
+					dx			   = support::multiply_add(
+						support::constants::RD.at(static_cast<std::size_t>(idx_x)), m_x - c, support::constants::CD.at(static_cast<std::size_t>(idx_x)));
+					dx_c0 = ccm::types::exact_mult(POW_LOG2_COEFFS[0], dx);
+				}
 			}
 
 			const double dx2 = dx * dx;

@@ -251,7 +251,7 @@ namespace ccm::gen
 				{
 					const long double r0 = 1.0L / p.hi;
 					if (r0 == 0.0L || ccm::isinf(r0) || ccm::isnan(r0)) { return r0; }
-					// p.hi near LDBL_MAX would overflow the split; r0 alone is already within an ULP.
+					// p.hi near LDBL_MAX would overflow the split. r0 alone is already within an ULP.
 					if (abs_ld(p.hi) >= kSplitSafe) { return r0; }
 					const Pair pr		  = bit80::powl_ld80_detail::exact_mult(p.hi, r0);
 					const long double res = ((1.0L - pr.hi) - pr.lo) - p.lo * r0;

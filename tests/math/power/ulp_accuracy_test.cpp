@@ -159,8 +159,8 @@ TEST(CcmathPowerUlpTests, PowGenFloatAllMantissaBuckets)
 
 // Exhaustive sweep over all 2^23 mantissa patterns in [1, 2) for the generic
 // float kernel.  Every dx value the float log polynomial will ever receive is
-// exercised.  Failures are batched so the loop runs without per-iteration GTest
-// overhead; only the first failure and the total count are reported.
+// exercised. Failures are batched so the loop runs without per-iteration GTest
+// overhead. Only the first failure and the total count are reported.
 TEST(CcmathPowerUlpTests, DISABLED_PowGenFloatExhaustiveMantissa)
 {
 	constexpr std::array<float, 4> exponents = { 2.0F, 0.5F, -1.0F, 3.14159265F };

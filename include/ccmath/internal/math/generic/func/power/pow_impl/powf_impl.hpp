@@ -38,11 +38,7 @@ namespace ccm::gen::impl
 	{
 		using namespace ccm::types;
 
-#ifdef CCMATH_TARGET_CPU_HAS_FMA
-		constexpr std::uint64_t error_tolerance = 64;
-#else
-		constexpr std::uint64_t error_tolerance = 128;
-#endif
+		inline constexpr std::uint64_t error_tolerance = ccm::builtin::target_cpu_has_fma ? 64 : 128;
 
 		constexpr bool is_odd_integer(float val) noexcept
 		{
@@ -327,7 +323,7 @@ namespace ccm::gen::impl
 			// Check for exceptional cases
 			if (auto exceptional_case = handle_exceptional_cases(x, y, xbits, ybits, x_u, ex, sign); CCM_UNLIKELY(exceptional_case.has_value()))
 			{
-				return *exceptional_case; // Return the handled value
+				return *exceptional_case;
 			}
 
 			if (x < 0.0F && !is_integer(y))
@@ -358,11 +354,16 @@ namespace ccm::gen::impl
 			// Then m_x = (1 + dx) / r, and
 			//   log2(m_x) = log2( (1 + dx) / r )
 			//             = log2(1 + dx) - log2(r).
-#ifdef CCMATH_TARGET_CPU_HAS_FMA
-			const double dx = static_cast<double>(support::multiply_add(m_x, support::constants::R.at(static_cast<std::size_t>(idx_x)), -1.0F)); // Exact
-#else
-			const double dx = support::multiply_add(static_cast<double>(m_x), support::constants::RD.at(static_cast<std::size_t>(idx_x)), -1.0); // Exact
-#endif // LIBC_TARGET_CPU_HAS_FMA
+			const double dx = [&]() {
+				if constexpr (ccm::builtin::target_cpu_has_fma)
+				{
+					return static_cast<double>(support::multiply_add(m_x, support::constants::R.at(static_cast<std::size_t>(idx_x)), -1.0F));
+				}
+				else
+				{
+					return support::multiply_add(static_cast<double>(m_x), support::constants::RD.at(static_cast<std::size_t>(idx_x)), -1.0);
+				}
+			}();
 
 			// Degree-5 polynomial approximation:
 			//   dx * P(dx) ~ log2(1 + dx)
@@ -379,22 +380,6 @@ namespace ccm::gen::impl
 			const double c2	 = support::multiply_add(dx, COEFFS[5], COEFFS[4]);
 
 			const double p = ::ccm::support::polyeval(dx2, c0, c1, c2);
-
-			//////////////////////////////////////////////////////////////////////////////
-			// NOTE: For some reason, this is significantly less efficient than above!
-			//
-			// > P = fpminimax(log2(1 + x)/x, 4, [|D...|], [-2^-8, 2^-7]);
-			// > dirtyinfnorm(log2(1 + x)/x - P, [-2^-8, 2^-7]);
-			//   0x1.d04...p-44
-			// constexpr double COEFFS[] = {0x1.71547652b8133p0, -0x1.71547652d1e33p-1,
-			//                              0x1.ec70a098473dep-2, -0x1.7154c5ccdf121p-2,
-			//                              0x1.2514fd90a130ap-2};
-			//
-			// double dx2 = dx * dx;
-			// double c0 = fputil::multiply_add(dx, COEFFS[1], COEFFS[0]);
-			// double c1 = fputil::multiply_add(dx, COEFFS[3], COEFFS[2]);
-			// double p = fputil::polyeval(dx2, c0, c1, COEFFS[4]);
-			//////////////////////////////////////////////////////////////////////////////
 
 			// s = e_x - log2(r) + dx * P(dx)
 			// Approximation errors:
@@ -429,7 +414,7 @@ namespace ccm::gen::impl
 			// lo6 = 2^6 * lo.
 			const double lo6_hi = support::multiply_add(y6, e_x + LOG2_R_TD.at(static_cast<std::size_t>(idx_x)).hi, -hm); // Exact
 			// Error bounds:
-			//   | (y*log2(x) - hm * 2^-6 - lo) / y| < err(dx * p) + err(LOG2_R_DD.lo)
+			//   | (y*log2(x) - hm * 2^-6 - lo) / y| < err(dx * p) + err(LOG2_R_TD.mid)
 			//                                       < 2^-51 + 2^-75
 			const double lo6 = support::multiply_add(y6, support::multiply_add(dx, p, LOG2_R_TD.at(static_cast<std::size_t>(idx_x)).mid), lo6_hi);
 

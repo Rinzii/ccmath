@@ -59,6 +59,14 @@ namespace ccm::builtin
 		#endif
 	// clang-format on
 
+	inline constexpr bool target_cpu_has_fma =
+#ifdef CCMATH_TARGET_CPU_HAS_FMA
+		true
+#else
+		false
+#endif
+		;
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_fma.
