@@ -1,5 +1,5 @@
 /*
-* Copyright (c) Ian Pike
+ * Copyright (c) Ian Pike
  * Copyright (c) CCMath contributors
  *
  * CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
@@ -29,9 +29,7 @@ namespace ccm::ext
 	{
 		const T delta = target - current;
 
-		if (ccm::abs(delta) <= max_delta) {
-			return target;
-		}
+		if (ccm::abs(delta) <= max_delta) { return target; }
 
 		return current + ((delta > T(0)) ? max_delta : -max_delta);
 	}

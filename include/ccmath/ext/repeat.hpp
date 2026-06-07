@@ -1,5 +1,5 @@
 /*
-* Copyright (c) Ian Pike
+ * Copyright (c) Ian Pike
  * Copyright (c) CCMath contributors
  *
  * CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
@@ -45,9 +45,7 @@ namespace ccm::ext
 		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 		[[nodiscard]] constexpr T repeat(T value, T length) noexcept
 		{
-			if (length == T(0)) {
-				return T(0);
-			}
+			if (length == T(0)) { return T(0); }
 
 			return ext::repeat(value, length);
 		}

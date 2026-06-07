@@ -1,5 +1,5 @@
 /*
-* Copyright (c) Ian Pike
+ * Copyright (c) Ian Pike
  * Copyright (c) CCMath contributors
  *
  * CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
@@ -30,9 +30,7 @@ namespace ccm::ext
 	{
 		const T magnitude = ::ccm::abs(x);
 
-		if (::ccm::signbit(y)) {
-			return -magnitude;
-		}
+		if (::ccm::signbit(y)) { return -magnitude; }
 
 		return magnitude;
 	}

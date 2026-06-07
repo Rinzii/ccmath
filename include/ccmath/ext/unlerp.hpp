@@ -1,5 +1,5 @@
 /*
-* Copyright (c) Ian Pike
+ * Copyright (c) Ian Pike
  * Copyright (c) CCMath contributors
  *
  * CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
@@ -54,9 +54,7 @@ namespace ccm::ext
 		{
 			const T length = end - start;
 
-			if (length == T(0)) {
-				return T(0);
-			}
+			if (length == T(0)) { return T(0); }
 
 			return (value - start) / length;
 		}

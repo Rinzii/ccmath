@@ -354,15 +354,13 @@ namespace ccm::gen::impl
 			// Then m_x = (1 + dx) / r, and
 			//   log2(m_x) = log2( (1 + dx) / r )
 			//             = log2(1 + dx) - log2(r).
-			const double dx = [&]() {
+			const double dx = [&]()
+			{
 				if constexpr (ccm::builtin::target_cpu_has_fma)
 				{
 					return static_cast<double>(support::multiply_add(m_x, support::constants::R.at(static_cast<std::size_t>(idx_x)), -1.0F));
 				}
-				else
-				{
-					return support::multiply_add(static_cast<double>(m_x), support::constants::RD.at(static_cast<std::size_t>(idx_x)), -1.0);
-				}
+				else { return support::multiply_add(static_cast<double>(m_x), support::constants::RD.at(static_cast<std::size_t>(idx_x)), -1.0); }
 			}();
 
 			// Degree-5 polynomial approximation:

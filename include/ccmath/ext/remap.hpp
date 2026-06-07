@@ -68,9 +68,7 @@ namespace ccm::ext
 		{
 			const T length = src_end - src_start;
 
-			if (length == T(0)) {
-				return dst_start;
-			}
+			if (length == T(0)) { return dst_start; }
 
 			return dst_start + ((x - src_start) * (dst_end - dst_start)) / length;
 		}

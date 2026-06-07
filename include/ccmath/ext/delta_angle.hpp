@@ -1,5 +1,5 @@
 /*
-* Copyright (c) Ian Pike
+ * Copyright (c) Ian Pike
  * Copyright (c) CCMath contributors
  *
  * CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
@@ -28,9 +28,7 @@ namespace ccm::ext
 	{
 		T delta = ext::repeat(target - current, T(360));
 
-		if (delta > T(180)) {
-			delta -= T(360);
-		}
+		if (delta > T(180)) { delta -= T(360); }
 
 		return delta;
 	}
@@ -49,9 +47,7 @@ namespace ccm::ext
 		{
 			T delta = ext::safe::repeat(target - current, T(360));
 
-			if (delta > T(180)) {
-				delta -= T(360);
-			}
+			if (delta > T(180)) { delta -= T(360); }
 
 			return delta;
 		}

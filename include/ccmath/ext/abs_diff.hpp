@@ -1,5 +1,5 @@
 /*
-* Copyright (c) Ian Pike
+ * Copyright (c) Ian Pike
  * Copyright (c) CCMath contributors
  *
  * CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
@@ -21,10 +21,7 @@ namespace ccm::ext
 	 * @param rhs The second value.
 	 * @return The absolute difference between lhs and rhs.
 	 */
-	template <
-		typename T,
-		std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<std::remove_cv_t<T>, bool>, bool> = true
-	>
+	template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<std::remove_cv_t<T>, bool>, bool> = true>
 	[[nodiscard]] constexpr T abs_diff(T lhs, T rhs) noexcept
 	{
 		return lhs > rhs ? static_cast<T>(lhs - rhs) : static_cast<T>(rhs - lhs);
