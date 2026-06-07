@@ -91,7 +91,7 @@ namespace ccm::support::fp::op
 				return OutFPBits::inf(result_sign).get_val();
 			}
 
-			// Now either x or y is zero, and the other one is finite.
+			// Either x or y is zero, and the other one is finite.
 			return OutFPBits::zero(result_sign).get_val();
 		}
 

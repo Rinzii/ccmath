@@ -10,6 +10,7 @@
 
 #pragma once
 
+// TODO(IanP): Wire ldexp.hpp constexpr dispatch through ldexp_gen like pow_gen.
 #include "ccmath/internal/config/builtin/bit_cast_support.hpp"
 #include "ccmath/internal/config/builtin/ldexp_support.hpp"
 #include "ccmath/internal/predef/has_const_builtin.hpp"

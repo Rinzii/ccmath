@@ -1,3 +1,4 @@
+// TODO(IanP): Review whether to delete or revive this legacy SIMD draft.
 #pragma once
 
 #include <type_traits>

@@ -46,7 +46,6 @@ namespace ccm::support::fp
 
 		FPBits_t bits(val);
 
-		// Check if the value is NaN, infinity, or zero. If so, return the value.
 		if (bits.is_inf_or_nan() || bits.is_zero()) { return val; }
 
 		bool is_neg	 = bits.is_neg();
@@ -90,7 +89,7 @@ namespace ccm::support::fp
 		// If the truncated value is the same as the original value, then the value is already integral.
 		if (truncated_value == val) { return val; }
 
-		// Calculate the trimmed value and the half-value for rounding decisions.
+		// Bits below the rounding point and the half-way bit for tie handling.
 		Storage_t trimmed_value = bits.get_mantissa() & ((Storage_t(1) << trimming_length) - 1);
 		Storage_t half_value	= Storage_t(1) << (trimming_length - 1);
 

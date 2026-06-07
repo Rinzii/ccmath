@@ -45,10 +45,8 @@ namespace ccm
 	template <typename T, typename U, std::enable_if_t<std::is_floating_point_v<T> && std::is_floating_point_v<U>, bool> = true>
 	constexpr auto fdim(T x, U y)
 	{
-		// Find the common type of the two arguments
 		using shared_type = std::common_type_t<T, U>;
 
-		// Convert the arguments to the common type
 		return ccm::fdim<shared_type>(static_cast<shared_type>(x), static_cast<shared_type>(y));
 	}
 

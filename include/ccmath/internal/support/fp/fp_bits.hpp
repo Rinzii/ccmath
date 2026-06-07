@@ -579,7 +579,7 @@ namespace ccm::support::fp
 			 *
 			 * This function examines the bits and returns whether the implicit bit, as defined by EXPLICIT_BIT_MASK, is set.
 			 *
-			 * @attention This function is specific to FPRepSem<FPType::X86_Binary80>.
+			 * @attention This function is specific to FPRepSem<FPType::eBinary80>.
 			 */
 			[[nodiscard]] constexpr bool get_implicit_bit() const { return static_cast<bool>(bits & EXPLICIT_BIT_MASK); }
 
@@ -591,7 +591,7 @@ namespace ccm::support::fp
 			 * This function sets the implicit bit, defined by EXPLICIT_BIT_MASK, to the given value.
 			 * If the current state of the implicit bit differs from the specified value, it toggles the bit.
 			 *
-			 * @attention This function is specific to FPRepSem<FPType::X86_Binary80>.
+			 * @attention This function is specific to FPRepSem<FPType::eBinary80>.
 			 */
 			constexpr void set_implicit_bit(bool implicitVal)
 			{
@@ -758,11 +758,12 @@ namespace ccm::support::fp
 			 *
 			 * @attention Pay close attention to the following items about this function:
 			 *				1) "ep" is the raw exponent value.
-			 *				2) The function adds +1 to ep for seamless normalized to denormalized transition.
+			 *				2) The function adds +1 to ep for a smooth normalized to denormalized transition.
 			 *				3) The function does not check exponent high limit.
 			 *				4) "number" zero value is not processed correctly.
 			 *				5) Number is unsigned, so the result can be only positive.
 			 */
+			// TODO(IanP): Review whether make_value and FPRep should remain or move into ld80-specific code.
 			static constexpr RetT make_value(storage_type number, int expo)
 			{
 				// Result = number * 2^(expo + 1 - exponent_bias)
@@ -788,6 +789,7 @@ namespace ccm::support::fp
 		 * @tparam fp_type The floating point type to manipulate.
 		 */
 		template <FPType fp_type>
+		// TODO(IanP): Review whether FPRep is still needed or should fold into FPRepImpl.
 		struct FPRep : FPRepImpl<fp_type, FPRep<fp_type>>
 		{
 			using BASE		   = FPRepImpl<fp_type, FPRep<fp_type>>;

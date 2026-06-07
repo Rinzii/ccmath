@@ -79,9 +79,9 @@ namespace ccm::types
 	 * @brief A class for high-precision floating point computations using a dyadic format.
 	 *
 	 * This class represents high-precision floating-point values in a dyadic format, consisting of three fields:
-	 * - <b>sign</b>: A boolean value where `false` indicates positive and `true` indicates negative.
+	 * - <b>sign</b>: A boolean value where false indicates positive and true indicates negative.
 	 * - <b>exponent</b>: The exponent value (for the least significant bit of the mantissa).
-	 * - <b>mantissa</b>: An unsigned integer of length `Bits`.
+	 * - <b>mantissa</b>: An unsigned integer of length Bits.
 	 *
 	 * The stored value is calculated as:
 	 * @code
@@ -430,7 +430,7 @@ namespace ccm::types
 
 			d_lo = support::fp::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_lo), implicit_mask).get_val();
 
-			// Still correct without FMA instructions if `d_lo` is not underflow.
+			// Still correct without FMA instructions if d_lo is not underflow.
 			T r = ccm::support::multiply_add(d_lo, T(round_and_sticky), d_hi);
 
 			if (CCM_UNLIKELY(denorm))

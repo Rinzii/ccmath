@@ -40,7 +40,7 @@ TEST(CcmathBasicTests, Min)
 	ccm::test::ExpectSameAsStd(ccm::min(0.0F, -1.0F), std::min(0.0F, -1.0F));
 	ccm::test::ExpectSameAsStd(ccm::min(-1.0F, -1.0F), std::min(-1.0F, -1.0F));
 
-	// Now mix and match types
+	// Mixed integer and floating-point arguments.
 	ccm::test::ExpectSameAsStd(ccm::fmin(1, 2.0F), std::fmin(1, 2.0F));
 	ccm::test::ExpectSameAsStd(ccm::fmin(2.0F, 1), std::fmin(2.0F, 1));
 	ccm::test::ExpectSameAsStd(ccm::fmin(1, 1.0F), std::fmin(1, 1.0F));

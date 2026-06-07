@@ -289,8 +289,8 @@ namespace ccm::pp::detail
 	 * @internal
 	 * Determines if one integral type has a higher rank than another.
 	 *
-	 * This checks if `From` is a strictly larger integral type than `To`, or if both types
-	 * have the same size and `From` is the common type between the two.
+	 * This checks if From is a strictly larger integral type than To, or if both types
+	 * have the same size and From is the common type between the two.
 	 *
 	 * @tparam From The first integral type to compare.
 	 * @tparam To The second integral type to compare.
@@ -307,7 +307,7 @@ namespace ccm::pp::detail
 	 *
 	 * @tparam T0 The first type.
 	 * @tparam T1 The second type.
-	 * @tparam Enable A SFINAE helper for specialization (default is `void`).
+	 * @tparam Enable A SFINAE helper for specialization (default is void).
 	 */
 	template <typename T0, typename T1, typename Enable = void>
 	struct nopromot_common_type;
@@ -369,7 +369,7 @@ namespace ccm::pp::detail
 	 * @internal
 	 * Fallback specialization for non-integral or incompatible types.
 	 *
-	 * Defaults to `std::common_type` for cases where the inputs are not integral,
+	 * Defaults to std::common_type for cases where the inputs are not integral,
 	 * or where a suitable integral common type cannot be determined.
 	 *
 	 * @tparam T0 The first type.
@@ -386,7 +386,7 @@ namespace ccm::pp::detail
 
 	/**
 	 * @internal
-	 * Alias template for `nopromot_common_type`.
+	 * Alias template for nopromot_common_type.
 	 *
 	 * Provides a cleaner way to access the computed common type.
 	 *

@@ -36,15 +36,12 @@ namespace ccm::support
 		static_assert(!std::is_same_v<T, bool>, "T must not be a boolean type");
 		static_assert(!std::is_enum_v<T>, "T must not be an enumerated type");
 
-		// Get the largest integral type that can hold the sum of a and b
 		using LargerType = long long;
 		auto la			 = static_cast<LargerType>(a);
 		auto lb			 = static_cast<LargerType>(b);
 
-		// Perform the addition
 		LargerType const lres = la + lb;
 
-		// Check for overflow by comparing the signs
 		bool overflow = false;
 		if constexpr (std::is_signed_v<T>)
 		{
@@ -55,7 +52,6 @@ namespace ccm::support
 			if (static_cast<unsigned long long>(lres) < 0 || static_cast<unsigned long long>(lres) > std::numeric_limits<T>::max()) { overflow = true; }
 		}
 
-		// Store the result if no overflow
 		if (!overflow) { res = static_cast<T>(lres); }
 
 		return overflow;
@@ -73,12 +69,10 @@ namespace ccm::support
 		static_assert(!std::is_same_v<T, bool>, "T must not be a boolean type");
 		static_assert(!std::is_enum_v<T>, "T must not be an enumerated type");
 
-		// Get the largest integral type that can hold the sum of a and b
 		using LargerType = long long;
 		auto la			 = static_cast<LargerType>(a);
 		auto lb			 = static_cast<LargerType>(b);
 
-		// Perform the subtraction
 		LargerType const lres = la - lb;
 
 		if constexpr (std::is_signed_v<T>)
@@ -102,7 +96,7 @@ namespace ccm::support
 	if constexpr (std::is_same_v<T, TYPE>) { return BUILTIN(a, b, carry_in, &carry_out); }
 
 	// Returns the result of 'a + b' taking into account 'carry_in'.
-	// The carry out is stored in 'carry_out' it not 'nullptr', dropped otherwise.
+	// The carry out is stored in carry_out when provided, dropped otherwise.
 	// We keep the pass by pointer interface for consistency with the intrinsic.
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> add_with_carry(T a, T b, T carry_in, T & carry_out)
@@ -129,7 +123,7 @@ namespace ccm::support
 	}
 
 	// Returns the result of 'a - b' taking into account 'carry_in'.
-	// The carry out is stored in 'carry_out' if not 'nullptr', dropped otherwise.
+	// The carry out is stored in carry_out when provided, dropped otherwise.
 	// We keep the pass by pointer interface for consistency with the intrinsic.
 	template <typename T>
 	[[nodiscard]] inline constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> sub_with_borrow(T a, T b, T carry_in, T & carry_out)
@@ -164,8 +158,7 @@ namespace ccm::support
 	CCM_DISABLE_MSVC_WARNING(4293)
 	CCM_DISABLE_CLANG_WARNING(-Wshift-count-overflow) // Disabled for same reasons stated above
 
-	// Create a bitmask with the count right-most bits set to 1, and all other bits
-	// set to 0.  Only unsigned types are allowed.
+	// Rightmost count bits set to 1. Unsigned T only.
 	template <typename T, std::size_t count>
 	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_trailing_ones()
 	{
@@ -177,30 +170,28 @@ namespace ccm::support
 	CCM_RESTORE_MSVC_WARNING()
 	CCM_RESTORE_CLANG_WARNING()
 
-	// Create a bitmask with the count left-most bits set to 1, and all other bits
-	// set to 0.  Only unsigned types are allowed.
+	// Only unsigned types are allowed.
 	template <typename T, std::size_t count>
 	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_leading_ones()
 	{
 		return T(~mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>());
 	}
 
-	// Create a bitmask with the count right-most bits set to 0, and all other bits
-	// set to 1.  Only unsigned types are allowed.
+	// Only unsigned types are allowed.
 	template <typename T, std::size_t count>
 	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_trailing_zeros()
 	{
 		return mask_leading_ones<T, CHAR_BIT * sizeof(T) - count>();
 	}
 
-	// Create a bitmask with the count left-most bits set to 0, and all other bits
-	// set to 1.  Only unsigned types are allowed.
+	// Only unsigned types are allowed.
 	template <typename T, std::size_t count>
 	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_leading_zeros()
 	{
 		return mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>();
 	}
 
+	// TODO(IanP): Review whether these helpers should replace or merge with ccm::types::exact_add and split in double_double.hpp.
 	/**
 	 * @brief Add a + b, such that &hi + &lo approximates a + b.
 	 *

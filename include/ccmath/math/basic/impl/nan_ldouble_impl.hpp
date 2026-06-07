@@ -72,36 +72,26 @@ namespace ccm::internal::impl
 
 		if (has_hex_been_detected)
 		{
-			// Calculate tag_value by handling wrapping for numbers larger than 8 digits
 			for (std::size_t i = 0; arg[i] != '\0'; ++i)
 			{
 				dbl_bits *= 16;
-				dbl_bits += static_cast<std::uint8_t>(ccm::support::helpers::digit_to_int(arg[i])); // Convert ASCII to numeric value
-				if (i >= 15)
-				{
-					dbl_bits %= static_cast<ccm::types::uint128_t>(1e18); // Wrap around for numbers larger than 8 digits
-				}
+				dbl_bits += static_cast<std::uint8_t>(ccm::support::helpers::digit_to_int(arg[i]));
+				if (i >= 15) { dbl_bits %= static_cast<ccm::types::uint128_t>(1e18); }
 			}
 		}
 		else
 		{
-			// Calculate tag_value by handling wrapping for numbers larger than 8 digits
 			for (std::size_t i = 0; arg[i] != '\0'; ++i)
 			{
 				dbl_bits *= 10;
-				dbl_bits += static_cast<std::uint8_t>(arg[i] - '0'); // Convert ASCII to numeric value
-				if (i >= 15)
-				{
-					dbl_bits %= static_cast<ccm::types::uint128_t>(1e18); // Wrap around for numbers larger than 8 digits
-				}
+				dbl_bits += static_cast<std::uint8_t>(arg[i] - '0');
+				if (i >= 15) { dbl_bits %= static_cast<ccm::types::uint128_t>(1e18); }
 			}
 		}
 		// NOLINTEND
 
-		// Set the tag bits for NaN
 		dbl_bits |= ccm::support::bit_cast<ccm::types::uint128_t>(std::numeric_limits<long double>::quiet_NaN());
 
-		// Convert the uint128_t tag into a double NaN
 		return ccm::support::bit_cast<long double>(dbl_bits);
 	}
 #endif

@@ -90,7 +90,7 @@ namespace ccm::support
 				for (char const ch : str) { push(ch); }
 			}
 
-			CCM_DISABLE_MSVC_WARNING(4127) // MSVC thinks the is_alpha is a constant expression; It is not.
+			CCM_DISABLE_MSVC_WARNING(4127) // MSVC treats is_alpha as a constant expression. It is not.
 			// Returns the digit for a particular character.
 			// Returns INVALID_DIGIT if the character is invalid.
 			static constexpr uint8_t get_digit_value(const char c)
@@ -115,10 +115,10 @@ namespace ccm::support
 				const std::uint8_t value = get_digit_value(c);
 				if (value == INVALID_DIGIT || size >= MAX_DIGITS)
 				{
-					// During constant evaluation `ccm::support::unreachable()` will halt the
-					// compiler as it is not executable. This is preferable over `assert` that
-					// will only trigger in debug mode. Also, we can't use `static_assert`
-					// because `value` and `size` are not constant.
+					// During constant evaluation ccm::support::unreachable() will halt the
+					// compiler as it is not executable. This is preferable over assert that
+					// will only trigger in debug mode. Also, we cannot use static_assert
+					// because value and size are not constant.
 					ccm::support::unreachable(); // invalid or too many characters.
 				}
 				digits.at(size) = value;
