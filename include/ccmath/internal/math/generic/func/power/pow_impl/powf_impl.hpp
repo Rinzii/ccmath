@@ -130,16 +130,16 @@ namespace ccm::gen::impl
 			};
 
 			DoubleDouble pp		  = ::ccm::support::polyeval(lo6,
-															 EXP2_COEFFS[0],
-															 EXP2_COEFFS[1],
-															 EXP2_COEFFS[2],
-															 EXP2_COEFFS[3],
-															 EXP2_COEFFS[4],
-															 EXP2_COEFFS[5],
-															 EXP2_COEFFS[6],
-															 EXP2_COEFFS[7],
-															 EXP2_COEFFS[8],
-															 EXP2_COEFFS[9]);
+														 EXP2_COEFFS[0],
+														 EXP2_COEFFS[1],
+														 EXP2_COEFFS[2],
+														 EXP2_COEFFS[3],
+														 EXP2_COEFFS[4],
+														 EXP2_COEFFS[5],
+														 EXP2_COEFFS[6],
+														 EXP2_COEFFS[7],
+														 EXP2_COEFFS[8],
+														 EXP2_COEFFS[9]);
 			const DoubleDouble rr = quick_mult(exp2_hi_mid, pp);
 
 			// Make sure the sum is normalized:
@@ -361,10 +361,7 @@ namespace ccm::gen::impl
 				{
 					return static_cast<double>(support::multiply_add(m_x, support::constants::R.at(static_cast<std::size_t>(idx_x)), -1.0F));
 				}
-				else
-				{
-					return support::multiply_add(static_cast<double>(m_x), support::constants::RD.at(static_cast<std::size_t>(idx_x)), -1.0);
-				}
+				else { return support::multiply_add(static_cast<double>(m_x), support::constants::RD.at(static_cast<std::size_t>(idx_x)), -1.0); }
 			}();
 
 			// Degree-5 polynomial approximation:
