@@ -43,9 +43,9 @@ def _line_tag_counts(sm, file, line):
 def _likely_effect(before_tags, after_tags, before_cnt, after_cnt):
     effects = []
     if before_tags.get("spill", 0) > after_tags.get("spill", 0):
-        effects.append("fewer stack spills (correlation)")
+        effects.append("fewer stack spills")
     if after_tags.get("spill", 0) > before_tags.get("spill", 0):
-        effects.append("more stack spills (correlation)")
+        effects.append("more stack spills")
     if before_tags.get("fma", 0) < after_tags.get("fma", 0):
         effects.append("more FMA instructions (possible contraction)")
     if before_tags.get("external_call", 0) < after_tags.get("external_call", 0):

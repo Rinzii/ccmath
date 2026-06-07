@@ -138,7 +138,7 @@ footer { padding: 8px 16px; background: #11111b; color: #a6adc8; font-size: 11px
 </div>
 <div class="diff-panel" id="diff-panel"></div>
 <div class="analysis-panel" id="analysis-panel"></div>
-<footer>Static metrics and path classification are estimates. Deep analysis attributions are correlational unless perf counters agree.</footer>
+<footer>Static metrics and path classification are estimates, not measured wall clock.</footer>
 <script>
 const DATA = %(payload)s;
 const meta = document.getElementById('meta');
@@ -249,8 +249,7 @@ if (DATA.analysis_summary) {
 }
 if (DATA.mca_deep && DATA.mca_deep.bottleneck) {
   ah += '<h3>MCA bottleneck</h3><span class="bottleneck">'
-    + DATA.mca_deep.bottleneck.primary + '</span> ('
-    + (DATA.mca_deep.bottleneck.confidence||'correlation') + ')<br>';
+    + DATA.mca_deep.bottleneck.primary + '</span><br>';
 }
 if (DATA.vectorization) {
   ah += '<h3>Vectorization</h3>width=' + (DATA.vectorization.dominant_width||'-')
@@ -261,7 +260,7 @@ if (DATA.reg_pressure && DATA.reg_pressure.spill_count) {
     + ' reloads=' + (DATA.reg_pressure.reload_count||0) + '<br>';
 }
 if (DATA.semantic && DATA.semantic.classifications) {
-  ah += '<h3>Semantic classifications</h3>'
+  ah += '<h3>Asm tags</h3>'
     + DATA.semantic.classifications.slice(0,8).map(c => c.kind).join(', ') + '<br>';
 }
 if (DATA.analysis_diff) {

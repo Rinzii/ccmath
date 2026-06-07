@@ -450,7 +450,6 @@ def build_source_map(variant_dir, fn, target, path_analysis=None):
             "Mappings come from compiler line tables (-gline-tables-only -fverbose-asm).",
             "Optimized code may have ambiguous or line-zero attributions.",
             "inline_stack and inline_context are metadata-derived follow chains, not full DWARF inline stacks.",
-            "Likely effects are correlational, not proven causal.",
         ],
     }
 
@@ -464,8 +463,8 @@ def write_source_map_md(result, path):
     lines = [
         "# Source map: %s (%s)" % (result["function"], result["variant"]),
         "",
-        "- primary symbol: `%s`" % result.get("primary_symbol", ""),
-        "- source attribution: **%s**" % result.get("primary_attribution", "unknown"),
+        "- primary symbol: %s" % result.get("primary_symbol", ""),
+        "- source attribution: %s" % result.get("primary_attribution", "unknown"),
         "- attribution counts: %s" % result.get("attribution_counts", {}),
         "- path category: %s" % result.get("path_category", "-"),
         "- instructions mapped: %d" % result.get("instruction_count", 0),

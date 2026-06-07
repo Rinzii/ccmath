@@ -93,7 +93,7 @@ def build_perf(variant_dir, mca=None, bench_binary=None):
         "notes": [
             "Linux perf requires a runnable benchmark binary and appropriate permissions.",
             "Apple Instruments and VTune are not wired in this revision.",
-            "Measured counters validate static predictions only at correlation level.",
+            "Compare measured IPC to llvm-mca when perf stat data is available.",
         ],
     }
 

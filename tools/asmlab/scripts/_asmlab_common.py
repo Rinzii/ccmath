@@ -6,12 +6,7 @@
 # See LICENSE for more information.
 #
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-"""Shared helpers for the asmlab scripts.
-
-Standard library only, so it runs on the stock macOS Python 3.9 with no venv.
-Everything here is read-only with respect to the ccmath library. Outputs go to
-out/asmlab/ which is gitignored.
-"""
+"""Shared paths, registry loading, and subprocess helpers for asmlab scripts."""
 
 import json
 import os

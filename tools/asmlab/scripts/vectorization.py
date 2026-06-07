@@ -95,7 +95,7 @@ def build_vectorization(variant_dir, source_map, opt_remarks=None):
         "confidence": "high" if vectorized else ("medium" if missed else "low"),
         "notes": [
             "Width detection is register-class based, not loop-centric.",
-            "Scalar fallback regions are grouped by source line correlation.",
+            "Scalar fallback regions are grouped by source line.",
         ],
     }
 
