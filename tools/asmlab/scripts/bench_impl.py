@@ -166,7 +166,7 @@ def run_powf_impl_bench(profile, variant=None, mode="", extra_args=None):
         "benchmark_mode": mode or "latency",
         "result_ns": result_ns,
         "timestamp": datetime.now(timezone.utc).isoformat(),
-        "merge_grade": "advisory",
+        "bench_note": "bench alone is not a merge signal",
         "raw_excerpt": (res.stdout + res.stderr)[-3000:],
     }
     if status == "failed":

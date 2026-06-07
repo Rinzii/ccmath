@@ -203,7 +203,7 @@ doc = {
     "profile": profile,
     "benchmark_mode": mode or "mixed",
     "timestamp": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-    "merge_grade": "advisory",
+    "bench_note": "bench alone is not a merge signal",
     "samples": len(ns_vals),
     "result_ns": min(ns_vals) if ns_vals else None,
     "raw_excerpt": raw[-2000:],

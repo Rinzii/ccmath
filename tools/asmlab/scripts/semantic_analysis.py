@@ -3,7 +3,7 @@
 # Copyright (c) CCMath contributors
 #
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-"""Semantic optimization classification (source-aware, diff-aware)."""
+"""Compiler remark and asm pattern tags for deep analyze output."""
 
 import re
 
@@ -51,8 +51,6 @@ def build_semantic(variant_dir, source_map, opt_remarks=None, reg_pressure=None,
             "kind": "missed_fma_contraction",
             "evidence": "mul+add pairs without vfmadd",
             "count": muladd_count - fma_count,
-            "confidence": "medium",
-            "causal_level": AC.CAUSAL_LIKELY,
             "source_hint": "polynomial evaluation or dot-like accumulation",
         })
 
@@ -63,8 +61,6 @@ def build_semantic(variant_dir, source_map, opt_remarks=None, reg_pressure=None,
                 "file": r.get("file", ""),
                 "line": r.get("line", 0),
                 "message": r.get("message") or r.get("name", ""),
-                "confidence": "high",
-                "causal_level": AC.CAUSAL_LIKELY,
             })
         for r in opt_remarks.get("inline_decisions", []):
             if r.get("kind") == "Missed":
@@ -73,8 +69,6 @@ def build_semantic(variant_dir, source_map, opt_remarks=None, reg_pressure=None,
                     "file": r.get("file", ""),
                     "line": r.get("line", 0),
                     "message": r.get("message", ""),
-                    "confidence": "high",
-                    "causal_level": AC.CAUSAL_LIKELY,
                 })
 
     if reg_pressure and reg_pressure.get("spill_count", 0) > 0:
@@ -82,8 +76,6 @@ def build_semantic(variant_dir, source_map, opt_remarks=None, reg_pressure=None,
             "kind": "register_spill",
             "spill_count": reg_pressure["spill_count"],
             "reload_count": reg_pressure["reload_count"],
-            "confidence": "medium",
-            "causal_level": AC.CAUSAL_LIKELY,
             "source_hint": "live range growth in hot kernel",
         })
 
@@ -93,8 +85,6 @@ def build_semantic(variant_dir, source_map, opt_remarks=None, reg_pressure=None,
                 "kind": "scalar_fallback",
                 "file": reg["file"],
                 "line": reg["line"],
-                "confidence": "medium",
-                "causal_level": AC.CAUSAL_CORRELATION,
             })
 
     regressions = []
@@ -110,21 +100,20 @@ def build_semantic(variant_dir, source_map, opt_remarks=None, reg_pressure=None,
         "classifications": classifications,
         "regressions_vs_baseline": regressions,
         "tagged_instruction_count": len(tagged),
-        "confidence": "medium",
         "notes": [
-            "Semantic tags combine asm patterns, remarks, and pressure heuristics.",
-            "Classifications are likely causal at best unless backed by measured perf.",
+            "Tags combine asm patterns, remarks, and spill heuristics.",
+            "Confirm with bench before treating a tag as a perf root cause.",
         ],
     }
 
     md = [
-        "# Semantic optimization classification",
+        "# Asm pattern tags",
         "",
-        "## Classifications",
+        "## Tags",
         "",
     ]
     for c in classifications:
-        md.append("- %s (%s, %s)" % (c["kind"], c.get("confidence"), c.get("causal_level")))
+        md.append("- %s" % c["kind"])
         if c.get("file"):
             md.append("  - %s:%d" % (c["file"], c["line"]))
     if regressions:

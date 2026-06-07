@@ -6,7 +6,7 @@
 # See LICENSE for more information.
 #
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-"""Collect reproducibility metadata for asmlab artifacts."""
+"""Record git, compiler, and tool versions for an asmlab run."""
 
 import datetime
 from datetime import timezone

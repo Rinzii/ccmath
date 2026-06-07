@@ -3,7 +3,7 @@
 # Copyright (c) CCMath contributors
 #
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-"""Multi-candidate comparison across scenarios with conservative ranking."""
+"""Multi-candidate comparison across scenarios."""
 
 import json
 import re
@@ -24,13 +24,12 @@ DECISION_PRIORITY = {
     "reject_special_values": 3,
     "reject_benchmark": 4,
     "reject_constexpr": 5,
-    "not_enough_evidence": 6,
-    "advisory_only": 7,
-    "candidate_for_review": 8,
-    "merge_grade": 9,
+    "incomplete": 6,
+    "static_only": 7,
+    "ready_for_review": 8,
 }
 
-POSITIVE_DECISIONS = {"candidate_for_review", "merge_grade"}
+POSITIVE_DECISIONS = {"ready_for_review"}
 
 
 def list_workspace_variants(fn):
@@ -435,18 +434,18 @@ def _decide_scenario(fn, arch, heuristics, m1_spill_advisory):
         if worst in ("not_run", "not_wired", "fail"):
             missing_cand_acc = True
     if bench == "pass" and missing_cand_acc:
-        return "not_enough_evidence"
+        return "incomplete"
     if bench in ("not_run", "not_wired", "advisory", None):
         if heuristics.get("static_improved") and not heuristics.get("benchmark_win"):
-            return "advisory_only" if not m1_spill_advisory else "not_enough_evidence"
-        return "not_enough_evidence"
+            return "static_only" if not m1_spill_advisory else "incomplete"
+        return "incomplete"
     if missing_cand_acc:
-        return "not_enough_evidence"
+        return "incomplete"
     if bench == "pass" and cand_acc == "pass" and ps in ("pass", "warn"):
-        return "candidate_for_review"
+        return "ready_for_review"
     if heuristics.get("static_improved"):
-        return "advisory_only"
-    return "not_enough_evidence"
+        return "static_only"
+    return "incomplete"
 
 
 def compare_variant_scenario(fn, variant, scenario, arch, flags, compiler,
@@ -582,7 +581,7 @@ def aggregate_variant_ranking(scenario_results):
         by_variant.setdefault(v, []).append(row)
     ranking = []
     for variant, rows in sorted(by_variant.items()):
-        decisions = [r.get("decision", "not_enough_evidence") for r in rows]
+        decisions = [r.get("decision", "incomplete") for r in rows]
         worst = min(decisions, key=lambda d: DECISION_PRIORITY.get(d, 99))
         wins = []
         risks = []
@@ -612,7 +611,7 @@ def aggregate_variant_ranking(scenario_results):
             "major_wins": wins[:5],
             "major_risks": risks[:5],
             "static_only": bool(non_reject) and all(
-                r["decision"] == "advisory_only" for r in non_reject),
+                r["decision"] == "static_only" for r in non_reject),
         })
     ranking.sort(key=lambda x: (-x["priority"], x["variant"]))
     for i, ent in enumerate(ranking, 1):
@@ -717,13 +716,13 @@ def _recommendation(ranking, scenario_results, arch, fn):
     top = ranking[0]
     if top["decision"].startswith("reject"):
         return "reject all listed candidates; fix path or accuracy before review"
-    if top["decision"] == "not_enough_evidence":
+    if top["decision"] == "incomplete":
         return "run missing benchmarks and rigorous accuracy gates before merge review"
-    if top["decision"] == "advisory_only":
+    if top["decision"] == "static_only":
         return "keep as advisory; static metrics improved without benchmark proof"
     if any(r.get("m1_spill_ranking_suppressed") for r in scenario_results):
         return "M1 comparisons are scope-limited; prefer x86-64-v3 for spill ranking"
-    if top["decision"] == "candidate_for_review":
+    if top["decision"] == "ready_for_review":
         return "candidate ready for manual review after rigorous accuracy gate"
     return "review ranking table and run missing evidence"
 
@@ -759,7 +758,7 @@ def render_compare_md(report):
     ])
     for r in report.get("scenario_results", []):
         if "error" in r:
-            lines.append("| %s | %s | error | - | - | - | - | - | - | not_enough_evidence |" % (
+            lines.append("| %s | %s | error | - | - | - | - | - | - | incomplete |" % (
                 r.get("scenario"), r.get("variant")))
             continue
         sh = r.get("spill_heuristic", {})
