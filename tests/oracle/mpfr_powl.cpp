@@ -1,7 +1,6 @@
-#include "mpfr_pow_common.hpp"
-
 #include "ccmath/internal/config/powl_policy.hpp"
 #include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
+#include "mpfr_pow_common.hpp"
 #include "oracle/powl_path_reporting.hpp"
 
 #include <fstream>
@@ -9,24 +8,21 @@
 
 namespace
 {
-	using ccm::test::oracle::PowlImplementationPath;
 	using ccm::test::oracle::classify_powl_gen_path;
-	using ccm::test::oracle::powl_path_is_reduced_precision;
-	using ccm::test::oracle::powl_path_is_native_phase1;
-	using ccm::test::oracle::powl_path_name;
 	using ccm::test::oracle::pow_case;
+	using ccm::test::oracle::powl_path_is_native_phase1;
+	using ccm::test::oracle::powl_path_is_reduced_precision;
+	using ccm::test::oracle::powl_path_name;
+	using ccm::test::oracle::PowlImplementationPath;
 
 	std::vector<pow_case<long double>> build_ld64_cases()
 	{
-		const std::array<long double, 6> bases = { 0.25L, 0.5L, 1.0L, 2.0L, 3.0L, 10.0L };
+		const std::array<long double, 6> bases	   = { 0.25L, 0.5L, 1.0L, 2.0L, 3.0L, 10.0L };
 		const std::array<long double, 6> exponents = { -2.0L, -0.5L, 0.0L, 0.5L, 2.0L, 3.0L };
 		std::vector<pow_case<long double>> cases;
 		for (long double base : bases)
 		{
-			for (long double exponent : exponents)
-			{
-				cases.push_back({ base, exponent, "ld64 conservative oracle grid" });
-			}
+			for (long double exponent : exponents) { cases.push_back({ base, exponent, "ld64 conservative oracle grid" }); }
 		}
 		return cases;
 	}
@@ -35,34 +31,15 @@ namespace
 	{
 		std::vector<pow_case<long double>> cases;
 		const std::array<long double, 10> special_bases = {
-			-std::numeric_limits<long double>::infinity(),
-			-2.0L,
-			-1.0L,
-			-0.0L,
-			0.0L,
-			1.0L,
-			2.0L,
-			10.0L,
-			std::numeric_limits<long double>::max(),
+			-std::numeric_limits<long double>::infinity(), -2.0L, -1.0L, -0.0L, 0.0L, 1.0L, 2.0L, 10.0L, std::numeric_limits<long double>::max(),
 			std::numeric_limits<long double>::infinity(),
 		};
 		const std::array<long double, 9> special_exponents = {
-			-std::numeric_limits<long double>::infinity(),
-			-3.0L,
-			-1.0L,
-			-0.0L,
-			0.0L,
-			0.5L,
-			2.0L,
-			3.0L,
-			std::numeric_limits<long double>::infinity(),
+			-std::numeric_limits<long double>::infinity(), -3.0L, -1.0L, -0.0L, 0.0L, 0.5L, 2.0L, 3.0L, std::numeric_limits<long double>::infinity(),
 		};
 		for (long double base : special_bases)
 		{
-			for (long double exponent : special_exponents)
-			{
-				cases.push_back({ base, exponent, "ld80 special-value matrix" });
-			}
+			for (long double exponent : special_exponents) { cases.push_back({ base, exponent, "ld80 special-value matrix" }); }
 		}
 		return cases;
 	}
@@ -77,10 +54,7 @@ namespace
 				cases.push_back({ base, exponent, "ld80 bounded integer exponent corpus" });
 			}
 		}
-		for (long double exponent : { 0x1.0p62L, 0x1.0000000000001p62L, 0x1.0p63L })
-		{
-			cases.push_back({ -1.0L, exponent, "ld80 parity threshold corpus" });
-		}
+		for (long double exponent : { 0x1.0p62L, 0x1.0000000000001p62L, 0x1.0p63L }) { cases.push_back({ -1.0L, exponent, "ld80 parity threshold corpus" }); }
 		return cases;
 	}
 
@@ -114,10 +88,10 @@ namespace
 	struct powl_case_result
 	{
 		pow_case<long double> test_case;
-		PowlImplementationPath path = PowlImplementationPath::UnknownUnsupported;
+		PowlImplementationPath path		  = PowlImplementationPath::UnknownUnsupported;
 		powl_case_disposition disposition = powl_case_disposition::skipped_unsupported;
-		std::uint64_t ulp_distance = 0;
-		bool above_target = false;
+		std::uint64_t ulp_distance		  = 0;
+		bool above_target				  = false;
 		std::string notes;
 	};
 
@@ -125,24 +99,23 @@ namespace
 	{
 		ccm::config::LongDoubleFormat format = ccm::config::LongDoubleFormat::Unknown;
 		std::string corpus;
-		bool fallback_enabled = false;
-		std::size_t case_count = 0;
-		std::size_t validated_native_count = 0;
-		std::size_t validated_exceptional_count = 0;
-		std::size_t skipped_unsupported_count = 0;
+		bool fallback_enabled						= false;
+		std::size_t case_count						= 0;
+		std::size_t validated_native_count			= 0;
+		std::size_t validated_exceptional_count		= 0;
+		std::size_t skipped_unsupported_count		= 0;
 		std::size_t skipped_reduced_precision_count = 0;
-		std::size_t failure_count = 0;
-		std::size_t above_target_count = 0;
-		std::uint64_t max_observed_ulp = 0;
+		std::size_t failure_count					= 0;
+		std::size_t above_target_count				= 0;
+		std::uint64_t max_observed_ulp				= 0;
 		std::vector<powl_case_result> case_results;
 	};
 
-	powl_case_result evaluate_powl_case(const pow_case<long double> & test_case, mpfr_prec_t precision, std::uint64_t max_ulp,
-										std::uint64_t target_ulp)
+	powl_case_result evaluate_powl_case(const pow_case<long double> & test_case, mpfr_prec_t precision, std::uint64_t max_ulp, std::uint64_t target_ulp)
 	{
 		powl_case_result result;
 		result.test_case = test_case;
-		result.path = classify_powl_gen_path(test_case.base, test_case.exponent);
+		result.path		 = classify_powl_gen_path(test_case.base, test_case.exponent);
 
 		if (result.path == PowlImplementationPath::Ld80Unsupported || result.path == PowlImplementationPath::Ld128Unsupported ||
 			result.path == PowlImplementationPath::UnknownUnsupported)
@@ -154,22 +127,21 @@ namespace
 		if (powl_path_is_reduced_precision(result.path))
 		{
 			result.disposition = powl_case_disposition::skipped_reduced_precision;
-			result.notes = "reduced-precision fallback path is not independent powl validation";
+			result.notes	   = "reduced-precision fallback path is not independent powl validation";
 			return result;
 		}
 
-		const mpfr_rnd_t rounding = ccm::test::oracle::current_mpfr_rounding_mode();
-		const long double actual = ccm::gen::pow_gen(test_case.base, test_case.exponent);
+		const mpfr_rnd_t rounding  = ccm::test::oracle::current_mpfr_rounding_mode();
+		const long double actual   = ccm::gen::pow_gen(test_case.base, test_case.exponent);
 		const long double mpfr_ref = ccm::test::oracle::mpfr_pow_reference(test_case.base, test_case.exponent, precision, rounding);
-		const long double std_ref = std::pow(test_case.base, test_case.exponent);
+		const long double std_ref  = std::pow(test_case.base, test_case.exponent);
 
-		if (ccm::test::oracle::powl_exceptional_case(test_case.base, test_case.exponent) ||
-			result.path == PowlImplementationPath::Ld80SpecialCase)
+		if (ccm::test::oracle::powl_exceptional_case(test_case.base, test_case.exponent) || result.path == PowlImplementationPath::Ld80SpecialCase)
 		{
 			if (!ccm::test::oracle::exceptional_or_zero_match(actual, std_ref))
 			{
 				result.disposition = powl_case_disposition::failed;
-				result.notes = "exceptional mismatch vs std::pow";
+				result.notes	   = "exceptional mismatch vs std::pow";
 				return result;
 			}
 			result.disposition = powl_case_disposition::validated_exceptional;
@@ -178,17 +150,17 @@ namespace
 
 		std::uint64_t distance = 0;
 		std::string notes;
-		const bool pass = ccm::test::oracle::oracle_match(actual, mpfr_ref, max_ulp, distance, notes);
+		const bool pass		= ccm::test::oracle::oracle_match(actual, mpfr_ref, max_ulp, distance, notes);
 		result.ulp_distance = distance;
 		if (!pass)
 		{
 			result.disposition = powl_case_disposition::failed;
-			result.notes = notes;
+			result.notes	   = notes;
 			return result;
 		}
 
 		result.above_target = distance > target_ulp;
-		result.disposition = powl_case_disposition::validated_native;
+		result.disposition	= powl_case_disposition::validated_native;
 		return result;
 	}
 
@@ -207,12 +179,8 @@ namespace
 			++report.validated_exceptional_count;
 			++report.case_count;
 			break;
-		case powl_case_disposition::skipped_unsupported:
-			++report.skipped_unsupported_count;
-			break;
-		case powl_case_disposition::skipped_reduced_precision:
-			++report.skipped_reduced_precision_count;
-			break;
+		case powl_case_disposition::skipped_unsupported: ++report.skipped_unsupported_count; break;
+		case powl_case_disposition::skipped_reduced_precision: ++report.skipped_reduced_precision_count; break;
 		case powl_case_disposition::failed:
 			++report.failure_count;
 			++report.case_count;
@@ -289,28 +257,22 @@ namespace
 									std::uint64_t target_ulp)
 	{
 		powl_campaign_report report;
-		report.format = format;
-		report.corpus = corpus_name;
+		report.format			= format;
+		report.corpus			= corpus_name;
 		report.fallback_enabled = ccm::config::reduced_precision_powl_fallback_enabled();
 
 		for (const int rounding_mode : rounding_modes)
 		{
 			ccm::test::oracle::ScopedMpfrRoundingMode scope(rounding_mode);
 			if (!scope) { continue; }
-			for (const auto & test_case : cases)
-			{
-				accumulate_report(report, evaluate_powl_case(test_case, precision, max_ulp, target_ulp));
-			}
+			for (const auto & test_case : cases) { accumulate_report(report, evaluate_powl_case(test_case, precision, max_ulp, target_ulp)); }
 		}
 
-		std::cout << "powl corpus=" << corpus_name << " format=" << ccm::config::long_double_format_name(format)
-				  << " rounding_modes=" << rounding_modes.size() << " fallback_enabled=" << (report.fallback_enabled ? "yes" : "no")
-				  << " validated_native=" << report.validated_native_count
-				  << " validated_exceptional=" << report.validated_exceptional_count
-				  << " skipped_unsupported=" << report.skipped_unsupported_count
-				  << " skipped_reduced_precision=" << report.skipped_reduced_precision_count
-				  << " failures=" << report.failure_count << " max_ulp=" << report.max_observed_ulp
-				  << " target_ulp=" << target_ulp << " above_target=" << report.above_target_count
+		std::cout << "powl corpus=" << corpus_name << " format=" << ccm::config::long_double_format_name(format) << " rounding_modes=" << rounding_modes.size()
+				  << " fallback_enabled=" << (report.fallback_enabled ? "yes" : "no") << " validated_native=" << report.validated_native_count
+				  << " validated_exceptional=" << report.validated_exceptional_count << " skipped_unsupported=" << report.skipped_unsupported_count
+				  << " skipped_reduced_precision=" << report.skipped_reduced_precision_count << " failures=" << report.failure_count
+				  << " max_ulp=" << report.max_observed_ulp << " target_ulp=" << target_ulp << " above_target=" << report.above_target_count
 				  << " oracle_precision=" << precision << " configuration=" << ccm::test::oracle::configuration_name()
 				  << " compiler=" << ccm::test::oracle::compiler_id() << " platform=" << ccm::test::oracle::platform_id() << '\n';
 
@@ -336,32 +298,31 @@ int main(int argc, char ** argv)
 		return 0;
 	}
 
-	const auto format = ccm::config::detect_long_double_format();
+	// detect_long_double_format() is constexpr, so the format dispatch below is resolved at
+	// compile time. Using if constexpr keeps MSVC /W4 from flagging the constant condition (C4127).
+	constexpr auto format		= ccm::config::detect_long_double_format();
 	const mpfr_prec_t precision = ccm::test::oracle::powl_oracle_precision(format);
-	const std::uint64_t max_ulp =
-		ccm::test::oracle::parse_option_or<std::uint64_t>(ccm::test::oracle::option_value(argc, argv, "--max-ulp="),
-			[](const std::string & value) { return static_cast<std::uint64_t>(std::stoull(value)); },
-			4);
+	const std::uint64_t max_ulp = ccm::test::oracle::parse_option_or<std::uint64_t>(
+		ccm::test::oracle::option_value(argc, argv, "--max-ulp="), [](const std::string & value) { return static_cast<std::uint64_t>(std::stoull(value)); }, 4);
 	// Hard ceiling stays at 4 ULP. The correctly-rounded target is 0.5 ULP, which in the
 	// integer ULP-distance metric versus the rounded MPFR reference is distance 0.
-	const std::uint64_t target_ulp =
-		ccm::test::oracle::parse_option_or<std::uint64_t>(ccm::test::oracle::option_value(argc, argv, "--target-ulp="),
-			[](const std::string & value) { return static_cast<std::uint64_t>(std::stoull(value)); },
-			0);
+	const std::uint64_t target_ulp = ccm::test::oracle::parse_option_or<std::uint64_t>(
+		ccm::test::oracle::option_value(argc, argv, "--target-ulp="),
+		[](const std::string & value) { return static_cast<std::uint64_t>(std::stoull(value)); },
+		0);
 	const auto rounding_modes = ccm::test::oracle::parse_rounding_modes(argc, argv);
 	mpfr_set_default_rounding_mode(MPFR_RNDN);
 
-	std::cout << "powl MPFR harness format=" << ccm::config::long_double_format_name(format) << " digits="
-			  << std::numeric_limits<long double>::digits << " max_exponent=" << std::numeric_limits<long double>::max_exponent
-			  << " rounding_modes=" << rounding_modes.size()
+	std::cout << "powl MPFR harness format=" << ccm::config::long_double_format_name(format) << " digits=" << std::numeric_limits<long double>::digits
+			  << " max_exponent=" << std::numeric_limits<long double>::max_exponent << " rounding_modes=" << rounding_modes.size()
 			  << " fallback_enabled=" << (ccm::config::reduced_precision_powl_fallback_enabled() ? "yes" : "no") << '\n';
 
 	std::vector<powl_campaign_report> reports;
-	if (format == ccm::config::LongDoubleFormat::Double)
+	if constexpr (format == ccm::config::LongDoubleFormat::Double)
 	{
 		reports.push_back(run_corpus("ld64_conservative", build_ld64_cases(), rounding_modes, format, precision, max_ulp, target_ulp));
 	}
-	else if (format == ccm::config::LongDoubleFormat::X87Extended)
+	else if constexpr (format == ccm::config::LongDoubleFormat::X87Extended)
 	{
 		reports.push_back(run_corpus("ld80_special_cases", build_ld80_special_cases(), rounding_modes, format, precision, max_ulp, target_ulp));
 		reports.push_back(run_corpus("ld80_bounded_integer", build_ld80_bounded_integer_cases(), rounding_modes, format, precision, max_ulp, target_ulp));

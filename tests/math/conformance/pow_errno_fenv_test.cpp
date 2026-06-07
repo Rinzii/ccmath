@@ -8,6 +8,10 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "ccmath/ccmath.hpp"
+#include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
+#include "ccmath/internal/predef/attributes/never_inline.hpp"
+#include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "utils/conformance_suite.hpp"
 
 #include <gtest/gtest.h>
@@ -15,10 +19,6 @@
 #include <cerrno>
 #include <cmath>
 #include <limits>
-
-#include "ccmath/ccmath.hpp"
-#include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
-#include "ccmath/internal/support/fenv/fenv_support.hpp"
 
 namespace
 {
@@ -36,12 +36,12 @@ namespace
 		(void)sink;
 	}
 
-	__attribute__((noinline)) double invoke_pow_gen(double base, double exp)
+	CCM_NEVER_INLINE double invoke_pow_gen(double base, double exp)
 	{
 		return ccm::gen::pow_gen(base, exp);
 	}
 
-	__attribute__((noinline)) float invoke_powf_gen(float base, float exp)
+	CCM_NEVER_INLINE float invoke_powf_gen(float base, float exp)
 	{
 		return ccm::gen::pow_gen(base, exp);
 	}
@@ -49,8 +49,7 @@ namespace
 
 TEST(CcmathPowErrnoTests, GenericPowSetsErrnoWhenRuntimeErrnoIsEnabled)
 {
-	if constexpr ((ccm::support::fenv::ccm_math_err_handling() &
-				   ccm::support::fenv::get_mode(ccm::support::fenv::ccm_math_err_mode::eErrno)) == 0)
+	if constexpr ((ccm::support::fenv::ccm_math_err_handling() & ccm::support::fenv::get_mode(ccm::support::fenv::ccm_math_err_mode::eErrno)) == 0)
 	{
 		GTEST_SKIP() << "this build does not advertise errno-setting math error handling";
 	}
@@ -90,25 +89,21 @@ TEST(CcmathPowErrnoTests, GenericPowSetsErrnoWhenRuntimeErrnoIsEnabled)
 
 TEST(CcmathPowFenvTests, OverflowAndUnderflowFlagsMatchStdForPowPublicApi)
 {
-	ccm::test::ExpectFenvFlagsMatchStd(
-		[] { consume(ccm::pow(runtime_value(std::numeric_limits<double>::max()), runtime_value(2.0))); },
-		[] { consume(std::pow(runtime_value(std::numeric_limits<double>::max()), runtime_value(2.0))); },
-		FE_OVERFLOW);
+	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::pow(runtime_value(std::numeric_limits<double>::max()), runtime_value(2.0))); },
+									   [] { consume(std::pow(runtime_value(std::numeric_limits<double>::max()), runtime_value(2.0))); },
+									   FE_OVERFLOW);
 
-	ccm::test::ExpectFenvFlagsMatchStd(
-		[] { consume(ccm::pow(runtime_value(2.0), runtime_value(-1075.0))); },
-		[] { consume(std::pow(runtime_value(2.0), runtime_value(-1075.0))); },
-		FE_UNDERFLOW);
+	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::pow(runtime_value(2.0), runtime_value(-1075.0))); },
+									   [] { consume(std::pow(runtime_value(2.0), runtime_value(-1075.0))); },
+									   FE_UNDERFLOW);
 
-	ccm::test::ExpectFenvFlagsMatchStd(
-		[] { consume(ccm::powf(runtime_value(std::numeric_limits<float>::max()), runtime_value(2.0F))); },
-		[] { consume(std::pow(runtime_value(std::numeric_limits<float>::max()), runtime_value(2.0F))); },
-		FE_OVERFLOW);
+	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::powf(runtime_value(std::numeric_limits<float>::max()), runtime_value(2.0F))); },
+									   [] { consume(std::pow(runtime_value(std::numeric_limits<float>::max()), runtime_value(2.0F))); },
+									   FE_OVERFLOW);
 
-	ccm::test::ExpectFenvFlagsMatchStd(
-		[] { consume(ccm::powf(runtime_value(2.0F), runtime_value(-150.0F))); },
-		[] { consume(std::pow(runtime_value(2.0F), runtime_value(-150.0F))); },
-		FE_UNDERFLOW);
+	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::powf(runtime_value(2.0F), runtime_value(-150.0F))); },
+									   [] { consume(std::pow(runtime_value(2.0F), runtime_value(-150.0F))); },
+									   FE_UNDERFLOW);
 }
 
 TEST(CcmathPowFenvTests, SignalingNaNsRaiseInvalidLikeStdWhenObservable)
@@ -118,20 +113,17 @@ TEST(CcmathPowFenvTests, SignalingNaNsRaiseInvalidLikeStdWhenObservable)
 		GTEST_SKIP() << "signaling NaNs are not available on this platform";
 	}
 
-	ccm::test::ExpectFenvFlagsMatchStd(
-		[] { consume(ccm::pow(runtime_value(std::numeric_limits<double>::signaling_NaN()), runtime_value(2.0))); },
-		[] { consume(std::pow(runtime_value(std::numeric_limits<double>::signaling_NaN()), runtime_value(2.0))); },
-		FE_INVALID);
+	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::pow(runtime_value(std::numeric_limits<double>::signaling_NaN()), runtime_value(2.0))); },
+									   [] { consume(std::pow(runtime_value(std::numeric_limits<double>::signaling_NaN()), runtime_value(2.0))); },
+									   FE_INVALID);
 
-	ccm::test::ExpectFenvFlagsMatchStd(
-		[] { consume(ccm::pow(runtime_value(2.0), runtime_value(std::numeric_limits<double>::signaling_NaN()))); },
-		[] { consume(std::pow(runtime_value(2.0), runtime_value(std::numeric_limits<double>::signaling_NaN()))); },
-		FE_INVALID);
+	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::pow(runtime_value(2.0), runtime_value(std::numeric_limits<double>::signaling_NaN()))); },
+									   [] { consume(std::pow(runtime_value(2.0), runtime_value(std::numeric_limits<double>::signaling_NaN()))); },
+									   FE_INVALID);
 
-	ccm::test::ExpectFenvFlagsMatchStd(
-		[] { consume(ccm::powf(runtime_value(std::numeric_limits<float>::signaling_NaN()), runtime_value(2.0F))); },
-		[] { consume(std::pow(runtime_value(std::numeric_limits<float>::signaling_NaN()), runtime_value(2.0F))); },
-		FE_INVALID);
+	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::powf(runtime_value(std::numeric_limits<float>::signaling_NaN()), runtime_value(2.0F))); },
+									   [] { consume(std::pow(runtime_value(std::numeric_limits<float>::signaling_NaN()), runtime_value(2.0F))); },
+									   FE_INVALID);
 }
 
 TEST(CcmathPowExceptionalValueTests, QuietAndSignalingNaNsProduceNaNResults)

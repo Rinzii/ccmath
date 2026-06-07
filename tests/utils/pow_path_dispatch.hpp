@@ -140,8 +140,7 @@ namespace ccm::test::pow_path
 		{
 		case validation_path::public_default:
 		case validation_path::generic_runtime:
-		case validation_path::generic_modeled_domain:
-			return { true, {} };
+		case validation_path::generic_modeled_domain: return { true, {} };
 		case validation_path::runtime_no_builtin:
 #if defined(CCM_CONFIG_TEST_DISABLE_RUNTIME_BUILTIN_POW)
 			return { true, {} };
@@ -172,10 +171,8 @@ namespace ccm::test::pow_path
 			else if constexpr (std::is_same_v<T, double>) { return ccm::pow(runtime_value(base), runtime_value(exponent)); }
 			else { return ccm::powl(runtime_value(base), runtime_value(exponent)); }
 		case validation_path::generic_runtime:
-		case validation_path::generic_modeled_domain:
-			return ccm::gen::pow_gen(runtime_value(base), runtime_value(exponent));
-		case validation_path::runtime_no_builtin:
-			return ccm::rt::pow_rt(runtime_value(base), runtime_value(exponent));
+		case validation_path::generic_modeled_domain: return ccm::gen::pow_gen(runtime_value(base), runtime_value(exponent));
+		case validation_path::runtime_no_builtin: return ccm::rt::pow_rt(runtime_value(base), runtime_value(exponent));
 		case validation_path::runtime_simd:
 #if defined(CCMATH_HAS_SIMD)
 			return ccm::rt::simd_impl::pow_simd_impl(runtime_value(base), runtime_value(exponent));
@@ -183,7 +180,11 @@ namespace ccm::test::pow_path
 			return ccm::gen::pow_gen(runtime_value(base), runtime_value(exponent));
 #endif
 		case validation_path::runtime_builtin:
-			return ccm::builtin::runtime_pow(runtime_value(base), runtime_value(exponent));
+			// runtime_pow is only defined where has_runtime_pow<T> holds (GCC/Clang). On other
+			// toolchains this path reports unsupported via path_is_supported, but the switch must
+			// still compile, so fall back to the generic kernel in the discarded branch.
+			if constexpr (ccm::builtin::has_runtime_pow<T>) { return ccm::builtin::runtime_pow(runtime_value(base), runtime_value(exponent)); }
+			else { return ccm::gen::pow_gen(runtime_value(base), runtime_value(exponent)); }
 		}
 		return ccm::gen::pow_gen(runtime_value(base), runtime_value(exponent));
 	}
@@ -204,14 +205,7 @@ namespace ccm::test::pow_path
 	inline configuration_report make_configuration_report(validation_path path)
 	{
 		return configuration_report{
-			configuration_name(),
-			path_name(path),
-			compiler_id(),
-			platform_id(),
-			optimization_mode(),
-			fma_status(),
-			builtin_status<T>(),
-			simd_status(),
+			configuration_name(), path_name(path), compiler_id(), platform_id(), optimization_mode(), fma_status(), builtin_status<T>(), simd_status(),
 		};
 	}
 
