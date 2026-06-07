@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+# Copyright (c) Ian Pike
+# Copyright (c) CCMath contributors
+#
+# CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
+# See LICENSE for more information.
+#
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 """Emit powl_ld80_tables.hpp from pow Sollya tables and ld80-native splits."""
 
 from __future__ import annotations
