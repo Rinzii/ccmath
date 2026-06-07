@@ -144,8 +144,6 @@ def build_opt_remarks(variant_dir, source_map=None):
             "message": doc.get("message") or doc.get("reason", ""),
             "tags": tags,
             "attribution_layer": layer,
-            "confidence": "high" if f and doc.get("line") else "medium",
-            "causal_level": AC.CAUSAL_CORRELATION,
         })
 
     by_tag = {}

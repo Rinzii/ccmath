@@ -3,7 +3,7 @@
 # Copyright (c) CCMath contributors
 #
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-"""Vectorization detection and failure correlation."""
+"""Vectorization width and missed-vectorize remarks from asm and opt records."""
 
 import re
 
@@ -66,8 +66,6 @@ def build_vectorization(variant_dir, source_map, opt_remarks=None):
             "file": m.get("file", ""),
             "line": m.get("line", 0),
             "message": m.get("message") or m.get("name", ""),
-            "confidence": "high",
-            "causal_level": AC.CAUSAL_LIKELY,
         })
 
     scalar_fallback_regions = []
@@ -81,8 +79,6 @@ def build_vectorization(variant_dir, source_map, opt_remarks=None):
                 "file": f,
                 "line": ln,
                 "scalar_insn_count": len(items),
-                "confidence": "medium",
-                "causal_level": AC.CAUSAL_CORRELATION,
             })
 
     result = {

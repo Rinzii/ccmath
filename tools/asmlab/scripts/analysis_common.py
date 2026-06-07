@@ -10,11 +10,6 @@ from pathlib import Path
 
 import _asmlab_common as C
 
-CAUSAL_PROVEN = "proven"
-CAUSAL_LIKELY = "likely_causal"
-CAUSAL_CORRELATION = "correlation"
-CAUSAL_UNKNOWN = "unknown"
-
 ANALYSIS_VERSION = 1
 
 

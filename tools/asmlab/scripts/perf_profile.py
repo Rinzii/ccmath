@@ -76,7 +76,6 @@ def build_perf(variant_dir, mca=None, bench_binary=None):
             "measured_ipc": measured["ipc"],
             "predicted_ipc": predicted_ipc,
             "delta": measured["ipc"] - predicted_ipc,
-            "confidence": AC.CAUSAL_CORRELATION,
             "note": "Static MCA IPC vs perf stat IPC on harness binary",
         }
 

@@ -79,7 +79,6 @@ def build_microarch(variant_dir, source_map, mca, cfg=None):
         "dependency_chain_ops": dep_chain_score,
         "bottleneck": {
             "primary": primary,
-            "confidence": AC.CAUSAL_CORRELATION,
             "frontend_score": round(frontend, 2),
             "backend_score": round(backend, 2),
             "scheduler_score": scheduler,

@@ -3,7 +3,7 @@
 # Copyright (c) CCMath contributors
 #
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-"""Diff-aware comparisons for deep analysis artifacts."""
+"""Diff deep analyze artifacts between baseline and current runs."""
 
 import json
 from pathlib import Path
@@ -37,7 +37,6 @@ def compare_variants(current_dir, baseline_dir):
         "throughput_delta": _delta((base_mca or {}).get("function", {}), (cur_mca or {}).get("function", {}), "block_rthroughput"),
         "bottleneck_from": (base_mca or {}).get("bottleneck", {}).get("primary"),
         "bottleneck_to": (cur_mca or {}).get("bottleneck", {}).get("primary"),
-        "confidence": AC.CAUSAL_CORRELATION,
     }
 
     cfg_diff = {
@@ -48,7 +47,6 @@ def compare_variants(current_dir, baseline_dir):
     spill_diff = {
         "spill_delta": _delta(base_rp, cur_rp, "spill_count"),
         "reload_delta": _delta(base_rp, cur_rp, "reload_count"),
-        "confidence": AC.CAUSAL_LIKELY if _delta(base_rp, cur_rp, "spill_count") else AC.CAUSAL_CORRELATION,
     }
 
     vec_diff = {
@@ -87,7 +85,6 @@ def compare_variants(current_dir, baseline_dir):
         "per_block_mca": block_mca,
         "confidence": "medium",
         "notes": [
-            "Regression attribution is correlational unless backed by perf.json.",
             "Block IDs may shift when CFG recovery changes between builds.",
         ],
     }

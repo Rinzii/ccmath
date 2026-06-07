@@ -56,8 +56,6 @@ def build_reg_pressure(variant_dir, source_map, cfg=None):
             "file": loc.get("file", ""),
             "line": loc.get("line", 0),
             "attribution_layer": AC.attribution_layer(loc.get("file", "")),
-            "confidence": ent.get("confidence", "medium"),
-            "causal_level": AC.CAUSAL_LIKELY if loc.get("file") else AC.CAUSAL_CORRELATION,
         }
         if is_spill:
             rec["kind"] = "spill"
@@ -71,8 +69,6 @@ def build_reg_pressure(variant_dir, source_map, cfg=None):
             "kind": "high_register_usage",
             "peak_gpr": peak_gpr,
             "peak_vec": peak_vec,
-            "confidence": "medium",
-            "causal_level": AC.CAUSAL_CORRELATION,
             "note": "Approximate live-set size from textual register mentions.",
         })
 
@@ -97,11 +93,9 @@ def build_reg_pressure(variant_dir, source_map, cfg=None):
         "reloads": reloads,
         "pressure_regions": pressure_regions,
         "block_pressure": block_pressure,
-        "confidence": "medium",
         "notes": [
             "Live ranges are approximated by cumulative register mentions, not true liveness.",
-            "Stack slot indices are not tracked; only rsp-relative spill/reload patterns.",
-            "Spill attribution to source is correlational when .loc maps to a line.",
+            "Stack slot indices are not tracked, only rsp-relative spill/reload patterns.",
         ],
     }
 
@@ -121,5 +115,4 @@ def build_reg_pressure(variant_dir, source_map, cfg=None):
     md.append("")
 
     AC.write_artifact(variant_dir, "reg_pressure", result, md)
-    AC.write_artifact(variant_dir, "spill_report", result, md)
     return result

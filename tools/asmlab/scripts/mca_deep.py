@@ -112,9 +112,7 @@ def build_mca(variant_dir, cfg, arch_name, compiler):
         "",
         "- llvm-mca: %s" % llvm_mca,
         "- mcpu: %s" % arch["mca_cpu"],
-        "- bottleneck: %s (%s)" % (
-            bottleneck.get("primary", "unknown"),
-            bottleneck.get("confidence", AC.CAUSAL_CORRELATION)),
+        "- bottleneck: %s" % bottleneck.get("primary", "unknown"),
         "",
         "## Function summary",
         "",
@@ -151,7 +149,5 @@ def _classify_bottleneck(function_level, blocks_mca):
 
     return {
         "primary": primary,
-        "confidence": AC.CAUSAL_CORRELATION,
         "evidence": hints[:10],
-        "attribution": "correlation with llvm-mca pressure summary",
     }
