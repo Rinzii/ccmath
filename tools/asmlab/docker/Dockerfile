@@ -2,8 +2,7 @@
 #
 # Provides Linux-accurate codegen with both clang and gcc, the LLVM analysis tools,
 # an aarch64 cross toolchain (so the docker-only ARM arches in the matrix emit), and
-# the optional throughput models. Mirrors the .AI/linux-test recipe so the two stay
-# recognisable. Build with docker/run.sh, which mounts the repo at /ccmath.
+# the optional throughput models. Build with docker/run.sh, which mounts the repo at /ccmath.
 FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive

@@ -12,7 +12,7 @@
 # coverage from registry/accuracy_manifest.json.
 #
 #   simple   (default) native build + manifest-driven ctest
-#   rigorous            Linux/MPFR campaign via .AI/linux-test
+#   rigorous            Linux MPFR campaign (set CCMATH_RIGOROUS_GATE to script path)
 #   all                 simple then rigorous
 #
 # Usage:
@@ -150,9 +150,10 @@ PY
 
 run_rigorous() {
     echo ">> accuracy gate: rigorous oracle campaign (MPFR + CORE-MATH, Docker)" >&2
-    local linux_script="${project_root}/.AI/linux-test/linux_rigorous_test.sh"
-    if [[ ! -x "${linux_script}" && ! -f "${linux_script}" ]]; then
-        echo "rigorous gate needs ${linux_script} (Docker/Colima). See .AI/linux-test/README.md" >&2
+    local linux_script="${CCMATH_RIGOROUS_GATE:-}"
+    if [[ -z "${linux_script}" || ( ! -x "${linux_script}" && ! -f "${linux_script}" ) ]]; then
+        echo "rigorous gate needs CCMATH_RIGOROUS_GATE pointing at the Docker rigorous test script" >&2
+        echo "See CONTRIBUTING.md for the rigorous validation workflow." >&2
         return 2
     fi
     local gate_key
