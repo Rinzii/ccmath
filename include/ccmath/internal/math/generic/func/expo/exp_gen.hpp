@@ -10,33 +10,19 @@
 
 #pragma once
 
-#include "ccmath/internal/support/floating_point_traits.hpp"
-#include "ccmath/internal/support/fp/bit_mask_traits.hpp"
-#include "ccmath/internal/support/fp/directional_rounding_utils.hpp"
-#include "ccmath/internal/support/fp/fp_bits.hpp"
-#include "ccmath/internal/support/unreachable.hpp"
-#include "ccmath/internal/types/big_int.hpp"
-#include "ccmath/math/basic/fabs.hpp"
-#include "ccmath/math/compare/isnan.hpp"
-#include "ccmath/math/power/sqrt.hpp"
+#include "ccmath/math/expo/impl/exp_double_impl.hpp"
+#include "ccmath/math/expo/impl/exp_float_impl.hpp"
 
-#include <limits>
+#include <type_traits>
 
 namespace ccm::gen
 {
-	namespace internal::impl
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+	constexpr T exp_gen(T num) noexcept
 	{
-
-		template <typename T>
-		constexpr std::enable_if_t<std::is_floating_point_v<T>, T> exp_impl(T x, T y) noexcept
-		{
-			return 0;
-		}
-	} // namespace internal::impl
-
-	template <typename T>
-	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> exp_gen(T base, T exp) noexcept
-	{
-		return internal::impl::exp_impl(base, exp);
+		if constexpr (std::is_same_v<T, float>) { return ccm::internal::impl::exp_float_impl(num); }
+		if constexpr (std::is_same_v<T, double>) { return ccm::internal::impl::exp_double_impl(num); }
+		if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(ccm::internal::impl::exp_double_impl(static_cast<double>(num))); }
+		return static_cast<T>(ccm::internal::impl::exp_double_impl(static_cast<double>(num)));
 	}
 } // namespace ccm::gen

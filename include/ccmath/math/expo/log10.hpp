@@ -12,13 +12,13 @@
 
 #include "ccmath/internal/config/compiler.hpp"
 #include "ccmath/internal/math/generic/builtins/expo/log10.hpp"
+#include "ccmath/internal/math/generic/func/expo/log10_gen.hpp"
 #include "ccmath/internal/math/runtime/func/expo/log10_rt.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "ccmath/internal/support/fp/directional_rounding_utils.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/compare/isnan.hpp"
-#include "ccmath/math/expo/impl/log10_impl.hpp"
 
 #include <limits>
 #include <type_traits>
@@ -71,10 +71,7 @@ namespace ccm
 
 			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::log10_rt(num); }
 
-			if constexpr (std::is_same_v<T, float>) { return internal::log10_float(num); }
-			if constexpr (std::is_same_v<T, double>) { return internal::log10_double(num); }
-			if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::log10_double(static_cast<double>(num))); }
-			return static_cast<T>(internal::log10_double(static_cast<double>(num)));
+			return gen::log10_gen(num);
 		}
 	}
 

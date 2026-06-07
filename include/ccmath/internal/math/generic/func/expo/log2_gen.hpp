@@ -10,33 +10,19 @@
 
 #pragma once
 
-#include "ccmath/internal/support/floating_point_traits.hpp"
-#include "ccmath/internal/support/fp/bit_mask_traits.hpp"
-#include "ccmath/internal/support/fp/directional_rounding_utils.hpp"
-#include "ccmath/internal/support/fp/fp_bits.hpp"
-#include "ccmath/internal/support/unreachable.hpp"
-#include "ccmath/internal/types/big_int.hpp"
-#include "ccmath/math/basic/fabs.hpp"
-#include "ccmath/math/compare/isnan.hpp"
-#include "ccmath/math/power/sqrt.hpp"
+#include "ccmath/math/expo/impl/log2_double_impl.hpp"
+#include "ccmath/math/expo/impl/log2_float_impl.hpp"
 
-#include <limits>
+#include <type_traits>
 
 namespace ccm::gen
 {
-	namespace internal::impl
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+	constexpr T log2_gen(T num) noexcept
 	{
-
-		template <typename T>
-		constexpr std::enable_if_t<std::is_floating_point_v<T>, T> log2_impl(T x, T y) noexcept
-		{
-			return 0;
-		}
-	} // namespace internal::impl
-
-	template <typename T>
-	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> log2_gen(T base, T exp) noexcept
-	{
-		return internal::impl::log2_impl(base, exp);
+		if constexpr (std::is_same_v<T, float>) { return ccm::internal::log2_float(num); }
+		if constexpr (std::is_same_v<T, double>) { return ccm::internal::log2_double(num); }
+		if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(ccm::internal::log2_double(static_cast<double>(num))); }
+		return static_cast<T>(ccm::internal::log2_double(static_cast<double>(num)));
 	}
 } // namespace ccm::gen

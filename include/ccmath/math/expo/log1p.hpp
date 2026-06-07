@@ -11,6 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/expo/log1p.hpp"
+#include "ccmath/internal/math/generic/func/expo/log1p_gen.hpp"
 #include "ccmath/internal/math/runtime/func/expo/log1p_rt.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
@@ -65,13 +66,7 @@ namespace ccm
 				return -std::numeric_limits<T>::quiet_NaN();
 			}
 
-			if (ccm::support::is_constant_evaluated())
-			{
-				if constexpr (std::is_same_v<T, float>) { return internal::log1p_float(num); }
-				if constexpr (std::is_same_v<T, double>) { return internal::log1p_double(num); }
-				if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::log1p_double(static_cast<double>(num))); }
-				return static_cast<T>(internal::log1p_double(static_cast<double>(num)));
-			}
+			if (ccm::support::is_constant_evaluated()) { return gen::log1p_gen(num); }
 
 			return ccm::rt::log1p_rt(num);
 		}

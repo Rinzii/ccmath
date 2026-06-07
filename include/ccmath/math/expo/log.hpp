@@ -12,12 +12,11 @@
 
 #include "ccmath/internal/config/compiler.hpp"
 #include "ccmath/internal/math/generic/builtins/expo/log.hpp"
+#include "ccmath/internal/math/generic/func/expo/log_gen.hpp"
 #include "ccmath/internal/math/runtime/func/expo/log_rt.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "ccmath/internal/support/fp/directional_rounding_utils.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
-#include "ccmath/math/expo/impl/log_double_impl.hpp"
-#include "ccmath/math/expo/impl/log_float_impl.hpp"
 
 #if defined(_MSC_VER) && !defined(__clang__)
 	#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
@@ -75,10 +74,7 @@ namespace ccm
 
 			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::log_rt(num); }
 
-			if constexpr (std::is_same_v<T, float>) { return internal::log_float(num); }
-			if constexpr (std::is_same_v<T, double>) { return internal::log_double(num); }
-			if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::log_double(static_cast<double>(num))); }
-			return static_cast<T>(internal::log_double(static_cast<double>(num)));
+			return gen::log_gen(num);
 		}
 	}
 

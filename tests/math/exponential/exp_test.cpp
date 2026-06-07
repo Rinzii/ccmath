@@ -38,13 +38,13 @@ TEST(CcmathExponentialTests, Exp)
 	ccm::test::ExpectSameAsStd(ccm::exp(4096.0) * ccm::exp(4096.0), std::exp(4096.0) * std::exp(4096.0));
 
 
-	// Test Edge Cases
+	// Edge cases for float overloads.
 
 	constexpr double double_edges[] = { 0.0, -0.0, std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(),
 										std::numeric_limits<double>::quiet_NaN() };
 	for (double input : double_edges) { ccm::test::ExpectUnaryMatchesStd(input, ccm::exp<double>, static_cast<double (*)(double)>(std::exp)); }
 
-	// Now test floats
+	// Float overloads.
 
 	constexpr float float_inputs[] = { 1.0F, 2.0F, 4.0F, 8.0F, 16.0F, 32.0F, 64.0F, 256.0F, 512.0F, 1024.0F, 2048.0F, 4096.0F };
 	for (float input : float_inputs) { ccm::test::ExpectUnaryMatchesStd(input, ccm::exp<float>, static_cast<float (*)(float)>(std::exp)); }

@@ -11,7 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/expo/expm1.hpp"
-#include "ccmath/math/expo/impl/expm1_impl.hpp"
+#include "ccmath/internal/math/generic/func/expo/expm1_gen.hpp"
 
 #include <type_traits>
 
@@ -21,13 +21,7 @@ namespace ccm
 	constexpr T expm1(T num)
 	{
 		if constexpr (ccm::builtin::has_constexpr_expm1<T>) { return ccm::builtin::expm1(num); }
-		else
-		{
-			if constexpr (std::is_same_v<T, float>) { return internal::expm1_float(num); }
-			if constexpr (std::is_same_v<T, double>) { return internal::expm1_double(num); }
-			if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::expm1_double(static_cast<double>(num))); }
-			return static_cast<T>(internal::expm1_double(static_cast<double>(num)));
-		}
+		else { return gen::expm1_gen(num); }
 	}
 
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>

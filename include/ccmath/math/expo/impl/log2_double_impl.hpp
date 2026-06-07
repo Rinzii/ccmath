@@ -82,7 +82,7 @@ namespace ccm::internal
 				intX -= 52ULL << 52;
 			}
 
-			// x = 2^expo normVal; where normVal is in range [k_logTableOff_dbl, 2 * k_logTableOff_dbl) and exact.
+			// x = 2^expo normVal. normVal is in range [k_logTableOff_dbl, 2 * k_logTableOff_dbl) and exact.
 			//  The range is split into N sub-intervals.
 			// The ith sub-interval contains normVal and c is near its center.
 			const std::uint64_t tmp = intX - k_log2TableOff_dbl;

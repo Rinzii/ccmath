@@ -11,9 +11,8 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/expo/log.hpp"
+#include "ccmath/internal/math/generic/func/expo/log_gen.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
-#include "ccmath/math/expo/impl/log_double_impl.hpp"
-#include "ccmath/math/expo/impl/log_float_impl.hpp"
 
 #if defined(_MSC_VER) && !defined(__clang__)
 	#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
@@ -59,10 +58,7 @@ namespace ccm
 			// If the argument is NaN, NaN is returned.
 			if (CCM_UNLIKELY(ccm::isnan(num))) { return std::numeric_limits<T>::quiet_NaN(); }
 
-			if constexpr (std::is_same_v<T, float>) { return internal::log_float(num); }
-			if constexpr (std::is_same_v<T, double>) { return internal::log_double(num); }
-			if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::log_double(static_cast<double>(num))); }
-			return static_cast<T>(internal::log_double(static_cast<double>(num)));
+			return gen::log_gen(num);
 		}
 	}
 

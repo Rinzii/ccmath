@@ -18,9 +18,8 @@
 #include "ccmath/internal/support/unreachable.hpp"
 #include "ccmath/internal/types/big_int.hpp"
 #include "ccmath/internal/types/double_double.hpp"
-#include "ccmath/math/basic/fabs.hpp"
-#include "ccmath/math/compare/isnan.hpp"
-#include "ccmath/math/power/sqrt.hpp"
+#include "ccmath/math/expo/impl/exp2_double_impl.hpp"
+#include "ccmath/math/expo/impl/exp2_float_impl.hpp"
 
 #include <limits>
 
@@ -28,6 +27,7 @@ namespace ccm::gen
 {
 	namespace internal::impl
 	{
+		// TODO(IanP): Wire poly_approx_* below into exp2_gen instead of delegating to exp2_*_impl.
 		using namespace types;
 		using Float128 = DyadicFloat<128>;
 
@@ -69,9 +69,9 @@ namespace ccm::gen
 		/**
 		 * @brief Approximates the expression (2^x - 1)/x using a degree-5 polynomial in double-double precision.
 		 *
-		 * This function computes a high-precision approximation for `(2^x - 1)/x` using double-double arithmetic.
-		 * The coefficients were generated with Sollya to minimize error over the range `[-2^-13 - 2^-30, 2^-13 + 2^-30]`.
-		 * The approximation has a maximum error of less than `2^-101` when compared to the actual value of `2^x`.
+		 * This function computes a high-precision approximation for (2^x - 1)/x using double-double arithmetic.
+		 * The coefficients were generated with Sollya to minimize error over the range [-2^-13 - 2^-30, 2^-13 + 2^-30].
+		 * The approximation has a maximum error of less than 2^-101 when compared to the actual value of 2^x.
 		 *
 		 * Polynomial generation in Sollya:
 		 * @code
@@ -79,7 +79,7 @@ namespace ccm::gen
 		 * @endcode
 		 *
 		 * @param dx The input value as a double-double for which the approximation is calculated.
-		 * @return A double-double representation of the approximation of `(2^x - 1)/x`.
+		 * @return A double-double representation of the approximation of (2^x - 1)/x.
 		 */
 		inline DoubleDouble poly_approx_dd(const DoubleDouble & dx)
 		{
@@ -120,16 +120,14 @@ namespace ccm::gen
 			return p;
 		}
 
-		template <typename T>
-		constexpr std::enable_if_t<std::is_floating_point_v<T>, T> exp2_impl(T x, T y) noexcept
-		{
-			return 0;
-		}
 	} // namespace internal::impl
 
-	template <typename T>
-	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> exp2_gen(T base, T exp) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+	constexpr T exp2_gen(T num) noexcept
 	{
-		return internal::impl::exp2_impl(base, exp);
+		if constexpr (std::is_same_v<T, float>) { return ccm::internal::exp2_float(num); }
+		if constexpr (std::is_same_v<T, double>) { return ccm::internal::exp2_double(num); }
+		if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(ccm::internal::exp2_double(static_cast<double>(num))); }
+		return static_cast<T>(ccm::internal::exp2_double(static_cast<double>(num)));
 	}
 } // namespace ccm::gen

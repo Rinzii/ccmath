@@ -10,11 +10,9 @@
 
 #pragma once
 
-#include "ccmath/internal/config/builtin/exp2_support.hpp"
 #include "ccmath/internal/math/generic/builtins/expo/exp2.hpp"
+#include "ccmath/internal/math/generic/func/expo/exp2_gen.hpp"
 #include "ccmath/internal/predef/has_const_builtin.hpp"
-#include "ccmath/math/expo/impl/exp2_double_impl.hpp"
-#include "ccmath/math/expo/impl/exp2_float_impl.hpp"
 
 #include <type_traits>
 
@@ -35,13 +33,7 @@ namespace ccm
 	constexpr T exp2(T num)
 	{
 		if constexpr (ccm::builtin::has_constexpr_exp2<T>) { return ccm::builtin::exp2(num); }
-		else
-		{
-			if constexpr (std::is_same_v<T, float>) { return internal::exp2_float(num); }
-			if constexpr (std::is_same_v<T, double>) { return internal::exp2_double(num); }
-			if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::exp2_double(static_cast<double>(num))); }
-			return static_cast<T>(internal::exp2_double(static_cast<double>(num)));
-		}
+		else { return gen::exp2_gen(num); }
 	}
 
 	/**

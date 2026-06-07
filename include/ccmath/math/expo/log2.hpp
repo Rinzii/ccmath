@@ -12,14 +12,13 @@
 
 #include "ccmath/internal/config/compiler.hpp"
 #include "ccmath/internal/math/generic/builtins/expo/log2.hpp"
+#include "ccmath/internal/math/generic/func/expo/log2_gen.hpp"
 #include "ccmath/internal/math/runtime/func/expo/log2_rt.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "ccmath/internal/support/fp/directional_rounding_utils.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/compare/signbit.hpp"
-#include "ccmath/math/expo/impl/log2_double_impl.hpp"
-#include "ccmath/math/expo/impl/log2_float_impl.hpp"
 
 #include <limits>
 #include <type_traits>
@@ -90,12 +89,7 @@ namespace ccm
 
 			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::log2_rt(num); }
 
-			// We cannot handle long double at this time due to problems
-			// with long double being platform-dependent with its bit size.
-			if constexpr (std::is_same_v<T, float>) { return internal::log2_float(num); }
-			if constexpr (std::is_same_v<T, double>) { return internal::log2_double(num); }
-			if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::log2_double(static_cast<double>(num))); }
-			return static_cast<T>(internal::log2_double(static_cast<double>(num)));
+			return gen::log2_gen(num);
 		}
 	}
 

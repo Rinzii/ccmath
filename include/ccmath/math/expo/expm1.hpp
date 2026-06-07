@@ -11,9 +11,9 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/expo/expm1.hpp"
+#include "ccmath/internal/math/generic/func/expo/expm1_gen.hpp"
 #include "ccmath/internal/math/runtime/func/expo/expm1_rt.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
-#include "ccmath/math/expo/impl/expm1_impl.hpp"
 
 #include <type_traits>
 
@@ -39,10 +39,7 @@ namespace ccm
 		{
 			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::expm1_rt(num); }
 
-			if constexpr (std::is_same_v<T, float>) { return internal::expm1_float(num); }
-			if constexpr (std::is_same_v<T, double>) { return internal::expm1_double(num); }
-			if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::expm1_double(static_cast<double>(num))); }
-			return static_cast<T>(internal::expm1_double(static_cast<double>(num)));
+			return gen::expm1_gen(num);
 		}
 	}
 
