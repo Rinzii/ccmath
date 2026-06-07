@@ -15,21 +15,47 @@ permissions:
 
 jobs:
   libfuzzer-smoke:
-    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            install: brew
+          - os: ubuntu-latest
+            install: apt
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
-      - name: Install dependencies
+      - name: Install dependencies (macOS)
+        if: matrix.install == 'brew'
         run: brew install ninja llvm lld
 
-      - name: Configure fuzz targets
+      - name: Install dependencies (Linux)
+        if: matrix.install == 'apt'
+        run: >
+          sudo apt-get update -qq &&
+          sudo apt-get install -yqq --no-install-recommends
+          cmake ninja-build git llvm-18 clang-18 lld-18 libclang-rt-18-dev
+
+      - name: Configure fuzz targets (macOS)
+        if: matrix.install == 'brew'
         run: |
           LLVM_PREFIX="$(brew --prefix llvm)"
           cmake --preset=ninja-fuzz-debug \
             -DCMAKE_C_COMPILER="${LLVM_PREFIX}/bin/clang" \
             -DCMAKE_CXX_COMPILER="${LLVM_PREFIX}/bin/clang++" \
             -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld"
+
+      - name: Configure fuzz targets (Linux)
+        if: matrix.install == 'apt'
+        run: |
+          cmake --preset=ninja-fuzz-debug \
+            -DCMAKE_C_COMPILER=/usr/lib/llvm-18/bin/clang \
+            -DCMAKE_CXX_COMPILER=/usr/lib/llvm-18/bin/clang++ \
+            -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld-18"
 
       - name: Build fuzz targets
         run: cmake --build --preset=build-ninja-fuzz-debug

@@ -2,7 +2,7 @@
 
 # CCMath
 
-## A modern C++ implementation of the C and C++ mathematical library
+## A constexpr-first `<cmath>` library for C++17 and later
 
 [![Windows CI](https://github.com/Rinzii/ccmath/workflows/ci-windows/badge.svg)](https://github.com/Rinzii/ccmath/actions?query=workflow%3Aci-windows)
 [![Linux CI](https://github.com/Rinzii/ccmath/workflows/ci-linux/badge.svg)](https://github.com/Rinzii/ccmath/actions?query=workflow%3Aci-linux)
@@ -12,40 +12,15 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0%20WITH%20LLVM--exception-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Discord](https://img.shields.io/discord/1286067628456284244?label=Discord)](https://discord.gg/p3mVxAbdmc)
 
-CCMath is a header-only C++17 mathematical library that provides standards-oriented implementations of the C and C++ mathematical library.
+CCMath is a header-only library with a `<cmath>`-style API. The same entry points constexpr-evaluate where the standard and compiler allow, dispatch to portable runtime implementations elsewhere, and can use SIMD on selected functions when the target supports it. Standards behavior, cross-platform portability, and layered validation under one API.
 
-The project aims to closely follow the behavior specified by the C and C++ standards while supporting:
-
-- Compile-time evaluation
-- Runtime execution
-- SIMD acceleration
-- Cross-platform portability
-- Extensive numerical validation
-
-through a familiar `<cmath>`-style API.
-
-Public entry points dispatch through constexpr-friendly generic paths and runtime paths where required by the standard or where the compiler cannot perform constant evaluation.
-
-For current implementation status and function coverage, see [STATUS.md](docs/STATUS.md).
-
----
-
-## At a Glance
-
-- Standards-oriented `<cmath>` implementation
-- Header-only
-- C++17 and newer
-- Compile-time and runtime execution
-- SIMD acceleration
-- Cross-platform support
-- Extensive numerical validation
-- Apache License 2.0 with LLVM Exceptions
+This README describes what CCMath is working toward. Some claims here reflect goals still in progress. See [STATUS.md](docs/STATUS.md) for current implementation status by module and function.
 
 ---
 
 ## Why CCMath?
 
-Many mathematical libraries focus on a specific use case.
+Most `<cmath>` alternatives optimize for one lane at a time.
 
 | Library | Standards-Oriented | Constexpr | Runtime | SIMD | Portable Implementation |
 |----------|----------|----------|----------|----------|----------|
@@ -86,7 +61,7 @@ This includes:
 - Rounding behavior
 - Edge-case handling
 
-The goal is not merely to produce mathematically reasonable results, but to behave like a conforming implementation of `<cmath>`.
+Implemented functions follow the rules the C and C++ standards set for `<cmath>`.
 
 ### Compile-Time Evaluation
 
@@ -96,7 +71,7 @@ constexpr auto value = ccm::sin(0.5);
 static_assert(value > 0.0);
 ```
 
-Functions are designed to participate naturally in constant evaluation without requiring separate APIs.
+There is no separate constexpr API. When constant evaluation is possible, the public symbol participates in it.
 
 ### Runtime Execution
 
@@ -104,55 +79,36 @@ Functions are designed to participate naturally in constant evaluation without r
 double result = ccm::exp(x);
 ```
 
-The same API can be used efficiently at runtime.
+When constant evaluation is not possible, the same symbols dispatch to runtime paths.
 
 ### SIMD Acceleration
 
-CCMath includes SIMD implementations for supported architectures, including:
+Selected functions pick up SIMD on supported targets:
 
 - SSE2
 - SSE4
 - AVX2
-- AVX512
 - ARM NEON
 
 ### Numerical Correctness
 
-Numerical behavior is a first-class design concern.
+We aim for correct rounding under all four IEEE rounding modes and are still working toward that goal. Implementations target correct rounding under round-to-nearest ties-to-even today.
 
-CCMath includes dedicated infrastructure for:
-
-- ULP validation
-- Worst-case input testing
-- Floating-point conformance testing
-- Rounding-mode verification
-- Cross-platform verification
-- Cross-compiler verification
+ULP harnesses, all-mode rounding probes, worst-case grids, and cross-compiler CI matrices live in-tree. The validation section below describes how they run in practice.
 
 ---
 
 ## Function Coverage
 
-CCMath provides implementations across the major categories of the C and C++ mathematical library:
-
-- Trigonometric functions
-- Exponential and logarithmic functions
-- Power and root functions
-- Rounding functions
-- Floating-point classification
-- Utility and floating-point operations
-
-See [STATUS.md](docs/STATUS.md) for complete coverage information and implementation status.
+Work spans trigonometric, exponential, power, rounding, classification, and utility categories from the C and C++ mathematical library. Several modules are still in flight. [STATUS.md](docs/STATUS.md) lists what ships today and what remains open.
 
 ---
 
 ## Validation and Verification
 
-CCMath uses a multi-layer validation strategy inspired by projects such as LLVM-libc, CORE-MATH, and glibc.
+Validation follows patterns from LLVM-libc, CORE-MATH, and glibc. CI covers:
 
 ### Continuous Integration
-
-CCMath is continuously validated on:
 
 #### Platforms
 
@@ -200,17 +156,20 @@ The `rigorous` suite runs in dedicated CI jobs:
 ctest -L rigorous
 ```
 
-Validation is performed using multiple independent oracles.
+Rigorous jobs compare against MPFR and CORE-MATH oracles.
 
 #### MPFR Validation
 
-`rigorous-mpfr`
+Within a rigorous build, MPFR-backed tests use the `mpfr` label:
+
+```bash
+ctest -L mpfr
+```
 
 Includes:
 
-- Extended `pow` and `powf` corpora
+- Extended function corpora
 - Exceptional-value matrices
-- `powl` characterization
 - Adversarial search
 
 Linux and macOS use system MPFR/GMP.
@@ -219,14 +178,13 @@ Windows uses MPFR provided through vcpkg.
 
 #### CORE-MATH Validation
 
-`rigorous-coremath`
+Within a rigorous build, CORE-MATH-backed tests use the `coremath` label:
 
-Uses correctly-rounded:
+```bash
+ctest -L coremath
+```
 
-- `cr_pow`
-- `cr_powf`
-
-under all four IEEE rounding modes on finite inputs.
+Correctly-rounded reference comparisons under all four IEEE rounding modes on finite inputs.
 
 #### Proof Verification
 
@@ -239,33 +197,15 @@ to refresh and verify proof artifacts for supported implementations.
 
 ### Fuzz Testing
 
-CCMath includes fuzzing infrastructure to help identify:
-
-- Numerical edge cases
-- Unexpected inputs
-- Undefined behavior
-- Stability issues
-
-that are difficult to discover through conventional testing.
+Fuzz smoke tests run in dedicated macOS and Linux CI jobs with full LLVM Clang (libFuzzer requires the fuzzer sanitizer runtime). Windows matrix jobs use MSVC and are outside libFuzzer coverage today.
 
 ### Static Analysis and Security
 
-Continuous validation includes:
-
-- CodeQL analysis
-- OpenSSF Scorecard analysis
-- Warning-as-error builds
-- Strict compiler warning validation
+CodeQL, OpenSSF Scorecard, warning-as-error builds, and strict compiler warning gates run in CI.
 
 ### Style and Consistency
 
-The project enforces:
-
-- clang-format
-- clang-tidy
-- Automated style validation
-
-through continuous integration.
+clang-format runs in CI on every platform matrix job and on pull requests that touch headers. clang-tidy is available locally via lint.sh and lint.bat.
 
 ---
 
@@ -309,7 +249,7 @@ include(FetchContent)
 FetchContent_Declare(
     ccmath
     GIT_REPOSITORY https://github.com/Rinzii/ccmath.git
-    GIT_TAG main
+    GIT_TAG v0.3.0
 )
 
 FetchContent_MakeAvailable(ccmath)
@@ -379,47 +319,22 @@ The following projects publicly use CCMath:
 
 - [Fornani](https://github.com/swagween/fornani)
 
-If your project uses CCMath and is publicly available, feel free to open a pull request and add it to this list.
+If your project uses CCMath and is publicly available, open a PR to add it to this list.
 
 ---
 
 ## Contributing
 
-Contributions are welcome.
-
-See:
-
-- [CONTRIBUTING.md](CONTRIBUTING.md)
-- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
-- [SECURITY.md](SECURITY.md)
-
-Questions, bug reports, and discussions are welcome through GitHub Issues or the Discord community.
+See [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and [SECURITY.md](SECURITY.md). Bug reports and design questions go to GitHub Issues or Discord.
 
 ---
 
 ## License
 
-CCMath is licensed under the Apache License v2.0 with LLVM Exceptions.
-
-This license combines the protections of Apache 2.0, including an explicit patent grant, with the LLVM exception that simplifies integration into both open-source and proprietary software.
-
-See:
-
-- [LICENSE](LICENSE)
-- [NOTICE](NOTICE)
-
-for complete licensing information.
+Apache License v2.0 with LLVM Exceptions. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
 
 ---
 
 ## Acknowledgments
 
-CCMath has been heavily influenced by the work of many numerical software projects and mathematical libraries, including:
-
-- LLVM-libc
-- GCC libm
-- CORE-MATH
-- glibc math
-- OpenLibm
-
-Their research, implementations, testing methodologies, and public documentation have been invaluable resources throughout CCMath's development.
+Algorithm and validation ideas draw on LLVM-libc, GCC libm, CORE-MATH, glibc math, and OpenLibm.
