@@ -34,9 +34,10 @@ def resolve_target(fn):
 
 def _cmake_configure(variant_name=None, variant_dir=None):
     BUILD_DIR.mkdir(parents=True, exist_ok=True)
+    gen_args, _ = C.cmake_generator_args()
     cmd = [
-        "cmake", "-S", str(C.PROJECT_ROOT), "-B", str(BUILD_DIR), "-G", "Ninja",
-        "-DCMAKE_BUILD_TYPE=Release",
+        "cmake", "-S", str(C.PROJECT_ROOT), "-B", str(BUILD_DIR),
+        *gen_args,
         "-DCCMATH_BUILD_BENCHMARKS=ON",
         "-DCCMATH_BUILD_TESTS=OFF",
         "-DCCMATH_BUILD_EXAMPLES=OFF",
@@ -52,15 +53,13 @@ def _cmake_configure(variant_name=None, variant_dir=None):
 
 
 def _cmake_build(target):
-    res = C.run(["cmake", "--build", str(BUILD_DIR), "--target", target])
+    _, build_config = C.cmake_generator_args()
+    res = C.run(C.cmake_build_command(BUILD_DIR, target, build_config))
     return res.returncode == 0, res.stderr
 
 
 def _find_binary(name):
-    for p in BUILD_DIR.rglob(name):
-        if p.is_file() and (p.stat().st_mode & 0o111):
-            return p
-    return None
+    return C.find_built_program(BUILD_DIR, name)
 
 
 def _parse_ns(output):

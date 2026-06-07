@@ -28,9 +28,10 @@ def _run_golden_bench(quick=False):
     """Build and run asmlab_bench_golden_poly (no ccmath dependency)."""
     BENCH_BUILD.mkdir(parents=True, exist_ok=True)
     min_time = "0.02s" if quick else "0.05s"
+    gen_args, build_config = C.cmake_generator_args()
     cmd = [
-        "cmake", "-S", str(C.PROJECT_ROOT), "-B", str(BENCH_BUILD), "-G", "Ninja",
-        "-DCMAKE_BUILD_TYPE=Release",
+        "cmake", "-S", str(C.PROJECT_ROOT), "-B", str(BENCH_BUILD),
+        *gen_args,
         "-DCCMATH_BUILD_BENCHMARKS=ON",
         "-DCCMATH_BUILD_TESTS=OFF",
         "-DCCMATH_BUILD_EXAMPLES=OFF",
@@ -39,15 +40,11 @@ def _run_golden_bench(quick=False):
     if C.run(cmd).returncode != 0:
         return {"status": "failed", "reason": "cmake configure failed"}
 
-    if C.run(["cmake", "--build", str(BENCH_BUILD),
-              "--target", "asmlab_bench_golden_poly"]).returncode != 0:
+    if C.run(C.cmake_build_command(BENCH_BUILD, "asmlab_bench_golden_poly",
+                                   build_config)).returncode != 0:
         return {"status": "failed", "reason": "build asmlab_bench_golden_poly failed"}
 
-    binary = None
-    for p in BENCH_BUILD.rglob("asmlab_bench_golden_poly"):
-        if p.is_file() and (p.stat().st_mode & 0o111):
-            binary = p
-            break
+    binary = C.find_built_program(BENCH_BUILD, "asmlab_bench_golden_poly")
     if not binary:
         return {"status": "failed", "reason": "golden bench binary not found"}
 

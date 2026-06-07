@@ -97,6 +97,41 @@ DEFAULT_FLAGS = "O2"
 CXX_STD = "c++17"
 
 
+def is_program_file(path):
+    """True when path looks like a runnable program on the current OS."""
+    if not path.is_file():
+        return False
+    if sys.platform == "win32":
+        return path.suffix.lower() in (".exe", ".com", ".bat", ".cmd")
+    return os.access(path, os.X_OK)
+
+
+def find_built_program(build_dir, name):
+    """Locate a built executable under build_dir (handles .exe on Windows)."""
+    build_dir = Path(build_dir)
+    for pattern in (name, name + ".exe", name + ".EXE"):
+        for path in build_dir.rglob(pattern):
+            if is_program_file(path):
+                return path
+    return None
+
+
+def cmake_generator_args():
+    """Return configure flags and optional --config for multi-config generators."""
+    if shutil.which("ninja"):
+        return ["-G", "Ninja", "-DCMAKE_BUILD_TYPE=Release"], None
+    if sys.platform == "win32":
+        return ["-G", "Visual Studio 17 2022", "-A", "x64"], "Release"
+    return ["-G", "Unix Makefiles", "-DCMAKE_BUILD_TYPE=Release"], None
+
+
+def cmake_build_command(build_dir, target, config=None):
+    cmd = ["cmake", "--build", str(build_dir), "--target", target]
+    if config:
+        cmd.extend(["--config", config])
+    return cmd
+
+
 def fail(msg):
     print("asmlab: error: " + msg, file=sys.stderr)
     sys.exit(1)
