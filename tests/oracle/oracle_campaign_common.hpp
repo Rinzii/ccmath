@@ -91,7 +91,7 @@ namespace ccm::test::oracle
 		// Cases that pass the hard ULP ceiling but miss the correctly-rounded target
 		// (more than 0.5 ULP from the real value). Tracked, not failed.
 		std::size_t above_target_count = 0;
-		std::uint64_t max_observed_ulp		   = 0;
+		std::uint64_t max_observed_ulp = 0;
 		T worst_base{};
 		T worst_exponent{};
 		T worst_actual{};
@@ -442,6 +442,21 @@ namespace ccm::test::oracle
 		out << "]\n";
 	}
 
+	// Echo hard-failure records to stdout so CI logs surface the offending input without an
+	// uploaded artifact. The JSON event log keeps the full record; this is the at-a-glance view.
+	template <typename T>
+	inline void print_hard_failures(const std::vector<failure_record<T>> & events)
+	{
+		for (const auto & event : events)
+		{
+			if (!is_hard_oracle_failure(event)) { continue; }
+			std::cout << "HARD FAILURE " << event.event_kind << " fn=" << event.function_name << " path=" << event.path << " rounding=" << event.rounding_mode
+					  << " fma=" << event.fma_enabled << " base=" << event.base_bits << " exponent=" << event.exponent_bits << " actual=" << event.actual_bits
+					  << " expected=" << event.expected_bits << " ulp=" << event.ulp_distance << " provenance=\"" << event.provenance << "\" notes=\""
+					  << event.notes << "\"\n";
+		}
+	}
+
 	inline std::optional<std::string> option_value(int argc, char ** argv, std::string_view prefix)
 	{
 		for (int i = 1; i < argc; ++i)
@@ -517,10 +532,7 @@ namespace ccm::test::oracle
 	inline std::vector<int> parse_rounding_modes(int argc, char ** argv)
 	{
 		const auto raw = option_value(argc, argv, "--rounding-modes=");
-		if (!raw.has_value() || *raw == "all")
-		{
-			return { FE_TONEAREST, FE_UPWARD, FE_DOWNWARD, FE_TOWARDZERO };
-		}
+		if (!raw.has_value() || *raw == "all") { return { FE_TONEAREST, FE_UPWARD, FE_DOWNWARD, FE_TOWARDZERO }; }
 
 		std::vector<int> modes;
 		std::string_view view = *raw;
@@ -627,12 +639,12 @@ namespace ccm::test::oracle
 
 	template <typename T>
 	inline campaign_report<T> make_coremath_campaign_report(std::string_view path_name,
-														   campaign_mode mode,
-														   const run_summary<T> & summary,
-														   std::uint64_t seed,
-														   std::uint64_t elapsed_ms,
-														   const std::vector<std::string> & domains_covered,
-														   const std::vector<std::string> & domains_skipped)
+															campaign_mode mode,
+															const run_summary<T> & summary,
+															std::uint64_t seed,
+															std::uint64_t elapsed_ms,
+															const std::vector<std::string> & domains_covered,
+															const std::vector<std::string> & domains_skipped)
 	{
 		return campaign_report<T>{
 			configuration_name(),
@@ -681,8 +693,8 @@ namespace ccm::test::oracle
 
 		const auto started = std::chrono::steady_clock::now();
 		execute_cases(summary);
-		const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - started);
-		const auto report = build_report(summary, static_cast<std::uint64_t>(elapsed.count()));
+		const auto elapsed			   = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - started);
+		const auto report			   = build_report(summary, static_cast<std::uint64_t>(elapsed.count()));
 		const std::string summary_path = std::string(summary_prefix) + report.path + "-summary.json";
 		write_campaign_summary_json(summary_path, report);
 		print_report(report, summary_path);
