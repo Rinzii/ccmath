@@ -22,6 +22,12 @@ ccmath_add_rigorous_oracle_target(my-target BACKEND MPFR SOURCES ../oracle/my_fi
 ccmath_add_rigorous_oracle_test(my-test my-target LABELS rigorous mpfr TIMEOUT 300 ARGS --mode=quick)
 ```
 
+## Event logs
+
+Pass `--log-output=<file>.json` (or `--json-output=`) to write a running log of mismatches and failures. Rigorous ctest targets under `tests/rigorous/CMakeLists.txt` write into [tests/rigorous/oracle_logs/README.md](../rigorous/oracle_logs/README.md).
+
+Each record carries `event_kind`, bit patterns for base/exponent/actual/expected, rounding mode, and provenance. MPFR campaigns also log `mpfr_above_target` cases separately from hard failures.
+
 ## Scope
 
 The shared backend helpers currently target binary scalar campaigns, which covers the current `pow`/`powf` path-matrix work and other two-argument functions that will want the same infrastructure. Unary campaigns can add a parallel adapter later without changing the CMake registration layer.

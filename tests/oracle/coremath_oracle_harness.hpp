@@ -22,7 +22,8 @@ namespace ccm::test::oracle
 																				  run_summary<T> & summary,
 																				  std::uint64_t seed			 = 0,
 																				  std::string_view search_mode = {},
-																				  std::string_view mismatch_note = "bit-exact mismatch vs CORE-MATH reference")
+																				  std::string_view mismatch_note = "bit-exact mismatch vs CORE-MATH reference",
+																				  std::vector<failure_record<T>> * event_log = nullptr)
 	{
 		if (!is_reference_case_fn(test_case.base, test_case.exponent))
 		{
@@ -48,6 +49,24 @@ namespace ccm::test::oracle
 		if (matches_truth_fn(test_case.base, test_case.exponent, actual))
 		{
 			++summary.oracle_corrected_count;
+			if (event_log != nullptr)
+			{
+				event_log->push_back(make_failure_record(
+					function_name,
+					path_name,
+					test_case.provenance,
+					test_case.base,
+					test_case.exponent,
+					actual,
+					expected,
+					0,
+					ccm::test::RoundingModeName(rounding_mode),
+					0,
+					seed,
+					search_mode,
+					"ccm matches higher-precision truth, CORE-MATH oracle disagrees",
+					"coremath_oracle_corrected"));
+			}
 			return std::nullopt;
 		}
 
@@ -57,7 +76,7 @@ namespace ccm::test::oracle
 			record_worst_case(summary, 1, test_case.base, test_case.exponent, actual, expected);
 		}
 
-		return make_failure_record(
+		auto record = make_failure_record(
 			function_name,
 			path_name,
 			test_case.provenance,
@@ -70,7 +89,10 @@ namespace ccm::test::oracle
 			0,
 			seed,
 			search_mode,
-			mismatch_note);
+			mismatch_note,
+			"coremath_bit_mismatch");
+		if (event_log != nullptr) { event_log->push_back(record); }
+		return record;
 	}
 
 	template <typename T, typename ActualFn, typename ReferenceFn, typename EligibilityFn, typename TruthFn>
@@ -86,7 +108,8 @@ namespace ccm::test::oracle
 														std::vector<failure_record<T>> & failures,
 														std::uint64_t seed			  = 0,
 														std::string_view search_mode  = {},
-														std::string_view mismatch_note = "bit-exact mismatch vs CORE-MATH reference")
+														std::string_view mismatch_note = "bit-exact mismatch vs CORE-MATH reference",
+														std::vector<failure_record<T>> * event_log = nullptr)
 	{
 		for (const int rounding_mode : rounding_modes)
 		{
@@ -102,9 +125,10 @@ namespace ccm::test::oracle
 					summary,
 					seed,
 					search_mode,
-					mismatch_note))
+					mismatch_note,
+					event_log))
 			{
-				failures.push_back(*failure);
+				if (event_log == nullptr) { failures.push_back(*failure); }
 			}
 		}
 	}

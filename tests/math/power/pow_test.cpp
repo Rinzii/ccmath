@@ -293,6 +293,11 @@ TEST(CcmathPowerTests, PowNegInfBasePositiveNonOddExponent)
 	EXPECT_EQ(ccm::pow(-std::numeric_limits<double>::infinity(), 4.0), std::numeric_limits<double>::infinity());
 	EXPECT_EQ(ccm::powf(-std::numeric_limits<float>::infinity(), 2.0F), std::numeric_limits<float>::infinity());
 	EXPECT_EQ(ccm::powf(-std::numeric_limits<float>::infinity(), 4.0F), std::numeric_limits<float>::infinity());
+
+	// Non-integer exponents are not odd integers, so the same rule applies.
+	EXPECT_EQ(ccm::pow(-std::numeric_limits<double>::infinity(), 0.5), std::numeric_limits<double>::infinity());
+	EXPECT_EQ(ccm::pow(-std::numeric_limits<double>::infinity(), 2.5), std::numeric_limits<double>::infinity());
+	EXPECT_EQ(ccm::powf(-std::numeric_limits<float>::infinity(), 0.5F), std::numeric_limits<float>::infinity());
 }
 
 // F.10.4.4(18): pow(+inf, y) = +0 for y < 0
@@ -462,16 +467,15 @@ TEST(CcmathPowerTests, PowNegativeBaseSignPropagation)
 	EXPECT_LT(ccm::powf(-2.0F, 3.0F), 0.0F);
 }
 
-// pow(-inf, y) for non-integer negative exponent: +0.
+// F.10.4.4(15): pow(-inf, y) = +0 for y < 0 and not an odd integer, including non-integers.
 
 TEST(CcmathPowerTests, PowNegInfBaseNegativeNonIntegerExponent)
 {
 	const double neg_inf = -std::numeric_limits<double>::infinity();
-	const double result = ccm::pow(neg_inf, -0.5);
-	// C standard says pow(-inf, y) for non-integer y where |x| < 0 is domain error.
-	// But -inf with y < 0 non-integer: this is implementation-defined per C17 annex F.
-	// std::pow(-inf, -0.5) returns NaN on most implementations. Match std.
-	ccm::test::ExpectSameFloatingAsStd(result, std::pow(neg_inf, -0.5));
+	ccm::test::ExpectFpEq(ccm::pow(neg_inf, -0.5), 0.0);
+	EXPECT_FALSE(std::signbit(ccm::pow(neg_inf, -0.5)));
+	ccm::test::ExpectFpEq(ccm::pow(neg_inf, -2.5), 0.0);
+	ccm::test::ExpectFpEq(ccm::powf(-std::numeric_limits<float>::infinity(), -0.5F), 0.0F);
 }
 
 // Constexpr evaluation: All special cases should work at compile time.

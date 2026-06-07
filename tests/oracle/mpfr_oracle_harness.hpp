@@ -152,7 +152,8 @@ namespace ccm::test::oracle
 																	  std::uint64_t target_ulp	   = 0,
 																	  std::uint64_t seed			   = 0,
 																	  std::string_view search_mode   = {},
-																	  std::string_view mismatch_note = "exceptional mismatch vs std reference")
+																	  std::string_view mismatch_note = "exceptional mismatch vs std reference",
+																	  std::vector<failure_record<T>> * event_log = nullptr)
 	{
 		if (const auto skip = skip_reason_fn(path, test_case.base, test_case.exponent))
 		{
@@ -172,12 +173,33 @@ namespace ccm::test::oracle
 			record_worst_case(summary, distance, test_case.base, test_case.exponent, actual, expected);
 			if (pass)
 			{
-				if (distance > target_ulp) { ++summary.above_target_count; }
+				if (distance > target_ulp)
+				{
+					++summary.above_target_count;
+					if (event_log != nullptr)
+					{
+						event_log->push_back(make_failure_record(
+							function_name,
+							path_name,
+							test_case.provenance,
+							test_case.base,
+							test_case.exponent,
+							actual,
+							expected,
+							distance,
+							current_rounding_mode_name(),
+							static_cast<unsigned long>(oracle_precision),
+							seed,
+							search_mode,
+							"above correctly-rounded target",
+							"mpfr_above_target"));
+					}
+				}
 				return std::nullopt;
 			}
 
 			++summary.failure_count;
-			return make_failure_record(
+			auto record = make_failure_record(
 				function_name,
 				path_name,
 				test_case.provenance,
@@ -190,7 +212,10 @@ namespace ccm::test::oracle
 				static_cast<unsigned long>(oracle_precision),
 				seed,
 				search_mode,
-				notes);
+				notes,
+				"mpfr_hard_failure");
+			if (event_log != nullptr) { event_log->push_back(record); }
+			return record;
 		};
 
 		if (!uses_full_oracle_fn(path))
@@ -207,7 +232,7 @@ namespace ccm::test::oracle
 				}
 
 				++summary.failure_count;
-				return make_failure_record(
+				auto record = make_failure_record(
 					function_name,
 					path_name,
 					test_case.provenance,
@@ -220,7 +245,10 @@ namespace ccm::test::oracle
 					static_cast<unsigned long>(oracle_precision),
 					seed,
 					search_mode,
-					mismatch_note);
+					mismatch_note,
+					"mpfr_hard_failure");
+				if (event_log != nullptr) { event_log->push_back(record); }
+				return record;
 			}
 
 			return finish_case(mpfr_expected);

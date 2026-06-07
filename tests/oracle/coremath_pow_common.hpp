@@ -74,7 +74,8 @@ namespace ccm::test::oracle
 																  Fn fn,
 																  run_summary<T> & summary,
 																  std::uint64_t seed		   = 0,
-																  std::string_view search_mode = {})
+																  std::string_view search_mode = {},
+																  std::vector<failure_record<T>> * event_log = nullptr)
 	{
 		return evaluate_binary_coremath_case_in_mode(
 			test_case,
@@ -88,7 +89,8 @@ namespace ccm::test::oracle
 			summary,
 			seed,
 			search_mode,
-			"bit-exact mismatch vs CORE-MATH cr_pow");
+			"bit-exact mismatch vs CORE-MATH cr_pow",
+			event_log);
 	}
 
 	template <typename T, typename Fn>
@@ -100,7 +102,8 @@ namespace ccm::test::oracle
 										run_summary<T> & summary,
 										std::vector<failure_record<T>> & failures,
 										std::uint64_t seed			 = 0,
-										std::string_view search_mode = {})
+										std::string_view search_mode = {},
+										std::vector<failure_record<T>> * event_log = nullptr)
 	{
 		evaluate_binary_coremath_case_all_modes(
 			test_case,
@@ -115,6 +118,7 @@ namespace ccm::test::oracle
 			failures,
 			seed,
 			search_mode,
-			"bit-exact mismatch vs CORE-MATH cr_pow");
+			"bit-exact mismatch vs CORE-MATH cr_pow",
+			event_log);
 	}
 } // namespace ccm::test::oracle

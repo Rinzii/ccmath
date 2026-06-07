@@ -50,7 +50,14 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T pow(T base, T exp)
 	{
-		if constexpr (ccm::builtin::has_constexpr_pow<T>) { return ccm::builtin::pow(base, exp); }
+		if constexpr (ccm::builtin::has_constexpr_pow<T>)
+		{
+			// Constant evaluation always rounds to nearest, so the constexpr builtin is correct there.
+			// At runtime the builtin lowers to libm, so defer to the runtime dispatcher which only
+			// trusts the builtin under round to nearest.
+			if (support::is_constant_evaluated()) { return ccm::builtin::pow(base, exp); }
+			return rt::pow_rt(base, exp);
+		}
 		else
 		{
 			if (support::is_constant_evaluated()) { return gen::pow_gen(base, exp); }

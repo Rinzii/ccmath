@@ -14,7 +14,7 @@ namespace
 				  const std::vector<int> & rounding_modes,
 				  std::uint64_t seed,
 				  campaign_mode mode,
-				  std::vector<ccm::test::oracle::failure_record<double>> & failures,
+				  std::vector<ccm::test::oracle::failure_record<double>> & events,
 				  ccm::test::oracle::run_summary<double> & summary)
 	{
 		ccm::test::oracle::run_path_campaign<double>(
@@ -31,8 +31,10 @@ namespace
 						rounding_modes,
 						[ path ](double base, double exponent) { return ccm::test::pow_path::invoke(path, base, exponent); },
 						path_summary,
-						failures,
-						seed);
+						events,
+						seed,
+						{},
+						&events);
 				}
 			},
 			[&](const ccm::test::oracle::run_summary<double> & path_summary, std::uint64_t elapsed_ms) {
@@ -51,7 +53,7 @@ namespace
 int main(int argc, char ** argv)
 {
 	const auto mode = ccm::test::oracle::parse_mode(ccm::test::oracle::option_value(argc, argv, "--mode="));
-	const auto output_path = ccm::test::oracle::option_value(argc, argv, "--json-output=");
+	const auto output_path = ccm::test::oracle::resolve_event_log_path(argc, argv);
 	const std::uint64_t seed =
 		ccm::test::oracle::parse_option_or<std::uint64_t>(ccm::test::oracle::option_value(argc, argv, "--seed="),
 			[](const std::string & value) { return std::stoull(value); },
@@ -60,7 +62,7 @@ int main(int argc, char ** argv)
 	auto paths = ccm::test::oracle::parse_paths(argc, argv);
 	const auto rounding_modes = ccm::test::oracle::parse_rounding_modes(argc, argv);
 	const auto cases = ccm::test::oracle::coremath_cases::build_double_cases(mode, seed);
-	std::vector<ccm::test::oracle::failure_record<double>> failures;
+	std::vector<ccm::test::oracle::failure_record<double>> events;
 
 	std::cout << "coremath pow<double> campaign mode=" << ccm::test::oracle::mode_name(mode) << " fma=" << ccm::test::oracle::fma_status()
 			  << " configuration=" << ccm::test::oracle::configuration_name() << " rounding_modes=" << rounding_modes.size() << '\n';
@@ -68,11 +70,15 @@ int main(int argc, char ** argv)
 	for (const validation_path path : paths)
 	{
 		ccm::test::oracle::run_summary<double> summary;
-		run_path(path, cases, rounding_modes, seed, mode, failures, summary);
+		run_path(path, cases, rounding_modes, seed, mode, events, summary);
 	}
 
-	if (output_path.has_value()) { ccm::test::oracle::write_failure_json(*output_path, failures); }
-	if (output_path.has_value()) { std::cout << "failures json: " << *output_path << '\n'; }
+	if (output_path.has_value()) { ccm::test::oracle::write_failure_json(*output_path, events); }
+	if (output_path.has_value())
+	{
+		std::cout << "oracle event log: " << *output_path << " events=" << events.size()
+				  << " hard_failures=" << (ccm::test::oracle::has_hard_oracle_failure(events) ? "yes" : "no") << '\n';
+	}
 
-	return failures.empty() ? 0 : 1;
+	return ccm::test::oracle::has_hard_oracle_failure(events) ? 1 : 0;
 }

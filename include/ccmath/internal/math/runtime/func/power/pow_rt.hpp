@@ -49,7 +49,13 @@ namespace ccm::rt
 	T pow_rt(T base, T exp)
 	{
 #if (CCM_HAS_BUILTIN(__builtin_pow) || defined(__builtin_pow)) && !defined(CCM_CONFIG_TEST_DISABLE_RUNTIME_BUILTIN_POW)
-		if constexpr (ccm::builtin::has_runtime_pow<T>) { return ccm::builtin::runtime_pow(base, exp); }
+		if constexpr (ccm::builtin::has_runtime_pow<T>)
+		{
+			// The runtime builtin lowers to libm, which is not correctly rounded outside round to
+			// nearest. Outside FE_TONEAREST use the correctly-rounded generic kernel instead.
+			if (CCM_UNLIKELY(ccm::support::fenv::get_rounding_mode() != FE_TONEAREST)) { return gen::pow_gen<T>(base, exp); }
+			return ccm::builtin::runtime_pow(base, exp);
+		}
 		else { return gen::pow_gen<T>(base, exp); }
 #elif defined(CCMATH_HAS_SIMD)
 		// In the unlikely event, the rounding mode is not the default, use the runtime implementation instead.

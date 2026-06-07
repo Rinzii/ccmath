@@ -73,6 +73,8 @@ namespace ccm::test::oracle
 		std::uint64_t seed = 0;
 		std::string timestamp;
 		std::string notes;
+		// mpfr_hard_failure, mpfr_above_target, coremath_bit_mismatch, coremath_oracle_corrected
+		std::string event_kind;
 	};
 
 	template <typename T>
@@ -353,7 +355,8 @@ namespace ccm::test::oracle
 												 unsigned long oracle_precision,
 												 std::uint64_t seed,
 												 std::string_view search_mode,
-												 std::string_view notes)
+												 std::string_view notes,
+												 std::string_view event_kind = {})
 	{
 		return failure_record<T>{
 			std::string(function_name),
@@ -382,7 +385,24 @@ namespace ccm::test::oracle
 			seed,
 			utc_timestamp(),
 			std::string(notes),
+			std::string(event_kind),
 		};
+	}
+
+	template <typename T>
+	inline bool is_hard_oracle_failure(const failure_record<T> & event)
+	{
+		return event.event_kind == "mpfr_hard_failure" || event.event_kind == "coremath_bit_mismatch";
+	}
+
+	template <typename T>
+	inline bool has_hard_oracle_failure(const std::vector<failure_record<T>> & events)
+	{
+		for (const auto & event : events)
+		{
+			if (is_hard_oracle_failure(event)) { return true; }
+		}
+		return false;
 	}
 
 	template <typename T>
@@ -415,6 +435,7 @@ namespace ccm::test::oracle
 			out << "    \"search_mode\": \"" << json_escape(failure.search_mode) << "\",\n";
 			out << "    \"seed\": " << failure.seed << ",\n";
 			out << "    \"timestamp\": \"" << json_escape(failure.timestamp) << "\",\n";
+			out << "    \"event_kind\": \"" << json_escape(failure.event_kind) << "\",\n";
 			out << "    \"notes\": \"" << json_escape(failure.notes) << "\"\n";
 			out << "  }" << (i + 1 == failures.size() ? "\n" : ",\n");
 		}
@@ -428,6 +449,13 @@ namespace ccm::test::oracle
 			const std::string_view arg(argv[i]);
 			if (arg.rfind(prefix, 0) == 0) { return std::string(arg.substr(prefix.size())); }
 		}
+		return std::nullopt;
+	}
+
+	inline std::optional<std::string> resolve_event_log_path(int argc, char ** argv)
+	{
+		if (const auto log_output = option_value(argc, argv, "--log-output=")) { return *log_output; }
+		if (const auto json_output = option_value(argc, argv, "--json-output=")) { return *json_output; }
 		return std::nullopt;
 	}
 

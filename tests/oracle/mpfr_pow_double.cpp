@@ -116,7 +116,7 @@ namespace
 				  std::uint64_t target_ulp,
 				  std::uint64_t seed,
 				  campaign_mode mode,
-				  std::vector<ccm::test::oracle::failure_record<double>> & failures,
+				  std::vector<ccm::test::oracle::failure_record<double>> & events,
 				  ccm::test::oracle::run_summary<double> & summary)
 	{
 		ccm::test::oracle::run_path_campaign<double>(
@@ -135,20 +135,19 @@ namespace
 						{
 							continue;
 						}
-						if (auto failure = ccm::test::oracle::evaluate_case(
-								test_case,
-								"ccm::pow",
-								ccm::test::pow_path::path_name(path),
-								path,
-								[ path ](double base, double exponent) { return ccm::test::pow_path::invoke(path, base, exponent); },
-								precision,
-								max_ulp,
-								path_summary,
-								target_ulp,
-								seed))
-						{
-							failures.push_back(*failure);
-						}
+						(void)ccm::test::oracle::evaluate_case(
+							test_case,
+							"ccm::pow",
+							ccm::test::pow_path::path_name(path),
+							path,
+							[ path ](double base, double exponent) { return ccm::test::pow_path::invoke(path, base, exponent); },
+							precision,
+							max_ulp,
+							path_summary,
+							target_ulp,
+							seed,
+							{},
+							&events);
 					}
 				}
 			},
@@ -178,7 +177,7 @@ namespace
 int main(int argc, char ** argv)
 {
 	const auto mode = ccm::test::oracle::parse_mode(ccm::test::oracle::option_value(argc, argv, "--mode="));
-	const auto output_path = ccm::test::oracle::option_value(argc, argv, "--json-output=");
+	const auto output_path = ccm::test::oracle::resolve_event_log_path(argc, argv);
 	if (ccm::test::oracle::has_flag(argc, argv, "--include-generic-modeled-path"))
 	{
 		std::cout << "warning: --include-generic-modeled-path is deprecated, use --path=generic_modeled_domain\n";
@@ -212,7 +211,7 @@ int main(int argc, char ** argv)
 	mpfr_set_default_rounding_mode(MPFR_RNDN);
 
 	const auto cases = build_cases(mode, seed);
-	std::vector<ccm::test::oracle::failure_record<double>> failures;
+	std::vector<ccm::test::oracle::failure_record<double>> events;
 
 	std::cout << "mpfr pow<double> campaign mode=" << ccm::test::oracle::mode_name(mode) << " fma=" << ccm::test::oracle::fma_status()
 			  << " configuration=" << ccm::test::oracle::configuration_name() << " rounding_modes=" << rounding_modes.size() << '\n';
@@ -220,11 +219,15 @@ int main(int argc, char ** argv)
 	for (const validation_path path : paths)
 	{
 		ccm::test::oracle::run_summary<double> summary;
-		run_path(path, cases, rounding_modes, precision, max_ulp, target_ulp, seed, mode, failures, summary);
+		run_path(path, cases, rounding_modes, precision, max_ulp, target_ulp, seed, mode, events, summary);
 	}
 
-	if (output_path.has_value()) { ccm::test::oracle::write_failure_json(*output_path, failures); }
-	if (output_path.has_value()) { std::cout << "failures json: " << *output_path << '\n'; }
+	if (output_path.has_value()) { ccm::test::oracle::write_failure_json(*output_path, events); }
+	if (output_path.has_value())
+	{
+		std::cout << "oracle event log: " << *output_path << " events=" << events.size()
+				  << " hard_failures=" << (ccm::test::oracle::has_hard_oracle_failure(events) ? "yes" : "no") << '\n';
+	}
 
-	return failures.empty() ? 0 : 1;
+	return ccm::test::oracle::has_hard_oracle_failure(events) ? 1 : 0;
 }

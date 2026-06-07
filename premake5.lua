@@ -35,7 +35,7 @@ project "ccmath-smoke"
     kind "ConsoleApp"
     language "C++"
     location "out/premake"
-    includedirs { "include", "out/build/ninja/ninja-clang-debug/include" }
+    includedirs { "include", "build-rigorous/include" }
     files { "examples/smoke/constexpr_smoke.cpp" }
 
 filter { "options:ccmath-enable-runtime-simd=true" }

@@ -19,6 +19,7 @@ cmake/vcpkg/vcpkg_installed/
 vcpkg_installed/
 pow-search-results.json
 powl-platform.json
+tests/rigorous/oracle_logs/
 path-matrix-json*/
 POW_PROOF.*
 .cache

@@ -72,7 +72,8 @@ namespace ccm::test::oracle
 														  run_summary<T> & summary,
 														  std::uint64_t target_ulp	   = 0,
 														  std::uint64_t seed		   = 0,
-														  std::string_view search_mode = {})
+														  std::string_view search_mode = {},
+														  std::vector<failure_record<T>> * event_log = nullptr)
 	{
 		return evaluate_binary_mpfr_case(
 			test_case,
@@ -94,6 +95,7 @@ namespace ccm::test::oracle
 			target_ulp,
 			seed,
 			search_mode,
-			"exceptional mismatch vs std::pow");
+			"exceptional mismatch vs std::pow",
+			event_log);
 	}
 } // namespace ccm::test::oracle

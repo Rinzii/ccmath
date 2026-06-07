@@ -1,5 +1,8 @@
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/config/TestOracleTargets.cmake)
 
+set(CCMATH_ORACLE_LOG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/oracle_logs)
+file(MAKE_DIRECTORY ${CCMATH_ORACLE_LOG_DIR})
+
 ccmath_add_test(ccmath-rigorous-conformance
         ../math/conformance/fenv_exception_test.cpp
         ../math/conformance/fenv_probe_test.cpp
@@ -40,30 +43,35 @@ if (CCMATH_ENABLE_MPFR_TESTS)
             ccmath_add_rigorous_oracle_test(ccmath-rigorous-mpfr-pow ccmath-rigorous-mpfr-pow
                     LABELS rigorous mpfr
                     TIMEOUT 600
-                    ARGS --mode=quick --path=public_default)
+                    ARGS --mode=quick --path=public_default --log-output=mpfr-pow-double-public_default.json
+                    WORKING_DIRECTORY ${CCMATH_ORACLE_LOG_DIR})
         endif ()
 
         ccmath_add_rigorous_oracle_target(ccmath-rigorous-mpfr-powf BACKEND MPFR SOURCES ../oracle/mpfr_pow_float.cpp)
         ccmath_add_rigorous_oracle_test(ccmath-rigorous-mpfr-powf ccmath-rigorous-mpfr-powf
                 LABELS rigorous mpfr
                 TIMEOUT 900
-                ARGS --mode=quick --path=public_default)
+                ARGS --mode=quick --path=public_default --log-output=mpfr-powf-public_default.json
+                WORKING_DIRECTORY ${CCMATH_ORACLE_LOG_DIR})
 
         ccmath_add_rigorous_oracle_test(ccmath-rigorous-mpfr-powf-reduced ccmath-rigorous-mpfr-powf
                 LABELS rigorous mpfr
                 TIMEOUT 900
-                ARGS --mode=quick --path=public_default --domain=mantissa-sweep,subnormal-x)
+                ARGS --mode=quick --path=public_default --domain=mantissa-sweep,subnormal-x --log-output=mpfr-powf-reduced-domains.json
+                WORKING_DIRECTORY ${CCMATH_ORACLE_LOG_DIR})
 
         if (CCMATH_TEST_DISABLE_RUNTIME_BUILTIN)
             ccmath_add_rigorous_oracle_test(ccmath-rigorous-mpfr-pow-nobuiltin ccmath-rigorous-mpfr-pow
                     LABELS rigorous mpfr
                     TIMEOUT 600
-                    ARGS --mode=quick --path=runtime_no_builtin,generic_modeled_domain)
+                    ARGS --mode=quick --path=runtime_no_builtin,generic_modeled_domain --log-output=mpfr-pow-double-nobuiltin.json
+                    WORKING_DIRECTORY ${CCMATH_ORACLE_LOG_DIR})
 
             ccmath_add_rigorous_oracle_test(ccmath-rigorous-mpfr-powf-nobuiltin ccmath-rigorous-mpfr-powf
                     LABELS rigorous mpfr
                     TIMEOUT 900
-                    ARGS --mode=quick --path=runtime_no_builtin,generic_modeled_domain)
+                    ARGS --mode=quick --path=runtime_no_builtin,generic_modeled_domain --log-output=mpfr-powf-nobuiltin.json
+                    WORKING_DIRECTORY ${CCMATH_ORACLE_LOG_DIR})
         endif ()
 
         if (CCMATH_ENABLE_POW_SEARCH_TOOLS)
@@ -78,13 +86,15 @@ if (CCMATH_ENABLE_MPFR_TESTS)
         ccmath_add_rigorous_oracle_test(ccmath-rigorous-powl-characterization ccmath-rigorous-powl-characterization
                 LABELS rigorous mpfr
                 TIMEOUT 120
-                ARGS --json-output=powl-platform.json)
+                ARGS --json-output=powl-platform.json
+                WORKING_DIRECTORY ${CCMATH_ORACLE_LOG_DIR})
 
         ccmath_add_rigorous_oracle_target(ccmath-rigorous-mpfr-powl BACKEND MPFR SOURCES ../oracle/mpfr_powl.cpp)
         ccmath_add_rigorous_oracle_test(ccmath-rigorous-mpfr-powl ccmath-rigorous-mpfr-powl
                 LABELS rigorous mpfr
                 TIMEOUT 300
-                ARGS --mode=quick)
+                ARGS --mode=quick --json-output=mpfr-powl.json
+                WORKING_DIRECTORY ${CCMATH_ORACLE_LOG_DIR})
     endif ()
 endif ()
 
@@ -93,21 +103,26 @@ if (CCMATH_ENABLE_COREMATH_TESTS)
 
     if (CCMATH_COREMATH_FOUND AND TARGET ccmath::coremath_oracle)
         ccmath_add_rigorous_oracle_target(ccmath-rigorous-coremath-pow BACKEND COREMATH SOURCES ../oracle/coremath_pow_double.cpp)
+        # CORE-MATH is a correctly-rounded oracle, so it validates ccmath's own kernel rather than
+        # the platform libm reached through the public builtin path.
         ccmath_add_rigorous_oracle_test(ccmath-rigorous-coremath-pow ccmath-rigorous-coremath-pow
                 LABELS rigorous coremath
                 TIMEOUT 900
-                ARGS --mode=quick --path=public_default --rounding-modes=all)
+                ARGS --mode=quick --path=generic_runtime --rounding-modes=all --log-output=coremath-pow-double-generic_runtime.json
+                WORKING_DIRECTORY ${CCMATH_ORACLE_LOG_DIR})
 
         ccmath_add_rigorous_oracle_target(ccmath-rigorous-coremath-powf BACKEND COREMATH SOURCES ../oracle/coremath_pow_float.cpp)
         ccmath_add_rigorous_oracle_test(ccmath-rigorous-coremath-powf ccmath-rigorous-coremath-powf
                 LABELS rigorous coremath
                 TIMEOUT 1200
-                ARGS --mode=quick --path=public_default --rounding-modes=all)
+                ARGS --mode=quick --path=generic_runtime --rounding-modes=all --log-output=coremath-powf-generic_runtime.json
+                WORKING_DIRECTORY ${CCMATH_ORACLE_LOG_DIR})
 
         ccmath_add_rigorous_oracle_test(ccmath-rigorous-coremath-powf-reduced ccmath-rigorous-coremath-powf
                 LABELS rigorous coremath
                 TIMEOUT 1200
-                ARGS --mode=quick --path=public_default --rounding-modes=all --domain=mantissa-sweep,subnormal-x)
+                ARGS --mode=quick --path=generic_runtime --rounding-modes=all --domain=mantissa-sweep,subnormal-x --log-output=coremath-powf-reduced-domains.json
+                WORKING_DIRECTORY ${CCMATH_ORACLE_LOG_DIR})
     endif ()
 endif ()
 

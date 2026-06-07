@@ -462,17 +462,9 @@ namespace ccm::gen::impl
 
 			if (base_bits.is_inf())
 			{
-#if defined(_MSC_VER) && !defined(__clang__)
-				// MSVC libm returns +0 for pow(-inf, negative non-integer).
-				if (base_bits.sign().is_neg() && !is_integer(exp) && exp < 0.0) { return 0.0; }
-#endif
-				if (base_bits.sign().is_neg() && !is_integer(exp))
-				{
-					support::fenv::set_errno_if_required(EDOM);
-					support::fenv::raise_except_if_required(FE_INVALID);
-					return std::numeric_limits<double>::quiet_NaN();
-				}
-
+				// pow(+/-inf, y) is never a domain error. A negative infinite base only flips the
+				// result sign when the exponent is an odd integer, otherwise the magnitude rule for
+				// +inf applies (including non-integer exponents, e.g. pow(-inf, 0.5) = +inf).
 				const bool out_is_neg = base_bits.sign().is_neg() && is_odd_integer(exp);
 				if (exp < 0.0) { return out_is_neg ? -0.0 : 0.0; }
 				return FPBits_t::inf(out_is_neg ? Sign::NEG : Sign::POS).get_val();
