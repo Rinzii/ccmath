@@ -11,12 +11,9 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/basic/fma.hpp"
-#include "ccmath/internal/predef/unlikely.hpp"
-#include "ccmath/math/compare/isinf.hpp"
-#include "ccmath/math/compare/isnan.hpp"
-#include "ccmath/math/compare/signbit.hpp"
+#include "ccmath/internal/support/fp/fma.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 
-#include <limits>
 #include <type_traits>
 
 namespace ccm
@@ -36,32 +33,15 @@ namespace ccm
 		if constexpr (ccm::builtin::has_constexpr_fma<T>) { return ccm::builtin::fma(x, y, z); }
 		else
 		{
-			if (CCM_UNLIKELY(x == 0 || y == 0 || z == 0)) { return x * y + z; }
-
-			// If x is zero, and y is infinity, or if y is zero and x is infinity and...
-			if ((x == static_cast<T>(0) && ccm::isinf(y)) || (y == T{ 0 } && ccm::isinf(x)))
+			// Compilers without a constexpr builtin still get a genuine fused multiply-add: the
+			// runtime builtin where one exists (e.g. Clang's __builtin_fma), otherwise the
+			// correctly-rounded software FMA. The software path also covers constant evaluation, so
+			// the result is fused and follows CCM_CONSTEXPR_ROUNDING_MODE at compile time.
+			if (!support::is_constant_evaluated())
 			{
-				// ...z is NaN, return +NaN...
-				if (ccm::isnan(z)) { return std::numeric_limits<T>::quiet_NaN(); }
-
-				// ...else return -NaN if Z is not NaN.
-				return -std::numeric_limits<T>::quiet_NaN();
+				if constexpr (ccm::builtin::has_fma<T>) { return ccm::builtin::fma(x, y, z); }
 			}
-
-			// If x is a zero and y is an infinity, or if y is zero and x is an infinity and Z is NaN, then the result is -NaN.
-			if (ccm::isinf(x * y) && ccm::isinf(z) && ccm::signbit(x * y) != ccm::signbit(z)) { return -std::numeric_limits<T>::quiet_NaN(); }
-
-			// If x or y are NaN, NaN is returned.
-			if (ccm::isnan(x) || ccm::isnan(y)) { return std::numeric_limits<T>::quiet_NaN(); }
-
-			// If z is NaN, and x * y is not 0 * Inf or Inf * 0, then +NaN is returned
-			if (ccm::isnan(z) && (x * y != 0 * std::numeric_limits<T>::infinity() || x * y != std::numeric_limits<T>::infinity() * 0))
-			{
-				return std::numeric_limits<T>::quiet_NaN();
-			}
-
-			// Hope the compiler optimizes this.
-			return (x * y) + z;
+			return support::fp::generic_fma(x, y, z);
 		}
 	}
 

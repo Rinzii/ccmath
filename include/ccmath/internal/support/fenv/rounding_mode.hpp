@@ -15,8 +15,25 @@
 #include <cfenv>
 #include <limits>
 
+// Rounding mode assumed during constant evaluation. The C++ constant evaluator always performs
+// floating-point arithmetic in round-to-nearest, ties-to-even, so ccmath assumes the same by
+// default. Users who want ccmath's constexpr results to follow a directed rounding mode can define
+// CCM_CONSTEXPR_ROUNDING_MODE to FE_UPWARD, FE_DOWNWARD, or FE_TOWARDZERO before including ccmath.
+#ifndef CCM_CONSTEXPR_ROUNDING_MODE
+	#define CCM_CONSTEXPR_ROUNDING_MODE FE_TONEAREST
+#endif
+
 namespace ccm::support::fenv
 {
+	/**
+	 * @brief The rounding mode ccmath assumes while a function is being constant-evaluated.
+	 * @return CCM_CONSTEXPR_ROUNDING_MODE, which defaults to FE_TONEAREST.
+	 */
+	constexpr int constant_eval_rounding_mode() noexcept
+	{
+		return CCM_CONSTEXPR_ROUNDING_MODE;
+	}
+
 	namespace internal
 	{
 		inline bool rt_rounding_mode_is_round_up()
@@ -51,7 +68,7 @@ namespace ccm::support::fenv
 	 */
 	constexpr bool rounding_mode_is_round_up()
 	{
-		if (is_constant_evaluated()) { return std::numeric_limits<float>::round_style == std::float_round_style::round_toward_infinity; }
+		if (is_constant_evaluated()) { return constant_eval_rounding_mode() == FE_UPWARD; }
 		return internal::rt_rounding_mode_is_round_up();
 	}
 
@@ -61,7 +78,7 @@ namespace ccm::support::fenv
 	 */
 	constexpr bool rounding_mode_is_round_down()
 	{
-		if (is_constant_evaluated()) { return std::numeric_limits<float>::round_style == std::float_round_style::round_toward_neg_infinity; }
+		if (is_constant_evaluated()) { return constant_eval_rounding_mode() == FE_DOWNWARD; }
 		return internal::rt_rounding_mode_is_round_down();
 	}
 
@@ -71,7 +88,7 @@ namespace ccm::support::fenv
 	 */
 	constexpr bool rounding_mode_is_round_to_nearest()
 	{
-		if (is_constant_evaluated()) { return std::numeric_limits<float>::round_style == std::float_round_style::round_to_nearest; }
+		if (is_constant_evaluated()) { return constant_eval_rounding_mode() == FE_TONEAREST; }
 		return internal::rt_rounding_mode_is_round_to_nearest();
 	}
 
@@ -81,7 +98,7 @@ namespace ccm::support::fenv
 	 */
 	constexpr bool rounding_mode_is_round_to_zero()
 	{
-		if (is_constant_evaluated()) { return std::numeric_limits<float>::round_style == std::float_round_style::round_toward_zero; }
+		if (is_constant_evaluated()) { return constant_eval_rounding_mode() == FE_TOWARDZERO; }
 		return internal::rt_rounding_mode_is_round_to_zero();
 	}
 
@@ -91,16 +108,7 @@ namespace ccm::support::fenv
 	 */
 	constexpr int get_rounding_mode()
 	{
-		if (is_constant_evaluated())
-		{
-			switch (std::numeric_limits<float>::round_style)
-			{
-			case std::float_round_style::round_toward_infinity: return FE_UPWARD;
-			case std::float_round_style::round_toward_zero: return FE_TOWARDZERO;
-			case std::float_round_style::round_toward_neg_infinity: return FE_DOWNWARD;
-			default: return FE_TONEAREST; // Default rounding mode.
-			}
-		}
+		if (is_constant_evaluated()) { return constant_eval_rounding_mode(); }
 		return internal::rt_get_rounding_mode();
 	}
 } // namespace ccm::support::fenv

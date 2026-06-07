@@ -11,11 +11,10 @@
 #pragma once
 
 #include "ccmath/internal/predef/has_builtin.hpp"
+#include "ccmath/internal/support/fp/fma.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/multiply_add.hpp"
 #include "ccmath/internal/types/number_pair.hpp"
-
-#include <cmath>
 
 namespace ccm
 {
@@ -23,25 +22,22 @@ namespace ccm
 	{
 		using DoubleDouble = NumberPair<double>;
 
-		// True fused multiply-add for the error-free transforms below. support::multiply_add
-		// only fuses when the target advertises a hardware FMA, so on a generic build without one
-		// it degrades to (x * y) + z and a residual such as fma(a, b, -a*b) collapses to zero (or
-		// a double-double cross product loses its last bit). __builtin_fma is a correct fused
-		// operation on every target that provides it (lowering to a libm call when there is no FMA
-		// instruction), so the residual stays exact in every rounding mode. Compilers without that
-		// builtin (e.g. MSVC) fall back to std::fma, which the C runtime computes as a single
-		// rounded fused operation, keeping the residual exact there too.
+		// True fused multiply-add for the error-free transforms below. support::multiply_add only
+		// fuses when the target advertises a hardware FMA, so on a generic build without one it
+		// degrades to (x * y) + z and a residual such as fma(a, b, -a*b) collapses to zero. At
+		// runtime __builtin_fma is a correct fused operation on every target that provides it; where
+		// it is absent (e.g. MSVC) the correctly-rounded software support::fp::generic_fma keeps the
+		// residual exact in every rounding mode without falling back to libm. During constant
+		// evaluation generic_fma is used as well, so the transforms stay exact and follow
+		// CCM_CONSTEXPR_ROUNDING_MODE at compile time too.
 		constexpr double exact_fma(double x, double y, double z) noexcept
 		{
-			if (!support::is_constant_evaluated())
-			{
+			if (support::is_constant_evaluated()) { return support::fp::generic_fma(x, y, z); }
 #if CCM_HAS_BUILTIN(__builtin_fma)
-				return __builtin_fma(x, y, z);
+			return __builtin_fma(x, y, z);
 #else
-				return std::fma(x, y, z);
+			return support::fp::generic_fma(x, y, z);
 #endif
-			}
-			return support::multiply_add(x, y, z);
 		}
 
 		// The output of Dekker's FastTwoSum algorithm is correct, i.e.:
