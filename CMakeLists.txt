@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.18.0)
 # Project Setup and Metadata
 # ----------------------------------------------------------------------
 set(CCMATH_TARGET_NAME "ccmath")
-set(CCMATH_BUILD_VERSION 0.2.0)
+set(CCMATH_BUILD_VERSION 0.3.0)
 
 project(
         ${CCMATH_TARGET_NAME}
