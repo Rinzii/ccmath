@@ -43,9 +43,9 @@ def generate_html(fn, arch, flags, compiler, variant_dir=None, view_subpath=None
     semantic = _load_json(variant_dir / "semantic.json")
     perf = _load_json(variant_dir / "perf.json")
     analysis_summary = _load_json(variant_dir / "analysis_summary.json")
-    provenance = _load_json(C.OUT_DIR / "reports" / ("%s.run.json" % fn))
-    if provenance is None:
-        provenance = _load_json(C.OUT_DIR / "reports" / ("%s.provenance.json" % fn))
+    run_meta = _load_json(C.OUT_DIR / "reports" / ("%s.run.json" % fn))
+    if run_meta is None:
+        run_meta = _load_json(C.OUT_DIR / "reports" / ("%s.provenance.json" % fn))
 
     view_dir = C.OUT_DIR / "views" / (view_subpath or (fn + "/" + arch))
     view_dir.mkdir(parents=True, exist_ok=True)
@@ -86,7 +86,7 @@ def generate_html(fn, arch, flags, compiler, variant_dir=None, view_subpath=None
         "semantic": semantic,
         "perf": perf,
         "analysis_summary": analysis_summary,
-        "provenance": provenance,
+        "run": run_meta,
         "source_groups": list(source_groups.values()),
     }
     payload = json.dumps(data)

@@ -297,7 +297,7 @@ def write_report(fn, results, flags, compiler, constexpr_result=None):
     json_path = reports / ("%s.json" % fn)
     md_path.write_text("\n".join(md_lines) + "\n")
     json_path.write_text(json.dumps(report, indent=2) + "\n")
-    prov_mod.write_provenance(reports / ("%s.run.json" % fn), prov)
+    prov_mod.write_run_json(reports / ("%s.run.json" % fn), prov)
     return md_path
 
 

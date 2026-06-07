@@ -370,7 +370,8 @@ def write_scenario_report(fn, scenario_name, arch_name, flags, compiler,
     prov["scenario"] = scenario_name
     prov["source_kind"] = report["source_kind"]
     prov["variant"] = variant
-    (sdir / "scenario_provenance.json").write_text(json.dumps(prov, indent=2) + "\n")
+    report["run"] = prov
+    (sdir / "scenario_run.json").write_text(json.dumps(prov, indent=2) + "\n")
     (sdir / "scenario_report.json").write_text(json.dumps(report, indent=2) + "\n")
 
     md = _render_scenario_md(report)

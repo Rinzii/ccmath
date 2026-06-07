@@ -76,7 +76,7 @@ def _tool_version(name, finder):
 
 
 def collect(fn, flags, compiler, arches, extra=None):
-    """Build a provenance dict for a report or gate run."""
+    """Build run metadata for a report or gate run."""
     git = _git_commit()
     prov = {
         "timestamp": datetime.datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -107,7 +107,11 @@ def collect(fn, flags, compiler, arches, extra=None):
     return prov
 
 
-def write_provenance(path, prov):
+def write_run_json(path, prov):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(prov, indent=2) + "\n")
     return path
+
+
+def write_provenance(path, prov):
+    return write_run_json(path, prov)
