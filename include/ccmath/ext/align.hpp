@@ -62,7 +62,8 @@ namespace ccm::ext
 			 *   	This operation zeroes out the lower bits that fall within the alignment range, effectively rounding
 			 *   	value up to the nearest multiple of alignment.
 			 */
-			return (value + (alignment - 1)) & ~(alignment - 1);
+			const T align_mask = static_cast<T>(alignment - 1);
+			return (value + align_mask) & ~align_mask;
 		}
 		else
 		{
@@ -80,7 +81,8 @@ namespace ccm::ext
 			 *   - This operation zeroes out the lower bits that fall within the alignment range, effectively rounding
 			 *     value down to the nearest multiple of alignment.
 			 */
-			return value & ~(alignment - 1);
+			const T align_mask = static_cast<T>(alignment - 1);
+			return value & ~align_mask;
 		}
 	}
 
