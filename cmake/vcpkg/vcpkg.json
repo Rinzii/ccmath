@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "ccmath-validation",
+  "version-string": "0.3.0",
+  "builtin-baseline": "b1b19307e2d2ec476133bd9527d43f86c88456d9",
+  "dependencies": [
+    "mpfr",
+    "pkgconf"
+  ]
+}

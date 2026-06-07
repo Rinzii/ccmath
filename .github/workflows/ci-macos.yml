@@ -188,8 +188,20 @@ jobs:
             ~/Library/Caches/Homebrew
           key: ${{ runner.os }}-brew-mpfr-gmp-ninja-pkgconfig-v1
 
+      - name: Cache CORE-MATH prefix
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: coremath-prefix
+          key: ${{ runner.os }}-coremath-prefix-v1-${{ hashFiles('cmake/coremath/**', 'tools/coremath/**') }}
+
       - name: Install dependencies
         run: brew install ninja pkg-config mpfr gmp
+
+      - name: Build CORE-MATH oracle prefix
+        run: |
+          if [[ ! -f coremath-prefix/include/crmath.h ]]; then
+            bash tools/coremath/build_prefix.sh "${GITHUB_WORKSPACE}/coremath-prefix"
+          fi
 
       - name: Configure rigorous validation
         run: >
@@ -198,6 +210,8 @@ jobs:
           -DCCMATH_BUILD_SIMPLE_TESTS=OFF
           -DCCMATH_BUILD_RIGOROUS_TESTS=ON
           -DCCMATH_ENABLE_MPFR_TESTS=ON
+          -DCCMATH_ENABLE_COREMATH_TESTS=ON
+          -DCCMATH_COREMATH_ROOT=${{ github.workspace }}/coremath-prefix
           -DCCMATH_ENABLE_POW_SEARCH_TOOLS=ON
           -DCCMATH_DESIRED_CXX_STANDARD=cxx_std_20
           -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON

@@ -260,6 +260,15 @@
       "description": "VS2022 + Release"
     },
     {
+      "name": "vs22-release-rigorous",
+      "inherits": [
+        "base-vs22",
+        "Release"
+      ],
+      "description": "VS2022 + Release for rigorous MPFR validation via vcpkg",
+      "binaryDir": "${sourceDir}/out/build/vs22/vs22-release-rigorous"
+    },
+    {
       "name": "vs22-clang-debug",
       "inherits": [
         "base-vs22",
@@ -375,6 +384,14 @@
       ]
     },
     {
+      "name": "build-vs22-release-rigorous",
+      "configurePreset": "vs22-release-rigorous",
+      "configuration": "Release",
+      "targets": [
+        "ALL_BUILD"
+      ]
+    },
+    {
       "name": "build-vs22-clang-debug",
       "configurePreset": "vs22-clang-debug",
       "configuration": "Debug",
@@ -464,6 +481,12 @@
     {
       "name": "test-vs22-release",
       "configurePreset": "vs22-release",
+      "configuration": "Release",
+      "inheritConfigureEnvironment": true
+    },
+    {
+      "name": "test-vs22-release-rigorous",
+      "configurePreset": "vs22-release-rigorous",
       "configuration": "Release",
       "inheritConfigureEnvironment": true
     },

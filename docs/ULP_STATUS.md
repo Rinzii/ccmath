@@ -598,6 +598,15 @@ The tables in this section are legacy engineering measurements. They are not pro
 | `ccm::pow`  | `runtime_no_builtin`, `generic_modeled_domain` | Path-matrix quick campaign (`rigorous` label, no-builtin build)              | Kernel oracle policy; 0 failures on current corpus. Campaign JSON is a generated local artifact, not proof. |
 | `ccm::powf` | `public_default`                               | MPFR quick campaign                                                          | Structured binary32 corpus. Observed max error `1` ULP on the current local run.                            |
 | `ccm::powf` | Reduced domains                                | MPFR quick reduced campaign                                                  | Mantissa/subnormal domains in rigorous CI.                                                                  |
+
+**Rigorous CORE-MATH all-mode campaigns**
+
+| Function    | Path / configuration | Evidence type              | Notes                                                                                          |
+|-------------|----------------------|----------------------------|------------------------------------------------------------------------------------------------|
+| `ccm::pow`  | `public_default`     | CORE-MATH quick campaign   | Finite regular inputs only. Bit-exact vs `cr_pow` under all four IEEE rounding modes.          |
+| `ccm::powf` | `public_default`     | CORE-MATH quick campaign   | Finite regular inputs only. Bit-exact vs `cr_powf` under all four IEEE rounding modes.         |
+| `ccm::powf` | Reduced domains      | CORE-MATH reduced campaign | Mantissa/subnormal finite domains in rigorous CI. Not evidence for NaN, infinity, or zero cases. |
+
 | `ccm::powl` | ld64 alias                                     | MPFR conservative grid via `ccmath-rigorous-mpfr-powl`                       | Documented double-shaped alias, not independent extended precision                                          |
 | `ccm::powl` | ld80 special + bounded int + general finite    | MPFR ld80 corpora (native paths only), `std::pow` regression on native paths | Global ld80 ULP bound                                                                                       |
 | `ccm::powl` | ld128 / unknown strict                         | Detection and NaN policy tests                                               | Any native binary128 powl claim                                                                             |

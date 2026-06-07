@@ -128,6 +128,7 @@ entry = json.loads(sys.argv[1])
 labels = entry.get("simple", [])
 print("  labels run: %s" % ", ".join(labels))
 print("  MPFR oracle: %s" % ("yes" if entry.get("mpfr_oracle") else "no"))
+print("  CORE-MATH oracle: %s" % ("yes" if entry.get("coremath_oracle") else "no"))
 print("  boundary corpus: %s" % ("yes" if entry.get("boundary_corpus") else "no"))
 print("  worst-case replay: %s" % ("yes" if entry.get("worst_case_replay") else "no"))
 PY
@@ -148,7 +149,7 @@ PY
 }
 
 run_rigorous() {
-    echo ">> accuracy gate: rigorous MPFR campaign (Docker)" >&2
+    echo ">> accuracy gate: rigorous oracle campaign (MPFR + CORE-MATH, Docker)" >&2
     local linux_script="${project_root}/.AI/linux-test/linux_rigorous_test.sh"
     if [[ ! -x "${linux_script}" && ! -f "${linux_script}" ]]; then
         echo "rigorous gate needs ${linux_script} (Docker/Colima). See .AI/linux-test/README.md" >&2
@@ -164,10 +165,15 @@ run_rigorous() {
 import json, sys
 entry = json.loads(sys.argv[1])
 fn = sys.argv[2]
+mpfr_labels = entry.get("rigorous_mpfr", [])
+coremath_labels = entry.get("rigorous_coremath", [])
 labels = entry.get("rigorous", [])
 print("%s rigorous accuracy:" % fn)
-print("  labels run: %s" % ", ".join(labels))
+print("  MPFR labels: %s" % ", ".join(mpfr_labels))
+print("  CORE-MATH labels: %s" % ", ".join(coremath_labels))
+print("  combined labels: %s" % ", ".join(labels))
 print("  MPFR oracle: %s" % ("yes" if entry.get("mpfr_oracle") else "no"))
+print("  CORE-MATH oracle: %s" % ("yes" if entry.get("coremath_oracle") else "no"))
 print("  boundary corpus: %s" % ("yes" if entry.get("boundary_corpus") else "no"))
 print("  worst-case replay: %s" % ("yes" if entry.get("worst_case_replay") else "no"))
 PY

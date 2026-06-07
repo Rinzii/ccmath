@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mpfr_pow_common.hpp"
+#include "oracle_campaign_common.hpp"
 
 #include <set>
 #include <string>

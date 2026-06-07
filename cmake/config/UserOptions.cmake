@@ -24,6 +24,18 @@ option(CCMATH_BUILD_RIGOROUS_TESTS "Build the rigorous ccmath validation project
 # Enable MPFR-backed oracle validation binaries when MPFR and GMP are available.
 option(CCMATH_ENABLE_MPFR_TESTS "Enable MPFR-backed pow validation executables" OFF)
 
+# CCMATH_ENABLE_COREMATH_TESTS:
+# Enable CORE-MATH-backed oracle validation binaries when CORE-MATH is discoverable.
+option(CCMATH_ENABLE_COREMATH_TESTS "Enable CORE-MATH-backed pow validation executables" OFF)
+
+# CCMATH_COREMATH_ROOT:
+# Optional install prefix for a pre-built CORE-MATH oracle library (include + lib).
+set(CCMATH_COREMATH_ROOT "" CACHE PATH "Install prefix for CORE-MATH oracle library")
+
+# CCMATH_FETCH_COREMATH:
+# Last-resort FetchContent build when prefix/pkg-config discovery fails.
+option(CCMATH_FETCH_COREMATH "Fetch and build CORE-MATH sources when not found on the system" OFF)
+
 # CCMATH_ENABLE_POW_SEARCH_TOOLS:
 # Build standalone pow adversarial-search tools.
 option(CCMATH_ENABLE_POW_SEARCH_TOOLS "Build standalone pow adversarial-search tools" OFF)

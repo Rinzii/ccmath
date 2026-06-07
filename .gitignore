@@ -12,6 +12,11 @@ build/*
 mpfr-pow*-summary.json
 mpfr-powf*-summary.json
 mpfr-powl-summary.json
+coremath-pow*-summary.json
+coremath-powf*-summary.json
+coremath-prefix/
+cmake/vcpkg/vcpkg_installed/
+vcpkg_installed/
 pow-search-results.json
 powl-platform.json
 path-matrix-json*/
