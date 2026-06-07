@@ -16,6 +16,7 @@
 #include <type_traits>
 
 #include "ccmath/ccmath.hpp"
+#include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "utils/conformance_suite.hpp"
 #include "utils/ulp_suite.hpp"
@@ -482,13 +483,17 @@ TEST(CcmathPowerTests, PowNegInfBaseNegativeNonIntegerExponent)
 // x^-1 must be the correctly rounded reciprocal in every rounding mode. The integer-exponent
 // kernel reciprocates an exact single-double divisor with IEEE division, which is correctly
 // rounded, rather than a Newton step that could re-round the last bit to the wrong neighbor.
+//
+// This asserts the property of ccmath's own generic kernel, so it calls pow_gen directly. The
+// public ccm::pow delegates to the platform libm under round-to-nearest, and some libm builds
+// (e.g. glibc) return a pow(x, -1) that is one ULP off the IEEE reciprocal.
 TEST(CcmathPowerTests, PowNegativeOneExponentMatchesDivision)
 {
 	for (const std::uint64_t base_bits :
 		 {0x3f4fffffffffffffULL, 0x3fdfffffffffffffULL, 0x3fefffffffffffffULL, 0x3fffffffffffffffULL, 0x408fffffffffffffULL})
 	{
 		const double base = ccm::support::bit_cast<double>(base_bits);
-		EXPECT_EQ(ccm::support::bit_cast<std::uint64_t>(ccm::pow(base, -1.0)), ccm::support::bit_cast<std::uint64_t>(1.0 / base));
+		EXPECT_EQ(ccm::support::bit_cast<std::uint64_t>(ccm::gen::pow_gen(base, -1.0)), ccm::support::bit_cast<std::uint64_t>(1.0 / base));
 	}
 }
 
