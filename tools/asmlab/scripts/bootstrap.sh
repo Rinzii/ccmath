@@ -94,4 +94,4 @@ printf 'https://uops.info/\nhttps://uops.info/xml.html (machine-readable instruc
     > "${refdata}/uops-info.url"
 ok "uops.info pointer written: ${refdata}/uops-info.url"
 
-info "Done. See .AI/asm-optimization/toolchain.md for usage."
+info "Done. See tools/asmlab/README.md for usage."
