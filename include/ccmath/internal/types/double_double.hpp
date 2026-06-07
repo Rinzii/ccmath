@@ -15,6 +15,8 @@
 #include "ccmath/internal/support/multiply_add.hpp"
 #include "ccmath/internal/types/number_pair.hpp"
 
+#include <cmath>
+
 namespace ccm
 {
 	namespace types
@@ -26,12 +28,19 @@ namespace ccm
 		// it degrades to (x * y) + z and a residual such as fma(a, b, -a*b) collapses to zero (or
 		// a double-double cross product loses its last bit). __builtin_fma is a correct fused
 		// operation on every target that provides it (lowering to a libm call when there is no FMA
-		// instruction), so the residual stays exact in every rounding mode.
+		// instruction), so the residual stays exact in every rounding mode. Compilers without that
+		// builtin (e.g. MSVC) fall back to std::fma, which the C runtime computes as a single
+		// rounded fused operation, keeping the residual exact there too.
 		constexpr double exact_fma(double x, double y, double z) noexcept
 		{
+			if (!support::is_constant_evaluated())
+			{
 #if CCM_HAS_BUILTIN(__builtin_fma)
-			if (!support::is_constant_evaluated()) { return __builtin_fma(x, y, z); }
+				return __builtin_fma(x, y, z);
+#else
+				return std::fma(x, y, z);
 #endif
+			}
 			return support::multiply_add(x, y, z);
 		}
 
