@@ -14,9 +14,11 @@
 | Misc Functions               | 97     |              |                                                                                          | v0.2.0 (Released)          |
 | **Total Library Completion** | **68** |              |                                                                                          | N/a                        |
 
-> Last Updated: May 31, 2026
+> Last Updated: June 7, 2026
 
 ## Implementation Progress (Functions)
+
+Per-function rounding mode status: [ROUNDING_STATUS.md](ROUNDING_STATUS.md).
 
 | Feature        | % done | TODO                                                                                                                                                                                             |
 |----------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -103,5 +105,4 @@
 | gamma          | 100    |                                                                                                                                                                                                  |
 | lerp           | 90     |                                                                                                                                                                                                  |
 | lgamma         | 100    |                                                                                                                                                                                                  |
-
-> Last Updated: May 31, 2026
+> Last Updated: June 7, 2026
