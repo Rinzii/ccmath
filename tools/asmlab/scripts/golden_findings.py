@@ -107,7 +107,7 @@ def extract_single_findings(variant_dir, role):
     if bottleneck == "dependency_chain":
         findings.append({
             "id": "dependency_chain_present",
-            "confidence": "likely_causal",
+            "confidence": "high",
             "evidence": "mca bottleneck=%s" % bottleneck,
             "role": role,
         })
@@ -115,7 +115,7 @@ def extract_single_findings(variant_dir, role):
     if fn.get("ipc") is not None:
         findings.append({
             "id": "scalar_polynomial_kernel",
-            "confidence": "correlation",
+            "confidence": "medium",
             "evidence": "ipc=%s" % fn.get("ipc"),
             "role": role,
         })
@@ -123,7 +123,7 @@ def extract_single_findings(variant_dir, role):
     if _fma_count(sm) > 0:
         findings.append({
             "id": "FMA_contraction_present",
-            "confidence": "correlation",
+            "confidence": "medium",
             "evidence": "fma_insn_count=%d" % _fma_count(sm),
             "role": role,
         })
@@ -131,7 +131,7 @@ def extract_single_findings(variant_dir, role):
     if vec.get("vector_insn_count", 0) > 0 or vec.get("vectorized"):
         findings.append({
             "id": "vectorization_opportunity_increased",
-            "confidence": "correlation",
+            "confidence": "medium",
             "evidence": "vector_insn_count=%s" % vec.get("vector_insn_count"),
             "role": role,
         })
@@ -139,7 +139,7 @@ def extract_single_findings(variant_dir, role):
     if rp.get("peak_gpr_mentions", 0) >= 8:
         findings.append({
             "id": "register_pressure_increased",
-            "confidence": "correlation",
+            "confidence": "medium",
             "evidence": "peak_gpr=%s" % rp.get("peak_gpr_mentions"),
             "role": role,
         })
@@ -186,23 +186,23 @@ def extract_pair_findings(horner_dir, estrin_dir, pair_expected=None):
 
     bn_h, bn_e = hm.get("bottleneck"), em.get("bottleneck")
     if bn_h == "dependency_chain" and bn_e != "dependency_chain":
-        ranked.append(_ranked("dependency_chain_reduced", "likely_causal",
+        ranked.append(_ranked("dependency_chain_reduced", "high",
                               "bottleneck %s -> %s" % (bn_h, bn_e)))
     elif serial_h > serial_e:
-        ranked.append(_ranked("dependency_chain_reduced", "likely_causal",
+        ranked.append(_ranked("dependency_chain_reduced", "high",
                               "stack-serial FMA %s -> %s" % (serial_h, serial_e)))
     elif b2b_e > b2b_h and serial_h >= serial_e:
-        ranked.append(_ranked("dependency_chain_reduced", "likely_causal",
+        ranked.append(_ranked("dependency_chain_reduced", "high",
                               "parallel fmadd pairs %s -> %s (serial FMA %s -> %s)" % (
                                   b2b_h, b2b_e, serial_h, serial_e)))
 
     ipc_h, ipc_e = hm.get("ipc"), em.get("ipc")
     min_ratio = thresholds.get("ipc_improvement_ratio_min", 1.02)
     if ipc_h and ipc_e and ipc_e >= ipc_h * min_ratio:
-        ranked.append(_ranked("ILP_increased", "likely_causal",
+        ranked.append(_ranked("ILP_increased", "high",
                               "ipc %.3f -> %.3f" % (ipc_h, ipc_e)))
     elif insn_e > insn_h and serial_h > serial_e:
-        ranked.append(_ranked("ILP_increased", "correlation",
+        ranked.append(_ranked("ILP_increased", "medium",
                               "more insns with fewer stack-serial FMAs (%d vs %d)" % (
                                   serial_e, serial_h)))
 
@@ -210,7 +210,7 @@ def extract_pair_findings(horner_dir, estrin_dir, pair_expected=None):
     mca_correct = None
     if rthru_h is not None and rthru_e is not None:
         if rthru_e < rthru_h:
-            ranked.append(_ranked("throughput_improved", "likely_causal",
+            ranked.append(_ranked("throughput_improved", "high",
                                   "rthroughput %.3f -> %.3f (lower is faster)" % (
                                       rthru_h, rthru_e)))
             mca_correct = True
@@ -219,26 +219,26 @@ def extract_pair_findings(horner_dir, estrin_dir, pair_expected=None):
 
     peak_h, peak_e = hm.get("peak_gpr", 0), em.get("peak_gpr", 0)
     if insn_e > insn_h + 4 and mca_correct is False:
-        ranked.append(_ranked("throughput_improved", "correlation",
+        ranked.append(_ranked("throughput_improved", "medium",
                               "more insns but benchmark may favor estrin (structural ILP)"))
     insn_delta_min = thresholds.get("instruction_count_delta_min", 2)
     reg_insn_delta = thresholds.get("register_insn_delta_min", 0)
     if peak_e is not None and peak_h is not None and (
             peak_e > peak_h or insn_e > insn_h + reg_insn_delta
             or stack_e > stack_h + thresholds.get("stack_mem_delta_min", 1)):
-        ranked.append(_ranked("register_pressure_increased", "correlation",
+        ranked.append(_ranked("register_pressure_increased", "medium",
                               "peak_gpr %s -> %s insn %s -> %s stack_mem %s -> %s" % (
                                   peak_h, peak_e, insn_h, insn_e, stack_h, stack_e)))
 
     if _fma_count(_load_json(estrin_dir / "source_map.json")) > 0:
-        ranked.append(_ranked("FMA_contraction_present", "correlation",
+        ranked.append(_ranked("FMA_contraction_present", "medium",
                               "FMA ops present in Estrin asm"))
 
     vec_h = _load_json(horner_dir / "vectorization.json")
     vec_e = _load_json(estrin_dir / "vectorization.json")
     if (vec_e.get("vector_insn_count", 0) > vec_h.get("vector_insn_count", 0)
             or (vec_e.get("missed_vectorization") and not vec_h.get("vectorized"))):
-        ranked.append(_ranked("vectorization_opportunity_increased", "correlation",
+        ranked.append(_ranked("vectorization_opportunity_increased", "medium",
                               "vector_insn %s -> %s" % (
                                   vec_h.get("vector_insn_count"),
                                   vec_e.get("vector_insn_count"))))

@@ -12,7 +12,7 @@
     "register_pressure": "lower_than_estrin"
   },
   "expected_confidence": {
-    "dependency_chain_present": "likely_causal",
-    "scalar_polynomial_kernel": "correlation"
+    "dependency_chain_present": "high",
+    "scalar_polynomial_kernel": "medium"
   }
 }

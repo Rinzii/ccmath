@@ -15,8 +15,8 @@
     "register_pressure": "increases"
   },
   "expected_confidence": {
-    "dependency_chain_reduced": "likely_causal",
-    "vectorization_opportunity_increased": "correlation",
-    "register_pressure_increased": "correlation"
+    "dependency_chain_reduced": "high",
+    "vectorization_opportunity_increased": "medium",
+    "register_pressure_increased": "medium"
   }
 }
