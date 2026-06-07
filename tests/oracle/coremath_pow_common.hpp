@@ -1,16 +1,13 @@
 #pragma once
 
-#include "oracle_campaign_common.hpp"
-
-#include "utils/fenv_fixture.hpp"
+#include "coremath_oracle_harness.hpp"
 
 #include <crmath.h>
 
+#include <cfenv>
 #include <cmath>
-#include <optional>
-#include <string>
-#include <string_view>
-#include <vector>
+#include <cstdint>
+#include <cstring>
 
 namespace ccm::test::oracle
 {
@@ -20,6 +17,53 @@ namespace ccm::test::oracle
 		if constexpr (std::is_same_v<T, float>) { return cr_powf(base, exponent); }
 		else if constexpr (std::is_same_v<T, double>) { return cr_pow(base, exponent); }
 		else { return static_cast<T>(cr_pow(static_cast<double>(base), static_cast<double>(exponent))); }
+	}
+
+	// Higher-precision correctly-rounded float reference, used only to cross-check
+	// disagreements with the primary float oracle (cr_powf). cr_powf has a fast path
+	// that flushes results extremely close to 1.0 to exactly 1.0 in every rounding
+	// mode (ignoring directed rounding) and mishandles (-1)^(large even); the double
+	// oracle cr_pow does not. We evaluate cr_pow under round-up and round-down, take
+	// the round-to-odd double, and cast it to float in the active rounding mode, which
+	// yields the correctly rounded float without double rounding.
+	inline float coremath_float_truth(float base, float exponent)
+	{
+		const int active = std::fegetround();
+		std::fesetround(FE_UPWARD);
+		const double du = cr_pow(static_cast<double>(base), static_cast<double>(exponent));
+		std::fesetround(FE_DOWNWARD);
+		const double dd = cr_pow(static_cast<double>(base), static_cast<double>(exponent));
+		std::fesetround(active);
+		double rod = du;
+		if (du != dd)
+		{
+			std::uint64_t bd = 0;
+			std::memcpy(&bd, &dd, sizeof(bd));
+			rod = (bd & 1U) ? dd : du;
+		}
+		volatile float result = static_cast<float>(rod); // final rounding in the active mode
+		return result;
+	}
+
+	// True when the function output disagrees with the primary oracle but is in fact
+	// correctly rounded (confirmed by a higher-precision cross-check), i.e. the oracle
+	// is wrong for this case. Only float has a higher-precision cross-check available
+	// here; cr_pow (double) is trusted directly.
+	template <typename T>
+	inline bool function_matches_high_precision_truth(T base, T exponent, T actual)
+	{
+		if constexpr (std::is_same_v<T, float>)
+		{
+			const float truth = coremath_float_truth(base, exponent);
+			return oracle_fp_bits_match(actual, truth);
+		}
+		else
+		{
+			(void) base;
+			(void) exponent;
+			(void) actual;
+			return false;
+		}
 	}
 
 	template <typename T, typename Fn>
@@ -32,65 +76,19 @@ namespace ccm::test::oracle
 																  std::uint64_t seed		   = 0,
 																  std::string_view search_mode = {})
 	{
-		if (!is_coremath_oracle_case(test_case.base, test_case.exponent))
-		{
-			++summary.skipped_count;
-			return std::nullopt;
-		}
-
-		++summary.case_count;
-
-		ccm::test::ForceRoundingMode force(rounding_mode);
-		if (!force)
-		{
-			++summary.skipped_count;
-			--summary.case_count;
-			return std::nullopt;
-		}
-
-		const T expected = coremath_pow_reference(test_case.base, test_case.exponent);
-		const T actual	 = fn(test_case.base, test_case.exponent);
-
-		if (oracle_fp_bits_match(actual, expected)) { return std::nullopt; }
-
-		++summary.failure_count;
-		if (summary.max_observed_ulp == 0)
-		{
-			summary.max_observed_ulp = 1;
-			summary.worst_base		 = test_case.base;
-			summary.worst_exponent	 = test_case.exponent;
-			summary.worst_actual	 = actual;
-			summary.worst_expected	 = expected;
-		}
-
-		return failure_record<T>{
-			std::string(function_name),
-			scalar_type_name<T>(),
-			std::string(path_name),
-			test_case.provenance,
-			test_case.base,
-			test_case.exponent,
-			actual,
-			expected,
-			bits_hex(test_case.base),
-			bits_hex(test_case.exponent),
-			bits_hex(actual),
-			bits_hex(expected),
-			0,
-			ccm::test::RoundingModeName(rounding_mode),
-			0,
-			compiler_id(),
-			platform_id(),
-			fma_status(),
-			builtin_status<T>(),
-			simd_status(),
-			configuration_name(),
-			optimization_mode(),
-			std::string(search_mode),
+		return evaluate_binary_coremath_case_in_mode(
+			test_case,
+			function_name,
+			path_name,
+			rounding_mode,
+			fn,
+			[](T base, T exponent) { return coremath_pow_reference(base, exponent); },
+			[](T base, T exponent) { return is_coremath_oracle_case(base, exponent); },
+			[](T base, T exponent, T actual) { return function_matches_high_precision_truth(base, exponent, actual); },
+			summary,
 			seed,
-			utc_timestamp(),
-			"bit-exact mismatch vs CORE-MATH cr_pow",
-		};
+			search_mode,
+			"bit-exact mismatch vs CORE-MATH cr_pow");
 	}
 
 	template <typename T, typename Fn>
@@ -104,12 +102,19 @@ namespace ccm::test::oracle
 										std::uint64_t seed			 = 0,
 										std::string_view search_mode = {})
 	{
-		for (int mode : rounding_modes)
-		{
-			if (auto failure = evaluate_case_in_mode(test_case, function_name, path_name, mode, fn, summary, seed, search_mode))
-			{
-				failures.push_back(*failure);
-			}
-		}
+		evaluate_binary_coremath_case_all_modes(
+			test_case,
+			function_name,
+			path_name,
+			rounding_modes,
+			fn,
+			[](T base, T exponent) { return coremath_pow_reference(base, exponent); },
+			[](T base, T exponent) { return is_coremath_oracle_case(base, exponent); },
+			[](T base, T exponent, T actual) { return function_matches_high_precision_truth(base, exponent, actual); },
+			summary,
+			failures,
+			seed,
+			search_mode,
+			"bit-exact mismatch vs CORE-MATH cr_pow");
 	}
 } // namespace ccm::test::oracle

@@ -25,7 +25,7 @@ namespace
 		for (const auto & test_case : cases)
 		{
 			if (auto failure = ccm::test::oracle::evaluate_case(
-					test_case, function_name, path_name, path, fn, precision, max_ulp, summary, seed, search_mode))
+					test_case, function_name, path_name, path, fn, precision, max_ulp, summary, /*target_ulp=*/0, seed, search_mode))
 			{
 				failures.push_back(*failure);
 			}

@@ -22,11 +22,11 @@ option(CCMATH_BUILD_RIGOROUS_TESTS "Build the rigorous ccmath validation project
 
 # CCMATH_ENABLE_MPFR_TESTS:
 # Enable MPFR-backed oracle validation binaries when MPFR and GMP are available.
-option(CCMATH_ENABLE_MPFR_TESTS "Enable MPFR-backed pow validation executables" OFF)
+option(CCMATH_ENABLE_MPFR_TESTS "Enable MPFR-backed rigorous oracle executables" OFF)
 
 # CCMATH_ENABLE_COREMATH_TESTS:
 # Enable CORE-MATH-backed oracle validation binaries when CORE-MATH is discoverable.
-option(CCMATH_ENABLE_COREMATH_TESTS "Enable CORE-MATH-backed pow validation executables" OFF)
+option(CCMATH_ENABLE_COREMATH_TESTS "Enable CORE-MATH-backed rigorous oracle executables" OFF)
 
 # CCMATH_COREMATH_ROOT:
 # Optional install prefix for a pre-built CORE-MATH oracle library (include + lib).

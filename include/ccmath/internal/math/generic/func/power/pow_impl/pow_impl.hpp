@@ -12,6 +12,7 @@
 
 #include "ccmath/internal/math/generic/builtins/basic/fma.hpp"
 #include "ccmath/internal/math/generic/func/power/pow_impl/powf_data.hpp"
+#include "ccmath/internal/math/generic/func/power/sqrt_gen.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/common_math_constants.hpp"
@@ -44,6 +45,13 @@ namespace ccm::gen::impl
 #else
 				return (x * y) + z;
 #endif
+			}
+
+			// Order operands for Fast2Sum (exact_add), which requires |a| >= |b|.
+			constexpr bool larger_exponent(double a, double b) noexcept
+			{
+				using DoubleBits = support::fp::FPBits<double>;
+				return DoubleBits(a).get_biased_exponent() >= DoubleBits(b).get_biased_exponent();
 			}
 		} // namespace pow_kernel_detail
 
@@ -81,6 +89,184 @@ namespace ccm::gen::impl
 		inline constexpr std::array<double, 6> POW_EXP2_COEFFS = {
 			0x1p0, 0x1.62e42fefa39efp-7, 0x1.ebfbdff82a23ap-15, 0x1.c6b08d7076268p-23, 0x1.3b2ad33f8b48bp-31, 0x1.5d870c4d84445p-40,
 		};
+
+		// Exact-as-possible integer powers via double-double exponentiation by squaring.
+		// Used for small integer exponents, where the result can land within one ULP of a
+		// power of two (or be exactly representable) and the log2/exp2 reconstruction cannot
+		// resolve the last bit. The products use an FMA-based error-free transform, which is
+		// exact under every rounding mode (Dekker's exact_mult is exact only to nearest).
+		namespace pow_int_detail
+		{
+			using ccm::types::DoubleDouble;
+
+			constexpr DoubleDouble two_prod(double a, double b) noexcept
+			{
+				const double hi = a * b;
+				const double lo = support::multiply_add(a, b, -hi);
+				return DoubleDouble{ hi, lo };
+			}
+
+			constexpr DoubleDouble mul(const DoubleDouble & a, const DoubleDouble & b) noexcept
+			{
+				DoubleDouble p = two_prod(a.hi, b.hi);
+				p.lo += support::multiply_add(a.hi, b.lo, a.lo * b.hi);
+				return ccm::types::exact_add(p.hi, p.lo);
+			}
+
+			constexpr DoubleDouble ipow(DoubleDouble factor, std::uint64_t e) noexcept
+			{
+				DoubleDouble result{ 1.0, 0.0 };
+				while (e > 0U)
+				{
+					if ((e & 1U) != 0U) { result = mul(result, factor); }
+					e >>= 1U;
+					if (e > 0U) { factor = mul(factor, factor); }
+				}
+				return result;
+			}
+
+			constexpr DoubleDouble ipow(double base, std::uint64_t e) noexcept
+			{ return ipow(DoubleDouble{ base, 0.0 }, e); }
+
+			// sqrt(x) refined to a double-double via one Newton correction on a correctly
+			// rounded seed: x^(k + 1/2) = sqrt(x)^(2k + 1) is then exact integer exponentiation.
+			// Tiny x is scaled up first so that s0^2 stays in the normal range, otherwise the
+			// two_prod residual underflows and the correction is lost.
+			constexpr DoubleDouble dd_sqrt(double x) noexcept
+			{
+				double mult = 1.0;
+				if (x < 0x1.0p-1000)
+				{
+					x *= 0x1.0p106;
+					mult = 0x1.0p-53;
+				}
+				const double s0		  = ccm::gen::sqrt_gen<double>(x);
+				const DoubleDouble sq = two_prod(s0, s0);
+				const double e		  = (x - sq.hi) - sq.lo; // x - s0^2 (exact)
+				const double corr	  = e / (2.0 * s0);
+				return DoubleDouble{ s0 * mult, corr * mult };
+			}
+
+			// 1 / (p.hi + p.lo), refined to one rounding by a Newton step on the pair.
+			constexpr double reciprocal(const DoubleDouble & p) noexcept
+			{
+				using FPBits_t	= support::fp::FPBits<double>;
+				const double r0 = 1.0 / p.hi;
+				const FPBits_t r0_bits(r0);
+				if (r0 == 0.0 || !r0_bits.is_finite()) { return r0; }
+				const DoubleDouble pr = two_prod(p.hi, r0);
+				const double res	  = ((1.0 - pr.hi) - pr.lo) - p.lo * r0;
+				return r0 + r0 * res;
+			}
+		} // namespace pow_int_detail
+
+		// Accurate double-double reconstruction of x^y for the in-range (non-clamped)
+		// exponent region. The fast pow_kernel single-double path is good to a few ULP
+		// but loses the last bit near rounding boundaries under directed rounding. This
+		// path mirrors powf_double_double but keeps a full double-double log2(x) (binary64
+		// allows |y| up to ~2^53, so the powf lo6_hi single-double shortcut is unsafe) and
+		// collapses the normalized double-double with a single binary64 addition, which
+		// rounds once in the active mode and is therefore correctly rounded in all modes.
+		constexpr double pow_double_double(unsigned idx_x, double dx, double log2_x_hi_part, double y6, std::uint64_t sign) noexcept
+		{
+			using FPBits_t = support::fp::FPBits<double>;
+
+			// Second range reduction:
+			//   idx2 = round(dx * 2^14 + 2^6), dx2 = (1 + dx) * R2[idx2] - 1,
+			//   with -0x1.3ffcp-15 <= dx2 <= 0x1.3e3dp-15.
+			// The powf path can keep dx2 in a single double because its dx derives from a
+			// 24-bit float, so (1 + dx) * R2 is exact. Here dx is full binary64 precision,
+			// so (1 + dx) * R2 - 1 must be carried as a double-double or the reduction loses
+			// roughly 2^-52, which feeds straight through into the result.
+			const int idx2				   = static_cast<int>(support::fp::nearest_integer(support::multiply_add(dx, 0x1.0p14, 0x1.0p6)));
+			const double r2				   = support::constants::R2.at(static_cast<std::size_t>(idx2));
+			const DoubleDouble one_plus_dx = ccm::types::exact_add(1.0, dx);
+			const DoubleDouble r2_prod	   = quick_mult(r2, one_plus_dx);
+			const double dx2_hi			   = r2_prod.hi - 1.0; // Exact by Sterbenz, r2_prod.hi ~ 1
+			const DoubleDouble dx2		   = ccm::types::exact_add(dx2_hi, r2_prod.lo);
+
+			// Degree-5 double-double minimax for log2(1 + x)/x on the twice-reduced range.
+			//   P = fpminimax(log2(1 + x)/x, 5, [|DD...|], [-0x1.3ffcp-15, 0x1.3e3dp-15])
+			//   dirtyinfnorm(log2(1 + x)/x - P) = 0x1.8be5...p-96
+			constexpr std::array<DoubleDouble, 6> COEFFS = {
+				DoubleDouble{ 0x1.71547652b82fep0, 0x1.777d0ffda25ep-56 },	  DoubleDouble{ -0x1.71547652b82fep-1, -0x1.777d101cf0a84p-57 },
+				DoubleDouble{ 0x1.ec709dc3a03fdp-2, 0x1.ce04b5140d867p-56 },  DoubleDouble{ -0x1.71547652b82fbp-2, 0x1.137b47e635be5p-56 },
+				DoubleDouble{ 0x1.2776c516a92a2p-2, -0x1.b5a30b3bdb318p-58 }, DoubleDouble{ -0x1.ec70af1929ca6p-3, 0x1.2d2fbd081e657p-57 },
+			};
+
+			const DoubleDouble p = ::ccm::support::polyeval(dx2, COEFFS[0], COEFFS[1], COEFFS[2], COEFFS[3], COEFFS[4], COEFFS[5]);
+
+			// log2(1 + dx2) ~ dx2 * P(dx2)
+			const DoubleDouble log2_1p = quick_mult(dx2, p);
+
+			// Lower-order parts of (e_x - log2(r1)) and -log2(r2). LOG2_R2_DD is stored {lo, hi}.
+			const auto & lr = LOG2_R_TD.at(static_cast<std::size_t>(idx_x));
+			const DoubleDouble log2_x_mid{ lr.mid, lr.lo };
+			const auto & lr2 = LOG2_R2_DD.at(static_cast<std::size_t>(idx2));
+			const DoubleDouble log2_r2_dd{ lr2.lo, lr2.hi };
+			const DoubleDouble log2_x_m = ccm::types::add(log2_r2_dd, log2_x_mid);
+
+			const DoubleDouble log2_x_low =
+				pow_kernel_detail::larger_exponent(log2_x_m.hi, log2_1p.hi) ? ccm::types::add(log2_x_m, log2_1p) : ccm::types::add(log2_1p, log2_x_m);
+
+			// Full log2(x) = (e_x - log2(r1) high part) + lower-order double-double.
+			const DoubleDouble hi_dd{ log2_x_hi_part, 0.0 };
+			const DoubleDouble log2_x =
+				pow_kernel_detail::larger_exponent(log2_x_hi_part, log2_x_low.hi) ? ccm::types::add(hi_dd, log2_x_low) : ccm::types::add(log2_x_low, hi_dd);
+
+			// 2^6 * y * log2(x). In the gated range |y6_log2_x.hi| < 512 * 2^6.
+			const DoubleDouble y6_log2_x = quick_mult(y6, log2_x);
+
+			const double hm		   = support::fp::nearest_integer(y6_log2_x.hi);
+			const double lo6_hi	   = y6_log2_x.hi - hm; // Exact, |lo6_hi| <= 0.5
+			const DoubleDouble lo6 = ccm::types::exact_add(lo6_hi, y6_log2_x.lo);
+
+			const int hm_i		 = static_cast<int>(hm);
+			const unsigned idx_y = static_cast<unsigned>(hm_i) & 0x3f;
+
+			const std::int64_t exp2_hi_i =
+				static_cast<std::int64_t>(static_cast<std::uint64_t>(static_cast<std::int64_t>(hm_i >> 6)) << FPBits_t::fraction_length);
+			const std::int64_t exp2_mid_hi_i =
+				static_cast<std::int64_t>(FPBits_t(support::constants::EXP2_MID1.at(static_cast<std::size_t>(idx_y)).hi).uintval());
+			const std::int64_t exp2_mid_lo_i =
+				static_cast<std::int64_t>(FPBits_t(support::constants::EXP2_MID1.at(static_cast<std::size_t>(idx_y)).mid).uintval());
+
+			const std::uint64_t exp2_hm_hi_i = static_cast<std::uint64_t>(exp2_hi_i + exp2_mid_hi_i) + sign;
+			const std::uint64_t exp2_hm_lo_i = idx_y != 0 ? static_cast<std::uint64_t>(exp2_hi_i + exp2_mid_lo_i) + sign : sign;
+
+			const DoubleDouble exp2_hm{ FPBits_t(exp2_hm_hi_i).get_val(), FPBits_t(exp2_hm_lo_i).get_val() };
+
+			// Degree-9 double-double minimax for 2^(x/64), dirtyinfnorm ~ 2^-106.
+			constexpr std::array<DoubleDouble, 10> EXP2_COEFFS = {
+				DoubleDouble{ 0x1p0, 0 },
+				DoubleDouble{ 0x1.62e42fefa39efp-7, 0x1.abc9e3b398024p-62 },
+				DoubleDouble{ 0x1.ebfbdff82c58fp-15, -0x1.5e43a5429bddbp-69 },
+				DoubleDouble{ 0x1.c6b08d704a0cp-23, -0x1.d33162491268fp-77 },
+				DoubleDouble{ 0x1.3b2ab6fba4e77p-31, 0x1.4fb32d240a14ep-86 },
+				DoubleDouble{ 0x1.5d87fe78a6731p-40, 0x1.e84e916be83ep-97 },
+				DoubleDouble{ 0x1.430912f86bfb8p-49, -0x1.9a447bfddc5e6p-103 },
+				DoubleDouble{ 0x1.ffcbfc588ded9p-59, -0x1.31a55719de47fp-113 },
+				DoubleDouble{ 0x1.62c034beb8339p-68, -0x1.0ba57164eb36bp-122 },
+				DoubleDouble{ 0x1.b5251ff97bee1p-78, -0x1.8483eabd9642dp-132 },
+			};
+
+			const DoubleDouble pp = ::ccm::support::polyeval(lo6,
+															 EXP2_COEFFS[0],
+															 EXP2_COEFFS[1],
+															 EXP2_COEFFS[2],
+															 EXP2_COEFFS[3],
+															 EXP2_COEFFS[4],
+															 EXP2_COEFFS[5],
+															 EXP2_COEFFS[6],
+															 EXP2_COEFFS[7],
+															 EXP2_COEFFS[8],
+															 EXP2_COEFFS[9]);
+			const DoubleDouble rr = quick_mult(exp2_hm, pp);
+
+			// A single binary64 addition of a faithful double-double rounds once in the
+			// active mode, yielding the correctly-rounded result without double rounding.
+			return rr.hi + rr.lo;
+		}
 
 		constexpr double pow_kernel(double base, double exp, std::uint64_t sign) noexcept
 		{
@@ -137,9 +323,10 @@ namespace ccm::gen::impl
 			const double c2	 = support::multiply_add(dx, POW_LOG2_COEFFS[6], POW_LOG2_COEFFS[5]);
 			const double p	 = support::polyeval(dx2, c0, c1, c2);
 
-			const auto & log2_r	   = LOG2_R_TD.at(static_cast<std::size_t>(idx_x));
-			DoubleDouble log2_x_hi = ccm::types::exact_add(static_cast<double>(e_x) + log2_r.hi, dx_c0.hi);
-			const double log2_x_lo = support::multiply_add(dx2, p, dx_c0.lo + log2_r.mid);
+			const auto & log2_r			= LOG2_R_TD.at(static_cast<std::size_t>(idx_x));
+			const double log2_x_hi_part = static_cast<double>(e_x) + log2_r.hi;
+			DoubleDouble log2_x_hi		= ccm::types::exact_add(log2_x_hi_part, dx_c0.hi);
+			const double log2_x_lo		= support::multiply_add(dx2, p, dx_c0.lo + log2_r.mid);
 
 			DoubleDouble log2_x = ccm::types::exact_add(log2_x_hi.hi, log2_x_lo);
 			log2_x.lo += log2_x_hi.lo + log2_r.lo;
@@ -158,7 +345,13 @@ namespace ccm::gen::impl
 				{
 					scale = 0x1.0p512;
 					y6_log2_x.hi -= 512.0 * 64.0;
-					if (y6_log2_x.hi > 513.0 * 64.0) { y6_log2_x.hi = 513.0 * 64.0; }
+					if (y6_log2_x.hi > 513.0 * 64.0)
+					{
+						y6_log2_x.hi = 513.0 * 64.0;
+						// If hi is clamped, the huge double-double tail would dominate lo6 and
+						// reconstruct a spurious value instead of cleanly overflowing to infinity.
+						y6_log2_x.lo = 0.0;
+					}
 				}
 				else
 				{
@@ -173,6 +366,11 @@ namespace ccm::gen::impl
 					}
 				}
 			}
+
+			// In-range exponents use the accurate double-double reconstruction so the
+			// result is correctly rounded in every mode. Clamped over/underflow cases keep
+			// the fast single-double path below, which saturates cleanly to inf/0.
+			if (scale == 1.0) { return pow_double_double(idx_x, dx, log2_x_hi_part, y6, sign); }
 
 			const double hm		= support::fp::nearest_integer(y6_log2_x.hi);
 			const double lo6_hi = y6_log2_x.hi - hm;
@@ -304,6 +502,36 @@ namespace ccm::gen::impl
 				base = base_bits.abs().get_val();
 			}
 
+			// Small integer exponents: double-double exponentiation by squaring rounds
+			// correctly even for results sitting within one ULP of a power of two, which the
+			// log2/exp2 kernel cannot. Over/underflow (non-normal result) falls through to the
+			// kernel, which owns errno and floating-point exception signaling.
+			if (is_integer(exp) && FPBits_t(exp).abs().get_val() <= 1024.0)
+			{
+				const auto exp_i					 = static_cast<std::int64_t>(exp);
+				const std::uint64_t mag				 = exp_i < 0 ? static_cast<std::uint64_t>(-(exp_i + 1)) + 1U : static_cast<std::uint64_t>(exp_i);
+				const pow_int_detail::DoubleDouble p = pow_int_detail::ipow(base, mag);
+				const double r						 = exp_i < 0 ? pow_int_detail::reciprocal(p) : (p.hi + p.lo);
+				if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal()) { return sign != 0 ? -r : r; }
+			}
+
+			// Small half-integer exponents: x^(k + 1/2) = sqrt(x)^(2k + 1). Here base > 0
+			// (negative base with non-integer exponent already returned NaN), so the result is
+			// a correctly rounded integer power of an accurate double-double sqrt.
+			const double two_exp = exp * 2.0;
+			if (is_integer(two_exp) && FPBits_t(two_exp).abs().get_val() <= 2048.0)
+			{
+				// pow(x, 1/2) is exactly the correctly rounded sqrt. The double-double round
+				// trip below would re-round an exact midpoint to the wrong neighbor.
+				if (exp == 0.5) { return ccm::gen::sqrt_gen<double>(base); }
+
+				const auto m						 = static_cast<std::int64_t>(two_exp);
+				const std::uint64_t mag				 = m < 0 ? static_cast<std::uint64_t>(-(m + 1)) + 1U : static_cast<std::uint64_t>(m);
+				const pow_int_detail::DoubleDouble p = pow_int_detail::ipow(pow_int_detail::dd_sqrt(base), mag);
+				const double r						 = m < 0 ? pow_int_detail::reciprocal(p) : (p.hi + p.lo);
+				if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal()) { return r; }
+			}
+
 			// LLVM libc clamps huge finite exponents so the kernel can round overflow/underflow.
 			const FPBits_t exp_abs_bits(exp);
 			const std::uint64_t exp_a					   = exp_abs_bits.abs().uintval();
@@ -315,8 +543,6 @@ namespace ccm::gen::impl
 	} // namespace internal::impl
 
 	constexpr double pow_impl(double base, double exp) noexcept
-	{
-		return internal::impl::pow_impl(base, exp);
-	}
+	{ return internal::impl::pow_impl(base, exp); }
 
 } // namespace ccm::gen::impl

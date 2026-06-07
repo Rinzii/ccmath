@@ -7,7 +7,9 @@ include_guard(GLOBAL)
 
 set(CCMATH_MPFR_FOUND FALSE)
 
-macro(_ccmath_configure_vcpkg_pkgconfig)
+# vcpkg pkg-config wiring is Windows-only. This is a function (not a macro) so the early
+# returns scope to the helper instead of aborting the whole module on Linux and macOS.
+function(_ccmath_configure_vcpkg_pkgconfig)
     if (NOT WIN32)
         return()
     endif ()
@@ -33,7 +35,7 @@ macro(_ccmath_configure_vcpkg_pkgconfig)
 
     set(ENV{PKG_CONFIG_PATH}
             "${_vcpkg_triplet_root}/lib/pkgconfig;${_vcpkg_triplet_root}/share/pkgconfig")
-endmacro()
+endfunction()
 
 _ccmath_configure_vcpkg_pkgconfig()
 

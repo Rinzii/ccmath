@@ -20,35 +20,34 @@ namespace
 				  std::vector<ccm::test::oracle::failure_record<float>> & failures,
 				  ccm::test::oracle::run_summary<float> & summary)
 	{
-		const auto support = ccm::test::pow_path::path_is_supported<float>(path);
-		if (!support.supported)
-		{
-			std::cout << "SKIP path=" << ccm::test::pow_path::path_name(path) << " reason=" << support.skip_reason << '\n';
-			return;
-		}
-
-		const auto started = std::chrono::steady_clock::now();
-		for (const auto & test_case : cases)
-		{
-			ccm::test::oracle::evaluate_case_all_modes(
-				test_case,
-				"ccm::powf",
-				ccm::test::pow_path::path_name(path),
-				rounding_modes,
-				[ path ](float base, float exponent) { return ccm::test::pow_path::invoke(path, base, exponent); },
-				summary,
-				failures,
-				seed);
-		}
-		const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - started);
-		const auto report = ccm::test::oracle::make_coremath_campaign_report<float>(
-			ccm::test::pow_path::path_name(path), mode, summary, seed, static_cast<std::uint64_t>(elapsed.count()), domains_covered, domains_skipped);
-		const std::string summary_path = "coremath-powf-" + report.path + "-summary.json";
-		ccm::test::oracle::write_campaign_summary_json(summary_path, report);
-
-		std::cout << "path=" << report.path << " configuration=" << report.configuration_name << " cases=" << report.case_count
-				  << " skipped=" << report.skipped_count << " max_ulp=" << report.max_observed_ulp << " failures=" << report.failure_count
-				  << " elapsed_ms=" << report.elapsed_ms << " summary=" << summary_path << '\n';
+		ccm::test::oracle::run_path_campaign<float>(
+			path,
+			summary,
+			"coremath-powf-",
+			[&](ccm::test::oracle::run_summary<float> & path_summary) {
+				for (const auto & test_case : cases)
+				{
+					ccm::test::oracle::evaluate_case_all_modes(
+						test_case,
+						"ccm::powf",
+						ccm::test::pow_path::path_name(path),
+						rounding_modes,
+						[ path ](float base, float exponent) { return ccm::test::pow_path::invoke(path, base, exponent); },
+						path_summary,
+						failures,
+						seed);
+				}
+			},
+			[&](const ccm::test::oracle::run_summary<float> & path_summary, std::uint64_t elapsed_ms) {
+				return ccm::test::oracle::make_coremath_campaign_report<float>(
+					ccm::test::pow_path::path_name(path), mode, path_summary, seed, elapsed_ms, domains_covered, domains_skipped);
+			},
+			[&](const auto & report, const std::string & summary_path) {
+				std::cout << "path=" << report.path << " configuration=" << report.configuration_name
+						  << " cases=" << report.case_count << " skipped=" << report.skipped_count
+						  << " max_ulp=" << report.max_observed_ulp << " failures=" << report.failure_count
+						  << " elapsed_ms=" << report.elapsed_ms << " summary=" << summary_path << '\n';
+			});
 	}
 } // namespace
 

@@ -2,6 +2,7 @@
 #include "powf_exhaustive_domains.hpp"
 
 #include "tests/utils/math_samples.hpp"
+#include "utils/worst_case_samples.hpp"
 
 #include <iostream>
 
@@ -167,8 +168,10 @@ namespace
 
 	void run_path(validation_path path,
 				  const std::vector<pow_case<float>> & cases,
+				  const std::vector<int> & rounding_modes,
 				  mpfr_prec_t precision,
 				  std::uint64_t max_ulp,
+				  std::uint64_t target_ulp,
 				  std::uint64_t seed,
 				  campaign_mode mode,
 				  const std::vector<std::string> & domains_covered,
@@ -176,45 +179,59 @@ namespace
 				  std::vector<ccm::test::oracle::failure_record<float>> & failures,
 				  ccm::test::oracle::run_summary<float> & summary)
 	{
-		const auto support = ccm::test::pow_path::path_is_supported<float>(path);
-		if (!support.supported)
-		{
-			std::cout << "SKIP path=" << ccm::test::pow_path::path_name(path) << " reason=" << support.skip_reason << '\n';
-			return;
-		}
-
-		const auto started = std::chrono::steady_clock::now();
-		for (const auto & test_case : cases)
-		{
-			if (path == validation_path::generic_modeled_domain &&
-				!ccm::test::oracle::is_modeled_generic_pow_case(test_case.base, test_case.exponent))
-			{
-				continue;
-			}
-			if (auto failure = ccm::test::oracle::evaluate_case(
-					test_case,
-					"ccm::powf",
+		ccm::test::oracle::run_path_campaign<float>(
+			path,
+			summary,
+			"mpfr-powf-",
+			[&](ccm::test::oracle::run_summary<float> & path_summary) {
+				for (const int rounding_mode : rounding_modes)
+				{
+					ccm::test::oracle::ScopedMpfrRoundingMode scope(rounding_mode);
+					if (!scope) { continue; }
+					for (const auto & test_case : cases)
+					{
+						if (path == validation_path::generic_modeled_domain &&
+							!ccm::test::oracle::is_modeled_generic_pow_case(test_case.base, test_case.exponent))
+						{
+							continue;
+						}
+						if (auto failure = ccm::test::oracle::evaluate_case(
+								test_case,
+								"ccm::powf",
+								ccm::test::pow_path::path_name(path),
+								path,
+								[ path ](float base, float exponent) { return ccm::test::pow_path::invoke(path, base, exponent); },
+								precision,
+								max_ulp,
+								path_summary,
+								target_ulp,
+								seed))
+						{
+							failures.push_back(*failure);
+						}
+					}
+				}
+			},
+			[&](const ccm::test::oracle::run_summary<float> & path_summary, std::uint64_t elapsed_ms) {
+				return ccm::test::oracle::make_campaign_report<float>(
 					ccm::test::pow_path::path_name(path),
 					path,
-					[ path ](float base, float exponent) { return ccm::test::pow_path::invoke(path, base, exponent); },
-					precision,
-					max_ulp,
-					summary,
-					seed))
-			{
-				failures.push_back(*failure);
-			}
-		}
-		const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - started);
-		const auto report = ccm::test::oracle::make_campaign_report<float>(
-			ccm::test::pow_path::path_name(path), path, mode, summary, seed, static_cast<std::uint64_t>(elapsed.count()), domains_covered, domains_skipped);
-		const std::string summary_path = "mpfr-powf-" + report.path + "-summary.json";
-		ccm::test::oracle::write_campaign_summary_json(summary_path, report);
-
-		std::cout << "path=" << report.path << " configuration=" << report.configuration_name << " cases=" << report.case_count
-				  << " skipped=" << report.skipped_count << " mpfr_policy_mismatches=" << report.mpfr_policy_mismatch_count
-				  << " max_ulp=" << report.max_observed_ulp << " failures=" << report.failure_count << " elapsed_ms=" << report.elapsed_ms
-				  << " summary=" << summary_path << '\n';
+					mode,
+					path_summary,
+					seed,
+					elapsed_ms,
+					domains_covered,
+					domains_skipped);
+			},
+			[&](const auto & report, const std::string & summary_path) {
+				std::cout << "path=" << report.path << " configuration=" << report.configuration_name
+						  << " rounding_modes=" << rounding_modes.size() << " cases=" << report.case_count
+						  << " skipped=" << report.skipped_count
+						  << " mpfr_policy_mismatches=" << report.mpfr_policy_mismatch_count
+						  << " max_ulp=" << report.max_observed_ulp << " target_ulp=" << target_ulp
+						  << " above_target=" << report.above_target_count << " failures=" << report.failure_count
+						  << " elapsed_ms=" << report.elapsed_ms << " summary=" << summary_path << '\n';
+			});
 	}
 } // namespace
 
@@ -232,6 +249,12 @@ int main(int argc, char ** argv)
 		ccm::test::oracle::parse_option_or<std::uint64_t>(ccm::test::oracle::option_value(argc, argv, "--max-ulp="),
 			[](const std::string & value) { return static_cast<std::uint64_t>(std::stoull(value)); },
 			4);
+	// Hard ceiling stays at 4 ULP. The correctly-rounded target is 0.5 ULP, which in the
+	// integer ULP-distance metric versus the rounded MPFR reference is distance 0.
+	const std::uint64_t target_ulp =
+		ccm::test::oracle::parse_option_or<std::uint64_t>(ccm::test::oracle::option_value(argc, argv, "--target-ulp="),
+			[](const std::string & value) { return static_cast<std::uint64_t>(std::stoull(value)); },
+			0);
 	const mpfr_prec_t precision =
 		ccm::test::oracle::parse_option_or<mpfr_prec_t>(ccm::test::oracle::option_value(argc, argv, "--oracle-precision="),
 			[](const std::string & value) { return static_cast<mpfr_prec_t>(std::stoul(value)); },
@@ -243,18 +266,22 @@ int main(int argc, char ** argv)
 		paths.push_back(validation_path::generic_modeled_domain);
 	}
 
+	const auto rounding_modes = ccm::test::oracle::parse_rounding_modes(argc, argv);
+	mpfr_set_default_rounding_mode(MPFR_RNDN);
+
 	std::vector<std::string> domains_covered;
 	std::vector<std::string> domains_skipped;
 	const auto cases = build_cases(mode, domain_filter, seed, domains_covered, domains_skipped);
 	std::vector<ccm::test::oracle::failure_record<float>> failures;
 
 	std::cout << "mpfr powf campaign mode=" << ccm::test::oracle::mode_name(mode) << " fma=" << ccm::test::oracle::fma_status()
-			  << " configuration=" << ccm::test::oracle::configuration_name() << " cases=" << cases.size() << '\n';
+			  << " configuration=" << ccm::test::oracle::configuration_name() << " cases=" << cases.size()
+			  << " rounding_modes=" << rounding_modes.size() << '\n';
 
 	for (const validation_path path : paths)
 	{
 		ccm::test::oracle::run_summary<float> summary;
-		run_path(path, cases, precision, max_ulp, seed, mode, domains_covered, domains_skipped, failures, summary);
+		run_path(path, cases, rounding_modes, precision, max_ulp, target_ulp, seed, mode, domains_covered, domains_skipped, failures, summary);
 	}
 
 	if (output_path.has_value()) { ccm::test::oracle::write_failure_json(*output_path, failures); }

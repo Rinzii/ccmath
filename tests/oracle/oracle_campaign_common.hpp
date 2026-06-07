@@ -13,6 +13,7 @@
 #include <ctime>
 #include <fstream>
 #include <iomanip>
+#include <iostream>
 #include <limits>
 #include <optional>
 #include <random>
@@ -39,6 +40,9 @@ namespace ccm::test::oracle
 		T exponent;
 		std::string provenance;
 	};
+
+	template <typename T>
+	using binary_case = pow_case<T>;
 
 	template <typename T>
 	struct failure_record
@@ -78,6 +82,13 @@ namespace ccm::test::oracle
 		std::size_t skipped_count			   = 0;
 		std::size_t failure_count			   = 0;
 		std::size_t mpfr_policy_mismatch_count = 0;
+		// Cases where the primary oracle (cr_pow/cr_powf) disagrees with the function
+		// but a higher-precision cross-check confirms the function is correctly rounded,
+		// i.e. the oracle itself is wrong. These are not counted as failures.
+		std::size_t oracle_corrected_count = 0;
+		// Cases that pass the hard ULP ceiling but miss the correctly-rounded target
+		// (more than 0.5 ULP from the real value). Tracked, not failed.
+		std::size_t above_target_count = 0;
 		std::uint64_t max_observed_ulp		   = 0;
 		T worst_base{};
 		T worst_exponent{};
@@ -104,6 +115,8 @@ namespace ccm::test::oracle
 		std::size_t skipped_count			   = 0;
 		std::size_t failure_count			   = 0;
 		std::size_t mpfr_policy_mismatch_count = 0;
+		std::size_t oracle_corrected_count	   = 0;
+		std::size_t above_target_count		   = 0;
 		std::uint64_t max_observed_ulp		   = 0;
 		std::string worst_base_bits;
 		std::string worst_exponent_bits;
@@ -315,6 +328,64 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T>
+	inline void record_worst_case(run_summary<T> & summary, std::uint64_t ulp_distance, T base, T exponent, T actual, T expected)
+	{
+		if (ulp_distance >= summary.max_observed_ulp)
+		{
+			summary.max_observed_ulp = ulp_distance;
+			summary.worst_base		 = base;
+			summary.worst_exponent	 = exponent;
+			summary.worst_actual	 = actual;
+			summary.worst_expected	 = expected;
+		}
+	}
+
+	template <typename T>
+	inline failure_record<T> make_failure_record(std::string_view function_name,
+												 std::string_view path_name,
+												 std::string_view provenance,
+												 T base,
+												 T exponent,
+												 T actual,
+												 T expected,
+												 std::uint64_t ulp_distance,
+												 std::string_view rounding_mode,
+												 unsigned long oracle_precision,
+												 std::uint64_t seed,
+												 std::string_view search_mode,
+												 std::string_view notes)
+	{
+		return failure_record<T>{
+			std::string(function_name),
+			scalar_type_name<T>(),
+			std::string(path_name),
+			std::string(provenance),
+			base,
+			exponent,
+			actual,
+			expected,
+			bits_hex(base),
+			bits_hex(exponent),
+			bits_hex(actual),
+			bits_hex(expected),
+			ulp_distance,
+			std::string(rounding_mode),
+			oracle_precision,
+			compiler_id(),
+			platform_id(),
+			fma_status(),
+			builtin_status<T>(),
+			simd_status(),
+			configuration_name(),
+			optimization_mode(),
+			std::string(search_mode),
+			seed,
+			utc_timestamp(),
+			std::string(notes),
+		};
+	}
+
+	template <typename T>
 	inline void write_failure_json(const std::string & output_path, const std::vector<failure_record<T>> & failures)
 	{
 		std::ofstream out(output_path, std::ios::trunc);
@@ -472,6 +543,8 @@ namespace ccm::test::oracle
 		out << "  \"skipped_count\": " << report.skipped_count << ",\n";
 		out << "  \"failure_count\": " << report.failure_count << ",\n";
 		out << "  \"mpfr_policy_mismatch_count\": " << report.mpfr_policy_mismatch_count << ",\n";
+		out << "  \"oracle_corrected_count\": " << report.oracle_corrected_count << ",\n";
+		out << "  \"above_target_count\": " << report.above_target_count << ",\n";
 		out << "  \"oracle_policy\": \"" << json_escape(report.oracle_policy) << "\",\n";
 		out << "  \"max_observed_ulp\": " << report.max_observed_ulp << ",\n";
 		out << "  \"worst_base_bits\": \"" << report.worst_base_bits << "\",\n";
@@ -511,6 +584,8 @@ namespace ccm::test::oracle
 			summary.skipped_count,
 			summary.failure_count,
 			summary.mpfr_policy_mismatch_count,
+			summary.oracle_corrected_count,
+			summary.above_target_count,
 			summary.max_observed_ulp,
 			bits_hex(summary.worst_base),
 			bits_hex(summary.worst_exponent),
@@ -548,6 +623,8 @@ namespace ccm::test::oracle
 			summary.skipped_count,
 			summary.failure_count,
 			summary.mpfr_policy_mismatch_count,
+			summary.oracle_corrected_count,
+			summary.above_target_count,
 			summary.max_observed_ulp,
 			bits_hex(summary.worst_base),
 			bits_hex(summary.worst_exponent),
@@ -557,6 +634,30 @@ namespace ccm::test::oracle
 			elapsed_ms,
 			utc_timestamp(),
 		};
+	}
+
+	template <typename T, typename ExecuteFn, typename ReportFn, typename PrintFn>
+	inline void run_path_campaign(ccm::test::pow_path::validation_path path,
+								  run_summary<T> & summary,
+								  std::string_view summary_prefix,
+								  ExecuteFn execute_cases,
+								  ReportFn build_report,
+								  PrintFn print_report)
+	{
+		const auto support = ccm::test::pow_path::path_is_supported<T>(path);
+		if (!support.supported)
+		{
+			std::cout << "SKIP path=" << ccm::test::pow_path::path_name(path) << " reason=" << support.skip_reason << '\n';
+			return;
+		}
+
+		const auto started = std::chrono::steady_clock::now();
+		execute_cases(summary);
+		const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - started);
+		const auto report = build_report(summary, static_cast<std::uint64_t>(elapsed.count()));
+		const std::string summary_path = std::string(summary_prefix) + report.path + "-summary.json";
+		write_campaign_summary_json(summary_path, report);
+		print_report(report, summary_path);
 	}
 
 	template <typename T>
