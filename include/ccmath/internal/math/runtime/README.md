@@ -1,15 +1,12 @@
-# CCMath Runtime Headers Info
+# Runtime implementation headers
 
 > [!CAUTION]
-> This directory contains internal runtime headers for the CCMath library. These headers are not intended for public use
-> and are subject to change at any time. They are used for internal implementation details and are not guaranteed to be
-> stable or to have a stable API. Assume anything included here directly could change its signature at any moment.
+> Not public API. Signatures and paths can change in any commit.
 
-This folder handles runtime specific optimizations and functions meant to speed up evaluation during runtime that is not
-possible at compile time.
+Runtime-only kernels (`*_rt`), SIMD paths, and other code that must not run at
+compile time in the current dispatch shape.
 
 ## Folders
 
-- `generic`: Runtime specific generic implementations for the library that provide runtime specific optimizations to
-  speed up execution times.
-- `simd`: Internal implementation details for SIMD wrappers and SIMD specific functions for the library.
+- `generic`: portable runtime implementations
+- `simd`: SIMD-specific kernels and wrappers

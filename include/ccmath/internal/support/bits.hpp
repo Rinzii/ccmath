@@ -69,8 +69,7 @@ namespace ccm::support
 		return x && !(x & (x - 1));
 	}
 
-	// TODO: Have the below function replace all other top_bits func.
-	// TODO: Remove all usages of bit grabbing functions
+	// TODO: Consolidate top_bits helpers and retire duplicate bit-grab paths.
 
 	template <typename T, std::size_t TopBitsToTake, std::enable_if_t<std::is_floating_point_v<T> && !std::is_same_v<T, long double>, bool> = true>
 	constexpr std::uint32_t top_bits(T x) noexcept

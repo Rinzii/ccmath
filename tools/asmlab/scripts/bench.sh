@@ -130,7 +130,7 @@ PY
 bench_info="$(resolve_bench)"
 if echo "${bench_info}" | python3 -c "import json,sys; d=json.load(sys.stdin); sys.exit(0 if d.get('error') else 1)" 2>/dev/null; then
     echo "${bench_info}" | python3 -c "import json,sys; print(json.load(sys.stdin)['error'])" >&2
-    echo "See tools/asmlab/docs/benchmarking.md for wiring new benchmarks." >&2
+    echo "See tools/asmlab/README.md (Benchmarks) for wiring new benchmarks." >&2
     exit 1
 fi
 

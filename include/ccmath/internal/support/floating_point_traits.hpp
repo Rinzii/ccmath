@@ -146,7 +146,7 @@ namespace ccm::support
 		static constexpr uint_type shifted_sign_mask		 = 0x8000000000000000U; // 1ULL << sign_shift
 		static constexpr uint_type shifted_exponent_mask	 = 0x7FFF000000000000U; // exponent_mask << exponent_shift
 
-		// TODO: Not 100% sure if the normalize factor should be 2^128 or 2^80. I think it should be 2^128, but I've not yet tested this.
+		// TODO(IanP): Not 100% sure if the normalize factor should be 2^128 or 2^80. I think it should be 2^128, but I've not yet tested this.
 		static constexpr long double normalize_factor = 340282366920938463463374607431768211456.0L; // 2^128
 
 		static constexpr long double max_safe_integer = 0x1p+64L; // 18446744073709551616.0L (2^64)
@@ -197,7 +197,7 @@ namespace ccm::support
 	template <typename T>
 	inline constexpr typename floating_point_traits<T>::uint_type sign_mask_v = floating_point_traits<T>::shifted_sign_mask;
 
-	// TODO: Possible remove these func from floating_point_traits as they are more so there own things and not really traits.
+	// TODO(IanP): Possible remove these func from floating_point_traits as they are more so there own things and not really traits.
 	// All func below that use bit_cast have to use the __builtin_bit_cast as bit_cast itself includes floating_point_traits.hpp
 
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>

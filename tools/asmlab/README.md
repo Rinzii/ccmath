@@ -1,135 +1,218 @@
-# asmlab: assembly analysis and performance validation
+<img src="../../docs/resources/ccmath_logo_white.png" style="width: 35%;" alt="CCMath Logo">
 
-asmlab is an external, script-driven workflow for inspecting the assembly ccmath
-generates, classifying which code path was measured, scoring regions with static cost
-models, and gating changes behind accuracy and benchmark evidence. It lives entirely
-under `tools/asmlab/` and never edits `include/ccmath/`.
+# CCMath asmlab
 
-**Current maturity: Level 4–7.** The tool emits assembly, isolates regions, classifies
-paths, runs static models, manages baselines, runs function-specific accuracy gates, and
-supports profile-aware benchmarks where wired. It does not claim hardware-validated or
-merge-grade performance evidence without benchmark and accuracy confirmation.
+Assembly analysis and performance validation for [CCMath](../../README.md).
+Script-driven workflow for inspecting the assembly CCMath emits, checking which
+path was measured, scoring it with static cost models, and only then looking at
+benches and accuracy.
 
-## What it does
+Lives under tools/asmlab/. Never edits include/ccmath/. Outputs go to
+out/asmlab/ (gitignored).
 
-1. Emits assembly for registered functions across a microarchitecture matrix.
-2. Isolates the meaningful region and follows thin local forwarders.
-3. Classifies the measured path (kernel, wrapper, libm, hardware insn, unknown).
-4. Separates compile-time probes from runtime codegen in reports.
-5. Scores each variant with llvm-mca (always) and optional uiCA/OSACA as **static model
-   estimates**, not measured performance.
-6. Runs function-specific accuracy gates from `registry/accuracy_manifest.json`.
-7. Runs profile-specific benchmarks where Google Benchmark targets exist.
-
-## Quickstart
+## Bootstrap
 
 ```bash
-# Provision tooling (idempotent).
 bash tools/asmlab/scripts/bootstrap.sh
-
-# List registered functions and harness modes.
 python3 tools/asmlab/scripts/asmlab.py list
+```
 
-# Path verification (constexpr + emit + classify).
+## Everyday commands
+
+Path check on a registered kernel:
+
+```bash
 python3 tools/asmlab/scripts/asmlab.py verify pow_impl --arch x86-64-v3
+```
 
-# Source-to-assembly map (headless JSON + markdown).
+Report with source map and optional HTML viewer:
+
+```bash
 python3 tools/asmlab/scripts/asmlab.py report pow_impl --arch x86-64-v3 --source-map
+python3 tools/asmlab/scripts/asmlab.py view pow_impl --arch x86-64-v3 --open
+```
 
-# HTML viewer (optional, local review).
-python3 tools/asmlab/scripts/asmlab.py view pow_impl --arch x86-64-v3
+Baseline, re-emit, diff:
 
-# Deep analysis: CFG, llvm-mca per block, opt remarks, register pressure, semantics.
+```bash
+python3 tools/asmlab/scripts/asmlab.py baseline powf_impl --arch x86-64-v3 --source-map
+python3 tools/asmlab/scripts/asmlab.py diff powf_impl --arch x86-64-v3 --source-map
+```
+
+Deep pass (CFG, per-block MCA, opt remarks, register pressure, semantics):
+
+```bash
 python3 tools/asmlab/scripts/asmlab.py deep-analyze powf_impl --arch x86-64-v3 --deep-analyze
-python3 tools/asmlab/scripts/asmlab.py baseline powf_impl --arch x86-64-v3 --deep-analyze
-python3 tools/asmlab/scripts/asmlab.py diff powf_impl --arch x86-64-v3 --deep-analyze
+```
 
-# Full report (markdown + JSON + provenance).
-python3 tools/asmlab/scripts/asmlab.py report pow_impl
+Production accuracy gate:
 
-# Baseline and diff (static model estimates).
-python3 tools/asmlab/scripts/asmlab.py baseline pow_impl
-python3 tools/asmlab/scripts/asmlab.py diff pow_impl
-
-# Function-specific accuracy gate.
+```bash
 python3 tools/asmlab/scripts/asmlab.py gate powf --mode simple
+```
 
-# Profile benchmark (sqrt public API; powf_impl isolated impl kernel).
+Profile benchmark (where wired):
+
+```bash
 bash tools/asmlab/scripts/bench.sh sqrt --profile positive_finite_general
 bash tools/asmlab/scripts/bench.sh powf_impl --profile positive_finite_general
-bash tools/asmlab/scripts/bench.sh powf_impl --profile positive_finite_general --variant test_candidate
-
-# Isolated candidate variant (edit out/asmlab/variants/ only, not include/ccmath/).
-python3 tools/asmlab/scripts/asmlab.py variant init sqrt --name test_candidate
-python3 tools/asmlab/scripts/asmlab.py variant scenario report sqrt test_candidate \
-  positive_finite_general --arch x86-64-v3 --source-map
 ```
 
-See `docs/candidate-variants.md` for the full candidate workflow.
+## When is a perf change worth merging?
+
+All of these, not just a static model win:
+
+1. Path verified. The measured symbol is the CCMath kernel, not libm or a thin jmp.
+2. Static model improved on the arches you care about (llvm-mca is always run).
+3. Accuracy unchanged. gate passes for the function manifest.
+4. Benchmark improved on the relevant input profile.
+
+Static analysis alone means worth testing, not accepted. llvm-mca and friends are
+estimates. Disagreement between tools is normal.
+
+## Constexpr vs runtime
+
+Separate checks. constexpr_check.py compiles static_assert cases from the registry.
+Runtime emit uses the harness templates with volatile guards so arguments are not
+folded away.
+
+Do not infer runtime codegen from a constexpr probe or the other way around.
+
+Harness modes in registry/functions.json:
+
+| Mode | Typical target |
+| --- | --- |
+| runtime_no_flatten | Public API, see dispatch |
+| runtime_flatten | Impl kernels |
+| constexpr_probe | gen paths |
+| path_direct | Same as runtime_flatten for direct entries |
+
+Path categories (classify.py) include ccmath_internal_kernel, external_libm_call,
+hardware_instruction_lowering, unknown, and others in registry/path_categories.json.
+If you see pow or _pow in the slice, you measured libm, not pow_impl.
+
+## Scenarios
+
+Scenarios fix harness inputs and an intended path label per branch. They are a
+static slice, not a dynamic trace.
 
 ```bash
-# Golden analysis calibration (Horner vs Estrin, tool-owned fixtures only)
-python3 tools/asmlab/scripts/run_golden_analysis.py --quick
+python3 tools/asmlab/scripts/asmlab.py scenario list powf_impl
+python3 tools/asmlab/scripts/asmlab.py scenario report powf_impl positive_finite_general \
+  --arch x86-64-v3 --source-map
+python3 tools/asmlab/scripts/asmlab.py scenario verify powf_impl positive_finite_general \
+  --arch x86-64-v3
+python3 tools/asmlab/scripts/asmlab.py scenario baseline powf_impl near_one \
+  --arch x86-64-v3 --source-map
+python3 tools/asmlab/scripts/asmlab.py scenario diff powf_impl near_one --arch x86-64-v3 --source-map
 ```
 
-See `docs/golden-analysis.md`.
+PATH MISMATCH in a scenario report means stop. Comparing static metrics across
+different paths is invalid.
 
-## CPU knowledge base
+Artifacts live under out/asmlab/<fn>/scenarios/<scenario>/.
 
-Structured microarchitecture knowledge (sources, calibration, pattern rules, instruction facts) lives under `knowledge/`. Reports and scenario reports attach cpu_knowledge annotations via `cpu_knowledge.py`.
+## Candidate variants
 
-See `docs/cpu-knowledge.md`.
+Edit candidates only under out/asmlab/variants/, never production headers until
+review is done.
 
-## The decision loop
+```bash
+python3 tools/asmlab/scripts/asmlab.py variant init powf_impl --name my_candidate
+# edit out/asmlab/variants/powf_impl/my_candidate/candidate.hpp
+python3 tools/asmlab/scripts/asmlab.py variant scenario report powf_impl my_candidate \
+  positive_finite_general --arch x86-64-v3 --source-map
+python3 tools/asmlab/scripts/asmlab.py variant scenario diff powf_impl my_candidate \
+  positive_finite_general --arch x86-64-v3 --source-map
+python3 tools/asmlab/scripts/bench_impl.py powf_impl --profile positive_finite_general \
+  --variant my_candidate
+python3 tools/asmlab/scripts/asmlab.py variant accuracy powf_impl my_candidate --mode simple
+python3 tools/asmlab/scripts/asmlab.py variant compare powf_impl --all \
+  --scenarios positive_finite_general,near_one --arch x86-64-v3
+```
 
-A runtime optimization is worth testing only when:
+Stale variants (base file changed after init) are rejected in scenario diff.
+variant patch writes a review diff. It does not apply by default.
 
-1. **Path verified.** The report shows the intended ccmath path was measured, not libm.
-2. **Static model improved.** `diff` shows lower static model estimate on target arches.
-3. **Accuracy unchanged.** `gate` passes with manifest-listed coverage.
-4. **Benchmark improved.** `bench.sh` shows lower ns/op for the relevant profile.
+candidate_accuracy is isolated from production gate. A bench win without
+candidate_accuracy pass is not_enough_evidence.
 
-Static wins alone mean "worth testing," not "accepted." See `docs/reports.md`.
+## Benchmarks
 
-## Layout
+Profiles are in registry/benchmark_profiles.json. powf_impl benches the isolated
+impl kernel (tools/asmlab/bench/powf_impl_bench.cpp), not the public ccm::powf
+wrapper. Public pow bench wiring is still incomplete. Do not use sqrt bench
+results as pow evidence.
 
-| Path | Purpose |
+bench.sh prints wiring hints when a profile is not configured. Add targets under
+tools/asmlab/bench/ and registry entries to wire a new case.
+
+## Source maps
+
+Pass --source-map on emit, report, baseline, diff, or deep-analyze. Produces
+source_map.json and optional asm_diff.json on diff. Mapping at O2/O3 is
+approximate. line 0 means uncertain attribution.
+
+## Golden calibration
+
+Validates asmlab analysis on tool-owned fixtures (Horner vs Estrin under
+tools/asmlab/golden/), not CCMath numerical correctness.
+
+```bash
+python3 tools/asmlab/scripts/run_golden_analysis.py --quick
+python3 tools/asmlab/scripts/test_golden_quick.py -v
+```
+
+## CPU knowledge
+
+Selected microarchitecture facts with source and confidence live in knowledge/.
+Loader is scripts/cpu_knowledge.py. Reports get advisory annotations, not proof.
+
+```bash
+python3 tools/asmlab/scripts/asmlab.py knowledge validate
+```
+
+See knowledge/README.md for file layout.
+
+## Registry and scripts
+
+| Path | Role |
 | --- | --- |
-| `registry/functions.json` | Analysis targets, harness modes, intended paths |
-| `registry/accuracy_manifest.json` | Function-specific gate coverage |
-| `registry/benchmark_profiles.json` | Input profiles and benchmark wiring |
-| `registry/path_categories.json` | Path classification vocabulary |
-| `registry/variant_targets.json` | Base impl files for candidate variant init |
-| `out/asmlab/variants/` | Gitignored candidate workspaces (manifest, candidate.hpp) |
-| `harness/` | Runtime and constexpr probe templates |
-| `scripts/asmlab.py` | Orchestrator |
-| `scripts/classify.py` | Path classification |
-| `scripts/constexpr_check.py` | Compile-time path probe |
-| `scripts/provenance.py` | Reproducibility metadata |
-| `scripts/analysis_pipeline.py` | Deep analysis orchestrator |
-| `scripts/cfg_analysis.py` | CFG and loop recovery |
-| `scripts/mca_deep.py` | Per-block llvm-mca |
-| `scripts/opt_remarks.py` | LLVM optimization records |
-| `docs/` | External documentation |
+| registry/functions.json | Targets, harness modes, constexpr cases |
+| registry/path_scenarios.json | Scenario inputs and intended paths |
+| registry/accuracy_manifest.json | Production gate coverage |
+| registry/benchmark_profiles.json | Bench profiles and wiring |
+| registry/variant_targets.json | Base files for variant init |
+| registry/path_categories.json | Path classification vocabulary |
+| scripts/asmlab.py | CLI entry point |
+| harness/ | Harness and constexpr probe templates |
 
-Outputs go to `out/asmlab/` (gitignored): variants, reports, baselines, gates, benches.
+To add a function, copy a registry/functions.json entry, set harness_mode and
+intended_path, and add accuracy_manifest coverage if you plan to gate it.
 
-## Adding a function
+## Main artifacts
 
-Copy an entry in `registry/functions.json`. Set `harness_mode`, `intended_path`, and
-add a matching `accuracy_manifest.json` entry. Public entries use `runtime_no_flatten`
-to observe dispatch. Kernel entries use `runtime_flatten` to inline the body.
+Per emit variant: emit_meta.json, path_analysis.json, metrics.json, region.s.
+With --source-map: source_map.json, asm_verbose.s.
+With --deep-analyze: cfg.json, mca.json, opt_remarks.json, reg_pressure.json,
+semantic.json, analysis_summary.json.
+Reports: out/asmlab/reports/<fn>.md, .json, .provenance.json.
+Baselines: baselines/<fn>.json plus per-arch snapshot dirs.
 
-See `docs/path-classification.md` and `docs/constexpr-runtime.md`.
+## Limits
 
-## Further reading
+- Static models can be wrong by large margins versus hardware.
+- CFG recovery misses indirect branches and exception edges.
+- Register pressure uses mention counting, not true liveness.
+- perf stat only on Linux x86 in the default pipeline.
+- ast_schema.json is a placeholder. Full Clang AST mapping is not implemented.
+- Apple M1 slices are often thin call boundaries. Prefer x86-64-v3 for spill and
+  dependency ranking when the kernel is not fully exposed.
 
-- [Path classification](docs/path-classification.md)
-- [Constexpr vs runtime](docs/constexpr-runtime.md)
-- [Reports and provenance](docs/reports.md)
-- [Benchmarking](docs/benchmarking.md)
-- [Source traceability](docs/source-traceability.md)
-- [Analysis platform](docs/analysis-platform.md)
-- [Artifact schemas](docs/artifact-schemas.md)
-- [Limitations](docs/limitations.md)
-- [Path scenarios](docs/path-scenarios.md)
+Nothing in the default pipeline claims proven causation from instruction counts
+alone.
+
+---
+
+Part of [CCMath](https://github.com/Rinzii/ccmath). Apache-2.0 WITH LLVM-exception.
+See [LICENSE](../../LICENSE).

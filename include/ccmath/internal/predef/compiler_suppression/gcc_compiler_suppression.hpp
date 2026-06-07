@@ -10,7 +10,7 @@
 
 #pragma once
 
-// TODO: This should work fine on gcc based compilers, but I still need to validate this is fact.
+// TODO(IanP): This should work fine on gcc based compilers, but I still need to validate this is fact.
 
 ///
 /// \def CCM_DISABLE_GCC_WARNING(w)

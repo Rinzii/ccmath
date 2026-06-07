@@ -21,6 +21,6 @@ namespace ccm::gen
 	{
 		if constexpr (std::is_same_v<T, float>) { return ccm::internal::impl::logb_impl(num); }
 		if constexpr (std::is_same_v<T, double>) { return ccm::internal::impl::logb_impl(num); }
-		return static_cast<long double>(ccm::internal::impl::logb_impl(static_cast<double>(num)));
+		return static_cast<T>(ccm::internal::impl::logb_impl(static_cast<double>(num)));
 	}
 } // namespace ccm::gen

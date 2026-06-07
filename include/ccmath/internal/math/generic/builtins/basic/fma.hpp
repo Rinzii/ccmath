@@ -98,7 +98,7 @@ namespace ccm::builtin
 	 * This is thanks to taking advantage of ADL.
 	 */
 	template <typename T>
-	auto fma(T x, T y, T z) -> std::enable_if_t<has_fma<T>, T>
+	auto fma(T x, T y, T z) -> std::enable_if_t<has_fma<T> && !has_constexpr_fma<T>, T>
 	{
 		if constexpr (std::is_same_v<T, float>) { return __builtin_fmaf(x, y, z); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_fma(x, y, z); }

@@ -43,9 +43,7 @@ namespace
 	}
 } // namespace
 
-// ============================================================================
-// [cmath.syn]: Synopsis-level overloads are constexpr entry points
-// ============================================================================
+// [cmath.syn]: Synopsis-level overloads are constexpr entry points.
 
 TEST(CcmathPowerTests, PowFloatingOverloadsAreConstexpr)
 {
@@ -54,9 +52,7 @@ TEST(CcmathPowerTests, PowFloatingOverloadsAreConstexpr)
 	static_assert(ccm::powl(2.0L, 3.0L) == 8.0L, "ccm::powl must be usable in constant evaluation");
 }
 
-// ============================================================================
-// [cmath.syn]: Named C compatibility entry points have standard signatures
-// ============================================================================
+// [cmath.syn]: Named C compatibility entry points have standard signatures.
 
 TEST(CcmathPowerTests, PowNamedEntryPointsHaveStandardSignatures)
 {
@@ -64,9 +60,7 @@ TEST(CcmathPowerTests, PowNamedEntryPointsHaveStandardSignatures)
 	static_assert(std::is_same_v<decltype(&ccm::powl), long double (*)(long double, long double)>);
 }
 
-// ============================================================================
-// [c.math]/3: Integer arguments promote to double
-// ============================================================================
+// [c.math]/3: Integer arguments promote to double.
 
 TEST(CcmathPowerTests, PowAdditionalOverloadsTreatIntegersAsDouble)
 {
@@ -79,9 +73,7 @@ TEST(CcmathPowerTests, PowAdditionalOverloadsTreatIntegersAsDouble)
 	EXPECT_DOUBLE_EQ(ccm::pow(2, 3.0F), static_cast<double (*)(double, double)>(std::pow)(2.0, 3.0));
 }
 
-// ============================================================================
-// [c.math]/3: Mixed-rank arguments promote to the greatest floating rank
-// ============================================================================
+// [c.math]/3: Mixed-rank arguments promote to the greatest floating rank.
 
 TEST(CcmathPowerTests, PowAdditionalOverloadsChooseGreatestFloatingRank)
 {
@@ -96,9 +88,7 @@ TEST(CcmathPowerTests, PowAdditionalOverloadsChooseGreatestFloatingRank)
 	ccm::test::ExpectSameFloatingAsStd(ccm::pow(2.0L, 3), std::pow(2.0L, 3.0L));
 }
 
-// ============================================================================
-// [cmath.syn] and [c.math]/1: Named entry points match std for representative inputs
-// ============================================================================
+// [cmath.syn] and [c.math]/1: Named entry points match std for representative inputs.
 
 TEST(CcmathPowerTests, PowNamedEntryPointsMatchStd)
 {
@@ -108,13 +98,8 @@ TEST(CcmathPowerTests, PowNamedEntryPointsMatchStd)
 	ccm::test::ExpectSameFloatingAsStd(ccm::powl(2.0L, 10.0L), std::pow(2.0L, 10.0L));
 }
 
-// ============================================================================
-// C17 F.10.4.4 / C++ [cmath.syn]: pow special cases
-//
-// The C++ standard defers to the C standard for the semantics of pow.
-// C17 7.12.7.4 and Annex F (F.10.4.4) define the required behavior.
-// Each test below references the specific clause it validates.
-// ============================================================================
+// C17 F.10.4.4 / C++ [cmath.syn]: pow special cases.
+// C++ defers to C17 7.12.7.4 and Annex F. Each test below cites its clause.
 
 // F.10.4.4(1): pow(+/-0, y) = +/-inf and FE_DIVBYZERO for y an odd integer < 0
 TEST(CcmathPowerTests, PowZeroBaseNegativeOddExponent)
@@ -354,9 +339,7 @@ TEST(CcmathPowerTests, PowNaNPropagation)
 	EXPECT_EQ(ccm::pow(1.0, nan), 1.0);
 }
 
-// ============================================================================
-// FE_DIVBYZERO: pow(+/-0, y) for y < 0
-// ============================================================================
+// FE_DIVBYZERO: pow(+/-0, y) for y < 0.
 
 TEST(CcmathPowerTests, PowZeroPoleRaisesDivByZero)
 {
@@ -387,9 +370,7 @@ TEST(CcmathPowerTests, PowZeroPoleRaisesDivByZero)
 		FE_DIVBYZERO);
 }
 
-// ============================================================================
-// FE_INVALID: pow(x, y) for finite x < 0 and finite non-integer y
-// ============================================================================
+// FE_INVALID: pow(x, y) for finite x < 0 and finite non-integer y.
 
 TEST(CcmathPowerTests, PowNegBaseNonIntExpRaisesInvalid)
 {
@@ -406,9 +387,7 @@ TEST(CcmathPowerTests, PowNegBaseNonIntExpRaisesInvalid)
 		FE_INVALID);
 }
 
-// ============================================================================
-// Overflow: pow with large positive results should match std overflow behavior
-// ============================================================================
+// Overflow: pow with large positive results should match std overflow behavior.
 
 TEST(CcmathPowerTests, PowOverflowMatchesStd)
 {
@@ -421,9 +400,7 @@ TEST(CcmathPowerTests, PowOverflowMatchesStd)
 	ccm::test::ExpectSameFloatingAsStd(ccm::powf(2.0F, 128.0F), std::pow(2.0F, 128.0F));
 }
 
-// ============================================================================
-// Underflow: pow with very small results
-// ============================================================================
+// Underflow: pow with very small results.
 
 TEST(CcmathPowerTests, PowUnderflowMatchesStd)
 {
@@ -431,9 +408,7 @@ TEST(CcmathPowerTests, PowUnderflowMatchesStd)
 	ccm::test::ExpectSameFloatingAsStd(ccm::powf(2.0F, -150.0F), std::pow(2.0F, -150.0F));
 }
 
-// ============================================================================
-// Subnormal base handling
-// ============================================================================
+// Subnormal base handling.
 
 TEST(CcmathPowerTests, PowSubnormalBase)
 {
@@ -446,9 +421,7 @@ TEST(CcmathPowerTests, PowSubnormalBase)
 	ccm::test::ExpectSameFloatingAsStd(ccm::powf(subnormalf, 1.0F), std::pow(subnormalf, 1.0F));
 }
 
-// ============================================================================
-// Exact integer exponents
-// ============================================================================
+// Exact integer exponents.
 
 TEST(CcmathPowerTests, PowExactIntegerExponents)
 {
@@ -471,9 +444,7 @@ TEST(CcmathPowerTests, PowExactIntegerExponents)
 	ccm::test::ExpectSameFloatingAsStd(ccm::powf(4.0F, 0.5F), std::pow(4.0F, 0.5F));
 }
 
-// ============================================================================
-// Negative base with integer exponent: sign propagation
-// ============================================================================
+// Negative base with integer exponent: sign propagation.
 
 TEST(CcmathPowerTests, PowNegativeBaseSignPropagation)
 {
@@ -491,9 +462,7 @@ TEST(CcmathPowerTests, PowNegativeBaseSignPropagation)
 	EXPECT_LT(ccm::powf(-2.0F, 3.0F), 0.0F);
 }
 
-// ============================================================================
-// pow(-inf, y) for non-integer negative exponent: +0
-// ============================================================================
+// pow(-inf, y) for non-integer negative exponent: +0.
 
 TEST(CcmathPowerTests, PowNegInfBaseNegativeNonIntegerExponent)
 {
@@ -505,9 +474,7 @@ TEST(CcmathPowerTests, PowNegInfBaseNegativeNonIntegerExponent)
 	ccm::test::ExpectSameFloatingAsStd(result, std::pow(neg_inf, -0.5));
 }
 
-// ============================================================================
-// Constexpr evaluation: All special cases should work at compile time
-// ============================================================================
+// Constexpr evaluation: All special cases should work at compile time.
 
 TEST(CcmathPowerTests, PowSpecialCasesConstexpr)
 {
@@ -536,9 +503,7 @@ TEST(CcmathPowerTests, PowSpecialCasesConstexpr)
 	static_assert(ccm::powl(2.0L, 10.0L) == 1024.0L);
 }
 
-// ============================================================================
-// Cross-type consistency: powf, pow, powl agree on shared inputs
-// ============================================================================
+// Cross-type consistency: powf, pow, powl agree on shared inputs.
 
 TEST(CcmathPowerTests, PowCrossTypePrecisionConsistency)
 {
@@ -552,9 +517,7 @@ TEST(CcmathPowerTests, PowCrossTypePrecisionConsistency)
 	EXPECT_EQ(static_cast<double>(ccm::powl(2.0L, 10.0L)), 1024.0);
 }
 
-// ============================================================================
-// Large exponents at boundaries
-// ============================================================================
+// Large exponents at boundaries.
 
 TEST(CcmathPowerTests, PowLargeExponents)
 {
@@ -567,9 +530,7 @@ TEST(CcmathPowerTests, PowLargeExponents)
 	ccm::test::ExpectSameFloatingAsStd(ccm::powf(2.0F, 127.0F), std::pow(2.0F, 127.0F));
 }
 
-// ============================================================================
-// Identity: pow(x, 1) == x for all finite x
-// ============================================================================
+// Identity: pow(x, 1) == x for all finite x.
 
 TEST(CcmathPowerTests, PowIdentityExponent)
 {
@@ -585,9 +546,7 @@ TEST(CcmathPowerTests, PowIdentityExponent)
 	}
 }
 
-// ============================================================================
-// Reciprocal: pow(x, -1) for positive finite x
-// ============================================================================
+// Reciprocal: pow(x, -1) for positive finite x.
 
 TEST(CcmathPowerTests, PowReciprocalExponent)
 {
@@ -601,10 +560,7 @@ TEST(CcmathPowerTests, PowReciprocalExponent)
 	}
 }
 
-// ============================================================================
-// Rounding-mode conformance: pow should produce correct results under all
-// IEEE 754 rounding modes per C17 F.10
-// ============================================================================
+// Rounding-mode conformance: pow should produce correct results under all IEEE 754 rounding modes per C17 F.10.
 
 TEST(CcmathPowerTests, PowDoubleUnderflowResidualPathMatrixRegression)
 {

@@ -104,7 +104,7 @@ namespace ccm::types
 		 * @return A DoubleWide object containing the lower and upper half-width parts of the input value.
 		 */
 		template <typename T>
-		constexpr auto split(T value) // TODO: IanP: Return to this
+		constexpr auto split(T value)
 		{
 			static_assert(ccm::support::traits::ccm_is_unsigned_v<T>);
 			using half_type = half_width_t<T>;

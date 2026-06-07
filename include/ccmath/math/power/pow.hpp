@@ -53,8 +53,6 @@ namespace ccm
 		if constexpr (ccm::builtin::has_constexpr_pow<T>) { return ccm::builtin::pow(base, exp); }
 		else
 		{
-			// TODO: Add in usage of builtins that meet ccmath standards.
-
 			if (support::is_constant_evaluated()) { return gen::pow_gen(base, exp); }
 			return rt::pow_rt(base, exp);
 		}

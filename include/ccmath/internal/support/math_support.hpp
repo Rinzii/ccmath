@@ -191,7 +191,7 @@ namespace ccm::support
 		return mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>();
 	}
 
-	// TODO(IanP): Review whether these helpers should replace or merge with ccm::types::exact_add and split in double_double.hpp.
+	// TODO(IanP): Review whether these helpers should replace or merge with exact_add and split in double_double.hpp.
 	/**
 	 * @brief Add a + b, such that &hi + &lo approximates a + b.
 	 *

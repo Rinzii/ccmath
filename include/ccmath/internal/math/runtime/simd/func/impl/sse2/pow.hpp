@@ -23,6 +23,8 @@
 
 namespace ccm::intrin
 {
+	// TODO: Replace gen::pow_gen fallback with a native SIMD kernel when SVML is unavailable.
+
 	CCM_ALWAYS_INLINE simd<float, abi::sse2> pow(simd<float, abi::sse2> const & a, simd<float, abi::sse2> const & b)
 	{
 		// The cmake performs a test validating if the compiler supports SVML.
@@ -30,7 +32,6 @@ namespace ccm::intrin
 		#ifdef CCMATH_HAS_SIMD_SVML
 		return { _mm_pow_ps(a.get(), b.get()) };
 		#else
-		// TODO: Replace this with a refined solution. For the time being this is temporary.
 		return { gen::pow_gen(a.convert(), b.convert()) };
 		#endif
 	}
@@ -42,7 +43,6 @@ namespace ccm::intrin
 		#ifdef CCMATH_HAS_SIMD_SVML
 		return { _mm_pow_pd(a.get(), b.get()) };
 		#else
-		// TODO: Replace this with a refined solution. For the time being this is temporary.
 		return { gen::pow_gen(a.convert(), b.convert()) };
 		#endif
 	}

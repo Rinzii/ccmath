@@ -1,10 +1,7 @@
-# CCMath Extension Headers Info
+# Extension headers
 
 > [!CAUTION]
-> The extension headers are generally experimental and could have a change to their overall API. This is generally
-> avoided, but not guaranteed.
+> Experimental. APIs here are outside `<cmath>` and may change without a major bump.
 
-
-The extension headers in this directory are intended to provide additional functionality to the CCMath library.
-Functions here are not a part of the `<cmath>` API but provide additional functionality people may find useful in
-general mathematics.
+Non-standard helpers that still live in the ccmath namespace layout. Not covered by
+the same stability bar as `include/ccmath/math/`.
