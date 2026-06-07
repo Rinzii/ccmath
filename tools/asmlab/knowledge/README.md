@@ -1,8 +1,7 @@
 # CCMath asmlab: CPU knowledge base
 
-Selected microarchitecture facts for CCMath asmlab report annotations.
-Source-attributed, scoped, and confidence-tagged. Not a full uops.info or Agner
-scrape.
+Selected microarchitecture facts for asmlab report notes. Source-attributed,
+not a full uops.info or Agner scrape.
 
 See [../README.md](../README.md) for the full asmlab guide.
 
