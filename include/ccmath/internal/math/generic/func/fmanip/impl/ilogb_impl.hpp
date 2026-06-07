@@ -10,10 +10,10 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/func/fmanip/impl/frexp_impl.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
-#include "ccmath/math/fmanip/impl/frexp_impl.hpp"
 
 #include <cerrno>
 #include <cfenv>

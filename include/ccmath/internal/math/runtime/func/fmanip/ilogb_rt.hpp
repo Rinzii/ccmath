@@ -10,9 +10,9 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/func/fmanip/impl/ilogb_impl.hpp"
 #include "ccmath/internal/math/runtime/func/rt_dispatch.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
-#include "ccmath/math/fmanip/impl/ilogb_impl.hpp"
 
 #include <type_traits>
 
@@ -27,7 +27,7 @@ namespace ccm::rt
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_ilogbl(num); }
 		else { return __builtin_ilogbl(static_cast<long double>(num)); }
 #else
-		return internal::impl::ilogb_impl(num);
+		return ccm::internal::impl::ilogb_impl(num);
 #endif
 	}
 } // namespace ccm::rt

@@ -11,7 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/fmanip/frexp.hpp"
-#include "ccmath/math/fmanip/impl/frexp_impl.hpp"
+#include "ccmath/internal/math/generic/func/fmanip/frexp_gen.hpp"
 
 #include <type_traits>
 
@@ -21,9 +21,7 @@ namespace ccm
 	constexpr T frexp(T x, int & exp)
 	{
 		if constexpr (ccm::builtin::has_constexpr_frexp<T>) { return ccm::builtin::frexp(x, &exp); }
-		else if constexpr (std::is_same_v<T, float>) { return internal::impl::frexp_impl(x, exp); }
-		else if constexpr (std::is_same_v<T, double>) { return internal::impl::frexp_impl(x, exp); }
-		else { return static_cast<T>(internal::impl::frexp_impl(static_cast<double>(x), exp)); }
+		else { return gen::frexp_gen(x, exp); }
 	}
 
 	constexpr float frexpf(float x, int & exp)

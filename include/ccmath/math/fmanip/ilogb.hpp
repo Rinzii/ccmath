@@ -11,9 +11,9 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/fmanip/ilogb.hpp"
+#include "ccmath/internal/math/generic/func/fmanip/ilogb_gen.hpp"
 #include "ccmath/internal/math/runtime/func/fmanip/ilogb_rt.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
-#include "ccmath/math/fmanip/impl/ilogb_impl.hpp"
 
 #include <type_traits>
 
@@ -30,13 +30,11 @@ namespace ccm
 	constexpr int ilogb(T num) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_ilogb<T>) { return ccm::builtin::ilogb(num); }
-		else if (ccm::support::is_constant_evaluated())
+		else
 		{
-			if constexpr (std::is_same_v<T, float>) { return internal::impl::ilogb_impl(num); }
-			else if constexpr (std::is_same_v<T, double>) { return internal::impl::ilogb_impl(num); }
-			else { return internal::impl::ilogb_impl(static_cast<double>(num)); }
+			if (ccm::support::is_constant_evaluated()) { return ccm::gen::ilogb_gen(num); }
+			return ccm::rt::ilogb_rt(num);
 		}
-		else { return ccm::rt::ilogb_rt(num); }
 	}
 
 	/**
