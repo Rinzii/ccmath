@@ -91,6 +91,13 @@ DEFAULT_FLAGS = "O2"
 
 CXX_STD = "c++17"
 
+HUMAN_MD = False
+
+
+def set_human_md(flag):
+    global HUMAN_MD
+    HUMAN_MD = bool(flag)
+
 
 def is_program_file(path):
     """True when path looks like a runnable program on the current OS."""

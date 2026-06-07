@@ -236,7 +236,6 @@ def annotate_scenario_report(report, path_analysis=None, variant_dir=None):
         report_kind="scenario", variant=report.get("variant"))
 
     return {
-        "annotation_kind": "advisory",
         "microarchitecture": uarch,
         "calibration": _calibration_summary(cal),
         "matched_patterns": patterns,
@@ -257,7 +256,6 @@ def annotate_function_report(fn, arch, metrics_entry, variant_dir=None):
     warnings = calibration_warnings(fn, arch, pa, variant_dir, report_kind="function")
 
     return {
-        "annotation_kind": "advisory",
         "arch": arch,
         "microarchitecture_id": uarch.get("id") if uarch else None,
         "microarchitecture_confidence": uarch.get("confidence") if uarch else None,
@@ -494,11 +492,11 @@ def validate_all():
 def main(argv=None):
     errors = validate_all()
     if errors:
-        print("cpu knowledge validation FAILED (%d errors):" % len(errors), file=sys.stderr)
+        print("cpu notes validation FAILED (%d errors):" % len(errors), file=sys.stderr)
         for e in errors:
             print("  %s" % e, file=sys.stderr)
         return 1
-    print("cpu knowledge validation OK")
+    print("cpu notes validation OK")
     return 0
 
 

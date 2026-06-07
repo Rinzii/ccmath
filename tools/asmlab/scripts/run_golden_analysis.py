@@ -134,9 +134,23 @@ def _render_md(report):
     return "\n".join(lines)
 
 
+def _smoke_validate(baseline_dir, candidate_dir):
+    checks = {}
+    for label, d in (("baseline", baseline_dir), ("candidate", candidate_dir)):
+        checks["%s_mca" % label] = (d / "mca.json").exists()
+        checks["%s_source_map" % label] = (d / "source_map.json").exists()
+        checks["%s_cfg" % label] = (d / "cfg.json").exists()
+    return {"passed": all(checks.values()), "checks": checks}
+
+
 def run_golden(arch="x86-64-v3", flags="O2", compiler="clang", quick=False,
-               skip_bench=False):
-    mode = "quick" if quick else "full"
+               skip_bench=False, calibrate=False):
+    if calibrate:
+        mode = "calibrate"
+    elif quick:
+        mode = "quick"
+    else:
+        mode = "smoke"
     print(">> golden analysis: %s / %s / %s (%s)" % (BASELINE_FN, CANDIDATE_FN, arch, mode))
 
     hdir = gemit.emit_golden(BASELINE_FN, arch, flags, compiler,
@@ -148,9 +162,14 @@ def run_golden(arch="x86-64-v3", flags="O2", compiler="clang", quick=False,
         _write_outputs(report)
         return report
 
-    pair = gfind.extract_pair_findings(hdir, edir)
-    bench = {"status": "skipped"} if skip_bench else _run_golden_bench(quick=quick)
-    validation = gfind.validate_pair(pair, bench if bench.get("status") == "ran" else None)
+    if calibrate:
+        pair = gfind.extract_pair_findings(hdir, edir)
+        bench = {"status": "skipped"} if skip_bench else _run_golden_bench(quick=quick)
+        validation = gfind.validate_pair(pair, bench if bench.get("status") == "ran" else None)
+    else:
+        pair = {"baseline": {}, "candidate": {}, "ranked_findings": []}
+        bench = {"status": "skipped"}
+        validation = _smoke_validate(hdir, edir)
 
     report = {
         "passed": validation["passed"],
@@ -170,6 +189,8 @@ def run_golden(arch="x86-64-v3", flags="O2", compiler="clang", quick=False,
             "ranking_quality_ok": validation["checks"].get("ranking_quality_ok"),
             "matched_expected": validation["checks"].get("expected_findings_matched"),
             "missing_expected": validation["checks"].get("expected_findings_missing"),
+            "baseline_mca": validation["checks"].get("baseline_mca"),
+            "candidate_mca": validation["checks"].get("candidate_mca"),
         },
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
@@ -194,13 +215,15 @@ def main(argv=None):
     ap.add_argument("--flags", default=C.DEFAULT_FLAGS, choices=list(C.FLAG_VARIANTS))
     ap.add_argument("--compiler", default="clang", choices=["clang", "gcc"])
     ap.add_argument("--quick", action="store_true",
-                    help="CI smoke: short benchmark, structural validation")
+                    help="short benchmark min time when calibrating")
+    ap.add_argument("--calibrate", action="store_true",
+                    help="full Horner vs Estrin ranking validation")
     ap.add_argument("--skip-bench", action="store_true")
     args = ap.parse_args(argv)
 
     report = run_golden(
         arch=args.arch, flags=args.flags, compiler=args.compiler,
-        quick=args.quick, skip_bench=args.skip_bench)
+        quick=args.quick, skip_bench=args.skip_bench, calibrate=args.calibrate)
 
     print("golden analysis: passed=%s" % report.get("passed"))
     if report.get("validation"):

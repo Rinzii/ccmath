@@ -11,11 +11,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import _asmlab_common as C
+import analysis_common as AC
 import asm_diff as adiff_mod
 import scenario as scenario_mod
 import variant as variant_mod
 
-import cpu_knowledge as cpu_kb
+import cpu_notes as cpu_kb
 
 DECISION_PRIORITY = {
     "reject_stale": 0,
@@ -398,8 +399,8 @@ def _accuracy_heuristic(fn, scenario_rec, cand_rep, variant):
 
 
 def _static_delta(orig_rep, cand_rep):
-    o = orig_rep.get("static_model_advisory", {})
-    c = cand_rep.get("static_model_advisory", {})
+    o = AC.read_static_model(orig_rep)
+    c = AC.read_static_model(cand_rep)
     return {
         "throughput_delta": (c.get("block_rthroughput") or 0) - (o.get("block_rthroughput") or 0),
         "ipc_delta": round((c.get("ipc") or 0) - (o.get("ipc") or 0), 3),
@@ -550,9 +551,9 @@ def compare_variant_scenario(fn, variant, scenario, arch, flags, compiler,
         "kernel_exposed": kernel_exposed,
         "instruction_count": cand_pa.get("instruction_count"),
         "instruction_count_delta": reg_detail.get("instruction_delta"),
-        "static_model_estimate": cand_rep.get("static_model_advisory", {}).get("block_rthroughput"),
+        "static_model_estimate": AC.read_static_model(cand_rep).get("block_rthroughput"),
         "static_delta": static_d,
-        "ipc_estimate": cand_rep.get("static_model_advisory", {}).get("ipc"),
+        "ipc_estimate": AC.read_static_model(cand_rep).get("ipc"),
         "path_safety": path_safety,
         "path_signals": path_signals,
         "spill_heuristic": spill_h,

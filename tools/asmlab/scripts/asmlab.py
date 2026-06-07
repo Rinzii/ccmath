@@ -1,8 +1,7 @@
 """CCMath asmlab: emit, score, and gate assembly changes for registered math functions.
 
 Subcommands:
-  list, emit, check, analyze, verify, report, baseline, diff, gate, bench
-  scenario, variant, golden, view
+  list, check, emit, baseline, diff, gate, bench, scenario, variant
 """
 
 import argparse
@@ -196,7 +195,7 @@ def build_report(fn, results, flags, compiler, constexpr_result, prov):
     primary = next((a for a in C.DEFAULT_ARCHES if a in results), None) or (
         sorted(results)[0] if results else None)
 
-    import cpu_knowledge as cpu_kb
+    import cpu_notes as cpu_kb
     cpu_by_arch = {}
     for arch in results:
         vdir = C.variant_dir(fn, arch, flags, compiler)
@@ -241,7 +240,7 @@ def build_report(fn, results, flags, compiler, constexpr_result, prov):
     md.extend(_static_model_section(results))
     if primary and cpu_by_arch.get(primary):
         md.append("")
-        import cpu_knowledge as cpu_kb
+        import cpu_notes as cpu_kb
         ann = {
             "microarchitecture": cpu_kb.get_microarch(primary),
             "calibration": cpu_kb._calibration_summary(cpu_kb.get_calibration(primary)),
@@ -326,7 +325,7 @@ def snapshot(results, prov=None, fn=None):
 
 
 def cmd_knowledge_validate(_args):
-    import cpu_knowledge as cpu_kb
+    import cpu_notes as cpu_kb
     errors = cpu_kb.validate_all()
     if errors:
         print("knowledge validation FAILED (%d errors):" % len(errors), file=sys.stderr)
@@ -353,10 +352,39 @@ def cmd_list(_args):
 
 
 def cmd_check(args):
-    return cmd_report(args)
+    C.set_human_md(getattr(args, "human", False))
+    rc = cmd_report(args)
+    if getattr(args, "view", False):
+        for fn in args.fn:
+            view_args = argparse.Namespace(
+                fn=fn, arch=args.arch, flags=args.flags, compiler=args.compiler,
+                open=getattr(args, "open", False), source_map=True, deep_analyze=False)
+            vrc = cmd_view(view_args)
+            if vrc:
+                rc = vrc
+    if getattr(args, "with_gate", False):
+        for fn in args.fn:
+            gate_args = argparse.Namespace(
+                fn=fn, mode="simple", flags=args.flags, compiler=args.compiler, arch=args.arch)
+            if cmd_gate(gate_args) != 0:
+                rc = 1
+    if getattr(args, "calibrate", False):
+        gargv = ["--arch", args.arch or "x86-64-v3", "--flags", args.flags,
+                 "--compiler", args.compiler, "--calibrate"]
+        if getattr(args, "golden_quick", False):
+            gargv.append("--quick")
+        if cmd_golden_calibrate(gargv) != 0:
+            rc = 1
+    return rc
+
+
+def cmd_golden_calibrate(argv):
+    import run_golden_analysis as rg
+    return rg.main(argv)
 
 
 def cmd_report(args):
+    C.set_human_md(getattr(args, "human", False))
     flags, compiler = args.flags, args.compiler
     arches = C.parse_arch_list(args.arch)
     rc = 0
@@ -836,23 +864,38 @@ def main(argv=None):
     sub.add_parser("list").set_defaults(func=cmd_list)
     p_check = sub.add_parser("check", help="emit, analyze, and write report (preferred)")
     add_common(p_check, many=True, source_map=True, deep=True)
+    p_check.add_argument("--human", action="store_true",
+                         help="write .md twins for analysis artifacts")
+    p_check.add_argument("--view", action="store_true",
+                         help="generate HTML source map viewer after report")
+    p_check.add_argument("--open", action="store_true", help="open viewer in browser")
+    p_check.add_argument("--with-gate", action="store_true",
+                         help="run simple accuracy gate after report")
+    p_check.add_argument("--calibrate", action="store_true",
+                         help="run golden Horner vs Estrin calibration")
+    p_check.add_argument("--golden-quick", action="store_true",
+                         help="with --calibrate, use short benchmark min time")
     p_check.set_defaults(func=cmd_check)
     p_emit = sub.add_parser("emit"); add_common(p_emit, source_map=True, deep=True)
     p_emit.set_defaults(func=lambda a: emit_mod.main(
         [a.fn, "--arch", a.arch, "--flags", a.flags, "--compiler", a.compiler] + deep_flags(a)))
-    p_an = sub.add_parser("analyze"); add_common(p_an)
+    p_an = sub.add_parser("analyze", help=argparse.SUPPRESS); add_common(p_an)
     p_an.set_defaults(func=lambda a: analyze_mod.main([a.fn, "--arch", a.arch]))
-    p_verify = sub.add_parser("verify"); add_common(p_verify, source_map=True, deep=True)
+    p_verify = sub.add_parser("verify", help=argparse.SUPPRESS)
+    add_common(p_verify, source_map=True, deep=True)
     p_verify.set_defaults(func=cmd_verify)
-    p_rep = sub.add_parser("report"); add_common(p_rep, many=True, source_map=True, deep=True)
+    p_rep = sub.add_parser("report", help=argparse.SUPPRESS)
+    add_common(p_rep, many=True, source_map=True, deep=True)
     p_rep.set_defaults(func=cmd_report)
     p_base = sub.add_parser("baseline"); add_common(p_base, source_map=True, deep=True)
     p_base.set_defaults(func=cmd_baseline)
     p_diff = sub.add_parser("diff"); add_common(p_diff, source_map=True, deep=True)
     p_diff.set_defaults(func=cmd_diff)
-    p_deep = sub.add_parser("deep-analyze"); add_common(p_deep, source_map=True, deep=True)
+    p_deep = sub.add_parser("deep-analyze", help=argparse.SUPPRESS)
+    add_common(p_deep, source_map=True, deep=True)
     p_deep.set_defaults(func=cmd_deep_analyze)
-    p_view = sub.add_parser("view"); add_common(p_view, source_map=True, deep=True)
+    p_view = sub.add_parser("view", help=argparse.SUPPRESS)
+    add_common(p_view, source_map=True, deep=True)
     p_view.add_argument("--open", action="store_true", help="open HTML in browser")
     p_view.set_defaults(func=cmd_view)
     p_gate = sub.add_parser("gate"); add_common(p_gate)
@@ -864,23 +907,27 @@ def main(argv=None):
     p_bench.add_argument("--variant", default="", help="candidate variant name (impl benches)")
     p_bench.add_argument("bench_args", nargs="*", help="extra Google Benchmark flags")
     p_bench.set_defaults(func=cmd_bench)
-    p_val = sub.add_parser("validate"); add_common(p_val, source_map=True, deep=True)
+    p_val = sub.add_parser("validate", help=argparse.SUPPRESS)
+    add_common(p_val, many=True, source_map=True, deep=True)
     p_val.set_defaults(func=cmd_validate)
 
-    p_know = sub.add_parser("knowledge", help="validate CPU note JSON files")
+    p_know = sub.add_parser("knowledge", help=argparse.SUPPRESS)
     know_sub = p_know.add_subparsers(dest="knowledge_cmd", required=True)
-    p_kv = know_sub.add_parser("validate", help="validate knowledge JSON files")
+    p_kv = know_sub.add_parser("validate", help=argparse.SUPPRESS)
     p_kv.set_defaults(func=cmd_knowledge_validate)
 
-    p_golden = sub.add_parser("golden", help="Horner vs Estrin calibration validation")
+    p_golden = sub.add_parser("golden", help=argparse.SUPPRESS)
     p_golden.add_argument("--arch", default="x86-64-v3")
     p_golden.add_argument("--flags", default=C.DEFAULT_FLAGS, choices=list(C.FLAG_VARIANTS))
     p_golden.add_argument("--compiler", default="clang", choices=["clang", "gcc"])
     p_golden.add_argument("--quick", action="store_true")
     p_golden.add_argument("--skip-bench", action="store_true")
-    p_golden.set_defaults(func=lambda a: __import__("run_golden_analysis").main([
-        "--arch", a.arch, "--flags", a.flags, "--compiler", a.compiler]
+    p_golden.add_argument("--calibrate", action="store_true",
+                          help="full ranking validation (default when --quick omitted)")
+    p_golden.set_defaults(func=lambda a: cmd_golden_calibrate(
+        ["--arch", a.arch, "--flags", a.flags, "--compiler", a.compiler]
         + (["--quick"] if a.quick else [])
+        + (["--calibrate"] if (a.calibrate or not a.quick) else [])
         + (["--skip-bench"] if a.skip_bench else [])))
 
     p_sc = sub.add_parser("scenario", help="path scenario testing")

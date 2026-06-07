@@ -11,6 +11,7 @@ import sys
 from pathlib import Path
 
 import _asmlab_common as C
+import analysis_common as AC
 
 # Reuse emit/classify/analyze/source_map from sibling modules.
 import emit as emit_mod
@@ -353,7 +354,7 @@ def write_scenario_report(fn, scenario_name, arch_name, flags, compiler,
         "benchmark_target": bench_data.get("benchmark_target"),
         "benchmark_filter": bench_data.get("benchmark_filter"),
         "benchmark_reason": bench_data.get("reason"),
-        "static_model_advisory": {
+        "static_model": {
             "block_rthroughput": mca.get("block_rthroughput"),
             "ipc": mca.get("ipc"),
             "instructions": mca.get("instructions"),
@@ -363,7 +364,7 @@ def write_scenario_report(fn, scenario_name, arch_name, flags, compiler,
         "path_analysis": pa,
     }
 
-    import cpu_knowledge as cpu_kb
+    import cpu_notes as cpu_kb
     report["cpu_notes"] = cpu_kb.annotate_scenario_report(report, pa, sdir)
 
     prov = prov_mod.collect(fn, flags, compiler, [arch_name])
@@ -455,13 +456,13 @@ def _render_scenario_md(report):
         "## Static model (advisory)",
         "",
     ])
-    sm = report.get("static_model_advisory", {})
+    sm = AC.read_static_model(report)
     lines.append("- throughput estimate: %s" % sm.get("block_rthroughput"))
     lines.append("- ipc: %s" % sm.get("ipc"))
     lines.append("- instructions: %s" % sm.get("instructions"))
     lines.append("")
     if report.get("cpu_notes") or report.get("cpu_knowledge"):
-        import cpu_knowledge as cpu_kb
+        import cpu_notes as cpu_kb
         ann = report.get("cpu_notes") or report.get("cpu_knowledge")
         lines.extend(cpu_kb.render_knowledge_md(ann))
     return "\n".join(lines)
@@ -610,8 +611,8 @@ def scenario_diff(fn, scenario_name, arch, flags, compiler, variant=None):
     cur_sm = load_json(cur / "scenario_source_map.json") or load_json(cur / "source_map.json")
     base_sm = load_json(base / "scenario_source_map.json") or load_json(base / "source_map.json")
     if cur_sm and base_sm:
-        cur_m = (cur_rep or {}).get("static_model_advisory", {})
-        base_m = (base_rep or {}).get("static_model_advisory", {})
+        cur_m = AC.read_static_model(cur_rep)
+        base_m = AC.read_static_model(base_rep)
         asm_diff = adiff_mod.diff_source_maps(base_sm, cur_sm, base_m, cur_m)
         asm_diff["scenario"] = scenario_name
         asm_diff["diff_kind"] = diff_kind
@@ -641,8 +642,8 @@ def scenario_diff(fn, scenario_name, arch, flags, compiler, variant=None):
 
     diff["metrics_delta"] = {}
     if cur_rep and base_rep:
-        c = cur_rep.get("static_model_advisory", {})
-        b = base_rep.get("static_model_advisory", {})
+        c = AC.read_static_model(cur_rep)
+        b = AC.read_static_model(base_rep)
         diff["metrics_delta"] = {
             "throughput_delta": (c.get("block_rthroughput") or 0) - (b.get("block_rthroughput") or 0),
             "ipc_delta": (c.get("ipc") or 0) - (b.get("ipc") or 0),

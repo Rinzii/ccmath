@@ -24,9 +24,15 @@ def write_artifact(variant_dir, name, data, md_lines=None):
     variant_dir = Path(variant_dir)
     jpath = variant_dir / ("%s.json" % name)
     jpath.write_text(json.dumps(data, indent=2) + "\n")
-    if md_lines is not None:
+    if md_lines is not None and C.HUMAN_MD:
         (variant_dir / ("%s.md" % name)).write_text("\n".join(md_lines) + "\n")
     return jpath
+
+
+def read_static_model(report):
+    if not report:
+        return {}
+    return report.get("static_model") or report.get("static_model_advisory") or {}
 
 
 def attribution_layer(path):
