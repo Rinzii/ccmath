@@ -1,7 +1,6 @@
 #pragma once
 
 #include "oracle_campaign_common.hpp"
-
 #include "utils/fenv_fixture.hpp"
 #include "utils/ulp_distance.hpp"
 
@@ -49,8 +48,8 @@ namespace ccm::test::oracle
 
 		~ScopedMpfrRoundingMode() { mpfr_set_default_rounding_mode(previous_); }
 
-		ScopedMpfrRoundingMode(const ScopedMpfrRoundingMode &)			   = delete;
-		ScopedMpfrRoundingMode & operator=(const ScopedMpfrRoundingMode &) = delete;
+		ScopedMpfrRoundingMode(const ScopedMpfrRoundingMode &)			  = delete;
+		ScopedMpfrRoundingMode &operator=(const ScopedMpfrRoundingMode &) = delete;
 
 		explicit operator bool() const { return static_cast<bool>(guard_); }
 
@@ -76,7 +75,7 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T>
-	inline bool oracle_match(T actual, T expected, std::uint64_t max_ulp, std::uint64_t & ulp_distance, std::string & notes)
+	inline bool oracle_match(T actual, T expected, std::uint64_t max_ulp, std::uint64_t &ulp_distance, std::string &notes)
 	{
 		const auto distance = ccm::test::ulp::classify_distance(actual, expected);
 		ulp_distance		= distance.distance;
@@ -137,7 +136,7 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T, typename ActualFn, typename ReferenceFn, typename ExceptionalReferenceFn, typename UsesFullOracleFn, typename SkipReasonFn>
-	inline std::optional<failure_record<T>> evaluate_binary_mpfr_case(const pow_case<T> & test_case,
+	inline std::optional<failure_record<T>> evaluate_binary_mpfr_case(const pow_case<T> &test_case,
 																	  std::string_view function_name,
 																	  std::string_view path_name,
 																	  ccm::test::pow_path::validation_path path,
@@ -148,12 +147,12 @@ namespace ccm::test::oracle
 																	  SkipReasonFn skip_reason_fn,
 																	  mpfr_prec_t oracle_precision,
 																	  std::uint64_t max_ulp,
-																	  run_summary<T> & summary,
-																	  std::uint64_t target_ulp	   = 0,
-																	  std::uint64_t seed			   = 0,
-																	  std::string_view search_mode   = {},
-																	  std::string_view mismatch_note = "exceptional mismatch vs std reference",
-																	  std::vector<failure_record<T>> * event_log = nullptr)
+																	  run_summary<T> &summary,
+																	  std::uint64_t target_ulp					= 0,
+																	  std::uint64_t seed						= 0,
+																	  std::string_view search_mode				= {},
+																	  std::string_view mismatch_note			= "exceptional mismatch vs std reference",
+																	  std::vector<failure_record<T>> *event_log = nullptr)
 	{
 		if (const auto skip = skip_reason_fn(path, test_case.base, test_case.exponent))
 		{
@@ -166,7 +165,8 @@ namespace ccm::test::oracle
 		const mpfr_rnd_t rounding = current_mpfr_rounding_mode();
 		const T actual			  = actual_fn(test_case.base, test_case.exponent);
 
-		const auto finish_case = [&](T expected) -> std::optional<failure_record<T>> {
+		const auto finish_case = [&](T expected) -> std::optional<failure_record<T>>
+		{
 			std::uint64_t distance = 0;
 			std::string notes;
 			const bool pass = oracle_match(actual, expected, max_ulp, distance, notes);
@@ -178,42 +178,40 @@ namespace ccm::test::oracle
 					++summary.above_target_count;
 					if (event_log != nullptr)
 					{
-						event_log->push_back(make_failure_record(
-							function_name,
-							path_name,
-							test_case.provenance,
-							test_case.base,
-							test_case.exponent,
-							actual,
-							expected,
-							distance,
-							current_rounding_mode_name(),
-							static_cast<unsigned long>(oracle_precision),
-							seed,
-							search_mode,
-							"above correctly-rounded target",
-							"mpfr_above_target"));
+						event_log->push_back(make_failure_record(function_name,
+																 path_name,
+																 test_case.provenance,
+																 test_case.base,
+																 test_case.exponent,
+																 actual,
+																 expected,
+																 distance,
+																 current_rounding_mode_name(),
+																 static_cast<unsigned long>(oracle_precision),
+																 seed,
+																 search_mode,
+																 "above correctly-rounded target",
+																 "mpfr_above_target"));
 					}
 				}
 				return std::nullopt;
 			}
 
 			++summary.failure_count;
-			auto record = make_failure_record(
-				function_name,
-				path_name,
-				test_case.provenance,
-				test_case.base,
-				test_case.exponent,
-				actual,
-				expected,
-				distance,
-				current_rounding_mode_name(),
-				static_cast<unsigned long>(oracle_precision),
-				seed,
-				search_mode,
-				notes,
-				"mpfr_hard_failure");
+			auto record = make_failure_record(function_name,
+											  path_name,
+											  test_case.provenance,
+											  test_case.base,
+											  test_case.exponent,
+											  actual,
+											  expected,
+											  distance,
+											  current_rounding_mode_name(),
+											  static_cast<unsigned long>(oracle_precision),
+											  seed,
+											  search_mode,
+											  notes,
+											  "mpfr_hard_failure");
 			if (event_log != nullptr) { event_log->push_back(record); }
 			return record;
 		};
@@ -221,32 +219,38 @@ namespace ccm::test::oracle
 		if (!uses_full_oracle_fn(path))
 		{
 			const T fallback_expected = exceptional_reference_fn(test_case.base, test_case.exponent);
-			const T mpfr_expected = reference_fn(test_case.base, test_case.exponent, oracle_precision, rounding);
+			const T mpfr_expected	  = reference_fn(test_case.base, test_case.exponent, oracle_precision, rounding);
 
 			if (is_exceptional_or_zero_result(actual) || is_exceptional_or_zero_result(fallback_expected))
 			{
-				if (exceptional_or_zero_match(actual, fallback_expected))
+				// MPFR is the correctly-rounded oracle; std::pow is only the fallback for IEEE
+				// special-case conventions MPFR may not model (signed zeros, inf/NaN from C rules).
+				// A result that matches the correctly-rounded MPFR value is never a failure, even
+				// when the platform std::pow disagrees: e.g. pow(2, -1074) is exactly the smallest
+				// subnormal, which some libm builds flush to zero under directed rounding.
+				const bool matches_std	= exceptional_or_zero_match(actual, fallback_expected);
+				const bool matches_mpfr = exceptional_or_zero_match(actual, mpfr_expected);
+				if (matches_std || matches_mpfr)
 				{
-					if (!exceptional_or_zero_match(actual, mpfr_expected)) { ++summary.mpfr_policy_mismatch_count; }
+					if (matches_std && !matches_mpfr) { ++summary.mpfr_policy_mismatch_count; }
 					return std::nullopt;
 				}
 
 				++summary.failure_count;
-				auto record = make_failure_record(
-					function_name,
-					path_name,
-					test_case.provenance,
-					test_case.base,
-					test_case.exponent,
-					actual,
-					fallback_expected,
-					0,
-					current_rounding_mode_name(),
-					static_cast<unsigned long>(oracle_precision),
-					seed,
-					search_mode,
-					mismatch_note,
-					"mpfr_hard_failure");
+				auto record = make_failure_record(function_name,
+												  path_name,
+												  test_case.provenance,
+												  test_case.base,
+												  test_case.exponent,
+												  actual,
+												  fallback_expected,
+												  0,
+												  current_rounding_mode_name(),
+												  static_cast<unsigned long>(oracle_precision),
+												  seed,
+												  search_mode,
+												  mismatch_note,
+												  "mpfr_hard_failure");
 				if (event_log != nullptr) { event_log->push_back(record); }
 				return record;
 			}
