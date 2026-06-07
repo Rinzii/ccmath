@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "facts": [
+    {
+      "instruction": "vfmadd132ps",
+      "isa": "x86_64",
+      "category": "fma",
+      "latency_cycles": {"value": null, "source": "unknown", "confidence": "unknown"},
+      "reciprocal_throughput_cycles": {"value": null, "source": "unknown", "confidence": "unknown"},
+      "notes": ["Consult uops.info or Agner for Skylake/Zen uarch-specific values."],
+      "source_ids": ["uops_info", "agner_fog"]
+    },
+    {
+      "instruction": "vfmadd213ss",
+      "isa": "x86_64",
+      "category": "fma",
+      "latency_cycles": {"value": null, "source": "unknown", "confidence": "unknown"},
+      "reciprocal_throughput_cycles": {"value": null, "source": "unknown", "confidence": "unknown"},
+      "notes": ["Scalar FMA common in golden and libm-style kernels."],
+      "source_ids": ["uops_info", "agner_fog"]
+    }
+  ]
+}

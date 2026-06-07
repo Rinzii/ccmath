@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "facts": [
+    {
+      "instruction": "fmadd",
+      "isa": "aarch64",
+      "category": "fma",
+      "latency_cycles": {"value": null, "source": "unknown", "confidence": "unknown"},
+      "reciprocal_throughput_cycles": {"value": null, "source": "unknown", "confidence": "unknown"},
+      "notes": [
+        "Use local calibration before making Apple M1 static claims.",
+        "Golden M1 kernels use scalar fmadd heavily."
+      ],
+      "source_ids": ["apple_silicon_opt_guide", "dougallj_m1", "asmlab_local_calibration"]
+    }
+  ]
+}

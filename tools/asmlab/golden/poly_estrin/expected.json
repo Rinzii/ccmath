@@ -1,0 +1,22 @@
+{
+  "fixture": "poly_estrin",
+  "role": "candidate",
+  "description": "Estrin form with reduced dependency depth and more independent temporaries.",
+  "expected_findings": [
+    "dependency_chain_reduced",
+    "ILP_increased",
+    "vectorization_opportunity_increased",
+    "register_pressure_increased",
+    "FMA_contraction_present"
+  ],
+  "expected_metric_direction": {
+    "llvm_mca_rthroughput": "improves",
+    "benchmark_ns": "improves_or_equal",
+    "register_pressure": "increases"
+  },
+  "expected_confidence": {
+    "dependency_chain_reduced": "likely_causal",
+    "vectorization_opportunity_increased": "correlation",
+    "register_pressure_increased": "correlation"
+  }
+}

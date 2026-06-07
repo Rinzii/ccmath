@@ -1,0 +1,14 @@
+{
+  "id": "aarch64_stack_serial_fma",
+  "isa": "aarch64",
+  "description": "Load from stack followed by fmadd can indicate spill-fed FMA dependency.",
+  "instruction_patterns": ["ldr * [sp,*]", "fmadd", "str * [sp,*]"],
+  "detection_hints": [
+    "ldr from [sp, #offset] immediately before fmadd",
+    "str to [sp] between serial fmadd stages in Horner-style chains"
+  ],
+  "meaning": "stack_serial_fma_candidate",
+  "confidence": "medium",
+  "source_ids": ["asmlab_local_calibration", "apple_silicon_opt_guide"],
+  "used_for": ["golden_findings", "dependency_chain_analysis", "register_pressure_analysis"]
+}

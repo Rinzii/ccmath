@@ -1,0 +1,10 @@
+{
+  "id": "back_to_back_fma_dependency",
+  "isa": "any",
+  "description": "Back-to-back FMA instructions may indicate a dependency chain when results feed the next stage. Independent parallel FMA pairs may indicate ILP or Estrin-style parallelism.",
+  "instruction_patterns": ["consecutive_vfmadd", "consecutive_fmadd"],
+  "meaning": "dependency_chain_or_ilp_candidate",
+  "confidence": "medium",
+  "source_ids": ["asmlab_local_calibration", "agner_fog"],
+  "used_for": ["golden_findings", "dependency_chain_analysis", "ILP_analysis"]
+}

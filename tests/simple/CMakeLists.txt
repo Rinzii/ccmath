@@ -98,3 +98,29 @@ ccmath_add_test(ccmath-simple-internal-types
         ../math/internal/types/dyadic_float_test.cpp
 )
 set_tests_properties(ccmath-simple-internal-types PROPERTIES LABELS simple)
+
+ccmath_add_test(ccmath-simple-ext
+        ../ext/ext_helpers_test.cpp
+)
+set_tests_properties(ccmath-simple-ext PROPERTIES LABELS simple)
+
+find_package(Python3 COMPONENTS Interpreter QUIET)
+if (Python3_FOUND)
+    add_test(NAME asmlab-powf-impl-bench-wiring
+            COMMAND ${Python3_EXECUTABLE}
+            ${CMAKE_SOURCE_DIR}/tools/asmlab/scripts/test_bench_wiring.py
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+    set_tests_properties(asmlab-powf-impl-bench-wiring PROPERTIES LABELS simple)
+    add_test(NAME asmlab-golden-quick-wiring
+            COMMAND ${Python3_EXECUTABLE}
+            ${CMAKE_SOURCE_DIR}/tools/asmlab/scripts/test_golden_quick.py
+            GoldenWiringTest
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+    set_tests_properties(asmlab-golden-quick-wiring PROPERTIES LABELS simple)
+    add_test(NAME asmlab-golden-quick
+            COMMAND ${Python3_EXECUTABLE}
+            ${CMAKE_SOURCE_DIR}/tools/asmlab/scripts/run_golden_analysis.py
+            --quick
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+    set_tests_properties(asmlab-golden-quick PROPERTIES LABELS simple)
+endif ()

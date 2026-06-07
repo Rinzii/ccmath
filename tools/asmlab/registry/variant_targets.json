@@ -1,0 +1,15 @@
+{
+  "_comment": "Maps registered functions to the implementation file copied for variant init. candidate_call uses {variant} placeholder.",
+  "targets": {
+    "sqrt": {
+      "base_file": "include/ccmath/internal/math/runtime/func/power/sqrt_rt.hpp",
+      "candidate_call": "asmlab::variant::sqrt::{variant}::ccm_rt::sqrt_rt<double>(a0)",
+      "namespace_rewrite": "sqrt_rt"
+    },
+    "powf_impl": {
+      "base_file": "include/ccmath/internal/math/generic/func/power/pow_impl/powf_impl.hpp",
+      "candidate_call": "asmlab::variant::powf_impl::{variant}::powf_impl(a0, a1)",
+      "namespace_rewrite": "powf_impl"
+    }
+  }
+}

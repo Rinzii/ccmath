@@ -3,6 +3,7 @@
 **/.vscode/*
 **/.idea/*
 .idea/*
+!.idea/cmake.xml
 .vs/*
 .vscode/*
 build/*
@@ -79,4 +80,8 @@ fuzzing/leak-*
 fuzzing/oom-*
 fuzzing/slow-unit-*
 fuzzing/minimize-crash-*
+
+# asmlab cached reference data (Agner Fog tables, uops.info exports); fetched on demand
+tools/asmlab/refdata/*
+!tools/asmlab/refdata/.gitkeep
 

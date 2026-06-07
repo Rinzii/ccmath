@@ -35,6 +35,12 @@ endif ()
 
 if (CCM_BENCH_POWER)
     add_benchmark(sqrt benchmarks/power/sqrt.bench.cpp benchmarks/power/sqrt.bench.hpp)
+    if (EXISTS "${CMAKE_SOURCE_DIR}/tools/asmlab/bench/CMakeLists.txt")
+        add_subdirectory("${CMAKE_SOURCE_DIR}/tools/asmlab/bench" "${CMAKE_BINARY_DIR}/asmlab_bench")
+    endif ()
+    if (EXISTS "${CMAKE_SOURCE_DIR}/tools/asmlab/accuracy/CMakeLists.txt")
+        add_subdirectory("${CMAKE_SOURCE_DIR}/tools/asmlab/accuracy" "${CMAKE_BINARY_DIR}/asmlab_accuracy")
+    endif ()
 endif ()
 
 if (CCM_BENCH_NEAREST)
