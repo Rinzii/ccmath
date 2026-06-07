@@ -159,6 +159,10 @@ jobs:
         run: |
           if (-not (Test-Path vcpkg)) {
             git clone --depth 1 https://github.com/microsoft/vcpkg.git vcpkg
+            # Fetch the exact builtin-baseline commit so manifest version resolution can read
+            # versions/baseline.json from it; a depth-1 clone of HEAD alone does not contain it.
+            git -C vcpkg fetch --depth 1 origin 10ceb139a610ebf3c6aa49cdc4a4b7f3db5d3f2b
+            git -C vcpkg checkout 10ceb139a610ebf3c6aa49cdc4a4b7f3db5d3f2b
           }
           if (-not (Test-Path vcpkg/vcpkg.exe)) {
             .\vcpkg\bootstrap-vcpkg.bat -disableMetrics

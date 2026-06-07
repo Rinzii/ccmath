@@ -8,6 +8,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <optional>
 
 namespace ccm::test::oracle
 {
@@ -45,10 +46,39 @@ namespace ccm::test::oracle
 		return result;
 	}
 
+	// cr_pow rounds a result that is within ~half an ulp of 1.0 to the round-to-nearest value
+	// in every rounding mode, because its internal precision (~2^-240 relative) cannot resolve a
+	// deviation from 1.0 far below that. For such inputs the correctly rounded directed result is
+	// the neighbor of 1.0 on the side of the true value, which cr_pow does not return. The double
+	// truth here is the correctly rounded value in the active mode for that provably near-1 region.
+	//
+	// The region is identified soundly: for base > 0, |x^y - 1| < |y * log2|x|| <= |y| * (|e_x| + 1),
+	// so when that bound is below 2^-54 the true value lies within 2^-54 of 1.0. There round to
+	// nearest yields exactly 1.0 and the directed results are the adjacent doubles, selected by the
+	// sign of x^y - 1 = sign(y) * sign(|x| - 1). Outside this region cr_pow is reliable.
+	inline std::optional<double> coremath_double_near_one_truth(double base, double exponent)
+	{
+		if (!(base > 0.0) || !std::isfinite(base) || !std::isfinite(exponent) || base == 1.0) { return std::nullopt; }
+
+		int e_x = 0;
+		std::frexp(base, &e_x); // base in [0.5, 1) * 2^e_x, so |log2(base)| <= |e_x| + 1
+		const double log2_bound = std::fabs(static_cast<double>(e_x)) + 1.0;
+		if (!(std::fabs(exponent) * log2_bound < 0x1.0p-54)) { return std::nullopt; }
+
+		const int sign_y	 = (exponent > 0.0) ? 1 : (exponent < 0.0) ? -1 : 0;
+		const int sign_log	 = (base > 1.0) ? 1 : (base < 1.0) ? -1 : 0;
+		const int sign_delta = sign_y * sign_log; // sign of x^y - 1
+		const int mode		 = std::fegetround();
+
+		if (sign_delta > 0) { return mode == FE_UPWARD ? std::nextafter(1.0, 2.0) : 1.0; }
+		if (sign_delta < 0) { return (mode == FE_DOWNWARD || mode == FE_TOWARDZERO) ? std::nextafter(1.0, 0.0) : 1.0; }
+		return 1.0;
+	}
+
 	// True when the function output disagrees with the primary oracle but is in fact
 	// correctly rounded (confirmed by a higher-precision cross-check), i.e. the oracle
-	// is wrong for this case. Only float has a higher-precision cross-check available
-	// here; cr_pow (double) is trusted directly.
+	// is wrong for this case. float cross-checks against the round-to-odd double oracle;
+	// double resolves the near-1 region where cr_pow ignores directed rounding.
 	template <typename T>
 	inline bool function_matches_high_precision_truth(T base, T exponent, T actual)
 	{
@@ -56,6 +86,11 @@ namespace ccm::test::oracle
 		{
 			const float truth = coremath_float_truth(base, exponent);
 			return oracle_fp_bits_match(actual, truth);
+		}
+		else if constexpr (std::is_same_v<T, double>)
+		{
+			const std::optional<double> truth = coremath_double_near_one_truth(base, exponent);
+			return truth.has_value() && oracle_fp_bits_match(actual, *truth);
 		}
 		else
 		{

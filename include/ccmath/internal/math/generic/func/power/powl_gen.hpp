@@ -376,8 +376,15 @@ namespace ccm::gen
 					if (powl_bits::try_extract_int64(exp, int_exp))
 					{
 						long double result = powl_bounded_integer(working_base, int_exp);
-						if (result_is_neg && result != 0.0L && !ccm::isinf(result) && !ccm::isnan(result)) { result = -result; }
-						return result;
+						// Only trust the exact integer round trip when it lands on a normal value.
+						// An overflowing or underflowing intermediate (e.g. max^-3 squares max first)
+						// cannot saturate per rounding mode, so defer such cases to the general kernel,
+						// which over/underflows through internal_ldexp and is correct in every mode.
+						if (const PowlFPBits_t r_bits(result); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal())
+						{
+							if (result_is_neg) { result = -result; }
+							return result;
+						}
 					}
 
 					const PowlFPBits_t exp_abs_bits(exp);

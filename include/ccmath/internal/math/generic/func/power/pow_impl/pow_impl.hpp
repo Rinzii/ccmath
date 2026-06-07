@@ -102,14 +102,14 @@ namespace ccm::gen::impl
 			constexpr DoubleDouble two_prod(double a, double b) noexcept
 			{
 				const double hi = a * b;
-				const double lo = support::multiply_add(a, b, -hi);
+				const double lo = ccm::types::exact_fma(a, b, -hi);
 				return DoubleDouble{ hi, lo };
 			}
 
 			constexpr DoubleDouble mul(const DoubleDouble & a, const DoubleDouble & b) noexcept
 			{
 				DoubleDouble p = two_prod(a.hi, b.hi);
-				p.lo += support::multiply_add(a.hi, b.lo, a.lo * b.hi);
+				p.lo += ccm::types::exact_fma(a.hi, b.lo, a.lo * b.hi);
 				return ccm::types::exact_add(p.hi, p.lo);
 			}
 
@@ -156,6 +156,10 @@ namespace ccm::gen::impl
 				const double r0 = 1.0 / p.hi;
 				const FPBits_t r0_bits(r0);
 				if (r0 == 0.0 || !r0_bits.is_finite()) { return r0; }
+				// An exact single-double divisor (e.g. x^-1) is reciprocated correctly by IEEE
+				// division in every rounding mode. The Newton refinement below targets a genuine
+				// double-double divisor and would re-round r0 to the wrong neighbor here.
+				if (p.lo == 0.0) { return r0; }
 				const DoubleDouble pr = two_prod(p.hi, r0);
 				const double res	  = ((1.0 - pr.hi) - pr.lo) - p.lo * r0;
 				return r0 + r0 * res;

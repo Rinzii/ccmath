@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "ccmath/internal/predef/has_builtin.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/multiply_add.hpp"
 #include "ccmath/internal/types/number_pair.hpp"
 
@@ -18,6 +20,20 @@ namespace ccm
 	namespace types
 	{
 		using DoubleDouble = NumberPair<double>;
+
+		// True fused multiply-add for the error-free transforms below. support::multiply_add
+		// only fuses when the target advertises a hardware FMA, so on a generic build without one
+		// it degrades to (x * y) + z and a residual such as fma(a, b, -a*b) collapses to zero (or
+		// a double-double cross product loses its last bit). __builtin_fma is a correct fused
+		// operation on every target that provides it (lowering to a libm call when there is no FMA
+		// instruction), so the residual stays exact in every rounding mode.
+		constexpr double exact_fma(double x, double y, double z) noexcept
+		{
+#if CCM_HAS_BUILTIN(__builtin_fma)
+			if (!support::is_constant_evaluated()) { return __builtin_fma(x, y, z); }
+#endif
+			return support::multiply_add(x, y, z);
+		}
 
 		// The output of Dekker's FastTwoSum algorithm is correct, i.e.:
 		//   r.hi + r.lo = a + b exactly
@@ -77,15 +93,15 @@ namespace ccm
 		constexpr DoubleDouble quick_mult(double a, const DoubleDouble & b)
 		{
 			DoubleDouble r = exact_mult(a, b.hi);
-			r.lo		   = support::multiply_add(a, b.lo, r.lo);
+			r.lo		   = exact_fma(a, b.lo, r.lo);
 			return r;
 		}
 
 		constexpr DoubleDouble quick_mult(const DoubleDouble & a, const DoubleDouble & b)
 		{
 			DoubleDouble r	= exact_mult(a.hi, b.hi);
-			const double t1 = support::multiply_add(a.hi, b.lo, r.lo);
-			const double t2 = support::multiply_add(a.lo, b.hi, t1);
+			const double t1 = exact_fma(a.hi, b.lo, r.lo);
+			const double t2 = exact_fma(a.lo, b.hi, t1);
 			r.lo			= t2;
 			return r;
 		}

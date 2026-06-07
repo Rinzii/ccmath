@@ -186,10 +186,28 @@ namespace ccm::gen::internal::impl::bit80
 				}
 			}
 
+			// Saturate with a genuine over/underflowing product so the active rounding mode
+			// decides the result: round to nearest and rounding toward the result sign give
+			// inf/zero, the opposing directed modes give max_normal/min_subnormal. A hard
+			// inf/zero here would be wrong under directed rounding (the binary64 kernel lets
+			// result * scale round naturally for the same reason). The magnitude is far past
+			// the representable range, so the exact factors do not matter.
+			// The result here is positive (the caller applies the sign) and far outside the
+			// representable range. Saturate by scaling a positive unit past the range so the
+			// hardware conversion rounds in the active mode: round to nearest and rounding toward
+			// the result sign give inf/zero, the opposing directed modes give max_normal and
+			// min_subnormal. A hard inf/zero would be wrong under directed rounding, mirroring how
+			// the binary64 kernel lets result * scale round naturally. The shifts stay inside the
+			// internal_ldexp fast range so the rounding comes from the conversion, not a rounding
+			// mode read (which a fenv-unaware optimizer may hoist). Constant evaluation always
+			// rounds to nearest, so the compile-time path keeps the inf/zero saturation.
+			constexpr int kOverflowShift  = LDBL_MAX_EXP;					  // 2^LDBL_MAX_EXP overflows.
+			constexpr int kUnderflowShift = LDBL_MIN_EXP - LDBL_MANT_DIG - 1; // half the smallest subnormal.
 			if (forced_overflow)
 			{
 				support::fenv::set_errno_if_required(ERANGE);
 				support::fenv::raise_except_if_required(FE_OVERFLOW);
+				if (!support::is_constant_evaluated()) { return support::helpers::internal_ldexp(1.0L, kOverflowShift); }
 				return FPBits_t::inf(types::Sign::POS).get_val();
 			}
 
@@ -197,6 +215,7 @@ namespace ccm::gen::internal::impl::bit80
 			{
 				support::fenv::set_errno_if_required(ERANGE);
 				support::fenv::raise_except_if_required(FE_UNDERFLOW);
+				if (!support::is_constant_evaluated()) { return support::helpers::internal_ldexp(1.0L, kUnderflowShift); }
 				return FPBits_t::zero(types::Sign::POS).get_val();
 			}
 
