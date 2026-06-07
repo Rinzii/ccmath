@@ -64,7 +64,7 @@ TEST(CcmathBasicTests, Remquo)
 	// Test with zero values
 	ccm::test::ExpectRemquoMatchesStd(0.0, 2.0);
 
-	/* TODO: These test are failing on the CI, but not on my local machine. Investigate why.
+	/* TODO(IanP): Infinity and NaN remquo cases fail on CI but pass locally. Investigate.
 	// Test with infinity
 	bool isCcmLeftInfinityNegative = (std::signbit(get_ccm_rem(std::numeric_limits<double>::infinity(), 2.0)) == true); // NOLINT
 	bool isStdLeftInfinityNegative = (std::signbit(get_std_rem(std::numeric_limits<double>::infinity(), 2.0)) == true); // NOLINT
@@ -102,5 +102,4 @@ TEST(CcmathBasicTests, Remquo)
 	EXPECT_EQ(get_ccm_quo(-std::numeric_limits<double>::quiet_NaN(), 2.0), get_std_quo(-std::numeric_limits<double>::quiet_NaN(), 2.0));
 
 	 */
-	// TODO: Add more test cases for remquo.
 }

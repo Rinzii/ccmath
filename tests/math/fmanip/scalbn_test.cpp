@@ -38,8 +38,7 @@ TEST(CcmathFmanipTests, ScalbnFloat)
 
 TEST(CcmathFmanipTests, ScalbnLongDouble)
 {
-	// TODO: Currently, I am not able to implement a long double version of this function at this time.
-	//       This is due to technical challenges with being able to interact with the bits of a long double.
+	// TODO(IanP): scalbn long double tests need native ld80/ld128 bit access. Delegates to double for now.
 	/*
 	EXPECT_EQ(ccm::scalbn(7.0L, -4), std::scalbn(7.0L, -4));
     EXPECT_EQ(ccm::scalbn(1.0L, -1074), std::scalbn(1.0L, -1074));

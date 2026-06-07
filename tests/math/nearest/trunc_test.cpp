@@ -127,7 +127,7 @@ namespace
 
 } // namespace
 
-// TODO: Find a way to test all of the different ways the function may behave internally to work based on the provided compiler.
+// TODO(IanP): Add coverage for compiler-specific trunc dispatch paths when they diverge.
 
 class CcmathTruncDoubleTests : public TestWithParam<TruncTestParams<double>>
 {

@@ -22,8 +22,8 @@
 #include <ccmath/internal/predef/compiler_suppression/gcc_compiler_suppression.hpp>
 #include <ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp>
 
-// TODO: Look into this issue at a later date.
-CCM_DISABLE_MSVC_WARNING(4756) // 4756: overflow in constant arithmetic - Not sure why this is happening
+// TODO(IanP): MSVC 4756 overflow in constant arithmetic on int abs edge cases.
+CCM_DISABLE_MSVC_WARNING(4756) // 4756: overflow in constant arithmetic
 
 namespace
 {
@@ -171,7 +171,7 @@ namespace
 		{ 0, std::abs(0) },
 
 		// Edge cases
-		// TODO: Currently this is a problem section for our aggressive compiler warnings. We need to fix this later.
+		// TODO(IanP): int max and denorm_min rows trip aggressive compiler warnings on some toolchains.
 		{ std::numeric_limits<int>::max(), std::abs(std::numeric_limits<int>::max()) },
 		{ std::numeric_limits<int>::denorm_min(), std::abs(std::numeric_limits<int>::denorm_min()) },
 		{ -std::numeric_limits<int>::denorm_min(), std::abs(-std::numeric_limits<int>::denorm_min()) },

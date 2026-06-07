@@ -14,8 +14,6 @@
 #include <limits>
 #include <ccmath/ccmath.hpp>
 
-// TODO: add more tests for isinf
-
 TEST(CcmathCompareTests, IsInf)
 {
 	// test isinf is static_assert-able

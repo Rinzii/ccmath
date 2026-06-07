@@ -19,8 +19,7 @@
 
 #include "ccmath/internal/types/float128.hpp"
 
-// TODO: The nan func are quite brittle and the test cases are extremely forgiving to the func.
-// 		 At some point we should improve these test cases and the nan func to handle all edge cases.
+// TODO(IanP): Tighten nan payload and overflow cases. Current tests are forgiving.
 
 TEST(CcmathBasicTests, NanStaticAssert)
 {
@@ -28,7 +27,7 @@ TEST(CcmathBasicTests, NanStaticAssert)
 	static_assert(ccm::isnan(ccm::nanf("")), "ccm::nanf() is NOT static assertable!");
 	static_assert(ccm::isnan(ccm::nan("")), "ccm::nan() is NOT static assertable!");
 	// Currently nanl is not possible to static assert on clang due to issues with bit_cast.
-	// TODO: Look into alternative approach to handling nanl.
+	// TODO(IanP): nanl static_assert needs a bit_cast approach that works on Clang.
 	//static_assert(ccm::isnan(ccm::nanl("")), "ccm::nanl() is NOT static assertable!");
 }
 
@@ -85,10 +84,7 @@ TEST(CcmathBasicTests, Nan_Double)
 	stdNanBits = ccm::support::bit_cast<std::uint64_t>(std::nan("000000000000000000000000000000000000000000000000000000002"));
 	EXPECT_EQ(ccmNanBits, stdNanBits);
 
-	// TODO: Correct these test cases.
-	/** These currently fail. Likely due to the fact that we are not handling overflow.
-	 * ccm::nan is a pretty low priority function so I will not be fixing this for the time being, but
-	 * I will be allowing these issues inside of the codebase and fix them at a later date.
+	/* Disabled until nan handles long hex strings and overflow like std::nan.
 	// Check the outcome if we are handling a string with a hex prefix and multiple characters
 	ccmNanBits = ccm::support::bit_cast<std::uint64_t>(ccm::nan("0x7FF8000000000000"));
 	stdNanBits = ccm::support::bit_cast<std::uint64_t>(std::nan("0x7FF8000000000000"));
@@ -107,9 +103,7 @@ TEST(CcmathBasicTests, Nan_Double)
 	*/
 }
 
-// TODO: Currently, the testing for 64 bit long doubles on intel DPC++ is causing a SEH exception.
-//       I need to investigate this further but I don't yet have the time.
-//       Return to this later, but for now, I will disable the test for DPC++.
+// 64-bit long double nanl tests trigger an SEH fault on Intel DPC++. Disabled until investigated.
 #if !(defined(SYCL_LANGUAGE_VERSION) || defined(__INTEL_LLVM_COMPILER))
 #if (LDBL_MANT_DIG == 53)
 

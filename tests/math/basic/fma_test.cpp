@@ -38,7 +38,7 @@ TEST(CcmathBasicTests, Fma)
 	ccm::test::ExpectTernaryMatchesStd(0.0, 0.0, 0.0, ccm_fma_double, static_cast<double (*)(double, double, double)>(std::fma));
 	ccm::test::ExpectTernaryMatchesStd(-0.0, -0.0, -0.0, ccm_fma_double, static_cast<double (*)(double, double, double)>(std::fma));
 
-	/* TODO: Add these test back in once the implementation is complete
+	/* TODO(IanP): Re-enable zero-times-infinity FMA cases once ccm::fma matches std::fma there.
 
 	// If x is zero and y is infinity, or if y is zero and x is infinity and Z is not NaN, then the result is NaN.
 	bool testCcmFmaZeroTimesInfinityIsNan		= std::isnan(ccm::fma(0.0, std::numeric_limits<double>::infinity(), 0.0));

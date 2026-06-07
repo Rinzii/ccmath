@@ -14,8 +14,6 @@
 #include <cmath>
 #include <limits>
 
-// TODO: add more tests for isfinite
-
 TEST(CcmathCompareTests, IsFinite)
 {
 	// test isfinite is static_assert-able

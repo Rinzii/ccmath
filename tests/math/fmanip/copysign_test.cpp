@@ -21,7 +21,5 @@ TEST(CcmathFmanipTests, Copysign)
 	ccm::test::ExpectSameAsStd(ccm::copysign(1.0, -2.0), std::copysign(1.0, -2.0));
 	ccm::test::ExpectSameAsStd(ccm::copysign(std::numeric_limits<double>::infinity(), -2.0), std::copysign(std::numeric_limits<double>::infinity(), -2.0));
 	ccm::test::ExpectFpEq(ccm::copysign(std::numeric_limits<double>::quiet_NaN(), -2.0), std::copysign(std::numeric_limits<double>::quiet_NaN(), -2.0));
-
-	// TODO: Add more tests
 }
 
