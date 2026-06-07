@@ -3,7 +3,7 @@
 # Copyright (c) CCMath contributors
 #
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-"""Load, validate, and annotate asmlab reports with CPU knowledge."""
+"""CPU notes attached to asmlab reports."""
 
 import json
 import re
@@ -200,7 +200,7 @@ def calibration_warnings(fn, arch, path_analysis=None, variant_dir=None,
                 "id": "call_boundary_thin_slice",
                 "message": (
                     "M1 powf_impl analyzed region is call-boundary-like. "
-                    "Do not use for C1 spill/static claims."),
+                    "Spill and static counts are not comparable to x86-64-v3 here."),
                 "confidence": "high",
                 "source": "asmlab_local_calibration",
                 "pattern_rule_id": "call_boundary_thin_slice",
@@ -283,9 +283,7 @@ def _calibration_summary(cal):
 
 def render_knowledge_md(annotation):
     lines = [
-        "## CPU knowledge (advisory)",
-        "",
-        "Annotations are heuristic and source-attributed. They do not prove performance.",
+        "## CPU notes",
         "",
     ]
     uarch = annotation.get("microarchitecture")
@@ -304,16 +302,12 @@ def render_knowledge_md(annotation):
         if cal.get("recommendation"):
             lines.append("- recommendation: %s" % cal["recommendation"])
     for w in annotation.get("warnings", []):
-        lines.append("- WARNING [%s]: %s" % (w.get("confidence", "?"), w.get("message")))
+        lines.append("- %s" % w.get("message"))
     patterns = annotation.get("matched_patterns") or []
     if patterns:
-        lines.append("- heuristic pattern matches (advisory, not proof):")
+        lines.append("- pattern matches:")
         for p in patterns:
-            lines.append("  - %s [%s/%s]: %s" % (
-                p.get("pattern_rule_id"),
-                p.get("match_kind", "heuristic"),
-                p.get("confidence"),
-                p.get("evidence")))
+            lines.append("  - %s: %s" % (p.get("pattern_rule_id"), p.get("evidence")))
     if annotation.get("kernel_exposed_heuristic") is False and patterns:
         lines.append("- note: kernel exposure heuristic is false for this artifact")
     if len(lines) <= 4:

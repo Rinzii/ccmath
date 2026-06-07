@@ -12,7 +12,7 @@
 # coverage from registry/accuracy_manifest.json.
 #
 #   simple   (default) native build + manifest-driven ctest
-#   rigorous            Linux MPFR campaign (set CCMATH_RIGOROUS_GATE to script path)
+#   rigorous            Linux MPFR campaign via tools/asmlab/rigorous_gate.sh
 #   all                 simple then rigorous
 #
 # Usage:
@@ -150,10 +150,10 @@ PY
 
 run_rigorous() {
     echo ">> accuracy gate: rigorous oracle campaign (MPFR + CORE-MATH, Docker)" >&2
-    local linux_script="${CCMATH_RIGOROUS_GATE:-}"
-    if [[ -z "${linux_script}" || ( ! -x "${linux_script}" && ! -f "${linux_script}" ) ]]; then
-        echo "rigorous gate needs CCMATH_RIGOROUS_GATE pointing at the Docker rigorous test script" >&2
-        echo "See CONTRIBUTING.md for the rigorous validation workflow." >&2
+    local linux_script="${CCMATH_RIGOROUS_GATE:-${project_root}/tools/asmlab/rigorous_gate.sh}"
+    if [[ ! -x "${linux_script}" && ! -f "${linux_script}" ]]; then
+        echo "rigorous gate needs tools/asmlab/rigorous_gate.sh or CCMATH_RIGOROUS_GATE" >&2
+        echo "See CONTRIBUTING.md for rigorous validation setup." >&2
         return 2
     fi
     local gate_key

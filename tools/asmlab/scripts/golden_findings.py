@@ -3,7 +3,7 @@
 # Copyright (c) CCMath contributors
 #
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-"""Extract, rank, and validate golden calibration findings (Horner vs Estrin)."""
+"""Golden Horner vs Estrin calibration checks."""
 
 import json
 import re
@@ -306,7 +306,7 @@ def validate_pair(pair_result, bench_result=None, pair_expected=None):
             f["id"] == "throughput_improved"
             for f in pair_result.get("ranked_findings", [])):
         pair_result.setdefault("ranked_findings", []).append(
-            _ranked("throughput_improved", "correlation",
+            _ranked("throughput_improved", "medium",
                       "benchmark favors estrin despite static model ambiguity"))
         pair_result["ranked_findings"].sort(key=lambda x: (x["priority"], x["id"]))
     pair_result["mca_prediction_correct"] = mca_pred

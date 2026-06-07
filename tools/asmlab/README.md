@@ -72,8 +72,8 @@ Profiles live in registry/benchmark_profiles.json. powf_impl uses the isolated
 bench under tools/asmlab/bench/. gate delegates to accuracy_gate.sh and
 registry/accuracy_manifest.json.
 
-Rigorous oracle campaigns need CCMATH_RIGOROUS_GATE set to your Docker rigorous
-test script. See CONTRIBUTING.md.
+Rigorous oracle campaigns run via tools/asmlab/rigorous_gate.sh (Docker).
+Set CCMATH_RIGOROUS_GATE to override the script path. See CONTRIBUTING.md.
 
 ## Registry
 
