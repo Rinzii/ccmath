@@ -1,31 +1,8 @@
-#!/usr/bin/env python3
-# Copyright (c) Ian Pike
-# Copyright (c) CCMath contributors
-#
-# CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
-# See LICENSE for more information.
-#
-# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-"""asmlab orchestrator: the single entry point for the assembly-optimization loop.
+"""CCMath asmlab: emit, score, and gate assembly changes for registered math functions.
 
 Subcommands:
-  list                          show registered functions and arches
-  emit   <fn> [--arch ...]      emit assembly variants
-  analyze <fn> [--arch ...]     score emitted variants with static cost models
-  verify <fn> [--arch ...]      constexpr check + emit + classify (no static model)
-  report <fn...> [--arch ...]   emit + analyze + write markdown and JSON reports
-  baseline <fn> [--arch ...]    snapshot current metrics as the comparison baseline
-  diff   <fn> [--arch ...]      compare current metrics against the saved baseline
-  gate   <fn> [--mode ...]      function-specific accuracy gate
-  bench  <fn> [--profile ...]   profile-specific benchmark (delegates to bench.sh)
-  validate <fn> [--arch ...]    report + gate + advisory bench
-  view   <fn> [--arch ...]      generate HTML source/assembly viewer
-  deep-analyze <fn> [--arch ...]  CFG, MCA, remarks, pressure, semantic passes
-  scenario list <fn>            list path scenarios for a function
-  scenario verify/report/...    emit and analyze one path scenario
-  variant scenario diff ...     compare original vs candidate on one scenario
-  knowledge validate            validate CPU knowledge JSON files
-  variant compare <fn>          multi-candidate scenario comparison and ranking
+  list, emit, check, analyze, verify, report, baseline, diff, gate, bench
+  scenario, variant, golden, view
 """
 
 import argparse
@@ -45,9 +22,6 @@ import analysis_pipeline as apipe_mod
 import analysis_diff as adiff_mod
 import scenario as scenario_mod
 import variant as variant_mod
-
-
-MATURITY_LEVEL = 4
 
 
 def emit_and_analyze(fn, arches, flags, compiler, analyze=True, source_map=False,
@@ -231,8 +205,7 @@ def build_report(fn, results, flags, compiler, constexpr_result, prov):
 
     report = {
         "function": fn,
-        "maturity_level": MATURITY_LEVEL,
-        "provenance": prov,
+        "run": prov,
         "expr": target["expr"],
         "includes": target["includes"],
         "intended_path": target.get("intended_path", ""),
@@ -240,18 +213,15 @@ def build_report(fn, results, flags, compiler, constexpr_result, prov):
         "constexpr_behavior": constexpr_result,
         "variants": results,
         "cpu_knowledge": cpu_by_arch,
-        "validation_tiers": ["codegen-supported", "static-analysis-supported"],
     }
 
     md = []
-    md.append("# asmlab report: `%s`" % fn)
+    md.append("# asmlab report: %s" % fn)
     md.append("")
-    md.append("- maturity level: %d (path verification + static model)" % MATURITY_LEVEL)
-    md.append("- generated: %s (commit `%s`%s, %s, -%s)" % (
+    md.append("- generated: %s (commit %s%s, %s, -%s)" % (
         prov["timestamp"], prov["git_commit"],
         ", dirty" if prov["git_dirty"] else "", compiler, flags))
-    md.append("- validation tiers: %s" % ", ".join(report["validation_tiers"]))
-    md.append("- expr: `%s`" % target["expr"])
+    md.append("- expr: %s" % target["expr"])
     md.append("")
     md.append("## Compile-time behavior")
     md.append("")
@@ -327,14 +297,14 @@ def write_report(fn, results, flags, compiler, constexpr_result=None):
     json_path = reports / ("%s.json" % fn)
     md_path.write_text("\n".join(md_lines) + "\n")
     json_path.write_text(json.dumps(report, indent=2) + "\n")
-    prov_mod.write_provenance(reports / ("%s.provenance.json" % fn), prov)
+    prov_mod.write_provenance(reports / ("%s.run.json" % fn), prov)
     return md_path
 
 
 def snapshot(results, prov=None, fn=None):
     snap = {"metrics": {}, "path_classification": {}}
     if prov:
-        snap["provenance"] = prov
+        snap["run"] = prov
     for arch, m in results.items():
         mca = m.get("llvm_mca", {})
         if "error" in mca:
@@ -380,6 +350,10 @@ def cmd_list(_args):
         local = "local" if C.arch_local_capable(a) else "docker"
         print("  %-16s %-5s %-6s %s" % (name, a["isa"], local, a["note"]))
     return 0
+
+
+def cmd_check(args):
+    return cmd_report(args)
 
 
 def cmd_report(args):
@@ -860,6 +834,9 @@ def main(argv=None):
         return extra
 
     sub.add_parser("list").set_defaults(func=cmd_list)
+    p_check = sub.add_parser("check", help="emit, analyze, and write report (preferred)")
+    add_common(p_check, many=True, source_map=True, deep=True)
+    p_check.set_defaults(func=cmd_check)
     p_emit = sub.add_parser("emit"); add_common(p_emit, source_map=True, deep=True)
     p_emit.set_defaults(func=lambda a: emit_mod.main(
         [a.fn, "--arch", a.arch, "--flags", a.flags, "--compiler", a.compiler] + deep_flags(a)))
