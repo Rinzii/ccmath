@@ -24,27 +24,18 @@ namespace ccm
 		template <typename T>
 		constexpr T floor_pos_impl(T num) noexcept
 		{
-			// Calculate the maximum value that can be compared with 'num' for equality.
+			// At or above 1/epsilon, num is already integral (or indistinguishable from one) in T.
 			constexpr auto max_comparable_val = T(1) / std::numeric_limits<T>::epsilon();
 
-			// If 'num' is greater than or equal to the maximum comparable value,
-			// it is already an integer or very close to one, return 'num'.
 			if (num >= max_comparable_val) { return num; }
 
-			// Initialize the result to 1, as it represents the smallest positive integer
-			// that is not less than 'num'.
 			T result = 1;
 
-			// Check if 'num' is equal to the initial result (1).
-			// If true, return 'num' as it is already an integer.
 			if (result == num) { return num; }
 
-			// If 'num' is greater than 1, loop until 'result' becomes greater than or equal to 'num'.
-			// This loop doubles the 'result' in each iteration until it surpasses 'num'.
+			// Bracket num by doubling from 1, then step down to the floor.
 			while (result < num) { result *= 2; }
 
-			// After the previous loop, 'result' might have become greater than 'num'.
-			// To get the largest integer not greater than 'num', decrement 'result' until it becomes less than or equal to 'num'.
 			while (result > num) { --result; }
 
 			return result;
@@ -53,19 +44,13 @@ namespace ccm
 		template <typename T>
 		constexpr T floor_neg_impl(T num) noexcept
 		{
-			// Initialize the result to -1, as it represents the largest integer not greater than 'num'.
 			T result = -1;
 
-			// If 'num' is less than -1, loop until 'result' becomes less than or equal to 'num'.
-			// This loop doubles the 'result' in each iteration until it becomes less than or equal to 'num'.
 			if (result > num)
 			{
+				// Bracket num by doubling from -1, then adjust to the largest integer not greater than num.
 				while (result > num) { result *= 2; }
-				// After the previous loop, 'result' might have become less than 'num'.
-				// To get the largest integer not greater than 'num' for negative numbers,
-				// increment 'result' until it becomes greater than or equal to 'num'.
 				while (result < num) { ++result; }
-				// If 'result' is not equal to 'num', decrement it to ensure it represents the largest integer not greater than 'num'.
 				if (result != num) { --result; }
 			}
 
