@@ -20,7 +20,7 @@ namespace ccm::gen
 	constexpr T frexp_gen(T x, int & exp)
 	{
 		if constexpr (std::is_same_v<T, float>) { return ccm::internal::impl::frexp_impl(x, exp); }
-		if constexpr (std::is_same_v<T, double>) { return ccm::internal::impl::frexp_impl(x, exp); }
-		return static_cast<T>(ccm::internal::impl::frexp_impl(static_cast<double>(x), exp));
+		else if constexpr (std::is_same_v<T, double>) { return ccm::internal::impl::frexp_impl(x, exp); }
+		else { return static_cast<T>(ccm::internal::impl::frexp_impl(static_cast<double>(x), exp)); }
 	}
 } // namespace ccm::gen

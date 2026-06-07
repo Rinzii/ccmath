@@ -20,11 +20,13 @@ namespace ccm::gen
 	constexpr T modf_gen(T x, T * iptr) noexcept
 	{
 		if constexpr (std::is_same_v<T, float>) { return internal::impl::modf_impl(x, iptr); }
-		if constexpr (std::is_same_v<T, double>) { return internal::impl::modf_impl(x, iptr); }
-
-		double integer_part{};
-		const double fractional = internal::impl::modf_impl(static_cast<double>(x), &integer_part);
-		*iptr					= static_cast<T>(integer_part);
-		return static_cast<T>(fractional);
+		else if constexpr (std::is_same_v<T, double>) { return internal::impl::modf_impl(x, iptr); }
+		else
+		{
+			double integer_part{};
+			const double fractional = internal::impl::modf_impl(static_cast<double>(x), &integer_part);
+			*iptr					= static_cast<T>(integer_part);
+			return static_cast<T>(fractional);
+		}
 	}
 } // namespace ccm::gen

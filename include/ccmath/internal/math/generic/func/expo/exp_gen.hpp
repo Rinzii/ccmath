@@ -21,8 +21,7 @@ namespace ccm::gen
 	constexpr T exp_gen(T num) noexcept
 	{
 		if constexpr (std::is_same_v<T, float>) { return ccm::internal::impl::exp_float_impl(num); }
-		if constexpr (std::is_same_v<T, double>) { return ccm::internal::impl::exp_double_impl(num); }
-		if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(ccm::internal::impl::exp_double_impl(static_cast<double>(num))); }
-		return static_cast<T>(ccm::internal::impl::exp_double_impl(static_cast<double>(num)));
+		else if constexpr (std::is_same_v<T, double>) { return ccm::internal::impl::exp_double_impl(num); }
+		else { return static_cast<T>(ccm::internal::impl::exp_double_impl(static_cast<double>(num))); }
 	}
 } // namespace ccm::gen

@@ -20,8 +20,7 @@ namespace ccm::gen
 	constexpr T expm1_gen(T num) noexcept
 	{
 		if constexpr (std::is_same_v<T, float>) { return ccm::internal::expm1_float(num); }
-		if constexpr (std::is_same_v<T, double>) { return ccm::internal::expm1_double(num); }
-		if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(ccm::internal::expm1_double(static_cast<double>(num))); }
-		return static_cast<T>(ccm::internal::expm1_double(static_cast<double>(num)));
+		else if constexpr (std::is_same_v<T, double>) { return ccm::internal::expm1_double(num); }
+		else { return static_cast<T>(ccm::internal::expm1_double(static_cast<double>(num))); }
 	}
 } // namespace ccm::gen
