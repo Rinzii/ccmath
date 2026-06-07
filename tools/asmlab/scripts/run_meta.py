@@ -114,4 +114,5 @@ def write_run_json(path, prov):
 
 
 def write_provenance(path, prov):
+    """Deprecated alias for write_run_json."""
     return write_run_json(path, prov)

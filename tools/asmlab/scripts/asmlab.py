@@ -15,7 +15,7 @@ import emit as emit_mod
 import analyze as analyze_mod
 import classify as classify_mod
 import constexpr_check as constexpr_mod
-import provenance as prov_mod
+import run_meta as prov_mod
 import asm_diff as asm_diff_mod
 import view as view_mod
 import analysis_pipeline as apipe_mod

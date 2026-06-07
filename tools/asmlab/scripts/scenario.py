@@ -18,7 +18,7 @@ import classify as classify_mod
 import analyze as analyze_mod
 import source_map as smod
 import asm_diff as adiff_mod
-import provenance as prov_mod
+import run_meta as prov_mod
 
 
 def _scenario_target(fn, scenario_rec):
