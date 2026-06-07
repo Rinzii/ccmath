@@ -56,11 +56,6 @@ option(CCMATH_TEST_DISABLE_FMA "Disable FMA pow kernel branches in validation bu
 # Request FMA-capable compilation for validation builds when supported.
 option(CCMATH_TEST_FORCE_FMA "Force FMA-capable compilation for validation builds" OFF)
 
-# CCMATH_ENABLE_REDUCED_PRECISION_POWL:
-# Allow incomplete powl tiers to delegate to the double pow_impl path.
-# Default OFF. Reduced-precision fallback must not be mistaken for native long-double support.
-option(CCMATH_ENABLE_REDUCED_PRECISION_POWL "Allow reduced-precision double fallback for incomplete powl tiers" OFF)
-
 # CCMATH_BUILD_BENCHMARKS:
 # Enable building of ccmath benchmarks. If OFF, benchmarks are skipped.
 option(CCMATH_BUILD_BENCHMARKS "Build ccmath benchmarks" OFF)
@@ -83,16 +78,13 @@ option(CCMATH_ENABLE_EXTENSIONS
         "Enable the extended ccmath library that adds additional methods beyond the standard"
         ${CCMATH_PROJECT_IS_TOP_LEVEL})
 
-# CCMATH_DISABLE_ERRNO:
-# Disable usage of errno during runtime breaking standard compliance, but may lead to faster evaluation and smaller binaries.
-option(CCMATH_DISABLE_ERRNO
-        "Disable the use of errno in ccmath during runtime (may lead to faster evaluations but is non-standard)"
-        OFF)
+include(cmake/config/BuildManifest.cmake)
+ccmath_manifest_declare_library_options()
 
-# CCMATH_ENABLE_RUNTIME_SIMD:
-# Enable runtime SIMD optimizations for faster evaluations at runtime.
-option(CCMATH_DISABLE_RUNTIME_SIMD
-        "Enable SIMD optimization for runtime evaluation (does not affect compile-time)"
+# CCMATH_REGISTER_HEADERS:
+# Register every header on the ccmath INTERFACE target for IDE visibility.
+option(CCMATH_REGISTER_HEADERS
+        "Register individual headers on the ccmath INTERFACE target for IDE visibility"
         OFF)
 
 # CCMATH_DISABLE_SVML_USAGE:

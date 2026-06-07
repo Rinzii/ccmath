@@ -127,6 +127,11 @@ set(CCMATH_VERSION_MINOR ${CMAKE_PROJECT_VERSION_MINOR})
 set(CCMATH_VERSION_PATCH ${CMAKE_PROJECT_VERSION_PATCH})
 configure_file("${PROJECT_SOURCE_DIR}/cmake/in/version.hpp.in" "${PROJECT_BINARY_DIR}/include/ccmath/version.hpp")
 
+if (CCMATH_PROJECT_IS_TOP_LEVEL)
+    include(cmake/config/EmitBuildManifest.cmake)
+    ccmath_setup_secondary_build_generation()
+endif ()
+
 
 # ----------------------------------------------------------------------
 # Installation Rules

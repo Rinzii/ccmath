@@ -12,7 +12,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0%20WITH%20LLVM--exception-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Discord](https://img.shields.io/discord/1286067628456284244?label=Discord)](https://discord.gg/p3mVxAbdmc)
 
-CCMath is a header-only library with a `<cmath>`-style API. The same entry points constexpr-evaluate where the standard and compiler allow, dispatch to portable runtime implementations elsewhere, and can use SIMD on selected functions when the target supports it. Standards behavior, cross-platform portability, and layered validation under one API.
+CCMath is a header-only library with a `<cmath>`-style API. The same entry points constexpr-evaluate where the standard and compiler allow, dispatch to portable runtime implementations elsewhere, and can use SIMD on selected functions when the target supports it.
 
 This README describes what CCMath is working toward. Some claims here reflect goals still in progress. See [STATUS.md](docs/STATUS.md) for current implementation status by module and function.
 
@@ -20,7 +20,7 @@ This README describes what CCMath is working toward. Some claims here reflect go
 
 ## Why CCMath?
 
-Most `<cmath>` alternatives optimize for one lane at a time.
+Most `<cmath>` implementations prioritize different tradeoffs. Few combine standards-oriented semantics, constexpr evaluation, full runtime paths, SIMD, and portable in-tree code.
 
 | Library | Standards-Oriented | Constexpr | Runtime | SIMD | Portable Implementation |
 |----------|----------|----------|----------|----------|----------|
@@ -31,7 +31,7 @@ Most `<cmath>` alternatives optimize for one lane at a time.
 | SLEEF | Partial | No | Yes | Yes | Yes |
 | CCMath | Yes | Yes | Yes | Yes | Yes |
 
-CCMath attempts to unify:
+CCMath targets:
 
 - Standards conformance
 - Compile-time evaluation
@@ -40,7 +40,7 @@ CCMath attempts to unify:
 - Numerical correctness
 - Cross-platform portability
 
-under a single API.
+These goals overlap with the comparison columns plus numerical validation. Per-function progress is tracked in [STATUS.md](docs/STATUS.md).
 
 ---
 
@@ -262,6 +262,51 @@ target_link_libraries(
 ```
 
 You may also vendor the headers directly.
+
+### Secondary build systems (Meson and Premake)
+
+CMake is the primary and authoritative build system. Meson and Premake support library consumption only (include paths, compile definitions, and the generated version header). Tests, benchmarks, fuzzing, and third-party dependencies remain CMake-only.
+
+After configuring CMake, regenerate the secondary build files:
+
+```bash
+cmake --preset ninja-clang-debug -DCCMATH_BUILD_TESTS=OFF -DCCMATH_BUILD_EXAMPLES=OFF
+cmake --build out/build/ninja/ninja-clang-debug --target ccmath-generate-secondary-builds
+```
+
+Meson smoke build from the generated tree:
+
+```bash
+meson setup build-meson-secondary out/build/ninja/ninja-clang-debug/gen-secondary
+meson compile -C build-meson-secondary
+```
+
+Premake smoke build from the generated tree:
+
+```bash
+cd out/build/ninja/ninja-clang-debug/gen-secondary
+premake5 gmake
+make -C ../premake-smoke config=debug
+```
+
+You can also use the root `meson.build` and `premake5.lua` entry points after regeneration. Library-facing options are declared once in `cmake/config/BuildManifest.cmake` and exported through `ccmath-build-manifest.json`.
+
+### Vendored integration testing
+
+[`integration/vendored-consumer`](integration/vendored-consumer) simulates an external project that vendors CCMath headers under `third_party/ccmath`. CI copies the public headers and generated `version.hpp`, then builds the consumer with CMake, Meson, and Premake.
+
+```bash
+cmake --preset ninja-clang-debug -DCCMATH_BUILD_TESTS=OFF -DCCMATH_BUILD_EXAMPLES=OFF
+bash tools/integration/prepare_vendored_tree.sh out/build/ninja/ninja-clang-debug
+
+cmake -S integration/vendored-consumer -B integration/vendored-consumer/build-cmake -G Ninja
+cmake --build integration/vendored-consumer/build-cmake
+
+meson setup integration/vendored-consumer/build-meson integration/vendored-consumer
+meson compile -C integration/vendored-consumer/build-meson
+
+cd integration/vendored-consumer && premake5 gmake && make config=debug
+```
 
 ---
 

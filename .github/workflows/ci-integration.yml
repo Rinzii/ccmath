@@ -1,0 +1,71 @@
+name: ci-integration
+
+on:
+  push:
+    tags-ignore:
+      - v*.*
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+permissions:
+  contents: read
+
+jobs:
+  vendored-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -yqq --no-install-recommends ninja-build meson premake5
+
+      - name: Configure CCMath with CMake
+        run: |
+          cmake --preset ninja-clang-debug \
+            -DCCMATH_BUILD_TESTS=OFF \
+            -DCCMATH_BUILD_EXAMPLES=OFF \
+            -DCCMATH_BUILD_BENCHMARKS=OFF
+
+      - name: Generate secondary build manifest
+        run: cmake --build out/build/ninja/ninja-clang-debug --target ccmath-generate-secondary-builds
+
+      - name: Verify secondary build markers
+        run: |
+          python3 tools/gen_secondary_builds.py \
+            --check \
+            --manifest out/build/ninja/ninja-clang-debug/ccmath-build-manifest.json \
+            --source-dir . \
+            --output-dir out/build/ninja/ninja-clang-debug/gen-secondary
+
+      - name: Prepare vendored CCMath tree
+        run: bash tools/integration/prepare_vendored_tree.sh out/build/ninja/ninja-clang-debug
+
+      - name: CMake vendored integration
+        working-directory: integration/vendored-consumer
+        run: |
+          cmake -B build-cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug
+          cmake --build build-cmake
+          ./build-cmake/vendored-ccmath-consumer
+
+      - name: Meson vendored integration
+        run: |
+          meson setup integration/vendored-consumer/build-meson integration/vendored-consumer
+          meson compile -C integration/vendored-consumer/build-meson
+          ./integration/vendored-consumer/build-meson/vendored-ccmath-consumer
+
+      - name: Premake vendored integration
+        working-directory: integration/vendored-consumer
+        run: |
+          premake5 gmake
+          make config=debug
+          ./bin/Debug/vendored-ccmath-consumer

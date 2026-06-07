@@ -90,3 +90,8 @@ fuzzing/minimize-crash-*
 tools/asmlab/refdata/*
 !tools/asmlab/refdata/.gitkeep
 
+# Premake generated artifacts at the repository root
+/Makefile
+/bin/
+/obj/
+
