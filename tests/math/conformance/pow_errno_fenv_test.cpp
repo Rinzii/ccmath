@@ -108,7 +108,7 @@ TEST(CcmathPowFenvTests, OverflowAndUnderflowFlagsMatchStdForPowPublicApi)
 
 TEST(CcmathPowFenvTests, SignalingNaNsRaiseInvalidLikeStdWhenObservable)
 {
-	if (!std::numeric_limits<double>::has_signaling_NaN || !std::numeric_limits<float>::has_signaling_NaN)
+	if constexpr (!std::numeric_limits<double>::has_signaling_NaN || !std::numeric_limits<float>::has_signaling_NaN)
 	{
 		GTEST_SKIP() << "signaling NaNs are not available on this platform";
 	}
