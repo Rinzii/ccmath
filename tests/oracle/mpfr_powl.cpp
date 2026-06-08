@@ -1,6 +1,8 @@
 #include "mpfr_pow_common.hpp"
 #include "oracle/powl_path_reporting.hpp"
 
+#include "ccmath/internal/config/type_support.hpp"
+
 #include <fstream>
 #include <iostream>
 
@@ -25,6 +27,7 @@ namespace
 		return cases;
 	}
 
+#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
 	std::vector<pow_case<long double>> build_ld80_special_cases()
 	{
 		std::vector<pow_case<long double>> cases;
@@ -73,6 +76,7 @@ namespace
 		}
 		return cases;
 	}
+#endif
 
 	enum class powl_case_disposition
 	{
