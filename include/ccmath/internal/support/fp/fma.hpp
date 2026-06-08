@@ -158,11 +158,9 @@ namespace ccm::support::fp
 			{
 				if (x_bits.is_signaling_nan() || y_bits.is_signaling_nan() || z_bits.is_signaling_nan()) { fenv::raise_except_if_required(FE_INVALID); }
 
-				// IEEE-754 fusedMultiplyAdd treats a 0*inf (or inf*0) product as an invalid operation
-				// even when the addend is a quiet NaN. std::fma and the native fma instruction signal
-				// it, so the software path matches them for consistency (7.2 leaves the quiet-NaN-addend
-				// case implementation defined; x and y are non-NaN when they form the 0*inf product).
-				if (CCM_UNLIKELY((x_bits.is_zero() && y_bits.is_inf()) || (x_bits.is_inf() && y_bits.is_zero())))
+				// When the addend is a quiet NaN, glibc std::fma does not raise FE_INVALID for an
+				// inf*0 product. Match that observable behavior here.
+				if (CCM_UNLIKELY(!z_bits.is_quiet_nan() && ((x_bits.is_zero() && y_bits.is_inf()) || (x_bits.is_inf() && y_bits.is_zero()))))
 				{
 					if (!is_constant_evaluated()) { fenv::set_errno_if_required(EDOM); }
 					fenv::raise_except_if_required(FE_INVALID);

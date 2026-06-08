@@ -324,12 +324,14 @@ int main(int argc, char ** argv)
 	{
 		reports.push_back(run_corpus("ld64_conservative", build_ld64_cases(), rounding_modes, format, precision, max_ulp, target_ulp));
 	}
+#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
 	else if constexpr (format == ccm::config::LongDoubleFormat::X87Extended)
 	{
 		reports.push_back(run_corpus("ld80_special_cases", build_ld80_special_cases(), rounding_modes, format, precision, max_ulp, target_ulp));
 		reports.push_back(run_corpus("ld80_bounded_integer", build_ld80_bounded_integer_cases(), rounding_modes, format, precision, max_ulp, target_ulp));
 		reports.push_back(run_corpus("ld80_general_finite", build_ld80_general_finite_cases(), rounding_modes, format, precision, max_ulp, target_ulp));
 	}
+#endif
 	else
 	{
 		std::cout << "powl MPFR harness: detection-only on format=" << ccm::config::long_double_format_name(format)
