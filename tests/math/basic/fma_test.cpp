@@ -82,8 +82,11 @@ TEST(CcmathBasicTests, FmaMatchesStdStructuredDoubleCases)
 {
 	for (const auto & input : ccm::test::samples::kFmaDoubleCases)
 	{
-		ccm::test::ExpectTernaryMatchesStd(
-			input.x, input.y, input.z, ccm::fma<double>, static_cast<double (*)(double, double, double)>(std::fma));
+		ccm::test::ExpectTernaryMatchesStd(input.x,
+										   input.y,
+										   input.z,
+										   static_cast<double (*)(double, double, double)>(ccm::fma),
+										   static_cast<double (*)(double, double, double)>(std::fma));
 	}
 }
 

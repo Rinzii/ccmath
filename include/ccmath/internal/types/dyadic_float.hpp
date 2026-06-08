@@ -789,7 +789,7 @@ namespace ccm::types
 		DblMant b = bf.mantissa;
 		DblMant q = qf.mantissa;
 		q <<= 2;
-		a <<= af.exponent - bf.exponent - qf.exponent + 2;
+		a <<= static_cast<std::size_t>(af.exponent - bf.exponent - qf.exponent + 2);
 		DblMant qb = q * b;
 		if (qb < a)
 		{

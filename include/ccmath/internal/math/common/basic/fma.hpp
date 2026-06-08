@@ -94,6 +94,19 @@ namespace ccm
 	 * @return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
 	 * calculated as a single ternary floating-point operation).
 	 */
+	constexpr double fma(double x, double y, double z) noexcept
+	{
+		return ccm::fma<double>(x, y, z);
+	}
+
+	/**
+	 * @brief Fused multiply-add operation.
+	 * @param x Floating-point value.
+	 * @param y Floating-point value.
+	 * @param z Floating-point value.
+	 * @return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
+	 * calculated as a single ternary floating-point operation).
+	 */
 	constexpr float fmaf(float x, float y, float z) noexcept
 	{
 		return ccm::fma<float>(x, y, z);
