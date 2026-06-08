@@ -28,9 +28,7 @@ namespace ccm::ext
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] constexpr T unlerp(T start, T end, T value) noexcept
-	{
-		return (value - start) / (end - start);
-	}
+	{ return (value - start) / (end - start); }
 
 	namespace safe
 	{

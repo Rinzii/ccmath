@@ -36,9 +36,7 @@ namespace ccm::ext
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] constexpr T remap(T src_start, T src_end, T dst_start, T dst_end, T x) noexcept
-	{
-		return dst_start + ((x - src_start) * (dst_end - dst_start)) / (src_end - src_start);
-	}
+	{ return dst_start + ((x - src_start) * (dst_end - dst_start)) / (src_end - src_start); }
 
 	namespace safe
 	{

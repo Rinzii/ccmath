@@ -23,7 +23,5 @@ namespace ccm::ext
 	 */
 	template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<std::remove_cv_t<T>, bool>, bool> = true>
 	[[nodiscard]] constexpr T abs_diff(T lhs, T rhs) noexcept
-	{
-		return lhs > rhs ? static_cast<T>(lhs - rhs) : static_cast<T>(rhs - lhs);
-	}
+	{ return lhs > rhs ? static_cast<T>(lhs - rhs) : static_cast<T>(rhs - lhs); }
 } // namespace ccm::ext

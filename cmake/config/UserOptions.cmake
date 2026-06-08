@@ -60,6 +60,18 @@ option(CCMATH_TEST_FORCE_FMA "Force FMA-capable compilation for validation build
 # Enable building of ccmath benchmarks. If OFF, benchmarks are skipped.
 option(CCMATH_BUILD_BENCHMARKS "Build ccmath benchmarks" OFF)
 
+# CCMATH_BUILD_SHOWCASE:
+# Build the external library comparison showcase (GCEM first, MPFR accuracy, gbench perf).
+option(CCMATH_BUILD_SHOWCASE "Build ccmath showcase comparisons" OFF)
+
+# CCMATH_SHOWCASE_ENABLE_GCEM:
+# Fetch and enable the GCEM backend in showcase targets.
+option(CCMATH_SHOWCASE_ENABLE_GCEM "Enable GCEM in showcase comparisons" ON)
+
+# CCMATH_SHOWCASE_ENABLE_MPFR:
+# Build MPFR-backed showcase accuracy executables when MPFR is available.
+option(CCMATH_SHOWCASE_ENABLE_MPFR "Enable MPFR accuracy in showcase comparisons" ON)
+
 # CCMATH_BUILD_FUZZING:
 # Build libFuzzer targets (Clang only). Couples fuzzer with ASan and UBSan.
 option(CCMATH_BUILD_FUZZING "Build libFuzzer fuzz targets (Clang only)" OFF)

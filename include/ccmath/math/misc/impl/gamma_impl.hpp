@@ -16,12 +16,8 @@
 namespace ccm::internal
 {
 	constexpr float gamma_float(float x) noexcept
-	{
-		return impl::gamma_float_impl(x);
-	}
+	{ return impl::gamma_float_impl(x); }
 
 	constexpr double gamma_double(double x) noexcept
-	{
-		return impl::gamma_double_impl(x);
-	}
+	{ return impl::gamma_double_impl(x); }
 } // namespace ccm::internal

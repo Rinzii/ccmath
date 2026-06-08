@@ -79,7 +79,10 @@ namespace ccm::types
 		constexpr explicit operator T() const
 		{
 			if constexpr (support::fp::get_fp_type<T>() == support::fp::FPType::eBinary80) { return convert_float80(); }
-			else { return convert_ieee(); }
+			else
+			{
+				return convert_ieee();
+			}
 		}
 
 	private:
@@ -102,7 +105,10 @@ namespace ccm::types
 			}
 
 			if constexpr (support::fp::get_fp_type<T>() == support::fp::FPType::eBinary80) { init_from_bits_float80(bits); }
-			else { init_from_bits_ieee(bits); }
+			else
+			{
+				init_from_bits_ieee(bits);
+			}
 		}
 
 		constexpr void init_from_bits_ieee(FPBits bits)
@@ -221,7 +227,10 @@ namespace ccm::types
 						result.set_biased_exponent(1);
 						result.set_implicit_bit(1);
 					}
-					else { result.set_implicit_bit(0); }
+					else
+					{
+						result.set_implicit_bit(0);
+					}
 					return result.get_val();
 				}
 				return result.get_val();

@@ -73,9 +73,7 @@ namespace ccm::builtin
 	 */
 	template <typename T>
 	constexpr auto isnormal(T x) -> std::enable_if_t<has_constexpr_isnormal<T>, bool>
-	{
-		return __builtin_isnormal(x);
-	}
+	{ return __builtin_isnormal(x); }
 } // namespace ccm::builtin
 
 // Cleanup the global namespace

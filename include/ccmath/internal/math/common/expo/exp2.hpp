@@ -33,7 +33,10 @@ namespace ccm
 	constexpr T exp2(T num)
 	{
 		if constexpr (ccm::builtin::has_constexpr_exp2<T>) { return ccm::builtin::exp2(num); }
-		else { return gen::exp2_gen(num); }
+		else
+		{
+			return gen::exp2_gen(num);
+		}
 	}
 
 	/**
@@ -44,9 +47,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double exp2(Integer num)
-	{
-		return ccm::exp2<double>(static_cast<double>(num));
-	}
+	{ return ccm::exp2<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Returns 2 raised to the given power (2^x)
@@ -54,9 +55,7 @@ namespace ccm
 	 * @return If no errors occur, the base-2 exponential of num (2^num) is returned as a float.
 	 */
 	constexpr float exp2f(float num)
-	{
-		return ccm::exp2<float>(num);
-	}
+	{ return ccm::exp2<float>(num); }
 
 	/**
 	 * @brief Returns 2 raised to the given power (2^x)
@@ -64,9 +63,7 @@ namespace ccm
 	 * @return If no errors occur, the base-2 exponential of num (2^num) is returned as a double.
 	 */
 	constexpr long double exp2l(long double num)
-	{
-		return ccm::exp2<long double>(num);
-	}
+	{ return ccm::exp2<long double>(num); }
 } // namespace ccm
 
 #if defined(_MSC_VER) && !defined(__clang__)

@@ -72,9 +72,7 @@ namespace ccm::builtin
 	 */
 	template <typename T>
 	constexpr auto isnan(T x) -> std::enable_if_t<has_constexpr_isnan<T>, bool>
-	{
-		return __builtin_isnan(x);
-	}
+	{ return __builtin_isnan(x); }
 } // namespace ccm::builtin
 
 // Cleanup the global namespace

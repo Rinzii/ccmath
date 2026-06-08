@@ -24,7 +24,5 @@ namespace ccm::ext
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] constexpr T saturate(T value) noexcept
-	{
-		return ext::clamp(value, T(0), T(1));
-	}
+	{ return ext::clamp(value, T(0), T(1)); }
 } // namespace ccm::ext

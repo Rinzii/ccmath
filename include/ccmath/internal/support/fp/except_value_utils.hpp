@@ -75,11 +75,17 @@ namespace ccm::support::fp
 					{
 					case FE_UPWARD:
 						if (sign) { out_bits += values[i].rnd_downward_offset; }
-						else { out_bits += values[i].rnd_upward_offset; }
+						else
+						{
+							out_bits += values[i].rnd_upward_offset;
+						}
 						break;
 					case FE_DOWNWARD:
 						if (sign) { out_bits += values[i].rnd_upward_offset; }
-						else { out_bits += values[i].rnd_downward_offset; }
+						else
+						{
+							out_bits += values[i].rnd_downward_offset;
+						}
 						break;
 					case FE_TONEAREST: out_bits += values[i].rnd_tonearest_offset; break;
 					default: break;

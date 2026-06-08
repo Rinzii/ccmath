@@ -52,9 +52,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double expm1(Integer num)
-	{
-		return ccm::expm1<double>(static_cast<double>(num));
-	}
+	{ return ccm::expm1<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Computes exp(num) - 1 for float.
@@ -63,9 +61,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/expm1
 	 */
 	constexpr float expm1f(float num)
-	{
-		return ccm::expm1<float>(num);
-	}
+	{ return ccm::expm1<float>(num); }
 
 	/**
 	 * @brief Computes exp(num) - 1 for long double.
@@ -74,7 +70,5 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/expm1
 	 */
 	constexpr long double expm1l(long double num)
-	{
-		return ccm::expm1<long double>(num);
-	}
+	{ return ccm::expm1<long double>(num); }
 } // namespace ccm

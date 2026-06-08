@@ -23,9 +23,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/nan
 	 */
 	constexpr double nan(const char * arg) noexcept
-	{
-		return internal::impl::nan_double_impl(arg);
-	}
+	{ return internal::impl::nan_double_impl(arg); }
 
 	/**
 	 * @brief not-a-number (NaN) function
@@ -34,9 +32,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/nan
 	 */
 	constexpr float nanf(const char * arg) noexcept
-	{
-		return internal::impl::nan_float_impl(arg);
-	}
+	{ return internal::impl::nan_float_impl(arg); }
 
 	/**
 	 * @brief not-a-number (NaN) function

@@ -288,14 +288,10 @@ namespace ccm::support::fp
 				using BASE::BASE;
 
 				friend constexpr Significand operator|(const Significand a, const Significand b)
-				{
-					return Significand(storage_type(a.to_storage_type() | b.to_storage_type()));
-				}
+				{ return Significand(storage_type(a.to_storage_type() | b.to_storage_type())); }
 
 				friend constexpr Significand operator^(const Significand a, const Significand b)
-				{
-					return Significand(storage_type(a.to_storage_type() ^ b.to_storage_type()));
-				}
+				{ return Significand(storage_type(a.to_storage_type() ^ b.to_storage_type())); }
 
 				friend constexpr Significand operator>>(const Significand a, int shift) { return Significand(storage_type(a.to_storage_type() >> shift)); }
 
@@ -336,9 +332,7 @@ namespace ccm::support::fp
 			/// Parts of the floating point number
 
 			[[nodiscard]] constexpr BiasedExponent biased_exponent() const
-			{
-				return BiasedExponent(static_cast<std::uint32_t>(exp_bits() >> significand_length));
-			}
+			{ return BiasedExponent(static_cast<std::uint32_t>(exp_bits() >> significand_length)); }
 
 			constexpr void set_biased_exponent(BiasedExponent biased) { bits = merge(bits, encode(biased), exponent_mask); }
 
@@ -388,9 +382,7 @@ namespace ccm::support::fp
 			static constexpr RetT min_subnormal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::subnormal(), Significand::lsb())); }
 
 			static constexpr RetT max_subnormal(types::Sign sign = types::Sign::POS)
-			{
-				return RetT(encode(sign, Exponent::subnormal(), Significand::bits_all_ones()));
-			}
+			{ return RetT(encode(sign, Exponent::subnormal(), Significand::bits_all_ones())); }
 
 			static constexpr RetT min_normal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::min(), Significand::zero())); }
 
@@ -399,14 +391,10 @@ namespace ccm::support::fp
 			static constexpr RetT inf(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::inf(), Significand::zero())); }
 
 			static constexpr RetT signaling_nan(types::Sign sign = types::Sign::POS, storage_type v = 0)
-			{
-				return RetT(encode(sign, Exponent::inf(), (v ? Significand(v) : (Significand::msb() >> 1))));
-			}
+			{ return RetT(encode(sign, Exponent::inf(), (v ? Significand(v) : (Significand::msb() >> 1)))); }
 
 			static constexpr RetT quiet_nan(types::Sign sign = types::Sign::POS, storage_type v = 0)
-			{
-				return RetT(encode(sign, Exponent::inf(), Significand::msb() | Significand(v)));
-			}
+			{ return RetT(encode(sign, Exponent::inf(), Significand::msb() | Significand(v))); }
 
 			/// Observer Functions
 
@@ -485,9 +473,7 @@ namespace ccm::support::fp
 			static constexpr RetT min_subnormal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::subnormal(), Significand::lsb())); }
 
 			static constexpr RetT max_subnormal(types::Sign sign = types::Sign::POS)
-			{
-				return RetT(encode(sign, Exponent::subnormal(), Significand::bits_all_ones() ^ Significand::msb()));
-			}
+			{ return RetT(encode(sign, Exponent::subnormal(), Significand::bits_all_ones() ^ Significand::msb())); }
 
 			static constexpr RetT min_normal(types::Sign sign = types::Sign::POS) { return RetT(encode(sign, Exponent::min(), Significand::msb())); }
 
@@ -502,9 +488,7 @@ namespace ccm::support::fp
 			}
 
 			static constexpr RetT quiet_nan(types::Sign sign = types::Sign::POS, storage_type v = 0)
-			{
-				return RetT(encode(sign, Exponent::inf(), Significand::msb() | (Significand::msb() >> 1) | Significand(v)));
-			}
+			{ return RetT(encode(sign, Exponent::inf(), Significand::msb() | (Significand::msb() >> 1) | Significand(v))); }
 
 			/// Observer Functions
 
@@ -540,9 +524,7 @@ namespace ccm::support::fp
 			}
 
 			[[nodiscard]] constexpr bool is_quiet_nan() const
-			{
-				return exp_sig_bits() >= encode(Exponent::inf(), Significand::msb() | (Significand::msb() >> 1));
-			}
+			{ return exp_sig_bits() >= encode(Exponent::inf(), Significand::msb() | (Significand::msb() >> 1)); }
 
 			[[nodiscard]] constexpr bool is_signaling_nan() const { return is_nan() && !is_quiet_nan(); }
 
@@ -691,14 +673,10 @@ namespace ccm::support::fp
 			[[nodiscard]] constexpr bool is_pos() const { return sign().is_pos(); }
 
 			[[nodiscard]] constexpr std::uint16_t get_biased_exponent() const
-			{
-				return static_cast<std::uint16_t>(static_cast<std::uint32_t>(BASE::biased_exponent()));
-			}
+			{ return static_cast<std::uint16_t>(static_cast<std::uint32_t>(BASE::biased_exponent())); }
 
 			constexpr void set_biased_exponent(storage_type biased)
-			{
-				BASE::set_biased_exponent(BiasedExponent(static_cast<std::uint32_t>(static_cast<std::int32_t>(biased))));
-			}
+			{ BASE::set_biased_exponent(BiasedExponent(static_cast<std::uint32_t>(static_cast<std::int32_t>(biased)))); }
 
 			[[nodiscard]] constexpr int get_exponent() const { return static_cast<std::int32_t>(Exponent(BASE::biased_exponent())); }
 
@@ -746,9 +724,7 @@ namespace ccm::support::fp
 			 *			This function will not check for its validity and assumes the caller has set it correctly.
 			 */
 			static constexpr RetT create_value(types::Sign sign, storage_type biased_exp, storage_type mantissa)
-			{
-				return RetT(encode(sign, BiasedExponent(static_cast<std::uint32_t>(biased_exp)), Significand(mantissa)));
-			}
+			{ return RetT(encode(sign, BiasedExponent(static_cast<std::uint32_t>(biased_exp)), Significand(mantissa))); }
 
 			/**
 			 * @brief Converts an integer number and unbiased exponent to a proper float type.
@@ -779,7 +755,10 @@ namespace ccm::support::fp
 					result.set_significand(number);
 					result.set_biased_exponent(expo + 1);
 				}
-				else { result.set_significand(number >> -expo); }
+				else
+				{
+					result.set_significand(number >> -expo);
+				}
 				return RetT(result.uintval());
 			}
 		};
@@ -818,7 +797,10 @@ namespace ccm::support::fp
 			else if constexpr (LDBL_MANT_DIG == 64) { return FPType::eBinary80; }	// long double is 80-bits
 			else if constexpr (LDBL_MANT_DIG == 113) { return FPType::eBinary128; } // long double is 128-bits
 		}
-		else { static_assert(support::always_false<UnqualT>, "Unsupported type"); }
+		else
+		{
+			static_assert(support::always_false<UnqualT>, "Unsupported type");
+		}
 		return FPType::eBinary32; // This will never be reached due to assert. Only here to appease the compiler.
 	}
 

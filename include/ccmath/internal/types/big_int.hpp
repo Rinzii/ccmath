@@ -119,9 +119,7 @@ namespace ccm::types
 		 */
 		template <typename T>
 		constexpr T lo(const DoubleWide<T>& value)
-		{
-			return value[0];
-		}
+		{ return value[0]; }
 
 		/**
 		 * @brief Returns the upper half of a DoubleWide value.
@@ -131,9 +129,7 @@ namespace ccm::types
 		 */
 		template <typename T>
 		constexpr T hi(const DoubleWide<T>& value)
-		{
-			return value[1];
-		}
+		{ return value[1]; }
 
 		/**
 		 * @brief Returns the lower half of a unsigned value
@@ -143,9 +139,7 @@ namespace ccm::types
 		 */
 		template <typename T>
 		constexpr half_width_t<T> lo(T value)
-		{
-			return lo(split<T>(value));
-		}
+		{ return lo(split<T>(value)); }
 
 		/**
 		 * @brief Returns the upper half of a unsigned value
@@ -155,9 +149,7 @@ namespace ccm::types
 		 */
 		template <typename T>
 		constexpr half_width_t<T> hi(T value)
-		{
-			return hi(split<T>(value));
-		}
+		{ return hi(split<T>(value)); }
 
 		/**
 		 * @brief Multiplies two words and returns the result as a DoubleWide containing the product.
@@ -282,9 +274,7 @@ namespace ccm::types
 		 */
 		template <typename word, std::size_t N, std::size_t M>
 		constexpr word add_with_carry(std::array<word, N>& dst, const std::array<word, M>& rhs)
-		{
-			return inplace_binop(ccm::support::add_with_carry<word>, dst, rhs);
-		}
+		{ return inplace_binop(ccm::support::add_with_carry<word>, dst, rhs); }
 
 		/**
 		 * @brief Performs in-place subtraction and returns the final borrow.
@@ -301,9 +291,7 @@ namespace ccm::types
 		 */
 		template <typename word, std::size_t N, std::size_t M>
 		constexpr word sub_with_borrow(std::array<word, N>& dst, const std::array<word, M>& rhs)
-		{
-			return inplace_binop(ccm::support::sub_with_borrow<word>, dst, rhs);
-		}
+		{ return inplace_binop(ccm::support::sub_with_borrow<word>, dst, rhs); }
 
 		/**
 		 * @brief Performs in-place multiply-add and returns the final carry.
@@ -320,9 +308,7 @@ namespace ccm::types
 		 */
 		template <typename word, std::size_t N>
 		constexpr word mul_add_with_carry(std::array<word, N>& dst, word b, word c)
-		{
-			return add_with_carry(dst, mul2(b, c));
-		}
+		{ return add_with_carry(dst, mul2(b, c)); }
 
 		/**
 		 * @brief An array of two elements used as an accumulator in multiword computations.
@@ -507,7 +493,10 @@ namespace ccm::types
 				using type = std::conditional_t<is_signed, __int128_t, __uint128_t>;
 				auto tmp   = ccm::support::bit_cast<type>(array);
 				if constexpr (direction == Direction::eLEFT) { tmp <<= offset; }
-				else { tmp >>= offset; }
+				else
+				{
+					tmp >>= offset;
+				}
 				return ccm::support::bit_cast<std::array<word, N>>(tmp);
 			}
 #endif
@@ -540,7 +529,10 @@ namespace ccm::types
 				word& dst		 = out[static_cast<std::size_t>(at(index))];
 				if (bit_offset == 0) { dst = part1; } // No crosstalk between parts.
 				else if constexpr (direction == Direction::eLEFT) { dst = (part1 << bit_offset) | (part2 >> (WORD_BITS - bit_offset)); }
-				else { dst = (part1 >> bit_offset) | (part2 << (WORD_BITS - bit_offset)); }
+				else
+				{
+					dst = (part1 >> bit_offset) | (part2 << (WORD_BITS - bit_offset));
+				}
 			}
 			return out;
 		}
@@ -735,7 +727,10 @@ namespace ccm::types
 				}
 				val[i] = static_cast<WordType>(v);
 				if constexpr (T_SIZE > WORD_SIZE) { v >>= WORD_SIZE; }
-				else { v = 0; }
+				else
+				{
+					v = 0;
+				}
 			}
 		}
 
@@ -790,9 +785,7 @@ namespace ccm::types
 
 		template <std::size_t OtherBits, bool OtherSigned, typename OtherWordType>
 		constexpr explicit operator BigInt<OtherBits, OtherSigned, OtherWordType>() const
-		{
-			return BigInt<OtherBits, OtherSigned, OtherWordType>(this);
-		}
+		{ return BigInt<OtherBits, OtherSigned, OtherWordType>(this); }
 
 		/**
 		 * @brief Converts the BigInt to another integral type.
@@ -804,9 +797,7 @@ namespace ccm::types
 		 */
 		template <typename T>
 		constexpr explicit operator T() const
-		{
-			return to<T>();
-		}
+		{ return to<T>(); }
 
 		/**
 		 * @brief Converts the BigInt to another integral type.
@@ -1027,7 +1018,10 @@ namespace ccm::types
 			if (CCM_UNLIKELY(divider == BigInt::one())) { return BigInt::zero(); }
 			Division result;
 			if constexpr (SIGNED) { result = divide_signed(*this, divider); }
-			else { result = divide_unsigned(*this, divider); }
+			else
+			{
+				result = divide_unsigned(*this, divider);
+			}
 			*this = result.quotient;
 			return result.remainder;
 		}
@@ -1116,7 +1110,10 @@ namespace ccm::types
 					rem %= x_word;
 					last_shift -= HALF_WORD_SIZE;
 				}
-				else { d >>= HALF_WORD_SIZE; } // Use the upper half-word of the current chunk only.
+				else
+				{
+					d >>= HALF_WORD_SIZE;
+				} // Use the upper half-word of the current chunk only.
 
 				if (last_shift > 0)
 				{
@@ -1137,9 +1134,15 @@ namespace ccm::types
 					if (pos < WORD_COUNT - 1) { remainder[pos + 1] = rem >> HALF_WORD_SIZE; }
 					remainder[pos] = (rem << HALF_WORD_SIZE) + (val[pos] & HALF_MASK);
 				}
-				else { remainder[pos] = rem; }
+				else
+				{
+					remainder[pos] = rem;
+				}
 			}
-			else { remainder[pos] = rem; }
+			else
+			{
+				remainder[pos] = rem;
+			}
 
 			// Set the remaining lower bits of the remainder.
 			for (; pos > 0; --pos) { remainder[pos - 1] = val[pos - 1]; }
@@ -1183,9 +1186,7 @@ namespace ccm::types
 
 		template <typename T>
 		constexpr BigInt operator<<(T s) const
-		{
-			return BigInt(multiword::shift<multiword::Direction::eLEFT, SIGNED>(val, s));
-		}
+		{ return BigInt(multiword::shift<multiword::Direction::eLEFT, SIGNED>(val, s)); }
 
 		constexpr BigInt& operator>>=(std::size_t s)
 		{
@@ -1202,7 +1203,7 @@ namespace ccm::types
 		for (std::size_t i = 0; i < WORD_COUNT; ++i) result[i] = lhs[i] OP rhs[i];                                                                             \
 		return result;                                                                                                                                         \
 	}                                                                                                                                                          \
-	friend constexpr BigInt operator OP##=(BigInt& lhs, const BigInt& rhs)                                                                                     \
+	friend constexpr BigInt operator OP## = (BigInt & lhs, const BigInt& rhs)                                                                                  \
 	{                                                                                                                                                          \
 		for (std::size_t i = 0; i < WORD_COUNT; ++i) lhs[i] OP## = rhs[i];                                                                                     \
 		return lhs;                                                                                                                                            \
@@ -1238,19 +1239,22 @@ namespace ccm::types
 
 		template <typename T>
 		friend constexpr bool operator==(const BigInt& lhs, T rhs)
-		{
-			return lhs == BigInt(rhs);
-		}
+		{ return lhs == BigInt(rhs); }
 
-		friend constexpr bool operator!=(const BigInt& lhs, const BigInt& rhs) { return !(lhs == rhs); }
+		friend constexpr bool operator!=(const BigInt& lhs, const BigInt& rhs)
+		{ return !(lhs == rhs); }
 
-		friend constexpr bool operator>(const BigInt& lhs, const BigInt& rhs) { return cmp(lhs, rhs) > 0; }
+		friend constexpr bool operator>(const BigInt& lhs, const BigInt& rhs)
+		{ return cmp(lhs, rhs) > 0; }
 
-		friend constexpr bool operator>=(const BigInt& lhs, const BigInt& rhs) { return cmp(lhs, rhs) >= 0; }
+		friend constexpr bool operator>=(const BigInt& lhs, const BigInt& rhs)
+		{ return cmp(lhs, rhs) >= 0; }
 
-		friend constexpr bool operator<(const BigInt& lhs, const BigInt& rhs) { return cmp(lhs, rhs) < 0; }
+		friend constexpr bool operator<(const BigInt& lhs, const BigInt& rhs)
+		{ return cmp(lhs, rhs) < 0; }
 
-		friend constexpr bool operator<=(const BigInt& lhs, const BigInt& rhs) { return cmp(lhs, rhs) <= 0; }
+		friend constexpr bool operator<=(const BigInt& lhs, const BigInt& rhs)
+		{ return cmp(lhs, rhs) <= 0; }
 
 		constexpr BigInt& operator++()
 		{
@@ -1278,9 +1282,11 @@ namespace ccm::types
 			return old_val;
 		}
 
-		constexpr const WordType& operator[](std::size_t i) const { return val[i]; }
+		constexpr const WordType& operator[](std::size_t i) const
+		{ return val[i]; }
 
-		constexpr WordType& operator[](std::size_t i) { return val.at(i); }
+		constexpr WordType& operator[](std::size_t i)
+		{ return val.at(i); }
 
 		[[nodiscard]] constexpr bool get_bit(std::size_t i) const
 		{
@@ -1325,9 +1331,11 @@ namespace ccm::types
 			increment();
 		}
 
-		constexpr void increment() { multiword::add_with_carry(val, std::array<WordType, 1>{ 1 }); }
+		constexpr void increment()
+		{ multiword::add_with_carry(val, std::array<WordType, 1>{ 1 }); }
 
-		constexpr void decrement() { multiword::sub_with_borrow(val, std::array<WordType, 1>{ 1 }); }
+		constexpr void decrement()
+		{ multiword::sub_with_borrow(val, std::array<WordType, 1>{ 1 }); }
 
 		constexpr void extend(std::size_t index, bool is_neg)
 		{
@@ -1335,11 +1343,14 @@ namespace ccm::types
 			for (std::size_t i = index; i < WORD_COUNT; ++i) { val[i] = value; }
 		}
 
-		[[nodiscard]] constexpr bool get_msb() const { return val.back() >> (WORD_SIZE - 1); }
+		[[nodiscard]] constexpr bool get_msb() const
+		{ return val.back() >> (WORD_SIZE - 1); }
 
-		constexpr void set_msb() { val.back() |= support::mask_leading_ones<WordType, 1>(); }
+		constexpr void set_msb()
+		{ val.back() |= support::mask_leading_ones<WordType, 1>(); }
 
-		constexpr void clear_msb() { val.back() &= support::mask_trailing_ones<WordType, WORD_SIZE - 1>(); }
+		constexpr void clear_msb()
+		{ val.back() &= support::mask_trailing_ones<WordType, WORD_SIZE - 1>(); }
 
 		constexpr static Division divide_unsigned(const BigInt& dividend, const BigInt& divider)
 		{
@@ -1560,9 +1571,7 @@ namespace ccm::support
 								   std::is_trivially_copyable_v<types::UInt<Bits>>,
 							   To>
 	bit_cast(const types::UInt<Bits>& from)
-	{
-		return support::bit_cast<To>(from.val);
-	}
+	{ return support::bit_cast<To>(from.val); }
 
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<types::is_big_int_v<T>, int> popcount(T value)
@@ -1590,33 +1599,23 @@ namespace ccm::support
 
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<types::is_big_int_v<T>, int> countr_zero(const T& value)
-	{
-		return types::multiword::countr_zero(value.val);
-	}
+	{ return types::multiword::countr_zero(value.val); }
 
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<types::is_big_int_v<T>, int> countl_zero(const T& value)
-	{
-		return types::multiword::countl_zero(value.val);
-	}
+	{ return types::multiword::countl_zero(value.val); }
 
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<types::is_big_int_v<T>, int> countl_one(T value)
-	{
-		return types::multiword::countl_one(value.val);
-	}
+	{ return types::multiword::countl_one(value.val); }
 
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<types::is_big_int_v<T>, int> countr_one(T value)
-	{
-		return types::multiword::countr_one(value.val);
-	}
+	{ return types::multiword::countr_one(value.val); }
 
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<types::is_big_int_v<T>, int> bit_width(T value)
-	{
-		return std::numeric_limits<T>::digits - support::countl_zero(value);
-	}
+	{ return std::numeric_limits<T>::digits - support::countl_zero(value); }
 
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<types::is_big_int_v<T>, T> rotr(T value, int rotate);
@@ -1667,45 +1666,31 @@ namespace ccm::support
 
 	template <typename T, size_t count>
 	constexpr std::enable_if_t<types::is_big_int_v<T>, T> mask_trailing_zeros()
-	{
-		return mask_leading_ones<T, T::BITS - count>();
-	}
+	{ return mask_leading_ones<T, T::BITS - count>(); }
 
 	template <typename T, std::size_t count>
 	constexpr std::enable_if_t<types::is_big_int_v<T>, T> mask_leading_zeros()
-	{
-		return mask_trailing_ones<T, T::BITS - count>();
-	}
+	{ return mask_trailing_ones<T, T::BITS - count>(); }
 
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<types::is_big_int_v<T>, int> count_zeros(T value)
-	{
-		return support::popcount(~value);
-	}
+	{ return support::popcount(~value); }
 
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<types::is_big_int_v<T>, int> first_leading_zero(T value)
-	{
-		return value == std::numeric_limits<T>::max() ? 0 : support::countl_one(value) + 1;
-	}
+	{ return value == std::numeric_limits<T>::max() ? 0 : support::countl_one(value) + 1; }
 
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<types::is_big_int_v<T>, int> first_leading_one(T value)
-	{
-		return first_leading_zero(~value);
-	}
+	{ return first_leading_zero(~value); }
 
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<types::is_big_int_v<T>, int> first_trailing_zero(T value)
-	{
-		return value == std::numeric_limits<T>::max() ? 0 : support::countr_zero(~value) + 1;
-	}
+	{ return value == std::numeric_limits<T>::max() ? 0 : support::countr_zero(~value) + 1; }
 
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<types::is_big_int_v<T>, int> first_trailing_one(T value)
-	{
-		return value == std::numeric_limits<T>::max() ? 0 : support::countr_zero(value) + 1;
-	}
+	{ return value == std::numeric_limits<T>::max() ? 0 : support::countr_zero(value) + 1; }
 } // namespace ccm::support
 
 #if defined(_MSC_VER) && !defined(__clang__)

@@ -40,9 +40,7 @@ namespace ccm
 
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T frexp(T x, int & exp)
-	{
-		return ccm::frexp(x, &exp);
-	}
+	{ return ccm::frexp(x, &exp); }
 
 	/**
 	 * @brief Decomposes a float into a normalized fraction and a base-2 exponent.
@@ -52,14 +50,10 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/frexp
 	 */
 	constexpr float frexpf(float x, int * exp)
-	{
-		return ccm::frexp(x, exp);
-	}
+	{ return ccm::frexp(x, exp); }
 
 	constexpr float frexpf(float x, int & exp)
-	{
-		return ccm::frexpf(x, &exp);
-	}
+	{ return ccm::frexpf(x, &exp); }
 
 	/**
 	 * @brief Decomposes a long double into a normalized fraction and a base-2 exponent.
@@ -69,12 +63,8 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/frexp
 	 */
 	constexpr long double frexpl(long double x, int * exp)
-	{
-		return ccm::frexp(x, exp);
-	}
+	{ return ccm::frexp(x, exp); }
 
 	constexpr long double frexpl(long double x, int & exp)
-	{
-		return ccm::frexpl(x, &exp);
-	}
+	{ return ccm::frexpl(x, &exp); }
 } // namespace ccm

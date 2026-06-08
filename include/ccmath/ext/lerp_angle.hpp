@@ -29,9 +29,7 @@ namespace ccm::ext
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] constexpr T lerp_angle(T start, T end, T t) noexcept
-	{
-		return start + (ext::delta_angle(start, end) * t);
-	}
+	{ return start + (ext::delta_angle(start, end) * t); }
 
 	namespace safe
 	{
@@ -48,8 +46,6 @@ namespace ccm::ext
 		 */
 		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 		[[nodiscard]] constexpr T lerp_angle(T start, T end, T t) noexcept
-		{
-			return start + (ext::safe::delta_angle(start, end) * t);
-		}
+		{ return start + (ext::safe::delta_angle(start, end) * t); }
 	} // namespace safe
 } // namespace ccm::ext

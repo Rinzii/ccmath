@@ -119,9 +119,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double ldexp(Integer num, int exp) noexcept
-	{
-		return ccm::ldexp<double>(static_cast<double>(num), exp);
-	}
+	{ return ccm::ldexp<double>(static_cast<double>(num), exp); }
 	/**
 	 * @brief Returns the floating-point remainder of the division operation x/y.
 	 * @note
@@ -130,9 +128,7 @@ namespace ccm
 	 * @return The result of parameter num multiplied by 2 to the power of parameter exp.
 	 */
 	constexpr float ldexpf(float num, int exp) noexcept
-	{
-		return ccm::ldexp<float>(num, exp);
-	}
+	{ return ccm::ldexp<float>(num, exp); }
 	/**
 	 * @brief Returns the floating-point remainder of the division operation x/y.
 	 * @note

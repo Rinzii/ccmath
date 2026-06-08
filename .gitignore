@@ -20,6 +20,8 @@ vcpkg_installed/
 pow-search-results.json
 powl-platform.json
 tests/rigorous/oracle_logs/
+showcase/reports/
+showcase/compile_time/probes/
 path-matrix-json*/
 POW_PROOF.*
 .cache

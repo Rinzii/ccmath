@@ -35,7 +35,10 @@ namespace ccm::support::fp
 		[[nodiscard]] constexpr bool int_is_zero(const Int& value)
 		{
 			if constexpr (std::is_integral_v<Int>) { return value == Int(0); }
-			else { return value.is_zero(); }
+			else
+			{
+				return value.is_zero();
+			}
 		}
 
 		template <typename Int>
@@ -50,7 +53,10 @@ namespace ccm::support::fp
 		{
 			if (index < 0) { return false; }
 			if constexpr (std::is_integral_v<Int>) { return ((value >> index) & Int(1)) != Int(0); }
-			else { return value.get_bit(static_cast<std::size_t>(index)); }
+			else
+			{
+				return value.get_bit(static_cast<std::size_t>(index));
+			}
 		}
 
 		template <typename Int>
@@ -145,9 +151,7 @@ namespace ccm::support::fp
 
 		template <typename T>
 		[[nodiscard]] constexpr T propagate_quiet_nan(const FPBits<T>& bits)
-		{
-			return FPBits<T>::quiet_nan(bits.sign(), bits.get_mantissa()).get_val();
-		}
+		{ return FPBits<T>::quiet_nan(bits.sign(), bits.get_mantissa()).get_val(); }
 
 		template <typename T, bool>
 		[[nodiscard]] constexpr bool special_case_fma(const FPBits<T>& x_bits, const FPBits<T>& y_bits, const FPBits<T>& z_bits, T& result)
@@ -228,7 +232,10 @@ namespace ccm::support::fp
 					if (product_sign != z_bits.sign()) { zero_sign = (fenv::get_rounding_mode() == FE_DOWNWARD) ? Sign::NEG : Sign::POS; }
 					result = FPBits<T>::zero(zero_sign).get_val();
 				}
-				else { result = z_bits.get_val(); }
+				else
+				{
+					result = z_bits.get_val();
+				}
 				return true;
 			}
 
@@ -613,7 +620,10 @@ namespace ccm::support::fp
 	{
 		if constexpr (std::is_same_v<T, float>) { return fma_internal::software_fmaf</*ShouldSignalExceptions=*/false>(x, y, z); }
 		else if constexpr (std::is_same_v<T, double>) { return fma_internal::fixed_fma<double, /*ShouldSignalExceptions=*/false>(x, y, z); }
-		else { return fma_internal::wide_fma<T, /*ShouldSignalExceptions=*/false>(x, y, z); }
+		else
+		{
+			return fma_internal::wide_fma<T, /*ShouldSignalExceptions=*/false>(x, y, z);
+		}
 	}
 
 	template <typename T>
@@ -621,7 +631,10 @@ namespace ccm::support::fp
 	{
 		if constexpr (std::is_same_v<T, float>) { return fma_internal::software_fmaf</*ShouldSignalExceptions=*/true>(x, y, z); }
 		else if constexpr (std::is_same_v<T, double>) { return fma_internal::fixed_fma<double, /*ShouldSignalExceptions=*/true>(x, y, z); }
-		else { return fma_internal::wide_fma<T, /*ShouldSignalExceptions=*/true>(x, y, z); }
+		else
+		{
+			return fma_internal::wide_fma<T, /*ShouldSignalExceptions=*/true>(x, y, z);
+		}
 	}
 
 	template <typename T>

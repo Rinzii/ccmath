@@ -28,7 +28,10 @@ namespace ccm
 	constexpr bool isgreaterequal(T x, T y) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_isgreaterequal<T>) { return ccm::builtin::isgreaterequal(x, y); }
-		else { return !ccm::isunordered(x, y) && (x >= y); }
+		else
+		{
+			return !ccm::isunordered(x, y) && (x >= y);
+		}
 	}
 
 	/**

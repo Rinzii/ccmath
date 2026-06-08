@@ -1,0 +1,191 @@
+#!/usr/bin/env bash
+# Copyright (c) Ian Pike
+# Copyright (c) CCMath contributors
+#
+# CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
+# See LICENSE for more information.
+#
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SHOWCASE="$ROOT/showcase"
+REPORTS="$SHOWCASE/reports"
+TOOLS="$SHOWCASE/tools"
+
+usage() {
+  cat <<EOF
+CCMath showcase runner
+
+Usage: showcase/run <command> [args]
+
+Setup
+  build              Configure and build showcase targets (CLion preset preferred)
+  doctor             Print build dir, binaries, and missing pieces
+
+Suite
+  all                Performance + accuracy + compile probes + summary
+  perf               All performance benches (JSON under showcase/reports/perf/)
+  accuracy           All accuracy campaigns
+  compile            Compile-time probes
+
+Performance
+  perf-sqrt          Benchmark sqrt (all backends and CCMath paths)
+  perf-sin           Benchmark sin
+
+Accuracy
+  accuracy-sqrt      MPFR campaign for sqrt (all paths + GCEM)
+  accuracy-sin       MPFR campaign for sin
+  accuracy-sqrt PATH Run one CCMath path (public_default, generic_gen, runtime_rt, ...)
+  accuracy-sin PATH  Same for sin
+
+Environment
+  CCMATH_SHOWCASE_BUILD_DIR   Override auto-detected build directory
+
+Examples
+  ./showcase/run build
+  ./showcase/run all
+  ./showcase/run accuracy-sqrt generic_gen
+  ./showcase/run perf-sqrt
+
+CLion: open Run configurations under showcase/item/ (grouped by feature).
+EOF
+}
+
+python_paths() {
+  python3 "$TOOLS/paths_cli.py" "$@"
+}
+
+require_build_dir() {
+  BUILD_DIR="$(python_paths build-dir)"
+  if [[ -z "$BUILD_DIR" ]]; then
+    echo "showcase: no build directory found. Run: ./showcase/run build" >&2
+    exit 1
+  fi
+}
+
+run_build() {
+  cd "$ROOT"
+  if cmake --list-presets configure 2>/dev/null | grep -q "$CLION_PRESET"; then
+    cmake --preset "$CLION_PRESET"
+    cmake --build --preset build-clion-clang-release-showcase
+    return
+  fi
+  cmake --preset ninja-clang-release-showcase
+  cmake --build --preset build-ninja-clang-release-showcase
+}
+
+run_doctor() {
+  python3 - "$ROOT" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(sys.argv[1]) / "showcase" / "tools"))
+import paths
+
+build_dir = paths.find_build_dir()
+print("build_dir:", build_dir or "(not found)")
+for name in ("showcase_bench_sqrt", "showcase_bench_sin", "showcase_accuracy"):
+    exe = paths.find_executable(build_dir, name) if build_dir else None
+    print(f"  {name}:", exe or "(missing)")
+gcem = paths.gcem_include_dir(build_dir)
+print("gcem_include:", gcem or "(missing)")
+PY
+}
+
+run_suite() {
+  local extra=()
+  case "${1:-all}" in
+    all) ;;
+    perf) extra+=(--skip-accuracy --skip-compile) ;;
+    accuracy) extra+=(--skip-perf --skip-compile) ;;
+    compile) extra+=(--skip-perf --skip-accuracy) ;;
+    *) echo "unknown suite mode: $1" >&2; exit 2 ;;
+  esac
+  require_build_dir
+  python3 "$TOOLS/showcase.py" --build-dir "$BUILD_DIR" "${extra[@]}"
+}
+
+run_perf() {
+  local fn="$1"
+  require_build_dir
+  mkdir -p "$REPORTS/perf"
+  local exe
+  exe="$(python_paths exe "showcase_bench_${fn}")"
+  "$exe" \
+    "--benchmark_out=$REPORTS/perf/${fn}.json" \
+    --benchmark_out_format=json
+}
+
+run_accuracy() {
+  local fn="$1"
+  local path="${2:-all}"
+  require_build_dir
+  mkdir -p "$REPORTS/accuracy"
+  local exe
+  exe="$(python_paths exe showcase_accuracy)"
+  local args=(--function="$fn" --log-output="$REPORTS/accuracy/${fn}.json")
+  if [[ "$path" != "all" ]]; then
+    args+=(--backend=ccmath --path="$path")
+  fi
+  "$exe" "${args[@]}"
+}
+
+run_compile() {
+  require_build_dir
+  local gcem
+  gcem="$(python_paths gcem-include || true)"
+  local args=(--function=all --json-out "$REPORTS/compile/compile.json")
+  if [[ -n "$gcem" ]]; then
+    args+=(--gcem-include "$gcem")
+  fi
+  python3 "$TOOLS/measure_compile.py" "${args[@]}"
+}
+
+CLION_PRESET="clion-clang-release-showcase"
+
+cmd="${1:-help}"
+shift || true
+
+case "$cmd" in
+  help|-h|--help|"")
+    usage
+    ;;
+  build)
+    run_build
+    ;;
+  doctor)
+    run_doctor
+    ;;
+  all)
+    run_suite all
+    ;;
+  perf)
+    run_suite perf
+    ;;
+  accuracy)
+    run_suite accuracy
+    ;;
+  compile)
+    run_compile
+    ;;
+  perf-sqrt)
+    run_perf sqrt
+    ;;
+  perf-sin)
+    run_perf sin
+    ;;
+  accuracy-sqrt)
+    run_accuracy sqrt "${1:-all}"
+    ;;
+  accuracy-sin)
+    run_accuracy sin "${1:-all}"
+    ;;
+  *)
+    echo "unknown command: $cmd" >&2
+    usage >&2
+    exit 2
+    ;;
+esac

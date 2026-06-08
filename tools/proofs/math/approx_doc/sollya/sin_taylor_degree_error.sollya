@@ -1,0 +1,52 @@
+// Degree-versus-error table for odd Taylor sine polynomials.
+
+prec = 220!;
+display = decimal!;
+rationalmode = off!;
+
+data_path = "tools/proofs/math/approx_doc/data/sin_taylor_degree_error.dat";
+
+I = [-pi / 2; pi / 2];
+sample_n = 4096!;
+
+print("script:", "sin_taylor_degree_error.sollya");
+version;
+print("interval:", I);
+print("sample fallback points:", sample_n + 1);
+
+print("degree", "abs_sup_error") > data_path;
+
+p = x;
+sup_abs = supnorm(p, sin(x), I, absolute, 1b-80);
+print("degree", 1, "source", "supnorm", "interval", sup_abs);
+print(1, sup(sup_abs)) >> data_path;
+
+p = x - x^3 / 6;
+sup_abs = supnorm(p, sin(x), I, absolute, 1b-80);
+print("degree", 3, "source", "supnorm", "interval", sup_abs);
+print(3, sup(sup_abs)) >> data_path;
+
+p = x - x^3 / 6 + x^5 / 120;
+sup_abs = supnorm(p, sin(x), I, absolute, 1b-80);
+print("degree", 5, "source", "supnorm", "interval", sup_abs);
+print(5, sup(sup_abs)) >> data_path;
+
+p = x - x^3 / 6 + x^5 / 120 - x^7 / 5040;
+sup_abs = supnorm(p, sin(x), I, absolute, 1b-80);
+print("degree", 7, "source", "supnorm", "interval", sup_abs);
+print(7, sup(sup_abs)) >> data_path;
+
+p = x - x^3 / 6 + x^5 / 120 - x^7 / 5040 + x^9 / 362880;
+sup_abs = supnorm(p, sin(x), I, absolute, 1b-80);
+print("degree", 9, "source", "supnorm", "interval", sup_abs);
+print(9, sup(sup_abs)) >> data_path;
+
+p = x - x^3 / 6 + x^5 / 120 - x^7 / 5040 + x^9 / 362880 - x^11 / 39916800;
+sup_abs = supnorm(p, sin(x), I, absolute, 1b-80);
+print("degree", 11, "source", "supnorm", "interval", sup_abs);
+print(11, sup(sup_abs)) >> data_path;
+
+p = x - x^3 / 6 + x^5 / 120 - x^7 / 5040 + x^9 / 362880 - x^11 / 39916800 + x^13 / 6227020800;
+sup_abs = supnorm(p, sin(x), I, absolute, 1b-80);
+print("degree", 13, "source", "supnorm", "interval", sup_abs);
+print(13, sup(sup_abs)) >> data_path;

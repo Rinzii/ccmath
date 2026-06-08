@@ -72,9 +72,7 @@ namespace ccm::builtin
 	 */
 	template <typename T>
 	constexpr auto isinf(T x) -> std::enable_if_t<has_constexpr_isinf<T>, bool>
-	{
-		return __builtin_isinf(x);
-	}
+	{ return __builtin_isinf(x); }
 } // namespace ccm::builtin
 
 // Cleanup the global namespace

@@ -18,7 +18,5 @@ namespace ccm::rt
 {
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] inline T frexp_rt(T num, int & exp) noexcept
-	{
-		return ccm::internal::impl::frexp_impl(num, exp);
-	}
+	{ return ccm::internal::impl::frexp_impl(num, exp); }
 } // namespace ccm::rt

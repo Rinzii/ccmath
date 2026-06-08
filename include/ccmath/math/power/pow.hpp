@@ -93,9 +93,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/pow
 	 */
 	constexpr float powf(float base, float exp)
-	{
-		return ccm::pow<float>(base, exp);
-	}
+	{ return ccm::pow<float>(base, exp); }
 
 	/**
 	 * @brief Raises long double inputs to a power.
@@ -105,7 +103,5 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/pow
 	 */
 	constexpr long double powl(long double base, long double exp)
-	{
-		return ccm::pow<long double>(base, exp);
-	}
+	{ return ccm::pow<long double>(base, exp); }
 } // namespace ccm

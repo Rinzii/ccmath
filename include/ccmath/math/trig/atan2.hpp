@@ -35,9 +35,15 @@ namespace ccm
 		{
 			if constexpr (std::is_same_v<T, float>) { return internal::impl::atan2_float(y, x); }
 			else if constexpr (std::is_same_v<T, double>) { return internal::impl::atan2_double(y, x); }
-			else { return static_cast<long double>(internal::impl::atan2_double(static_cast<double>(y), static_cast<double>(x))); }
+			else
+			{
+				return static_cast<long double>(internal::impl::atan2_double(static_cast<double>(y), static_cast<double>(x)));
+			}
 		}
-		else { return ccm::rt::atan2_rt(y, x); }
+		else
+		{
+			return ccm::rt::atan2_rt(y, x);
+		}
 	}
 
 	/**
@@ -48,9 +54,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/atan2
 	 */
 	constexpr float atan2f(float y, float x)
-	{
-		return ccm::atan2<float>(y, x);
-	}
+	{ return ccm::atan2<float>(y, x); }
 
 	/**
 	 * @brief Computes two-argument arc tangent for long double inputs.
@@ -60,9 +64,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/atan2
 	 */
 	constexpr long double atan2l(long double y, long double x)
-	{
-		return ccm::atan2<long double>(y, x);
-	}
+	{ return ccm::atan2<long double>(y, x); }
 } // namespace ccm
 
 /// @ingroup trig

@@ -115,8 +115,6 @@ namespace ccm
 		template <>
 		constexpr types::DoubleDouble
 		multiply_add<types::DoubleDouble>(const types::DoubleDouble & x, const types::DoubleDouble & y, const types::DoubleDouble & z)
-		{
-			return add(z, quick_mult(x, y));
-		}
+		{ return add(z, quick_mult(x, y)); }
 	} // namespace support
 } // namespace ccm

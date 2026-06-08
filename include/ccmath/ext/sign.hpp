@@ -22,7 +22,5 @@ namespace ccm::ext
 	 */
 	template <typename T, std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>, bool> = true>
 	[[nodiscard]] constexpr T sign(T value) noexcept
-	{
-		return static_cast<T>((T(0) < value) - (value < T(0)));
-	}
+	{ return static_cast<T>((T(0) < value) - (value < T(0))); }
 } // namespace ccm::ext

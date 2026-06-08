@@ -44,7 +44,10 @@ namespace ccm::rt
 		if constexpr (std::is_same_v<T, float>) { return __builtin_copysignf(x, y); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_copysign(x, y); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_copysignl(x, y); }
-		else { return static_cast<T>(__builtin_copysignl(static_cast<long double>(x), static_cast<long double>(y))); }
+		else
+		{
+			return static_cast<T>(__builtin_copysignl(static_cast<long double>(x), static_cast<long double>(y)));
+		}
 #else
 		return detail::copysign_scalar(x, y);
 #endif

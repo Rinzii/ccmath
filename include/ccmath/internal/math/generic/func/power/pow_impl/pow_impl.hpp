@@ -126,9 +126,7 @@ namespace ccm::gen::impl
 			}
 
 			constexpr DoubleDouble ipow(double base, std::uint64_t e) noexcept
-			{
-				return ipow(DoubleDouble{ base, 0.0 }, e);
-			}
+			{ return ipow(DoubleDouble{ base, 0.0 }, e); }
 
 			// sqrt(x) refined to a double-double via one Newton correction on a correctly
 			// rounded seed: x^(k + 1/2) = sqrt(x)^(2k + 1) is then exact integer exponentiation.
@@ -541,8 +539,6 @@ namespace ccm::gen::impl
 	} // namespace internal::impl
 
 	constexpr double pow_impl(double base, double exp) noexcept
-	{
-		return internal::impl::pow_impl(base, exp);
-	}
+	{ return internal::impl::pow_impl(base, exp); }
 
 } // namespace ccm::gen::impl

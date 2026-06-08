@@ -25,7 +25,10 @@ namespace ccm::gen
 		if constexpr (std::is_same_v<T, float>) { return impl::powf_impl(base, exp); }
 		else if constexpr (std::is_same_v<T, double>) { return impl::pow_impl(base, exp); }
 		else if constexpr (std::is_same_v<T, long double>) { return powl_gen(base, exp); }
-		else { return static_cast<T>(impl::pow_impl(static_cast<double>(base), static_cast<double>(exp))); }
+		else
+		{
+			return static_cast<T>(impl::pow_impl(static_cast<double>(base), static_cast<double>(exp)));
+		}
 	}
 
 } // namespace ccm::gen

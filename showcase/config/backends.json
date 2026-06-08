@@ -1,0 +1,20 @@
+{
+  "backends": {
+    "std": {
+      "kind": "runtime_baseline",
+      "accuracy": false,
+      "compile_probe": false
+    },
+    "ccmath": {
+      "kind": "ccmath_paths",
+      "accuracy": true,
+      "compile_probe": true
+    },
+    "gcem": {
+      "kind": "header_only",
+      "accuracy": true,
+      "compile_probe": true,
+      "cmake_target": "showcase::gcem"
+    }
+  }
+}

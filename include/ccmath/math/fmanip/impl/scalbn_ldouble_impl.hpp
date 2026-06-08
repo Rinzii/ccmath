@@ -75,12 +75,8 @@ namespace ccm::internal
 	} // namespace impl
 
 	constexpr long double scalbn_ldouble(long double num, int exp) noexcept
-	{
-		return impl::scalbn_ldouble_impl(num, exp);
-	}
+	{ return impl::scalbn_ldouble_impl(num, exp); }
 
 	constexpr long double scalbn_ldouble(long double num, long exp) noexcept
-	{
-		return impl::scalbn_ldouble_impl(num, static_cast<int>(exp));
-	}
+	{ return impl::scalbn_ldouble_impl(num, static_cast<int>(exp)); }
 } // namespace ccm::internal

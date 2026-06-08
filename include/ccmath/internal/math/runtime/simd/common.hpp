@@ -28,9 +28,7 @@ namespace ccm::intrin
 
 	template <class T>
 	CCM_GPU_HOST_DEVICE constexpr T const& choose(bool a, T const& b, T const& c)
-	{
-		return a ? b : c;
-	}
+	{ return a ? b : c; }
 
 	template <class T, class Abi>
 	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi>& operator+=(simd<T, Abi>& a, simd<T, Abi> const& b)
@@ -62,60 +60,40 @@ namespace ccm::intrin
 
 	template <class T, class Abi>
 	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> operator+(T const& a, simd<T, Abi> const& b)
-	{
-		return simd<T, Abi>(a) + b;
-	}
+	{ return simd<T, Abi>(a) + b; }
 
 	template <class T, class Abi>
 	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> operator+(simd<T, Abi> const& a, T const& b)
-	{
-		return a + simd<T, Abi>(b);
-	}
+	{ return a + simd<T, Abi>(b); }
 
 	template <class T, class Abi>
 	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> operator-(T const& a, simd<T, Abi> const& b)
-	{
-		return simd<T, Abi>(a) - b;
-	}
+	{ return simd<T, Abi>(a) - b; }
 
 	template <class T, class Abi>
 	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> operator-(simd<T, Abi> const& a, T const& b)
-	{
-		return a - simd<T, Abi>(b);
-	}
+	{ return a - simd<T, Abi>(b); }
 
 	template <class T, class Abi>
 	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> operator*(T const& a, simd<T, Abi> const& b)
-	{
-		return simd<T, Abi>(a) * b;
-	}
+	{ return simd<T, Abi>(a) * b; }
 
 	template <class T, class Abi>
 	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> operator*(simd<T, Abi> const& a, T const& b)
-	{
-		return a * simd<T, Abi>(b);
-	}
+	{ return a * simd<T, Abi>(b); }
 
 	template <class T, class Abi>
 	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> operator/(T const& a, simd<T, Abi> const& b)
-	{
-		return simd<T, Abi>(a) / b;
-	}
+	{ return simd<T, Abi>(a) / b; }
 
 	template <class T, class Abi>
 	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi> operator/(simd<T, Abi> const& a, T const& b)
-	{
-		return a / simd<T, Abi>(b);
-	}
+	{ return a / simd<T, Abi>(b); }
 
 	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE bool all_of(bool a)
-	{
-		return a;
-	}
+	{ return a; }
 	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE bool any_of(bool a)
-	{
-		return a;
-	}
+	{ return a; }
 
 	template <class T, class Abi>
 	struct simd_storage

@@ -26,7 +26,10 @@ namespace ccm::rt
 		if constexpr (std::is_same_v<T, float>) { return __builtin_ceilf(num); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_ceil(num); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_ceill(num); }
-		else { return static_cast<T>(__builtin_ceill(static_cast<long double>(num))); }
+		else
+		{
+			return static_cast<T>(__builtin_ceill(static_cast<long double>(num)));
+		}
 #else
 		return detail::ceil_scalar(num);
 #endif

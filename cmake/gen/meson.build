@@ -14,7 +14,7 @@ endif
 
 ccmath_inc = include_directories(
   '../../include',
-  '../../out/build/ninja/ninja-clang-debug/include',
+  '../../out/clang-rigorous-dev/include',
 )
 
 ccmath_dep = declare_dependency(

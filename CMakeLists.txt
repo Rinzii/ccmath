@@ -145,7 +145,7 @@ endif ()
 # Subdirectories for Examples, Benchmarks, and Tests
 # ----------------------------------------------------------------------
 # Only add these if the user explicitly asked for them in the options.
-if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TESTS)
+if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TESTS OR CCMATH_BUILD_SHOWCASE)
     # Use SYSTEM to suppress warnings from external code if supported by cmake
     if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
         add_subdirectory(thirdparty SYSTEM)
@@ -181,6 +181,14 @@ if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TESTS)
             add_subdirectory(tests)
         endif ()
         include(cmake/config/TestCtestTargets.cmake)
+    endif ()
+
+    if (CCMATH_BUILD_SHOWCASE)
+        if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
+            add_subdirectory(showcase SYSTEM)
+        else ()
+            add_subdirectory(showcase)
+        endif ()
     endif ()
 endif ()
 

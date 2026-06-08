@@ -18,7 +18,5 @@ namespace ccm::rt
 {
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] inline T fma_rt(T x, T y, T z) noexcept
-	{
-		return support::fp::dispatch_runtime_fma(x, y, z);
-	}
+	{ return support::fp::dispatch_runtime_fma(x, y, z); }
 } // namespace ccm::rt

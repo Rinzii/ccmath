@@ -24,14 +24,10 @@
 // The code will work fine, so ignore the warning it may emit.
 	#if defined(__clang__)
 		#define CCM_ASSUME(...)                                                                                                                                \
-			do {                                                                                                                                               \
-				__builtin_assume(__VA_ARGS__);                                                                                                                 \
-			} while (0)
+			do { __builtin_assume(__VA_ARGS__); } while (0)
 	#elif defined(_MSC_VER)
 		#define CCM_ASSUME(...)                                                                                                                                \
-			do {                                                                                                                                               \
-				__assume(__VA_ARGS__);                                                                                                                         \
-			} while (0)
+			do { __assume(__VA_ARGS__); } while (0)
 	#elif defined(__GNUC__)
 		#if __GNUC__ >= 13
 			#define CCM_ASSUME(...) __attribute__((__assume__(__VA_ARGS__)))

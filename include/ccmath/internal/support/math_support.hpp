@@ -173,23 +173,17 @@ namespace ccm::support
 	// Only unsigned types are allowed.
 	template <typename T, std::size_t count>
 	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_leading_ones()
-	{
-		return T(~mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>());
-	}
+	{ return T(~mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>()); }
 
 	// Only unsigned types are allowed.
 	template <typename T, std::size_t count>
 	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_trailing_zeros()
-	{
-		return mask_leading_ones<T, CHAR_BIT * sizeof(T) - count>();
-	}
+	{ return mask_leading_ones<T, CHAR_BIT * sizeof(T) - count>(); }
 
 	// Only unsigned types are allowed.
 	template <typename T, std::size_t count>
 	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_leading_zeros()
-	{
-		return mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>();
-	}
+	{ return mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>(); }
 
 	// TODO(IanP): Review whether these helpers should replace or merge with exact_add and split in double_double.hpp.
 	/**

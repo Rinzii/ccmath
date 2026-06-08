@@ -276,7 +276,10 @@ namespace ccm::types
 					underflow = true;
 					extra_fraction_len += 1 - FPBits::exponent_bias - unbiased_exp;
 				}
-				else { out_biased_exp = static_cast<StorageType>(unbiased_exp + FPBits::exponent_bias); }
+				else
+				{
+					out_biased_exp = static_cast<StorageType>(unbiased_exp + FPBits::exponent_bias);
+				}
 
 				const mantissa_type round_mask	= mantissa_type(1) << static_cast<std::size_t>(extra_fraction_len - 1);
 				round							= (mantissa & round_mask) != 0;
@@ -417,11 +420,11 @@ namespace ccm::types
 				// d_lo is denormal, but the output is normal.
 				int scale_up_exponent = 1 - exp_lo;
 				T scale_up_factor	  = support::fp::FPBits<T>::create_value(
-										Sign::POS, static_cast<output_bits_t>(support::fp::FPBits<T>::exponent_bias + scale_up_exponent), implicit_mask)
-										.get_val();
-				T scale_down_factor = support::fp::FPBits<T>::create_value(
-										  Sign::POS, static_cast<output_bits_t>(support::fp::FPBits<T>::exponent_bias - scale_up_exponent), implicit_mask)
-										  .get_val();
+											Sign::POS, static_cast<output_bits_t>(support::fp::FPBits<T>::exponent_bias + scale_up_exponent), implicit_mask)
+											.get_val();
+				T scale_down_factor	  = support::fp::FPBits<T>::create_value(
+											Sign::POS, static_cast<output_bits_t>(support::fp::FPBits<T>::exponent_bias - scale_up_exponent), implicit_mask)
+											.get_val();
 
 				d_lo = support::fp::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_lo + scale_up_exponent), implicit_mask).get_val();
 
@@ -483,9 +486,7 @@ namespace ccm::types
 				  bool ShouldSignalExceptions,
 				  typename = std::enable_if_t<std::is_floating_point_v<T> && (support::fp::FPBits<T>::fraction_length < Bits), void>>
 		constexpr T as() const
-		{
-			return fast_as<T, ShouldSignalExceptions>();
-		}
+		{ return fast_as<T, ShouldSignalExceptions>(); }
 
 		/**
 		 * @brief Explicitly converts this DyadicFloat to the floating-point type \p T,
@@ -502,9 +503,7 @@ namespace ccm::types
 		 */
 		template <typename T, typename = std::enable_if_t<std::is_floating_point_v<T> && (support::fp::FPBits<T>::fraction_length < Bits), void>>
 		explicit constexpr operator T() const
-		{
-			return as<T, false>();
-		}
+		{ return as<T, false>(); }
 
 		constexpr mantissa_type as_mantissa_type() const
 		{
@@ -536,7 +535,10 @@ namespace ccm::types
 				{
 					const std::size_t shift = static_cast<std::size_t>(-static_cast<std::int64_t>(exponent));
 					if (shift >= Bits) { new_mant = 0; }
-					else { new_mant >>= shift; }
+					else
+					{
+						new_mant >>= shift;
+					}
 					round_dir = rounding_direction(mantissa, shift, sign);
 					if (round_dir > 0) { ++new_mant; }
 				}
@@ -666,7 +668,10 @@ namespace ccm::types
 				result.shift_left(1);
 			}
 		}
-		else { result.mantissa = static_cast<typename DyadicFloat<Bits>::mantissa_type>(0); }
+		else
+		{
+			result.mantissa = static_cast<typename DyadicFloat<Bits>::mantissa_type>(0);
+		}
 		return result;
 	}
 
@@ -684,9 +689,7 @@ namespace ccm::types
 	 */
 	template <size_t Bits>
 	constexpr DyadicFloat<Bits> multiply_add(const DyadicFloat<Bits>& a, const DyadicFloat<Bits>& b, const DyadicFloat<Bits>& c)
-	{
-		return quick_add(c, quick_mul(a, b));
-	}
+	{ return quick_add(c, quick_mul(a, b)); }
 
 	/**
 	 * @brief Simple exponentiation implementation for printing or other use.
@@ -739,9 +742,7 @@ namespace ccm::types
 
 	template <size_t Bits>
 	constexpr DyadicFloat<Bits> quick_sub(DyadicFloat<Bits> a, DyadicFloat<Bits> b)
-	{
-		return quick_add(a, -b);
-	}
+	{ return quick_add(a, -b); }
 
 	template <size_t Bits>
 	constexpr DyadicFloat<Bits> rounded_mul(const DyadicFloat<Bits>& a, const DyadicFloat<Bits>& b)

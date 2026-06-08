@@ -22,6 +22,9 @@ namespace ccm::gen
 	{
 		if constexpr (std::is_same_v<T, float>) { return ccm::internal::log_float(num); }
 		else if constexpr (std::is_same_v<T, double>) { return ccm::internal::log_double(num); }
-		else { return static_cast<T>(ccm::internal::log_double(static_cast<double>(num))); }
+		else
+		{
+			return static_cast<T>(ccm::internal::log_double(static_cast<double>(num)));
+		}
 	}
 } // namespace ccm::gen

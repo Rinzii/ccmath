@@ -50,21 +50,15 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double tgamma(Integer num)
-	{
-		return ccm::tgamma<double>(static_cast<double>(num));
-	}
+	{ return ccm::tgamma<double>(static_cast<double>(num)); }
 
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T gamma(T num)
-	{
-		return ccm::tgamma(num);
-	}
+	{ return ccm::tgamma(num); }
 
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double gamma(Integer num)
-	{
-		return ccm::tgamma(num);
-	}
+	{ return ccm::tgamma(num); }
 
 	/**
 	 * @brief Computes the gamma function for float.
@@ -73,9 +67,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/tgamma
 	 */
 	constexpr float tgammaf(float num)
-	{
-		return ccm::tgamma<float>(num);
-	}
+	{ return ccm::tgamma<float>(num); }
 
 	/**
 	 * @brief Computes the gamma function for long double.
@@ -84,7 +76,5 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/tgamma
 	 */
 	constexpr long double tgammal(long double num)
-	{
-		return ccm::tgamma<long double>(num);
-	}
+	{ return ccm::tgamma<long double>(num); }
 } // namespace ccm

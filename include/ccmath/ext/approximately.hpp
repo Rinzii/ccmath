@@ -26,7 +26,5 @@ namespace ccm::ext
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] constexpr bool approximately(T lhs, T rhs, T epsilon) noexcept
-	{
-		return ccm::abs(lhs - rhs) <= epsilon;
-	}
+	{ return ccm::abs(lhs - rhs) <= epsilon; }
 } // namespace ccm::ext

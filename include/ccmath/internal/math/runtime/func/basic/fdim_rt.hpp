@@ -25,7 +25,10 @@ namespace ccm::rt
 		if constexpr (std::is_same_v<T, float>) { return __builtin_fdimf(x, y); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_fdim(x, y); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fdiml(x, y); }
-		else { return static_cast<T>(__builtin_fdiml(static_cast<long double>(x), static_cast<long double>(y))); }
+		else
+		{
+			return static_cast<T>(__builtin_fdiml(static_cast<long double>(x), static_cast<long double>(y)));
+		}
 #else
 		return gen::fdim(x, y);
 #endif

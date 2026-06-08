@@ -12,9 +12,9 @@ set(CCMATH_RE2_VERSION 2024-07-02)
 
 
 #
-# Fetch Google Benchmark if building benchmarks
+# Fetch Google Benchmark if building benchmarks or showcase
 #
-if (CCMATH_BUILD_BENCHMARKS)
+if (CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_SHOWCASE)
     # Disable benchmark’s own tests
     set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
 
@@ -117,6 +117,6 @@ if (CCMATH_BUILD_TESTS)
     endif ()
 endif ()
 
-if (CCMATH_BUILD_BENCHMARKS)
+if (CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_SHOWCASE)
     target_link_libraries(ccmath-ext INTERFACE benchmark::benchmark)
 endif ()

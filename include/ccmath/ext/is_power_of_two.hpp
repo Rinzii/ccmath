@@ -25,9 +25,7 @@ namespace ccm::ext
 	 */
 	template <typename T, std::enable_if_t<std::is_unsigned_v<T> && !std::is_same_v<T, bool>, bool> = true>
 	[[nodiscard]] constexpr bool is_power_of_two(T n) noexcept
-	{
-		return support::has_single_bit(n);
-	}
+	{ return support::has_single_bit(n); }
 
 	/**
 	 * @brief Determines if a signed integer value is a power of two.
@@ -41,9 +39,7 @@ namespace ccm::ext
 	 */
 	template <typename T, std::enable_if_t<std::is_signed_v<T> && !std::is_same_v<T, bool>, bool> = true>
 	[[nodiscard]] constexpr bool is_power_of_two(T n) noexcept
-	{
-		return n && !(n & (n - T(1)));
-	}
+	{ return n && !(n & (n - T(1))); }
 
 	/**
 	 * @brief Alias for is_power_of_two.
@@ -54,9 +50,7 @@ namespace ccm::ext
 	 */
 	template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<T, bool>, bool> = true>
 	[[nodiscard]] constexpr bool ispow2(T n) noexcept
-	{
-		return is_power_of_two(n);
-	}
+	{ return is_power_of_two(n); }
 
 	namespace safe
 	{
@@ -69,9 +63,7 @@ namespace ccm::ext
 		 */
 		template <typename T, std::enable_if_t<std::is_unsigned_v<T> && !std::is_same_v<T, bool>, bool> = true>
 		[[nodiscard]] constexpr bool is_power_of_two(T n) noexcept
-		{
-			return support::has_single_bit(n);
-		}
+		{ return support::has_single_bit(n); }
 
 		/**
 		 * @brief Safely determines if a signed integer value is a positive power of two.
@@ -97,8 +89,6 @@ namespace ccm::ext
 		 */
 		template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<T, bool>, bool> = true>
 		[[nodiscard]] constexpr bool ispow2(T n) noexcept
-		{
-			return safe::is_power_of_two(n);
-		}
+		{ return safe::is_power_of_two(n); }
 	} // namespace safe
 } // namespace ccm::ext

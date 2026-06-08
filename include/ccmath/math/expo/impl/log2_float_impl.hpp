@@ -81,7 +81,5 @@ namespace ccm::internal
 	} // namespace impl
 
 	constexpr float log2_float(float num) noexcept
-	{
-		return impl::log2_float_impl(num);
-	}
+	{ return impl::log2_float_impl(num); }
 } // namespace ccm::internal

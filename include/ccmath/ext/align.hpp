@@ -96,9 +96,7 @@ namespace ccm::ext
 	 */
 	template <typename T, std::size_t alignment, std::enable_if_t<std::is_integral_v<T>, bool> = true>
 	constexpr T align_up(T value) noexcept
-	{
-		return align<T, alignment, AR::Direction::eUP>(value);
-	}
+	{ return align<T, alignment, AR::Direction::eUP>(value); }
 
 	/**
 	 * @brief Aligns a value downward to the previous multiple of alignment.
@@ -110,7 +108,5 @@ namespace ccm::ext
 	 */
 	template <typename T, std::size_t alignment, std::enable_if_t<std::is_integral_v<T>, bool> = true>
 	constexpr T align_down(T value) noexcept
-	{
-		return align<T, alignment, AR::Direction::eDOWN>(value);
-	}
+	{ return align<T, alignment, AR::Direction::eDOWN>(value); }
 } // namespace ccm::ext

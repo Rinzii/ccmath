@@ -29,9 +29,7 @@ namespace ccm::ext
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] constexpr T inverse_lerp(T start, T end, T value) noexcept
-	{
-		return ext::unlerp(start, end, value);
-	}
+	{ return ext::unlerp(start, end, value); }
 
 	namespace safe
 	{
@@ -51,8 +49,6 @@ namespace ccm::ext
 		 */
 		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 		[[nodiscard]] constexpr T inverse_lerp(T start, T end, T value) noexcept
-		{
-			return ext::safe::unlerp(start, end, value);
-		}
+		{ return ext::safe::unlerp(start, end, value); }
 	} // namespace safe
 } // namespace ccm::ext

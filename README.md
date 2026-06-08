@@ -16,6 +16,8 @@ CCMath is a header-only library with a `<cmath>`-style API. The same entry point
 
 This README describes what CCMath is working toward. Some claims here reflect goals still in progress. See [STATUS.md](docs/STATUS.md) for current implementation status by module and function.
 
+For approximation-driven function work, see the implementation guide in [APPROXIMATING_FUNCTIONS.md](docs/APPROXIMATING_FUNCTIONS.md).
+
 ---
 
 ## Why CCMath?

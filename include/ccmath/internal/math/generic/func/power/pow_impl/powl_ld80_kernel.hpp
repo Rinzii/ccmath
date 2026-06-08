@@ -228,9 +228,9 @@ namespace ccm::gen::internal::impl::bit80
 
 			const int hm_i = static_cast<int>(hm);
 
-			const unsigned idx_y							= static_cast<unsigned>(hm_i) & 0x3fU;
-			const typename FPBits_t::storage_type exp2_hi_i = static_cast<typename FPBits_t::storage_type>(static_cast<std::int64_t>(hm_i >> 6))
-															  << FPBits_t::significand_length;
+			const unsigned idx_y								= static_cast<unsigned>(hm_i) & 0x3fU;
+			const typename FPBits_t::storage_type exp2_hi_i		= static_cast<typename FPBits_t::storage_type>(static_cast<std::int64_t>(hm_i >> 6))
+																  << FPBits_t::significand_length;
 			const typename FPBits_t::storage_type exp2_mid_hi_i = FPBits_t(tables::EXP2_HI.at(static_cast<std::size_t>(idx_y))).uintval();
 			const typename FPBits_t::storage_type exp2_mid_lo_i =
 				idx_y != 0U ? FPBits_t(tables::EXP2_MID.at(static_cast<std::size_t>(idx_y))).uintval() : typename FPBits_t::storage_type{};
@@ -272,7 +272,10 @@ namespace ccm::gen::internal::impl::bit80
 					support::fenv::raise_except_if_required(FE_UNDERFLOW);
 					final = 0.0L;
 				}
-				else { final = final_bits.abs().get_val(); }
+				else
+				{
+					final = final_bits.abs().get_val();
+				}
 			}
 			else if (scale_exp512 > 0 && final_bits.is_inf() && final_bits.is_pos())
 			{
@@ -292,9 +295,7 @@ namespace ccm::gen::internal::impl::bit80
 	} // namespace powl_ld80_detail
 
 	constexpr long double powl_ld80_general_finite(long double base, long double exp) noexcept
-	{
-		return powl_ld80_detail::powl_ld80_general_finite(base, exp);
-	}
+	{ return powl_ld80_detail::powl_ld80_general_finite(base, exp); }
 
 } // namespace ccm::gen::internal::impl::bit80
 

@@ -44,9 +44,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/ilogb
 	 */
 	constexpr int ilogbf(float num) noexcept
-	{
-		return ccm::ilogb(num);
-	}
+	{ return ccm::ilogb(num); }
 
 	/**
 	 * @brief Extracts the unbiased integer exponent of a long double.
@@ -55,7 +53,5 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/ilogb
 	 */
 	constexpr int ilogbl(long double num) noexcept
-	{
-		return ccm::ilogb(num);
-	}
+	{ return ccm::ilogb(num); }
 } // namespace ccm

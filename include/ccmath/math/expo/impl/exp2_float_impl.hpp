@@ -10,11 +10,11 @@
 
 #pragma once
 
-#include "ccmath/internal/support/fenv/fenv_support.hpp"
-#include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/support/fenv/fenv_support.hpp"
+#include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
 #include "ccmath/math/expo/impl/exp2_data.hpp"
 
@@ -79,7 +79,7 @@ namespace ccm::internal
 			ccm::double_t result{};
 
 			const auto input_as_double = static_cast<ccm::double_t>(x);
-			const auto x_bits		  = support::fp::FPBits<float>(x);
+			const auto x_bits		   = support::fp::FPBits<float>(x);
 
 			// If |x| >= 128 or x is NaN, then we need to handle the special case.
 			if (const std::uint32_t abs_top = sp::top12_bits_of_float(x) & 0x7ff; CCM_UNLIKELY(abs_top >= sp::top12_bits_of_float(128.0F)))
@@ -121,8 +121,6 @@ namespace ccm::internal
 	} // namespace impl
 
 	constexpr float exp2_float(float x)
-	{
-		return impl::exp2_float_impl(x);
-	}
+	{ return impl::exp2_float_impl(x); }
 } // namespace ccm::internal
 CCM_RESTORE_MSVC_WARNING()

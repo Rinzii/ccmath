@@ -1,0 +1,110 @@
+Warning: syntax error.
+The last symbol read has been "=".
+Will skip input until next semicolon after the unexpected token. May leak memory.
+Warning: syntax error.
+The last symbol read has been ",".
+Will skip input until next semicolon after the unexpected token. May leak memory.
+script: log2_core_points.sollya
+This is
+
+	sollya 8.0.
+
+Copyright 2006-2022 by
+
+   Laboratoire de l'Informatique du Parallelisme,
+   UMR CNRS - ENS Lyon - UCB Lyon 1 - INRIA 5668,
+
+   LORIA (CNRS, INPL, INRIA, UHP, U-Nancy 2),
+
+   Laboratoire d'Informatique de Paris 6, equipe PEQUAN,
+   UPMC Universite Paris 06 - CNRS - UMR 7606 - LIP6, Paris, France,
+
+   Laboratoire d'Informatique de Paris 6 - Équipe PEQUAN
+   Sorbonne Universités
+   UPMC Univ Paris 06
+   UMR 7606, LIP6
+   Boîte Courrier 169
+   4, place Jussieu
+   F-75252 Paris Cedex 05
+   France,
+
+   Sorbonne Université
+   CNRS, Laboratoire d'Informatique de Paris 6, LIP6
+   F - 75005 Paris
+   France,
+
+   CNRS, LIP6, UPMC
+   Sorbonne Universités, UPMC Univ Paris 06,
+   CNRS, LIP6 UMR 7606, 4 place Jussieu 75005 Paris,
+
+   University of Alaska Anchorage, College of Engineering
+
+and by
+
+   Centre de recherche INRIA Sophia Antipolis Mediterranee,
+   Equipes APICS, FACTAS,
+   Sophia Antipolis, France.
+
+All rights reserved.
+
+Contributors:
+   Ch. Lauter, 
+   S. Chevillard, 
+   M. Joldes, 
+   N. Jourdan, 
+   M. Mezzarobba, 
+   J. Benoit.
+ 
+License:
+   This software is governed by the CeCILL-C license under French law and
+   abiding by the rules of distribution of free software. You can use,
+   modify and/or redistribute the software under the terms of the CeCILL-C
+   license as circulated by CEA, CNRS and INRIA at the following URL
+   "http://www.cecill.info".
+
+   As a counterpart to the access to the source code and rights to copy,
+   modify and redistribute granted by the license, users are provided only
+   with a limited warranty and the software's author, the holder of the
+   economic rights, and the successive licensors have only limited
+   liability.
+
+   In this respect, the user's attention is drawn to the risks associated
+   with loading, using, modifying and/or developing or reproducing the
+   software by the user in light of its specific status of free software,
+   that may mean that it is complicated to manipulate, and that also
+   therefore means that it is reserved for developers and experienced
+   professionals having in-depth computer knowledge. Users are therefore
+   encouraged to load and test the software's suitability as regards their
+   requirements in conditions enabling the security of their systems and/or
+   data to be ensured and, more generally, to use and operate it in the
+   same conditions as regards security.
+
+   The fact that you are presently reading this means that you have had
+   knowledge of the CeCILL-C license and that you accept its terms.
+
+   This program is distributed WITHOUT ANY WARRANTY; without even the
+   implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+Send bug reports to <sollya-devl@lists.gforge.inria.fr>
+
+This build of sollya 8.0 is based on GMP 6.3.0, MPFR 4.2.2 and MPFI 1.5.4.
+It uses FPLLL as: "fplll.h lies directly in the include directory, linkage with -lfplll is compatible, -std option is passed (-std=c++11), using standard API."
+
+B: 16
+point set: exactly 1 just above 1 near a table boundary near the upper end bucket midpoint
+Warning: the identifier "p" is neither assigned to, nor bound to a library function nor external procedure, nor equal to the current free variable.
+Will interpret "p" as "x".
+point 0 x 1 table_index 0 reduced_u -3.030303030303027611580546363256871700286865234375e-2 approx 4.531239300399976879818911376660657592044928097924824233208931922867179765e-2 reference 0 abs_error 4.531239300399976879818911376660657592044928097924824233208931922867179765e-2
+Warning: the identifier "p" is neither assigned to, nor bound to a library function nor external procedure, nor equal to the current free variable.
+Will interpret "p" as "x".
+point 1 x 1.0000000000000002220446049250313080847263336181640625 table_index 0 reduced_u -3.03030303030300607998249302688700525644146816103756687229902819225024757e-2 approx 4.53123930039997557487357481082585474718539815110968685631920005452294257e-2 reference 3.20342650381491733033412103782929036433016910671678799905479504279133657e-16 abs_error 4.531239300399943540608536661652551405975019858206043554628132886642952022931495784306240427198996572034410642041733425307142133109141879352371910695e-2
+Warning: the identifier "p" is neither assigned to, nor bound to a library function nor external procedure, nor equal to the current free variable.
+Will interpret "p" as "x".
+point 2 x 1.0624999999990905052982270717620849609375 table_index 0 reduced_u 3.030303030214839737069203718066619827698793298350471436819475457014050335e-2 approx 4.531239300394632160151635052711330429623397216911804123355636209006711418e-2 reference 8.74628412491044684931595149329788440945320057512964682592146541033557849e-2 abs_error 4.215044824515814689164316440586553979829803358217842702565829201328867075e-2
+Warning: the identifier "p" is neither assigned to, nor bound to a library function nor external procedure, nor equal to the current free variable.
+Will interpret "p" as "x".
+point 3 x 1.99999904632568359375 table_index 15 reduced_u 1.5872531467013832496635162942755226112012678640894591808319091796875e-2 approx 0.977531860755087894720675022815368602650189582353988158907804736319550722 reference 0.9999993120692325332763306422424180101201651338085479373207669142855279674 abs_error 2.246745131414463855565561942704940746997555145455977841296217796597724515e-2
+Warning: the identifier "p" is neither assigned to, nor bound to a library function nor external procedure, nor equal to the current free variable.
+Will interpret "p" as "x".
+point 4 x 1.34375 table_index 5 reduced_u -1.387778780781445675529539585113525390625e-17 approx 0.426264754702097958905557290341925341268616812237617842642976183843066349 reference 0.426264754702097938884141640468067431968295186667548733625429710605173004 abs_error 2.002141564987385790930032162557006910901754647323789334502011458640182312e-17

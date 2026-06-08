@@ -178,6 +178,18 @@
       }
     },
     {
+      "name": "showcase",
+      "hidden": true,
+      "cacheVariables": {
+        "CCMATH_BUILD_SHOWCASE": "ON",
+        "CCMATH_BUILD_BENCHMARKS": "ON",
+        "CCMATH_BUILD_TESTS": "OFF",
+        "CCMATH_SHOWCASE_ENABLE_GCEM": "ON",
+        "CCMATH_SHOWCASE_ENABLE_MPFR": "ON",
+        "CCMATH_DESIRED_CXX_STANDARD": "cxx_std_20"
+      }
+    },
+    {
       "name": "rigorous-vcpkg",
       "hidden": true,
       "environment": {
@@ -256,6 +268,18 @@
       }
     },
     {
+      "name": "clion-clang-release-showcase",
+      "displayName": "CLion Clang Release + showcase",
+      "inherits": [
+        "base-clion",
+        "clang",
+        "Release",
+        "showcase"
+      ],
+      "binaryDir": "${sourceDir}/out/clang-showcase",
+      "description": "Single-config Release showcase comparisons for CLion"
+    },
+    {
       "name": "ninja-clang-debug-rigorous-dev",
       "inherits": [
         "base",
@@ -310,6 +334,16 @@
         "rigorous-coremath"
       ],
       "description": "Ninja Multi-config + Clang (Release) for rigorous validation"
+    },
+    {
+      "name": "ninja-clang-release-showcase",
+      "inherits": [
+        "base",
+        "clang",
+        "Release",
+        "showcase"
+      ],
+      "description": "Ninja Multi-config + Clang (Release) for library showcase comparisons"
     },
     {
       "name": "ninja-gcc-release-rigorous",
@@ -450,6 +484,15 @@
       ]
     },
     {
+      "name": "build-clion-clang-release-showcase",
+      "configurePreset": "clion-clang-release-showcase",
+      "targets": [
+        "showcase_bench_sqrt",
+        "showcase_bench_sin",
+        "showcase_accuracy"
+      ]
+    },
+    {
       "name": "build-ninja-clang-debug-rigorous-dev",
       "configurePreset": "ninja-clang-debug-rigorous-dev",
       "configuration": "Debug",
@@ -487,6 +530,16 @@
       "configuration": "Release",
       "targets": [
         "all"
+      ]
+    },
+    {
+      "name": "build-ninja-clang-release-showcase",
+      "configurePreset": "ninja-clang-release-showcase",
+      "configuration": "Release",
+      "targets": [
+        "showcase_bench_sqrt",
+        "showcase_bench_sin",
+        "showcase_accuracy"
       ]
     },
     {
@@ -769,6 +822,21 @@
         {
           "type": "test",
           "name": "test-clion-clang-debug-rigorous-dev"
+        }
+      ]
+    },
+    {
+      "name": "workflow-clion-clang-release-showcase",
+      "displayName": "CLion showcase",
+      "description": "Configure and build showcase comparison targets for CLion",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "clion-clang-release-showcase"
+        },
+        {
+          "type": "build",
+          "name": "build-clion-clang-release-showcase"
         }
       ]
     },

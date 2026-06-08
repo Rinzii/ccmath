@@ -114,7 +114,10 @@ namespace ccm::support::fp
 				if (truncated_value_is_odd) { return is_neg ? truncated_value - T(1.0) : truncated_value + T(1.0); }
 				return truncated_value;
 			}
-			else { return truncated_value; }
+			else
+			{
+				return truncated_value;
+			}
 		}
 	}
 

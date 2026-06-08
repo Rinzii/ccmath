@@ -21,16 +21,15 @@ namespace ccm
 	constexpr T frexp(T x, int & exp)
 	{
 		if constexpr (ccm::builtin::has_constexpr_frexp<T>) { return ccm::builtin::frexp(x, &exp); }
-		else { return gen::frexp_gen(x, exp); }
+		else
+		{
+			return gen::frexp_gen(x, exp);
+		}
 	}
 
 	constexpr float frexpf(float x, int & exp)
-	{
-		return ccm::frexp(x, exp);
-	}
+	{ return ccm::frexp(x, exp); }
 
 	constexpr long double frexpl(long double x, int & exp)
-	{
-		return ccm::frexp(x, exp);
-	}
+	{ return ccm::frexp(x, exp); }
 } // namespace ccm
