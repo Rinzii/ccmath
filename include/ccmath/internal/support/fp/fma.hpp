@@ -159,8 +159,12 @@ namespace ccm::support::fp
 				if (x_bits.is_signaling_nan() || y_bits.is_signaling_nan() || z_bits.is_signaling_nan()) { fenv::raise_except_if_required(FE_INVALID); }
 
 				// When the addend is a quiet NaN, glibc std::fma does not raise FE_INVALID for an
-				// inf*0 product. Match that observable behavior here.
+				// inf*0 product. Apple libm does. Match the platform libm observable behavior.
+#if defined(__APPLE__)
+				if (CCM_UNLIKELY((x_bits.is_zero() && y_bits.is_inf()) || (x_bits.is_inf() && y_bits.is_zero())))
+#else
 				if (CCM_UNLIKELY(!z_bits.is_quiet_nan() && ((x_bits.is_zero() && y_bits.is_inf()) || (x_bits.is_inf() && y_bits.is_zero()))))
+#endif
 				{
 					if (!is_constant_evaluated()) { fenv::set_errno_if_required(EDOM); }
 					fenv::raise_except_if_required(FE_INVALID);

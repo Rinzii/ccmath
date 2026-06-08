@@ -14,6 +14,8 @@
 #include "ccmath/internal/support/poly_eval.hpp"
 #include "ccmath/internal/types/double_double.hpp"
 #include "ccmath/internal/types/triple_double.hpp"
+#include "ccmath/math/expo/impl/exp2_double_impl.hpp"
+#include "ccmath/math/expo/impl/exp2_float_impl.hpp"
 #include "ccmath/math/expo/log2.hpp"
 
 #include <array>
@@ -75,19 +77,19 @@ namespace ccm::support::helpers
 			return p;
 		}
 
-		constexpr double exp10_double_impl([[maybe_unused]] double exp) noexcept
+		constexpr double exp10_double_impl(double exp) noexcept
 		{
-			return 0;
+			return ccm::internal::exp2_double(exp * LOG2_10);
 		}
 
-		constexpr double exp10_double_double_impl([[maybe_unused]] double exp) noexcept
+		constexpr double exp10_double_double_impl(double exp) noexcept
 		{
-			return 0;
+			return exp10_double_impl(exp);
 		}
 
-		constexpr float exp10_float_impl([[maybe_unused]] float exp) noexcept
+		constexpr float exp10_float_impl(float exp) noexcept
 		{
-			return 0;
+			return ccm::internal::exp2_float(static_cast<float>(static_cast<double>(exp) * LOG2_10));
 		}
 	} // namespace impl
 
