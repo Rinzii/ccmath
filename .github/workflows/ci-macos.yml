@@ -25,7 +25,6 @@ jobs:
         run: bash tools/ensure_format.sh
 
   build-cxx17:
-    needs: format
     runs-on: macos-latest
     strategy:
       fail-fast: true

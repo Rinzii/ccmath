@@ -26,7 +26,6 @@ jobs:
         shell: bash
 
   build-cxx17:
-    needs: format
     runs-on: windows-latest
     strategy:
       fail-fast: true
