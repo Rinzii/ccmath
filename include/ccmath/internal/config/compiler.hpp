@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 /// MSVC
 #if defined(_MSC_VER) && !defined(__clang__) && !defined(CCMATH_COMPILER_MSVC)
 	#define CCMATH_COMPILER_MSVC

@@ -1,5 +1,3 @@
-#include "ccmath/internal/config/powl_policy.hpp"
-#include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
 #include "mpfr_pow_common.hpp"
 #include "oracle/powl_path_reporting.hpp"
 
