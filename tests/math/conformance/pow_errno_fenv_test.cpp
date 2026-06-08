@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 
+#include <array>
 #include <cerrno>
 #include <cmath>
 #include <limits>
@@ -100,6 +101,30 @@ TEST(CcmathPowFenvTests, OverflowAndUnderflowFlagsMatchStdForPowPublicApi)
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::powf(runtime_value(2.0F), runtime_value(-150.0F))); },
 									   [] { consume(std::pow(runtime_value(2.0F), runtime_value(-150.0F))); },
 									   FE_UNDERFLOW);
+}
+
+TEST(CcmathPowFenvTests, GenericPowfBaseTwoMatchesStdAtRangeThresholdsAllModes)
+{
+	constexpr std::array<float, 5> kExponents = { 128.0F, 129.0F, -150.0F, -151.0F, -152.0F };
+
+	ccm::test::ForEachRoundingModeOrSkip(
+		[&](int mode)
+		{
+			ccm::test::ScopedRoundingMode scope(mode);
+			ASSERT_TRUE(scope.active());
+
+			for (float exponent_value : kExponents)
+			{
+				SCOPED_TRACE(exponent_value);
+
+				const float base	   = runtime_value(2.0F);
+				const float exponent = runtime_value(exponent_value);
+				const float actual   = invoke_powf_gen(base, exponent);
+				const float expected = static_cast<float>(std::pow(base, exponent));
+
+				ccm::test::ExpectFpEq(actual, expected);
+			}
+		});
 }
 
 TEST(CcmathPowFenvTests, SignalingNaNsRaiseInvalidLikeStdWhenObservable)
