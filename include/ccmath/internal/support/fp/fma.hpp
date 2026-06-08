@@ -35,10 +35,7 @@ namespace ccm::support::fp
 		[[nodiscard]] constexpr bool int_is_zero(const Int& value)
 		{
 			if constexpr (std::is_integral_v<Int>) { return value == Int(0); }
-			else
-			{
-				return value.is_zero();
-			}
+			else { return value.is_zero(); }
 		}
 
 		template <typename Int>
@@ -53,10 +50,7 @@ namespace ccm::support::fp
 		{
 			if (index < 0) { return false; }
 			if constexpr (std::is_integral_v<Int>) { return ((value >> index) & Int(1)) != Int(0); }
-			else
-			{
-				return value.get_bit(static_cast<std::size_t>(index));
-			}
+			else { return value.get_bit(static_cast<std::size_t>(index)); }
 		}
 
 		template <typename Int>
@@ -68,8 +62,8 @@ namespace ccm::support::fp
 
 			if constexpr (std::is_integral_v<Int>)
 			{
-				const Int mask = (Int{1} << bit_count) - Int{1};
-				return (value & mask) != Int{0};
+				const Int mask = (Int{ 1 } << bit_count) - Int{ 1 };
+				return (value & mask) != Int{ 0 };
 			}
 			else
 			{
@@ -89,7 +83,7 @@ namespace ccm::support::fp
 			constexpr int DIGITS = std::numeric_limits<Int>::digits;
 			if (shift_length >= DIGITS)
 			{
-				value = Int{0};
+				value = Int{ 0 };
 				return true;
 			}
 
@@ -149,7 +143,9 @@ namespace ccm::support::fp
 
 		template <typename T>
 		[[nodiscard]] constexpr T propagate_quiet_nan(const FPBits<T>& bits)
-		{ return FPBits<T>::quiet_nan(bits.sign(), bits.get_mantissa()).get_val(); }
+		{
+			return FPBits<T>::quiet_nan(bits.sign(), bits.get_mantissa()).get_val();
+		}
 
 		template <typename T, bool>
 		[[nodiscard]] constexpr bool special_case_fma(const FPBits<T>& x_bits, const FPBits<T>& y_bits, const FPBits<T>& z_bits, T& result)
@@ -158,10 +154,7 @@ namespace ccm::support::fp
 
 			if (CCM_UNLIKELY(x_bits.is_nan() || y_bits.is_nan() || z_bits.is_nan()))
 			{
-				if (x_bits.is_signaling_nan() || y_bits.is_signaling_nan() || z_bits.is_signaling_nan())
-				{
-					fenv::raise_except_if_required(FE_INVALID);
-				}
+				if (x_bits.is_signaling_nan() || y_bits.is_signaling_nan() || z_bits.is_signaling_nan()) { fenv::raise_except_if_required(FE_INVALID); }
 
 				// IEEE-754 fusedMultiplyAdd treats a 0*inf (or inf*0) product as an invalid operation
 				// even when the addend is a quiet NaN. std::fma and the native fma instruction signal
@@ -231,10 +224,7 @@ namespace ccm::support::fp
 					if (product_sign != z_bits.sign()) { zero_sign = (fenv::get_rounding_mode() == FE_DOWNWARD) ? Sign::NEG : Sign::POS; }
 					result = FPBits<T>::zero(zero_sign).get_val();
 				}
-				else
-				{
-					result = z_bits.get_val();
-				}
+				else { result = z_bits.get_val(); }
 				return true;
 			}
 
@@ -403,7 +393,7 @@ namespace ccm::support::fp
 				base_exponent  = z_value.top_exponent - (Traits::accumulator_bits - 1);
 			}
 
-			AccInt result_mantissa{0};
+			AccInt result_mantissa{ 0 };
 			bool sticky_tail = false;
 			Sign result_sign = product_sign;
 
@@ -437,7 +427,7 @@ namespace ccm::support::fp
 					result_sign = product_sign;
 					if (z_sticky)
 					{
-						result_mantissa = product_acc - z_acc - AccInt{1};
+						result_mantissa = product_acc - z_acc - AccInt{ 1 };
 						sticky_tail		= true;
 					}
 					else
@@ -451,7 +441,7 @@ namespace ccm::support::fp
 					result_sign = z_value.sign;
 					if (product_sticky)
 					{
-						result_mantissa = z_acc - product_acc - AccInt{1};
+						result_mantissa = z_acc - product_acc - AccInt{ 1 };
 						sticky_tail		= true;
 					}
 					else
@@ -502,10 +492,7 @@ namespace ccm::support::fp
 
 			if (CCM_UNLIKELY(x_bits.is_nan() || y_bits.is_nan() || z_bits.is_nan()))
 			{
-				if (x_bits.is_signaling_nan() || y_bits.is_signaling_nan() || z_bits.is_signaling_nan())
-				{
-					fenv::raise_except_if_required(FE_INVALID);
-				}
+				if (x_bits.is_signaling_nan() || y_bits.is_signaling_nan() || z_bits.is_signaling_nan()) { fenv::raise_except_if_required(FE_INVALID); }
 				if (x_bits.is_quiet_nan()) { return FPBits::quiet_nan(x_bits.sign(), x_bits.get_mantissa()).get_val(); }
 				if (y_bits.is_quiet_nan()) { return FPBits::quiet_nan(y_bits.sign(), y_bits.get_mantissa()).get_val(); }
 				if (z_bits.is_quiet_nan()) { return FPBits::quiet_nan(z_bits.sign(), z_bits.get_mantissa()).get_val(); }
@@ -622,10 +609,7 @@ namespace ccm::support::fp
 	{
 		if constexpr (std::is_same_v<T, float>) { return fma_internal::software_fmaf</*ShouldSignalExceptions=*/false>(x, y, z); }
 		else if constexpr (std::is_same_v<T, double>) { return fma_internal::fixed_fma<double, /*ShouldSignalExceptions=*/false>(x, y, z); }
-		else
-		{
-			return fma_internal::wide_fma<T, /*ShouldSignalExceptions=*/false>(x, y, z);
-		}
+		else { return fma_internal::wide_fma<T, /*ShouldSignalExceptions=*/false>(x, y, z); }
 	}
 
 	template <typename T>
@@ -633,10 +617,7 @@ namespace ccm::support::fp
 	{
 		if constexpr (std::is_same_v<T, float>) { return fma_internal::software_fmaf</*ShouldSignalExceptions=*/true>(x, y, z); }
 		else if constexpr (std::is_same_v<T, double>) { return fma_internal::fixed_fma<double, /*ShouldSignalExceptions=*/true>(x, y, z); }
-		else
-		{
-			return fma_internal::wide_fma<T, /*ShouldSignalExceptions=*/true>(x, y, z);
-		}
+		else { return fma_internal::wide_fma<T, /*ShouldSignalExceptions=*/true>(x, y, z); }
 	}
 
 	template <typename T>

@@ -31,8 +31,8 @@ namespace ccm::types
 	{
 		static_assert(support::traits::ccm_is_floating_point_v<T>, "NormalizedFloat requires a floating-point type.");
 
-		using FPBits	   = support::fp::FPBits<T>;
-		using StorageType  = typename FPBits::storage_type;
+		using FPBits					 = support::fp::FPBits<T>;
+		using StorageType				 = typename FPBits::storage_type;
 		static constexpr StorageType ONE = StorageType(1) << FPBits::fraction_length;
 
 		std::int32_t exponent = 0;
@@ -78,14 +78,8 @@ namespace ccm::types
 
 		constexpr explicit operator T() const
 		{
-			if constexpr (support::fp::get_fp_type<T>() == support::fp::FPType::eBinary80)
-			{
-				return convert_float80();
-			}
-			else
-			{
-				return convert_ieee();
-			}
+			if constexpr (support::fp::get_fp_type<T>() == support::fp::FPType::eBinary80) { return convert_float80(); }
+			else { return convert_ieee(); }
 		}
 
 	private:
@@ -159,7 +153,7 @@ namespace ccm::types
 
 		[[nodiscard]] constexpr T convert_ieee() const
 		{
-			int biased_exponent = exponent + FPBits::exponent_bias;
+			int biased_exponent				 = exponent + FPBits::exponent_bias;
 			constexpr int max_exponent_value = (1 << FPBits::exponent_length) - 2;
 			if (biased_exponent > max_exponent_value) { return FPBits::inf(sign).get_val(); }
 
@@ -172,9 +166,9 @@ namespace ccm::types
 				const unsigned shift = static_cast<unsigned>(subnormal_exponent - exponent);
 				if (shift <= FPBits::fraction_length + 1)
 				{
-					const StorageType shift_out_mask	= static_cast<StorageType>(StorageType(1) << shift) - 1;
-					const StorageType shift_out_value	= mantissa & shift_out_mask;
-					const StorageType halfway_value		= static_cast<StorageType>(StorageType(1) << (shift - 1));
+					const StorageType shift_out_mask  = static_cast<StorageType>(StorageType(1) << shift) - 1;
+					const StorageType shift_out_value = mantissa & shift_out_mask;
+					const StorageType halfway_value	  = static_cast<StorageType>(StorageType(1) << (shift - 1));
 					result.set_biased_exponent(0);
 					result.set_mantissa(mantissa >> shift);
 					StorageType new_mantissa = result.get_mantissa();
@@ -197,7 +191,7 @@ namespace ccm::types
 
 		[[nodiscard]] constexpr T convert_float80() const
 		{
-			int biased_exponent = exponent + 16383;
+			int biased_exponent				 = exponent + 16383;
 			constexpr int max_exponent_value = (1 << 15) - 2;
 			if (biased_exponent > max_exponent_value) { return FPBits::inf(sign).get_val(); }
 
@@ -210,9 +204,9 @@ namespace ccm::types
 				const unsigned shift = static_cast<unsigned>(subnormal_exponent - exponent);
 				if (shift <= FPBits::fraction_length + 1)
 				{
-					const StorageType shift_out_mask	= (StorageType(1) << shift) - 1;
-					const StorageType shift_out_value	= mantissa & shift_out_mask;
-					const StorageType halfway_value		= StorageType(1) << (shift - 1);
+					const StorageType shift_out_mask  = (StorageType(1) << shift) - 1;
+					const StorageType shift_out_value = mantissa & shift_out_mask;
+					const StorageType halfway_value	  = StorageType(1) << (shift - 1);
 					result.set_biased_exponent(0);
 					result.set_mantissa(mantissa >> shift);
 					StorageType new_mantissa = result.get_mantissa();
