@@ -19,7 +19,7 @@ TEST(PowlPlatform, CharacterizationSmoke)
 	std::cout << "powl platform smoke: sizeof=" << ld_size << " digits=" << digits << " format="
 			  << ccm::config::long_double_format_name(format)
 			  << " fallback=" << (ccm::config::reduced_precision_powl_fallback_enabled() ? "enabled" : "disabled")
-			  << " configuration=" << ccm::test::pow_path::configuration_name() << '\n';
+			  << " configuration=" << ccm::test::pow_configuration_name() << '\n';
 
 	const long double result = ccm::powl(2.0L, 3.0L);
 	EXPECT_EQ(result, 8.0L);

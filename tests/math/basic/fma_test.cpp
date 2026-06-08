@@ -36,12 +36,16 @@ namespace
 
 	constexpr float kFloatResidual =
 		ccm::fmaf(0x1.fffep-1F, 0x1.fffep-1F, -(0x1.fffep-1F * 0x1.fffep-1F));
+#if CCMATH_SUPPORTS_DEEP_CONSTEXPR
 	constexpr double kDoubleResidual =
 		ccm::fma(0x1.ffffffffffep-1, 0x1.ffffffffffep-1, -(0x1.ffffffffffep-1 * 0x1.ffffffffffep-1));
+#endif
 
 	static_assert(ccm::fma(1, 2, 3) == 5, "ccm::fma must be usable in constant evaluation");
 	static_assert(same_bits(kFloatResidual, 0x1p-32F), "constexpr ccm::fmaf must preserve fused residuals");
+#if CCMATH_SUPPORTS_DEEP_CONSTEXPR
 	static_assert(same_bits(kDoubleResidual, 0x1p-88), "constexpr ccm::fma must preserve fused residuals");
+#endif
 
 #if CCM_CONSTEXPR_ROUNDING_MODE == FE_TONEAREST
 	// Double-rounding killer: (double)x*(double)y + (double)z cast back to float rounds twice and
@@ -68,6 +72,14 @@ namespace
 
 	using ccm::test::runtime_value;
 } // namespace
+
+#if !CCMATH_SUPPORTS_DEEP_CONSTEXPR
+TEST(CcmathBasicTests, FmaDoubleFusedResidualRuntime)
+{
+	EXPECT_TRUE(same_bits(
+		ccm::fma(0x1.ffffffffffep-1, 0x1.ffffffffffep-1, -(0x1.ffffffffffep-1 * 0x1.ffffffffffep-1)), 0x1p-88));
+}
+#endif
 
 TEST(CcmathBasicTests, FmaMatchesStdStructuredFloatCases)
 {

@@ -45,9 +45,15 @@ namespace
 
 TEST(CcmathPowerTests, PowFloatingOverloadsAreConstexpr)
 {
+#if CCMATH_SUPPORTS_DEEP_CONSTEXPR
 	static_assert(ccm::pow(2.0, 3.0) == 8.0, "ccm::pow must be usable in constant evaluation");
-	static_assert(ccm::powf(2.0F, 3.0F) == 8.0F, "ccm::powf must be usable in constant evaluation");
 	static_assert(ccm::powl(2.0L, 3.0L) == 8.0L, "ccm::powl must be usable in constant evaluation");
+#endif
+	static_assert(ccm::powf(2.0F, 3.0F) == 8.0F, "ccm::powf must be usable in constant evaluation");
+#if !CCMATH_SUPPORTS_DEEP_CONSTEXPR
+	EXPECT_EQ(ccm::pow(2.0, 3.0), 8.0);
+	EXPECT_EQ(ccm::powl(2.0L, 3.0L), 8.0L);
+#endif
 }
 
 // [cmath.syn]: Named C compatibility entry points have standard signatures.
@@ -498,6 +504,7 @@ TEST(CcmathPowerTests, PowNegativeOneExponentMatchesDivision)
 TEST(CcmathPowerTests, PowSpecialCasesConstexpr)
 {
 	// pow(x, 0) = 1
+#if CCMATH_SUPPORTS_DEEP_CONSTEXPR
 	static_assert(ccm::pow(2.0, 0.0) == 1.0);
 	static_assert(ccm::pow(-2.0, 0.0) == 1.0);
 	static_assert(ccm::pow(0.0, 0.0) == 1.0);
@@ -513,13 +520,22 @@ TEST(CcmathPowerTests, PowSpecialCasesConstexpr)
 	static_assert(ccm::pow(2.0, 1.0) == 2.0);
 	static_assert(ccm::pow(2.0, 2.0) == 4.0);
 	static_assert(ccm::pow(2.0, 10.0) == 1024.0);
+#endif
 
 	static_assert(ccm::powf(2.0F, 0.0F) == 1.0F);
 	static_assert(ccm::powf(2.0F, 1.0F) == 2.0F);
 	static_assert(ccm::powf(2.0F, 10.0F) == 1024.0F);
 
+#if CCMATH_SUPPORTS_DEEP_CONSTEXPR
 	static_assert(ccm::powl(2.0L, 0.0L) == 1.0L);
 	static_assert(ccm::powl(2.0L, 10.0L) == 1024.0L);
+#endif
+#if !CCMATH_SUPPORTS_DEEP_CONSTEXPR
+	EXPECT_EQ(ccm::pow(2.0, 0.0), 1.0);
+	EXPECT_EQ(ccm::pow(2.0, 10.0), 1024.0);
+	EXPECT_EQ(ccm::powl(2.0L, 0.0L), 1.0L);
+	EXPECT_EQ(ccm::powl(2.0L, 10.0L), 1024.0L);
+#endif
 }
 
 // Cross-type consistency: powf, pow, powl agree on shared inputs.
