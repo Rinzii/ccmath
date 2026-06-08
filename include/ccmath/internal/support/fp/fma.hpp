@@ -119,11 +119,13 @@ namespace ccm::support::fp
 		template <typename T>
 		struct decoded_operand
 		{
-			types::Sign sign				 = types::Sign::POS;
-			typename FPBits<T>::storage_type mantissa = 0;
-			int width						 = 0;
-			int lsb_exponent				 = 0;
-			int top_exponent				 = 0;
+			using storage_type = typename FPBits<T>::storage_type;
+
+			types::Sign sign	  = types::Sign::POS;
+			storage_type mantissa = 0;
+			int width			  = 0;
+			int lsb_exponent	  = 0;
+			int top_exponent	  = 0;
 		};
 
 		template <typename T>
@@ -348,8 +350,8 @@ namespace ccm::support::fp
 			using Traits	  = fixed_fma_traits<T>;
 			using FPBits	  = FPBits<T>;
 			using StorageType = typename FPBits::storage_type;
-			using ProductInt  = Traits::product_int;
-			using AccInt	  = Traits::acc_int;
+			using ProductInt  = typename Traits::product_int;
+			using AccInt	  = typename Traits::acc_int;
 			using Sign		  = types::Sign;
 
 			FPBits x_bits(x);
