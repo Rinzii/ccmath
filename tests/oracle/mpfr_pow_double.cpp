@@ -1,6 +1,5 @@
 #include "mpfr_pow_common.hpp"
-#include "utils/math_samples.hpp"
-#include "utils/worst_case_samples.hpp"
+#include "pow_cases.hpp"
 
 #include <iostream>
 
@@ -9,89 +8,6 @@ namespace
 	using ccm::test::oracle::campaign_mode;
 	using ccm::test::oracle::pow_case;
 	using ccm::test::pow_path::validation_path;
-
-	std::vector<pow_case<double>> build_cases(campaign_mode mode, std::uint64_t seed)
-	{
-		std::vector<pow_case<double>> cases;
-		for (const auto & legacy_case : ccm::test::worst_case::kPowDoubleHard)
-		{
-			cases.push_back({ legacy_case.base, legacy_case.exponent, legacy_case.provenance });
-		}
-
-		const std::array<double, 10> special_bases = {
-			-std::numeric_limits<double>::infinity(),
-			-1.0,
-			-0.0,
-			0.0,
-			std::numeric_limits<double>::denorm_min(),
-			std::numeric_limits<double>::min(),
-			1.0,
-			std::nextafter(1.0, 0.0),
-			std::numeric_limits<double>::max(),
-			std::numeric_limits<double>::infinity(),
-		};
-		const std::array<double, 9> special_exponents = {
-			-std::numeric_limits<double>::infinity(), -3.0, -1.0, -0.0, 0.0, 0.5, 2.0, 3.0, std::numeric_limits<double>::infinity(),
-		};
-		for (double base : special_bases)
-		{
-			for (double exponent : special_exponents) { cases.push_back({ base, exponent, "special-value matrix" }); }
-		}
-
-		for (const double base : {
-				 std::nextafter(1.0, 0.0),
-				 1.0,
-				 std::nextafter(1.0, std::numeric_limits<double>::infinity()),
-				 std::nextafter(-1.0, -std::numeric_limits<double>::infinity()),
-				 -1.0,
-				 std::nextafter(-1.0, 0.0),
-			 })
-		{
-			for (double exponent : { -3.5, -1.5, -0.5, 0.5, 1.5, 3.5, 0x1.fffffffffffffp52, 0x1.0p53 })
-			{
-				cases.push_back({ base, exponent, "near +/-1 boundary campaign" });
-			}
-		}
-
-		const int bucket_step = (mode == campaign_mode::quick) ? 16 : 1;
-		for (int bucket = 0; bucket < 128; bucket += bucket_step)
-		{
-			const double boundary = 1.0 + static_cast<double>(bucket) / 128.0;
-			cases.push_back({ boundary, -10.0, "range-reduction boundary: exact bucket edge" });
-			cases.push_back({ std::nextafter(boundary, 0.0), -10.0, "range-reduction boundary: previous representable" });
-			cases.push_back({ std::nextafter(boundary, std::numeric_limits<double>::infinity()), 10.0, "range-reduction boundary: next representable" });
-		}
-
-		for (const int exp2_exponent : { -1022, -10, -1, 0, 1, 10, 1023 })
-		{
-			const double base = std::ldexp(1.0, exp2_exponent);
-			for (double exponent : { -1.0, -0.5, 2.0, 3.0 })
-			{
-				cases.push_back({ base, exponent, "power-of-two campaign" });
-				cases.push_back({ std::nextafter(base, 0.0), exponent, "nextafter neighborhood below power-of-two" });
-				cases.push_back({ std::nextafter(base, std::numeric_limits<double>::infinity()), exponent, "nextafter neighborhood above power-of-two" });
-			}
-		}
-
-		for (double exponent : { -3.0, -2.0, -1.0, 1.0, 2.0, 3.0, 0x1.fffffffffffffp52, 0x1.0p53 })
-		{
-			cases.push_back({ -2.0, exponent, "negative base with integer exponent campaign" });
-		}
-		for (double exponent : { 0.5, 1.5, 3.5, std::nextafter(1.0, 2.0), std::nextafter(2.0, 1.0) })
-		{
-			cases.push_back({ -2.0, exponent, "negative base near non-integer exponent boundary" });
-		}
-
-		for (const auto exponent : { 1023.0, std::nextafter(1024.0, 0.0), 1024.0, 1025.0 })
-		{
-			cases.push_back({ 2.0, exponent, "overflow-threshold campaign" });
-		}
-		for (const auto exponent : { -1074.0, -1075.0, -1076.0 }) { cases.push_back({ 2.0, exponent, "underflow-threshold campaign" }); }
-
-		const std::size_t random_count = mode == campaign_mode::quick ? 512 : (mode == campaign_mode::extended ? 4096 : 16384);
-		ccm::test::oracle::add_random_cases(cases, seed, random_count, "deterministic random bit-pattern campaign");
-		return cases;
-	}
 
 	void run_path(validation_path path,
 				  const std::vector<pow_case<double>> & cases,
@@ -182,7 +98,7 @@ int main(int argc, char ** argv)
 	const auto rounding_modes = ccm::test::oracle::parse_rounding_modes(argc, argv);
 	mpfr_set_default_rounding_mode(MPFR_RNDN);
 
-	const auto cases = build_cases(mode, seed);
+	const auto cases = ccm::test::oracle::pow_cases::build_double_cases(mode, seed);
 	std::vector<ccm::test::oracle::failure_record<double>> events;
 
 	std::cout << "mpfr pow<double> campaign mode=" << ccm::test::oracle::mode_name(mode) << " fma=" << ccm::test::oracle::fma_status()

@@ -10,10 +10,14 @@
 
 #pragma once
 
+#include "ccmath/internal/config/compiler.hpp"
+#include "ccmath/internal/config/type_support.hpp"
 // ReSharper disable once CppUnusedIncludeDirective
 #include "ccmath/internal/math/generic/builtins/builtin_helpers.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/always_false.hpp"
+
+#include <type_traits>
 
 // Checks if the cpu supports FMA instructions.
 // This macro is allowed to be defined in the global namespace.
@@ -66,6 +70,35 @@ namespace ccm::builtin
 		false
 #endif
 		;
+
+	inline constexpr bool runtime_builtin_fma_enabled =
+#ifdef CCM_CONFIG_DISABLE_RUNTIME_BUILTIN_FMA
+		false
+#else
+		true
+#endif
+		;
+
+	inline constexpr bool runtime_builtin_fma_validated_target =
+#if (defined(__aarch64__) || defined(__arm64__)) && (defined(CCMATH_COMPILER_APPLE_CLANG) || defined(CCMATH_COMPILER_CLANG) || defined(CCMATH_COMPILER_GCC))
+		true
+#else
+		false
+#endif
+		;
+
+	template <typename T>
+	inline constexpr bool runtime_builtin_fma_long_double_supported =
+#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
+		true
+#else
+		!std::is_same_v<T, long double>
+#endif
+		;
+
+	template <typename T>
+	inline constexpr bool runtime_builtin_fma_trusted =
+		runtime_builtin_fma_enabled && has_fma<T> && runtime_builtin_fma_validated_target && runtime_builtin_fma_long_double_supported<T>;
 
 	/**
 	 * @internal

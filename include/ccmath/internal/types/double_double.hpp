@@ -22,14 +22,9 @@ namespace ccm
 	{
 		using DoubleDouble = NumberPair<double>;
 
-		// True fused multiply-add for the error-free transforms below. support::multiply_add only
-		// fuses when the target advertises a hardware FMA, so on a generic build without one it
-		// degrades to (x * y) + z and a residual such as fma(a, b, -a*b) collapses to zero. At
-		// runtime __builtin_fma is a correct fused operation on every target that provides it; where
-		// it is absent (e.g. MSVC) the correctly-rounded software support::fp::generic_fma keeps the
-		// residual exact in every rounding mode without falling back to libm. During constant
-		// evaluation generic_fma is used as well, so the transforms stay exact and follow
-		// CCM_CONSTEXPR_ROUNDING_MODE at compile time too.
+		// True fused multiply-add for the error-free transforms below. This path stays on the quiet
+		// software fallback when a builtin is unavailable so the residual remains exact without
+		// raising spurious public FE_INEXACT / range exceptions.
 		constexpr double exact_fma(double x, double y, double z) noexcept
 		{
 			if (support::is_constant_evaluated()) { return support::fp::generic_fma(x, y, z); }

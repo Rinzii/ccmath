@@ -100,6 +100,28 @@ namespace ccm::test
 		});
 	}
 
+	template <typename T, typename CcmFn, typename StdFn>
+	void ExpectFpTernaryMatchesStdAllModes(T x, T y, T z, CcmFn ccm_fn, StdFn std_fn)
+	{
+		ForEachRoundingModeOrSkip([&](int mode) {
+			ForceRoundingMode force(mode);
+			if (!force) { ADD_FAILURE() << "could not set " << RoundingModeName(mode); }
+			ExpectFpEq(ccm_fn(x, y, z), std_fn(x, y, z));
+		});
+	}
+
+	template <typename TernaryCase, typename CcmFn, typename StdFn, std::size_t N>
+	void ExpectFpTernaryOverMatchesStdAllModes(const std::array<TernaryCase, N> & inputs, CcmFn ccm_fn, StdFn std_fn)
+	{
+		for (const auto & input : inputs)
+		{
+			SCOPED_TRACE(input.x);
+			SCOPED_TRACE(input.y);
+			SCOPED_TRACE(input.z);
+			ExpectFpTernaryMatchesStdAllModes(input.x, input.y, input.z, ccm_fn, std_fn);
+		}
+	}
+
 	/// Bit-exact check under each rounding mode. Both sides evaluated inside the forced mode.
 	template <typename T, typename CcmFn, typename StdFn>
 	void ExpectFpUnaryMatchesStdAllModes(T input, CcmFn ccm_fn, StdFn std_fn)

@@ -6,7 +6,7 @@ Status for the four IEEE rounding modes. x = runtime handles that mode. Empty = 
 |---------|---------------|------------|--------------|----------------|--------|
 | fabs | x | x | x | x | |
 | fdim | x | x | x | x | |
-| fma | x | x | x | x | |
+| fma | x | x | x | x | Native-first on validated AArch64 runtime paths; constexpr follows `CCM_CONSTEXPR_ROUNDING_MODE`; `fmal` remains target-format dependent |
 | (f)max | x | x | x | x | |
 | (f)min | x | x | x | x | |
 | remainder | x | x | x | x | |

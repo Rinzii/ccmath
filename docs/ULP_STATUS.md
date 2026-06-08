@@ -112,9 +112,9 @@
 
 | Precision   | Min ULP | Max ULP | Avg ULP | Notes |
 |-------------|---------|---------|---------|-------|
-| float       | N/a     | N/a     | N/a     |       |
-| double      | N/a     | N/a     | N/a     |       |
-| long double | N/a     | N/a     | N/a     |       |
+| float       | N/a     | N/a     | N/a     | See rigorous MPFR `fmaf` all-mode campaigns and simple constexpr residual regressions |
+| double      | N/a     | N/a     | N/a     | See rigorous MPFR `fma` all-mode campaigns and simple constexpr residual regressions |
+| long double | N/a     | N/a     | N/a     | `fmal` remains a target-format audit path in this pass |
 
 <a id="fdim"></a>
 ### fdim

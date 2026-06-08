@@ -107,9 +107,8 @@ namespace ccm::test::oracle
 			return false;
 		}
 
-		constexpr bool is_ld80_bounded_integer_route(long double base, long double exp) noexcept
+		constexpr bool is_ld80_bounded_integer_route([[maybe_unused]] long double base, long double exp) noexcept
 		{
-			(void)base;
 			if (is_ld80_special_case_route(base, exp)) { return false; }
 
 			std::int64_t ignored = 0;

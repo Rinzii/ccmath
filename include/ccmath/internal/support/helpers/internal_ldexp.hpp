@@ -19,7 +19,7 @@
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
-#include "ccmath/internal/types/dyadic_float.hpp"
+#include "ccmath/internal/types/normalized_float.hpp"
 
 #include <cfenv>
 
@@ -67,10 +67,9 @@ namespace ccm::support::helpers
 			return fp::FPBits<T>::zero(sign).get_val();
 		}
 
-		// For all other values, NormalFloat to T conversion handles it the right way.
-		types::DyadicFloat<fp::FPBits<T>::storage_length> normal(bits.get_val());
+		types::NormalizedFloat<T> normal(bits.get_val());
 		normal.exponent += static_cast<int>(exp);
-		T const result = normal.template as<T, false>();
+		const T result = static_cast<T>(normal);
 		if (exp < 0 && fp::FPBits<T>(result).is_zero())
 		{
 			fenv::set_errno_if_required(ERANGE);

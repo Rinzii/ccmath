@@ -8,180 +8,142 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "utils/fenv_fixture.hpp"
+#include "utils/fp_matcher.hpp"
+#include "utils/math_samples.hpp"
 #include "utils/std_compare.hpp"
+#include "utils/test_runtime.hpp"
 
 #include <gtest/gtest.h>
 
 #include <ccmath/ccmath.hpp>
+#include <ccmath/internal/support/bits.hpp>
+#include <ccmath/internal/support/fp/fma.hpp>
 
+#include <cfenv>
 #include <cmath>
-#include <limits>
+#include <cstdint>
 
-TEST(CcmathBasicTests, Fma)
+namespace
 {
-	// Test that fma works with static_assert
-	static_assert(ccm::fma(1, 2, 3) == 5, "fma has failed testing that it is static_assert-able!");
+	template <typename T>
+	constexpr bool same_bits(T lhs, T rhs)
+	{
+		if constexpr (std::is_same_v<T, float>) { return ccm::support::bit_cast<std::uint32_t>(lhs) == ccm::support::bit_cast<std::uint32_t>(rhs); }
+		else if constexpr (std::is_same_v<T, double>) { return ccm::support::bit_cast<std::uint64_t>(lhs) == ccm::support::bit_cast<std::uint64_t>(rhs); }
+		else { return lhs == rhs; }
+	}
 
-	const auto ccm_fma_double	   = [](double x, double y, double z) { return ccm::fma(x, y, z); };
-	const auto ccm_fma_float	   = [](float x, float y, float z) { return ccm::fma(x, y, z); };
-	const auto ccm_fma_long_double = [](long double x, long double y, long double z) { return ccm::fma(x, y, z); };
+	constexpr float kFloatResidual =
+		ccm::fmaf(0x1.fffep-1F, 0x1.fffep-1F, -(0x1.fffep-1F * 0x1.fffep-1F));
+	constexpr double kDoubleResidual =
+		ccm::fma(0x1.ffffffffffep-1, 0x1.ffffffffffep-1, -(0x1.ffffffffffep-1 * 0x1.ffffffffffep-1));
 
-	ccm::test::ExpectTernaryMatchesStd(1.0, 2.0, 3.0, ccm_fma_double, static_cast<double (*)(double, double, double)>(std::fma));
-	ccm::test::ExpectTernaryMatchesStd(1.0F, 2.0F, 3.0F, ccm_fma_float, static_cast<float (*)(float, float, float)>(std::fma));
-	ccm::test::ExpectTernaryMatchesStd(1.0L, 2.0L, 3.0L, ccm_fma_long_double, static_cast<long double (*)(long double, long double, long double)>(std::fma));
+	static_assert(ccm::fma(1, 2, 3) == 5, "ccm::fma must be usable in constant evaluation");
+	static_assert(same_bits(kFloatResidual, 0x1p-32F), "constexpr ccm::fmaf must preserve fused residuals");
+	static_assert(same_bits(kDoubleResidual, 0x1p-88), "constexpr ccm::fma must preserve fused residuals");
 
-	EXPECT_DOUBLE_EQ(std::fma(2.0, 3.0, 4.0), 10.0);  // 2.0 * 3.0 + 4.0 = 10.0
-	EXPECT_DOUBLE_EQ(std::fma(-2.5, 4.0, 1.5), -8.5); // -2.5 * 4.0 + 1.5 = -8.5
-	EXPECT_DOUBLE_EQ(std::fma(0.0, 5.0, 6.0), 6.0);	  // 0.0 * 5.0 + 6.0 = 6.0
+#if CCM_CONSTEXPR_ROUNDING_MODE == FE_TONEAREST
+	// Double-rounding killer: (double)x*(double)y + (double)z cast back to float rounds twice and
+	// returns 0x3f801000, which is 1 ulp below the correctly-rounded fused result 0x3f801001.
+	// These guard the constexpr paths (which cannot use a runtime builtin) against regressing to a
+	// naive double evaluation. See include/ccmath/internal/support/fp/fma.hpp.
+	inline constexpr float kKillerX = 0x1.001p+0F; // 1 + 2^-12
+	inline constexpr float kKillerZ = 0x1.0p-53F;
+	inline constexpr std::uint32_t kKillerCorrect = 0x3f801001U;
 
-	// Test edge cases
-	ccm::test::ExpectTernaryMatchesStd(0.0, 0.0, 0.0, ccm_fma_double, static_cast<double (*)(double, double, double)>(std::fma));
-	ccm::test::ExpectTernaryMatchesStd(-0.0, -0.0, -0.0, ccm_fma_double, static_cast<double (*)(double, double, double)>(std::fma));
+	static_assert(ccm::support::bit_cast<std::uint32_t>(ccm::fmaf(kKillerX, kKillerX, kKillerZ)) == kKillerCorrect,
+				  "constexpr ccm::fmaf must round the fused result once, not twice");
+	static_assert(
+		ccm::support::bit_cast<std::uint32_t>(ccm::support::fp::public_fma<float>(kKillerX, kKillerX, kKillerZ)) == kKillerCorrect,
+		"constexpr public_fma<float> must round the fused result once, not twice");
+	static_assert(
+		ccm::support::bit_cast<std::uint32_t>(ccm::support::fp::generic_fma<float>(kKillerX, kKillerX, kKillerZ)) == kKillerCorrect,
+		"constexpr generic_fma<float> must round the fused result once, not twice");
+	static_assert(
+		ccm::support::bit_cast<std::uint32_t>(ccm::support::fp::fma_internal::fixed_fma<float, true>(kKillerX, kKillerX, kKillerZ)) ==
+			kKillerCorrect,
+		"constexpr fixed_fma<float> must round the fused result once, not twice");
+#endif
 
-	/* TODO(IanP): Re-enable zero-times-infinity FMA cases once ccm::fma matches std::fma there.
+	using ccm::test::runtime_value;
+} // namespace
 
-	// If x is zero and y is infinity, or if y is zero and x is infinity and Z is not NaN, then the result is NaN.
-	bool testCcmFmaZeroTimesInfinityIsNan		= std::isnan(ccm::fma(0.0, std::numeric_limits<double>::infinity(), 0.0));
-	bool testStdFmaZeroTimesInfinityIsNan		= std::isnan(std::fma(0.0, std::numeric_limits<double>::infinity(), 0.0));
-	bool testCcmFmaZeroTimesInfinityHasSameSign = std::signbit(ccm::fma(0.0, std::numeric_limits<double>::infinity(), 0.0));
-	bool testStdFmaZeroTimesInfinityHasSameSign = std::signbit(std::fma(0.0, std::numeric_limits<double>::infinity(), 0.0));
-	EXPECT_EQ(testCcmFmaZeroTimesInfinityIsNan, testStdFmaZeroTimesInfinityIsNan);
-	EXPECT_EQ(testCcmFmaZeroTimesInfinityHasSameSign, testStdFmaZeroTimesInfinityHasSameSign);
+TEST(CcmathBasicTests, FmaMatchesStdStructuredFloatCases)
+{
+	for (const auto & input : ccm::test::samples::kFmaFloatCases)
+	{
+		ccm::test::ExpectTernaryMatchesStd(
+			input.x, input.y, input.z, ccm::fmaf, static_cast<float (*)(float, float, float)>(std::fma));
+	}
+}
 
-	bool testCcmFmaZeroTimesNegativeInfinityIsNan		= std::isnan(ccm::fma(0.0, -std::numeric_limits<double>::infinity(), 0.0));
-	bool testStdFmaZeroTimesNegativeInfinityIsNan		= std::isnan(std::fma(0.0, -std::numeric_limits<double>::infinity(), 0.0));
-	bool testCcmFmaZeroTimesNegativeInfinityHasSameSign = std::signbit(ccm::fma(0.0, -std::numeric_limits<double>::infinity(), 0.0));
-	bool testStdFmaZeroTimesNegativeInfinityHasSameSign = std::signbit(std::fma(0.0, -std::numeric_limits<double>::infinity(), 0.0));
-	EXPECT_EQ(testCcmFmaZeroTimesNegativeInfinityIsNan, testStdFmaZeroTimesNegativeInfinityIsNan);
-	EXPECT_EQ(testCcmFmaZeroTimesNegativeInfinityHasSameSign, testStdFmaZeroTimesNegativeInfinityHasSameSign);
+TEST(CcmathBasicTests, FmaMatchesStdStructuredDoubleCases)
+{
+	for (const auto & input : ccm::test::samples::kFmaDoubleCases)
+	{
+		ccm::test::ExpectTernaryMatchesStd(
+			input.x, input.y, input.z, ccm::fma<double>, static_cast<double (*)(double, double, double)>(std::fma));
+	}
+}
 
-	bool testCcmFmaInfinityTimesZeroIsNan		= std::isnan(ccm::fma(std::numeric_limits<double>::infinity(), 0.0, 0.0));
-	bool testStdFmaInfinityTimesZeroIsNan		= std::isnan(std::fma(std::numeric_limits<double>::infinity(), 0.0, 0.0));
-	bool testCcmFmaInfinityTimesZeroHasSameSign = std::signbit(ccm::fma(std::numeric_limits<double>::infinity(), 0.0, 0.0));
-	bool testStdFmaInfinityTimesZeroHasSameSign = std::signbit(std::fma(std::numeric_limits<double>::infinity(), 0.0, 0.0));
-	EXPECT_EQ(testCcmFmaInfinityTimesZeroIsNan, testStdFmaInfinityTimesZeroIsNan);
-	EXPECT_EQ(testCcmFmaInfinityTimesZeroHasSameSign, testStdFmaInfinityTimesZeroHasSameSign);
+TEST(CcmathBasicTests, FmaMatchesStdLongDoubleSmokeCases)
+{
+	ccm::test::ExpectTernaryMatchesStd(
+		1.0L, 2.0L, 3.0L, ccm::fmal, static_cast<long double (*)(long double, long double, long double)>(std::fma));
+	ccm::test::ExpectTernaryMatchesStd(
+		0x1.fffffffffffffp-1L,
+		0x1.fffffffffffffp-1L,
+		-0x1.ep-2L,
+		ccm::fmal,
+		static_cast<long double (*)(long double, long double, long double)>(std::fma));
+}
 
-	bool testCcmFmaNegativeInfinityTimesZeroIsNan		= std::isnan(ccm::fma(-std::numeric_limits<double>::infinity(), 0.0, 0.0));
-	bool testStdFmaNegativeInfinityTimesZeroIsNan		= std::isnan(std::fma(-std::numeric_limits<double>::infinity(), 0.0, 0.0));
-	bool testCcmFmaNegativeInfinityTimesZeroHasSameSign = std::signbit(ccm::fma(-std::numeric_limits<double>::infinity(), 0.0, 0.0));
-	bool testStdFmaNegativeInfinityTimesZeroHasSameSign = std::signbit(std::fma(-std::numeric_limits<double>::infinity(), 0.0, 0.0));
-	EXPECT_EQ(testCcmFmaNegativeInfinityTimesZeroIsNan, testStdFmaNegativeInfinityTimesZeroIsNan);
-	EXPECT_EQ(testCcmFmaNegativeInfinityTimesZeroHasSameSign, testStdFmaNegativeInfinityTimesZeroHasSameSign);
+// The internal quiet (generic_fma) and signaling (public_fma) software kernels are the paths
+// reached by error-free transforms and by the runtime fallback in directed rounding modes. They are
+// not exercised through ccm::fma in round-to-nearest (which may use the native builtin), so test
+// them directly. The double-rounding killers must be correctly rounded in every mode.
+TEST(CcmathBasicTests, FmaInternalSoftwarePathsAvoidDoubleRoundingAllModes)
+{
+	for (const auto & input : ccm::test::samples::kFmaFloatCases)
+	{
+		SCOPED_TRACE(input.x);
+		SCOPED_TRACE(input.y);
+		SCOPED_TRACE(input.z);
+		for (const int mode : ccm::test::kStdRoundingModes)
+		{
+			SCOPED_TRACE(ccm::test::RoundingModeName(mode));
+			ccm::test::ForceRoundingMode force(mode);
+			ASSERT_TRUE(force);
 
-	// If x is zero and y is infinity, or if y is zero and x is infinity and Z is NaN, then the result is NaN.
-	bool testCcmFmaZeroTimesInfinityWithNanOnZIsNan =
-		std::isnan(ccm::fma(0.0, std::numeric_limits<double>::infinity(), std::numeric_limits<double>::quiet_NaN()));
-	bool testStdFmaZeroTimesInfinityWithNanOnZIsNan =
-		std::isnan(std::fma(0.0, std::numeric_limits<double>::infinity(), std::numeric_limits<double>::quiet_NaN()));
-	bool testCcmFmaZeroTimesInfinityWithNanOnZHasSameSign =
-		std::signbit(ccm::fma(0.0, std::numeric_limits<double>::infinity(), std::numeric_limits<double>::quiet_NaN()));
-	bool testStdFmaZeroTimesInfinityWithNanOnZHasSameSign =
-		std::signbit(std::fma(0.0, std::numeric_limits<double>::infinity(), std::numeric_limits<double>::quiet_NaN()));
-	EXPECT_EQ(testCcmFmaZeroTimesInfinityWithNanOnZIsNan, testStdFmaZeroTimesInfinityWithNanOnZIsNan);
-	EXPECT_EQ(testCcmFmaZeroTimesInfinityWithNanOnZHasSameSign, testStdFmaZeroTimesInfinityWithNanOnZHasSameSign);
+			const float x = runtime_value(input.x);
+			const float y = runtime_value(input.y);
+			const float z = runtime_value(input.z);
+			const float reference = std::fmaf(x, y, z);
 
-	bool testCcmFmaZeroTimesNegativeInfinityWithNanOnZIsNan =
-		std::isnan(ccm::fma(0.0, -std::numeric_limits<double>::infinity(), std::numeric_limits<double>::quiet_NaN()));
-	bool testStdFmaZeroTimesNegativeInfinityWithNanOnZIsNan =
-		std::isnan(std::fma(0.0, -std::numeric_limits<double>::infinity(), std::numeric_limits<double>::quiet_NaN()));
-	bool testCcmFmaZeroTimesNegativeInfinityWithNanOnZHasSameSign =
-		std::signbit(ccm::fma(0.0, -std::numeric_limits<double>::infinity(), std::numeric_limits<double>::quiet_NaN()));
-	bool testStdFmaZeroTimesNegativeInfinityWithNanOnZHasSameSign =
-		std::signbit(std::fma(0.0, -std::numeric_limits<double>::infinity(), std::numeric_limits<double>::quiet_NaN()));
-	EXPECT_EQ(testCcmFmaZeroTimesNegativeInfinityWithNanOnZIsNan, testStdFmaZeroTimesNegativeInfinityWithNanOnZIsNan);
-	EXPECT_EQ(testCcmFmaZeroTimesNegativeInfinityWithNanOnZHasSameSign, testStdFmaZeroTimesNegativeInfinityWithNanOnZHasSameSign);
+			ccm::test::ExpectFpEq(ccm::support::fp::public_fma<float>(x, y, z), reference);
+			ccm::test::ExpectFpEq(ccm::support::fp::generic_fma<float>(x, y, z), reference);
+		}
+	}
 
-	bool testCcmFmaInfinityTimesZeroWithNanOnZIsNan =
-		std::isnan(ccm::fma(std::numeric_limits<double>::infinity(), 0.0, std::numeric_limits<double>::quiet_NaN()));
-	bool testStdFmaInfinityTimesZeroWithNanOnZIsNan =
-		std::isnan(std::fma(std::numeric_limits<double>::infinity(), 0.0, std::numeric_limits<double>::quiet_NaN()));
-	bool testCcmFmaInfinityTimesZeroWithNanOnZHasSameSign =
-		std::signbit(ccm::fma(std::numeric_limits<double>::infinity(), 0.0, std::numeric_limits<double>::quiet_NaN()));
-	bool testStdFmaInfinityTimesZeroWithNanOnZHasSameSign =
-		std::signbit(std::fma(std::numeric_limits<double>::infinity(), 0.0, std::numeric_limits<double>::quiet_NaN()));
-	EXPECT_EQ(testCcmFmaInfinityTimesZeroWithNanOnZIsNan, testStdFmaInfinityTimesZeroWithNanOnZIsNan);
-	EXPECT_EQ(testCcmFmaInfinityTimesZeroWithNanOnZHasSameSign, testStdFmaInfinityTimesZeroWithNanOnZHasSameSign);
+	for (const auto & input : ccm::test::samples::kFmaDoubleCases)
+	{
+		SCOPED_TRACE(input.x);
+		SCOPED_TRACE(input.y);
+		SCOPED_TRACE(input.z);
+		for (const int mode : ccm::test::kStdRoundingModes)
+		{
+			SCOPED_TRACE(ccm::test::RoundingModeName(mode));
+			ccm::test::ForceRoundingMode force(mode);
+			ASSERT_TRUE(force);
 
-	bool testCcmFmaNegativeInfinityTimesZeroWithNanOnZIsNan =
-		std::isnan(ccm::fma(-std::numeric_limits<double>::infinity(), 0.0, std::numeric_limits<double>::quiet_NaN()));
-	bool testStdFmaNegativeInfinityTimesZeroWithNanOnZIsNan =
-		std::isnan(std::fma(-std::numeric_limits<double>::infinity(), 0.0, std::numeric_limits<double>::quiet_NaN()));
-	bool testCcmFmaNegativeInfinityTimesZeroWithNanOnZHasSameSign =
-		std::signbit(ccm::fma(-std::numeric_limits<double>::infinity(), 0.0, std::numeric_limits<double>::quiet_NaN()));
-	bool testStdFmaNegativeInfinityTimesZeroWithNanOnZHasSameSign =
-		std::signbit(std::fma(-std::numeric_limits<double>::infinity(), 0.0, std::numeric_limits<double>::quiet_NaN()));
-	EXPECT_EQ(testCcmFmaNegativeInfinityTimesZeroWithNanOnZIsNan, testStdFmaNegativeInfinityTimesZeroWithNanOnZIsNan);
-	EXPECT_EQ(testCcmFmaNegativeInfinityTimesZeroWithNanOnZHasSameSign, testStdFmaNegativeInfinityTimesZeroWithNanOnZHasSameSign);
+			const double x = runtime_value(input.x);
+			const double y = runtime_value(input.y);
+			const double z = runtime_value(input.z);
+			const double reference = std::fma(x, y, z);
 
-	// If x * y is an exact infinity and z is an infinity with the opposite sign, NaN is returned.
-	bool testCcmFmaInfinityTimesInfinityWithOppositeSignIsNan =
-		std::isnan(ccm::fma(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity()));
-	bool testStdFmaInfinityTimesInfinityWithOppositeSignIsNan =
-		std::isnan(std::fma(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity()));
-	bool testCcmFmaInfinityTimesInfinityWithOppositeSignHasSameSign =
-		std::signbit(ccm::fma(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity()));
-	bool testStdFmaInfinityTimesInfinityWithOppositeSignHasSameSign =
-		std::signbit(std::fma(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity()));
-	EXPECT_EQ(testCcmFmaInfinityTimesInfinityWithOppositeSignIsNan, testStdFmaInfinityTimesInfinityWithOppositeSignIsNan);
-	EXPECT_EQ(testCcmFmaInfinityTimesInfinityWithOppositeSignHasSameSign, testStdFmaInfinityTimesInfinityWithOppositeSignHasSameSign);
-
-	bool testCcmFmaInfinityTimesInfinityWithOppositeSignIsNan2 =
-		std::isnan(ccm::fma(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()));
-	bool testStdFmaInfinityTimesInfinityWithOppositeSignIsNan2 =
-		std::isnan(std::fma(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()));
-	bool testCcmFmaInfinityTimesInfinityWithOppositeSignHasSameSign2 =
-		std::signbit(ccm::fma(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()));
-	bool testStdFmaInfinityTimesInfinityWithOppositeSignHasSameSign2 =
-		std::signbit(std::fma(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()));
-	EXPECT_EQ(testCcmFmaInfinityTimesInfinityWithOppositeSignIsNan2, testStdFmaInfinityTimesInfinityWithOppositeSignIsNan2);
-	EXPECT_EQ(testCcmFmaInfinityTimesInfinityWithOppositeSignHasSameSign2, testStdFmaInfinityTimesInfinityWithOppositeSignHasSameSign2);
-
-	// If x or y are NaN, NaN is returned.
-	bool testCcmFmaIfXIsPosNanReturnsNan = std::isnan(ccm::fma(std::numeric_limits<double>::quiet_NaN(), 1.0, 1.0));
-	bool testStdFmaIfXIsPosNanReturnsNan = std::isnan(std::fma(std::numeric_limits<double>::quiet_NaN(), 1.0, 1.0));
-	bool testCcmFmaIfXIsPosNanReturnsSameSign = std::signbit(ccm::fma(std::numeric_limits<double>::quiet_NaN(), 1.0, 1.0));
-	bool testStdFmaIfXIsPosNanReturnsSameSign = std::signbit(std::fma(std::numeric_limits<double>::quiet_NaN(), 1.0, 1.0));
-	EXPECT_EQ(testCcmFmaIfXIsPosNanReturnsNan, testStdFmaIfXIsPosNanReturnsNan);
-	EXPECT_EQ(testCcmFmaIfXIsPosNanReturnsSameSign, testStdFmaIfXIsPosNanReturnsSameSign);
-
-	bool testCcmFmaIfYIsPosNanReturnsNan = std::isnan(ccm::fma(1.0, std::numeric_limits<double>::quiet_NaN(), 1.0));
-	bool testStdFmaIfYIsPosNanReturnsNan = std::isnan(std::fma(1.0, std::numeric_limits<double>::quiet_NaN(), 1.0));
-	bool testCcmFmaIfYIsPosNanReturnsSameSign = std::signbit(ccm::fma(1.0, std::numeric_limits<double>::quiet_NaN(), 1.0));
-	bool testStdFmaIfYIsPosNanReturnsSameSign = std::signbit(std::fma(1.0, std::numeric_limits<double>::quiet_NaN(), 1.0));
-	EXPECT_EQ(testCcmFmaIfYIsPosNanReturnsNan, testStdFmaIfYIsPosNanReturnsNan);
-	EXPECT_EQ(testCcmFmaIfYIsPosNanReturnsSameSign, testStdFmaIfYIsPosNanReturnsSameSign);
-
-	bool testCcmFmaIfXIsNegNanReturnsNan = std::isnan(ccm::fma(-std::numeric_limits<double>::quiet_NaN(), 1.0, 1.0));
-	bool testStdFmaIfXIsNegNanReturnsNan = std::isnan(std::fma(-std::numeric_limits<double>::quiet_NaN(), 1.0, 1.0));
-	bool testCcmFmaIfXIsNegNanReturnsSameSign = std::signbit(ccm::fma(-std::numeric_limits<double>::quiet_NaN(), 1.0, 1.0));
-	bool testStdFmaIfXIsNegNanReturnsSameSign = std::signbit(std::fma(-std::numeric_limits<double>::quiet_NaN(), 1.0, 1.0));
-	EXPECT_EQ(testCcmFmaIfXIsNegNanReturnsNan, testStdFmaIfXIsNegNanReturnsNan);
-	EXPECT_EQ(testCcmFmaIfXIsNegNanReturnsSameSign, testStdFmaIfXIsNegNanReturnsSameSign);
-
-	bool testCcmFmaIfYIsNegNanReturnsNan = std::isnan(ccm::fma(1.0, -std::numeric_limits<double>::quiet_NaN(), 1.0));
-	bool testStdFmaIfYIsNegNanReturnsNan = std::isnan(std::fma(1.0, -std::numeric_limits<double>::quiet_NaN(), 1.0));
-	bool testCcmFmaIfYIsNegNanReturnsSameSign = std::signbit(ccm::fma(1.0, -std::numeric_limits<double>::quiet_NaN(), 1.0));
-	bool testStdFmaIfYIsNegNanReturnsSameSign = std::signbit(std::fma(1.0, -std::numeric_limits<double>::quiet_NaN(), 1.0));
-	EXPECT_EQ(testCcmFmaIfYIsNegNanReturnsNan, testStdFmaIfYIsNegNanReturnsNan);
-	EXPECT_EQ(testCcmFmaIfYIsNegNanReturnsSameSign, testStdFmaIfYIsNegNanReturnsSameSign);
-
-
-	// If z is NaN, and x * y is not 0 * Inf or Inf * 0, then NaN is returned
-	bool testCcmFmaXTimesYNotZeroTimesInfAndPosNanOnZIsNan		= std::isnan(ccm::fma(1.0, 1.0, std::numeric_limits<double>::quiet_NaN()));
-	bool testStdFmaXTimesYNotZeroTimesInfAndPosNanOnZIsNan		= std::isnan(std::fma(1.0, 1.0, std::numeric_limits<double>::quiet_NaN()));
-	bool testCcmFmaXTimesYNotZeroTimesInfAndPosNanOnZIsSameSign = std::signbit(ccm::fma(1.0, 1.0, std::numeric_limits<double>::quiet_NaN()));
-	bool testStdFmaXTimesYNotZeroTimesInfAndPosNanOnZIsSameSign = std::signbit(std::fma(1.0, 1.0, std::numeric_limits<double>::quiet_NaN()));
-	EXPECT_EQ(testCcmFmaXTimesYNotZeroTimesInfAndPosNanOnZIsNan, testStdFmaXTimesYNotZeroTimesInfAndPosNanOnZIsNan);
-	EXPECT_EQ(testCcmFmaXTimesYNotZeroTimesInfAndPosNanOnZIsSameSign, testStdFmaXTimesYNotZeroTimesInfAndPosNanOnZIsSameSign);
-
-	bool testCcmFmaXTimesYNotZeroTimesInfAndNegNanOnZIsNan		= std::isnan(ccm::fma(1.0, 1.0, -std::numeric_limits<double>::quiet_NaN()));
-	bool testStdFmaXTimesYNotZeroTimesInfAndNegNanOnZIsNan		= std::isnan(std::fma(1.0, 1.0, -std::numeric_limits<double>::quiet_NaN()));
-	bool testCcmFmaXTimesYNotZeroTimesInfAndNegNanOnZIsSameSign = std::signbit(ccm::fma(1.0, 1.0, -std::numeric_limits<double>::quiet_NaN()));
-	bool testStdFmaXTimesYNotZeroTimesInfAndNegNanOnZIsSameSign = std::signbit(std::fma(1.0, 1.0, -std::numeric_limits<double>::quiet_NaN()));
-	EXPECT_EQ(testCcmFmaXTimesYNotZeroTimesInfAndNegNanOnZIsNan, testStdFmaXTimesYNotZeroTimesInfAndNegNanOnZIsNan);
-	EXPECT_EQ(testCcmFmaXTimesYNotZeroTimesInfAndNegNanOnZIsSameSign, testStdFmaXTimesYNotZeroTimesInfAndNegNanOnZIsSameSign);
-
-
-*/
+			ccm::test::ExpectFpEq(ccm::support::fp::public_fma<double>(x, y, z), reference);
+			ccm::test::ExpectFpEq(ccm::support::fp::generic_fma<double>(x, y, z), reference);
+		}
+	}
 }

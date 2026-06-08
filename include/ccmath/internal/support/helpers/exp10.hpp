@@ -22,7 +22,7 @@ namespace ccm::support::helpers
 {
 	namespace impl
 	{
-		using namespace ccm::type;
+		using namespace ccm::types;
 
 		constexpr double LOG2_10 = ccm::log2(10.0);
 

@@ -32,7 +32,7 @@ namespace ccm::test::oracle::powf_domains
 	}
 
 	template <typename AddCaseFn>
-	inline void add_mantissa_sweep(campaign_mode mode, AddCaseFn add_case, const std::set<std::string_view> & filter)
+	void add_mantissa_sweep(campaign_mode mode, AddCaseFn add_case, const std::set<std::string_view> & filter)
 	{
 		if (!domain_enabled(filter, "mantissa-sweep")) { return; }
 
@@ -48,7 +48,7 @@ namespace ccm::test::oracle::powf_domains
 	}
 
 	template <typename AddCaseFn>
-	inline void add_all_x_for_y(campaign_mode mode, AddCaseFn add_case, const std::set<std::string_view> & filter)
+	void add_all_x_for_y(campaign_mode mode, AddCaseFn add_case, const std::set<std::string_view> & filter)
 	{
 		if (!domain_enabled(filter, "all-x-for-y")) { return; }
 
@@ -64,7 +64,7 @@ namespace ccm::test::oracle::powf_domains
 	}
 
 	template <typename AddCaseFn>
-	inline void add_all_y_for_x(campaign_mode mode, AddCaseFn add_case, const std::set<std::string_view> & filter)
+	void add_all_y_for_x(campaign_mode mode, AddCaseFn add_case, const std::set<std::string_view> & filter)
 	{
 		if (!domain_enabled(filter, "all-y-for-x")) { return; }
 
@@ -80,7 +80,7 @@ namespace ccm::test::oracle::powf_domains
 	}
 
 	template <typename AddCaseFn>
-	inline void add_exponent_field_sweep(campaign_mode mode, AddCaseFn add_case, const std::set<std::string_view> & filter)
+	void add_exponent_field_sweep(campaign_mode mode, AddCaseFn add_case, const std::set<std::string_view> & filter)
 	{
 		if (!domain_enabled(filter, "exponent-field-sweep")) { return; }
 
@@ -103,7 +103,7 @@ namespace ccm::test::oracle::powf_domains
 	}
 
 	template <typename AddCaseFn>
-	inline void add_subnormal_x(campaign_mode mode, AddCaseFn add_case, const std::set<std::string_view> & filter)
+	void add_subnormal_x(campaign_mode mode, AddCaseFn add_case, const std::set<std::string_view> & filter)
 	{
 		if (!domain_enabled(filter, "subnormal-x")) { return; }
 
@@ -117,14 +117,14 @@ namespace ccm::test::oracle::powf_domains
 	}
 
 	template <typename AddCaseFn>
-	inline void add_unit_interval(campaign_mode mode, AddCaseFn add_case, const std::set<std::string_view> & filter)
+	void add_unit_interval(campaign_mode mode, AddCaseFn add_case, const std::set<std::string_view> & filter)
 	{
 		if (!domain_enabled(filter, "unit-interval")) { return; }
 		add_mantissa_sweep(mode, add_case, { "mantissa-sweep" });
 	}
 
 	template <typename AddCaseFn>
-	inline void add_negative_base([[maybe_unused]] campaign_mode mode, AddCaseFn add_case, const std::set<std::string_view> & filter)
+	void add_negative_base([[maybe_unused]] campaign_mode mode, AddCaseFn add_case, const std::set<std::string_view> & filter)
 	{
 		if (!domain_enabled(filter, "negative-base")) { return; }
 
@@ -139,7 +139,7 @@ namespace ccm::test::oracle::powf_domains
 	}
 
 	template <typename AddCaseFn>
-	inline void add_overflow_threshold(AddCaseFn add_case, const std::set<std::string_view> & filter)
+	void add_overflow_threshold(AddCaseFn add_case, const std::set<std::string_view> & filter)
 	{
 		if (!domain_enabled(filter, "overflow-threshold")) { return; }
 
@@ -150,7 +150,7 @@ namespace ccm::test::oracle::powf_domains
 	}
 
 	template <typename AddCaseFn>
-	inline void add_underflow_threshold(AddCaseFn add_case, const std::set<std::string_view> & filter)
+	void add_underflow_threshold(AddCaseFn add_case, const std::set<std::string_view> & filter)
 	{
 		if (!domain_enabled(filter, "underflow-threshold")) { return; }
 

@@ -260,4 +260,390 @@ namespace ccm::test::oracle
 
 		return finish_case(reference_fn(test_case.base, test_case.exponent, oracle_precision, rounding));
 	}
+
+	template <typename T>
+	struct ternary_case
+	{
+		T x;
+		T y;
+		T z;
+		std::string provenance;
+	};
+
+	template <typename T>
+	struct ternary_failure_record
+	{
+		std::string function_name;
+		std::string input_type;
+		std::string path;
+		std::string provenance;
+		T x;
+		T y;
+		T z;
+		T actual;
+		T expected;
+		std::string x_bits;
+		std::string y_bits;
+		std::string z_bits;
+		std::string actual_bits;
+		std::string expected_bits;
+		std::uint64_t ulp_distance = 0;
+		std::string rounding_mode;
+		unsigned long oracle_precision = 0;
+		std::string compiler;
+		std::string platform;
+		std::string fma_enabled;
+		std::string builtin_available;
+		std::string configuration_name;
+		std::string optimization_mode;
+		std::uint64_t seed = 0;
+		std::string timestamp;
+		std::string notes;
+		std::string event_kind;
+	};
+
+	template <typename T>
+	struct ternary_run_summary
+	{
+		std::size_t case_count = 0;
+		std::size_t failure_count = 0;
+		std::size_t mpfr_policy_mismatch_count = 0;
+		std::uint64_t max_observed_ulp = 0;
+		T worst_x{};
+		T worst_y{};
+		T worst_z{};
+		T worst_actual{};
+		T worst_expected{};
+	};
+
+	template <typename T>
+	inline void record_worst_ternary_case(ternary_run_summary<T> & summary,
+										  std::uint64_t ulp_distance,
+										  const ternary_case<T> & test_case,
+										  T actual,
+										  T expected)
+	{
+		if (ulp_distance >= summary.max_observed_ulp)
+		{
+			summary.max_observed_ulp = ulp_distance;
+			summary.worst_x = test_case.x;
+			summary.worst_y = test_case.y;
+			summary.worst_z = test_case.z;
+			summary.worst_actual = actual;
+			summary.worst_expected = expected;
+		}
+	}
+
+	template <typename T>
+	inline ternary_failure_record<T> make_ternary_failure_record(std::string_view function_name,
+																 std::string_view path,
+																 std::string_view provenance,
+																 T x,
+																 T y,
+																 T z,
+																 T actual,
+																 T expected,
+																 std::uint64_t ulp_distance,
+																 unsigned long oracle_precision,
+																 std::uint64_t seed,
+																 std::string_view notes,
+																 std::string_view event_kind = "mpfr_hard_failure")
+	{
+		return ternary_failure_record<T>{
+			std::string(function_name),
+			scalar_type_name<T>(),
+			std::string(path),
+			std::string(provenance),
+			x,
+			y,
+			z,
+			actual,
+			expected,
+			bits_hex(x),
+			bits_hex(y),
+			bits_hex(z),
+			bits_hex(actual),
+			bits_hex(expected),
+			ulp_distance,
+			current_rounding_mode_name(),
+			oracle_precision,
+			compiler_id(),
+			platform_id(),
+			fma_status(),
+			fma_builtin_status<T>(),
+			fma_configuration_name(),
+			optimization_mode(),
+			seed,
+			utc_timestamp(),
+			std::string(notes),
+			std::string(event_kind),
+		};
+	}
+
+	template <typename T, typename ActualFn, typename ReferenceFn, typename ExceptionalReferenceFn>
+	inline std::optional<ternary_failure_record<T>> evaluate_ternary_mpfr_case(const ternary_case<T> & test_case,
+																			   std::string_view function_name,
+																			   std::string_view path_name,
+																			   ActualFn actual_fn,
+																			   ReferenceFn reference_fn,
+																			   ExceptionalReferenceFn exceptional_reference_fn,
+																			   mpfr_prec_t oracle_precision,
+																			   std::uint64_t max_ulp,
+																			   std::uint64_t seed,
+																			   ternary_run_summary<T> & summary,
+																			   std::string_view mismatch_note = "exceptional mismatch vs std reference")
+	{
+		++summary.case_count;
+
+		const mpfr_rnd_t rounding = current_mpfr_rounding_mode();
+		const T actual = actual_fn(test_case.x, test_case.y, test_case.z);
+		const T std_expected = exceptional_reference_fn(test_case.x, test_case.y, test_case.z);
+		const T mpfr_expected = reference_fn(test_case.x, test_case.y, test_case.z, oracle_precision, rounding);
+
+		if (is_exceptional_or_zero_result(actual) || is_exceptional_or_zero_result(std_expected))
+		{
+			const bool matches_std = exceptional_or_zero_match(actual, std_expected);
+			const bool matches_mpfr = exceptional_or_zero_match(actual, mpfr_expected);
+			if (matches_std || matches_mpfr)
+			{
+				if (matches_std && !matches_mpfr) { ++summary.mpfr_policy_mismatch_count; }
+				return std::nullopt;
+			}
+
+			++summary.failure_count;
+			return make_ternary_failure_record(
+				function_name,
+				path_name,
+				test_case.provenance,
+				test_case.x,
+				test_case.y,
+				test_case.z,
+				actual,
+				std_expected,
+				0,
+				static_cast<unsigned long>(oracle_precision),
+				seed,
+				mismatch_note);
+		}
+
+		std::uint64_t distance = 0;
+		std::string notes;
+		const bool pass = oracle_match(actual, mpfr_expected, max_ulp, distance, notes);
+		record_worst_ternary_case(summary, distance, test_case, actual, mpfr_expected);
+		if (pass) { return std::nullopt; }
+
+		++summary.failure_count;
+		return make_ternary_failure_record(
+			function_name,
+			path_name,
+			test_case.provenance,
+			test_case.x,
+			test_case.y,
+			test_case.z,
+			actual,
+			mpfr_expected,
+			distance,
+			static_cast<unsigned long>(oracle_precision),
+			seed,
+			notes.empty() ? "ULP threshold exceeded" : notes);
+	}
+
+	template <typename T>
+	struct unary_case
+	{
+		T input;
+		std::string provenance;
+	};
+
+	template <typename T>
+	struct unary_failure_record
+	{
+		std::string function_name;
+		std::string input_type;
+		std::string path;
+		std::string provenance;
+		T input;
+		T actual;
+		T expected;
+		std::string input_bits;
+		std::string actual_bits;
+		std::string expected_bits;
+		std::uint64_t ulp_distance = 0;
+		std::string rounding_mode;
+		unsigned long oracle_precision = 0;
+		std::string compiler;
+		std::string platform;
+		std::string fma_enabled;
+		std::string configuration_name;
+		std::string optimization_mode;
+		std::uint64_t seed = 0;
+		std::string timestamp;
+		std::string notes;
+		std::string event_kind;
+	};
+
+	template <typename T>
+	struct unary_run_summary
+	{
+		std::size_t case_count = 0;
+		std::size_t failure_count = 0;
+		std::size_t mpfr_policy_mismatch_count = 0;
+		std::size_t above_target_count = 0;
+		std::uint64_t max_observed_ulp = 0;
+		T worst_input{};
+		T worst_actual{};
+		T worst_expected{};
+	};
+
+	template <typename T>
+	inline void record_worst_unary_case(unary_run_summary<T> & summary,
+										std::uint64_t ulp_distance,
+										const unary_case<T> & test_case,
+										T actual,
+										T expected)
+	{
+		if (ulp_distance >= summary.max_observed_ulp)
+		{
+			summary.max_observed_ulp = ulp_distance;
+			summary.worst_input = test_case.input;
+			summary.worst_actual = actual;
+			summary.worst_expected = expected;
+		}
+	}
+
+	template <typename T>
+	inline unary_failure_record<T> make_unary_failure_record(std::string_view function_name,
+															 std::string_view path,
+															 std::string_view provenance,
+															 T input,
+															 T actual,
+															 T expected,
+															 std::uint64_t ulp_distance,
+															 unsigned long oracle_precision,
+															 std::uint64_t seed,
+															 std::string_view notes,
+															 std::string_view event_kind = "mpfr_hard_failure")
+	{
+		return unary_failure_record<T>{
+			std::string(function_name),
+			scalar_type_name<T>(),
+			std::string(path),
+			std::string(provenance),
+			input,
+			actual,
+			expected,
+			bits_hex(input),
+			bits_hex(actual),
+			bits_hex(expected),
+			ulp_distance,
+			current_rounding_mode_name(),
+			oracle_precision,
+			compiler_id(),
+			platform_id(),
+			fma_status(),
+			pow_configuration_name(),
+			optimization_mode(),
+			seed,
+			utc_timestamp(),
+			std::string(notes),
+			std::string(event_kind),
+		};
+	}
+
+	template <typename T, typename ActualFn, typename ReferenceFn, typename ExceptionalReferenceFn>
+	inline std::optional<unary_failure_record<T>> evaluate_unary_mpfr_case(const unary_case<T> & test_case,
+																		 std::string_view function_name,
+																		 std::string_view path_name,
+																		 ActualFn actual_fn,
+																		 ReferenceFn reference_fn,
+																		 ExceptionalReferenceFn exceptional_reference_fn,
+																		 mpfr_prec_t oracle_precision,
+																		 std::uint64_t max_ulp,
+																		 std::uint64_t seed,
+																		 unary_run_summary<T> & summary,
+																		 std::uint64_t target_ulp = 0,
+																		 std::string_view mismatch_note = "exceptional mismatch vs std reference",
+																		 std::vector<unary_failure_record<T>> * event_log = nullptr)
+	{
+		++summary.case_count;
+
+		const mpfr_rnd_t rounding = current_mpfr_rounding_mode();
+		const T actual = actual_fn(test_case.input);
+		const T std_expected = exceptional_reference_fn(test_case.input);
+		const T mpfr_expected = reference_fn(test_case.input, oracle_precision, rounding);
+
+		const auto finish_case = [&](T expected) -> std::optional<unary_failure_record<T>>
+		{
+			std::uint64_t distance = 0;
+			std::string notes;
+			const bool pass = oracle_match(actual, expected, max_ulp, distance, notes);
+			record_worst_unary_case(summary, distance, test_case, actual, expected);
+			if (pass)
+			{
+				if (distance > target_ulp)
+				{
+					++summary.above_target_count;
+					if (event_log != nullptr)
+					{
+						event_log->push_back(make_unary_failure_record(
+							function_name,
+							path_name,
+							test_case.provenance,
+							test_case.input,
+							actual,
+							expected,
+							distance,
+							static_cast<unsigned long>(oracle_precision),
+							seed,
+							"above correctly-rounded target",
+							"mpfr_above_target"));
+					}
+				}
+				return std::nullopt;
+			}
+
+			++summary.failure_count;
+			auto record = make_unary_failure_record(
+				function_name,
+				path_name,
+				test_case.provenance,
+				test_case.input,
+				actual,
+				expected,
+				distance,
+				static_cast<unsigned long>(oracle_precision),
+				seed,
+				notes.empty() ? "ULP threshold exceeded" : notes);
+			if (event_log != nullptr) { event_log->push_back(record); }
+			return record;
+		};
+
+		if (is_exceptional_or_zero_result(actual) || is_exceptional_or_zero_result(std_expected))
+		{
+			const bool matches_std = exceptional_or_zero_match(actual, std_expected);
+			const bool matches_mpfr = exceptional_or_zero_match(actual, mpfr_expected);
+			if (matches_std || matches_mpfr)
+			{
+				if (matches_std && !matches_mpfr) { ++summary.mpfr_policy_mismatch_count; }
+				return std::nullopt;
+			}
+
+			++summary.failure_count;
+			auto record = make_unary_failure_record(
+				function_name,
+				path_name,
+				test_case.provenance,
+				test_case.input,
+				actual,
+				std_expected,
+				0,
+				static_cast<unsigned long>(oracle_precision),
+				seed,
+				mismatch_note);
+			if (event_log != nullptr) { event_log->push_back(record); }
+			return record;
+		}
+
+		return finish_case(mpfr_expected);
+	}
 } // namespace ccm::test::oracle

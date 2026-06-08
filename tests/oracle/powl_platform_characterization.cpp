@@ -27,6 +27,7 @@ namespace
 		std::uint64_t oracle_max_ulp = 0;
 	};
 
+	// ReSharper disable once CppDFAConstantFunctionResult
 	std::string detect_powl_path()
 	{
 #if defined(CCMATH_HAS_CONSTEXPR_BUILTIN_POW)
@@ -42,15 +43,18 @@ namespace
 
 	void run_conservative_oracle(platform_report & report)
 	{
+		// ReSharper disable once CppDFAConstantConditions
 		if (report.classification != ccm::config::LongDoubleFormat::Double)
 		{
+			// ReSharper disable CppDFAUnreachableCode
 			report.mpfr_oracle_supported = false;
 			report.mpfr_skip_reason = "MPFR conservative oracle uses double reference only on double-shaped long double platforms";
 			return;
+			// ReSharper enable CppDFAUnreachableCode
 		}
 
-		const std::array<long double, 6> bases = { 0.25L, 0.5L, 1.0L, 2.0L, 3.0L, 10.0L };
-		const std::array<long double, 6> exponents = { -2.0L, -0.5L, 0.0L, 0.5L, 2.0L, 3.0L };
+		const std::array bases = { 0.25L, 0.5L, 1.0L, 2.0L, 3.0L, 10.0L };
+		const std::array exponents = { -2.0L, -0.5L, 0.0L, 0.5L, 2.0L, 3.0L };
 		ccm::test::oracle::run_summary<long double> summary;
 
 		for (long double base : bases)
@@ -61,7 +65,7 @@ namespace
 				const double exp_d = static_cast<double>(exponent);
 				const long double actual = ccm::powl(base, exponent);
 				const double expected = ccm::test::oracle::mpfr_pow_reference(base_d, exp_d, 256, ccm::test::oracle::current_mpfr_rounding_mode());
-				const long double expected_ld = static_cast<long double>(expected);
+				const long double expected_ld = expected;
 
 				std::uint64_t distance = 0;
 				std::string notes;
@@ -92,8 +96,10 @@ namespace
 		out << "  \"digits\": " << report.digits << ",\n";
 		out << "  \"max_exponent\": " << report.max_exponent << ",\n";
 		out << "  \"classification\": \"" << report.classification_name << "\",\n";
+		// ReSharper disable once CppDFAConstantConditions
 		out << "  \"fallback_enabled\": " << (report.fallback_enabled ? "true" : "false") << ",\n";
 		out << "  \"powl_path\": \"" << report.powl_path << "\",\n";
+		// ReSharper disable once CppDFAConstantConditions
 		out << "  \"mpfr_oracle_supported\": " << (report.mpfr_oracle_supported ? "true" : "false") << ",\n";
 		out << "  \"mpfr_skip_reason\": \"" << ccm::test::oracle::json_escape(report.mpfr_skip_reason) << "\",\n";
 		out << "  \"oracle_case_count\": " << report.oracle_case_count << ",\n";
@@ -125,14 +131,17 @@ int main(int argc, char ** argv)
 	std::cout << "  sizeof(long double)=" << report.sizeof_long_double << " digits=" << report.digits << " max_exponent=" << report.max_exponent << '\n';
 	std::cout << "  classification=" << report.classification_name << " fallback_enabled=" << (report.fallback_enabled ? "yes" : "no")
 			  << " powl_path=" << report.powl_path << '\n';
+	// ReSharper disable once CppDFAConstantConditions
 	std::cout << "  mpfr_oracle_supported=" << (report.mpfr_oracle_supported ? "yes" : "no");
 	if (!report.mpfr_skip_reason.empty()) { std::cout << " reason=" << report.mpfr_skip_reason; }
 	std::cout << '\n';
+	// ReSharper disable once CppDFAConstantConditions
 	if (report.mpfr_oracle_supported)
 	{
 		std::cout << "  oracle_case_count=" << report.oracle_case_count << " oracle_max_ulp=" << report.oracle_max_ulp << '\n';
 	}
 	std::cout << "  json=" << json_output << '\n';
 
+	// ReSharper disable once CppDFAConstantConditions
 	return (report.mpfr_oracle_supported && report.oracle_max_ulp > 4) ? 1 : 0;
 }

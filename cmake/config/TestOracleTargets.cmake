@@ -76,3 +76,58 @@ function(ccmath_add_rigorous_oracle_test TEST_NAME TARGET)
         set_tests_properties(${TEST_NAME} PROPERTIES WORKING_DIRECTORY "${CCM_ORACLE_TEST_WORKING_DIRECTORY}")
     endif ()
 endfunction()
+
+function(ccmath_ensure_mpfr_oracle_target TARGET)
+    set(options)
+    set(oneValueArgs)
+    set(multiValueArgs SOURCES)
+    cmake_parse_arguments(CCM_ENSURE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    if (TARGET ${TARGET})
+        return()
+    endif ()
+    if (NOT CCM_ENSURE_SOURCES)
+        message(FATAL_ERROR "ccmath_ensure_mpfr_oracle_target(${TARGET}): SOURCES is required")
+    endif ()
+    ccmath_add_rigorous_oracle_target(${TARGET} BACKEND MPFR SOURCES ${CCM_ENSURE_SOURCES})
+endfunction()
+
+function(ccmath_ensure_coremath_oracle_target TARGET)
+    set(options)
+    set(oneValueArgs)
+    set(multiValueArgs SOURCES)
+    cmake_parse_arguments(CCM_ENSURE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    if (TARGET ${TARGET})
+        return()
+    endif ()
+    if (NOT CCM_ENSURE_SOURCES)
+        message(FATAL_ERROR "ccmath_ensure_coremath_oracle_target(${TARGET}): SOURCES is required")
+    endif ()
+    ccmath_add_rigorous_oracle_target(${TARGET} BACKEND COREMATH SOURCES ${CCM_ENSURE_SOURCES})
+endfunction()
+
+function(ccmath_add_oracle_ctest TEST_NAME)
+    set(options)
+    set(oneValueArgs TARGET TIMEOUT WORKING_DIRECTORY LOG_OUTPUT JSON_OUTPUT)
+    set(multiValueArgs LABELS ARGS)
+    cmake_parse_arguments(CCM_CTEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    if (NOT CCM_CTEST_TARGET)
+        message(FATAL_ERROR "ccmath_add_oracle_ctest(${TEST_NAME}): TARGET is required")
+    endif ()
+
+    set(_command_args ${CCM_CTEST_ARGS})
+    if (CCM_CTEST_LOG_OUTPUT)
+        list(APPEND _command_args --log-output=${CCM_CTEST_LOG_OUTPUT})
+    endif ()
+    if (CCM_CTEST_JSON_OUTPUT)
+        list(APPEND _command_args --json-output=${CCM_CTEST_JSON_OUTPUT})
+    endif ()
+
+    ccmath_add_rigorous_oracle_test(${TEST_NAME} ${CCM_CTEST_TARGET}
+            LABELS ${CCM_CTEST_LABELS}
+            TIMEOUT ${CCM_CTEST_TIMEOUT}
+            ARGS ${_command_args}
+            WORKING_DIRECTORY ${CCM_CTEST_WORKING_DIRECTORY})
+endfunction()

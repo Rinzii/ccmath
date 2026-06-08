@@ -11,6 +11,7 @@
 #include "ccmath/ccmath.hpp"
 #include "utils/conformance_suite.hpp"
 #include "utils/math_samples.hpp"
+#include "utils/test_runtime.hpp"
 
 #include <gtest/gtest.h>
 
@@ -18,12 +19,7 @@
 
 namespace
 {
-	template <typename T>
-	T runtime_value(T value)
-	{
-		volatile T sink = value;
-		return sink;
-	}
+	using ccm::test::runtime_value;
 } // namespace
 
 TEST(CcmathRoundingConformanceTests, NearbyIntMatchesStdAllModesDouble)

@@ -180,6 +180,7 @@ if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TESTS)
         else ()
             add_subdirectory(tests)
         endif ()
+        include(cmake/config/TestCtestTargets.cmake)
     endif ()
 endif ()
 

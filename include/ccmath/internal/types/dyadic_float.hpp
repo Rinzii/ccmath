@@ -694,7 +694,7 @@ namespace ccm::types
 	 * This function computes \f$a^\text{power}\f$ by repeatedly squaring @p a
 	 * (stored as @p cur_power) and multiplying it into @p result when the current
 	 * bit of @p power is set (using quick_mul()). Only positive exponents are
-	 * supported since division is not implemented.
+	 * supported. Use rounded_div for general division.
 	 *
 	 * @tparam Bits The number of bits used in the DyadicFloat.
 	 * @param a The base DyadicFloat.

@@ -11,6 +11,12 @@ ccmath_add_test(ccmath-simple-basic
 )
 set_tests_properties(ccmath-simple-basic PROPERTIES LABELS simple)
 
+ccmath_add_command_test(ccmath-simple-constexpr-fmaf-upward
+        ../math/basic/fma_constexpr_upward_config_test.cpp
+)
+target_compile_definitions(ccmath-simple-constexpr-fmaf-upward PRIVATE CCM_CONSTEXPR_ROUNDING_MODE=FE_UPWARD)
+set_tests_properties(ccmath-simple-constexpr-fmaf-upward PROPERTIES LABELS simple)
+
 ccmath_add_test(ccmath-simple-compare
         ../math/compare/fpclassify_test.cpp
         ../math/compare/isfinite_test.cpp
@@ -96,6 +102,7 @@ set_tests_properties(ccmath-simple-misc PROPERTIES LABELS simple)
 ccmath_add_test(ccmath-simple-internal-types
         ../math/internal/types/big_int_test.cpp
         ../math/internal/types/dyadic_float_test.cpp
+        ../math/internal/types/normalized_float_test.cpp
 )
 set_tests_properties(ccmath-simple-internal-types PROPERTIES LABELS simple)
 

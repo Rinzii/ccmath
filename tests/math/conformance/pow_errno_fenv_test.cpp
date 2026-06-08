@@ -13,6 +13,7 @@
 #include "ccmath/internal/predef/attributes/never_inline.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "utils/conformance_suite.hpp"
+#include "utils/test_runtime.hpp"
 
 #include <gtest/gtest.h>
 
@@ -22,12 +23,7 @@
 
 namespace
 {
-	template <typename T>
-	T runtime_value(T value)
-	{
-		volatile T sink = value;
-		return sink;
-	}
+	using ccm::test::runtime_value;
 
 	template <typename T>
 	void consume(T value)

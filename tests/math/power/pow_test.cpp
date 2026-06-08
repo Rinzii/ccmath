@@ -21,6 +21,7 @@
 #include "utils/conformance_suite.hpp"
 #include "utils/ulp_suite.hpp"
 #include "utils/worst_case_samples.hpp"
+#include "utils/test_runtime.hpp"
 
 #if defined(_MSC_VER) && !defined(__clang__)
 	#define CCMATH_SKIP_MSVC_FENV() GTEST_SKIP() << "fenv exception flags are not reliable under MSVC"
@@ -30,18 +31,13 @@
 
 namespace
 {
+	using ccm::test::runtime_value;
+
 	template <typename T>
 	void consume(T value)
 	{
 		volatile T sink = value;
 		(void)sink;
-	}
-
-	template <typename T>
-	T runtime_value(T value)
-	{
-		volatile T sink = value;
-		return sink;
 	}
 } // namespace
 

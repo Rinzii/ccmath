@@ -12,9 +12,18 @@
 
 #include <array>
 #include <cstddef>
+#include <limits>
 
 namespace ccm::test::samples
 {
+	template <typename T>
+	struct ternary_input
+	{
+		T x;
+		T y;
+		T z;
+	};
+
 	inline constexpr std::array<float, 22> kTrigFloat = {
 		0.0F, -0.0F, 0.001F, -0.001F, 0.1F, -0.1F, 0.25F, -0.25F, 0.5F, -0.5F, 1.0F, -1.0F, 1.5F, -1.5F, 2.0F, -2.0F,
 		3.14159265F / 6.0F, 3.14159265F / 4.0F, 3.14159265F / 3.0F, 10.0F, -10.0F, 100.0F,
@@ -75,6 +84,57 @@ namespace ccm::test::samples
 
 	inline constexpr std::array<double, 4> kAllModesPowBases = { 2.0, 3.0, 0.5, 4.0 };
 	inline constexpr std::array<double, 4> kAllModesPowExponents = { 2.0, 1.0, 2.0, 0.5 };
+
+	inline constexpr std::array<ternary_input<float>, 14> kFmaFloatCases = {
+		ternary_input<float>{ 1.0F, 2.0F, 3.0F },
+		ternary_input<float>{ -0.0F, -0.0F, -0.0F },
+		ternary_input<float>{ 0x1.fffep-1F, 0x1.fffep-1F, -0x1.ep-2F },
+		ternary_input<float>{ 0x1.fffep-1F, 0x1.fffep-1F, -0x1.fffcp-1F },
+		ternary_input<float>{ 0x1.0p-126F, 0x1.0p-23F, -0x1.0p-149F },
+		ternary_input<float>{ 0x1.fffffep127F, 2.0F, -0x1.fffffep127F },
+		ternary_input<float>{ 0x1.0p-126F, 0x1.0p-24F, -0x1.0p-149F },
+		ternary_input<float>{ 0.0F, std::numeric_limits<float>::infinity(), std::numeric_limits<float>::quiet_NaN() },
+		ternary_input<float>{ std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity() },
+		ternary_input<float>{ std::numeric_limits<float>::quiet_NaN(), 1.0F, 1.0F },
+		ternary_input<float>{ 1.0F, 1.0F, std::numeric_limits<float>::quiet_NaN() },
+		// Double-rounding killers: double(x)*double(y) + double(z) cast back to float rounds twice
+		// and is off by 1 ulp; only a correctly-rounded fused kernel matches. See fma.hpp.
+		ternary_input<float>{ 0x1.001p+0F, 0x1.001p+0F, 0x1.0p-53F },  // 1+2^-12 squared + 2^-53 -> 0x3f801001
+		ternary_input<float>{ 0x1.001p+0F, 0x1.001p+0F, -0x1.0p-53F }, // 1+2^-12 squared - 2^-53 -> 0x3f801000
+		ternary_input<float>{ 0x1.8p+1F, 0x1.000002p+0F, -0x1.0p-149F }, // 3*(1+2^-23) - 2^-149
+	};
+
+	inline constexpr std::array<ternary_input<double>, 11> kFmaDoubleCases = {
+		ternary_input<double>{ 1.0, 2.0, 3.0 },
+		ternary_input<double>{ -0.0, -0.0, -0.0 },
+		ternary_input<double>{ 0x1.ffffffffffffep-1, 0x1.ffffffffffffep-1, -0x1.ep-2 },
+		ternary_input<double>{ 0x1.ffffffffffep-1, 0x1.ffffffffffep-1, -0x1.ffffffffffcp-1 },
+		ternary_input<double>{ 0x1.0p-1022, 0x1.0p-52, -0x1.0p-1074 },
+		ternary_input<double>{ 0x1.fffffffffffffp1023, 2.0, -0x1.fffffffffffffp1023 },
+		ternary_input<double>{ 0x1.0p-1022, 0x1.0p-53, -0x1.0p-1074 },
+		ternary_input<double>{ 0.0, std::numeric_limits<double>::infinity(), std::numeric_limits<double>::quiet_NaN() },
+		ternary_input<double>{ std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity() },
+		ternary_input<double>{ std::numeric_limits<double>::quiet_NaN(), 1.0, 1.0 },
+		ternary_input<double>{ 1.0, 1.0, std::numeric_limits<double>::quiet_NaN() },
+	};
+
+	inline constexpr std::array<ternary_input<float>, 7> kFmaAllModesFloatCases = {
+		ternary_input<float>{ 0x1.fffep-1F, 0x1.fffep-1F, -0x1.ep-2F },
+		ternary_input<float>{ 0x1.fffep-1F, 0x1.fffep-1F, -0x1.fffcp-1F },
+		ternary_input<float>{ 0x1.0p-126F, 0x1.0p-23F, -0x1.0p-149F },
+		ternary_input<float>{ 0.0F, std::numeric_limits<float>::infinity(), std::numeric_limits<float>::quiet_NaN() },
+		ternary_input<float>{ std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity() },
+		ternary_input<float>{ 0x1.001p+0F, 0x1.001p+0F, 0x1.0p-53F },  // double-rounding killer (all modes)
+		ternary_input<float>{ 0x1.001p+0F, 0x1.001p+0F, -0x1.0p-53F },
+	};
+
+	inline constexpr std::array<ternary_input<double>, 5> kFmaAllModesDoubleCases = {
+		ternary_input<double>{ 0x1.ffffffffffffep-1, 0x1.ffffffffffffep-1, -0x1.ep-2 },
+		ternary_input<double>{ 0x1.ffffffffffep-1, 0x1.ffffffffffep-1, -0x1.ffffffffffcp-1 },
+		ternary_input<double>{ 0x1.0p-1022, 0x1.0p-52, -0x1.0p-1074 },
+		ternary_input<double>{ 0.0, std::numeric_limits<double>::infinity(), std::numeric_limits<double>::quiet_NaN() },
+		ternary_input<double>{ std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity() },
+	};
 
 	// Inverse trig: asin/acos domain is [-1, 1]. atan accepts full range.
 	inline constexpr std::array<float, 16> kInvTrigUnitFloat = {

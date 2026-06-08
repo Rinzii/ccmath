@@ -4,6 +4,8 @@
 #include "ccmath/internal/math/generic/builtins/power/pow.hpp"
 #include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
 #include "ccmath/internal/math/runtime/func/power/pow_rt.hpp"
+#include "utils/campaign_metadata.hpp"
+#include "utils/test_runtime.hpp"
 
 #include <cmath>
 #include <iostream>
@@ -24,83 +26,6 @@ namespace ccm::test::pow_path
 		runtime_simd,
 		runtime_builtin,
 	};
-
-	template <typename T>
-	inline T runtime_value(T value)
-	{
-		volatile T sink = value;
-		return sink;
-	}
-
-	inline std::string compiler_id()
-	{
-#if defined(__clang__)
-		return std::string("clang ") + __clang_version__;
-#elif defined(__GNUC__)
-		return std::string("gcc ") + __VERSION__;
-#elif defined(_MSC_FULL_VER)
-		return "msvc " + std::to_string(_MSC_FULL_VER);
-#elif defined(_MSC_VER)
-		return "msvc " + std::to_string(_MSC_VER);
-#else
-		return "unknown";
-#endif
-	}
-
-	inline std::string platform_id()
-	{
-#if defined(__APPLE__)
-		return "apple";
-#elif defined(_WIN32)
-		return "windows";
-#elif defined(__linux__)
-		return "linux";
-#else
-		return "unknown";
-#endif
-	}
-
-	inline std::string optimization_mode()
-	{
-#if defined(NDEBUG)
-		return "release";
-#else
-		return "debug";
-#endif
-	}
-
-	inline constexpr const char * fma_status()
-	{
-#if defined(CCMATH_TARGET_CPU_HAS_FMA)
-		return "on";
-#else
-		return "off";
-#endif
-	}
-
-	template <typename T>
-	inline constexpr const char * builtin_status()
-	{
-		return ccm::builtin::has_runtime_pow<T> ? "available" : "unavailable";
-	}
-
-	inline constexpr const char * simd_status()
-	{
-#if defined(CCMATH_HAS_SIMD)
-		return "compiled";
-#else
-		return "unavailable";
-#endif
-	}
-
-	inline std::string configuration_name()
-	{
-#ifdef CCM_CONFIG_TEST_POW_VALIDATION_NAME
-		return CCM_CONFIG_TEST_POW_VALIDATION_NAME;
-#else
-		return "default";
-#endif
-	}
 
 	inline std::string path_name(validation_path path)
 	{
@@ -167,26 +92,26 @@ namespace ccm::test::pow_path
 		switch (path)
 		{
 		case validation_path::public_default:
-			if constexpr (std::is_same_v<T, float>) { return ccm::powf(runtime_value(base), runtime_value(exponent)); }
-			else if constexpr (std::is_same_v<T, double>) { return ccm::pow(runtime_value(base), runtime_value(exponent)); }
-			else { return ccm::powl(runtime_value(base), runtime_value(exponent)); }
+			if constexpr (std::is_same_v<T, float>) { return ccm::powf(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent)); }
+			else if constexpr (std::is_same_v<T, double>) { return ccm::pow(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent)); }
+			else { return ccm::powl(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent)); }
 		case validation_path::generic_runtime:
-		case validation_path::generic_modeled_domain: return ccm::gen::pow_gen(runtime_value(base), runtime_value(exponent));
-		case validation_path::runtime_no_builtin: return ccm::rt::pow_rt(runtime_value(base), runtime_value(exponent));
+		case validation_path::generic_modeled_domain: return ccm::gen::pow_gen(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
+		case validation_path::runtime_no_builtin: return ccm::rt::pow_rt(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
 		case validation_path::runtime_simd:
 #if defined(CCMATH_HAS_SIMD)
-			return ccm::rt::simd_impl::pow_simd_impl(runtime_value(base), runtime_value(exponent));
+			return ccm::rt::simd_impl::pow_simd_impl(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
 #else
-			return ccm::gen::pow_gen(runtime_value(base), runtime_value(exponent));
+			return ccm::gen::pow_gen(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
 #endif
 		case validation_path::runtime_builtin:
 			// runtime_pow is only defined where has_runtime_pow<T> holds (GCC/Clang). On other
 			// toolchains this path reports unsupported via path_is_supported, but the switch must
 			// still compile, so fall back to the generic kernel in the discarded branch.
-			if constexpr (ccm::builtin::has_runtime_pow<T>) { return ccm::builtin::runtime_pow(runtime_value(base), runtime_value(exponent)); }
-			else { return ccm::gen::pow_gen(runtime_value(base), runtime_value(exponent)); }
+			if constexpr (ccm::builtin::has_runtime_pow<T>) { return ccm::builtin::runtime_pow(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent)); }
+			else { return ccm::gen::pow_gen(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent)); }
 		}
-		return ccm::gen::pow_gen(runtime_value(base), runtime_value(exponent));
+		return ccm::gen::pow_gen(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
 	}
 
 	struct configuration_report
@@ -205,7 +130,14 @@ namespace ccm::test::pow_path
 	inline configuration_report make_configuration_report(validation_path path)
 	{
 		return configuration_report{
-			configuration_name(), path_name(path), compiler_id(), platform_id(), optimization_mode(), fma_status(), builtin_status<T>(), simd_status(),
+			ccm::test::pow_configuration_name(),
+			path_name(path),
+			ccm::test::compiler_id(),
+			ccm::test::platform_id(),
+			ccm::test::optimization_mode(),
+			ccm::test::fma_status(),
+			ccm::test::pow_builtin_status<T>(),
+			ccm::test::simd_status(),
 		};
 	}
 

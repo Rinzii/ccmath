@@ -26,8 +26,10 @@
 #include "ccmath/internal/support/fp/ops/add.hpp"
 #include "ccmath/internal/support/fp/ops/mul.hpp"
 #include "ccmath/internal/support/poly_eval.hpp"
+#include "ccmath/internal/support/helpers/exp10.hpp"
 #include "ccmath/internal/types/double_double.hpp"
 #include "ccmath/internal/types/triple_double.hpp"
+#include "ccmath/math/expo/impl/exp2_float_impl.hpp"
 
 #include <optional>
 #include <type_traits>
@@ -250,9 +252,9 @@ namespace ccm::gen::impl
 				case 0x3f80'0000: // x = 1.0f
 					return 1.0F;
 				case 0x4000'0000: // x = 2.0f
-								  // return generic::exp2f(y); // TODO: Implement
+					return ccm::internal::exp2_float(y);
 				case 0x4120'0000: // x = 10.0f
-								  // return generic::exp10f(y); // TODO: Implement
+					return ccm::support::helpers::exp10_float(y);
 				default: break;
 				}
 
