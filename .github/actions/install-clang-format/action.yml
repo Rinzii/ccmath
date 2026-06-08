@@ -1,9 +1,14 @@
 name: Install clang-format
-description: Install clang-format 20 for CI format checks with download retries on macOS and Windows
+description: Install clang-format 22.1.6 for CI format checks with download retries on macOS and Windows
 
 runs:
   using: composite
   steps:
+    - name: Read clang-format version
+      id: clang_format_version
+      shell: bash
+      run: echo "value=$(tr -d '[:space:]' < tools/clang_format_version)" >> "${GITHUB_OUTPUT}"
+
     - name: Install clang-format (Linux)
       if: runner.os == 'Linux'
       shell: bash
@@ -15,7 +20,7 @@ runs:
       continue-on-error: true
       id: clang_format_attempt_1
       with:
-        clangformat: 20.1.8
+        clangformat: ${{ steps.clang_format_version.outputs.value }}
 
     - name: Wait before clang-format retry
       if: runner.os != 'Linux' && steps.clang_format_attempt_1.outcome != 'success'
@@ -28,7 +33,7 @@ runs:
       continue-on-error: true
       id: clang_format_attempt_2
       with:
-        clangformat: 20.1.8
+        clangformat: ${{ steps.clang_format_version.outputs.value }}
 
     - name: Wait before clang-format retry
       if: runner.os != 'Linux' && steps.clang_format_attempt_1.outcome != 'success' && steps.clang_format_attempt_2.outcome != 'success'
@@ -40,4 +45,4 @@ runs:
       uses: aminya/setup-cpp@1f17f92d6a52bfcb1a25348e2c526c2e5cbb1134 # v1.8.0
       id: clang_format_attempt_3
       with:
-        clangformat: 20.1.8
+        clangformat: ${{ steps.clang_format_version.outputs.value }}

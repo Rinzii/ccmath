@@ -11,8 +11,16 @@
 
 set -euo pipefail
 
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+expected_version="$(tr -d '[:space:]' < "${repo_root}/tools/clang_format_version")"
 CLANG_FORMAT="${CLANG_FORMAT:-clang-format}"
 STYLE_ARGS=(-style=file -fallback-style=none)
+
+if ! "${CLANG_FORMAT}" --version | grep -Fq "${expected_version}"; then
+    echo "clang-format version mismatch: expected ${expected_version}" >&2
+    "${CLANG_FORMAT}" --version >&2
+    exit 1
+fi
 
 if ! find include -name '*.hpp' -print -quit | grep -q .; then
     echo "No header files found under include/."
