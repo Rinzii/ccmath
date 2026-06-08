@@ -11,6 +11,7 @@
 #include <gtest/gtest.h>
 
 #include <ccmath/ccmath.hpp>
+
 #include <cmath>
 #include <limits>
 
@@ -20,5 +21,4 @@ TEST(CcmathCompareTests, IsFinite)
 	static_assert(ccm::isfinite(1.0), "isfinite has failed testing that it is static_assert-able!");
 
 	EXPECT_EQ(ccm::isfinite(1.0), std::isfinite(1.0));
-
 }

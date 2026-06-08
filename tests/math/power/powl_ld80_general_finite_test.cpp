@@ -8,31 +8,28 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "ccmath/ccmath.hpp"
+#include "ccmath/internal/config/long_double_format.hpp"
+#include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
+#include "utils/ulp_suite.hpp"
+
 #include <gtest/gtest.h>
 
 #include <cmath>
 #include <limits>
 #include <random>
 
-#include "ccmath/ccmath.hpp"
-#include "ccmath/internal/config/long_double_format.hpp"
-#include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
-#include "utils/ulp_suite.hpp"
-
 namespace
 {
-#define REQUIRE_POWL_LD80()                                                                                                        \
-	do                                                                                                                             \
-	{                                                                                                                              \
-		if (ccm::config::detect_long_double_format() != ccm::config::LongDoubleFormat::X87Extended)                                \
-		{                                                                                                                          \
-			GTEST_SKIP() << "x87 80-bit long double required";                                                                     \
-		}                                                                                                                          \
+#define REQUIRE_POWL_LD80()                                                                                                                                    \
+	do                                                                                                                                                         \
+	{                                                                                                                                                          \
+		if (ccm::config::detect_long_double_format() != ccm::config::LongDoubleFormat::X87Extended) { GTEST_SKIP() << "x87 80-bit long double required"; }     \
 	} while (false)
 
 	void ExpectPowlMatchesStd(long double base, long double exponent)
 	{
-		const long double actual = ccm::gen::pow_gen(base, exponent);
+		const long double actual   = ccm::gen::pow_gen(base, exponent);
 		const long double expected = std::pow(base, exponent);
 		if (std::isnan(expected))
 		{
@@ -82,7 +79,7 @@ TEST(PowlLd80GeneralFinite, RandomFinitePositiveBase)
 
 	for (int i = 0; i < 256; ++i)
 	{
-		const long double base = base_dist(rng);
+		const long double base	   = base_dist(rng);
 		const long double exponent = exp_dist(rng);
 		if (base == 1.0L) { continue; }
 		ExpectPowlMatchesStd(base, exponent);

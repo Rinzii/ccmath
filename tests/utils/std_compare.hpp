@@ -30,7 +30,10 @@ namespace ccm::test
 		{
 			ExpectSameFloatingAsStd(static_cast<common_type>(actual), static_cast<common_type>(expected), max_ulp);
 		}
-		else { EXPECT_EQ(actual, expected); }
+		else
+		{
+			EXPECT_EQ(actual, expected);
+		}
 	}
 
 	template <typename T, typename CcmFn, typename StdFn>

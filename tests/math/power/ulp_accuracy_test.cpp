@@ -8,6 +8,12 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "ccmath/ccmath.hpp"
+#include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
+#include "ccmath/internal/support/bits.hpp"
+#include "utils/math_samples.hpp"
+#include "utils/ulp_suite.hpp"
+
 #include <gtest/gtest.h>
 
 #include <array>
@@ -15,21 +21,11 @@
 #include <cstdint>
 #include <limits>
 
-#include "ccmath/ccmath.hpp"
-#include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
-#include "ccmath/internal/support/bits.hpp"
-#include "utils/math_samples.hpp"
-#include "utils/ulp_suite.hpp"
-
 TEST(CcmathPowerUlpTests, SqrtDouble)
-{
-	ccm::test::ExpectUlpUnaryOver(ccm::test::samples::kSqrtDouble, ccm::sqrt<double>, static_cast<double (*)(double)>(std::sqrt));
-}
+{ ccm::test::ExpectUlpUnaryOver(ccm::test::samples::kSqrtDouble, ccm::sqrt<double>, static_cast<double (*)(double)>(std::sqrt)); }
 
 TEST(CcmathPowerUlpTests, SqrtFloat)
-{
-	ccm::test::ExpectUlpUnaryOver(ccm::test::samples::kSqrtFloat, ccm::sqrt<float>, static_cast<float (*)(float)>(std::sqrt));
-}
+{ ccm::test::ExpectUlpUnaryOver(ccm::test::samples::kSqrtFloat, ccm::sqrt<float>, static_cast<float (*)(float)>(std::sqrt)); }
 
 // [cmath.syn] and [c.math]/1: validates the primary double overload against the C library semantics used by the standard.
 TEST(CcmathPowerUlpTests, PowDouble)
@@ -56,7 +52,7 @@ TEST(CcmathPowerUlpTests, PowGenDouble)
 			SCOPED_TRACE(base);
 			SCOPED_TRACE(exp);
 			if (std::isnan(std::pow(base, exp))) { continue; }
-				ccm::test::ExpectSameFloatingAsStd(ccm::gen::pow_gen(base, exp), std::pow(base, exp), 1);
+			ccm::test::ExpectSameFloatingAsStd(ccm::gen::pow_gen(base, exp), std::pow(base, exp), 1);
 		}
 	}
 }
@@ -113,11 +109,12 @@ TEST(CcmathPowerUlpTests, PowSpecialCasesMatchLibm)
 {
 	ccm::test::ExpectSameFloatingAsStd(ccm::pow(1.0, 0.0), std::pow(1.0, 0.0));
 	ccm::test::ExpectSameFloatingAsStd(ccm::pow(2.0, 0.0), std::pow(2.0, 0.0));
-	ccm::test::ExpectDomainEdgeMatchesStd(std::numeric_limits<double>::quiet_NaN(),
-										  [](double x) { return ccm::pow(x, 1.0); },
-										  [](double x) { return std::pow(x, 1.0); });
-	ccm::test::ExpectDomainEdgeMatchesStd(2.0, [](double x) { return ccm::pow(x, std::numeric_limits<double>::quiet_NaN()); },
-										  [](double x) { return std::pow(x, std::numeric_limits<double>::quiet_NaN()); });
+	ccm::test::ExpectDomainEdgeMatchesStd(
+		std::numeric_limits<double>::quiet_NaN(), [](double x) { return ccm::pow(x, 1.0); }, [](double x) { return std::pow(x, 1.0); });
+	ccm::test::ExpectDomainEdgeMatchesStd(
+		2.0,
+		[](double x) { return ccm::pow(x, std::numeric_limits<double>::quiet_NaN()); },
+		[](double x) { return std::pow(x, std::numeric_limits<double>::quiet_NaN()); });
 	ccm::test::ExpectSameFloatingAsStd(ccm::pow(0.0, 2.0), std::pow(0.0, 2.0));
 	ccm::test::ExpectSameFloatingAsStd(ccm::pow(0.0, -1.0), std::pow(0.0, -1.0));
 }
@@ -198,14 +195,10 @@ TEST(CcmathPowerUlpTests, DISABLED_PowGenFloatExhaustiveMantissa)
 }
 
 TEST(CcmathPowerUlpTests, CbrtDouble)
-{
-	ccm::test::ExpectUlpUnaryOver(ccm::test::samples::kCbrtDouble, ccm::cbrt<double>, static_cast<double (*)(double)>(std::cbrt));
-}
+{ ccm::test::ExpectUlpUnaryOver(ccm::test::samples::kCbrtDouble, ccm::cbrt<double>, static_cast<double (*)(double)>(std::cbrt)); }
 
 TEST(CcmathPowerUlpTests, CbrtFloat)
-{
-	ccm::test::ExpectUlpUnaryOver(ccm::test::samples::kCbrtFloat, ccm::cbrt<float>, static_cast<float (*)(float)>(std::cbrt));
-}
+{ ccm::test::ExpectUlpUnaryOver(ccm::test::samples::kCbrtFloat, ccm::cbrt<float>, static_cast<float (*)(float)>(std::cbrt)); }
 
 TEST(CcmathPowerUlpTests, HypotDouble)
 {
@@ -213,7 +206,9 @@ TEST(CcmathPowerUlpTests, HypotDouble)
 	{
 		SCOPED_TRACE(ccm::test::samples::kHypotPairXDouble[i]);
 		SCOPED_TRACE(ccm::test::samples::kHypotPairYDouble[i]);
-		ccm::test::ExpectUlpBinaryVsStd(ccm::test::samples::kHypotPairXDouble[i], ccm::test::samples::kHypotPairYDouble[i], ccm::hypot<double>,
+		ccm::test::ExpectUlpBinaryVsStd(ccm::test::samples::kHypotPairXDouble[i],
+										ccm::test::samples::kHypotPairYDouble[i],
+										ccm::hypot<double>,
 										static_cast<double (*)(double, double)>(std::hypot));
 	}
 }
@@ -224,7 +219,9 @@ TEST(CcmathPowerUlpTests, HypotFloat)
 	{
 		SCOPED_TRACE(ccm::test::samples::kHypotPairXFloat[i]);
 		SCOPED_TRACE(ccm::test::samples::kHypotPairYFloat[i]);
-		ccm::test::ExpectUlpBinaryVsStd(ccm::test::samples::kHypotPairXFloat[i], ccm::test::samples::kHypotPairYFloat[i], ccm::hypot<float>,
+		ccm::test::ExpectUlpBinaryVsStd(ccm::test::samples::kHypotPairXFloat[i],
+										ccm::test::samples::kHypotPairYFloat[i],
+										ccm::hypot<float>,
 										static_cast<float (*)(float, float)>(std::hypot));
 	}
 }

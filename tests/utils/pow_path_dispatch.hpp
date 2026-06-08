@@ -94,7 +94,10 @@ namespace ccm::test::pow_path
 		case validation_path::public_default:
 			if constexpr (std::is_same_v<T, float>) { return ccm::powf(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent)); }
 			else if constexpr (std::is_same_v<T, double>) { return ccm::pow(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent)); }
-			else { return ccm::powl(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent)); }
+			else
+			{
+				return ccm::powl(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
+			}
 		case validation_path::generic_runtime:
 		case validation_path::generic_modeled_domain: return ccm::gen::pow_gen(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
 		case validation_path::runtime_no_builtin: return ccm::rt::pow_rt(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
@@ -108,8 +111,14 @@ namespace ccm::test::pow_path
 			// runtime_pow is only defined where has_runtime_pow<T> holds (GCC/Clang). On other
 			// toolchains this path reports unsupported via path_is_supported, but the switch must
 			// still compile, so fall back to the generic kernel in the discarded branch.
-			if constexpr (ccm::builtin::has_runtime_pow<T>) { return ccm::builtin::runtime_pow(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent)); }
-			else { return ccm::gen::pow_gen(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent)); }
+			if constexpr (ccm::builtin::has_runtime_pow<T>)
+			{
+				return ccm::builtin::runtime_pow(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
+			}
+			else
+			{
+				return ccm::gen::pow_gen(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
+			}
 		}
 		return ccm::gen::pow_gen(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
 	}
@@ -130,14 +139,8 @@ namespace ccm::test::pow_path
 	inline configuration_report make_configuration_report(validation_path path)
 	{
 		return configuration_report{
-			ccm::test::pow_configuration_name(),
-			path_name(path),
-			ccm::test::compiler_id(),
-			ccm::test::platform_id(),
-			ccm::test::optimization_mode(),
-			ccm::test::fma_status(),
-			ccm::test::pow_builtin_status<T>(),
-			ccm::test::simd_status(),
+			ccm::test::pow_configuration_name(), path_name(path),		  ccm::test::compiler_id(),			  ccm::test::platform_id(),
+			ccm::test::optimization_mode(),		 ccm::test::fma_status(), ccm::test::pow_builtin_status<T>(), ccm::test::simd_status(),
 		};
 	}
 
@@ -158,8 +161,6 @@ namespace ccm::test::pow_path
 	}
 
 	inline void print_configuration_banner(const configuration_report & report)
-	{
-		std::cout << "pow validation configuration: " << configuration_report_json(report) << '\n';
-	}
+	{ std::cout << "pow validation configuration: " << configuration_report_json(report) << '\n'; }
 
 } // namespace ccm::test::pow_path

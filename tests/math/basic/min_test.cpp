@@ -8,14 +8,14 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "utils/std_compare.hpp"
+
 #include <gtest/gtest.h>
 
 #include <ccmath/ccmath.hpp>
+
 #include <cmath>
 #include <limits>
-
-#include "utils/std_compare.hpp"
-
 
 TEST(CcmathBasicTests, Min)
 {
@@ -48,5 +48,4 @@ TEST(CcmathBasicTests, Min)
 	ccm::test::ExpectSameAsStd(ccm::fmin(-1, 0.0F), std::fmin(-1, 0.0F));
 	ccm::test::ExpectSameAsStd(ccm::fmin(0.0F, -1), std::fmin(0.0F, -1));
 	ccm::test::ExpectSameAsStd(ccm::fmin(-1.0F, -1), std::fmin(-1.0F, -1));
-
 }

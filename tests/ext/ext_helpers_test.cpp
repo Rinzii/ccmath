@@ -10,12 +10,12 @@
 
 #include <gtest/gtest.h>
 
-#include <cstddef>
-
 #include <ccmath/ext/align.hpp>
 #include <ccmath/ext/delta_angle.hpp>
 #include <ccmath/ext/is_power_of_two.hpp>
 #include <ccmath/ext/lerp_angle.hpp>
+
+#include <cstddef>
 
 TEST(CcmathExtTests, IsPowerOfTwo)
 {

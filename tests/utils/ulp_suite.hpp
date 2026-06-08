@@ -12,10 +12,11 @@
 
 #include "utils/helpers.hpp"
 
+#include <gtest/gtest.h>
+
 #include <array>
 #include <cmath>
 #include <cstdint>
-#include <gtest/gtest.h>
 #include <limits>
 #include <type_traits>
 
@@ -53,21 +54,15 @@ namespace ccm::test
 
 	template <typename T>
 	void ExpectUlpNearVsStd(T actual, T expected, int64_t max_ulp = kMaxAllowedUlp)
-	{
-		ExpectSameFloatingAsStd(actual, expected, max_ulp);
-	}
+	{ ExpectSameFloatingAsStd(actual, expected, max_ulp); }
 
 	template <typename T, typename CcmFn, typename StdFn>
 	void ExpectUlpUnaryVsStd(T input, CcmFn ccm_fn, StdFn std_fn, int64_t max_ulp = kMaxAllowedUlp)
-	{
-		ExpectSameFloatingAsStd(ccm_fn(input), std_fn(input), max_ulp);
-	}
+	{ ExpectSameFloatingAsStd(ccm_fn(input), std_fn(input), max_ulp); }
 
 	template <typename T, typename CcmFn, typename StdFn>
 	void ExpectUlpBinaryVsStd(T x, T y, CcmFn ccm_fn, StdFn std_fn, int64_t max_ulp = kMaxAllowedUlp)
-	{
-		ExpectSameFloatingAsStd(ccm_fn(x, y), std_fn(x, y), max_ulp);
-	}
+	{ ExpectSameFloatingAsStd(ccm_fn(x, y), std_fn(x, y), max_ulp); }
 
 	template <typename T, typename CcmFn, typename StdFn, std::size_t N>
 	void ExpectUlpUnaryOver(const T (&inputs)[N], CcmFn ccm_fn, StdFn std_fn, int64_t max_ulp = kMaxAllowedUlp)
@@ -80,7 +75,7 @@ namespace ccm::test
 	}
 
 	template <typename T, typename CcmFn, typename StdFn, std::size_t N>
-	void ExpectUlpUnaryOver(const std::array<T, N> & inputs, CcmFn ccm_fn, StdFn std_fn, int64_t max_ulp = kMaxAllowedUlp)
+	void ExpectUlpUnaryOver(const std::array<T, N>& inputs, CcmFn ccm_fn, StdFn std_fn, int64_t max_ulp = kMaxAllowedUlp)
 	{
 		for (T input : inputs)
 		{
@@ -107,8 +102,6 @@ namespace ccm::test
 
 	template <typename T, typename CcmFn, typename StdFn>
 	bool IsLikelyUnimplementedStub(T probe, CcmFn ccm_fn, StdFn std_fn)
-	{
-		return ccm_fn(probe) == T{} && std_fn(probe) != T{};
-	}
+	{ return ccm_fn(probe) == T{} && std_fn(probe) != T{}; }
 
 } // namespace ccm::test

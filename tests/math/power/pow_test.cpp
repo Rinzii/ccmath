@@ -8,20 +8,20 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "ccmath/ccmath.hpp"
+#include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
+#include "ccmath/internal/support/bits.hpp"
+#include "utils/conformance_suite.hpp"
+#include "utils/test_runtime.hpp"
+#include "utils/ulp_suite.hpp"
+#include "utils/worst_case_samples.hpp"
+
 #include <gtest/gtest.h>
 
 #include <cmath>
 #include <cstdint>
 #include <limits>
 #include <type_traits>
-
-#include "ccmath/ccmath.hpp"
-#include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
-#include "ccmath/internal/support/bits.hpp"
-#include "utils/conformance_suite.hpp"
-#include "utils/ulp_suite.hpp"
-#include "utils/worst_case_samples.hpp"
-#include "utils/test_runtime.hpp"
 
 #if defined(_MSC_VER) && !defined(__clang__)
 	#define CCMATH_SKIP_MSVC_FENV() GTEST_SKIP() << "fenv exception flags are not reliable under MSVC"
@@ -356,27 +356,19 @@ TEST(CcmathPowerTests, PowZeroPoleRaisesDivByZero)
 
 	// pow(0, -1) should raise FE_DIVBYZERO
 	ccm::test::ExpectFenvFlagsMatchStd(
-		[] { consume(ccm::pow(runtime_value(0.0), runtime_value(-1.0))); },
-		[] { consume(std::pow(runtime_value(0.0), runtime_value(-1.0))); },
-		FE_DIVBYZERO);
+		[] { consume(ccm::pow(runtime_value(0.0), runtime_value(-1.0))); }, [] { consume(std::pow(runtime_value(0.0), runtime_value(-1.0))); }, FE_DIVBYZERO);
 
 	// pow(0, -2) should raise FE_DIVBYZERO
 	ccm::test::ExpectFenvFlagsMatchStd(
-		[] { consume(ccm::pow(runtime_value(0.0), runtime_value(-2.0))); },
-		[] { consume(std::pow(runtime_value(0.0), runtime_value(-2.0))); },
-		FE_DIVBYZERO);
+		[] { consume(ccm::pow(runtime_value(0.0), runtime_value(-2.0))); }, [] { consume(std::pow(runtime_value(0.0), runtime_value(-2.0))); }, FE_DIVBYZERO);
 
 	// pow(-0, -3) should raise FE_DIVBYZERO
 	ccm::test::ExpectFenvFlagsMatchStd(
-		[] { consume(ccm::pow(runtime_value(-0.0), runtime_value(-3.0))); },
-		[] { consume(std::pow(runtime_value(-0.0), runtime_value(-3.0))); },
-		FE_DIVBYZERO);
+		[] { consume(ccm::pow(runtime_value(-0.0), runtime_value(-3.0))); }, [] { consume(std::pow(runtime_value(-0.0), runtime_value(-3.0))); }, FE_DIVBYZERO);
 
 	// pow(0, -0.5) should raise FE_DIVBYZERO
 	ccm::test::ExpectFenvFlagsMatchStd(
-		[] { consume(ccm::pow(runtime_value(0.0), runtime_value(-0.5))); },
-		[] { consume(std::pow(runtime_value(0.0), runtime_value(-0.5))); },
-		FE_DIVBYZERO);
+		[] { consume(ccm::pow(runtime_value(0.0), runtime_value(-0.5))); }, [] { consume(std::pow(runtime_value(0.0), runtime_value(-0.5))); }, FE_DIVBYZERO);
 }
 
 // FE_INVALID: pow(x, y) for finite x < 0 and finite non-integer y.
@@ -386,14 +378,10 @@ TEST(CcmathPowerTests, PowNegBaseNonIntExpRaisesInvalid)
 	CCMATH_SKIP_MSVC_FENV();
 
 	ccm::test::ExpectFenvFlagsMatchStd(
-		[] { consume(ccm::pow(runtime_value(-1.0), runtime_value(0.5))); },
-		[] { consume(std::pow(runtime_value(-1.0), runtime_value(0.5))); },
-		FE_INVALID);
+		[] { consume(ccm::pow(runtime_value(-1.0), runtime_value(0.5))); }, [] { consume(std::pow(runtime_value(-1.0), runtime_value(0.5))); }, FE_INVALID);
 
 	ccm::test::ExpectFenvFlagsMatchStd(
-		[] { consume(ccm::pow(runtime_value(-2.0), runtime_value(1.5))); },
-		[] { consume(std::pow(runtime_value(-2.0), runtime_value(1.5))); },
-		FE_INVALID);
+		[] { consume(ccm::pow(runtime_value(-2.0), runtime_value(1.5))); }, [] { consume(std::pow(runtime_value(-2.0), runtime_value(1.5))); }, FE_INVALID);
 }
 
 // Overflow: pow with large positive results should match std overflow behavior.
@@ -491,8 +479,7 @@ TEST(CcmathPowerTests, PowNegInfBaseNegativeNonIntegerExponent)
 // (e.g. glibc) return a pow(x, -1) that is one ULP off the IEEE reciprocal.
 TEST(CcmathPowerTests, PowNegativeOneExponentMatchesDivision)
 {
-	for (const std::uint64_t base_bits :
-		 {0x3f4fffffffffffffULL, 0x3fdfffffffffffffULL, 0x3fefffffffffffffULL, 0x3fffffffffffffffULL, 0x408fffffffffffffULL})
+	for (const std::uint64_t base_bits : { 0x3f4fffffffffffffULL, 0x3fdfffffffffffffULL, 0x3fefffffffffffffULL, 0x3fffffffffffffffULL, 0x408fffffffffffffULL })
 	{
 		const double base = ccm::support::bit_cast<double>(base_bits);
 		EXPECT_EQ(ccm::support::bit_cast<std::uint64_t>(ccm::gen::pow_gen(base, -1.0)), ccm::support::bit_cast<std::uint64_t>(1.0 / base));
@@ -569,10 +556,9 @@ TEST(CcmathPowerTests, PowLargeExponents)
 
 TEST(CcmathPowerTests, PowIdentityExponent)
 {
-	const double values[] = { -100.0, -1.0, -0.0, 0.0, 1.0, 100.0,
-							  std::numeric_limits<double>::min(),
-							  std::numeric_limits<double>::max(),
-							  std::numeric_limits<double>::denorm_min() };
+	const double values[] = {
+		-100.0, -1.0, -0.0, 0.0, 1.0, 100.0, std::numeric_limits<double>::min(), std::numeric_limits<double>::max(), std::numeric_limits<double>::denorm_min()
+	};
 
 	for (double x : values)
 	{
@@ -585,8 +571,7 @@ TEST(CcmathPowerTests, PowIdentityExponent)
 
 TEST(CcmathPowerTests, PowReciprocalExponent)
 {
-	const double values[] = { 0.5, 1.0, 2.0, 3.0, 10.0, 100.0,
-							  std::numeric_limits<double>::min() };
+	const double values[] = { 0.5, 1.0, 2.0, 3.0, 10.0, 100.0, std::numeric_limits<double>::min() };
 
 	for (double x : values)
 	{
@@ -629,14 +614,11 @@ TEST(CcmathPowerTests, PowDoubleUnderflowScalePathBoundary)
 
 	// Exponent neighbors around the min-subnormal threshold.
 	ccm::test::ExpectSameFloatingAsStd(ccm::gen::pow_gen(2.0, std::nextafter(-1074.0, 0.0)), std::pow(2.0, std::nextafter(-1074.0, 0.0)));
-	ccm::test::ExpectSameFloatingAsStd(ccm::gen::pow_gen(2.0, std::nextafter(-1074.0, -2000.0)),
-									   std::pow(2.0, std::nextafter(-1074.0, -2000.0)));
+	ccm::test::ExpectSameFloatingAsStd(ccm::gen::pow_gen(2.0, std::nextafter(-1074.0, -2000.0)), std::pow(2.0, std::nextafter(-1074.0, -2000.0)));
 
 	// Base perturbation at the threshold (log2 table path still active).
-	ccm::test::ExpectSameFloatingAsStd(ccm::gen::pow_gen(std::nextafter(2.0, 1.0), -1074.0),
-									   std::pow(std::nextafter(2.0, 1.0), -1074.0));
-	ccm::test::ExpectSameFloatingAsStd(ccm::gen::pow_gen(std::nextafter(2.0, 3.0), -1074.0),
-									   std::pow(std::nextafter(2.0, 3.0), -1074.0));
+	ccm::test::ExpectSameFloatingAsStd(ccm::gen::pow_gen(std::nextafter(2.0, 1.0), -1074.0), std::pow(std::nextafter(2.0, 1.0), -1074.0));
+	ccm::test::ExpectSameFloatingAsStd(ccm::gen::pow_gen(std::nextafter(2.0, 3.0), -1074.0), std::pow(std::nextafter(2.0, 3.0), -1074.0));
 
 	// Normal to subnormal transition (no scale split on these exponents).
 	ccm::test::ExpectSameFloatingAsStd(ccm::gen::pow_gen(2.0, -1023.0), std::pow(2.0, -1023.0));
@@ -645,16 +627,18 @@ TEST(CcmathPowerTests, PowDoubleUnderflowScalePathBoundary)
 
 TEST(CcmathPowerTests, PowRoundingModeConformance)
 {
-	ccm::test::ForEachRoundingModeOrSkip([](int mode) {
-		SCOPED_TRACE(ccm::test::RoundingModeName(mode));
+	ccm::test::ForEachRoundingModeOrSkip(
+		[](int mode)
+		{
+			SCOPED_TRACE(ccm::test::RoundingModeName(mode));
 
-		// Special cases must hold regardless of rounding mode
-		ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(1.0), runtime_value(42.0)), std::pow(1.0, 42.0));
-		ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(2.0), runtime_value(0.0)), std::pow(2.0, 0.0));
-		ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(0.0), runtime_value(3.0)), std::pow(0.0, 3.0));
+			// Special cases must hold regardless of rounding mode
+			ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(1.0), runtime_value(42.0)), std::pow(1.0, 42.0));
+			ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(2.0), runtime_value(0.0)), std::pow(2.0, 0.0));
+			ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(0.0), runtime_value(3.0)), std::pow(0.0, 3.0));
 
-		// Representative numeric cases
-		ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(2.0), runtime_value(10.0)), std::pow(2.0, 10.0));
-		ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(3.0), runtime_value(7.0)), std::pow(3.0, 7.0));
-	});
+			// Representative numeric cases
+			ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(2.0), runtime_value(10.0)), std::pow(2.0, 10.0));
+			ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(3.0), runtime_value(7.0)), std::pow(3.0, 7.0));
+		});
 }

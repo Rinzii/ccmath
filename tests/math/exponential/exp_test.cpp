@@ -8,13 +8,14 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "ccmath/ccmath.hpp"
+#include "ccmath/math/numbers.hpp"
+#include "utils/std_compare.hpp"
+
 #include <gtest/gtest.h>
 
 #include <cmath>
 #include <limits>
-#include "ccmath/math/numbers.hpp"
-#include "ccmath/ccmath.hpp"
-#include "utils/std_compare.hpp"
 
 TEST(CcmathExponentialTests, Exp)
 {
@@ -34,24 +35,23 @@ TEST(CcmathExponentialTests, Exp)
 	 * Also the issue only appears with the value 128.0 and only on MSVC under windows.
 	 * The same test passes on GCC and Clang on both Linux and MacOS without issue so I am allowing this test to fail.
 	 */
-	//EXPECT_EQ(ccm::exp(128.0), std::exp(128.0));
+	// EXPECT_EQ(ccm::exp(128.0), std::exp(128.0));
 	ccm::test::ExpectSameAsStd(ccm::exp(4096.0) * ccm::exp(4096.0), std::exp(4096.0) * std::exp(4096.0));
-
 
 	// Edge cases for float overloads.
 
-	constexpr double double_edges[] = { 0.0, -0.0, std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(),
-										std::numeric_limits<double>::quiet_NaN() };
+	constexpr double double_edges[] = {
+		0.0, -0.0, std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), std::numeric_limits<double>::quiet_NaN()
+	};
 	for (double input : double_edges) { ccm::test::ExpectUnaryMatchesStd(input, ccm::exp<double>, static_cast<double (*)(double)>(std::exp)); }
 
 	// Float overloads.
 
 	constexpr float float_inputs[] = { 1.0F, 2.0F, 4.0F, 8.0F, 16.0F, 32.0F, 64.0F, 256.0F, 512.0F, 1024.0F, 2048.0F, 4096.0F };
 	for (float input : float_inputs) { ccm::test::ExpectUnaryMatchesStd(input, ccm::exp<float>, static_cast<float (*)(float)>(std::exp)); }
-	//EXPECT_EQ(ccm::exp(128.0F), std::exp(128.0F)); // See above.
-	constexpr float float_edges[] = { 0.0F, -0.0F, std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity(),
-									  std::numeric_limits<float>::quiet_NaN() };
+	// EXPECT_EQ(ccm::exp(128.0F), std::exp(128.0F)); // See above.
+	constexpr float float_edges[] = {
+		0.0F, -0.0F, std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::quiet_NaN()
+	};
 	for (float input : float_edges) { ccm::test::ExpectUnaryMatchesStd(input, ccm::exp<float>, static_cast<float (*)(float)>(std::exp)); }
-
-
 }

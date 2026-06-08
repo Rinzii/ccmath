@@ -17,7 +17,10 @@ namespace ccm::test::oracle
 	{
 		if constexpr (std::is_same_v<T, float>) { return cr_powf(base, exponent); }
 		else if constexpr (std::is_same_v<T, double>) { return cr_pow(base, exponent); }
-		else { return static_cast<T>(cr_pow(static_cast<double>(base), static_cast<double>(exponent))); }
+		else
+		{
+			return static_cast<T>(cr_pow(static_cast<double>(base), static_cast<double>(exponent)));
+		}
 	}
 
 	// Higher-precision correctly-rounded float reference, used only to cross-check
@@ -94,23 +97,23 @@ namespace ccm::test::oracle
 		}
 		else
 		{
-			(void) base;
-			(void) exponent;
-			(void) actual;
+			(void)base;
+			(void)exponent;
+			(void)actual;
 			return false;
 		}
 	}
 
 	template <typename T, typename Fn>
-	inline std::optional<failure_record<T>> evaluate_case_in_mode(const pow_case<T> & test_case,
+	inline std::optional<failure_record<T>> evaluate_case_in_mode(const pow_case<T>& test_case,
 																  std::string_view function_name,
 																  std::string_view path_name,
 																  int rounding_mode,
 																  Fn fn,
-																  run_summary<T> & summary,
-																  std::uint64_t seed		   = 0,
-																  std::string_view search_mode = {},
-																  std::vector<failure_record<T>> * event_log = nullptr)
+																  run_summary<T>& summary,
+																  std::uint64_t seed						= 0,
+																  std::string_view search_mode				= {},
+																  std::vector<failure_record<T>>* event_log = nullptr)
 	{
 		return evaluate_binary_coremath_case_in_mode(
 			test_case,
@@ -129,16 +132,16 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T, typename Fn>
-	inline void evaluate_case_all_modes(const pow_case<T> & test_case,
+	inline void evaluate_case_all_modes(const pow_case<T>& test_case,
 										std::string_view function_name,
 										std::string_view path_name,
-										const std::vector<int> & rounding_modes,
+										const std::vector<int>& rounding_modes,
 										Fn fn,
-										run_summary<T> & summary,
-										std::vector<failure_record<T>> & failures,
-										std::uint64_t seed			 = 0,
-										std::string_view search_mode = {},
-										std::vector<failure_record<T>> * event_log = nullptr)
+										run_summary<T>& summary,
+										std::vector<failure_record<T>>& failures,
+										std::uint64_t seed						  = 0,
+										std::string_view search_mode			  = {},
+										std::vector<failure_record<T>>* event_log = nullptr)
 	{
 		evaluate_binary_coremath_case_all_modes(
 			test_case,

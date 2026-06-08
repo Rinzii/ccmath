@@ -8,13 +8,13 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "ccmath/internal/config/long_double_format.hpp"
+#include "ccmath/internal/config/type_support.hpp"
+
 #include <gtest/gtest.h>
 
 #include <limits>
 #include <string_view>
-
-#include "ccmath/internal/config/long_double_format.hpp"
-#include "ccmath/internal/config/type_support.hpp"
 
 namespace
 {
@@ -27,11 +27,11 @@ namespace
 
 TEST(PowlFormatDetection, NumericLimitsMatchExpectedTier)
 {
-	const int digits = std::numeric_limits<long double>::digits;
+	const int digits	   = std::numeric_limits<long double>::digits;
 	const int max_exponent = std::numeric_limits<long double>::max_exponent;
 
-	std::cout << "long double format: digits=" << digits << " max_exponent=" << max_exponent << " name="
-			  << ccm::config::long_double_format_name(ccm::config::detect_long_double_format()) << '\n';
+	std::cout << "long double format: digits=" << digits << " max_exponent=" << max_exponent
+			  << " name=" << ccm::config::long_double_format_name(ccm::config::detect_long_double_format()) << '\n';
 
 	EXPECT_GT(digits, 0);
 	EXPECT_GT(max_exponent, 0);

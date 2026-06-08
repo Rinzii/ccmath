@@ -14,8 +14,9 @@
 
 // clang-format off
 @@INCLUDES@@
-// clang-format on
+	// clang-format on
 
-@@STATIC_ASSERTS@@
+	@ @STATIC_ASSERTS @ @
 
-int main() { return 0; }
+	int main()
+{ return 0; }

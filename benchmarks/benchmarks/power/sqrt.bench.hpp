@@ -6,17 +6,18 @@
  * See LICENSE for more information.
  */
 
-#include "../../helpers/randomizers.hpp"
-
 #include <benchmark/benchmark.h>
+
 #include <ccmath/ccmath.hpp>
+
 #include <cmath>
+
+#include "../../helpers/randomizers.hpp"
 
 namespace bm = benchmark;
 
 // NOLINTBEGIN
 // std::sqrt
-
 
 #ifndef CCM_BM_CONFIG_NO_CT
 static void BM_power_sqrt_std(benchmark::State & state)
@@ -83,9 +84,7 @@ static void BM_power_sqrt_rand_double_ccm(benchmark::State & state)
 	#if !(defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)) // GCC 6.1+ has constexpr sqrt builtins.
 
 inline double sqrt_rt_bm(double v)
-{
-	return ccm::sqrt(v);
-}
+{ return ccm::sqrt(v); }
 
 static void BM_power_sqrt_std_rt(benchmark::State & state)
 {

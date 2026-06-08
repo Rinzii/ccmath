@@ -38,7 +38,7 @@ namespace
 	};
 
 	template <typename T, T (*StdFn)(T)>
-	const std::vector<NearestUnaryParams<T>> & BasicNearestParams()
+	const std::vector<NearestUnaryParams<T>>& BasicNearestParams()
 	{
 		static const std::vector<NearestUnaryParams<T>> params{
 			{ static_cast<T>(1.0), StdFn(static_cast<T>(1.0)) },

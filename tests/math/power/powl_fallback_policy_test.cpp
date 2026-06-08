@@ -8,29 +8,26 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
-
-#include <cmath>
-#include <iostream>
-
 #include "ccmath/ccmath.hpp"
 #include "ccmath/internal/config/long_double_format.hpp"
 #include "ccmath/internal/config/powl_policy.hpp"
 #include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
 #include "oracle/powl_path_reporting.hpp"
 
+#include <gtest/gtest.h>
+
+#include <cmath>
+#include <iostream>
+
 namespace
 {
-	using ccm::test::oracle::PowlImplementationPath;
 	using ccm::test::oracle::classify_powl_gen_path;
-	using ccm::test::oracle::powl_path_is_reduced_precision;
 	using ccm::test::oracle::powl_path_is_native_phase1;
+	using ccm::test::oracle::powl_path_is_reduced_precision;
+	using ccm::test::oracle::PowlImplementationPath;
 
 	void ExpectPath(long double base, long double exponent, PowlImplementationPath expected)
-	{
-		EXPECT_EQ(classify_powl_gen_path(base, exponent), expected)
-			<< "base=" << base << " exponent=" << exponent;
-	}
+	{ EXPECT_EQ(classify_powl_gen_path(base, exponent), expected) << "base=" << base << " exponent=" << exponent; }
 } // namespace
 
 TEST(PowlFallbackPolicy, ReportsFallbackPolicyState)
@@ -41,16 +38,13 @@ TEST(PowlFallbackPolicy, ReportsFallbackPolicyState)
 
 TEST(PowlFallbackPolicy, Ld64AliasIsNotReducedPrecision)
 {
-	if (ccm::config::detect_long_double_format() != ccm::config::LongDoubleFormat::Double)
-	{
-		GTEST_SKIP() << "double-shaped long double required";
-	}
+	if (ccm::config::detect_long_double_format() != ccm::config::LongDoubleFormat::Double) { GTEST_SKIP() << "double-shaped long double required"; }
 
 	ExpectPath(2.0L, 0.5L, PowlImplementationPath::Ld64DoubleAlias);
 	EXPECT_FALSE(powl_path_is_reduced_precision(PowlImplementationPath::Ld64DoubleAlias));
 	EXPECT_TRUE(powl_path_is_native_phase1(PowlImplementationPath::Ld64DoubleAlias));
 
-	const long double actual = ccm::gen::pow_gen(2.0L, 10.0L);
+	const long double actual   = ccm::gen::pow_gen(2.0L, 10.0L);
 	const long double expected = static_cast<long double>(ccm::gen::pow_gen(2.0, 10.0));
 	EXPECT_EQ(actual, expected);
 }
@@ -72,7 +66,7 @@ TEST(PowlFallbackPolicy, Ld80SpecialCaseDoesNotUseReducedFallback)
 
 TEST(PowlFallbackPolicy, Ld80GeneralRealExponentUsesNativeKernel)
 {
-	const long double base = 2.0L;
+	const long double base	   = 2.0L;
 	const long double exponent = 0.5L;
 
 	ExpectPath(base, exponent, PowlImplementationPath::Ld80GeneralFinite);
@@ -85,14 +79,13 @@ TEST(PowlFallbackPolicy, Ld80GeneralRealExponentUsesNativeKernel)
 #if !defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64) && !defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
 TEST(PowlFallbackPolicy, UnsupportedTierPolicy)
 {
-	const long double base = 2.0L;
+	const long double base	   = 2.0L;
 	const long double exponent = 3.0L;
 
 	if (ccm::config::reduced_precision_powl_fallback_enabled())
 	{
 		const auto path = classify_powl_gen_path(base, exponent);
-		EXPECT_TRUE(path == PowlImplementationPath::Ld128ReducedPrecisionFallback ||
-					path == PowlImplementationPath::UnknownReducedPrecisionFallback);
+		EXPECT_TRUE(path == PowlImplementationPath::Ld128ReducedPrecisionFallback || path == PowlImplementationPath::UnknownReducedPrecisionFallback);
 		EXPECT_TRUE(powl_path_is_reduced_precision(path));
 	}
 	else

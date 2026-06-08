@@ -8,14 +8,14 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "utils/std_compare.hpp"
+
 #include <gtest/gtest.h>
 
 #include <ccmath/math/basic/fabs.hpp>
 
 #include <cmath>
 #include <limits>
-
-#include "utils/std_compare.hpp"
 
 // NOLINTBEGIN
 

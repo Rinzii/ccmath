@@ -8,11 +8,12 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "ccmath/ccmath.hpp"
+
 #include <gtest/gtest.h>
 
 #include <cmath>
 #include <limits>
-#include "ccmath/ccmath.hpp"
 
 TEST(CcmathFmanipTests, Nextafter)
 {

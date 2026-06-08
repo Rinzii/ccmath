@@ -65,9 +65,6 @@ TEST(CcmathImplementationPolicyTests, LibraryHeadersDoNotIncludeCmath)
 	EXPECT_TRUE(violations.empty());
 	if (!violations.empty())
 	{
-		for (const std::string & violation : violations)
-		{
-			ADD_FAILURE() << "forbidden <cmath> include in library header: " << violation;
-		}
+		for (const std::string & violation : violations) { ADD_FAILURE() << "forbidden <cmath> include in library header: " << violation; }
 	}
 }

@@ -42,16 +42,13 @@ namespace ccm::test::oracle
 		case PowlImplementationPath::Ld64DoubleAlias:
 		case PowlImplementationPath::Ld80SpecialCase:
 		case PowlImplementationPath::Ld80BoundedInteger:
-		case PowlImplementationPath::Ld80GeneralFinite:
-			return false;
+		case PowlImplementationPath::Ld80GeneralFinite: return false;
 		case PowlImplementationPath::Ld80ReducedPrecisionFallback:
 		case PowlImplementationPath::Ld128ReducedPrecisionFallback:
-		case PowlImplementationPath::UnknownReducedPrecisionFallback:
-			return true;
+		case PowlImplementationPath::UnknownReducedPrecisionFallback: return true;
 		case PowlImplementationPath::Ld80Unsupported:
 		case PowlImplementationPath::Ld128Unsupported:
-		case PowlImplementationPath::UnknownUnsupported:
-			return false;
+		case PowlImplementationPath::UnknownUnsupported: return false;
 		}
 		return false;
 	}
@@ -63,10 +60,8 @@ namespace ccm::test::oracle
 		case PowlImplementationPath::Ld64DoubleAlias:
 		case PowlImplementationPath::Ld80SpecialCase:
 		case PowlImplementationPath::Ld80BoundedInteger:
-		case PowlImplementationPath::Ld80GeneralFinite:
-			return true;
-		default:
-			return false;
+		case PowlImplementationPath::Ld80GeneralFinite: return true;
+		default: return false;
 		}
 	}
 
@@ -132,10 +127,10 @@ namespace ccm::test::oracle
 		case config::LongDoubleFormat::X87Extended: return powl_path_detail::classify_ld80_path(base, exp);
 		case config::LongDoubleFormat::IEEEBinary128:
 			return config::reduced_precision_powl_fallback_enabled() ? PowlImplementationPath::Ld128ReducedPrecisionFallback
-																	: PowlImplementationPath::Ld128Unsupported;
+																	 : PowlImplementationPath::Ld128Unsupported;
 		case config::LongDoubleFormat::Unknown:
 			return config::reduced_precision_powl_fallback_enabled() ? PowlImplementationPath::UnknownReducedPrecisionFallback
-																	: PowlImplementationPath::UnknownUnsupported;
+																	 : PowlImplementationPath::UnknownUnsupported;
 		}
 		return PowlImplementationPath::UnknownUnsupported;
 	}

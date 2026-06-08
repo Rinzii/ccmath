@@ -13,9 +13,7 @@ int64_t ulp_difference(T a, T b)
 	static_assert(std::is_floating_point_v<T>, "T must be a floating-point type.");
 
 	const std::uint64_t distance = ccm::test::ulp::distance_or_max(a, b);
-	return (distance > static_cast<std::uint64_t>(std::numeric_limits<int64_t>::max()))
-			   ? std::numeric_limits<int64_t>::max()
-			   : static_cast<int64_t>(distance);
+	return (distance > static_cast<std::uint64_t>(std::numeric_limits<int64_t>::max())) ? std::numeric_limits<int64_t>::max() : static_cast<int64_t>(distance);
 }
 
 template <typename T>
@@ -54,16 +52,12 @@ private:
 
 template <typename T>
 ::testing::Matcher<T> IsWithinULP(T expected, int64_t max_ulp)
-{
-	return ::testing::MakeMatcher(new ULPEqualsMatcher<T>(expected, max_ulp));
-}
+{ return ::testing::MakeMatcher(new ULPEqualsMatcher<T>(expected, max_ulp)); }
 
 // Convenience Matcher for IsWithinULP with a maximum ULP difference of 1.
 template <typename T>
 ::testing::Matcher<T> IsWithinOneULP(T expected)
-{
-	return IsWithinULP(expected, 1);
-}
+{ return IsWithinULP(expected, 1); }
 
 // EXPECT_ULP_NEAR checks if the ACTUAL value is within a specified maximum ULP difference from the EXPECTED value.
 #define EXPECT_ULP_NEAR(ACTUAL, EXPECTED, MAX_ULP) EXPECT_THAT(ACTUAL, IsWithinULP(EXPECTED, MAX_ULP))

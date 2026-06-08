@@ -8,16 +8,17 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "ccmath/internal/types/float128.hpp"
+
 #include <gtest/gtest.h>
 
 #include <ccmath/ccmath.hpp>
+
 #include <cfloat>
 #include <cmath>
 #include <cstdint>
 #include <cstring>
 #include <limits>
-
-#include "ccmath/internal/types/float128.hpp"
 
 // TODO(IanP): Tighten nan payload and overflow cases. Current tests are forgiving.
 
@@ -28,7 +29,7 @@ TEST(CcmathBasicTests, NanStaticAssert)
 	static_assert(ccm::isnan(ccm::nan("")), "ccm::nan() is NOT static assertable!");
 	// Currently nanl is not possible to static assert on clang due to issues with bit_cast.
 	// TODO(IanP): nanl static_assert needs a bit_cast approach that works on Clang.
-	//static_assert(ccm::isnan(ccm::nanl("")), "ccm::nanl() is NOT static assertable!");
+	// static_assert(ccm::isnan(ccm::nanl("")), "ccm::nanl() is NOT static assertable!");
 }
 
 TEST(CcmathBasicTests, Nan_Double)
@@ -105,7 +106,7 @@ TEST(CcmathBasicTests, Nan_Double)
 
 // 64-bit long double nanl tests trigger an SEH fault on Intel DPC++. Disabled until investigated.
 #if !(defined(SYCL_LANGUAGE_VERSION) || defined(__INTEL_LLVM_COMPILER))
-#if (LDBL_MANT_DIG == 53)
+	#if (LDBL_MANT_DIG == 53)
 
 TEST(CcmathBasicTests, Nan_LDouble64bit)
 {
@@ -160,8 +161,8 @@ TEST(CcmathBasicTests, Nan_LDouble64bit)
 	EXPECT_EQ(ccmNanBits, stdNanBits);
 }
 
-// If our long double is 128 bits, then don't run this test as it would not be correct due to padding removal.
-#elif LDBL_MANT_DIG == 64
+	// If our long double is 128 bits, then don't run this test as it would not be correct due to padding removal.
+	#elif LDBL_MANT_DIG == 64
 
 /*
  * 80 bit long doubles have padding bits that are not determinable.
@@ -171,13 +172,13 @@ TEST(CcmathBasicTests, Nan_LDouble64bit)
  * the remainder afterward is padding that can't be determined or tested.
  */
 template <std::size_t N>
-void removePaddingBits(std::array<std::byte, N> & byteArray)
+void removePaddingBits(std::array<std::byte, N>& byteArray)
 {
 	// If the array has 10 or fewer elements, there's nothing to zero out
 	if (N <= 10) { return; }
 
 	// Zero out everything after the 10th element
-	for (std::size_t i = 10; i < N; ++i) { byteArray.at(i) = std::byte{0}; }
+	for (std::size_t i = 10; i < N; ++i) { byteArray.at(i) = std::byte{ 0 }; }
 }
 
 template <std::size_t N>
@@ -242,7 +243,7 @@ TEST(CcmathBasicTests, Nan_LDouble80bit)
 	EXPECT_EQ(ccm_nan_bits, std_nan_bits);
 }
 
-#elif LDBL_MANT_DIG == 113
+	#elif LDBL_MANT_DIG == 113
 
 // Does not strip padding as there shouldn't be any if ldouble is 128 bits
 template <std::size_t N>
@@ -305,11 +306,9 @@ TEST(CcmathBasicTests, Nan_LDouble128bit)
 	std_nan_bits = ldoubleToByteArray<sizeof(long double)>(std::nanl("000000000000000000000000000000000000000000000000000000002"));
 	EXPECT_EQ(ccm_nan_bits, std_nan_bits);
 }
-#else
+	#else
 
 TEST(CcmathBasicTests, Nan_LDoubleUnknownBits)
-{
-	FAIL() << "We do not know how to handle long doubles with an unknown number of bits. Please report this if you see this failure.";
-}
-#endif
+{ FAIL() << "We do not know how to handle long doubles with an unknown number of bits. Please report this if you see this failure."; }
+	#endif
 #endif // !(defined(SYCL_LANGUAGE_VERSION) || defined(__INTEL_LLVM_COMPILER))

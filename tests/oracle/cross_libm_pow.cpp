@@ -1,6 +1,5 @@
 #include "cross_libm_common.hpp"
 #include "mpfr_pow_common.hpp"
-
 #include "utils/worst_case_samples.hpp"
 
 #include <cmath>
@@ -25,18 +24,12 @@ namespace
 	std::vector<case_record> build_corpus(const std::string & corpus)
 	{
 		std::vector<case_record> cases;
-		for (const auto & hard : ccm::test::worst_case::kPowDoubleHard)
-		{
-			cases.push_back({ hard.base, hard.exponent, {} });
-		}
+		for (const auto & hard : ccm::test::worst_case::kPowDoubleHard) { cases.push_back({ hard.base, hard.exponent, {} }); }
 		if (corpus == "extended")
 		{
 			for (double base : { 0.5, 1.0, 2.0, -2.0, 1e-300, 1e300 })
 			{
-				for (double exponent : { -3.0, -0.5, 0.0, 0.5, 2.0, 10.0 })
-				{
-					cases.push_back({ base, exponent, {} });
-				}
+				for (double exponent : { -3.0, -0.5, 0.0, 0.5, 2.0, 10.0 }) { cases.push_back({ base, exponent, {} }); }
 			}
 		}
 		return cases;
@@ -51,9 +44,9 @@ namespace
 
 int main(int argc, char ** argv)
 {
-	const std::string corpus = ccm::test::oracle::option_value(argc, argv, "--corpus=").value_or("quick");
-	const std::string format = ccm::test::oracle::option_value(argc, argv, "--format=").value_or("json");
-	const std::string output = ccm::test::oracle::option_value(argc, argv, "--output=").value_or("cross-libm-pow.json");
+	const std::string corpus		= ccm::test::oracle::option_value(argc, argv, "--corpus=").value_or("quick");
+	const std::string format		= ccm::test::oracle::option_value(argc, argv, "--format=").value_or("json");
+	const std::string output		= ccm::test::oracle::option_value(argc, argv, "--output=").value_or("cross-libm-pow.json");
 	const bool fail_on_disagreement = ccm::test::oracle::has_flag(argc, argv, "--fail-on-disagreement");
 
 	auto backends = ccm::test::oracle::cross_libm::detect_backends();
@@ -63,14 +56,11 @@ int main(int argc, char ** argv)
 		if (backend.available) { active.push_back(backend); }
 	}
 
-	auto cases = build_corpus(corpus);
+	auto cases					   = build_corpus(corpus);
 	std::size_t disagreement_count = 0;
 
 	std::ofstream out(output, std::ios::trunc);
-	if (format == "csv")
-	{
-		out << "base,exponent,backend_a,backend_b,kind,result_a,result_b\n";
-	}
+	if (format == "csv") { out << "base,exponent,backend_a,backend_b,kind,result_a,result_b\n"; }
 	else
 	{
 		out << "[\n";
@@ -79,20 +69,15 @@ int main(int argc, char ** argv)
 	bool first_json = true;
 	for (auto & test_case : cases)
 	{
-		for (const auto & backend : active)
-		{
-			test_case.results[backend.id] = eval_backend(backend, test_case.base, test_case.exponent);
-		}
+		for (const auto & backend : active) { test_case.results[backend.id] = eval_backend(backend, test_case.base, test_case.exponent); }
 
-		const double mpfr_ref = ccm::test::oracle::mpfr_pow_reference(
-			test_case.base, test_case.exponent, 256, ccm::test::oracle::current_mpfr_rounding_mode());
+		const double mpfr_ref = ccm::test::oracle::mpfr_pow_reference(test_case.base, test_case.exponent, 256, ccm::test::oracle::current_mpfr_rounding_mode());
 
 		for (std::size_t i = 0; i < active.size(); ++i)
 		{
 			for (std::size_t j = i + 1; j < active.size(); ++j)
 			{
-				const auto kind = ccm::test::oracle::cross_libm::classify(
-					test_case.results[active[i].id], test_case.results[active[j].id]);
+				const auto kind = ccm::test::oracle::cross_libm::classify(test_case.results[active[i].id], test_case.results[active[j].id]);
 				if (kind == disagreement_kind::exact_match) { continue; }
 				++disagreement_count;
 				if (format == "csv")
@@ -122,8 +107,8 @@ int main(int argc, char ** argv)
 
 	if (format != "csv") { out << "\n]\n"; }
 
-	std::cout << "cross-libm pow corpus=" << corpus << " active_backends=" << active.size() << " disagreements=" << disagreement_count
-			  << " output=" << output << '\n';
+	std::cout << "cross-libm pow corpus=" << corpus << " active_backends=" << active.size() << " disagreements=" << disagreement_count << " output=" << output
+			  << '\n';
 	for (const auto & backend : backends)
 	{
 		std::cout << "  backend " << backend.id << " available=" << (backend.available ? "yes" : "no") << " label=" << backend.label << '\n';

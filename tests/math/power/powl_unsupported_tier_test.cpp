@@ -23,7 +23,8 @@
 // local. A const local initialized from a constexpr function reads as a compile-time constant to
 // MSVC /W4 (C4127), while if constexpr here would make the post-skip body unreachable (C4702).
 #define REQUIRE_POWL_UNSUPPORTED_TIER()                                                                                                                        \
-	do {                                                                                                                                                       \
+	do                                                                                                                                                         \
+	{                                                                                                                                                          \
 		if (ccm::config::detect_long_double_format() != ccm::config::LongDoubleFormat::IEEEBinary128 &&                                                        \
 			ccm::config::detect_long_double_format() != ccm::config::LongDoubleFormat::Unknown)                                                                \
 		{                                                                                                                                                      \

@@ -17,7 +17,7 @@ namespace ccm::bench
 	struct Randomizer
 	{
 	public:
-		explicit Randomizer(std::uint_fast32_t seed = 937162211) : m_gen{seed} {}
+		explicit Randomizer(std::uint_fast32_t seed = 937162211) : m_gen{ seed } {}
 
 		std::vector<int> generateRandomIntegers(std::int64_t count, int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max())
 		{
@@ -29,8 +29,7 @@ namespace ccm::bench
 			return randomIntegers;
 		}
 
-		std::vector<double> generateRandomDoubles(std::int64_t count, double min = 0.0,
-												  double max = 1.0)
+		std::vector<double> generateRandomDoubles(std::int64_t count, double min = 0.0, double max = 1.0)
 		{
 			assert(count > 0);
 			std::vector<double> randomDouble;

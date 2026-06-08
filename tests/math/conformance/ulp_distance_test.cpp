@@ -26,8 +26,8 @@ TEST(CcmathUlpDistanceTests, SignedZerosHaveZeroFiniteDistanceButNotBitwiseEqual
 
 TEST(CcmathUlpDistanceTests, AdjacentFloatValuesAreOneUlpApart)
 {
-	const float a = 1.0F;
-	const float b = std::nextafter(a, std::numeric_limits<float>::infinity());
+	const float a	  = 1.0F;
+	const float b	  = std::nextafter(a, std::numeric_limits<float>::infinity());
 	const auto result = ccm::test::ulp::classify_distance(a, b);
 	EXPECT_EQ(result.kind, ccm::test::ulp::relation::finite);
 	EXPECT_EQ(result.distance, 1U);
@@ -35,8 +35,8 @@ TEST(CcmathUlpDistanceTests, AdjacentFloatValuesAreOneUlpApart)
 
 TEST(CcmathUlpDistanceTests, SubnormalsAreMeasuredOnRawBitOrdering)
 {
-	const double a = std::numeric_limits<double>::denorm_min();
-	const double b = std::nextafter(a, std::numeric_limits<double>::infinity());
+	const double a	  = std::numeric_limits<double>::denorm_min();
+	const double b	  = std::nextafter(a, std::numeric_limits<double>::infinity());
 	const auto result = ccm::test::ulp::classify_distance(a, b);
 	EXPECT_EQ(result.kind, ccm::test::ulp::relation::finite);
 	EXPECT_EQ(result.distance, 1U);
@@ -44,8 +44,7 @@ TEST(CcmathUlpDistanceTests, SubnormalsAreMeasuredOnRawBitOrdering)
 
 TEST(CcmathUlpDistanceTests, SameSignInfinitiesCompareAsZeroDistance)
 {
-	const auto result = ccm::test::ulp::classify_distance(
-		std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity());
+	const auto result = ccm::test::ulp::classify_distance(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity());
 	EXPECT_EQ(result.kind, ccm::test::ulp::relation::both_infinity_same_sign);
 	EXPECT_EQ(result.distance, 0U);
 	EXPECT_TRUE(result.exact_bitwise_equal);
@@ -55,7 +54,5 @@ TEST(CcmathUlpDistanceTests, NaNMismatchIsNotFoldedIntoNumericDistance)
 {
 	const auto result = ccm::test::ulp::classify_distance(std::numeric_limits<double>::quiet_NaN(), 1.0);
 	EXPECT_EQ(result.kind, ccm::test::ulp::relation::nan_mismatch);
-	EXPECT_EQ(
-		ccm::test::ulp::distance_or_max(std::numeric_limits<double>::quiet_NaN(), 1.0),
-		std::numeric_limits<std::uint64_t>::max());
+	EXPECT_EQ(ccm::test::ulp::distance_or_max(std::numeric_limits<double>::quiet_NaN(), 1.0), std::numeric_limits<std::uint64_t>::max());
 }

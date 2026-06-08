@@ -8,14 +8,13 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
-
 #include "ccmath/ccmath.hpp"
+#include "utils/std_compare.hpp"
+
+#include <gtest/gtest.h>
 
 #include <cmath>
 #include <limits>
-
-#include "utils/std_compare.hpp"
 
 TEST(CcmathExponentialTests, Exp2_Double_ValidInput)
 {
@@ -25,8 +24,6 @@ TEST(CcmathExponentialTests, Exp2_Double_ValidInput)
 	// Test that exp2 is mathematically the same as exp( X * log(2) )
 	ccm::test::ExpectSameAsStd(ccm::exp2(4.0), std::exp(4.0 * std::log(2.0)));
 	ccm::test::ExpectSameAsStd(ccm::exp2(4.0), ccm::exp(4.0 * ccm::log(2.0)));
-
-
 }
 
 TEST(CcmathExponentialTests, Exp2_Double_EdgeCases)
@@ -45,8 +42,6 @@ TEST(CcmathExponentialTests, Exp2_Double_EdgeCases)
 	for (double input : inputs) { ccm::test::ExpectUnaryMatchesStd(input, ccm::exp2<double>, static_cast<double (*)(double)>(std::exp2)); }
 }
 
-
-
 TEST(CcmathExponentialTests, Exp2_Float)
 {
 	constexpr float inputs[] = { 1.0F, 2.0F, 4.0F, 8.0F, 16.0F, 32.0F, 64.0F, 128.0F, 256.0F, 512.0F, 1024.0F, 2048.0F, 4096.0F };
@@ -63,4 +58,3 @@ TEST(CcmathExponentialTests, Exp2_Float_EdgeCases)
 								 std::numeric_limits<float>::quiet_NaN() };
 	for (float input : inputs) { ccm::test::ExpectUnaryMatchesStd(input, ccm::exp2<float>, static_cast<float (*)(float)>(std::exp2)); }
 }
-

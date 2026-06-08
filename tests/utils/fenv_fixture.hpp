@@ -10,10 +10,11 @@
 
 #pragma once
 
+#include <gtest/gtest.h>
+
 #include <array>
 #include <cfenv>
 #include <cstdio>
-#include <gtest/gtest.h>
 
 namespace ccm::test
 {
@@ -27,7 +28,7 @@ namespace ccm::test
 
 	inline constexpr std::array<int, 4> kStdRoundingModes = { FE_TONEAREST, FE_UPWARD, FE_DOWNWARD, FE_TOWARDZERO };
 
-	inline constexpr const char * RoundingModeName(int rounding_mode)
+	inline constexpr const char *RoundingModeName(int rounding_mode)
 	{
 		switch (rounding_mode)
 		{
@@ -76,8 +77,8 @@ namespace ccm::test
 	public:
 		explicit ScopedRoundingMode(int rounding_mode) : saved_(std::fegetround()), active_(TrySetRoundingMode(rounding_mode)) {}
 
-		ScopedRoundingMode(const ScopedRoundingMode &) = delete;
-		ScopedRoundingMode & operator=(const ScopedRoundingMode &) = delete;
+		ScopedRoundingMode(const ScopedRoundingMode &)			  = delete;
+		ScopedRoundingMode &operator=(const ScopedRoundingMode &) = delete;
 
 		~ScopedRoundingMode()
 		{
@@ -96,8 +97,8 @@ namespace ccm::test
 	public:
 		ScopedFenvEnvironment() : active_(std::fegetenv(&saved_) == 0) {}
 
-		ScopedFenvEnvironment(const ScopedFenvEnvironment &) = delete;
-		ScopedFenvEnvironment & operator=(const ScopedFenvEnvironment &) = delete;
+		ScopedFenvEnvironment(const ScopedFenvEnvironment &)			= delete;
+		ScopedFenvEnvironment &operator=(const ScopedFenvEnvironment &) = delete;
 
 		~ScopedFenvEnvironment()
 		{
@@ -112,14 +113,10 @@ namespace ccm::test
 	};
 
 	inline bool ClearFenvExceptions()
-	{
-		return std::feclearexcept(FE_ALL_EXCEPT) == 0;
-	}
+	{ return std::feclearexcept(FE_ALL_EXCEPT) == 0; }
 
 	inline int CurrentFenvExceptions()
-	{
-		return std::fetestexcept(FE_ALL_EXCEPT);
-	}
+	{ return std::fetestexcept(FE_ALL_EXCEPT); }
 
 	/// LLVM-libc-style RAII wrapper. Restores the previous mode on destruction.
 	class ForceRoundingMode
@@ -136,7 +133,7 @@ namespace ccm::test
 	};
 
 	template <typename Fn>
-	void ForEachRoundingMode(Fn && fn)
+	void ForEachRoundingMode(Fn &&fn)
 	{
 		for (int mode : kStdRoundingModes)
 		{
@@ -152,12 +149,9 @@ namespace ccm::test
 	}
 
 	template <typename Fn>
-	void ForEachRoundingModeOrSkip(Fn && fn)
+	void ForEachRoundingModeOrSkip(Fn &&fn)
 	{
-		if (!FenvIsSupported())
-		{
-			GTEST_SKIP() << "floating-point rounding modes are not supported on this platform";
-		}
+		if (!FenvIsSupported()) { GTEST_SKIP() << "floating-point rounding modes are not supported on this platform"; }
 		ForEachRoundingMode(std::forward<Fn>(fn));
 	}
 

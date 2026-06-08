@@ -11,6 +11,7 @@
 #include "harness.hpp"
 
 #include <ccmath/ccmath.hpp>
+
 #include <cmath>
 #include <cstdint>
 

@@ -9,13 +9,12 @@
  */
 
 #include "ccmath/ccmath.hpp"
+#include "utils/std_compare.hpp"
 
 #include <gtest/gtest.h>
 
 #include <cmath>
 #include <limits>
-
-#include "utils/std_compare.hpp"
 
 // NOLINTBEGIN
 

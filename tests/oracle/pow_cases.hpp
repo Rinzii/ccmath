@@ -18,30 +18,20 @@ namespace ccm::test::oracle::pow_cases
 	inline std::vector<std::string> all_powf_domains()
 	{
 		return {
-			"mantissa-sweep",
-			"all-x-for-y",
-			"all-y-for-x",
-			"exponent-field-sweep",
-			"subnormal-x",
-			"unit-interval",
-			"negative-base",
-			"overflow-threshold",
-			"underflow-threshold",
-			"structured-corpus",
+			"mantissa-sweep", "all-x-for-y",   "all-y-for-x",		 "exponent-field-sweep", "subnormal-x",
+			"unit-interval",  "negative-base", "overflow-threshold", "underflow-threshold",	 "structured-corpus",
 		};
 	}
 
 	template <typename EligibilityFn>
-	void append_double_cases(std::vector<pow_case<double>> & cases, campaign_mode mode, std::uint64_t seed, EligibilityFn eligible)
+	void append_double_cases(std::vector<pow_case<double>>& cases, campaign_mode mode, std::uint64_t seed, EligibilityFn eligible)
 	{
-		auto maybe_add = [&](double base, double exponent, const char * provenance) {
+		auto maybe_add = [&](double base, double exponent, const char* provenance)
+		{
 			if (eligible(base, exponent)) { cases.push_back({ base, exponent, provenance }); }
 		};
 
-		for (const auto & legacy_case : ccm::test::worst_case::kPowDoubleHard)
-		{
-			maybe_add(legacy_case.base, legacy_case.exponent, legacy_case.provenance);
-		}
+		for (const auto& legacy_case : ccm::test::worst_case::kPowDoubleHard) { maybe_add(legacy_case.base, legacy_case.exponent, legacy_case.provenance); }
 
 		const std::array special_bases = {
 			-std::numeric_limits<double>::infinity(),
@@ -107,16 +97,13 @@ namespace ccm::test::oracle::pow_cases
 			maybe_add(-2.0, exponent, "negative base near non-integer exponent boundary");
 		}
 
-		for (const auto exponent : { 1023.0, std::nextafter(1024.0, 0.0), 1024.0, 1025.0 })
-		{
-			maybe_add(2.0, exponent, "overflow-threshold campaign");
-		}
+		for (const auto exponent : { 1023.0, std::nextafter(1024.0, 0.0), 1024.0, 1025.0 }) { maybe_add(2.0, exponent, "overflow-threshold campaign"); }
 		for (const auto exponent : { -1074.0, -1075.0, -1076.0 }) { maybe_add(2.0, exponent, "underflow-threshold campaign"); }
 
 		const std::size_t random_count = mode == campaign_mode::quick ? 512 : (mode == campaign_mode::extended ? 4096 : 16384);
 		std::vector<pow_case<double>> random_cases;
 		add_random_cases(random_cases, seed, random_count, "deterministic random bit-pattern campaign");
-		for (auto & test_case : random_cases)
+		for (auto& test_case : random_cases)
 		{
 			if (eligible(test_case.base, test_case.exponent)) { cases.push_back(std::move(test_case)); }
 		}
@@ -137,36 +124,36 @@ namespace ccm::test::oracle::pow_cases
 
 	template <typename EligibilityFn>
 	std::vector<pow_case<float>> build_float_cases(campaign_mode mode,
-															const std::set<std::string_view> & domain_filter,
-															std::uint64_t seed,
-															std::vector<std::string> & domains_covered,
-															std::vector<std::string> & domains_skipped,
-															EligibilityFn eligible)
+												   const std::set<std::string_view>& domain_filter,
+												   std::uint64_t seed,
+												   std::vector<std::string>& domains_covered,
+												   std::vector<std::string>& domains_skipped,
+												   EligibilityFn eligible)
 	{
 		namespace powf_domains = ccm::test::oracle::powf_domains;
 		std::vector<pow_case<float>> cases;
 		const bool filter_all = domain_filter.empty();
 
-		auto domain_enabled = [&](std::string_view domain) {
-			return filter_all || domain_filter.find(domain) != domain_filter.end();
-		};
+		auto domain_enabled = [&](std::string_view domain) { return filter_all || domain_filter.find(domain) != domain_filter.end(); };
 
-		auto mark_domain = [&](std::string_view domain, bool enabled) {
+		auto mark_domain = [&](std::string_view domain, bool enabled)
+		{
 			if (enabled) { domains_covered.emplace_back(domain); }
-			else { domains_skipped.emplace_back(domain); }
+			else
+			{
+				domains_skipped.emplace_back(domain);
+			}
 		};
 
-		auto maybe_add = [&](float base, float exponent, const char * provenance) {
+		auto maybe_add = [&](float base, float exponent, const char* provenance)
+		{
 			if (eligible(base, exponent)) { cases.push_back({ base, exponent, provenance }); }
 		};
 
 		if (domain_enabled("structured-corpus"))
 		{
 			mark_domain("structured-corpus", true);
-			for (const auto & hard_case : ccm::test::worst_case::kPowFloatHard)
-			{
-				maybe_add(hard_case.base, hard_case.exponent, hard_case.provenance);
-			}
+			for (const auto& hard_case : ccm::test::worst_case::kPowFloatHard) { maybe_add(hard_case.base, hard_case.exponent, hard_case.provenance); }
 
 			const std::array special_bases = {
 				-std::numeric_limits<float>::infinity(),
@@ -181,15 +168,7 @@ namespace ccm::test::oracle::pow_cases
 				std::numeric_limits<float>::infinity(),
 			};
 			constexpr std::array special_exponents = {
-				-std::numeric_limits<float>::infinity(),
-				-3.0F,
-				-1.0F,
-				-0.0F,
-				0.0F,
-				0.5F,
-				2.0F,
-				3.0F,
-				std::numeric_limits<float>::infinity(),
+				-std::numeric_limits<float>::infinity(), -3.0F, -1.0F, -0.0F, 0.0F, 0.5F, 2.0F, 3.0F, std::numeric_limits<float>::infinity(),
 			};
 			for (float base : special_bases)
 			{
@@ -208,21 +187,16 @@ namespace ccm::test::oracle::pow_cases
 			const std::size_t random_count = mode == campaign_mode::quick ? 1024 : (mode == campaign_mode::extended ? 8192 : 32768);
 			std::vector<pow_case<float>> random_cases;
 			add_random_cases(random_cases, seed, random_count, "deterministic random bit-pattern campaign");
-			for (auto & test_case : random_cases)
-			{
-				maybe_add(test_case.base, test_case.exponent, test_case.provenance.c_str());
-			}
+			for (auto& test_case : random_cases) { maybe_add(test_case.base, test_case.exponent, test_case.provenance.c_str()); }
 		}
 		else
 		{
 			mark_domain("structured-corpus", false);
 		}
 
-		const auto add_case = [&](float base, float exponent, const char * provenance) {
-			maybe_add(base, exponent, provenance);
-		};
+		const auto add_case = [&](float base, float exponent, const char* provenance) { maybe_add(base, exponent, provenance); };
 
-		const auto filter_copy = domain_filter;
+		const auto filter_copy	 = domain_filter;
 		const std::size_t before = cases.size();
 		powf_domains::add_mantissa_sweep(mode, add_case, filter_copy);
 		mark_domain("mantissa-sweep", powf_domains::domain_enabled(filter_copy, "mantissa-sweep") && cases.size() > before);
@@ -267,7 +241,7 @@ namespace ccm::test::oracle::pow_cases
 
 		if (!filter_all)
 		{
-			for (const auto & domain : all_powf_domains())
+			for (const auto& domain : all_powf_domains())
 			{
 				if (domain_filter.find(domain) == domain_filter.end() &&
 					std::find(domains_covered.begin(), domains_covered.end(), domain) == domains_covered.end() &&
@@ -282,10 +256,10 @@ namespace ccm::test::oracle::pow_cases
 	}
 
 	inline std::vector<pow_case<float>> build_float_cases(campaign_mode mode,
-															const std::set<std::string_view> & domain_filter,
-															std::uint64_t seed,
-															std::vector<std::string> & domains_covered,
-															std::vector<std::string> & domains_skipped)
+														  const std::set<std::string_view>& domain_filter,
+														  std::uint64_t seed,
+														  std::vector<std::string>& domains_covered,
+														  std::vector<std::string>& domains_skipped)
 	{
 		return build_float_cases(mode, domain_filter, seed, domains_covered, domains_skipped, [](float, float) { return true; });
 	}

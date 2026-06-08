@@ -137,21 +137,15 @@ namespace ccm::test::oracle
 	}
 
 	inline std::string configuration_name()
-	{
-		return pow_configuration_name();
-	}
+	{ return pow_configuration_name(); }
 
 	template <typename T>
-	inline constexpr const char * builtin_status()
-	{
-		return pow_builtin_status<T>();
-	}
+	inline constexpr const char* builtin_status()
+	{ return pow_builtin_status<T>(); }
 
 	template <typename T>
 	inline bool is_modeled_generic_pow_case(T base, T exponent)
-	{
-		return std::isfinite(base) && std::isfinite(exponent) && base > T{};
-	}
+	{ return std::isfinite(base) && std::isfinite(exponent) && base > T{}; }
 
 	inline bool uses_public_mpfr_oracle(ccm::test::pow_path::validation_path path)
 	{
@@ -170,9 +164,7 @@ namespace ccm::test::oracle
 	}
 
 	inline std::string coremath_oracle_policy_name()
-	{
-		return "coremath_cr_finite_all_modes";
-	}
+	{ return "coremath_cr_finite_all_modes"; }
 
 	template <typename T>
 	inline std::optional<std::string> kernel_path_skip_reason(ccm::test::pow_path::validation_path path, T base, T exponent)
@@ -204,7 +196,7 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T>
-	inline void record_worst_case(run_summary<T> & summary, std::uint64_t ulp_distance, T base, T exponent, T actual, T expected)
+	inline void record_worst_case(run_summary<T>& summary, std::uint64_t ulp_distance, T base, T exponent, T actual, T expected)
 	{
 		if (ulp_distance >= summary.max_observed_ulp)
 		{
@@ -264,15 +256,13 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T>
-	inline bool is_hard_oracle_failure(const failure_record<T> & event)
-	{
-		return event.event_kind == "mpfr_hard_failure" || event.event_kind == "coremath_bit_mismatch";
-	}
+	inline bool is_hard_oracle_failure(const failure_record<T>& event)
+	{ return event.event_kind == "mpfr_hard_failure" || event.event_kind == "coremath_bit_mismatch"; }
 
 	template <typename T>
-	inline bool has_hard_oracle_failure(const std::vector<failure_record<T>> & events)
+	inline bool has_hard_oracle_failure(const std::vector<failure_record<T>>& events)
 	{
-		for (const auto & event : events)
+		for (const auto& event : events)
 		{
 			if (is_hard_oracle_failure(event)) { return true; }
 		}
@@ -280,13 +270,13 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T>
-	inline void write_failure_json(const std::string & output_path, const std::vector<failure_record<T>> & failures)
+	inline void write_failure_json(const std::string& output_path, const std::vector<failure_record<T>>& failures)
 	{
 		std::ofstream out(output_path, std::ios::trunc);
 		out << "[\n";
 		for (std::size_t i = 0; i < failures.size(); ++i)
 		{
-			const auto & failure = failures[i];
+			const auto& failure = failures[i];
 			out << "  {\n";
 			out << "    \"function_name\": \"" << json_escape(failure.function_name) << "\",\n";
 			out << "    \"input_type\": \"" << json_escape(failure.input_type) << "\",\n";
@@ -319,9 +309,9 @@ namespace ccm::test::oracle
 	// Echo hard-failure records to stdout so CI logs surface the offending input without an
 	// uploaded artifact. The JSON event log keeps the full record; this is the at-a-glance view.
 	template <typename T>
-	inline void print_hard_failures(const std::vector<failure_record<T>> & events)
+	inline void print_hard_failures(const std::vector<failure_record<T>>& events)
 	{
-		for (const auto & event : events)
+		for (const auto& event : events)
 		{
 			if (!is_hard_oracle_failure(event)) { continue; }
 			std::cout << "HARD FAILURE " << event.event_kind << " fn=" << event.function_name << " path=" << event.path << " rounding=" << event.rounding_mode
@@ -331,7 +321,7 @@ namespace ccm::test::oracle
 		}
 	}
 
-	inline std::optional<std::string> option_value(int argc, char ** argv, std::string_view prefix)
+	inline std::optional<std::string> option_value(int argc, char** argv, std::string_view prefix)
 	{
 		for (int i = 1; i < argc; ++i)
 		{
@@ -341,14 +331,14 @@ namespace ccm::test::oracle
 		return std::nullopt;
 	}
 
-	inline std::optional<std::string> resolve_event_log_path(int argc, char ** argv)
+	inline std::optional<std::string> resolve_event_log_path(int argc, char** argv)
 	{
 		if (const auto log_output = option_value(argc, argv, "--log-output=")) { return *log_output; }
 		if (const auto json_output = option_value(argc, argv, "--json-output=")) { return *json_output; }
 		return std::nullopt;
 	}
 
-	inline bool has_flag(int argc, char ** argv, std::string_view flag)
+	inline bool has_flag(int argc, char** argv, std::string_view flag)
 	{
 		for (int i = 1; i < argc; ++i)
 		{
@@ -358,12 +348,10 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T, typename Parser>
-	inline T parse_option_or(const std::optional<std::string> & raw_value, Parser parser, T fallback)
-	{
-		return raw_value.has_value() ? parser(*raw_value) : fallback;
-	}
+	inline T parse_option_or(const std::optional<std::string>& raw_value, Parser parser, T fallback)
+	{ return raw_value.has_value() ? parser(*raw_value) : fallback; }
 
-	inline campaign_mode parse_mode(const std::optional<std::string> & raw_mode)
+	inline campaign_mode parse_mode(const std::optional<std::string>& raw_mode)
 	{
 		if (!raw_mode.has_value() || *raw_mode == "quick") { return campaign_mode::quick; }
 		if (*raw_mode == "extended") { return campaign_mode::extended; }
@@ -383,7 +371,7 @@ namespace ccm::test::oracle
 		return "quick";
 	}
 
-	inline std::vector<ccm::test::pow_path::validation_path> parse_paths(int argc, char ** argv)
+	inline std::vector<ccm::test::pow_path::validation_path> parse_paths(int argc, char** argv)
 	{
 		std::vector<ccm::test::pow_path::validation_path> paths;
 		const auto raw = option_value(argc, argv, "--path=");
@@ -403,7 +391,7 @@ namespace ccm::test::oracle
 		return paths;
 	}
 
-	inline std::vector<int> parse_rounding_modes(int argc, char ** argv)
+	inline std::vector<int> parse_rounding_modes(int argc, char** argv)
 	{
 		const auto raw = option_value(argc, argv, "--rounding-modes=");
 		if (!raw.has_value() || *raw == "all") { return { FE_TONEAREST, FE_UPWARD, FE_DOWNWARD, FE_TOWARDZERO }; }
@@ -426,7 +414,7 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T>
-	inline void write_campaign_summary_json(const std::string & output_path, const campaign_report<T> & report)
+	inline void write_campaign_summary_json(const std::string& output_path, const campaign_report<T>& report)
 	{
 		std::ofstream out(output_path, std::ios::trunc);
 		out << "{\n";
@@ -475,11 +463,11 @@ namespace ccm::test::oracle
 	inline campaign_report<T> make_campaign_report(std::string_view path_name,
 												   ccm::test::pow_path::validation_path path,
 												   campaign_mode mode,
-												   const run_summary<T> & summary,
+												   const run_summary<T>& summary,
 												   std::uint64_t seed,
 												   std::uint64_t elapsed_ms,
-												   const std::vector<std::string> & domains_covered,
-												   const std::vector<std::string> & domains_skipped)
+												   const std::vector<std::string>& domains_covered,
+												   const std::vector<std::string>& domains_skipped)
 	{
 		return campaign_report<T>{
 			configuration_name(),
@@ -514,11 +502,11 @@ namespace ccm::test::oracle
 	template <typename T>
 	inline campaign_report<T> make_coremath_campaign_report(std::string_view path_name,
 															campaign_mode mode,
-															const run_summary<T> & summary,
+															const run_summary<T>& summary,
 															std::uint64_t seed,
 															std::uint64_t elapsed_ms,
-															const std::vector<std::string> & domains_covered,
-															const std::vector<std::string> & domains_skipped)
+															const std::vector<std::string>& domains_covered,
+															const std::vector<std::string>& domains_skipped)
 	{
 		return campaign_report<T>{
 			configuration_name(),
@@ -552,7 +540,7 @@ namespace ccm::test::oracle
 
 	template <typename T, typename ExecuteFn, typename ReportFn, typename PrintFn>
 	inline void run_path_campaign(ccm::test::pow_path::validation_path path,
-								  run_summary<T> & summary,
+								  run_summary<T>& summary,
 								  std::string_view summary_prefix,
 								  ExecuteFn execute_cases,
 								  ReportFn build_report,
@@ -575,7 +563,7 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T>
-	inline void add_random_cases(std::vector<pow_case<T>> & cases, std::uint64_t seed, std::size_t count, const char * provenance)
+	inline void add_random_cases(std::vector<pow_case<T>>& cases, std::uint64_t seed, std::size_t count, const char* provenance)
 	{
 		std::mt19937_64 rng(seed);
 		for (std::size_t i = 0; i < count; ++i)

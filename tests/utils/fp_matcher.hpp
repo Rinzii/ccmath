@@ -47,7 +47,10 @@ namespace ccm::test
 
 		if (actual_bits.is_nan()) { EXPECT_FALSE(expected_bits.is_nan()); }
 		else if (expected_bits.is_nan()) { EXPECT_TRUE(actual_bits.is_nan()); }
-		else { EXPECT_NE(actual_bits.uintval(), expected_bits.uintval()); }
+		else
+		{
+			EXPECT_NE(actual_bits.uintval(), expected_bits.uintval());
+		}
 	}
 
 	template <typename T>

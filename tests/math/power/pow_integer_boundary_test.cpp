@@ -8,15 +8,15 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
-
-#include <cmath>
-#include <limits>
-
 #include "ccmath/ccmath.hpp"
 #include "ccmath/internal/config/type_support.hpp"
 #include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
 #include "utils/ulp_suite.hpp"
+
+#include <gtest/gtest.h>
+
+#include <cmath>
+#include <limits>
 
 namespace
 {
@@ -30,7 +30,7 @@ namespace
 	template <typename T>
 	void ExpectNegativeBaseDomainError(T exponent)
 	{
-		const T actual = ccm::pow<T>(static_cast<T>(-2.0), exponent);
+		const T actual	 = ccm::pow<T>(static_cast<T>(-2.0), exponent);
 		const T expected = static_cast<T>(std::pow(static_cast<T>(-2.0), exponent));
 		EXPECT_TRUE(std::isnan(actual));
 		ccm::test::ExpectSameFloatingAsStd(actual, expected);
@@ -46,7 +46,7 @@ namespace
 	template <typename T>
 	void ExpectGenNegativeBaseDomainError(T exponent)
 	{
-		const T actual = ccm::gen::pow_gen(static_cast<T>(-2.0), exponent);
+		const T actual	 = ccm::gen::pow_gen(static_cast<T>(-2.0), exponent);
 		const T expected = static_cast<T>(std::pow(static_cast<T>(-2.0), exponent));
 		EXPECT_TRUE(std::isnan(actual));
 		ccm::test::ExpectSameFloatingAsStd(actual, expected);

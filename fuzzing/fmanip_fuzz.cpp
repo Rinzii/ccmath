@@ -11,6 +11,7 @@
 #include "harness.hpp"
 
 #include <ccmath/ccmath.hpp>
+
 #include <cmath>
 #include <cstdint>
 
@@ -21,8 +22,8 @@ namespace
 	{
 		if (size < 2 * sizeof(T) + sizeof(int32_t)) { return; }
 
-		T const x = ccm::fuzz::load_floating<T>(data, size, 0);
-		T const y = ccm::fuzz::load_floating<T>(data, size, sizeof(T));
+		T const x	= ccm::fuzz::load_floating<T>(data, size, 0);
+		T const y	= ccm::fuzz::load_floating<T>(data, size, sizeof(T));
 		int const n = static_cast<int>(ccm::fuzz::load_i32(data, size, 2 * sizeof(T)));
 
 		ccm::fuzz::fuzz_binary_vs_std(x, y, ccm::copysign<T>, [](T a, T b) { return std::copysign(a, b); });

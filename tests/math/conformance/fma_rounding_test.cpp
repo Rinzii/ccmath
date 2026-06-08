@@ -25,9 +25,8 @@ namespace
 TEST(CcmathFmaRoundingConformanceTests, FmafMatchesStdAllModesStructuredCases)
 {
 	const auto ccm_fmaf = [](float x, float y, float z) { return ccm::fmaf(runtime_value(x), runtime_value(y), runtime_value(z)); };
-	const auto std_fmaf = [](float x, float y, float z) {
-		return static_cast<float (*)(float, float, float)>(std::fma)(runtime_value(x), runtime_value(y), runtime_value(z));
-	};
+	const auto std_fmaf = [](float x, float y, float z)
+	{ return static_cast<float (*)(float, float, float)>(std::fma)(runtime_value(x), runtime_value(y), runtime_value(z)); };
 
 	ccm::test::ExpectFpTernaryOverMatchesStdAllModes(ccm::test::samples::kFmaAllModesFloatCases, ccm_fmaf, std_fmaf);
 }
@@ -35,9 +34,8 @@ TEST(CcmathFmaRoundingConformanceTests, FmafMatchesStdAllModesStructuredCases)
 TEST(CcmathFmaRoundingConformanceTests, FmaMatchesStdAllModesStructuredCases)
 {
 	const auto ccm_fma = [](double x, double y, double z) { return ccm::fma(runtime_value(x), runtime_value(y), runtime_value(z)); };
-	const auto std_fma = [](double x, double y, double z) {
-		return static_cast<double (*)(double, double, double)>(std::fma)(runtime_value(x), runtime_value(y), runtime_value(z));
-	};
+	const auto std_fma = [](double x, double y, double z)
+	{ return static_cast<double (*)(double, double, double)>(std::fma)(runtime_value(x), runtime_value(y), runtime_value(z)); };
 
 	ccm::test::ExpectFpTernaryOverMatchesStdAllModes(ccm::test::samples::kFmaAllModesDoubleCases, ccm_fma, std_fma);
 }
@@ -45,13 +43,11 @@ TEST(CcmathFmaRoundingConformanceTests, FmaMatchesStdAllModesStructuredCases)
 TEST(CcmathFmaRoundingConformanceTests, ExactCancellationZeroSignMatchesStdAllModes)
 {
 	const auto ccm_float = [](float x, float y, float z) { return ccm::fmaf(runtime_value(x), runtime_value(y), runtime_value(z)); };
-	const auto std_float = [](float x, float y, float z) {
-		return static_cast<float (*)(float, float, float)>(std::fma)(runtime_value(x), runtime_value(y), runtime_value(z));
-	};
+	const auto std_float = [](float x, float y, float z)
+	{ return static_cast<float (*)(float, float, float)>(std::fma)(runtime_value(x), runtime_value(y), runtime_value(z)); };
 	const auto ccm_double = [](double x, double y, double z) { return ccm::fma(runtime_value(x), runtime_value(y), runtime_value(z)); };
-	const auto std_double = [](double x, double y, double z) {
-		return static_cast<double (*)(double, double, double)>(std::fma)(runtime_value(x), runtime_value(y), runtime_value(z));
-	};
+	const auto std_double = [](double x, double y, double z)
+	{ return static_cast<double (*)(double, double, double)>(std::fma)(runtime_value(x), runtime_value(y), runtime_value(z)); };
 
 	ccm::test::ExpectFpTernaryMatchesStdAllModes(1.0F, 1.0F, -1.0F, ccm_float, std_float);
 	ccm::test::ExpectFpTernaryMatchesStdAllModes(-1.0F, -1.0F, -1.0F, ccm_float, std_float);

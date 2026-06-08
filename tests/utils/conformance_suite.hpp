@@ -65,8 +65,7 @@ namespace ccm::test
 	}
 
 	template <typename T, typename CcmFn, typename StdFn, std::size_t N>
-	void ExpectUlpUnaryOverInMode(int rounding_mode, const std::array<T, N> & inputs, CcmFn ccm_fn, StdFn std_fn,
-								  int64_t max_ulp = kMaxAllowedUlp)
+	void ExpectUlpUnaryOverInMode(int rounding_mode, const std::array<T, N>& inputs, CcmFn ccm_fn, StdFn std_fn, int64_t max_ulp = kMaxAllowedUlp)
 	{
 		for (T input : inputs)
 		{
@@ -76,44 +75,45 @@ namespace ccm::test
 	}
 
 	template <typename T, typename CcmFn, typename StdFn, std::size_t N>
-	void ExpectUlpUnaryOverAllRoundingModes(const std::array<T, N> & inputs, CcmFn ccm_fn, StdFn std_fn,
-											int64_t max_ulp = kMaxAllowedUlp)
+	void ExpectUlpUnaryOverAllRoundingModes(const std::array<T, N>& inputs, CcmFn ccm_fn, StdFn std_fn, int64_t max_ulp = kMaxAllowedUlp)
 	{
-		ForEachRoundingModeOrSkip([&](int mode) {
-			ExpectUlpUnaryOverInMode(mode, inputs, ccm_fn, std_fn, max_ulp);
-		});
+		ForEachRoundingModeOrSkip([&](int mode) { ExpectUlpUnaryOverInMode(mode, inputs, ccm_fn, std_fn, max_ulp); });
 	}
 
 	template <typename T, typename CcmFn, typename StdFn, std::size_t N>
-	void ExpectUlpBinaryOverAllRoundingModes(const std::array<T, N> & bases, const std::array<T, N> & exponents, CcmFn ccm_fn,
-											 StdFn std_fn, int64_t max_ulp = kMaxAllowedUlp)
+	void ExpectUlpBinaryOverAllRoundingModes(
+		const std::array<T, N>& bases, const std::array<T, N>& exponents, CcmFn ccm_fn, StdFn std_fn, int64_t max_ulp = kMaxAllowedUlp)
 	{
 		static_assert(N > 0, "need at least one (base, exponent) pair");
-		ForEachRoundingModeOrSkip([&](int mode) {
-			for (std::size_t i = 0; i < N; ++i)
+		ForEachRoundingModeOrSkip(
+			[&](int mode)
 			{
-				SCOPED_TRACE(bases[i]);
-				SCOPED_TRACE(exponents[i]);
-				if (std::isnan(std_fn(bases[i], exponents[i]))) { continue; }
-				ExpectUlpBinaryVsStdInMode(mode, bases[i], exponents[i], ccm_fn, std_fn, max_ulp);
-			}
-		});
+				for (std::size_t i = 0; i < N; ++i)
+				{
+					SCOPED_TRACE(bases[i]);
+					SCOPED_TRACE(exponents[i]);
+					if (std::isnan(std_fn(bases[i], exponents[i]))) { continue; }
+					ExpectUlpBinaryVsStdInMode(mode, bases[i], exponents[i], ccm_fn, std_fn, max_ulp);
+				}
+			});
 	}
 
 	template <typename T, typename CcmFn, typename StdFn>
 	void ExpectFpTernaryMatchesStdAllModes(T x, T y, T z, CcmFn ccm_fn, StdFn std_fn)
 	{
-		ForEachRoundingModeOrSkip([&](int mode) {
-			ForceRoundingMode force(mode);
-			if (!force) { ADD_FAILURE() << "could not set " << RoundingModeName(mode); }
-			ExpectFpEq(ccm_fn(x, y, z), std_fn(x, y, z));
-		});
+		ForEachRoundingModeOrSkip(
+			[&](int mode)
+			{
+				ForceRoundingMode force(mode);
+				if (!force) { ADD_FAILURE() << "could not set " << RoundingModeName(mode); }
+				ExpectFpEq(ccm_fn(x, y, z), std_fn(x, y, z));
+			});
 	}
 
 	template <typename TernaryCase, typename CcmFn, typename StdFn, std::size_t N>
-	void ExpectFpTernaryOverMatchesStdAllModes(const std::array<TernaryCase, N> & inputs, CcmFn ccm_fn, StdFn std_fn)
+	void ExpectFpTernaryOverMatchesStdAllModes(const std::array<TernaryCase, N>& inputs, CcmFn ccm_fn, StdFn std_fn)
 	{
-		for (const auto & input : inputs)
+		for (const auto& input : inputs)
 		{
 			SCOPED_TRACE(input.x);
 			SCOPED_TRACE(input.y);
@@ -126,15 +126,17 @@ namespace ccm::test
 	template <typename T, typename CcmFn, typename StdFn>
 	void ExpectFpUnaryMatchesStdAllModes(T input, CcmFn ccm_fn, StdFn std_fn)
 	{
-		ForEachRoundingModeOrSkip([&](int mode) {
-			ForceRoundingMode force(mode);
-			if (!force) { ADD_FAILURE() << "could not set " << RoundingModeName(mode); }
-			ExpectFpEq(ccm_fn(input), std_fn(input));
-		});
+		ForEachRoundingModeOrSkip(
+			[&](int mode)
+			{
+				ForceRoundingMode force(mode);
+				if (!force) { ADD_FAILURE() << "could not set " << RoundingModeName(mode); }
+				ExpectFpEq(ccm_fn(input), std_fn(input));
+			});
 	}
 
 	template <typename T, typename CcmFn, typename StdFn, std::size_t N>
-	void ExpectFpUnaryOverMatchesStdAllModes(const std::array<T, N> & inputs, CcmFn ccm_fn, StdFn std_fn)
+	void ExpectFpUnaryOverMatchesStdAllModes(const std::array<T, N>& inputs, CcmFn ccm_fn, StdFn std_fn)
 	{
 		for (T input : inputs)
 		{
@@ -146,29 +148,31 @@ namespace ccm::test
 	template <typename T, typename CcmFn, typename StdFn>
 	void ExpectDomainEdgeMatchesStdAllModes(T input, CcmFn ccm_fn, StdFn std_fn)
 	{
-		ForEachRoundingModeOrSkip([&](int mode) {
-			SCOPED_TRACE(input);
-			ForceRoundingMode force(mode);
-			if (!force) { ADD_FAILURE() << "could not set " << RoundingModeName(mode); }
-			ExpectSameFloatingAsStd(ccm_fn(input), std_fn(input), kMaxAllowedUlp);
-		});
+		ForEachRoundingModeOrSkip(
+			[&](int mode)
+			{
+				SCOPED_TRACE(input);
+				ForceRoundingMode force(mode);
+				if (!force) { ADD_FAILURE() << "could not set " << RoundingModeName(mode); }
+				ExpectSameFloatingAsStd(ccm_fn(input), std_fn(input), kMaxAllowedUlp);
+			});
 	}
 
 } // namespace ccm::test
 
-#define CCM_EXPECT_FP_EQ_ROUNDING_MODE(expected, actual, rounding_mode)                                                     \
-	do                                                                                                                      \
-	{                                                                                                                       \
-		::ccm::test::ForceRoundingMode __ccm_force_round((rounding_mode));                                                 \
-		if (__ccm_force_round) { CCM_EXPECT_FP_EQ((actual), (expected)); }                                                  \
+#define CCM_EXPECT_FP_EQ_ROUNDING_MODE(expected, actual, rounding_mode)                                                                                        \
+	do                                                                                                                                                         \
+	{                                                                                                                                                          \
+		::ccm::test::ForceRoundingMode __ccm_force_round((rounding_mode));                                                                                     \
+		if (__ccm_force_round) { CCM_EXPECT_FP_EQ((actual), (expected)); }                                                                                     \
 	} while (0)
 
-#define CCM_EXPECT_FP_EQ_ALL_ROUNDING(expected, actual)                                                                     \
-	do                                                                                                                      \
-	{                                                                                                                       \
-		for (int __ccm_mode : ::ccm::test::kStdRoundingModes)                                                               \
-		{                                                                                                                   \
-			SCOPED_TRACE(::ccm::test::RoundingModeName(__ccm_mode));                                                         \
-			CCM_EXPECT_FP_EQ_ROUNDING_MODE((expected), (actual), __ccm_mode);                                                \
-		}                                                                                                                   \
+#define CCM_EXPECT_FP_EQ_ALL_ROUNDING(expected, actual)                                                                                                        \
+	do                                                                                                                                                         \
+	{                                                                                                                                                          \
+		for (int __ccm_mode : ::ccm::test::kStdRoundingModes)                                                                                                  \
+		{                                                                                                                                                      \
+			SCOPED_TRACE(::ccm::test::RoundingModeName(__ccm_mode));                                                                                           \
+			CCM_EXPECT_FP_EQ_ROUNDING_MODE((expected), (actual), __ccm_mode);                                                                                  \
+		}                                                                                                                                                      \
 	} while (0)

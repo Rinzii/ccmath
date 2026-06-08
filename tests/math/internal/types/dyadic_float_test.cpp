@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <cmath>
+#include "ccmath/internal/types/dyadic_float.hpp"
 
 #include <gtest/gtest.h>
 
-#include "ccmath/internal/types/dyadic_float.hpp"
+#include <cmath>
 
 namespace
 {
@@ -20,7 +20,8 @@ namespace
 
 	constexpr bool kNoFpExceptions = false;
 
-	double to_double(const Float128 & value) { return value.template as<double, kNoFpExceptions>(); }
+	double to_double(const Float128 & value)
+	{ return value.template as<double, kNoFpExceptions>(); }
 } // namespace
 
 TEST(CcmathInternalTypesTests, DyadicFloatQuickSubAndNegation)
@@ -37,7 +38,7 @@ TEST(CcmathInternalTypesTests, DyadicFloatRoundedMulMatchesQuickMulNearOne)
 {
 	const Float128 a(1.125);
 	const Float128 b(1.0625);
-	const Float128 quick	 = ccm::types::quick_mul(a, b);
+	const Float128 quick   = ccm::types::quick_mul(a, b);
 	const Float128 rounded = ccm::types::rounded_mul(a, b);
 
 	EXPECT_NEAR(to_double(quick), 1.1953125, 1e-12);
@@ -48,6 +49,6 @@ TEST(CcmathInternalTypesTests, DyadicFloatGenericAsMatchesDouble)
 {
 	const Float128 value(1.0 + std::ldexp(1.0, -40));
 	const double generic = value.template generic_as<double, kNoFpExceptions>();
-	const double fast = to_double(value);
+	const double fast	 = to_double(value);
 	EXPECT_DOUBLE_EQ(generic, fast);
 }

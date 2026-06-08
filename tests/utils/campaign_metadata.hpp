@@ -98,14 +98,15 @@ namespace ccm::test
 		if constexpr (std::is_same_v<T, float>) { return "float"; }
 		else if constexpr (std::is_same_v<T, double>) { return "double"; }
 		else if constexpr (std::is_same_v<T, long double>) { return "long double"; }
-		else { return "unknown"; }
+		else
+		{
+			return "unknown";
+		}
 	}
 
 	template <typename T>
 	inline constexpr const char * pow_builtin_status()
-	{
-		return ccm::builtin::has_runtime_pow<T> ? "available" : "unavailable";
-	}
+	{ return ccm::builtin::has_runtime_pow<T> ? "available" : "unavailable"; }
 
 	template <typename T>
 	inline constexpr const char * fma_builtin_status()

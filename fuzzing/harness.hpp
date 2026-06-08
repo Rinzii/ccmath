@@ -25,14 +25,14 @@ namespace ccm::fuzz
 {
 	inline constexpr int64_t kMaxAllowedUlp = 4;
 
-#define FUZZ_CHECK(cond)                                                                                                         \
-	do                                                                                                                           \
-	{                                                                                                                            \
-		if (!(cond))                                                                                                             \
-		{                                                                                                                        \
-			std::fprintf(stderr, "FUZZ_CHECK failed: %s\n", #cond);                                                              \
-			std::abort();                                                                                                        \
-		}                                                                                                                        \
+#define FUZZ_CHECK(cond)                                                                                                                                       \
+	do                                                                                                                                                         \
+	{                                                                                                                                                          \
+		if (!(cond))                                                                                                                                           \
+		{                                                                                                                                                      \
+			std::fprintf(stderr, "FUZZ_CHECK failed: %s\n", #cond);                                                                                            \
+			std::abort();                                                                                                                                      \
+		}                                                                                                                                                      \
 	} while (0)
 
 	template <typename T>
@@ -76,10 +76,11 @@ namespace ccm::fuzz
 		}
 		if (fp_a.is_inf() || fp_b.is_inf()) { return std::numeric_limits<int64_t>::max(); }
 
-		using uint_type = typename fp_bits_t::storage_type;
+		using uint_type				  = typename fp_bits_t::storage_type;
 		constexpr uint_type sign_mask = uint_type{ 1 } << (sizeof(uint_type) * 8 - 1);
 
-		auto ordered_bits = [=](fp_bits_t bits) {
+		auto ordered_bits = [=](fp_bits_t bits)
+		{
 			uint_type const raw = bits.uintval();
 			if ((raw & sign_mask) != 0) { return sign_mask - (raw & ~sign_mask); }
 			return sign_mask + raw;
@@ -87,7 +88,7 @@ namespace ccm::fuzz
 
 		uint_type const a_bits = ordered_bits(fp_a);
 		uint_type const b_bits = ordered_bits(fp_b);
-		uint_type const diff = (a_bits > b_bits) ? a_bits - b_bits : b_bits - a_bits;
+		uint_type const diff   = (a_bits > b_bits) ? a_bits - b_bits : b_bits - a_bits;
 		if (diff > static_cast<uint_type>(std::numeric_limits<int64_t>::max())) { return std::numeric_limits<int64_t>::max(); }
 		return static_cast<int64_t>(diff);
 	}
@@ -143,9 +144,7 @@ namespace ccm::fuzz
 
 	template <typename T, typename CcmFn, typename StdFn>
 	void fuzz_unary_vs_std(T input, CcmFn && ccm_fn, StdFn && std_fn, int64_t max_ulp = kMaxAllowedUlp)
-	{
-		check_same_floating(ccm_fn(input), std_fn(input), max_ulp);
-	}
+	{ check_same_floating(ccm_fn(input), std_fn(input), max_ulp); }
 
 	template <typename T, typename CcmFn, typename StdFn>
 	void fuzz_unary_log_family(T input, CcmFn && ccm_fn, StdFn && std_fn)
@@ -173,15 +172,11 @@ namespace ccm::fuzz
 
 	template <typename T, typename CcmFn, typename StdFn>
 	void fuzz_binary_vs_std(T x, T y, CcmFn && ccm_fn, StdFn && std_fn, int64_t max_ulp = kMaxAllowedUlp)
-	{
-		check_same_floating(ccm_fn(x, y), std_fn(x, y), max_ulp);
-	}
+	{ check_same_floating(ccm_fn(x, y), std_fn(x, y), max_ulp); }
 
 	template <typename T, typename CcmFn, typename StdFn>
 	void fuzz_binary_exact_int(T x, T y, CcmFn && ccm_fn, StdFn && std_fn)
-	{
-		FUZZ_CHECK(ccm_fn(x, y) == std_fn(x, y));
-	}
+	{ FUZZ_CHECK(ccm_fn(x, y) == std_fn(x, y)); }
 
 	template <typename T>
 	void check_remquo_vs_std(T x, T y)

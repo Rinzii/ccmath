@@ -34,14 +34,10 @@ namespace
 	}
 
 	CCM_NEVER_INLINE double invoke_pow_gen(double base, double exp)
-	{
-		return ccm::gen::pow_gen(base, exp);
-	}
+	{ return ccm::gen::pow_gen(base, exp); }
 
 	CCM_NEVER_INLINE float invoke_powf_gen(float base, float exp)
-	{
-		return ccm::gen::pow_gen(base, exp);
-	}
+	{ return ccm::gen::pow_gen(base, exp); }
 } // namespace
 
 TEST(CcmathPowErrnoTests, GenericPowSetsErrnoWhenRuntimeErrnoIsEnabled)
@@ -117,9 +113,9 @@ TEST(CcmathPowFenvTests, GenericPowfBaseTwoMatchesStdAtRangeThresholdsAllModes)
 			{
 				SCOPED_TRACE(exponent_value);
 
-				const float base	   = runtime_value(2.0F);
+				const float base	 = runtime_value(2.0F);
 				const float exponent = runtime_value(exponent_value);
-				const float actual   = invoke_powf_gen(base, exponent);
+				const float actual	 = invoke_powf_gen(base, exponent);
 				const float expected = static_cast<float>(std::pow(base, exponent));
 
 				ccm::test::ExpectFpEq(actual, expected);

@@ -8,24 +8,21 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "ccmath/ccmath.hpp"
+#include "ccmath/internal/config/long_double_format.hpp"
+#include "ccmath/internal/math/generic/func/power/powl_gen.hpp"
+
 #include <gtest/gtest.h>
 
 #include <cmath>
 #include <limits>
 
-#include "ccmath/ccmath.hpp"
-#include "ccmath/internal/config/long_double_format.hpp"
-#include "ccmath/internal/math/generic/func/power/powl_gen.hpp"
-
 namespace
 {
-#define REQUIRE_POWL_LD80()                                                                                                        \
-	do                                                                                                                             \
-	{                                                                                                                              \
-		if (ccm::config::detect_long_double_format() != ccm::config::LongDoubleFormat::X87Extended)                                \
-		{                                                                                                                          \
-			GTEST_SKIP() << "x87 80-bit long double required";                                                                     \
-		}                                                                                                                          \
+#define REQUIRE_POWL_LD80()                                                                                                                                    \
+	do                                                                                                                                                         \
+	{                                                                                                                                                          \
+		if (ccm::config::detect_long_double_format() != ccm::config::LongDoubleFormat::X87Extended) { GTEST_SKIP() << "x87 80-bit long double required"; }     \
 	} while (false)
 
 	void ExpectInteger(long double value, bool is_integer, bool is_odd = false)
@@ -70,7 +67,8 @@ TEST(PowlLd80IntegerClass, NegativeBaseParityMatchesStdPow)
 {
 	REQUIRE_POWL_LD80();
 
-	const auto expect_parity = [](long double exponent, long double expected) {
+	const auto expect_parity = [](long double exponent, long double expected)
+	{
 		const long double actual = ccm::gen::pow_gen(-1.0L, exponent);
 		EXPECT_EQ(actual, expected) << "exponent=" << exponent;
 	};

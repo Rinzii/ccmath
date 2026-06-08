@@ -6,13 +6,14 @@
  * See LICENSE for more information.
  */
 
-#include <benchmark/benchmark.h>
-#include <random>
-#include <vector>
-
-#include <cmath>
 #include "ccmath/ccmath.hpp"
 #include "helpers/randomizers.hpp"
+
+#include <benchmark/benchmark.h>
+
+#include <cmath>
+#include <random>
+#include <vector>
 
 // NOLINTBEGIN
 
@@ -20,46 +21,43 @@ namespace bm = benchmark;
 
 static ccm::bench::Randomizer ran{};
 
-static void BM_basic_abs_ccm(benchmark::State& state) {
+static void BM_basic_abs_ccm(benchmark::State& state)
+{
 	auto randomIntegers = ran.generateRandomIntegers(static_cast<size_t>(state.range(0)));
-	while (state.KeepRunning()) {
-		for (auto x : randomIntegers) {
-			benchmark::DoNotOptimize(std::abs(x));
-		}
+	while (state.KeepRunning())
+	{
+		for (auto x : randomIntegers) { benchmark::DoNotOptimize(std::abs(x)); }
 	}
 	state.SetComplexityN(state.range(0));
 }
-BENCHMARK(BM_basic_abs_ccm)->Range(8, 8<<10)->Complexity();
+BENCHMARK(BM_basic_abs_ccm)->Range(8, 8 << 10)->Complexity();
 
-static void BM_basic_abs_std(benchmark::State& state) {
+static void BM_basic_abs_std(benchmark::State& state)
+{
 	auto randomIntegers = ran.generateRandomIntegers(static_cast<size_t>(state.range(0)));
-	while (state.KeepRunning()) {
-		for (auto x : randomIntegers) {
-			benchmark::DoNotOptimize(ccm::abs(x));
-		}
+	while (state.KeepRunning())
+	{
+		for (auto x : randomIntegers) { benchmark::DoNotOptimize(ccm::abs(x)); }
 	}
 	state.SetComplexityN(state.range(0));
 }
-BENCHMARK(BM_basic_abs_std)->Range(8, 8<<10)->Complexity();
-
-
-
+BENCHMARK(BM_basic_abs_std)->Range(8, 8 << 10)->Complexity();
 
 /*
 
 static void BM_std_fma(bm::State& state) {
-    for ([[maybe_unused]] auto _ : state) {
-        bm::DoNotOptimize(std::fma(state.range(0), state.range(1), state.range(2)));
-    }
-    state.SetComplexityN(state.range(0));
+	for ([[maybe_unused]] auto _ : state) {
+		bm::DoNotOptimize(std::fma(state.range(0), state.range(1), state.range(2)));
+	}
+	state.SetComplexityN(state.range(0));
 }
 BENCHMARK(BM_std_fma)->Args({16, 16, 16})->Args({256, 256, 256})->Args({4096, 4096, 4096})->Args({65536, 65536, 65536})->Complexity();
 
 static void BM_ccm_fma(bm::State& state) {
-    for ([[maybe_unused]] auto _ : state) {
-        bm::DoNotOptimize(ccm::fma(state.range(0), state.range(1), state.range(2)));
-    }
-    state.SetComplexityN(state.range(0));
+	for ([[maybe_unused]] auto _ : state) {
+		bm::DoNotOptimize(ccm::fma(state.range(0), state.range(1), state.range(2)));
+	}
+	state.SetComplexityN(state.range(0));
 }
 BENCHMARK(BM_ccm_fma)->Args({16, 16, 16})->Args({256, 256, 256})->Args({4096, 4096, 4096})->Args({65536, 65536, 65536})->Complexity();
 
@@ -146,13 +144,13 @@ static void BM_std_log_rand_double(bm::State& state) {
 BENCHMARK(BM_std_log_rand_double)->Range(8, 8<<10)->Complexity();
 
 static void BM_ccm_log_rand_double(bm::State& state) {
-    auto randomDoubles = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
-    while (state.KeepRunning()) {
-        for (auto x : randomDoubles) {
-            bm::DoNotOptimize(ccm::log(x));
-        }
-    }
-    state.SetComplexityN(state.range(0));
+	auto randomDoubles = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
+	while (state.KeepRunning()) {
+		for (auto x : randomDoubles) {
+			bm::DoNotOptimize(ccm::log(x));
+		}
+	}
+	state.SetComplexityN(state.range(0));
 }
 BENCHMARK(BM_ccm_log_rand_double)->Range(8, 8<<10)->Complexity();
 
@@ -173,24 +171,24 @@ static void BM_std_log(bm::State& state) {
 BENCHMARK(BM_std_log)->Arg(16)->Arg(256)->Arg(4096)->Arg(65536)->Complexity();
 
 static void BM_std_log2_rand_double(bm::State& state) {
-    auto randomDoubles = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
-    while (state.KeepRunning()) {
-        for (auto x : randomDoubles) {
-            bm::DoNotOptimize(std::log2(x));
-        }
-    }
-    state.SetComplexityN(state.range(0));
+	auto randomDoubles = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
+	while (state.KeepRunning()) {
+		for (auto x : randomDoubles) {
+			bm::DoNotOptimize(std::log2(x));
+		}
+	}
+	state.SetComplexityN(state.range(0));
 }
 BENCHMARK(BM_std_log2_rand_double)->Range(8, 8<<10)->Complexity();
 
 static void BM_ccm_log2_rand_double(bm::State& state) {
-    auto randomDoubles = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
-    while (state.KeepRunning()) {
-        for (auto x : randomDoubles) {
-            bm::DoNotOptimize(ccm::log2(x));
-        }
-    }
-    state.SetComplexityN(state.range(0));
+	auto randomDoubles = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
+	while (state.KeepRunning()) {
+		for (auto x : randomDoubles) {
+			bm::DoNotOptimize(ccm::log2(x));
+		}
+	}
+	state.SetComplexityN(state.range(0));
 }
 BENCHMARK(BM_ccm_log2_rand_double)->Range(8, 8<<10)->Complexity();
 
@@ -211,10 +209,10 @@ static void BM_std_log2(bm::State& state) {
 BENCHMARK(BM_std_log2)->Arg(16)->Arg(256)->Arg(4096)->Arg(65536)->Complexity();
 
 static void BM_ccm_lerp(bm::State& state) {
-    for (auto _ : state) {
-        bm::DoNotOptimize(ccm::lerp(state.range(0), state.range(1), state.range(2)));
-    }
-    state.SetComplexityN(state.range(0));
+	for (auto _ : state) {
+		bm::DoNotOptimize(ccm::lerp(state.range(0), state.range(1), state.range(2)));
+	}
+	state.SetComplexityN(state.range(0));
 }
 BENCHMARK(BM_ccm_lerp)->Args({16, 16, 16})->Args({256, 256, 256})->Args({4096, 4096, 4096})->Args({65536, 65536, 65536})->Complexity();
 
@@ -228,57 +226,52 @@ BENCHMARK(BM_ccm_lerp2)->Args({16, 16, 16})->Args({256, 256, 256})->Args({4096, 
 
 
 static void BM_std_lerp(bm::State& state) {
-    for (auto _ : state) {
-        bm::DoNotOptimize(ccm::lerp(state.range(0), state.range(1), state.range(2)));
-    }
-    state.SetComplexityN(state.range(0));
+	for (auto _ : state) {
+		bm::DoNotOptimize(ccm::lerp(state.range(0), state.range(1), state.range(2)));
+	}
+	state.SetComplexityN(state.range(0));
 }
 BENCHMARK(BM_std_lerp)->Args({16, 16, 16})->Args({256, 256, 256})->Args({4096, 4096, 4096})->Args({65536, 65536, 65536})->Complexity();
 
 */
 
 // fma
-static void BM_std_fma(bm::State& state) {
-    for ([[maybe_unused]] auto _ : state) {
-        bm::DoNotOptimize(std::fma(state.range(0), state.range(1), state.range(2)));
-    }
-    state.SetComplexityN(state.range(0));
+static void BM_std_fma(bm::State& state)
+{
+	for ([[maybe_unused]] auto _ : state) { bm::DoNotOptimize(std::fma(state.range(0), state.range(1), state.range(2))); }
+	state.SetComplexityN(state.range(0));
 }
-BENCHMARK(BM_std_fma)->Args({16, 16, 16})->Args({256, 256, 256})->Args({4096, 4096, 4096})->Args({65536, 65536, 65536})->Complexity();
+BENCHMARK(BM_std_fma)->Args({ 16, 16, 16 })->Args({ 256, 256, 256 })->Args({ 4096, 4096, 4096 })->Args({ 65536, 65536, 65536 })->Complexity();
 
-static void BM_ccm_fma(bm::State& state) {
-    for ([[maybe_unused]] auto _ : state) {
-        bm::DoNotOptimize(ccm::fma(state.range(0), state.range(1), state.range(2)));
-    }
-    state.SetComplexityN(state.range(0));
+static void BM_ccm_fma(bm::State& state)
+{
+	for ([[maybe_unused]] auto _ : state) { bm::DoNotOptimize(ccm::fma(state.range(0), state.range(1), state.range(2))); }
+	state.SetComplexityN(state.range(0));
 }
-BENCHMARK(BM_ccm_fma)->Args({16, 16, 16})->Args({256, 256, 256})->Args({4096, 4096, 4096})->Args({65536, 65536, 65536})->Complexity();
+BENCHMARK(BM_ccm_fma)->Args({ 16, 16, 16 })->Args({ 256, 256, 256 })->Args({ 4096, 4096, 4096 })->Args({ 65536, 65536, 65536 })->Complexity();
 
-static void BM_std_fma_rand_double(bm::State& state) {
-    auto randomDoubles = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
-    while (state.KeepRunning()) {
-        for (auto x : randomDoubles) {
-            bm::DoNotOptimize(std::fma(x, x, x));
-        }
-    }
-    state.SetComplexityN(state.range(0));
+static void BM_std_fma_rand_double(bm::State& state)
+{
+	auto randomDoubles = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
+	while (state.KeepRunning())
+	{
+		for (auto x : randomDoubles) { bm::DoNotOptimize(std::fma(x, x, x)); }
+	}
+	state.SetComplexityN(state.range(0));
 }
-BENCHMARK(BM_std_fma_rand_double)->Range(8, 8<<10)->Complexity();
+BENCHMARK(BM_std_fma_rand_double)->Range(8, 8 << 10)->Complexity();
 
-static void BM_ccm_fma_rand_double(bm::State& state) {
-    auto randomDoubles = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
-    while (state.KeepRunning()) {
-        for (auto x : randomDoubles) {
-            bm::DoNotOptimize(ccm::fma(x, x, x));
-        }
-    }
-    state.SetComplexityN(state.range(0));
+static void BM_ccm_fma_rand_double(bm::State& state)
+{
+	auto randomDoubles = generateRandomDoubles(static_cast<size_t>(state.range(0)), DefaultSeed);
+	while (state.KeepRunning())
+	{
+		for (auto x : randomDoubles) { bm::DoNotOptimize(ccm::fma(x, x, x)); }
+	}
+	state.SetComplexityN(state.range(0));
 }
-BENCHMARK(BM_ccm_fma_rand_double)->Range(8, 8<<10)->Complexity();
-
-
+BENCHMARK(BM_ccm_fma_rand_double)->Range(8, 8 << 10)->Complexity();
 
 BENCHMARK_MAIN();
-
 
 // NOLINTEND

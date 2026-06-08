@@ -10,27 +10,27 @@ namespace
 	using ccm::test::pow_path::validation_path;
 
 	void run_path(validation_path path,
-				  const std::vector<pow_case<double>> & cases,
-				  const std::vector<int> & rounding_modes,
+				  const std::vector<pow_case<double>>& cases,
+				  const std::vector<int>& rounding_modes,
 				  mpfr_prec_t precision,
 				  std::uint64_t max_ulp,
 				  std::uint64_t target_ulp,
 				  std::uint64_t seed,
 				  campaign_mode mode,
-				  std::vector<ccm::test::oracle::failure_record<double>> & events,
-				  ccm::test::oracle::run_summary<double> & summary)
+				  std::vector<ccm::test::oracle::failure_record<double>>& events,
+				  ccm::test::oracle::run_summary<double>& summary)
 	{
 		ccm::test::oracle::run_path_campaign<double>(
 			path,
 			summary,
 			"mpfr-pow-double-",
-			[&](ccm::test::oracle::run_summary<double> & path_summary)
+			[&](ccm::test::oracle::run_summary<double>& path_summary)
 			{
 				for (const int rounding_mode : rounding_modes)
 				{
 					ccm::test::oracle::ScopedMpfrRoundingMode scope(rounding_mode);
 					if (!scope) { continue; }
-					for (const auto & test_case : cases)
+					for (const auto& test_case : cases)
 					{
 						if (path == validation_path::generic_modeled_domain &&
 							!ccm::test::oracle::is_modeled_generic_pow_case(test_case.base, test_case.exponent))
@@ -53,12 +53,12 @@ namespace
 					}
 				}
 			},
-			[&](const ccm::test::oracle::run_summary<double> & path_summary, std::uint64_t elapsed_ms)
+			[&](const ccm::test::oracle::run_summary<double>& path_summary, std::uint64_t elapsed_ms)
 			{
 				return ccm::test::oracle::make_campaign_report<double>(
 					ccm::test::pow_path::path_name(path), path, mode, path_summary, seed, elapsed_ms, { "structured-binary64-corpus" }, {});
 			},
-			[&](const auto & report, const std::string & summary_path)
+			[&](const auto& report, const std::string& summary_path)
 			{
 				std::cout << "path=" << report.path << " configuration=" << report.configuration_name << " rounding_modes=" << rounding_modes.size()
 						  << " cases=" << report.case_count << " skipped=" << report.skipped_count
@@ -69,7 +69,7 @@ namespace
 	}
 } // namespace
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
 	const auto mode		   = ccm::test::oracle::parse_mode(ccm::test::oracle::option_value(argc, argv, "--mode="));
 	const auto output_path = ccm::test::oracle::resolve_event_log_path(argc, argv);
@@ -78,18 +78,18 @@ int main(int argc, char ** argv)
 		std::cout << "warning: --include-generic-modeled-path is deprecated, use --path=generic_modeled_domain\n";
 	}
 	const std::uint64_t seed = ccm::test::oracle::parse_option_or<std::uint64_t>(
-		ccm::test::oracle::option_value(argc, argv, "--seed="), [](const std::string & value) { return std::stoull(value); }, 0xC0DEC0FFEEULL);
+		ccm::test::oracle::option_value(argc, argv, "--seed="), [](const std::string& value) { return std::stoull(value); }, 0xC0DEC0FFEEULL);
 	const std::uint64_t max_ulp = ccm::test::oracle::parse_option_or<std::uint64_t>(
-		ccm::test::oracle::option_value(argc, argv, "--max-ulp="), [](const std::string & value) { return static_cast<std::uint64_t>(std::stoull(value)); }, 4);
+		ccm::test::oracle::option_value(argc, argv, "--max-ulp="), [](const std::string& value) { return static_cast<std::uint64_t>(std::stoull(value)); }, 4);
 	// Hard ceiling stays at 4 ULP. The correctly-rounded target is 0.5 ULP, which in the
 	// integer ULP-distance metric versus the rounded MPFR reference is distance 0.
 	const std::uint64_t target_ulp = ccm::test::oracle::parse_option_or<std::uint64_t>(
 		ccm::test::oracle::option_value(argc, argv, "--target-ulp="),
-		[](const std::string & value) { return static_cast<std::uint64_t>(std::stoull(value)); },
+		[](const std::string& value) { return static_cast<std::uint64_t>(std::stoull(value)); },
 		0);
 	const mpfr_prec_t precision = ccm::test::oracle::parse_option_or<mpfr_prec_t>(
 		ccm::test::oracle::option_value(argc, argv, "--oracle-precision="),
-		[](const std::string & value) { return static_cast<mpfr_prec_t>(std::stoul(value)); },
+		[](const std::string& value) { return static_cast<mpfr_prec_t>(std::stoul(value)); },
 		256);
 
 	auto paths = ccm::test::oracle::parse_paths(argc, argv);

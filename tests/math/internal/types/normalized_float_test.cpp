@@ -8,13 +8,13 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <cmath>
-
-#include <gtest/gtest.h>
-
 #include "ccmath/internal/support/fp/except_value_utils.hpp"
 #include "ccmath/internal/types/dyadic_float.hpp"
 #include "ccmath/internal/types/normalized_float.hpp"
+
+#include <gtest/gtest.h>
+
+#include <cmath>
 
 namespace
 {
@@ -46,16 +46,14 @@ TEST(CcmathInternalSupportTests, ExceptValuesLookupTowardZero)
 }
 
 TEST(CcmathInternalSupportTests, ExceptValuesLookupMissReturnsNullopt)
-{
-	EXPECT_FALSE(kFloatExcepts.lookup(0x40000000U).has_value());
-}
+{ EXPECT_FALSE(kFloatExcepts.lookup(0x40000000U).has_value()); }
 
 TEST(CcmathInternalTypesTests, DyadicFloatRoundedDivNearOne)
 {
 	using Dyadic = ccm::types::DyadicFloat<128>;
 	const Dyadic a(1.5);
 	const Dyadic b(1.5);
-	const Dyadic quotient = ccm::types::rounded_div(a, b);
+	const Dyadic quotient	  = ccm::types::rounded_div(a, b);
 	const double quotient_val = quotient.template as<double, false>();
 	EXPECT_NEAR(quotient_val, 1.0, 1e-12);
 }
