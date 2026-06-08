@@ -1,0 +1,43 @@
+name: Install clang-format
+description: Install clang-format 20 for CI format checks with download retries on macOS and Windows
+
+runs:
+  using: composite
+  steps:
+    - name: Install clang-format (Linux)
+      if: runner.os == 'Linux'
+      shell: bash
+      run: bash tools/install_clang_format_linux.sh
+
+    - name: Install clang-format (attempt 1)
+      if: runner.os != 'Linux'
+      uses: aminya/setup-cpp@1f17f92d6a52bfcb1a25348e2c526c2e5cbb1134 # v1.8.0
+      continue-on-error: true
+      id: clang_format_attempt_1
+      with:
+        clangformat: 20.1.8
+
+    - name: Wait before clang-format retry
+      if: runner.os != 'Linux' && steps.clang_format_attempt_1.outcome != 'success'
+      shell: bash
+      run: sleep 30
+
+    - name: Install clang-format (attempt 2)
+      if: runner.os != 'Linux' && steps.clang_format_attempt_1.outcome != 'success'
+      uses: aminya/setup-cpp@1f17f92d6a52bfcb1a25348e2c526c2e5cbb1134 # v1.8.0
+      continue-on-error: true
+      id: clang_format_attempt_2
+      with:
+        clangformat: 20.1.8
+
+    - name: Wait before clang-format retry
+      if: runner.os != 'Linux' && steps.clang_format_attempt_1.outcome != 'success' && steps.clang_format_attempt_2.outcome != 'success'
+      shell: bash
+      run: sleep 60
+
+    - name: Install clang-format (attempt 3)
+      if: runner.os != 'Linux' && steps.clang_format_attempt_1.outcome != 'success' && steps.clang_format_attempt_2.outcome != 'success'
+      uses: aminya/setup-cpp@1f17f92d6a52bfcb1a25348e2c526c2e5cbb1134 # v1.8.0
+      id: clang_format_attempt_3
+      with:
+        clangformat: 20.1.8

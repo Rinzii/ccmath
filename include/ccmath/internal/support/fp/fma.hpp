@@ -120,7 +120,7 @@ namespace ccm::support::fp
 		struct decoded_operand
 		{
 			types::Sign sign				 = types::Sign::POS;
-			FPBits<T>::storage_type mantissa = 0;
+			typename FPBits<T>::storage_type mantissa = 0;
 			int width						 = 0;
 			int lsb_exponent				 = 0;
 			int top_exponent				 = 0;
@@ -235,7 +235,7 @@ namespace ccm::support::fp
 		[[nodiscard]] constexpr T round_normalized(types::Sign sign, int base_exponent, Int mantissa, bool sticky_tail)
 		{
 			using OutFPBits	  = FPBits<T>;
-			using StorageType = OutFPBits::storage_type;
+			using StorageType = typename OutFPBits::storage_type;
 
 			if (int_is_zero(mantissa)) { return OutFPBits::zero(sign).get_val(); }
 
@@ -347,7 +347,7 @@ namespace ccm::support::fp
 		{
 			using Traits	  = fixed_fma_traits<T>;
 			using FPBits	  = FPBits<T>;
-			using StorageType = FPBits::storage_type;
+			using StorageType = typename FPBits::storage_type;
 			using ProductInt  = Traits::product_int;
 			using AccInt	  = Traits::acc_int;
 			using Sign		  = types::Sign;
@@ -477,7 +477,7 @@ namespace ccm::support::fp
 		[[nodiscard]] constexpr std::enable_if_t<std::is_floating_point_v<T>, T> wide_fma(T x, T y, T z)
 		{
 			using FPBits	  = FPBits<T>;
-			using StorageType = FPBits::storage_type;
+			using StorageType = typename FPBits::storage_type;
 			using Sign		  = types::Sign;
 
 			constexpr int IN_EXPLICIT_MANT_LEN	 = static_cast<int>(FPBits::fraction_length) + 1;

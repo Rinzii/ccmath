@@ -75,17 +75,17 @@ namespace ccm::support::helpers
 			return p;
 		}
 
-		constexpr double exp10_double_impl(double exp) noexcept
+		constexpr double exp10_double_impl([[maybe_unused]] double exp) noexcept
 		{
 			return 0;
 		}
 
-		constexpr double exp10_double_double_impl(double exp) noexcept
+		constexpr double exp10_double_double_impl([[maybe_unused]] double exp) noexcept
 		{
 			return 0;
 		}
 
-		constexpr float exp10_float_impl(float exp) noexcept
+		constexpr float exp10_float_impl([[maybe_unused]] float exp) noexcept
 		{
 			return 0;
 		}

@@ -29,13 +29,19 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -yqq --no-install-recommends ninja-build meson
 
+      - name: Cache premake5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: .ci-cache/premake
+          key: premake-5.0.0-beta8-linux
+
       - name: Install premake5
+        env:
+          PREMAKE_CACHE_DIR: ${{ github.workspace }}/.ci-cache/premake
         run: |
-          curl -fsSL -o /tmp/premake5.tar.gz \
-            https://github.com/premake/premake-core/releases/download/v5.0.0-beta8/premake-5.0.0-beta8-linux.tar.gz
-          sudo tar -xzf /tmp/premake5.tar.gz -C /usr/local/bin premake5
-          sudo chmod +x /usr/local/bin/premake5
-          premake5 --version
+          mkdir -p .ci-cache/premake
+          bash tools/install_premake5_linux.sh .ci-cache/premake
+          sudo install -m 755 .ci-cache/premake/premake5 /usr/local/bin/premake5
 
       - name: Configure CCMath with CMake
         run: |
