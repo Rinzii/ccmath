@@ -41,6 +41,7 @@ function(ccmath_add_rigorous_oracle_target TARGET)
     endif ()
 
     target_include_directories(${TARGET} PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/../shared
             ${CMAKE_CURRENT_SOURCE_DIR}/..
             ${CMAKE_CURRENT_SOURCE_DIR}/../..
             ${CCM_ORACLE_INCLUDE_DIRECTORIES}

@@ -14,7 +14,7 @@ endif
 
 ccmath_inc = include_directories(
   '../../include',
-  '../../out/clang-rigorous-dev/include',
+  '../../out/clang/include',
 )
 
 ccmath_dep = declare_dependency(

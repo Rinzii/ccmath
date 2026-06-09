@@ -43,6 +43,7 @@ endif ()
 
 if (CCMATH_BUILD_RIGOROUS_TESTS)
     _ccmath_add_ctest_label_target(ccmath-ctest-rigorous rigorous)
+    _ccmath_add_ctest_label_target(ccmath-ctest-aspirational aspirational)
 
     if (CCMATH_ENABLE_MPFR_TESTS)
         _ccmath_add_ctest_label_target(ccmath-ctest-rigorous-mpfr mpfr)

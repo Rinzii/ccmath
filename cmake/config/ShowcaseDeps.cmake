@@ -62,7 +62,7 @@ function(ccmath_showcase_configure_target TARGET)
             ${CMAKE_SOURCE_DIR}/showcase/common
             ${CMAKE_SOURCE_DIR}/benchmarks
             ${CMAKE_SOURCE_DIR}/tests
-            ${CMAKE_SOURCE_DIR}/tests/utils
+            ${CMAKE_SOURCE_DIR}/tests/shared/utils
     )
     if (CCMATH_SHOWCASE_ENABLE_GCEM)
         target_link_libraries(${TARGET} PRIVATE showcase::gcem)

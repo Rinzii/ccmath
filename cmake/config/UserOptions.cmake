@@ -14,7 +14,7 @@ option(CCMATH_BUILD_TESTS "Build ccmath tests" ${CCMATH_PROJECT_IS_TOP_LEVEL})
 
 # CCMATH_BUILD_SIMPLE_TESTS:
 # Build the lightweight unit/regression suite intended for every developer and CI run.
-option(CCMATH_BUILD_SIMPLE_TESTS "Build the lightweight ccmath test project" ON)
+option(CCMATH_BUILD_SIMPLE_TESTS "Build the lightweight ccmath test project" ${CCMATH_PROJECT_IS_TOP_LEVEL})
 
 # CCMATH_BUILD_RIGOROUS_TESTS:
 # Build the heavier validation/oracle suite intended for post-merge, nightly, or release validation.
@@ -66,11 +66,11 @@ option(CCMATH_BUILD_SHOWCASE "Build ccmath showcase comparisons" OFF)
 
 # CCMATH_SHOWCASE_ENABLE_GCEM:
 # Fetch and enable the GCEM backend in showcase targets.
-option(CCMATH_SHOWCASE_ENABLE_GCEM "Enable GCEM in showcase comparisons" ON)
+option(CCMATH_SHOWCASE_ENABLE_GCEM "Enable GCEM in showcase comparisons" ${CCMATH_PROJECT_IS_TOP_LEVEL})
 
 # CCMATH_SHOWCASE_ENABLE_MPFR:
 # Build MPFR-backed showcase accuracy executables when MPFR is available.
-option(CCMATH_SHOWCASE_ENABLE_MPFR "Enable MPFR accuracy in showcase comparisons" ON)
+option(CCMATH_SHOWCASE_ENABLE_MPFR "Enable MPFR accuracy in showcase comparisons" ${CCMATH_PROJECT_IS_TOP_LEVEL})
 
 # CCMATH_BUILD_FUZZING:
 # Build libFuzzer targets (Clang only). Couples fuzzer with ASan and UBSan.
@@ -92,12 +92,6 @@ option(CCMATH_ENABLE_EXTENSIONS
 
 include(cmake/config/BuildManifest.cmake)
 ccmath_manifest_declare_library_options()
-
-# CCMATH_REGISTER_HEADERS:
-# Register every header on the ccmath INTERFACE target for IDE visibility.
-option(CCMATH_REGISTER_HEADERS
-        "Register individual headers on the ccmath INTERFACE target for IDE visibility"
-        OFF)
 
 # CCMATH_DISABLE_SVML_USAGE:
 # Disable the use of SVML (Short Vector Math Library) if supported by the compiler.

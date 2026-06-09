@@ -23,8 +23,25 @@ tests/rigorous/oracle_logs/
 showcase/reports/
 showcase/compile_time/probes/
 path-matrix-json*/
-POW_PROOF.*
 .cache
+
+# LaTeX build artifacts (.tex and .bib remain tracked)
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.toc
+docs/proofs/**/*.pdf
+tools/proofs/**/build/
+
+# Sollya approx_doc regenerated outputs (see tools/proofs/math/approx_doc/README.md)
+tools/proofs/math/approx_doc/logs/
+tools/proofs/math/approx_doc/data/
+
+# Local duplicate approximation tree (canonical: docs/APPROXIMATING_FUNCTIONS.md)
+docs/approximation_guide/
 .DS_Store
 __pycache__/
 *.py[cod]
@@ -92,6 +109,11 @@ fuzzing/minimize-crash-*
 # asmlab cached reference data (Agner Fog tables, uops.info exports); fetched on demand
 tools/asmlab/refdata/*
 !tools/asmlab/refdata/.gitkeep
+
+# asmlab rendered harness TUs (from tools/asmlab/**/*.cpp.in); primary output is under /out/
+tools/asmlab/harness/harness.cpp
+tools/asmlab/harness/constexpr_probe.cpp
+tools/asmlab/golden/harness.cpp
 
 # Premake generated artifacts at the repository root
 /Makefile
