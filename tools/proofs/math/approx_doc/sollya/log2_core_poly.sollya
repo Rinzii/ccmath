@@ -8,15 +8,15 @@ data_path = "tools/proofs/math/approx_doc/data/log2_core_poly_error.dat";
 
 U = [-1 / 32; 1 / 32];
 n = 200!;
-degree = 5!;
+poly_degree = 5!;
 g = log2(1 + x) / x;
-p = fpminimax(g, degree, [|D...|], U, relative);
+p = fpminimax(g, poly_degree, [|D...|], U, relative);
 
 print("script:", "log2_core_poly.sollya");
 version;
 print("kernel function:", "log2(1 + u) / u");
 print("interval:", U);
-print("polynomial degree:", degree);
+print("polynomial degree:", poly_degree);
 print("coefficient formats:", "[|D...|]");
 
 display = hexadecimal!;
@@ -30,11 +30,11 @@ print("u", "abs_error", "rel_error") > data_path;
 
 for i from 0 to n do {
   ui = round(-1 / 32 + (1 / 16) * i / n, prec, RN);
-  abs_err = evaluate(abs(x * p - log2(1 + x)), ui);
+  abs_err = sup(evaluate(abs(x * p - log2(1 + x)), ui));
   if (i == n / 2) then {
-    rel_err = evaluate(abs(p / (1 / log(2)) - 1), ui);
+    rel_err = sup(evaluate(abs(p / (1 / log(2)) - 1), ui));
   } else {
-    rel_err = evaluate(abs(p / g - 1), ui);
+    rel_err = sup(evaluate(abs(p / g - 1), ui));
   };
   print(ui, abs_err, rel_err) >> data_path;
 };

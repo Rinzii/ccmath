@@ -37,11 +37,11 @@ max_rel_x = 0;
 
 for i from 0 to n do {
   xi = round(-1 / 16 + (1 / 8) * i / n, prec, RN);
-  abs_err = evaluate(abs(p - sin(x)), xi);
+  abs_err = sup(evaluate(abs(p - sin(x)), xi));
   if (i == n / 2) then {
     rel_err = 0;
   } else {
-    rel_err = evaluate(abs(p / sin(x) - 1), xi);
+    rel_err = sup(evaluate(abs(p / sin(x) - 1), xi));
   };
 
   if (abs_err > max_abs) then {

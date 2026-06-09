@@ -28,7 +28,7 @@ global_max_u = -1;
 for i from 0 to B - 1 do {
   c = round(1 + (i + 0.5) / B, prec, RN);
   r = round(1 / c, D, RN);
-  a = -log2(r);
+  a = evaluate(-log2(x), r);
   a_hi = round(a, hi_bits, RN);
   a_lo = round(a - a_hi, D, RN);
   residual_center = round(c * r - 1, prec, RN);

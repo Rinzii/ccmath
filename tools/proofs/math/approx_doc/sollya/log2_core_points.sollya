@@ -7,10 +7,10 @@ rationalmode = off!;
 data_path = "tools/proofs/math/approx_doc/data/log2_core_points.dat";
 
 B = 16!;
-degree = 5!;
+poly_degree = 5!;
 U = [-1 / 32; 1 / 32];
 g = log2(1 + x) / x;
-p = fpminimax(g, degree, [|D...|], U, relative);
+p = fpminimax(g, poly_degree, [|D...|], U, relative);
 
 print("script:", "log2_core_points.sollya");
 version;
@@ -35,13 +35,13 @@ for k from 0 to 4 do {
   i = floor((xv - 1) * B);
   c = round(1 + (i + 0.5) / B, prec, RN);
   r = round(1 / c, D, RN);
-  a = -log2(r);
+  a = evaluate(-log2(x), r);
   a_hi = round(a, 32, RN);
   a_lo = round(a - a_hi, D, RN);
   u = round(xv * r - 1, prec, RN);
   approx = round(a_hi + a_lo + u * evaluate(p, u), prec, RN);
-  reference = evaluate(log2(x), xv);
-  abs_err = abs(approx - reference);
+  reference = sup(evaluate(log2(x), xv));
+  abs_err = sup(abs(approx - reference));
 
   print(xv, u, approx, reference, abs_err) >> data_path;
   print("point", k, "x", xv, "table_index", i, "reduced_u", u, "approx", approx, "reference", reference, "abs_error", abs_err);

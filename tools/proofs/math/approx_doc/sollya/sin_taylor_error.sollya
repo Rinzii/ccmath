@@ -19,7 +19,7 @@ print("x", "abs_error") > data_path;
 
 for i from 0 to n do {
   xi = round(-pi / 2 + pi * i / n, prec, RN);
-  abs_err = evaluate(abs(p - sin(x)), xi);
+  abs_err = sup(evaluate(abs(p - sin(x)), xi));
   print(xi, abs_err) >> data_path;
 };
 
