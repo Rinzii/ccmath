@@ -4,6 +4,11 @@ function(ccmath_find_optional_proof_tools)
     find_package(Python3 COMPONENTS Interpreter QUIET)
     find_program(CCMATH_GAPPA_EXECUTABLE gappa)
     find_program(CCMATH_SOLLYA_EXECUTABLE sollya)
+
+    # FindPython3 exposes these as regular variables, so lift them out of the
+    # helper scope before downstream checks and custom targets consume them.
+    set(Python3_Interpreter_FOUND "${Python3_Interpreter_FOUND}" PARENT_SCOPE)
+    set(Python3_EXECUTABLE "${Python3_EXECUTABLE}" PARENT_SCOPE)
 endfunction()
 
 function(ccmath_missing_optional_tools OUT_VAR)
