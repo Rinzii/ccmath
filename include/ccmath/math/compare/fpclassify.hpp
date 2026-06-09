@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include "ccmath/internal/support/helpers/fpclassify_helper.hpp"
 #include "ccmath/math/basic/fabs.hpp"
 #include "ccmath/math/compare/isinf.hpp"

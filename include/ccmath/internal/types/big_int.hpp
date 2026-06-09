@@ -196,8 +196,7 @@ namespace ccm::types
 				//
 				//    lhs      lhs_hi lhs_lo
 				//  x rhs => x rhs_hi rhs_lo
-				// ----    -----------
-				//    result
+				//    result from the four partial products
 				//
 				// We convert 'lo' and 'hi' from 'half_word' to 'word' to prevent overflow during multiplication.
 

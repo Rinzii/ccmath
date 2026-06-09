@@ -14,9 +14,9 @@
 #include "ccmath/internal/support/poly_eval.hpp"
 #include "ccmath/internal/types/double_double.hpp"
 #include "ccmath/internal/types/triple_double.hpp"
+#include "ccmath/internal/math/generic/func/expo/log2_gen.hpp"
 #include "ccmath/math/expo/impl/exp2_double_impl.hpp"
 #include "ccmath/math/expo/impl/exp2_float_impl.hpp"
-#include "ccmath/math/expo/log2.hpp"
 
 #include <array>
 
@@ -26,7 +26,7 @@ namespace ccm::support::helpers
 	{
 		using namespace ccm::types;
 
-		constexpr double LOG2_10 = ccm::log2(10.0);
+		constexpr double LOG2_10 = ccm::gen::log2_gen(10.0);
 
 		// -2^-12 * log10(2)
 		// > a = -2^-12 * log10(2);

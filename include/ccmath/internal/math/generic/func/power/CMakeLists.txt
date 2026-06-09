@@ -2,6 +2,7 @@ ccm_add_headers(
         cbrt_gen.hpp
         hypot_gen.hpp
         pow_gen.hpp
+        powl_gen.hpp
         sqrt_gen.hpp
 )
 
