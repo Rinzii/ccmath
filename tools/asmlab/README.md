@@ -63,8 +63,8 @@ python3 tools/asmlab/scripts/asmlab.py variant scenario diff powf_impl my_candid
 python3 tools/asmlab/scripts/asmlab.py variant compare powf_impl --all --arch x86-64-v3
 ```
 
-Edit candidate code under out/asmlab/variants/ only. If the base file changed
-after variant init, refresh or recreate the variant before trusting diffs.
+If the base file changed after variant init, refresh or recreate the variant
+before trusting diffs.
 
 ## Bench and gate
 

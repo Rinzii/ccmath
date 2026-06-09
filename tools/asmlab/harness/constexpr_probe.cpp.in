@@ -9,14 +9,12 @@
  */
 
 // asmlab constexpr probe template. constexpr_check.py substitutes @@TOKENS@@ and
-// compiles this TU to verify the constexpr path without emitting runtime assembly.
-// STATIC_ASSERTS block is substituted below with constexpr probe cases.
+// writes constexpr_probe.cpp under out/asmlab/. .cpp.in sources are not
+// clang-formatted, are never compiled as-is, and must not be checked in.
 
-// clang-format off
 @@INCLUDES@@
-	// clang-format on
 
-	@ @STATIC_ASSERTS @ @
+@@STATIC_ASSERTS@@
 
-	int main()
+int main()
 { return 0; }

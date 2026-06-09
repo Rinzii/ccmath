@@ -12,7 +12,7 @@ from pathlib import Path
 import _asmlab_common as C
 
 GOLDEN_REGISTRY = C.ASMLAB_DIR / "registry" / "golden_targets.json"
-GOLDEN_HARNESS = C.ASMLAB_DIR / "golden" / "harness_template.cpp"
+GOLDEN_HARNESS = C.ASMLAB_DIR / "golden" / "harness.cpp.in"
 GOLDEN_OUT = C.OUT_DIR / "golden"
 
 
@@ -44,15 +44,15 @@ def render_golden_harness(fn, target):
     loads = "\n".join(
         "\ta%d = (%s)(asmlab_opaque_seed + %du);" % (i, ty, i + 1)
         for i, ty in enumerate(sig["args"]))
-    tpl = GOLDEN_HARNESS.read_text()
-    return (tpl
-            .replace("@@KERNEL_HEADER@@", target["kernel_header"])
-            .replace("@@RET@@", sig["ret"])
-            .replace("@@SYMBOL@@", C.symbol_for(fn))
-            .replace("@@PARAMS@@", params)
-            .replace("@@EXPR@@", target["namespace_call"])
-            .replace("@@FLATTEN_ATTR@@", flatten_attr)
-            .replace("@@VOLATILE_LOADS@@", loads))
+    return C.render_template(GOLDEN_HARNESS, {
+        "@@KERNEL_HEADER@@": target["kernel_header"],
+        "@@RET@@": sig["ret"],
+        "@@SYMBOL@@": C.symbol_for(fn),
+        "@@PARAMS@@": params,
+        "@@EXPR@@": target["namespace_call"],
+        "@@FLATTEN_ATTR@@": flatten_attr,
+        "@@VOLATILE_LOADS@@": loads,
+    })
 
 
 def emit_golden(fn, arch_name, flags_name, compiler, source_map=True, deep_analyze=True):
@@ -71,7 +71,7 @@ def emit_golden(fn, arch_name, flags_name, compiler, source_map=True, deep_analy
     outdir.mkdir(parents=True, exist_ok=True)
     inc = fixture_include_dir(target)
 
-    src = outdir / "harness.cpp"
+    src = C.generated_path_from_template(GOLDEN_HARNESS, outdir)
     src.write_text(render_golden_harness(fn, target))
 
     cxx = C.cxx_compiler(compiler)

@@ -11,8 +11,8 @@
 #include "ccmath/ccmath.hpp"
 #include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
-#include "tests/utils/math_samples.hpp"
-#include "tests/utils/ulp_distance.hpp"
+#include "utils/math_samples.hpp"
+#include "utils/ulp_distance.hpp"
 
 #include <array>
 #include <cfenv>

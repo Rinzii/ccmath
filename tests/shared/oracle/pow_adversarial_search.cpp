@@ -48,7 +48,7 @@ int main(int argc, char** argv)
 	const std::string mode		  = ccm::test::oracle::option_value(argc, argv, "--mode=").value_or("random-bit-pattern");
 	const std::string output_path = ccm::test::oracle::option_value(argc, argv, "--json-output=").value_or("pow-search-results.json");
 	const std::uint64_t seed	  = ccm::test::oracle::parse_option_or<std::uint64_t>(
-		ccm::test::oracle::option_value(argc, argv, "--seed="), [](const std::string& value) { return std::stoull(value); }, 0xBAD5EEDULL);
+		 ccm::test::oracle::option_value(argc, argv, "--seed="), [](const std::string& value) { return std::stoull(value); }, 0xBAD5EEDULL);
 	const std::size_t count = ccm::test::oracle::parse_option_or<std::size_t>(
 		ccm::test::oracle::option_value(argc, argv, "--count="), [](const std::string& value) { return static_cast<std::size_t>(std::stoull(value)); }, 4096);
 	const std::uint64_t max_ulp = ccm::test::oracle::parse_option_or<std::uint64_t>(

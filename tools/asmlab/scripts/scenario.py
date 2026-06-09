@@ -103,17 +103,16 @@ def render_scenario_harness(fn, target, scenario_rec):
         "Static assembly reflects selected inputs, not dynamic branch frequency."
         % scenario_rec.get("scenario", "")
     )
-    tpl = C.HARNESS_TEMPLATE.read_text()
-    body = (tpl
-            .replace("@@INCLUDES@@", includes + _scenario_prelude())
-            .replace("@@RET@@", sig["ret"])
-            .replace("@@SYMBOL@@", C.symbol_for(fn))
-            .replace("@@PARAMS@@", params)
-            .replace("@@EXPR@@", target["expr"])
-            .replace("@@FLATTEN_ATTR@@", flatten_attr)
-            .replace("@@FLATTEN_COMMENT@@", flatten_comment)
-            .replace("@@VOLATILE_LOADS@@", _scenario_loads(sig, scenario_rec.get("inputs", {}))))
-    return body
+    return C.render_template(C.HARNESS_TEMPLATE, {
+        "@@INCLUDES@@": includes + _scenario_prelude(),
+        "@@RET@@": sig["ret"],
+        "@@SYMBOL@@": C.symbol_for(fn),
+        "@@PARAMS@@": params,
+        "@@EXPR@@": target["expr"],
+        "@@FLATTEN_ATTR@@": flatten_attr,
+        "@@FLATTEN_COMMENT@@": flatten_comment,
+        "@@VOLATILE_LOADS@@": _scenario_loads(sig, scenario_rec.get("inputs", {})),
+    })
 
 
 def _path_match(scenario_rec, path_analysis):
@@ -213,7 +212,7 @@ def emit_scenario(fn, scenario_name, arch_name, flags_name, compiler,
                             source_kind=source_kind, variant=variant)
     outdir.mkdir(parents=True, exist_ok=True)
 
-    src = outdir / "harness.cpp"
+    src = C.generated_path_from_template(C.HARNESS_TEMPLATE, outdir)
     src.write_text(render_scenario_harness(fn, target, scenario_rec))
 
     cxx = C.cxx_compiler(compiler)

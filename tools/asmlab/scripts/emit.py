@@ -8,7 +8,7 @@
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 """Emit assembly for a registered ccmath function across a microarch matrix.
 
-Generates a harness translation unit from harness_template.cpp + the registry,
+Generates a harness translation unit from harness.cpp.in + the registry,
 compiles it to .s (and a stable disassembly) for each (arch, flags, compiler)
 variant, and writes everything under out/asmlab/<fn>/<variant>/.
 
@@ -44,16 +44,16 @@ def render_harness(fn, target):
         if flatten else
         "No flatten attribute: observe wrapper shape and out-of-line calls."
     )
-    tpl = C.HARNESS_TEMPLATE.read_text()
-    return (tpl
-            .replace("@@INCLUDES@@", includes)
-            .replace("@@RET@@", sig["ret"])
-            .replace("@@SYMBOL@@", C.symbol_for(fn))
-            .replace("@@PARAMS@@", params)
-            .replace("@@EXPR@@", target["expr"])
-            .replace("@@FLATTEN_ATTR@@", flatten_attr)
-            .replace("@@FLATTEN_COMMENT@@", flatten_comment)
-            .replace("@@VOLATILE_LOADS@@", _volatile_loads(sig)))
+    return C.render_template(C.HARNESS_TEMPLATE, {
+        "@@INCLUDES@@": includes,
+        "@@RET@@": sig["ret"],
+        "@@SYMBOL@@": C.symbol_for(fn),
+        "@@PARAMS@@": params,
+        "@@EXPR@@": target["expr"],
+        "@@FLATTEN_ATTR@@": flatten_attr,
+        "@@FLATTEN_COMMENT@@": flatten_comment,
+        "@@VOLATILE_LOADS@@": _volatile_loads(sig),
+    })
 
 
 def emit_variant(fn, target, arch_name, flags_name, compiler, source_map=False, deep_analyze=False):
@@ -66,7 +66,7 @@ def emit_variant(fn, target, arch_name, flags_name, compiler, source_map=False, 
     outdir = C.variant_dir(fn, arch_name, flags_name, compiler)
     outdir.mkdir(parents=True, exist_ok=True)
 
-    src = outdir / "harness.cpp"
+    src = C.generated_path_from_template(C.HARNESS_TEMPLATE, outdir)
     src.write_text(render_harness(fn, target))
 
     cxx = C.cxx_compiler(compiler)

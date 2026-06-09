@@ -8,8 +8,9 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-// asmlab harness template. emit.py substitutes the @@TOKENS@@ from the function
-// registry and compiles the result to assembly. This file is never compiled as-is.
+// asmlab harness template. emit.py substitutes @@TOKENS@@ from the function
+// registry and writes harness.cpp under out/asmlab/. .cpp.in sources are not
+// clang-formatted, are never compiled as-is, and must not be checked in.
 //
 // Why this works: the target is an extern "C", non-inline wrapper whose arguments
 // arrive as ordinary runtime parameters. External linkage forces the body to be
@@ -20,17 +21,15 @@
 // Volatile loads block manifest constant evaluation of the call arguments.
 // @@FLATTEN_COMMENT@@
 
-// clang-format off
 @@INCLUDES@@
-// clang-format on
 
 #if defined(__GNUC__) || defined(__clang__)
-	#define ASMLAB_FLATTEN @ @FLATTEN_ATTR @ @
+	#define ASMLAB_FLATTEN @@FLATTEN_ATTR@@
 #else
 	#define ASMLAB_FLATTEN
 #endif
 
-	extern "C" volatile unsigned long long asmlab_opaque_seed;
+extern "C" volatile unsigned long long asmlab_opaque_seed;
 
-extern "C" ASMLAB_FLATTEN @ @RET @ @ @ @SYMBOL @ @(@ @PARAMS @ @)
-{ @ @VOLATILE_LOADS @ @ return @ @EXPR @ @; }
+extern "C" ASMLAB_FLATTEN @@RET@@ @@SYMBOL@@(@@PARAMS@@)
+{ @@VOLATILE_LOADS@@ return @@EXPR@@; }

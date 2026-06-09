@@ -6,6 +6,7 @@
 """Regression tests: powf_impl benchmark must stay wired."""
 
 import json
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -34,6 +35,27 @@ class PowfImplBenchWiringTest(unittest.TestCase):
         text = BENCH_CPP.read_text()
         self.assertIn("BM_asmlab_powf_impl_positive_finite_general", text)
         self.assertIn("ASMLAB_POWF_IMPL_CANDIDATE", text)
+
+    def test_harness_templates_use_in_extension(self):
+        templates = (
+            ASMLAB_DIR / "harness" / "harness.cpp.in",
+            ASMLAB_DIR / "harness" / "constexpr_probe.cpp.in",
+            ASMLAB_DIR / "golden" / "harness.cpp.in",
+        )
+        for path in templates:
+            self.assertTrue(path.is_file(), "%s missing" % path)
+            text = path.read_text()
+            broken = re.search(r"@ @\w+ @ @", text)
+            self.assertIsNone(broken, "broken @@ token spacing in %s" % path)
+
+        self.assertEqual(
+            C.generated_path_from_template(templates[0], "/tmp/out").name,
+            "harness.cpp",
+        )
+        self.assertEqual(
+            C.generated_path_from_template(templates[1], "/tmp/out").name,
+            "constexpr_probe.cpp",
+        )
 
     def test_scenario_bench_status_labels(self):
         import bench_impl as bench_impl_mod

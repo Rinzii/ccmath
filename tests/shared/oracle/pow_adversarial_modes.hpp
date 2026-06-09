@@ -2,7 +2,7 @@
 
 #include "ccmath/internal/support/bits.hpp"
 #include "mpfr_pow_common.hpp"
-#include "tests/utils/worst_case_samples.hpp"
+#include "utils/worst_case_samples.hpp"
 
 #include <cmath>
 #include <limits>

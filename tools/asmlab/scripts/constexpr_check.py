@@ -45,9 +45,10 @@ def render_probe_v2(fn, target):
         lines.append("static_assert(asmlab_ce_%d == asmlab_ce_%d, "
                      "\"constexpr probe case %d\");" % (i, i, i))
 
-    tpl = C.CONSTEXPR_PROBE_TEMPLATE.read_text()
-    return (tpl.replace("@@INCLUDES@@", includes)
-              .replace("@@STATIC_ASSERTS@@", "\n".join(lines)))
+    return C.render_template(C.CONSTEXPR_PROBE_TEMPLATE, {
+        "@@INCLUDES@@": includes,
+        "@@STATIC_ASSERTS@@": "\n".join(lines),
+    })
 
 
 def run_constexpr_check(fn, target, out_dir=None):
@@ -64,7 +65,7 @@ def run_constexpr_check(fn, target, out_dir=None):
 
     out_dir = out_dir or (C.OUT_DIR / fn / "constexpr")
     out_dir.mkdir(parents=True, exist_ok=True)
-    src = out_dir / "constexpr_probe.cpp"
+    src = C.generated_path_from_template(C.CONSTEXPR_PROBE_TEMPLATE, out_dir)
     src.write_text(render_probe_v2(fn, target))
 
     cxx = C.cxx_compiler("clang")

@@ -27,8 +27,8 @@ CANDIDATE_EDGE_CASES_PATH = ASMLAB_DIR / "registry" / "candidate_edge_cases.json
 CANDIDATE_ACCURACY_STATUSES = frozenset({
     "pass", "fail", "not_run", "not_wired", "advisory", "production_only",
 })
-HARNESS_TEMPLATE = ASMLAB_DIR / "harness" / "harness_template.cpp"
-CONSTEXPR_PROBE_TEMPLATE = ASMLAB_DIR / "harness" / "constexpr_probe_template.cpp"
+HARNESS_TEMPLATE = ASMLAB_DIR / "harness" / "harness.cpp.in"
+CONSTEXPR_PROBE_TEMPLATE = ASMLAB_DIR / "harness" / "constexpr_probe.cpp.in"
 REFDATA_DIR = ASMLAB_DIR / "refdata"
 OUT_DIR = PROJECT_ROOT / "out" / "asmlab"
 INCLUDE_DIR = PROJECT_ROOT / "include"
@@ -137,6 +137,30 @@ def cmake_build_command(build_dir, target, config=None):
 def fail(msg):
     print("asmlab: error: " + msg, file=sys.stderr)
     sys.exit(1)
+
+
+def generated_path_from_template(template_path, output_dir):
+    """Map template.cpp.in to output_dir/template.cpp (strip trailing .in)."""
+    path = Path(template_path)
+    name = path.name
+    if not name.endswith(".in"):
+        fail("asmlab template must end with .in: %s" % path)
+    return Path(output_dir) / name[:-3]
+
+
+def render_template(template_path, replacements):
+    """Substitute @@TOKENS@@ in a .cpp.in template. Returns rendered source text."""
+    text = Path(template_path).read_text()
+    for token, value in replacements.items():
+        text = text.replace(token, value)
+    return text
+
+
+def write_rendered_template(template_path, output_dir, replacements):
+    """Render template.cpp.in and write template.cpp under output_dir."""
+    dest = generated_path_from_template(template_path, output_dir)
+    dest.write_text(render_template(template_path, replacements))
+    return dest
 
 
 def load_registry():

@@ -295,7 +295,7 @@ def emit_variant(fn, variant_name, arch_name, flags_name, compiler, source_map=F
     outdir.mkdir(parents=True, exist_ok=True)
 
     harness = render_variant_harness(fn, variant_name, scenario_rec)
-    src = outdir / "harness.cpp"
+    src = C.generated_path_from_template(C.HARNESS_TEMPLATE, outdir)
     src.write_text(harness)
 
     cxx = C.cxx_compiler(compiler)
