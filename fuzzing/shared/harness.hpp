@@ -10,13 +10,14 @@
 
 #pragma once
 
+#include "input.hpp"
+
 #include "ccmath/ccmath.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
-#include <cstring>
 #include <limits>
 #include <type_traits>
 #include <utility>
@@ -34,27 +35,6 @@ namespace ccm::fuzz
 			std::abort();                                                                                                                                      \
 		}                                                                                                                                                      \
 	} while (0)
-
-	template <typename T>
-	T load_floating(uint8_t const * data, size_t size, size_t byte_offset = 0)
-	{
-		static_assert(std::is_floating_point_v<T>, "T must be floating-point");
-
-		T value{};
-		if (byte_offset + sizeof(T) > size) { return value; }
-
-		std::memcpy(&value, data + byte_offset, sizeof(T));
-		return value;
-	}
-
-	inline int32_t load_i32(uint8_t const * data, size_t size, size_t byte_offset = 0)
-	{
-		int32_t value{};
-		if (byte_offset + sizeof(value) > size) { return 0; }
-
-		std::memcpy(&value, data + byte_offset, sizeof(value));
-		return value;
-	}
 
 	template <typename T>
 	int64_t ulp_difference(T a, T b)

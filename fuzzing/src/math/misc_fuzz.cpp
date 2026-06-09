@@ -8,12 +8,12 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "entry.hpp"
 #include "harness.hpp"
 
 #include <ccmath/ccmath.hpp>
 
 #include <cmath>
-#include <cstdint>
 
 namespace
 {
@@ -31,25 +31,17 @@ namespace
 	}
 
 	template <typename T>
-	void fuzz_misc_type(uint8_t const * data, size_t size)
+	void misc(uint8_t const * data, size_t size)
 	{
-		if (size < 3 * sizeof(T)) { return; }
+		ccm::fuzz::Inputs<T> in;
+		if (!in.load_xyz(data, size)) { return; }
 
-		T const a = ccm::fuzz::load_floating<T>(data, size, 0);
-		T const b = ccm::fuzz::load_floating<T>(data, size, sizeof(T));
-		T const t = ccm::fuzz::load_floating<T>(data, size, 2 * sizeof(T));
+		ccm::fuzz::check_same_floating(ccm::lerp(in.x, in.y, in.z), reference_lerp(in.x, in.y, in.z));
 
-		ccm::fuzz::check_same_floating(ccm::lerp(a, b, t), reference_lerp(a, b, t));
-
-		if (a < T{} && a == std::trunc(a)) { return; }
-		ccm::fuzz::fuzz_unary_vs_std(a, ccm::gamma<T>, [](T v) { return std::tgamma(v); });
-		ccm::fuzz::fuzz_unary_vs_std(a, ccm::lgamma<T>, [](T v) { return std::lgamma(v); });
+		if (in.x < T{} && in.x == std::trunc(in.x)) { return; }
+		ccm::fuzz::fuzz_unary_vs_std(in.x, ccm::gamma<T>, [](T v) { return std::tgamma(v); });
+		ccm::fuzz::fuzz_unary_vs_std(in.x, ccm::lgamma<T>, [](T v) { return std::lgamma(v); });
 	}
 } // namespace
 
-extern "C" int LLVMFuzzerTestOneInput(uint8_t const * data, size_t size)
-{
-	fuzz_misc_type<float>(data, size);
-	fuzz_misc_type<double>(data, size);
-	return 0;
-}
+CCMATH_FUZZ_DRIVER(misc)
