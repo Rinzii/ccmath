@@ -6,6 +6,9 @@ if (NOT TARGET ccmath)
     find_package(ccmath CONFIG REQUIRED)
 endif ()
 
+set(CCMATH_TESTS_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/helpers/CcmTestHelpers.cmake)
+
 add_library(ccmath-test STATIC ccmath_test_main.cpp)
 add_library(ccmath::test ALIAS ccmath-test)
 
@@ -17,7 +20,8 @@ target_link_libraries(ccmath-test
 
 target_include_directories(ccmath-test PUBLIC
         ${Abseil_INCLUDE_DIRS}
-        .
+        ${CMAKE_CURRENT_SOURCE_DIR}/shared
+        ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL MSVC)
@@ -37,28 +41,12 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|IntelLLVM")
     endif ()
 endif ()
 
-function(ccmath_add_test TEST_TARGET)
-    set(SOURCES ${ARGN})
-    add_executable(${TEST_TARGET})
-    target_sources(${TEST_TARGET} PRIVATE ${SOURCES})
-    target_link_libraries(${TEST_TARGET} PRIVATE ccmath::test)
-    add_test(NAME ${TEST_TARGET} COMMAND ${TEST_TARGET})
-endfunction()
-
-function(ccmath_add_command_test TEST_TARGET)
-    set(SOURCES ${ARGN})
-    add_executable(${TEST_TARGET} ${SOURCES})
-    target_link_libraries(${TEST_TARGET} PRIVATE ccmath::ccmath ccmath::ext)
-    target_include_directories(${TEST_TARGET} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/..)
-    target_compile_features(${TEST_TARGET} PRIVATE cxx_std_17)
-    add_test(NAME ${TEST_TARGET} COMMAND ${TEST_TARGET})
-endfunction()
-
 if (CCMATH_BUILD_SIMPLE_TESTS)
-    add_subdirectory(simple)
+    add_subdirectory(unit)
 endif ()
 
 if (CCMATH_BUILD_RIGOROUS_TESTS)
     include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/config/TestValidationOptions.cmake)
     add_subdirectory(rigorous)
 endif ()
+
