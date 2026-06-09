@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include "ccmath/internal/config/builtin/bit_cast_support.hpp"
 #include "ccmath/internal/config/type_support.hpp"
 // ReSharper disable once CppUnusedIncludeDirective
 #include "ccmath/internal/math/runtime/simd/simd_vectorize.hpp"
@@ -25,6 +26,10 @@
 
 #if defined(_MSC_VER) && !defined(__clang__)
 	#include <cstdlib>
+#endif
+
+#ifndef CCMATH_HAS_BUILTIN_BIT_CAST
+	#error "CCMath requires compiler support for __builtin_bit_cast. Use the CMake, Meson, or Premake consumer wiring to validate the toolchain before building."
 #endif
 
 namespace ccm::support

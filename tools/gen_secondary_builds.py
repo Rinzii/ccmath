@@ -15,6 +15,30 @@ GENERATED_BEGIN_MESON = "# BEGIN GENERATED LIBRARY MANIFEST"
 GENERATED_END_MESON = "# END GENERATED LIBRARY MANIFEST"
 GENERATED_BEGIN_PREMAKE = "-- BEGIN GENERATED LIBRARY MANIFEST"
 GENERATED_END_PREMAKE = "-- END GENERATED LIBRARY MANIFEST"
+ROOT_SECONDARY_INCLUDE = Path("out") / "secondary" / "include"
+
+BIT_CAST_PROBE = """#include <type_traits>
+int main() {
+  struct A { int x; };
+  struct B { int y; };
+  B b = __builtin_bit_cast(B, A{42});
+  return b.y;
+}
+"""
+
+SIMD_FMA_PROBE = """#include <immintrin.h>
+int main() {
+  __m128 fma_test = _mm_fmadd_ps(_mm_set1_ps(1.0f), _mm_set1_ps(2.0f), _mm_set1_ps(3.0f));
+  return static_cast<int>(_mm_cvtss_f32(fma_test));
+}
+"""
+
+SIMD_SVML_PROBE = """#include <immintrin.h>
+int main() {
+  __m128d value = _mm_sin_pd(_mm_set1_pd(1.0));
+  return static_cast<int>(_mm_cvtsd_f64(value));
+}
+"""
 
 
 def load_manifest(path: Path) -> dict[str, Any]:
@@ -22,16 +46,105 @@ def load_manifest(path: Path) -> dict[str, Any]:
         return json.load(handle)
 
 
-def meson_define_args(options: list[dict[str, Any]]) -> str:
+def version_components(manifest: dict[str, Any]) -> tuple[str, str, str]:
+    version = manifest["version"]
+    parts = version.split(".")
+    if len(parts) != 3:
+        raise ValueError(f"expected semantic version 'major.minor.patch', got {version!r}")
+    return parts[0], parts[1], parts[2]
+
+
+def render_version_header(manifest: dict[str, Any], source_dir: Path) -> str:
+    template_path = source_dir / manifest["version_template"]
+    major, minor, patch = version_components(manifest)
+    template = template_path.read_text(encoding="utf-8")
+    return (
+        template.replace("@CCMATH_VERSION_MAJOR@", major)
+        .replace("@CCMATH_VERSION_MINOR@", minor)
+        .replace("@CCMATH_VERSION_PATCH@", patch)
+    )
+
+
+def write_version_header(include_dir: Path, header: str) -> None:
+    version_path = include_dir / "ccmath" / "version.hpp"
+    version_path.parent.mkdir(parents=True, exist_ok=True)
+    version_path.write_text(header, encoding="utf-8")
+
+
+def meson_define_lines(options: list[dict[str, Any]]) -> list[str]:
     lines: list[str] = []
     for option in options:
         meson_name = option["meson_option"]
         define = option["define"]
-        lines.append(
-            f"if get_option('{meson_name}')\n"
-            f"  _ccmath_defines += '-D{define}'\n"
-            f"endif"
+        lines.extend(
+            [
+                f"if get_option('{meson_name}')",
+                f"  _ccmath_defines += '-D{define}'",
+                "endif",
+            ]
         )
+    return lines
+
+
+def meson_runtime_probe_lines(options: list[dict[str, Any]]) -> list[str]:
+    runtime_option = next((option for option in options if option["key"] == "runtime_simd"), None)
+    if runtime_option is None:
+        return []
+
+    meson_name = runtime_option["meson_option"]
+    return [
+        "",
+        "_ccmath_simd_fma_probe = '''",
+        SIMD_FMA_PROBE.rstrip(),
+        "'''",
+        "",
+        f"if get_option('{meson_name}') and cpp.compiles(_ccmath_simd_fma_probe, name : 'ccmath runtime SIMD FMA intrinsics')",
+        "  _ccmath_defines += '-DCCM_CONFIG_RT_SIMD_HAS_FMA'",
+        "endif",
+        "",
+        "_ccmath_simd_svml_probe = '''",
+        SIMD_SVML_PROBE.rstrip(),
+        "'''",
+        "",
+        f"if get_option('{meson_name}') and cpp.compiles(_ccmath_simd_svml_probe, name : 'ccmath runtime SIMD SVML intrinsics')",
+        "  _ccmath_defines += '-DCCM_CONFIG_RT_SIMD_HAS_SVML'",
+        "endif",
+    ]
+
+
+def meson_dependency_block(source_include: str, generated_include: str, options: list[dict[str, Any]]) -> str:
+    lines = [
+        "cpp = meson.get_compiler('cpp')",
+        "",
+        "_ccmath_builtin_bit_cast_probe = '''",
+        BIT_CAST_PROBE.rstrip(),
+        "'''",
+        "",
+        "if not cpp.compiles(_ccmath_builtin_bit_cast_probe, name : 'ccmath builtin bit_cast support')",
+        "  error('CCMath requires compiler support for __builtin_bit_cast')",
+        "endif",
+        "",
+        "_ccmath_defines = []",
+    ]
+    lines.extend(meson_define_lines(options))
+    lines.extend(meson_runtime_probe_lines(options))
+    lines.extend(
+        [
+            "",
+            "ccmath_inc = include_directories(",
+            f"  '{source_include}',",
+            f"  '{generated_include}',",
+            ")",
+            "",
+            "ccmath_dep = declare_dependency(",
+            "  include_directories: ccmath_inc,",
+            "  compile_args: _ccmath_defines,",
+            ")",
+            "",
+            "meson.override_dependency('ccmath', ccmath_dep)",
+            "",
+        ]
+    )
     return "\n".join(lines)
 
 
@@ -52,106 +165,38 @@ def meson_options_txt(options: list[dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
-def meson_build_content(manifest: dict[str, Any], source_dir: Path, standalone: bool) -> str:
-    options = manifest["options"]
-    version = manifest["version"]
+def meson_build_content(manifest: dict[str, Any], source_dir: Path) -> str:
     cpp_standard = manifest["cpp_standard"]
-    include_dirs = manifest["include_dirs"]
-    build_include = next(
-        (entry for entry in include_dirs if "include" in entry and entry != "include"),
-        "include",
+    body = meson_dependency_block(
+        source_include=(source_dir / "include").as_posix(),
+        generated_include="include",
+        options=manifest["options"],
     )
-
-    project_line = (
-        f"project('{manifest['name']}', 'cpp',\n"
-        f"  version: '{version}',\n"
-        f"  meson_version: '>=1.0.0',\n"
-        f"  default_options: ['cpp_std=c++{cpp_standard}'],\n"
-        f")"
-    )
-
-    if standalone:
-        source_root = Path(manifest["source_dir"])
-        build_include = Path(manifest["build_dir"]) / "include"
-        header = [
+    return "\n".join(
+        [
             "# Generated by tools/gen_secondary_builds.py from ccmath-build-manifest.json.",
             "# CMake is the primary build system.",
             "#",
-            "# Requires a prior CMake configure so version.hpp exists under the build include dir.",
-            "#",
-            "# Usage:",
-            "#   meson setup build-meson <path-to-this-directory>",
-            "#   meson compile -C build-meson",
+            "# This entry point exposes CCMath as a Meson dependency only.",
+            "# It does not define examples, tests, or smoke executables.",
             "",
-            project_line,
-            "",
-            "_ccmath_defines = []",
-            meson_define_args(options),
-            "",
-            "ccmath_inc = include_directories(",
-            f"  '{source_root / 'include'}',",
-            f"  '{build_include}',",
+            f"project('{manifest['name']}', 'cpp',",
+            f"  version: '{manifest['version']}',",
+            "  meson_version: '>=1.0.0',",
+            f"  default_options: ['cpp_std=c++{cpp_standard}'],",
             ")",
             "",
-            "ccmath_dep = declare_dependency(",
-            "  include_directories: ccmath_inc,",
-            "  compile_args: _ccmath_defines,",
-            ")",
-            "",
-            "executable(",
-            "  'ccmath-smoke',",
-            f"  '{source_root / 'examples/smoke/constexpr_smoke.cpp'}',",
-            "  dependencies: ccmath_dep,",
-            ")",
+            body.rstrip(),
             "",
         ]
-        return "\n".join(header)
-
-    header = [
-        "# Generated by tools/gen_secondary_builds.py from ccmath-build-manifest.json.",
-        "",
-        project_line,
-        "",
-        "version_conf = configuration_data()",
-        f"version_conf.set('CCMATH_VERSION_MAJOR', {version.split('.')[0]})",
-        f"version_conf.set('CCMATH_VERSION_MINOR', {version.split('.')[1]})",
-        f"version_conf.set('CCMATH_VERSION_PATCH', {version.split('.')[2]})",
-        "configure_file(",
-        f"  input: '{source_dir / manifest['version_template']}',",
-        "  output: 'ccmath/version.hpp',",
-        "  configuration: version_conf,",
-        "  format: 'cmake',",
-        "  install: false,",
-        ")",
-        "",
-        "_ccmath_defines = []",
-        meson_define_args(options),
-        "",
-        "ccmath_inc = include_directories(",
-        f"  '{source_dir / 'include'}',",
-        f"  '{Path(build_include).as_posix() if Path(build_include).is_absolute() else source_dir / build_include}',",
-        ")",
-        "",
-        "ccmath_dep = declare_dependency(",
-        "  include_directories: ccmath_inc,",
-        "  compile_args: _ccmath_defines,",
-        ")",
-        "",
-        "executable(",
-        "  'ccmath-smoke',",
-        f"  '{source_dir / 'examples/smoke/constexpr_smoke.cpp'}',",
-        "  dependencies: ccmath_dep,",
-        ")",
-        "",
-    ]
-    return "\n".join(header)
+    )
 
 
 def premake_trigger_name(meson_option: str) -> str:
     return "ccmath-" + meson_option.replace("_", "-")
 
 
-def premake_options(options: list[dict[str, Any]], indent: str = "") -> str:
+def premake_options(options: list[dict[str, Any]]) -> str:
     lines: list[str] = []
     for option in options:
         default = "true" if option["meson_default"] else "false"
@@ -159,123 +204,90 @@ def premake_options(options: list[dict[str, Any]], indent: str = "") -> str:
         trigger = premake_trigger_name(option["meson_option"])
         lines.extend(
             [
-                f"{indent}newoption {{",
-                f'{indent}    trigger = "{trigger}",',
-                f'{indent}    description = "{description}",',
-                f'{indent}    allowed = {{ {{ "true", "Enable" }}, {{ "false", "Disable" }} }},',
-                f'{indent}    default = "{default}",',
-                f"{indent}}}",
+                "newoption {",
+                f'    trigger = "{trigger}",',
+                f'    description = "{description}",',
+                '    allowed = { { "true", "Enable" }, { "false", "Disable" } },',
+                f'    default = "{default}",',
+                "}",
                 "",
             ]
         )
     return "\n".join(lines)
 
 
-def premake_project_body(
-    manifest: dict[str, Any],
-    source_dir: Path,
-    *,
-    premake_location: Path,
-    option_indent: str = "",
-    body_indent: str = "",
-    relative_paths: bool = False,
-) -> str:
-    options = manifest["options"]
-    build_include = Path(manifest["build_dir"]) / "include"
-    if relative_paths:
-        include_dir = "include"
-        build_include_dir = os.path.relpath(build_include, source_dir.resolve()).replace("\\", "/")
-        smoke_source = "examples/smoke/constexpr_smoke.cpp"
-        location_dir = os.path.relpath(premake_location, source_dir.resolve()).replace("\\", "/")
-    else:
-        include_dir = f"{source_dir.as_posix()}/include"
-        build_include_dir = build_include.as_posix()
-        smoke_source = f"{source_dir.as_posix()}/examples/smoke/constexpr_smoke.cpp"
-        location_dir = premake_location.as_posix()
-
-    return "\n".join(
-        [
-            premake_options(options, indent=option_indent),
-            "",
-            f'{body_indent}project "ccmath-smoke"',
-            f'{body_indent}    kind "ConsoleApp"',
-            f'{body_indent}    language "C++"',
-            f'{body_indent}    location "{location_dir}"',
-            f'{body_indent}    includedirs {{ "{include_dir}", "{build_include_dir}" }}',
-            f'{body_indent}    files {{ "{smoke_source}" }}',
-            "",
-            premake_define_blocks_with_indent(options, body_indent),
-            "",
-            f'{body_indent}filter "configurations:Debug"',
-            f'{body_indent}    symbols "On"',
-            f'{body_indent}    optimize "Off"',
-            "",
-            f'{body_indent}filter "configurations:Release"',
-            f'{body_indent}    symbols "Off"',
-            f'{body_indent}    optimize "Speed"',
-            "",
-            f"{body_indent}filter {{}}",
-            "",
-        ]
-    )
-
-
-def premake_define_blocks_with_indent(
-    options: list[dict[str, Any]],
-    indent: str,
-) -> str:
-    blocks: list[str] = []
-    for option in options:
-        trigger = premake_trigger_name(option["meson_option"])
-        define = option["define"]
-        blocks.append(
-            f'{indent}filter {{ "options:{trigger}=true" }}\n'
-            f'{indent}    defines {{ "{define}" }}\n'
-            f"{indent}filter {{}}"
-        )
-    return "\n\n".join(blocks)
-
-
-def premake_content(
-    manifest: dict[str, Any],
-    source_dir: Path,
-    standalone: bool,
-    *,
-    premake_location: Path | None = None,
-) -> str:
-    cpp_standard = manifest["cpp_standard"]
-    resolved_location = premake_location or (Path(manifest["build_dir"]) / "premake-smoke")
-    header = [
-        "-- Generated by tools/gen_secondary_builds.py from ccmath-build-manifest.json.",
-        "-- CMake is the primary build system.",
+def premake_defines_block(options: list[dict[str, Any]]) -> str:
+    lines = [
+        "function ccmath.defines()",
+        "    local defs = {}",
         "",
     ]
-
-    if standalone:
-        workspace_location = "." if premake_location is not None else source_dir.as_posix()
-        header.extend(
+    for option in options:
+        trigger = premake_trigger_name(option["meson_option"])
+        default = "true" if option["meson_default"] else "false"
+        define = option["define"]
+        lines.extend(
             [
-                f'workspace "{manifest["name"]}"',
-                f'    location "{workspace_location}"',
-                '    configurations { "Debug", "Release" }',
-                '    architecture "x86_64"',
-                f'    cppdialect "C++{cpp_standard}"',
+                f'    if _ccmath_option_enabled("{trigger}", {default}) then',
+                f'        table.insert(defs, "{define}")',
+                "    end",
                 "",
             ]
         )
-
-    fragment_indent = "" if standalone else "    "
-    header.append(
-        premake_project_body(
-            manifest,
-            source_dir,
-            premake_location=resolved_location,
-            option_indent=fragment_indent,
-            body_indent=fragment_indent,
-            relative_paths=premake_location is not None,
-        )
+    lines.extend(
+        [
+            "    return defs",
+            "end",
+            "",
+        ]
     )
-    return "\n".join(header)
+    return "\n".join(lines)
+
+
+def premake_content(manifest: dict[str, Any], source_dir: Path, generated_include_dir: Path) -> str:
+    source_include = (source_dir / "include").as_posix()
+    generated_include = generated_include_dir.as_posix()
+
+    return "\n".join(
+        [
+            "-- Generated by tools/gen_secondary_builds.py from ccmath-build-manifest.json.",
+            "-- CMake is the primary build system.",
+            "--",
+            "-- Consumer usage:",
+            '--   include("path/to/ccmath/premake5.lua")',
+            '--   project "my-app"',
+            '--       kind "ConsoleApp"',
+            '--       language "C++"',
+            '--       files { "main.cpp" }',
+            "--       ccmath.use()",
+            "",
+            premake_options(manifest["options"]).rstrip(),
+            "",
+            "ccmath = ccmath or {}",
+            "",
+            f'local _ccmath_include_dirs = {{ "{source_include}", "{generated_include}" }}',
+            "",
+            "local function _ccmath_option_enabled(trigger, default_value)",
+            "    local value = _OPTIONS[trigger]",
+            "    if value == nil then",
+            "        return default_value",
+            "    end",
+            '    return value == "true"',
+            "end",
+            "",
+            "function ccmath.include_dirs()",
+            "    return _ccmath_include_dirs",
+            "end",
+            "",
+            premake_defines_block(manifest["options"]).rstrip(),
+            "",
+            "function ccmath.use()",
+            "    includedirs(ccmath.include_dirs())",
+            "    defines(ccmath.defines())",
+            "end",
+            "",
+        ]
+    )
 
 
 def root_meson_wrapper(manifest: dict[str, Any]) -> str:
@@ -283,12 +295,15 @@ def root_meson_wrapper(manifest: dict[str, Any]) -> str:
         [
             f"project('{manifest['name']}', 'cpp',",
             f"  version: '{manifest['version']}',",
-            f"  meson_version: '>=1.0.0',",
+            "  meson_version: '>=1.0.0',",
             f"  default_options: ['cpp_std=c++{manifest['cpp_standard']}'],",
             ")",
             "",
             "# Regenerate this block:",
             "#   cmake --build <build-dir> --target ccmath-generate-secondary-builds",
+            "#",
+            "# Consumer usage:",
+            "#   ccmath_dep = dependency('ccmath', fallback : ['ccmath', 'ccmath_dep'])",
             "",
             "subdir('cmake/gen')",
             "",
@@ -310,65 +325,36 @@ def root_meson_wrapper(manifest: dict[str, Any]) -> str:
 
 
 def root_premake_wrapper(manifest: dict[str, Any], source_dir: Path) -> str:
-    header = [
-        "-- CCMath secondary build (library consumption). CMake is the primary build system.",
-        "-- Regenerate generated files:",
-        "--   cmake --build <build-dir> --target ccmath-generate-secondary-builds",
-        "",
-        GENERATED_BEGIN_PREMAKE,
-    ]
-    body = premake_content(
-        manifest,
-        source_dir,
-        standalone=True,
-        premake_location=source_dir / "out" / "premake",
-    ).splitlines()  # premake_location selects relative path mode
-    # Drop duplicate generator header from the embedded standalone body.
-    while body and (
-        body[0].startswith("-- Generated by tools/gen_secondary_builds.py")
-        or body[0].strip() == ""
-        or body[0].startswith("-- CMake is the primary")
-    ):
-        body.pop(0)
-    return "\n".join(header + body + [GENERATED_END_PREMAKE, ""])
+    body = premake_content(manifest, source_dir, source_dir / ROOT_SECONDARY_INCLUDE)
+    return "\n".join(
+        [
+            "-- CCMath secondary build (library consumption). CMake is the primary build system.",
+            "-- Regenerate generated files:",
+            "--   cmake --build <build-dir> --target ccmath-generate-secondary-builds",
+            "",
+            GENERATED_BEGIN_PREMAKE,
+            body.rstrip(),
+            GENERATED_END_PREMAKE,
+            "",
+        ]
+    )
 
 
 def cmake_gen_meson(manifest: dict[str, Any], source_dir: Path) -> str:
-    options = manifest["options"]
-
-    build_include = Path(manifest["build_dir"]) / "include"
     gen_subdir = source_dir / "cmake" / "gen"
-    try:
-        include_rel = Path("..") / ".." / "include"
-        build_include_rel = Path(
-            os.path.relpath(build_include, gen_subdir.resolve())
-        ).as_posix()
-    except ValueError:
-        build_include_rel = build_include.as_posix()
+    source_include = os.path.relpath(source_dir / "include", gen_subdir.resolve()).replace("\\", "/")
+    generated_include = os.path.relpath(source_dir / ROOT_SECONDARY_INCLUDE, gen_subdir.resolve()).replace("\\", "/")
 
     return "\n".join(
         [
             "# Generated by tools/gen_secondary_builds.py. Do not edit by hand.",
-            "# Requires a prior CMake configure so version.hpp exists under the build include dir.",
+            "# Exposes CCMath as a Meson dependency only.",
             "",
-            "_ccmath_defines = []",
-            meson_define_args(options),
-            "",
-            "ccmath_inc = include_directories(",
-            f"  '{include_rel.as_posix()}',",
-            f"  '{build_include_rel}',",
-            ")",
-            "",
-            "ccmath_dep = declare_dependency(",
-            "  include_directories: ccmath_inc,",
-            "  compile_args: _ccmath_defines,",
-            ")",
-            "",
-            "executable(",
-            "  'ccmath-smoke',",
-            "  '../../examples/smoke/constexpr_smoke.cpp',",
-            "  dependencies: ccmath_dep,",
-            ")",
+            meson_dependency_block(
+                source_include=source_include,
+                generated_include=generated_include,
+                options=manifest["options"],
+            ).rstrip(),
             "",
         ]
     )
@@ -380,21 +366,27 @@ def write_outputs(
     source_dir: Path,
     update_root: bool,
 ) -> None:
+    output_dir = output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    version_header = render_version_header(manifest, source_dir)
+    write_version_header(output_dir / "include", version_header)
+
     (output_dir / "meson.build").write_text(
-        meson_build_content(manifest, source_dir, standalone=True),
+        meson_build_content(manifest, source_dir),
         encoding="utf-8",
     )
     options_txt = meson_options_txt(manifest["options"])
-
     (output_dir / "meson_options.txt").write_text(options_txt, encoding="utf-8")
     (output_dir / "premake5.lua").write_text(
-        premake_content(manifest, source_dir, standalone=True),
+        premake_content(manifest, source_dir, output_dir / "include"),
         encoding="utf-8",
     )
 
     if update_root:
+        root_generated_include = source_dir / ROOT_SECONDARY_INCLUDE
+        write_version_header(root_generated_include, version_header)
+
         gen_dir = source_dir / "cmake" / "gen"
         gen_dir.mkdir(parents=True, exist_ok=True)
         (gen_dir / "meson.build").write_text(
@@ -449,7 +441,7 @@ def main() -> int:
 
     write_outputs(
         manifest=manifest,
-        output_dir=args.output_dir,
+        output_dir=args.output_dir.resolve(),
         source_dir=args.source_dir.resolve(),
         update_root=args.update_root,
     )

@@ -10,11 +10,10 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/func/expo/log2_gen.hpp"
 #include "ccmath/internal/support/multiply_add.hpp"
 #include "ccmath/internal/support/poly_eval.hpp"
 #include "ccmath/internal/types/double_double.hpp"
-#include "ccmath/internal/types/triple_double.hpp"
-#include "ccmath/internal/math/generic/func/expo/log2_gen.hpp"
 #include "ccmath/math/expo/impl/exp2_double_impl.hpp"
 #include "ccmath/math/expo/impl/exp2_float_impl.hpp"
 

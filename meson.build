@@ -11,6 +11,9 @@ project('ccmath', 'cpp',
 
 # Regenerate this block:
 #   cmake --build <build-dir> --target ccmath-generate-secondary-builds
+#
+# Consumer usage:
+#   ccmath_dep = dependency('ccmath', fallback : ['ccmath', 'ccmath_dep'])
 
 subdir('cmake/gen')
 # END GENERATED LIBRARY MANIFEST

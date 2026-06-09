@@ -277,7 +277,7 @@ You may also vendor the headers directly.
 
 ### Secondary build systems (Meson and Premake)
 
-CMake is the primary and authoritative build system. Meson and Premake support library consumption only (include paths, compile definitions, and the generated version header). Tests, benchmarks, fuzzing, and third-party dependencies remain CMake-only.
+CMake is the primary and authoritative build system. Meson and Premake support library consumption only: include paths, compile definitions, the generated `version.hpp`, and the library-required feature validation that a consumer needs. They do not define examples, smoke binaries, tests, benchmarks, fuzzing targets, or third-party dependency fetches.
 
 After configuring CMake, regenerate the secondary build files:
 
@@ -286,22 +286,26 @@ cmake --preset ninja-clang-debug -DCCMATH_BUILD_TESTS=OFF -DCCMATH_BUILD_EXAMPLE
 cmake --build out/build/ninja/ninja-clang-debug --target ccmath-generate-secondary-builds
 ```
 
-Meson smoke build from the generated tree:
+Meson consumer usage after regeneration:
 
-```bash
-meson setup build-meson-secondary out/build/ninja/ninja-clang-debug/gen-secondary
-meson compile -C build-meson-secondary
+```meson
+ccmath_dep = dependency('ccmath', fallback : ['ccmath', 'ccmath_dep'])
+executable('my-app', 'main.cpp', dependencies : ccmath_dep)
 ```
 
-Premake smoke build from the generated tree:
+Premake consumer usage after regeneration:
 
-```bash
-cd out/build/ninja/ninja-clang-debug/gen-secondary
-premake5 gmake
-make -C ../premake-smoke config=debug
+```lua
+include("../ccmath/premake5.lua")
+
+project "my-app"
+    kind "ConsoleApp"
+    language "C++"
+    files { "main.cpp" }
+    ccmath.use()
 ```
 
-You can also use the root `meson.build` and `premake5.lua` entry points after regeneration. Library-facing options are declared once in `cmake/config/BuildManifest.cmake` and exported through `ccmath-build-manifest.json`.
+The generated root `meson.build` exposes `ccmath_dep` and overrides the `ccmath` dependency name for Meson consumers. The generated root `premake5.lua` exposes `ccmath.use()`, `ccmath.include_dirs()`, and `ccmath.defines()` for Premake consumers. Library-facing options are declared once in `cmake/config/BuildManifest.cmake` and exported through `ccmath-build-manifest.json`.
 
 ### Vendored integration testing
 
