@@ -190,6 +190,16 @@
       }
     },
     {
+      "name": "examples",
+      "hidden": true,
+      "cacheVariables": {
+        "CCMATH_BUILD_EXAMPLES": "ON",
+        "CCMATH_BUILD_TESTS": "OFF",
+        "CCMATH_BUILD_BENCHMARKS": "OFF",
+        "CCMATH_BUILD_SHOWCASE": "OFF"
+      }
+    },
+    {
       "name": "rigorous-vcpkg",
       "hidden": true,
       "environment": {
@@ -248,6 +258,18 @@
       ],
       "binaryDir": "${sourceDir}/out/clang",
       "description": "Single-config Ninja + Clang (Debug) for CLion"
+    },
+    {
+      "name": "clion-clang-debug-examples",
+      "displayName": "CLion Clang Debug + examples",
+      "inherits": [
+        "base-clion",
+        "clang",
+        "Debug",
+        "examples"
+      ],
+      "binaryDir": "${sourceDir}/out/clang-examples",
+      "description": "Single-config Ninja + Clang (Debug) for CLion examples"
     },
     {
       "name": "clion-clang-debug-rigorous-dev",
@@ -474,6 +496,13 @@
       "configurePreset": "clion-clang-debug",
       "targets": [
         "all"
+      ]
+    },
+    {
+      "name": "build-clion-clang-debug-examples",
+      "configurePreset": "clion-clang-debug-examples",
+      "targets": [
+        "ccmath-example-all"
       ]
     },
     {
@@ -806,6 +835,21 @@
     }
   ],
   "workflowPresets": [
+    {
+      "name": "workflow-clion-clang-debug-examples",
+      "displayName": "CLion examples",
+      "description": "Configure and build the example targets for CLion",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "clion-clang-debug-examples"
+        },
+        {
+          "type": "build",
+          "name": "build-clion-clang-debug-examples"
+        }
+      ]
+    },
     {
       "name": "workflow-clion-clang-debug-rigorous-dev",
       "displayName": "CLion rigorous validation",

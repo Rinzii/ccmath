@@ -1,5 +1,5 @@
 # Declarative example registry.
-# Add an example: drop examples/src/<module>/<id>.cpp and append <id> below.
+# Add an example: drop examples/src/<id>.cpp and append <id> below.
 
 set(CCMATH_EXAMPLE_MODULE_ORDER smoke basic trig power expo nearest compare)
 

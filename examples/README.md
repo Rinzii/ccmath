@@ -1,28 +1,27 @@
 # CCMath examples
 
-Small programs that show constexpr use, numeric behavior, and practical call patterns. Layout mirrors showcase: registry-driven CMake, grouped sources, and CLion run configs under examples/item/.
+Small programs that show constexpr use, numeric behavior, and practical call patterns. The examples stay registry-driven in CMake, but the source files and CLion run configs are kept flat so moving between demos is fast.
 
 ## Quick start
 
 ```bash
-cmake --preset clion-clang-release-showcase -DCCMATH_BUILD_EXAMPLES=ON
-cmake --build out/clang-showcase --target ccmath-example-all
-out/clang-showcase/examples/ccmath-example-unit_circle
+cmake --preset clion-clang-debug-examples
+cmake --build --preset build-clion-clang-debug-examples
+out/clang-examples/examples/ccmath-example-unit_circle
 ```
 
 CLion run configurations live under examples/item/.
 
 ## Layout
 
-```
+```text
 examples/
-  config/          # ExampleModuleRegistry.cmake (via cmake/config/)
   common/          # shared printing helpers
-  src/<module>/    # one .cpp per example id
-  item/            # CLion *.run.xml
+  src/             # one .cpp per example id
+  item/            # flat CLion *.run.xml entries
 ```
 
-CMake helpers: cmake/helpers/CcmExampleHelpers.cmake. Registry: cmake/config/ExampleModuleRegistry.cmake.
+CMake helpers: cmake/helpers/CcmExampleHelpers.cmake. Topic groupings remain in cmake/config/ExampleModuleRegistry.cmake.
 
 ## Modules
 
@@ -40,16 +39,16 @@ Targets: ccmath-example-<id>. Aggregate: ccmath-example-all.
 
 ## Add an example
 
-1. Add examples/src/<module>/my_demo.cpp with a short main and optional common/io.hpp helpers.
+1. Add examples/src/my_demo.cpp with a short main and optional common/io.hpp helpers.
 2. Append my_demo to CCMATH_EXAMPLE_MODULE_<module>_EXAMPLES in cmake/config/ExampleModuleRegistry.cmake.
 3. Reconfigure with CCMATH_BUILD_EXAMPLES=ON and build ccmath-example-my_demo.
-4. Optional: add examples/item/<module>/my_demo.run.xml for CLion.
+4. Optional: add examples/item/my_demo.run.xml for CLion.
 
 ## Build one target
 
 ```bash
-cmake --preset clion-clang-release-showcase -DCCMATH_BUILD_EXAMPLES=ON
-cmake --build out/clang-showcase --target ccmath-example-unit_circle
+cmake --preset clion-clang-debug-examples
+cmake --build out/clang-examples --target ccmath-example-unit_circle
 ```
 
 Compiler notes: examples/docs/compiler_support.md
