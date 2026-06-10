@@ -1654,8 +1654,9 @@ namespace ccm::support
 		if constexpr (count == T::BITS) { return T::all_ones(); }
 		constexpr std::size_t QUOTIENT	= count / T::WORD_SIZE;
 		constexpr std::size_t REMAINDER = count % T::WORD_SIZE;
+		constexpr auto ALL_ONES_WORD	= std::numeric_limits<typename T::word_type>::max();
 		T out; // zero initialized
-		for (std::size_t i = 0; i <= QUOTIENT; ++i) { out[i] = i < QUOTIENT ? -1 : mask_trailing_ones<typename T::word_type, REMAINDER>(); }
+		for (std::size_t i = 0; i <= QUOTIENT; ++i) { out[i] = i < QUOTIENT ? ALL_ONES_WORD : mask_trailing_ones<typename T::word_type, REMAINDER>(); }
 		return out;
 	}
 
@@ -1663,11 +1664,15 @@ namespace ccm::support
 	constexpr std::enable_if_t<types::is_big_int_v<T>, T> mask_leading_ones()
 	{
 		static_assert(!T::SIGNED && count <= T::BITS);
-		if (count == T::BITS) { return T::all_ones(); }
+		if constexpr (count == T::BITS) { return T::all_ones(); }
 		constexpr std::size_t QUOTIENT	= (T::BITS - count - 1U) / T::WORD_SIZE;
 		constexpr std::size_t REMAINDER = count % T::WORD_SIZE;
+		constexpr auto ALL_ONES_WORD	= std::numeric_limits<typename T::word_type>::max();
 		T out; // zero initialized
-		for (std::size_t i = QUOTIENT; i < T::WORD_COUNT; ++i) { out[i] = i > QUOTIENT ? -1 : mask_leading_ones<typename T::word_type, REMAINDER>(); }
+		for (std::size_t i = QUOTIENT; i < T::WORD_COUNT; ++i)
+		{
+			out[i] = i > QUOTIENT ? ALL_ONES_WORD : mask_leading_ones<typename T::word_type, REMAINDER>();
+		}
 		return out;
 	}
 

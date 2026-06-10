@@ -159,7 +159,11 @@ namespace ccm::support
 	{
 		constexpr unsigned T_BITS = CHAR_BIT * sizeof(T);
 		static_assert(count <= T_BITS && "Invalid bit index");
-		return count == 0 ? 0 : (T(-1) >> (T_BITS - count));
+		if constexpr (count == 0) { return T(0); }
+		else
+		{
+			return T(~T(0)) >> (T_BITS - count);
+		}
 	}
 
 	CCM_RESTORE_MSVC_WARNING()

@@ -125,7 +125,7 @@ TEST(CcmathInternalSupportTests, AddWithCarryUint8MatchesReferenceExhaustively)
 				const std::uint8_t actual =
 					ccm::support::add_with_carry<std::uint8_t>(static_cast<std::uint8_t>(lhs), static_cast<std::uint8_t>(rhs), carry_in, carry_out);
 
-				const std::uint16_t expected = static_cast<std::uint16_t>(lhs) + static_cast<std::uint16_t>(rhs) + carry_in;
+				const auto expected = static_cast<unsigned>(lhs) + static_cast<unsigned>(rhs) + static_cast<unsigned>(carry_in);
 				EXPECT_EQ(actual, static_cast<std::uint8_t>(expected));
 				EXPECT_EQ(carry_out, expected > std::numeric_limits<std::uint8_t>::max() ? 1U : 0U);
 			}
