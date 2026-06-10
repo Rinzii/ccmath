@@ -36,9 +36,9 @@ namespace ccm::support
 		static_assert(!std::is_same_v<T, bool>, "T must not be a boolean type");
 		static_assert(!std::is_enum_v<T>, "T must not be an enumerated type");
 
-		using UnsignedT = std::make_unsigned_t<T>;
-		const UnsignedT ua = static_cast<UnsignedT>(a);
-		const UnsignedT ub = static_cast<UnsignedT>(b);
+		using UnsignedT		 = std::make_unsigned_t<T>;
+		const UnsignedT ua	 = static_cast<UnsignedT>(a);
+		const UnsignedT ub	 = static_cast<UnsignedT>(b);
 		const UnsignedT usum = ua + ub;
 
 		if constexpr (std::is_unsigned_v<T>)
@@ -49,7 +49,7 @@ namespace ccm::support
 		else
 		{
 			constexpr UnsignedT SIGN_BIT = UnsignedT(1) << (std::numeric_limits<UnsignedT>::digits - 1);
-			const bool overflow = ((~(ua ^ ub) & (ua ^ usum)) & SIGN_BIT) != 0;
+			const bool overflow			 = ((~(ua ^ ub) & (ua ^ usum)) & SIGN_BIT) != 0;
 			if (!overflow) { res = static_cast<T>(usum); }
 			return overflow;
 		}
@@ -67,9 +67,9 @@ namespace ccm::support
 		static_assert(!std::is_same_v<T, bool>, "T must not be a boolean type");
 		static_assert(!std::is_enum_v<T>, "T must not be an enumerated type");
 
-		using UnsignedT = std::make_unsigned_t<T>;
-		const UnsignedT ua = static_cast<UnsignedT>(a);
-		const UnsignedT ub = static_cast<UnsignedT>(b);
+		using UnsignedT		  = std::make_unsigned_t<T>;
+		const UnsignedT ua	  = static_cast<UnsignedT>(a);
+		const UnsignedT ub	  = static_cast<UnsignedT>(b);
 		const UnsignedT udiff = ua - ub;
 
 		if constexpr (std::is_unsigned_v<T>)
@@ -80,7 +80,7 @@ namespace ccm::support
 		else
 		{
 			constexpr UnsignedT SIGN_BIT = UnsignedT(1) << (std::numeric_limits<UnsignedT>::digits - 1);
-			const bool overflow = (((ua ^ ub) & (ua ^ udiff)) & SIGN_BIT) != 0;
+			const bool overflow			 = (((ua ^ ub) & (ua ^ udiff)) & SIGN_BIT) != 0;
 			if (!overflow) { res = static_cast<T>(udiff); }
 			return overflow;
 		}
