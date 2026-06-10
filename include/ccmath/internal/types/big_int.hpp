@@ -1359,14 +1359,14 @@ namespace ccm::types
 			{
 				BigInt subtractor = divider;
 				int cur_bit		  = multiword::countl_zero(subtractor.val) - multiword::countl_zero(remainder.val);
-				subtractor <<= cur_bit;
+				subtractor <<= static_cast<std::size_t>(cur_bit);
 
 				while (cur_bit >= 0 && remainder > 0)
 				{
 					if (remainder >= subtractor)
 					{
 						remainder -= subtractor;
-						quotient.set_bit(cur_bit);
+						quotient.set_bit(static_cast<std::size_t>(cur_bit));
 					}
 					--cur_bit;
 					subtractor >>= 1;
