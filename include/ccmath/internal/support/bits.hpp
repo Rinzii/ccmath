@@ -29,7 +29,8 @@
 #endif
 
 #ifndef CCMATH_HAS_BUILTIN_BIT_CAST
-	#error "CCMath requires compiler support for __builtin_bit_cast. Use the CMake, Meson, or Premake consumer wiring to validate the toolchain before building."
+	#error                                                                                                                                                     \
+		"CCMath requires compiler support for __builtin_bit_cast. Use the CMake, Meson, or Premake consumer wiring to validate the toolchain before building."
 #endif
 
 namespace ccm::support
