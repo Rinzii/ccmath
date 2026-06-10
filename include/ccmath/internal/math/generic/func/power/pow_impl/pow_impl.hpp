@@ -158,9 +158,19 @@ namespace ccm::gen::impl
 				// division in every rounding mode. The Newton refinement below targets a genuine
 				// double-double divisor and would re-round r0 to the wrong neighbor here.
 				if (p.lo == 0.0) { return r0; }
-				const DoubleDouble pr = two_prod(p.hi, r0);
-				const double res	  = ((1.0 - pr.hi) - pr.lo) - p.lo * r0;
-				return r0 + r0 * res;
+
+				// Keep both Newton steps fused so software-FMA backends such as MSVC preserve the
+				// full double-double correction instead of bleeding precision through intermediate
+				// rounding in the residual and update terms.
+				auto refine = [&p](double r) constexpr noexcept
+				{
+					const DoubleDouble pr = two_prod(p.hi, r);
+					const double err_hi	  = (1.0 - pr.hi) - pr.lo;
+					const double err	  = ccm::types::exact_fma(-p.lo, r, err_hi);
+					return ccm::types::exact_fma(r, err, r);
+				};
+
+				return refine(refine(r0));
 			}
 		} // namespace pow_int_detail
 

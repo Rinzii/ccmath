@@ -782,35 +782,26 @@ namespace ccm::types
 	template <size_t Bits>
 	constexpr DyadicFloat<Bits> rounded_div(const DyadicFloat<Bits>& af, const DyadicFloat<Bits>& bf)
 	{
-		using DblMant = UInt<(Bits * 2) + 64>;
+		using WideMant					 = UInt<(Bits * 2) + 64>;
+		constexpr std::size_t guard_bits = 64;
+		const Sign result_sign			 = (af.sign != bf.sign) ? Sign::NEG : Sign::POS;
 
-		const DyadicFloat<Bits> qf = quick_mul(af, approx_reciprocal(bf));
+		if (af.mantissa.is_zero()) { return DyadicFloat<Bits>(result_sign, 0, typename DyadicFloat<Bits>::mantissa_type(0)); }
 
-		DblMant a = af.mantissa;
-		DblMant b = bf.mantissa;
-		DblMant q = qf.mantissa;
-		q <<= 2;
-		a <<= static_cast<std::size_t>(af.exponent - bf.exponent - qf.exponent + 2);
-		DblMant qb = q * b;
-		if (qb < a)
-		{
-			const DblMant too_small = a - b;
-			while (qb <= too_small)
-			{
-				qb += b;
-				++q;
-			}
-		}
-		else
-		{
-			while (qb > a)
-			{
-				qb -= b;
-				--q;
-			}
-		}
+		const bool quotient_in_unit_interval = af.mantissa < bf.mantissa;
+		const int result_exponent			 = af.exponent - bf.exponent - static_cast<int>(Bits) + (quotient_in_unit_interval ? 0 : 1);
 
-		DyadicFloat<(Bits * 2)> qbig(qf.sign, qf.exponent - 2, q);
-		return DyadicFloat<Bits>::round(qbig.sign, qbig.exponent + static_cast<int>(Bits), qbig.mantissa, Bits);
+		WideMant numerator = WideMant(af.mantissa);
+		numerator <<= static_cast<std::size_t>(Bits - (quotient_in_unit_interval ? 0 : 1) + guard_bits);
+
+		const WideMant denominator = WideMant(bf.mantissa);
+		WideMant quotient		   = numerator / denominator;
+		const WideMant remainder   = numerator % denominator;
+
+		// Encode any truncated tail into the discarded region so DyadicFloat::round sees the
+		// correct sticky state when it drops the guard bits.
+		if (!remainder.is_zero()) { quotient |= WideMant(1); }
+
+		return DyadicFloat<Bits>::round(result_sign, result_exponent, quotient, guard_bits);
 	}
 } // namespace ccm::types
