@@ -7,6 +7,8 @@
 
 #include "io.hpp"
 
+#include <cmath>
+
 #include <ccmath/ccmath.hpp>
 
 #include <limits>
