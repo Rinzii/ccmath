@@ -1366,7 +1366,7 @@ namespace ccm::types
 			if (remainder >= divider)
 			{
 				unsigned_type subtractor = divider;
-				int cur_bit		  = multiword::countl_zero(subtractor.val) - multiword::countl_zero(remainder.val);
+				int cur_bit				 = multiword::countl_zero(subtractor.val) - multiword::countl_zero(remainder.val);
 				subtractor <<= static_cast<std::size_t>(cur_bit);
 
 				while (cur_bit >= 0 && remainder > 0)
