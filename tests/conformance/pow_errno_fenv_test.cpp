@@ -99,24 +99,53 @@ TEST(CcmathPowFenvTests, OverflowAndUnderflowFlagsMatchStdForPowPublicApi)
 									   FE_UNDERFLOW);
 }
 
-TEST(CcmathPowFenvTests, GenericPowfBaseTwoMatchesStdAtRangeThresholdsAllModes)
+TEST(CcmathPowFenvTests, GenericPowfBaseTwoCorrectlyRoundedAtRangeThresholdsAllModes)
 {
-	constexpr std::array<float, 5> kExponents = { 128.0F, 129.0F, -150.0F, -151.0F, -152.0F };
+	// std::pow cannot serve as the oracle here: MSVC's UCRT ignores the prevailing
+	// rounding mode at range thresholds (it returns inf for 2^129 under FE_DOWNWARD and
+	// 0 for 2^-150 under FE_UPWARD). Base-two thresholds have exactly known IEEE 754
+	// correctly rounded results in every mode, so compare against those directly.
+	struct ThresholdCase
+	{
+		float exponent;
+		float expected_nearest;
+		float expected_upward;
+		float expected_downward;
+		float expected_toward_zero;
+	};
+
+	constexpr float kInf	= std::numeric_limits<float>::infinity();
+	constexpr float kMax	= std::numeric_limits<float>::max();
+	constexpr float kMinSub = std::numeric_limits<float>::denorm_min();
+
+	// 2^128 and 2^129 overflow; 2^-150 and below sit beneath the smallest subnormal 2^-149.
+	constexpr std::array<ThresholdCase, 5> kCases = { {
+		{ 128.0F, kInf, kInf, kMax, kMax },
+		{ 129.0F, kInf, kInf, kMax, kMax },
+		{ -150.0F, 0.0F, kMinSub, 0.0F, 0.0F },
+		{ -151.0F, 0.0F, kMinSub, 0.0F, 0.0F },
+		{ -152.0F, 0.0F, kMinSub, 0.0F, 0.0F },
+	} };
 
 	ccm::test::ForEachRoundingModeOrSkip(
 		[&](int mode)
 		{
-			ccm::test::ScopedRoundingMode scope(mode);
-			ASSERT_TRUE(scope.active());
-
-			for (float exponent_value : kExponents)
+			for (const ThresholdCase& threshold : kCases)
 			{
-				SCOPED_TRACE(exponent_value);
+				SCOPED_TRACE(threshold.exponent);
 
 				const float base	 = runtime_value(2.0F);
-				const float exponent = runtime_value(exponent_value);
+				const float exponent = runtime_value(threshold.exponent);
 				const float actual	 = invoke_powf_gen(base, exponent);
-				const float expected = static_cast<float>(std::pow(base, exponent));
+
+				float expected = threshold.expected_nearest;
+				switch (ccm::test::ToRoundingModeKind(mode))
+				{
+				case ccm::test::RoundingModeKind::Upward: expected = threshold.expected_upward; break;
+				case ccm::test::RoundingModeKind::Downward: expected = threshold.expected_downward; break;
+				case ccm::test::RoundingModeKind::TowardZero: expected = threshold.expected_toward_zero; break;
+				case ccm::test::RoundingModeKind::Nearest: break;
+				}
 
 				ccm::test::ExpectFpEq(actual, expected);
 			}
