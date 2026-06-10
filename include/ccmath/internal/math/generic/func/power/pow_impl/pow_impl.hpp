@@ -108,9 +108,10 @@ namespace ccm::gen::impl
 
 			constexpr DoubleDouble mul(const DoubleDouble & a, const DoubleDouble & b) noexcept
 			{
-				DoubleDouble p = two_prod(a.hi, b.hi);
-				p.lo += ccm::types::exact_fma(a.hi, b.lo, a.lo * b.hi);
-				return ccm::types::exact_add(p.hi, p.lo);
+				DoubleDouble p	= two_prod(a.hi, b.hi);
+				const double t1 = ccm::types::exact_fma(a.hi, b.lo, p.lo);
+				const double t2 = ccm::types::exact_fma(a.lo, b.hi, t1);
+				return ccm::types::exact_add(p.hi, t2);
 			}
 
 			constexpr DoubleDouble ipow(DoubleDouble factor, std::uint64_t e) noexcept
@@ -144,29 +145,30 @@ namespace ccm::gen::impl
 				const DoubleDouble sq = two_prod(s0, s0);
 				const double e		  = (x - sq.hi) - sq.lo; // x - s0^2 (exact)
 				const double corr	  = e / (2.0 * s0);
-				return DoubleDouble{ s0 * mult, corr * mult };
+				return ccm::types::exact_add(s0 * mult, corr * mult);
 			}
 
 			// 1 / (p.hi + p.lo), refined to one rounding by a Newton step on the pair.
 			constexpr double reciprocal(const DoubleDouble & p) noexcept
 			{
-				using FPBits_t	= support::fp::FPBits<double>;
-				const double r0 = 1.0 / p.hi;
+				using FPBits_t			   = support::fp::FPBits<double>;
+				const DoubleDouble divisor = ccm::types::exact_add(p.hi, p.lo);
+				const double r0			   = 1.0 / divisor.hi;
 				const FPBits_t r0_bits(r0);
 				if (r0 == 0.0 || !r0_bits.is_finite()) { return r0; }
 				// An exact single-double divisor (e.g. x^-1) is reciprocated correctly by IEEE
 				// division in every rounding mode. The Newton refinement below targets a genuine
 				// double-double divisor and would re-round r0 to the wrong neighbor here.
-				if (p.lo == 0.0) { return r0; }
+				if (divisor.lo == 0.0) { return r0; }
 
 				// Keep both Newton steps fused so software-FMA backends such as MSVC preserve the
 				// full double-double correction instead of bleeding precision through intermediate
 				// rounding in the residual and update terms.
-				auto refine = [&p](double r) constexpr noexcept
+				auto refine = [&divisor](double r) constexpr noexcept
 				{
-					const DoubleDouble pr = two_prod(p.hi, r);
+					const DoubleDouble pr = two_prod(divisor.hi, r);
 					const double err_hi	  = (1.0 - pr.hi) - pr.lo;
-					const double err	  = ccm::types::exact_fma(-p.lo, r, err_hi);
+					const double err	  = ccm::types::exact_fma(-divisor.lo, r, err_hi);
 					return ccm::types::exact_fma(r, err, r);
 				};
 
