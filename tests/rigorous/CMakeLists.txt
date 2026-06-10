@@ -26,6 +26,15 @@ ccmath_add_rigorous_gtest_suite(ccmath-rigorous-powl-platform
 
 if (CCMATH_ENABLE_MPFR_TESTS)
     include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/config/FindMpfrGmp.cmake)
+    if (CCMATH_MPFR_FOUND)
+        ccmath_add_rigorous_oracle_target(ccmath-rigorous-mpfr-big-int
+                BACKEND MPFR
+                SOURCES ../shared/oracle/big_int_gmp.cpp)
+        ccmath_add_oracle_ctest(ccmath-rigorous-mpfr-big-int
+                TARGET ccmath-rigorous-mpfr-big-int
+                LABELS rigorous mpfr
+                TIMEOUT 180)
+    endif ()
 endif ()
 
 if (CCMATH_ENABLE_COREMATH_TESTS)

@@ -23,6 +23,11 @@ ccmath_add_unit_module(
         MODULE internal/types
         LABELS simple)
 
+ccmath_add_unit_module(
+        TARGET ccmath-simple-internal-support
+        MODULE internal/support
+        LABELS simple)
+
 ccmath_add_command_gtest(ccmath-simple-constexpr-fmaf-upward
         SOURCES ../src/math/basic/fma_constexpr_upward_config_test.cpp
         LABELS simple

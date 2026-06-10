@@ -570,6 +570,12 @@ namespace ccm::types
 			BigInt remainder;
 		};
 
+		struct UnsignedDivision
+		{
+			BigInt<Bits, false, WordType> quotient;
+			BigInt<Bits, false, WordType> remainder;
+		};
+
 	public:
 		using word_type		= WordType;
 		using unsigned_type = BigInt<Bits, false, word_type>;
@@ -1019,7 +1025,9 @@ namespace ccm::types
 			if constexpr (SIGNED) { result = divide_signed(*this, divider); }
 			else
 			{
-				result = divide_unsigned(*this, divider);
+				const auto unsigned_result = divide_unsigned(*this, divider);
+				result.quotient			   = BigInt(unsigned_result.quotient);
+				result.remainder		   = BigInt(unsigned_result.remainder);
 			}
 			*this = result.quotient;
 			return result.remainder;
@@ -1351,13 +1359,13 @@ namespace ccm::types
 		constexpr void clear_msb()
 		{ val.back() &= support::mask_trailing_ones<WordType, WORD_SIZE - 1>(); }
 
-		constexpr static Division divide_unsigned(const BigInt& dividend, const BigInt& divider)
+		constexpr static UnsignedDivision divide_unsigned(const unsigned_type& dividend, const unsigned_type& divider)
 		{
-			BigInt remainder = dividend;
-			BigInt quotient;
+			unsigned_type remainder = dividend;
+			unsigned_type quotient;
 			if (remainder >= divider)
 			{
-				BigInt subtractor = divider;
+				unsigned_type subtractor = divider;
 				int cur_bit		  = multiword::countl_zero(subtractor.val) - multiword::countl_zero(remainder.val);
 				subtractor <<= static_cast<std::size_t>(cur_bit);
 
@@ -1372,7 +1380,7 @@ namespace ccm::types
 					subtractor >>= 1;
 				}
 			}
-			return Division{ quotient, remainder };
+			return UnsignedDivision{ quotient, remainder };
 		}
 
 		constexpr static Division divide_signed(const BigInt& dividend, const BigInt& divider)
