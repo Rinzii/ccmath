@@ -4,9 +4,9 @@
 
 ## A constexpr-first `<cmath>` library for C++17 and later
 
-[![Windows CI](https://github.com/Rinzii/ccmath/workflows/ci-windows/badge.svg)](https://github.com/Rinzii/ccmath/actions?query=workflow%3Aci-windows)
-[![Linux CI](https://github.com/Rinzii/ccmath/workflows/ci-linux/badge.svg)](https://github.com/Rinzii/ccmath/actions?query=workflow%3Aci-linux)
-[![macOS CI](https://github.com/Rinzii/ccmath/workflows/ci-macos/badge.svg)](https://github.com/Rinzii/ccmath/actions?query=workflow%3Aci-macos)
+[![Windows CI](https://github.com/Rinzii/ccmath/actions/workflows/ci-windows.yml/badge.svg?branch=main)](https://github.com/Rinzii/ccmath/actions/workflows/ci-windows.yml?query=branch%3Amain)
+[![Linux CI](https://github.com/Rinzii/ccmath/actions/workflows/ci-linux.yml/badge.svg?branch=main)](https://github.com/Rinzii/ccmath/actions/workflows/ci-linux.yml?query=branch%3Amain)
+[![macOS CI](https://github.com/Rinzii/ccmath/actions/workflows/ci-macos.yml/badge.svg?branch=main)](https://github.com/Rinzii/ccmath/actions/workflows/ci-macos.yml?query=branch%3Amain)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/Rinzii/ccmath/badge)](https://securityscorecards.dev/viewer/?uri=github.com/Rinzii/ccmath)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9402/badge)](https://www.bestpractices.dev/projects/9402)
 [![License](https://img.shields.io/badge/License-Apache%202.0%20WITH%20LLVM--exception-blue.svg)](https://opensource.org/licenses/Apache-2.0)
