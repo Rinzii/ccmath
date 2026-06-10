@@ -6,4 +6,5 @@ ccm_add_headers(
         sqrt_gen.hpp
 )
 
+add_subdirectory(impl)
 add_subdirectory(pow_impl) # ccm::pow()
