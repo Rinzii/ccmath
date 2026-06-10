@@ -22,6 +22,7 @@ if (CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_SHOWCASE)
             benchmark
             GIT_REPOSITORY https://github.com/google/benchmark.git
             GIT_TAG ${CCMATH_BENCHMARK_VERSION}
+            GIT_SHALLOW TRUE
     )
     FetchContent_MakeAvailable(benchmark)
 endif ()
@@ -57,6 +58,7 @@ if (CCMATH_BUILD_TESTS)
             abseil
             GIT_REPOSITORY https://github.com/abseil/abseil-cpp.git
             GIT_TAG ${CCMATH_ABSEIL_VERSION}
+            GIT_SHALLOW TRUE
     )
     FetchContent_MakeAvailable(abseil)
 
@@ -66,6 +68,7 @@ if (CCMATH_BUILD_TESTS)
             re2
             GIT_REPOSITORY https://github.com/google/re2.git
             GIT_TAG ${CCMATH_RE2_VERSION}
+            GIT_SHALLOW TRUE
     )
     FetchContent_MakeAvailable(re2)
 
@@ -78,6 +81,7 @@ if (CCMATH_BUILD_TESTS)
                 googletest
                 GIT_REPOSITORY https://github.com/google/googletest.git
                 GIT_TAG ${CCMATH_GTEST_VERSION}
+                GIT_SHALLOW TRUE
         )
         FetchContent_MakeAvailable(googletest)
         if (CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM" OR CMAKE_CXX_COMPILER_ID STREQUAL "Intel")

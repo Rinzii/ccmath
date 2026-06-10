@@ -59,7 +59,9 @@ jobs:
             ./**/CMakeFiles
             ./**/CMakeCache.txt
             ./**/out
-          key: ${{ runner.os }}-${{ matrix.name }}
+          key: ${{ runner.os }}-${{ matrix.name }}-${{ hashFiles('CMakeLists.txt', 'CMakePresets.json', 'cmake/**', 'include/**', 'tests/**', 'thirdparty/**') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.name }}-
 
       - name: Install dependencies
         run: sudo apt-get update -qq && sudo apt-get install -yqq --no-install-recommends ninja-build
@@ -127,7 +129,9 @@ jobs:
             ./**/CMakeFiles
             ./**/CMakeCache.txt
             ./**/out
-          key: ${{ runner.os }}-${{ matrix.name }}
+          key: ${{ runner.os }}-${{ matrix.name }}-${{ hashFiles('CMakeLists.txt', 'CMakePresets.json', 'cmake/**', 'include/**', 'tests/**', 'thirdparty/**') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.name }}-
 
       - name: Install dependencies
         run: sudo apt-get update -qq && sudo apt-get install -yqq --no-install-recommends ninja-build
@@ -161,11 +165,15 @@ jobs:
 
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
-      - name: Cache build
+      - name: Cache rigorous builds
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
-          path: build-rigorous
-          key: ${{ runner.os }}-rigorous-build-${{ hashFiles('CMakeLists.txt', 'cmake/**', 'tests/**', 'include/**') }}
+          path: |
+            build-rigorous
+            build-rigorous-nobuiltin
+          key: ${{ runner.os }}-rigorous-build-${{ hashFiles('CMakeLists.txt', 'cmake/**', 'tests/**', 'include/**', 'thirdparty/**') }}
+          restore-keys: |
+            ${{ runner.os }}-rigorous-build-
 
       - name: Cache APT archives
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5

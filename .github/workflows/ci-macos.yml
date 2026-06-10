@@ -59,10 +59,9 @@ jobs:
             ./**/CMakeFiles
             ./**/CMakeCache.txt
             ./**/out
-          key: ${{ runner.os }}-${{ matrix.name }}
-
-      - name: Install Ninja
-        run: brew install ninja
+          key: ${{ runner.os }}-${{ matrix.name }}-${{ hashFiles('CMakeLists.txt', 'CMakePresets.json', 'cmake/**', 'include/**', 'tests/**', 'thirdparty/**') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.name }}-
 
       - name: Configure
         run: >
@@ -127,10 +126,9 @@ jobs:
             ./**/CMakeFiles
             ./**/CMakeCache.txt
             ./**/out
-          key: ${{ runner.os }}-${{ matrix.name }}
-
-      - name: Install Ninja
-        run: brew install ninja
+          key: ${{ runner.os }}-${{ matrix.name }}-${{ hashFiles('CMakeLists.txt', 'CMakePresets.json', 'cmake/**', 'include/**', 'tests/**', 'thirdparty/**') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.name }}-
 
       - name: Configure
         run: >
@@ -161,11 +159,13 @@ jobs:
 
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
-      - name: Cache build
+      - name: Cache rigorous build
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: build-rigorous
-          key: ${{ runner.os }}-rigorous-build-${{ hashFiles('CMakeLists.txt', 'cmake/**', 'tests/**', 'include/**') }}
+          key: ${{ runner.os }}-rigorous-build-${{ hashFiles('CMakeLists.txt', 'cmake/**', 'tests/**', 'include/**', 'thirdparty/**') }}
+          restore-keys: |
+            ${{ runner.os }}-rigorous-build-
 
       - name: Cache Homebrew downloads
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
@@ -181,7 +181,7 @@ jobs:
           key: ${{ runner.os }}-coremath-prefix-v1-${{ hashFiles('cmake/coremath/**', 'tools/coremath/**') }}
 
       - name: Install dependencies
-        run: brew install ninja pkg-config mpfr gmp
+        run: brew install mpfr gmp
 
       - name: Build CORE-MATH oracle prefix
         run: |
