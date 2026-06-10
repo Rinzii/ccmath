@@ -48,6 +48,11 @@ namespace
 	[[nodiscard]] Big make_big(const std::array<std::uint64_t, Big::WORD_COUNT>& words)
 	{ return Big(words); }
 
+	// GMP bit counts are mp_bitcnt_t (32-bit unsigned long on Windows); every count we pass is
+	// bounded well below that, so the narrowing cast is safe.
+	[[nodiscard]] constexpr mp_bitcnt_t to_bitcnt(std::size_t bits)
+	{ return static_cast<mp_bitcnt_t>(bits); }
+
 	[[nodiscard]] std::array<std::uint64_t, 4> generated_words(std::uint64_t seed)
 	{
 		std::array<std::uint64_t, 4> out{};
@@ -139,7 +144,7 @@ namespace
 		{
 			mpz_holder two_to_bits;
 			mpz_set_ui(two_to_bits.value, 1U);
-			mpz_mul_2exp(two_to_bits.value, two_to_bits.value, Bits);
+			mpz_mul_2exp(two_to_bits.value, two_to_bits.value, to_bitcnt(Bits));
 			mpz_sub(out.value, out.value, two_to_bits.value);
 		}
 		return out;
@@ -149,10 +154,10 @@ namespace
 	[[nodiscard]] bool matches_unsigned_bits(const Big& actual, const mpz_t expected)
 	{
 		mpz_holder reduced;
-		mpz_fdiv_r_2exp(reduced.value, expected, Big::BITS);
+		mpz_fdiv_r_2exp(reduced.value, expected, to_bitcnt(Big::BITS));
 		for (std::size_t bit = 0; bit < Big::BITS; ++bit)
 		{
-			if (actual.get_bit(bit) != (mpz_tstbit(reduced.value, bit) != 0)) { return false; }
+			if (actual.get_bit(bit) != (mpz_tstbit(reduced.value, to_bitcnt(bit)) != 0)) { return false; }
 		}
 		return true;
 	}
@@ -234,7 +239,7 @@ int main()
 
 				mpz_holder denominator;
 				mpz_set_ui(denominator.value, divisor);
-				mpz_mul_2exp(denominator.value, denominator.value, shift);
+				mpz_mul_2exp(denominator.value, denominator.value, to_bitcnt(shift));
 
 				mpz_holder q;
 				mpz_holder r;

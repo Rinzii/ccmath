@@ -16,6 +16,7 @@ permissions:
 jobs:
   build-cxx17:
     runs-on: macos-latest
+    timeout-minutes: 30
     strategy:
       fail-fast: true
       matrix:
@@ -83,6 +84,7 @@ jobs:
   build-cxx20:
     needs: build-cxx17
     runs-on: macos-latest
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -150,6 +152,7 @@ jobs:
   rigorous:
     needs: build-cxx17
     runs-on: macos-latest
+    timeout-minutes: 45
 
     steps:
       - name: Harden Runner

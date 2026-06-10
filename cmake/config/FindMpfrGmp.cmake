@@ -55,5 +55,8 @@ if (TARGET PkgConfig::MPFR AND TARGET PkgConfig::GMP)
 endif ()
 
 if (CCMATH_ENABLE_MPFR_TESTS AND NOT CCMATH_MPFR_FOUND)
-    message(STATUS "CCMath rigorous MPFR validation requested, but MPFR/GMP were not both found")
+    # Fail loudly: silently dropping the requested oracle suite lets CI pass without validation.
+    message(FATAL_ERROR
+            "CCMATH_ENABLE_MPFR_TESTS=ON but MPFR/GMP were not both found via pkg-config. "
+            "Install mpfr and gmp (and pkg-config), or set CCMATH_ENABLE_MPFR_TESTS=OFF.")
 endif ()

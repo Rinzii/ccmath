@@ -16,6 +16,7 @@ permissions:
 jobs:
   build-cxx17:
     runs-on: windows-latest
+    timeout-minutes: 45
     strategy:
       fail-fast: true
       matrix:
@@ -71,6 +72,7 @@ jobs:
   build-cxx20:
     needs: build-cxx17
     runs-on: windows-latest
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -126,6 +128,7 @@ jobs:
   rigorous:
     needs: build-cxx20
     runs-on: windows-latest
+    timeout-minutes: 90
     env:
       CCMATH_VCPKG_BINARY_CACHE_DIR: ${{ github.workspace }}/.cache/vcpkg/archives
       CCMATH_VCPKG_DOWNLOADS_DIR: ${{ github.workspace }}/.cache/vcpkg/downloads
