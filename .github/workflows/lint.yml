@@ -5,7 +5,7 @@ on:
     tags-ignore:
       - v*.*
     branches:
-      - '*'
+      - '**'
     paths:
       - '.clang-format'
       - '.github/actions/install-clang-format/**'
@@ -16,7 +16,7 @@ on:
       - 'tools/ensure_format.sh'
   pull_request:
     branches:
-      - '*'
+      - '**'
     paths:
       - '.clang-format'
       - '.github/actions/install-clang-format/**'
