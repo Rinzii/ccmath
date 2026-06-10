@@ -8,9 +8,12 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "ccmath/internal/support/math_support.hpp"
 #include "ccmath/internal/types/big_int.hpp"
 
 #include <gtest/gtest.h>
+
+#include <limits>
 
 namespace
 {
@@ -45,4 +48,28 @@ TEST(CcmathInternalTypesTests, BigIntCrossWordConversion)
 
 	const UInt32 narrowed(wide);
 	EXPECT_EQ(static_cast<std::uint32_t>(narrowed), 0x12345678U);
+}
+
+TEST(CcmathInternalTypesTests, AddWithCarryDetectsUint64Wrap)
+{
+	std::uint64_t carry = 0;
+
+	EXPECT_EQ(ccm::support::add_with_carry<std::uint64_t>(std::numeric_limits<std::uint64_t>::max(), 1ULL, 0ULL, carry), 0ULL);
+	EXPECT_EQ(carry, 1ULL);
+
+	EXPECT_EQ(ccm::support::add_with_carry<std::uint64_t>(std::numeric_limits<std::uint64_t>::max(), 0ULL, 1ULL, carry), 0ULL);
+	EXPECT_EQ(carry, 1ULL);
+}
+
+TEST(CcmathInternalTypesTests, BigIntFullMultiplyPreservesLowWordCarries)
+{
+	using UInt128x64 = ccm::types::BigInt<128, false, std::uint64_t>;
+
+	const UInt128x64 value(std::numeric_limits<std::uint64_t>::max());
+	const auto product = value.ful_mul(value);
+
+	EXPECT_EQ(product[0], 1ULL);
+	EXPECT_EQ(product[1], std::numeric_limits<std::uint64_t>::max() - 1ULL);
+	EXPECT_EQ(product[2], 0ULL);
+	EXPECT_EQ(product[3], 0ULL);
 }

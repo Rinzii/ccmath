@@ -18,6 +18,7 @@
 #include "ccmath/internal/support/type_traits.hpp"
 
 #include <climits>
+#include <limits>
 
 // CCM_DISABLE_GCC_WARNING(-Wpedantic)
 
@@ -31,30 +32,27 @@ namespace ccm::support
 #if CCM_HAS_BUILTIN(__builtin_add_overflow)
 		return __builtin_add_overflow(a, b, &res);
 #else
-		// This is a fallback implementation that should work on all compilers.
 		static_assert(std::is_integral_v<T>, "T must be an integral type");
 		static_assert(!std::is_same_v<T, bool>, "T must not be a boolean type");
 		static_assert(!std::is_enum_v<T>, "T must not be an enumerated type");
 
-		using LargerType = long long;
-		auto la			 = static_cast<LargerType>(a);
-		auto lb			 = static_cast<LargerType>(b);
+		using UnsignedT = std::make_unsigned_t<T>;
+		const UnsignedT ua = static_cast<UnsignedT>(a);
+		const UnsignedT ub = static_cast<UnsignedT>(b);
+		const UnsignedT usum = ua + ub;
 
-		LargerType const lres = la + lb;
-
-		bool overflow = false;
-		if constexpr (std::is_signed_v<T>)
+		if constexpr (std::is_unsigned_v<T>)
 		{
-			if ((a > 0 && b > 0 && lres < 0) || (a < 0 && b < 0 && lres > 0)) { overflow = true; }
+			res = static_cast<T>(usum);
+			return usum < ua;
 		}
 		else
 		{
-			if (static_cast<unsigned long long>(lres) < 0 || static_cast<unsigned long long>(lres) > std::numeric_limits<T>::max()) { overflow = true; }
+			constexpr UnsignedT SIGN_BIT = UnsignedT(1) << (std::numeric_limits<UnsignedT>::digits - 1);
+			const bool overflow = ((~(ua ^ ub) & (ua ^ usum)) & SIGN_BIT) != 0;
+			if (!overflow) { res = static_cast<T>(usum); }
+			return overflow;
 		}
-
-		if (!overflow) { res = static_cast<T>(lres); }
-
-		return overflow;
 #endif
 	}
 
@@ -69,25 +67,22 @@ namespace ccm::support
 		static_assert(!std::is_same_v<T, bool>, "T must not be a boolean type");
 		static_assert(!std::is_enum_v<T>, "T must not be an enumerated type");
 
-		using LargerType = long long;
-		auto la			 = static_cast<LargerType>(a);
-		auto lb			 = static_cast<LargerType>(b);
+		using UnsignedT = std::make_unsigned_t<T>;
+		const UnsignedT ua = static_cast<UnsignedT>(a);
+		const UnsignedT ub = static_cast<UnsignedT>(b);
+		const UnsignedT udiff = ua - ub;
 
-		LargerType const lres = la - lb;
-
-		if constexpr (std::is_signed_v<T>)
+		if constexpr (std::is_unsigned_v<T>)
 		{
-			bool overflow = false;
-			if ((b > 0 && a < std::numeric_limits<T>::min() + b) || (b < 0 && a > std::numeric_limits<T>::max() + b)) { overflow = true; }
-
-			if (!overflow) { res = static_cast<T>(lres); }
-
-			return overflow;
+			res = static_cast<T>(udiff);
+			return ua < ub;
 		}
 		else
 		{
-			res = static_cast<T>(lres);
-			return a < b;
+			constexpr UnsignedT SIGN_BIT = UnsignedT(1) << (std::numeric_limits<UnsignedT>::digits - 1);
+			const bool overflow = (((ua ^ ub) & (ua ^ udiff)) & SIGN_BIT) != 0;
+			if (!overflow) { res = static_cast<T>(udiff); }
+			return overflow;
 		}
 #endif
 	}
