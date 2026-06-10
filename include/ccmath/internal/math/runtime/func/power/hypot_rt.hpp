@@ -10,9 +10,9 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/func/power/impl/hypot_impl.hpp"
 #include "ccmath/internal/math/runtime/func/rt_dispatch.hpp"
 #include "ccmath/internal/predef/has_builtin.hpp"
-#include "ccmath/math/power/impl/hypot_impl.hpp"
 
 #include <type_traits>
 
