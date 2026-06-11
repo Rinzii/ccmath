@@ -37,7 +37,7 @@ newoption {
 
 ccmath = ccmath or {}
 
-local _ccmath_include_dirs = { "/Users/ianpike/Dev/ccmath/include", "/Users/ianpike/Dev/ccmath/out/secondary/include" }
+local _ccmath_include_dirs = { "include", "out/secondary/include" }
 
 local function _ccmath_option_enabled(trigger, default_value)
     local value = _OPTIONS[trigger]

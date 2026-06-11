@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -44,6 +45,10 @@ int main() {
 def load_manifest(path: Path) -> dict[str, Any]:
     with path.open(encoding="utf-8") as handle:
         return json.load(handle)
+
+
+def relative_posix_path(path: Path, base_dir: Path) -> str:
+    return os.path.relpath(path.resolve(), base_dir.resolve()).replace("\\", "/")
 
 
 def version_components(manifest: dict[str, Any]) -> tuple[str, str, str]:
@@ -165,11 +170,11 @@ def meson_options_txt(options: list[dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
-def meson_build_content(manifest: dict[str, Any], source_dir: Path) -> str:
+def meson_build_content(manifest: dict[str, Any], source_dir: Path, base_dir: Path) -> str:
     cpp_standard = manifest["cpp_standard"]
     body = meson_dependency_block(
-        source_include=(source_dir / "include").as_posix(),
-        generated_include="include",
+        source_include=relative_posix_path(source_dir / "include", base_dir),
+        generated_include=relative_posix_path(base_dir / "include", base_dir),
         options=manifest["options"],
     )
     return "\n".join(
@@ -244,9 +249,14 @@ def premake_defines_block(options: list[dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
-def premake_content(manifest: dict[str, Any], source_dir: Path, generated_include_dir: Path) -> str:
-    source_include = (source_dir / "include").as_posix()
-    generated_include = generated_include_dir.as_posix()
+def premake_content(
+    manifest: dict[str, Any],
+    source_dir: Path,
+    generated_include_dir: Path,
+    base_dir: Path,
+) -> str:
+    source_include = relative_posix_path(source_dir / "include", base_dir)
+    generated_include = relative_posix_path(generated_include_dir, base_dir)
 
     return "\n".join(
         [
@@ -325,7 +335,12 @@ def root_meson_wrapper(manifest: dict[str, Any]) -> str:
 
 
 def root_premake_wrapper(manifest: dict[str, Any], source_dir: Path) -> str:
-    body = premake_content(manifest, source_dir, source_dir / ROOT_SECONDARY_INCLUDE)
+    body = premake_content(
+        manifest,
+        source_dir,
+        source_dir / ROOT_SECONDARY_INCLUDE,
+        source_dir,
+    )
     return "\n".join(
         [
             "-- CCMath secondary build (library consumption). CMake is the primary build system.",
@@ -342,8 +357,8 @@ def root_premake_wrapper(manifest: dict[str, Any], source_dir: Path) -> str:
 
 def cmake_gen_meson(manifest: dict[str, Any], source_dir: Path) -> str:
     gen_subdir = source_dir / "cmake" / "gen"
-    source_include = os.path.relpath(source_dir / "include", gen_subdir.resolve()).replace("\\", "/")
-    generated_include = os.path.relpath(source_dir / ROOT_SECONDARY_INCLUDE, gen_subdir.resolve()).replace("\\", "/")
+    source_include = relative_posix_path(source_dir / "include", gen_subdir)
+    generated_include = relative_posix_path(source_dir / ROOT_SECONDARY_INCLUDE, gen_subdir)
 
     return "\n".join(
         [
@@ -373,13 +388,13 @@ def write_outputs(
     write_version_header(output_dir / "include", version_header)
 
     (output_dir / "meson.build").write_text(
-        meson_build_content(manifest, source_dir),
+        meson_build_content(manifest, source_dir, output_dir),
         encoding="utf-8",
     )
     options_txt = meson_options_txt(manifest["options"])
     (output_dir / "meson_options.txt").write_text(options_txt, encoding="utf-8")
     (output_dir / "premake5.lua").write_text(
-        premake_content(manifest, source_dir, output_dir / "include"),
+        premake_content(manifest, source_dir, output_dir / "include", output_dir),
         encoding="utf-8",
     )
 
@@ -419,6 +434,13 @@ def check_root_markers(source_dir: Path) -> int:
         if markers[0] not in text or markers[1] not in text:
             print(f"check failed: markers missing in {path}", file=sys.stderr)
             return 1
+        if name == "premake5.lua":
+            for line in text.splitlines():
+                if "_ccmath_include_dirs" not in line:
+                    continue
+                if re.search(r'["\'](/|[A-Za-z]:[/\\])', line):
+                    print(f"check failed: absolute include path in {path}", file=sys.stderr)
+                    return 1
     return 0
 
 
