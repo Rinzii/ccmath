@@ -29,7 +29,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T logb(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_logb<T>) { return ccm::builtin::logb(num); }
+		if constexpr (ccm::builtin::has_constexpr_logb<T>) { return ccm::builtin::logb_ct(num); }
 		else
 		{
 			if (ccm::support::is_constant_evaluated()) { return ccm::gen::logb_gen(num); }

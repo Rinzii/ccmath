@@ -35,7 +35,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T scalbn(T num, int exp) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_scalbn<T>) { return ccm::builtin::scalbn(num, exp); }
+		if constexpr (ccm::builtin::has_constexpr_scalbn<T>) { return ccm::builtin::scalbn_ct(num, exp); }
 		else
 		{
 			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::scalbn_rt(num, exp); }
@@ -58,7 +58,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T scalbn(T num, long exp) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_scalbn<T>) { return ccm::builtin::scalbn(num, exp); }
+		if constexpr (ccm::builtin::has_constexpr_scalbn<T>) { return ccm::builtin::scalbn_ct(num, exp); }
 		else
 		{
 			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::scalbn_rt(num, static_cast<int>(exp)); }

@@ -25,7 +25,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T trunc(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_trunc<T>) { return ccm::builtin::trunc(num); }
+		if constexpr (ccm::builtin::has_constexpr_trunc<T>) { return ccm::builtin::trunc_ct(num); }
 		else
 		{
 			using FPBits_t	= ccm::support::fp::FPBits<T>;

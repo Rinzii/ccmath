@@ -55,7 +55,7 @@ namespace ccm
 			// Constant evaluation always rounds to nearest, so the constexpr builtin is correct there.
 			// At runtime the builtin lowers to libm, so defer to the runtime dispatcher which only
 			// trusts the builtin under round to nearest.
-			if (support::is_constant_evaluated()) { return ccm::builtin::pow(base, exp); }
+			if (support::is_constant_evaluated()) { return ccm::builtin::pow_ct(base, exp); }
 			return rt::pow_rt(base, exp);
 		}
 		else

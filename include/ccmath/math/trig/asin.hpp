@@ -29,7 +29,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T asin(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_asin<T>) { return ccm::builtin::asin(num); }
+		if constexpr (ccm::builtin::has_constexpr_asin<T>) { return ccm::builtin::asin_ct(num); }
 		else if (ccm::support::is_constant_evaluated())
 		{
 			if constexpr (std::is_same_v<T, float>) { return internal::impl::asin_float(num); }

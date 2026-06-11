@@ -30,7 +30,7 @@ namespace ccm
 	template <typename T>
 	constexpr T max(T x, T y) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_fmax<T>) { return ccm::builtin::fmax(x, y); }
+		if constexpr (ccm::builtin::has_constexpr_fmax<T>) { return ccm::builtin::fmax_ct(x, y); }
 		else
 		{
 			return ccm::gen::max(x, y);

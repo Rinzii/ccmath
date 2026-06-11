@@ -49,6 +49,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_ISNORMAL
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for isnormal that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_ISNORMAL
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_ISNORMAL
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -64,6 +79,15 @@ namespace ccm::builtin
 #endif
 	// clang-format on
 
+	// TODO: determine actual compiler/version support for runtime __builtin_isnormal.
+	template <typename T>
+	inline constexpr bool has_runtime_isnormal =
+#ifdef CCMATH_HAS_BUILTIN_ISNORMAL
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_isnormal functions.
@@ -72,9 +96,14 @@ namespace ccm::builtin
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
-	constexpr auto isnormal(T x) -> std::enable_if_t<has_constexpr_isnormal<T>, bool>
+	constexpr auto isnormal_ct(T x) -> std::enable_if_t<has_constexpr_isnormal<T>, bool>
+	{ return __builtin_isnormal(x); }
+
+	template <typename T>
+	auto isnormal_rt(T x) -> std::enable_if_t<has_runtime_isnormal<T>, bool>
 	{ return __builtin_isnormal(x); }
 } // namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_ISNORMAL
+#undef CCMATH_HAS_BUILTIN_ISNORMAL

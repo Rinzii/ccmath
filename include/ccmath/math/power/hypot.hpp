@@ -30,7 +30,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T hypot(T x, T y) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_hypot<T>) { return ccm::builtin::hypot(x, y); }
+		if constexpr (ccm::builtin::has_constexpr_hypot<T>) { return ccm::builtin::hypot_ct(x, y); }
 		else
 		{
 			if (ccm::support::is_constant_evaluated()) { return ccm::gen::hypot_gen<T>(x, y); }

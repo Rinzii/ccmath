@@ -32,7 +32,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T scalbn(T num, int exp) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_scalbn<T>) { return ccm::builtin::scalbn(num, exp); }
+		if constexpr (ccm::builtin::has_constexpr_scalbn<T>) { return ccm::builtin::scalbn_ct(num, exp); }
 		else
 		{
 			if constexpr (std::is_same_v<T, float>) { return internal::scalbn_float(num, exp); }
@@ -52,7 +52,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T scalbn(T num, long exp) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_scalbn<T>) { return ccm::builtin::scalbn(num, exp); }
+		if constexpr (ccm::builtin::has_constexpr_scalbn<T>) { return ccm::builtin::scalbn_ct(num, exp); }
 		else
 		{
 			if constexpr (std::is_same_v<T, float>) { return internal::scalbn_float(num, exp); }

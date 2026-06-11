@@ -21,7 +21,7 @@ namespace ccm::rt
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] inline T expm1_rt(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_runtime_expm1<T>) { return ccm::builtin::runtime_expm1(num); }
+		if constexpr (ccm::builtin::has_runtime_expm1<T>) { return ccm::builtin::expm1_rt(num); }
 		else
 		{
 			const auto scalar = [](T value) { return detail::dispatch_float_double(value, ccm::internal::expm1_float, ccm::internal::expm1_double); };

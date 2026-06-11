@@ -29,7 +29,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T sqrt(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_sqrt<T>) { return ccm::builtin::sqrt(num); }
+		if constexpr (ccm::builtin::has_constexpr_sqrt<T>) { return ccm::builtin::sqrt_ct(num); }
 		else
 		{
 			if (ccm::support::is_constant_evaluated()) { return ccm::gen::sqrt_gen<T>(num); }

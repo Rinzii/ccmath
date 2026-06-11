@@ -47,6 +47,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_ABS
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for abs that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_ABS
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_ABS
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -63,6 +78,15 @@ namespace ccm::builtin
 	#endif
 	// clang-format on
 
+	// TODO: determine actual compiler/version support for runtime __builtin_abs.
+	template <typename T>
+	inline constexpr bool has_runtime_abs =
+#ifdef CCMATH_HAS_BUILTIN_ABS
+		has_constexpr_abs<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_abs functions.
@@ -71,7 +95,7 @@ namespace ccm::builtin
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
-	constexpr auto abs(T x) -> std::enable_if_t<has_constexpr_abs<T>, T>
+	constexpr auto abs_ct(T x) -> std::enable_if_t<has_constexpr_abs<T>, T>
 	{
 		if constexpr (std::is_same_v<T, float>) { return __builtin_fabsf(x); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_fabs(x); }
@@ -85,7 +109,27 @@ namespace ccm::builtin
 		else
 		{
 			// This should never be reached
-			static_assert(support::always_false<T>, "Unsupported type for __builtin_abs");
+			static_assert(support::always_false<T>, "Unsupported type for abs");
+			return T{};
+		}
+	}
+
+	template <typename T>
+	auto abs_rt(T x) -> std::enable_if_t<has_runtime_abs<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>) { return __builtin_fabsf(x); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_fabs(x); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fabsl(x); }
+		else if constexpr (std::is_same_v<T, long long>) { return __builtin_llabs(x); }
+		else if constexpr (std::is_integral_v<T> && std::is_signed_v<T>) { return __builtin_abs(x); }
+		else if constexpr (std::is_integral_v<T> && std::is_unsigned_v<T>)
+		{
+			return x; // Absolute value of unsigned is the value itself
+		}
+		else
+		{
+			// This should never be reached
+			static_assert(support::always_false<T>, "Unsupported type for abs");
 			return T{};
 		}
 	}
@@ -93,3 +137,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_ABS
+#undef CCMATH_HAS_BUILTIN_ABS

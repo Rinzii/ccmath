@@ -10,8 +10,8 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/trig/asin.hpp"
 #include "ccmath/internal/math/runtime/func/rt_dispatch.hpp"
-#include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/math/trig/impl/inv_trig_impl.hpp"
 
 #include <type_traits>
@@ -21,17 +21,11 @@ namespace ccm::rt
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] inline T asin_rt(T num) noexcept
 	{
-#if CCM_HAS_BUILTIN(__builtin_asin) || defined(__builtin_asin)
-		if constexpr (std::is_same_v<T, float>) { return __builtin_asinf(num); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_asin(num); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_asinl(num); }
+		if constexpr (ccm::builtin::has_runtime_asin<T>) { return ccm::builtin::asin_rt(num); }
 		else
 		{
-			return static_cast<T>(__builtin_asinl(static_cast<long double>(num)));
+			const auto scalar = [](T value) { return detail::dispatch_float_double(value, internal::impl::asin_float, internal::impl::asin_double); };
+			return simd_impl::unary_via_scalar_abi(num, scalar);
 		}
-#else
-		const auto scalar = [](T value) { return detail::dispatch_float_double(value, internal::impl::asin_float, internal::impl::asin_double); };
-		return simd_impl::unary_via_scalar_abi(num, scalar);
-#endif
 	}
 } // namespace ccm::rt

@@ -30,7 +30,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T atan2(T y, T x)
 	{
-		if constexpr (ccm::builtin::has_constexpr_atan2<T>) { return ccm::builtin::atan2(y, x); }
+		if constexpr (ccm::builtin::has_constexpr_atan2<T>) { return ccm::builtin::atan2_ct(y, x); }
 		else if (ccm::support::is_constant_evaluated())
 		{
 			if constexpr (std::is_same_v<T, float>) { return internal::impl::atan2_float(y, x); }

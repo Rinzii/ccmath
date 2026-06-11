@@ -25,7 +25,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	[[nodiscard]] constexpr bool isnan(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_isnan<T>) { return ccm::builtin::isnan(num); }
+		if constexpr (ccm::builtin::has_constexpr_isnan<T>) { return ccm::builtin::isnan_ct(num); }
 		else
 		{
 			// If we can't use the builtin, fallback to this comparison and hope for the best.

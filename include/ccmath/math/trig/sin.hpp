@@ -29,7 +29,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T sin(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_sin<T>) { return ccm::builtin::sin(num); }
+		if constexpr (ccm::builtin::has_constexpr_sin<T>) { return ccm::builtin::sin_ct(num); }
 		else
 		{
 			if (ccm::support::is_constant_evaluated()) { return ccm::gen::sin_gen(num); }

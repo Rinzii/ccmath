@@ -28,6 +28,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_POW
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for pow that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_POW
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_POW
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -44,8 +59,9 @@ namespace ccm::builtin
 	// clang-format on
 
 	template <typename T>
+	// TODO: determine actual compiler/version support for runtime __builtin_pow.
 	inline constexpr bool has_runtime_pow =
-#if defined(__GNUC__) || defined(__clang__)
+#ifdef CCMATH_HAS_BUILTIN_POW
 		is_valid_builtin_type<T>;
 #else
 		false;
@@ -59,7 +75,7 @@ namespace ccm::builtin
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
-	constexpr auto pow(T x, T y) -> std::enable_if_t<has_constexpr_pow<T>, T>
+	constexpr auto pow_ct(T x, T y) -> std::enable_if_t<has_constexpr_pow<T>, T>
 	{
 		if constexpr (std::is_same_v<T, float>) { return __builtin_powf(x, y); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_pow(x, y); }
@@ -67,20 +83,20 @@ namespace ccm::builtin
 		else
 		{
 			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_pow");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for pow");
 			return T{};
 		}
 	}
 
 	template <typename T>
-	auto runtime_pow(T x, T y) -> std::enable_if_t<has_runtime_pow<T>, T>
+	auto pow_rt(T x, T y) -> std::enable_if_t<has_runtime_pow<T>, T>
 	{
 		if constexpr (std::is_same_v<T, float>) { return __builtin_powf(x, y); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_pow(x, y); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_powl(x, y); }
 		else
 		{
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_pow");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for pow");
 			return T{};
 		}
 	}
@@ -88,3 +104,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_POW
+#undef CCMATH_HAS_BUILTIN_POW

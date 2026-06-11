@@ -101,7 +101,7 @@ namespace ccm
 	{
 		if constexpr (ccm::builtin::has_constexpr_ldexp<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return builtin::ldexp(num, exp); }
+			if (ccm::support::is_constant_evaluated()) { return builtin::ldexp_ct(num, exp); }
 		}
 		if (!ccm::support::is_constant_evaluated()) { return ccm::rt::ldexp_rt(num, exp); }
 		return support::helpers::internal_ldexp(num, exp);

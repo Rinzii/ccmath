@@ -30,7 +30,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T log(const T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_log<T>) { return ccm::builtin::log(num); }
+		if constexpr (ccm::builtin::has_constexpr_log<T>) { return ccm::builtin::log_ct(num); }
 		else
 		{
 			// If the number is 1, return +0.

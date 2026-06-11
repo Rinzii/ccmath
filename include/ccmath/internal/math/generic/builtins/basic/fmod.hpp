@@ -28,6 +28,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_FMOD
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for fmod that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_FMOD
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_FMOD
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -44,8 +59,9 @@ namespace ccm::builtin
 	// clang-format on
 
 	template <typename T>
+	// TODO: determine actual compiler/version support for runtime __builtin_fmod.
 	inline constexpr bool has_runtime_fmod =
-#if defined(__GNUC__) || defined(__clang__)
+#ifdef CCMATH_HAS_BUILTIN_FMOD
 		is_valid_builtin_type<T>;
 #else
 		false;
@@ -59,7 +75,7 @@ namespace ccm::builtin
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
-	constexpr auto fmod(T x, T y) -> std::enable_if_t<has_constexpr_fmod<T>, T>
+	constexpr auto fmod_ct(T x, T y) -> std::enable_if_t<has_constexpr_fmod<T>, T>
 	{
 		if constexpr (std::is_same_v<T, float>) { return __builtin_fmodf(x, y); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_fmod(x, y); }
@@ -67,20 +83,20 @@ namespace ccm::builtin
 		else
 		{
 			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_fmod");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for fmod");
 			return T{};
 		}
 	}
 
 	template <typename T>
-	auto runtime_fmod(T x, T y) -> std::enable_if_t<has_runtime_fmod<T>, T>
+	auto fmod_rt(T x, T y) -> std::enable_if_t<has_runtime_fmod<T>, T>
 	{
 		if constexpr (std::is_same_v<T, float>) { return __builtin_fmodf(x, y); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_fmod(x, y); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fmodl(x, y); }
 		else
 		{
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_fmod");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for fmod");
 			return T{};
 		}
 	}
@@ -88,3 +104,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_FMOD
+#undef CCMATH_HAS_BUILTIN_FMOD

@@ -26,7 +26,7 @@ namespace ccm::rt
 #if defined(_MSC_VER) && !defined(__clang__)
 		return detail::msvc_libm::exp2_call(num);
 #else
-		if constexpr (ccm::builtin::has_runtime_exp2<T>) { return ccm::builtin::runtime_exp2(num); }
+		if constexpr (ccm::builtin::has_runtime_exp2<T>) { return ccm::builtin::exp2_rt(num); }
 		else
 		{
 			const auto scalar = [](T value) { return detail::dispatch_float_double(value, ccm::internal::exp2_float, ccm::internal::exp2_double); };

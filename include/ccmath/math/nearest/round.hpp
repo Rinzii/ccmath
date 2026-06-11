@@ -33,7 +33,7 @@ namespace ccm
 	{
 		if constexpr (ccm::builtin::has_constexpr_round<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::round(num); }
+			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::round_ct(num); }
 		}
 		{
 			// If num is NaN, NaN is returned.

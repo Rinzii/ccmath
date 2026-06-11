@@ -39,7 +39,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T log1p(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_log1p<T>) { return ccm::builtin::log1p(num); }
+		if constexpr (ccm::builtin::has_constexpr_log1p<T>) { return ccm::builtin::log1p_ct(num); }
 		else
 		{
 			if (num == static_cast<T>(0))

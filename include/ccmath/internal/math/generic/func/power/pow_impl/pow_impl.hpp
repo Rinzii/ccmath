@@ -13,7 +13,6 @@
 #include "ccmath/internal/math/generic/builtins/basic/fma.hpp"
 #include "ccmath/internal/math/generic/func/power/pow_impl/powf_data.hpp"
 #include "ccmath/internal/math/generic/func/power/sqrt_gen.hpp"
-#include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/common_math_constants.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
@@ -40,9 +39,8 @@ namespace ccm::gen::impl
 			{
 #if defined(CCMATH_TARGET_CPU_HAS_FMA)
 				return support::multiply_add(x, y, z);
-#elif CCM_HAS_BUILTIN(__builtin_fma)
-				return __builtin_fma(x, y, z);
 #else
+				if constexpr (ccm::builtin::has_runtime_fma<double>) { return ccm::builtin::fma_rt(x, y, z); }
 				return (x * y) + z;
 #endif
 			}

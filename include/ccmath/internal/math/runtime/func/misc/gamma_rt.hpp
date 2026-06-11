@@ -25,7 +25,7 @@ namespace ccm::rt
 #if defined(_MSC_VER) && !defined(__clang__)
 		return detail::msvc_libm::gamma_call(num);
 #else
-		if constexpr (ccm::builtin::has_runtime_gamma<T>) { return ccm::builtin::runtime_gamma(num); }
+		if constexpr (ccm::builtin::has_runtime_gamma<T>) { return ccm::builtin::gamma_rt(num); }
 		else
 		{
 			const auto scalar = [](T value) { return detail::dispatch_float_double(value, ccm::internal::gamma_float, ccm::internal::gamma_double); };

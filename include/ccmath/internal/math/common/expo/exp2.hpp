@@ -32,7 +32,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T exp2(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_exp2<T>) { return ccm::builtin::exp2(num); }
+		if constexpr (ccm::builtin::has_constexpr_exp2<T>) { return ccm::builtin::exp2_ct(num); }
 		else
 		{
 			return gen::exp2_gen(num);

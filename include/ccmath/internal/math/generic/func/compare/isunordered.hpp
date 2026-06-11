@@ -27,7 +27,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr bool isunordered(T x, T y) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_isunordered<T>) { return ccm::builtin::isunordered(x, y); }
+		if constexpr (ccm::builtin::has_constexpr_isunordered<T>) { return ccm::builtin::isunordered_ct(x, y); }
 		else
 		{
 			return ccm::isnan(x) || ccm::isnan(y);

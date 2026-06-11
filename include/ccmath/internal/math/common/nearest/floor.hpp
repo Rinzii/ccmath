@@ -67,7 +67,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T floor(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_floor<T>) { return ccm::builtin::floor(num); }
+		if constexpr (ccm::builtin::has_constexpr_floor<T>) { return ccm::builtin::floor_ct(num); }
 		else
 		{
 			// If num is NaN, NaN is returned.

@@ -28,7 +28,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T fdim(T x, T y)
 	{
-		if constexpr (ccm::builtin::has_constexpr_fdim<T>) { return ccm::builtin::fdim(x, y); }
+		if constexpr (ccm::builtin::has_constexpr_fdim<T>) { return ccm::builtin::fdim_ct(x, y); }
 		else if (ccm::support::is_constant_evaluated()) { return func::fdim(x, y); }
 		else
 		{

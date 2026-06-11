@@ -29,7 +29,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T cbrt(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_cbrt<T>) { return ccm::builtin::cbrt(num); }
+		if constexpr (ccm::builtin::has_constexpr_cbrt<T>) { return ccm::builtin::cbrt_ct(num); }
 		else
 		{
 			if (ccm::support::is_constant_evaluated()) { return ccm::gen::cbrt_gen<T>(num); }

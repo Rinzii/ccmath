@@ -12,8 +12,8 @@
 
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
 
+	#include "ccmath/internal/math/generic/builtins/nearest/round.hpp"
 	#include "ccmath/internal/math/generic/func/power/pow_impl/powl_ld80_tables.hpp"
-	#include "ccmath/internal/predef/has_builtin.hpp"
 	#include "ccmath/internal/support/fenv/fenv_support.hpp"
 	#include "ccmath/internal/support/fp/fp_bits.hpp"
 	#include "ccmath/internal/support/fp/nearest_integer.hpp"
@@ -76,11 +76,8 @@ namespace ccm::gen::internal::impl::bit80
 		{
 			if (!support::is_constant_evaluated())
 			{
-	#if CCM_HAS_BUILTIN(__builtin_roundl)
-				return __builtin_roundl(x);
-	#else
+				if constexpr (ccm::builtin::has_runtime_round<long double>) { return ccm::builtin::round_rt(x); }
 				return static_cast<long double>(support::fp::nearest_integer(static_cast<double>(x)));
-	#endif
 			}
 
 			if (constexpr long double max_exact_int = 0x1.0p63L; x < max_exact_int && x > -max_exact_int)
@@ -228,9 +225,9 @@ namespace ccm::gen::internal::impl::bit80
 
 			const int hm_i = static_cast<int>(hm);
 
-			const unsigned idx_y								= static_cast<unsigned>(hm_i) & 0x3fU;
-			const typename FPBits_t::storage_type exp2_hi_i		= static_cast<typename FPBits_t::storage_type>(static_cast<std::int64_t>(hm_i >> 6))
-																  << FPBits_t::significand_length;
+			const unsigned idx_y							= static_cast<unsigned>(hm_i) & 0x3fU;
+			const typename FPBits_t::storage_type exp2_hi_i = static_cast<typename FPBits_t::storage_type>(static_cast<std::int64_t>(hm_i >> 6))
+															  << FPBits_t::significand_length;
 			const typename FPBits_t::storage_type exp2_mid_hi_i = FPBits_t(tables::EXP2_HI.at(static_cast<std::size_t>(idx_y))).uintval();
 			const typename FPBits_t::storage_type exp2_mid_lo_i =
 				idx_y != 0U ? FPBits_t(tables::EXP2_MID.at(static_cast<std::size_t>(idx_y))).uintval() : typename FPBits_t::storage_type{};

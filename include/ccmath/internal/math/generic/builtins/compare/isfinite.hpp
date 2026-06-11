@@ -41,6 +41,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_ISFINITE
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for isfinite that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_ISFINITE
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_ISFINITE
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -56,6 +71,15 @@ namespace ccm::builtin
 #endif
 	// clang-format on
 
+	// TODO: determine actual compiler/version support for runtime __builtin_isfinite.
+	template <typename T>
+	inline constexpr bool has_runtime_isfinite =
+#ifdef CCMATH_HAS_BUILTIN_ISFINITE
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_isfinite functions.
@@ -64,9 +88,14 @@ namespace ccm::builtin
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
-	constexpr auto isfinite(T x) -> std::enable_if_t<has_constexpr_isfinite<T>, bool>
+	constexpr auto isfinite_ct(T x) -> std::enable_if_t<has_constexpr_isfinite<T>, bool>
+	{ return __builtin_isfinite(x); }
+
+	template <typename T>
+	auto isfinite_rt(T x) -> std::enable_if_t<has_runtime_isfinite<T>, bool>
 	{ return __builtin_isfinite(x); }
 } // namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_ISFINITE
+#undef CCMATH_HAS_BUILTIN_ISFINITE

@@ -97,7 +97,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T ldexp(T num, int exp) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_ldexp<T>) { return builtin::ldexp(num, exp); }
+		if constexpr (ccm::builtin::has_constexpr_ldexp<T>) { return builtin::ldexp_ct(num, exp); }
 		else
 		{
 			return support::helpers::internal_ldexp(num, exp);

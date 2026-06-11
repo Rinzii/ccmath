@@ -29,7 +29,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T tgamma(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_gamma<T>) { return ccm::builtin::gamma(num); }
+		if constexpr (ccm::builtin::has_constexpr_gamma<T>) { return ccm::builtin::gamma_ct(num); }
 		else
 		{
 			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::gamma_rt(num); }

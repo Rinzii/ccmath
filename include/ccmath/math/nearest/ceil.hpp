@@ -34,7 +34,7 @@ namespace ccm
 	{
 		if constexpr (ccm::builtin::has_constexpr_ceil<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::ceil(num); }
+			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::ceil_ct(num); }
 		}
 		{
 			// If num is NaN, NaN is returned.

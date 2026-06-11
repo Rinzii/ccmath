@@ -30,7 +30,7 @@ namespace ccm
 	{
 		if constexpr (ccm::builtin::has_constexpr_trunc<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::trunc(num); }
+			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::trunc_ct(num); }
 		}
 		if (ccm::support::is_constant_evaluated())
 		{

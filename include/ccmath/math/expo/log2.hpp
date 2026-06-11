@@ -42,7 +42,7 @@ namespace ccm
 	{
 		if constexpr (ccm::builtin::has_constexpr_log2<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::log2(num); }
+			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::log2_ct(num); }
 		}
 		{
 			// If the argument is ±0, -∞ is returned

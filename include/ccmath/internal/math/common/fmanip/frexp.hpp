@@ -20,7 +20,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T frexp(T x, int & exp)
 	{
-		if constexpr (ccm::builtin::has_constexpr_frexp<T>) { return ccm::builtin::frexp(x, &exp); }
+		if constexpr (ccm::builtin::has_constexpr_frexp<T>) { return ccm::builtin::frexp_ct(x, &exp); }
 		else
 		{
 			return gen::frexp_gen(x, exp);

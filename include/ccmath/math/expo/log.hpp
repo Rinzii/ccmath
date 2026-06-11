@@ -36,7 +36,7 @@ namespace ccm
 	{
 		if constexpr (ccm::builtin::has_constexpr_log<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::log(num); }
+			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::log_ct(num); }
 		}
 		{
 			// If the argument is 1, exact zero is returned.

@@ -32,7 +32,7 @@ namespace ccm
 	template <typename T>
 	constexpr T min(const T x, const T y) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_fmin<T>) { return ccm::builtin::fmin(x, y); }
+		if constexpr (ccm::builtin::has_constexpr_fmin<T>) { return ccm::builtin::fmin_ct(x, y); }
 		else if constexpr (std::is_floating_point_v<T>)
 		{
 			if (ccm::support::is_constant_evaluated()) { return ccm::gen::min(x, y); }

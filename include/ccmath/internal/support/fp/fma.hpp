@@ -637,12 +637,24 @@ namespace ccm::support::fp
 		}
 	}
 
+	template <typename T, bool HasConstexprBuiltinFma = ccm::builtin::has_constexpr_fma<T>>
+	struct dispatch_fma_constexpr_builtin
+	{
+		static constexpr T tonearest(T, T, T) { return T{}; }
+	};
+
+	template <typename T>
+	struct dispatch_fma_constexpr_builtin<T, true>
+	{
+		static constexpr T tonearest(T x, T y, T z) { return ccm::builtin::fma_ct(x, y, z); }
+	};
+
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<std::is_floating_point_v<T>, T> dispatch_fma(T x, T y, T z)
 	{
 		if constexpr (ccm::builtin::has_constexpr_fma<T>)
 		{
-			if (fenv::constant_eval_rounding_mode() == FE_TONEAREST) { return builtin::fma(x, y, z); }
+			if (fenv::constant_eval_rounding_mode() == FE_TONEAREST) { return dispatch_fma_constexpr_builtin<T>::tonearest(x, y, z); }
 		}
 
 		if (!is_constant_evaluated())
@@ -653,7 +665,7 @@ namespace ccm::support::fp
 			// yielding wrong directed-mode results. Fall back to the correctly-rounded software path.
 			if constexpr (ccm::builtin::runtime_builtin_fma_trusted<T>)
 			{
-				if (fenv::get_rounding_mode() == FE_TONEAREST) { return builtin::fma(x, y, z); }
+				if (fenv::get_rounding_mode() == FE_TONEAREST) { return builtin::fma_rt(x, y, z); }
 			}
 		}
 
@@ -666,7 +678,7 @@ namespace ccm::support::fp
 		// See dispatch_fma: only trust the native FMA instruction under round-to-nearest.
 		if constexpr (ccm::builtin::runtime_builtin_fma_trusted<T>)
 		{
-			if (fenv::get_rounding_mode() == FE_TONEAREST) { return builtin::fma(x, y, z); }
+			if (fenv::get_rounding_mode() == FE_TONEAREST) { return builtin::fma_rt(x, y, z); }
 		}
 		return public_fma(x, y, z);
 	}

@@ -27,6 +27,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_ISLESSEQUAL
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for islessequal that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_ISLESSEQUAL
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_ISLESSEQUAL
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -42,6 +57,15 @@ namespace ccm::builtin
 	#endif
 	// clang-format on
 
+	// TODO: determine actual compiler/version support for runtime __builtin_islessequal.
+	template <typename T>
+	inline constexpr bool has_runtime_islessequal =
+#ifdef CCMATH_HAS_BUILTIN_ISLESSEQUAL
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_islessequal.
@@ -50,9 +74,14 @@ namespace ccm::builtin
 	 * when the compiler does not support it.
 	 */
 	template <typename T>
-	constexpr auto islessequal(T x, T y) -> std::enable_if_t<has_constexpr_islessequal<T>, bool>
+	constexpr auto islessequal_ct(T x, T y) -> std::enable_if_t<has_constexpr_islessequal<T>, bool>
+	{ return __builtin_islessequal(x, y); }
+
+	template <typename T>
+	auto islessequal_rt(T x, T y) -> std::enable_if_t<has_runtime_islessequal<T>, bool>
 	{ return __builtin_islessequal(x, y); }
 } // namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_ISLESSEQUAL
+#undef CCMATH_HAS_BUILTIN_ISLESSEQUAL

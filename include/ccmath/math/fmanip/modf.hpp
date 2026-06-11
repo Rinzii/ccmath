@@ -30,7 +30,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T modf(T x, T * iptr) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_modf<T>) { return ccm::builtin::modf(x, iptr); }
+		if constexpr (ccm::builtin::has_constexpr_modf<T>) { return ccm::builtin::modf_ct(x, iptr); }
 		else if (!ccm::support::is_constant_evaluated())
 		{
 			T integer_part{};

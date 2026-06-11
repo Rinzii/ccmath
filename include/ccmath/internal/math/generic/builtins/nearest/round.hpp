@@ -40,6 +40,36 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_ROUND
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for round that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_ROUND
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_ROUND
+	#endif
+#endif
+
+/// CCMATH_HAS_BUILTIN_LROUND
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for lround that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_LROUND
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_LROUND
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -66,6 +96,24 @@ namespace ccm::builtin
 		#endif
 	// clang-format on
 
+	// TODO: determine actual compiler/version support for runtime __builtin_round.
+	template <typename T>
+	inline constexpr bool has_runtime_round =
+#ifdef CCMATH_HAS_BUILTIN_ROUND
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
+	// TODO: determine actual compiler/version support for runtime __builtin_lround.
+	template <typename T>
+	inline constexpr bool has_runtime_lround =
+#ifdef CCMATH_HAS_BUILTIN_LROUND
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_round functions.
@@ -74,7 +122,7 @@ namespace ccm::builtin
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
-	constexpr auto round(T x) -> std::enable_if_t<has_constexpr_round<T>, T>
+	constexpr auto round_ct(T x) -> std::enable_if_t<has_constexpr_round<T>, T>
 	{
 		if constexpr (std::is_same_v<T, float>) { return __builtin_roundf(x); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_round(x); }
@@ -82,7 +130,7 @@ namespace ccm::builtin
 		else
 		{
 			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_round");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for round");
 			return T{};
 		}
 	}
@@ -95,7 +143,7 @@ namespace ccm::builtin
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
-	constexpr auto lround(T x) -> std::enable_if_t<has_constexpr_lround<T>, T>
+	constexpr auto lround_ct(T x) -> std::enable_if_t<has_constexpr_lround<T>, T>
 	{
 		if constexpr (std::is_same_v<T, float>) { return __builtin_lroundf(x); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_lround(x); }
@@ -103,7 +151,34 @@ namespace ccm::builtin
 		else
 		{
 			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_lround");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for lround");
+			return T{};
+		}
+	}
+
+	template <typename T>
+	auto round_rt(T x) -> std::enable_if_t<has_runtime_round<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>) { return __builtin_roundf(x); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_round(x); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_roundl(x); }
+		else
+		{
+			static_assert(ccm::support::always_false<T>, "Unsupported type for round");
+			return T{};
+		}
+	}
+
+	template <typename T>
+	auto lround_rt(T x) -> std::enable_if_t<has_runtime_lround<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>) { return __builtin_lroundf(x); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_lround(x); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_lroundl(x); }
+		else
+		{
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for lround");
 			return T{};
 		}
 	}
@@ -112,3 +187,5 @@ namespace ccm::builtin
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_ROUND
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_LROUND
+#undef CCMATH_HAS_BUILTIN_LROUND
+#undef CCMATH_HAS_BUILTIN_ROUND

@@ -33,7 +33,7 @@ namespace ccm
 	{
 		if constexpr (ccm::builtin::has_constexpr_floor<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::floor(num); }
+			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::floor_ct(num); }
 		}
 		{
 			// If num is NaN, NaN is returned.

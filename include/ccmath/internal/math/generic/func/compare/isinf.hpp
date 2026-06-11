@@ -27,7 +27,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr bool isinf(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_isinf<T>) { return ccm::builtin::isinf(num); }
+		if constexpr (ccm::builtin::has_constexpr_isinf<T>) { return ccm::builtin::isinf_ct(num); }
 		else
 		{
 			// If we can't use the builtin, fallback to this comparison and hope for the best.
