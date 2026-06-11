@@ -1,0 +1,36 @@
+// Scan a grid of doubles for inputs whose exp lands close to a
+// round-to-nearest boundary.  Demonstrates how quickly hard cases appear.
+
+prec = 300!;
+display = decimal!;
+rationalmode = off!;
+
+data_path = "tools/proofs/math/approx_doc/data/hard_case_scan.dat";
+
+n = 4096!;
+worst_d = 1;
+worst_x = 0;
+
+// exp stays inside [1, 2) on this input range, so the significand of the
+// exact result is mid(y) * 2^52 and the rounding boundary sits at
+// fraction one half.
+for i from 0 to n do {
+  xi = round(1/64 + (1/2 - 1/64) * i / n, D, RN);
+  y = mid(evaluate(exp(x), xi));
+  m = y * 2^52;
+  fr = m - floor(m);
+  d = abs(fr - 1/2);
+  if (d < worst_d) then { worst_d = d; worst_x = xi; };
+};
+
+extra_bits = mid(evaluate(-log2(x), worst_d));
+
+print("x", "boundary_distance_ulps", "extra_bits") > data_path;
+print(worst_x, worst_d, extra_bits) >> data_path;
+
+print("script:", "hard_case_scan.sollya");
+version;
+print("samples:", n + 1);
+print("hardest input found:", worst_x);
+print("distance to rounding boundary in ulps:", worst_d);
+print("extra bits needed to decide:", extra_bits);
