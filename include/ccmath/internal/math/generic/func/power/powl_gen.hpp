@@ -185,6 +185,7 @@ namespace ccm::gen
 			constexpr long double powl_unsupported_result() noexcept
 			{ return std::numeric_limits<long double>::quiet_NaN(); }
 
+			// Incomplete powl tiers use double pow_impl and cast back. Not native long double yet.
 			constexpr long double powl_reduced_precision_double_fallback(long double base, long double exp) noexcept
 			{ return static_cast<long double>(::ccm::gen::impl::pow_impl(static_cast<double>(base), static_cast<double>(exp))); }
 
@@ -393,6 +394,7 @@ namespace ccm::gen
 			constexpr long double powl_impl(long double base, long double exp) noexcept
 			{
 #if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
+				// long double is a double alias. Same kernel as pow, not extended precision.
 				return static_cast<long double>(::ccm::gen::impl::pow_impl(static_cast<double>(base), static_cast<double>(exp)));
 #elif defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
 				return bit80::powl_calc_80bits(base, exp);
@@ -406,6 +408,7 @@ namespace ccm::gen
 		} // namespace impl
 	} // namespace internal
 
+	// Dispatch for long double pow. Native precision only on binary80. See powl_policy.hpp.
 	constexpr long double powl_gen(long double base, long double exp) noexcept
 	{ return internal::impl::powl_impl(base, exp); }
 

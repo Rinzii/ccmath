@@ -100,6 +100,9 @@ namespace ccm
 	 * @param base Base value.
 	 * @param exp Exponent value.
 	 * @return base raised to exp as long double.
+	 * @note Native long-double precision is available only when long double is x87 binary80.
+	 *       On other platforms the default path evaluates pow in double precision and casts
+	 *       the result to long double. That fallback is not native long-double accuracy yet.
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/pow
 	 */
 	constexpr long double powl(long double base, long double exp)

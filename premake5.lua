@@ -29,8 +29,8 @@ newoption {
 }
 
 newoption {
-    trigger = "ccmath-enable-reduced-precision-powl",
-    description = "Allow reduced-precision double fallback for incomplete powl tiers",
+    trigger = "ccmath-disable-reduced-precision-powl",
+    description = "Return quiet NaN from powl on non-binary80 long double instead of the default reduced-precision double fallback",
     allowed = { { "true", "Enable" }, { "false", "Disable" } },
     default = "false",
 }
@@ -62,8 +62,8 @@ function ccmath.defines()
         table.insert(defs, "CCM_CONFIG_DISABLE_ERRNO")
     end
 
-    if _ccmath_option_enabled("ccmath-enable-reduced-precision-powl", false) then
-        table.insert(defs, "CCM_CONFIG_ENABLE_REDUCED_PRECISION_POWL")
+    if _ccmath_option_enabled("ccmath-disable-reduced-precision-powl", false) then
+        table.insert(defs, "CCM_CONFIG_DISABLE_REDUCED_PRECISION_POWL")
     end
 
     return defs

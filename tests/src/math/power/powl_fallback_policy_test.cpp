@@ -97,7 +97,7 @@ TEST(PowlFallbackPolicy, UnsupportedTierPolicy)
 }
 #endif
 
-#if defined(CCM_CONFIG_ENABLE_REDUCED_PRECISION_POWL) && defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+#if !defined(CCM_CONFIG_DISABLE_REDUCED_PRECISION_POWL) && defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
 TEST(PowlFallbackPolicyCompat, Ld80GeneralStillUsesNativeKernelWhenFallbackEnabled)
 {
 	ExpectPath(3.0L, 0.25L, PowlImplementationPath::Ld80GeneralFinite);

@@ -12,15 +12,16 @@
 
 namespace ccm::config
 {
-	// When enabled, incomplete powl tiers may delegate to the double pow_impl path.
-	// This is reduced precision and must not be reported as native long-double support.
-	// Default is OFF. Set CCMATH_ENABLE_REDUCED_PRECISION_POWL=ON for source compatibility.
+	// Native long-double powl exists only when long double is x87 binary80
+	// (CCM_TYPES_LONG_DOUBLE_IS_FLOAT80). On other formats powl uses the double pow kernel
+	// by default. That path is source compatible but not native long-double precision yet.
+	// Set CCMATH_DISABLE_REDUCED_PRECISION_POWL=ON to return quiet NaN on incomplete tiers.
 	constexpr bool reduced_precision_powl_fallback_enabled() noexcept
 	{
-#if defined(CCM_CONFIG_ENABLE_REDUCED_PRECISION_POWL)
-		return true;
-#else
+#if defined(CCM_CONFIG_DISABLE_REDUCED_PRECISION_POWL)
 		return false;
+#else
+		return true;
 #endif
 	}
 

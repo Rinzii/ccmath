@@ -31,13 +31,13 @@ set(CCMATH_LIBRARY_MANIFEST_OPTION_disable_errno_DEFINE CCM_CONFIG_DISABLE_ERRNO
 set(CCMATH_LIBRARY_MANIFEST_OPTION_disable_errno_DESCRIPTION
         "Disable the use of errno in ccmath during runtime (may lead to faster evaluations but is non-standard)")
 
-set(CCMATH_LIBRARY_MANIFEST_OPTION_reduced_precision_powl_CMAKE_VAR CCMATH_ENABLE_REDUCED_PRECISION_POWL)
+set(CCMATH_LIBRARY_MANIFEST_OPTION_reduced_precision_powl_CMAKE_VAR CCMATH_DISABLE_REDUCED_PRECISION_POWL)
 set(CCMATH_LIBRARY_MANIFEST_OPTION_reduced_precision_powl_CMAKE_DEFAULT OFF)
 set(CCMATH_LIBRARY_MANIFEST_OPTION_reduced_precision_powl_CMAKE_INVERT FALSE)
-set(CCMATH_LIBRARY_MANIFEST_OPTION_reduced_precision_powl_MESON_OPTION enable_reduced_precision_powl)
-set(CCMATH_LIBRARY_MANIFEST_OPTION_reduced_precision_powl_DEFINE CCM_CONFIG_ENABLE_REDUCED_PRECISION_POWL)
+set(CCMATH_LIBRARY_MANIFEST_OPTION_reduced_precision_powl_MESON_OPTION disable_reduced_precision_powl)
+set(CCMATH_LIBRARY_MANIFEST_OPTION_reduced_precision_powl_DEFINE CCM_CONFIG_DISABLE_REDUCED_PRECISION_POWL)
 set(CCMATH_LIBRARY_MANIFEST_OPTION_reduced_precision_powl_DESCRIPTION
-        "Allow reduced-precision double fallback for incomplete powl tiers")
+        "Return quiet NaN from powl on non-binary80 long double instead of the default reduced-precision double fallback")
 
 function(ccmath_manifest_declare_library_options)
     foreach (_ccmath_manifest_key IN LISTS CCMATH_LIBRARY_MANIFEST_OPTION_KEYS)
