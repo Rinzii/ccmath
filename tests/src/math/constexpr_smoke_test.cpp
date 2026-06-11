@@ -12,6 +12,7 @@
 
 #include <ccmath/ccmath.hpp>
 
+#include <cmath>
 #include <limits>
 
 namespace

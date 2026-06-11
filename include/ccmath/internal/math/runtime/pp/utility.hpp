@@ -16,6 +16,10 @@
 #include <cstddef>
 #include <utility>
 
+#if defined(_MSC_VER) && !((defined(__GNUC__) || defined(__clang__)) && !defined(CCM_PP_FORCE_PORTABLE))
+	#include <math.h>
+#endif
+
 namespace ccm::pp
 {
 	// Per-(T, Abi) storage and operation set. Specialized by the scalar and
@@ -91,7 +95,6 @@ namespace ccm::pp
 			}
 		}
 #elif defined(_MSC_VER)
-	#include <math.h>
 	#define CCM_PP_S_UNARY(NAME, CF, CD)                                                                                                                       \
 		template <typename T>                                                                                                                                  \
 		CCM_ALWAYS_INLINE T NAME(T x)                                                                                                                          \
