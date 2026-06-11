@@ -4,7 +4,7 @@
 # this file bounds the distance from s to Ms.
 #
 # Run from the repository root:
-#   gappa tools/proofs/math/approx_doc/gappa/sin_small_eval.gappa
+#   gappa docs/approximating_functions/gappa/sin_small_eval.gappa
 
 @rnd = float<ieee_64, ne>;
 

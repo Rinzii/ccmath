@@ -2,7 +2,7 @@
 // approximation guide.
 //
 // Build and run from the repository root:
-//   c++ -std=c++17 -O2 tools/proofs/math/approx_doc/cpp/sin_small_check.cpp \
+//   c++ -std=c++17 -O2 docs/approximating_functions/cpp/sin_small_check.cpp \
 //       -lmpfr -lgmp -o sin_small_check && ./sin_small_check
 // Add -I and -L flags if MPFR is not on the default search paths.
 

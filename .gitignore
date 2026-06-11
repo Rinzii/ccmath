@@ -36,11 +36,11 @@ path-matrix-json*/
 docs/proofs/**/*.pdf
 tools/proofs/**/build/
 
-# Sollya approx_doc regenerated outputs (see tools/proofs/math/approx_doc/README.md)
-tools/proofs/math/approx_doc/logs/
-tools/proofs/math/approx_doc/data/
+# Sollya approximating_functions regenerated outputs (see docs/approximating_functions/README.md)
+docs/approximating_functions/logs/
+docs/approximating_functions/data/
 
-# Local duplicate approximation tree (canonical: docs/APPROXIMATING_FUNCTIONS.md)
+# Local duplicate approximation tree (canonical: docs/approximating_functions/APPROXIMATING_FUNCTIONS.pdf)
 docs/approximation_guide/
 .DS_Store
 __pycache__/

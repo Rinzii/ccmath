@@ -3,7 +3,7 @@
 //
 // Build and run from the repository root:
 //   c++ -std=c++17 -O2 -frounding-math \
-//       tools/proofs/math/approx_doc/cpp/directed_rounding_demo.cpp \
+//       docs/approximating_functions/cpp/directed_rounding_demo.cpp \
 //       -o directed_rounding_demo && ./directed_rounding_demo
 
 #include <cfenv>

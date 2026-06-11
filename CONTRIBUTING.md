@@ -1,5 +1,8 @@
 # Contributing to CCMath
 
+For help understanding how to implement elementary functions in CCMath, see
+[Approximating Functions: A Practical Guide to Sollya and Function Implementation](docs/approximating_functions/APPROXIMATING_FUNCTIONS.pdf).
+
 PRs go to the `dev` branch. Bug reports and design questions belong in
 [Issues](https://github.com/Rinzii/ccmath/issues) or
 [Discord](https://discord.gg/p3mVxAbdmc).

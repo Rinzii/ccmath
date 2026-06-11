@@ -5,7 +5,7 @@ prec = 300!;
 display = decimal!;
 rationalmode = off!;
 
-data_path = "tools/proofs/math/approx_doc/data/hard_case_scan.dat";
+data_path = "docs/approximating_functions/data/hard_case_scan.dat";
 
 n = 4096!;
 worst_d = 1;

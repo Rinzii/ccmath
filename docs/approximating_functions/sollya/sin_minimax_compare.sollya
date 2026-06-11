@@ -4,7 +4,7 @@ prec = 200!;
 display = decimal!;
 rationalmode = off!;
 
-data_path = "tools/proofs/math/approx_doc/data/sin_minimax_error.dat";
+data_path = "docs/approximating_functions/data/sin_minimax_error.dat";
 
 I = [-pi / 2; pi / 2];
 n = 200!;

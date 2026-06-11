@@ -4,7 +4,7 @@ prec = 240!;
 display = decimal!;
 rationalmode = off!;
 
-data_path = "tools/proofs/math/approx_doc/data/sin_small_error.dat";
+data_path = "docs/approximating_functions/data/sin_small_error.dat";
 
 I = [-1 / 16; 1 / 16];
 n = 200!;

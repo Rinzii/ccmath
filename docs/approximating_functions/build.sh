@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Build docs/APPROXIMATING_FUNCTIONS.pdf from its LaTeX source.
+# Build docs/approximating_functions/APPROXIMATING_FUNCTIONS.pdf from its LaTeX source.
 #
 # Run from the repository root:
-#   bash docs/build_approx_doc.sh
+#   bash docs/approximating_functions/build.sh
 #
 # Options:
 #   --regen-data   Re-run Sollya scripts to refresh data files before building.
@@ -11,13 +11,14 @@
 
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-DOCS_DIR="$REPO_ROOT/docs"
-BUILD_DIR="$REPO_ROOT/out/docs"
-TEX="$DOCS_DIR/APPROXIMATING_FUNCTIONS.tex"
-PDF="$DOCS_DIR/APPROXIMATING_FUNCTIONS.pdf"
-BUILD_PDF="$BUILD_DIR/APPROXIMATING_FUNCTIONS.pdf"
-SOLLYA_DIR="$REPO_ROOT/tools/proofs/math/approx_doc/sollya"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+DOC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BUILD_DIR="$REPO_ROOT/out/docs/approximating_functions"
+TEX="$DOC_DIR/APPROXIMATING_FUNCTIONS.tex"
+PDF="$DOC_DIR/APPROXIMATING_FUNCTIONS.pdf"
+SOLLYA_DIR="$DOC_DIR/sollya"
+DATA_DIR="$DOC_DIR/data"
+LOGS_DIR="$DOC_DIR/logs"
 
 REGEN_DATA=0
 DO_CLEAN=0
@@ -40,7 +41,7 @@ done
 # ---- optional: regenerate Sollya data files ---------------------------
 # Figures load the generated data files, which are not checked in, so a
 # fresh checkout generates them on the first build.
-if [[ ! -f "$REPO_ROOT/tools/proofs/math/approx_doc/data/sin_taylor_error.dat" ]]; then
+if [[ ! -f "$DATA_DIR/sin_taylor_error.dat" ]]; then
   echo "==> Sollya data files missing; regenerating."
   REGEN_DATA=1
 fi
@@ -52,8 +53,7 @@ if [[ $REGEN_DATA -eq 1 ]]; then
   fi
   echo "==> Regenerating Sollya data files..."
   cd "$REPO_ROOT"
-  mkdir -p "$REPO_ROOT/tools/proofs/math/approx_doc/data" \
-           "$REPO_ROOT/tools/proofs/math/approx_doc/logs"
+  mkdir -p "$DATA_DIR" "$LOGS_DIR"
   for script in \
       sin_taylor_degree_error \
       sin_taylor_error \
@@ -70,7 +70,7 @@ if [[ $REGEN_DATA -eq 1 ]]; then
     # other codes as failures.
     status=0
     sollya "$SOLLYA_DIR/${script}.sollya" \
-      > "$REPO_ROOT/tools/proofs/math/approx_doc/logs/${script}.log" 2>&1 \
+      > "$LOGS_DIR/${script}.log" 2>&1 \
       || status=$?
     if [[ $status -ne 0 && $status -ne 3 ]]; then
       echo "error: sollya failed (exit $status) for ${script}.sollya" >&2
@@ -88,7 +88,7 @@ if [[ $REGEN_DATA -eq 1 ]]; then
       log2_core_poly_error \
       log2_core_points \
       log2_core_table; do
-    if [[ ! -s "$REPO_ROOT/tools/proofs/math/approx_doc/data/${dat}.dat" ]]; then
+    if [[ ! -s "$DATA_DIR/${dat}.dat" ]]; then
       echo "error: ${dat}.dat was not generated; check the logs directory" >&2
       exit 1
     fi
@@ -102,31 +102,46 @@ mkdir -p "$BUILD_DIR"
 echo "==> Building APPROXIMATING_FUNCTIONS.pdf..."
 
 # Figures read generated data files by paths relative to the repo root,
-# so the TeX run must start there.  Aux files land in out/docs; the PDF
-# is copied next to the .tex source afterward.
+# so the TeX run must start there.  The PDF and bibliography stay in
+# docs/approximating_functions/; other aux files land in out/docs/.
 cd "$REPO_ROOT"
-export BIBINPUTS="$DOCS_DIR:"
+export BIBINPUTS="$DOC_DIR//:"
+export BSTINPUTS="$DOC_DIR//:"
+
+if [[ ! -f "$DOC_DIR/ACM-Reference-Format.bst" ]]; then
+  bst_src="$(kpsewhich ACM-Reference-Format.bst 2>/dev/null || true)"
+  if [[ -z "$bst_src" ]]; then
+    echo "error: ACM-Reference-Format.bst not found in docs/approximating_functions/ or TeX Live" >&2
+    echo "       install the acmart package, or add the .bst file beside the .tex source" >&2
+    exit 1
+  fi
+  cp "$bst_src" "$DOC_DIR/ACM-Reference-Format.bst"
+fi
 
 if command -v latexmk &>/dev/null; then
   latexmk \
     -pdf \
     -bibtex \
     -interaction=nonstopmode \
-    -outdir="$BUILD_DIR" \
+    -auxdir="$BUILD_DIR" \
+    -outdir="$DOC_DIR" \
     "$TEX"
 else
   # Manual fallback: pdflatex -> bibtex -> pdflatex x2
+  build_pdf="$BUILD_DIR/APPROXIMATING_FUNCTIONS.pdf"
   pdflatex -interaction=nonstopmode -output-directory="$BUILD_DIR" "$TEX"
   (cd "$BUILD_DIR" && bibtex "$(basename "${TEX%.tex}")")
   pdflatex -interaction=nonstopmode -output-directory="$BUILD_DIR" "$TEX"
   pdflatex -interaction=nonstopmode -output-directory="$BUILD_DIR" "$TEX"
+  if [[ -f "$build_pdf" ]]; then
+    mv "$build_pdf" "$PDF"
+  fi
 fi
 
-if [[ -f "$BUILD_PDF" ]]; then
-  cp "$BUILD_PDF" "$PDF"
-  echo "==> Output: docs/APPROXIMATING_FUNCTIONS.pdf"
+if [[ -f "$PDF" ]]; then
+  echo "==> Output: docs/approximating_functions/APPROXIMATING_FUNCTIONS.pdf"
 else
-  echo "error: PDF not produced; check out/docs for logs" >&2
+  echo "error: PDF not produced; check out/docs/approximating_functions for logs" >&2
   exit 1
 fi
 
