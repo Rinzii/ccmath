@@ -13,6 +13,7 @@
 #include "ccmath/internal/math/runtime/pp/declaration.hpp"
 #include "ccmath/internal/math/runtime/pp/utility.hpp"
 #include "ccmath/internal/predef/attributes/always_inline.hpp"
+#include "ccmath/internal/predef/compiler_suppression/gcc_compiler_suppression.hpp"
 
 #include <array>
 #include <cstddef>
@@ -57,6 +58,12 @@
 namespace ccm::pp
 {
 #if CCM_PP_HAS_VECTOR_EXT
+	// Wide GNU vector types use the AVX ABI on x86 when N*sizeof(T) > 16. TUs built
+	// without -mavx still need VecAbi<N> to compile. Use CCM_DISABLE_GCC_WARNING /
+	// CCM_RESTORE_GCC_WARNING from gcc_compiler_suppression.hpp (stacked push/pop).
+	#if !defined(__AVX__)
+	CCM_DISABLE_GCC_WARNING(-Wpsabi)
+	#endif
 	namespace detail
 	{
 		// A native vector of M elements of type U.
@@ -519,6 +526,9 @@ namespace ccm::pp
 			return s;
 		}
 	};
+	#if !defined(__AVX__)
+	CCM_RESTORE_GCC_WARNING()
+	#endif
 #endif // CCM_PP_HAS_VECTOR_EXT
 } // namespace ccm::pp
 

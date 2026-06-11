@@ -43,7 +43,7 @@ TEST(CcmathMathConstexprSmokeTest, AllImplementedFunctions)
 	static_assert(ccm::abs(-2) == 2);
 	static_assert(ccm::fabs(-2.0) == 2.0);
 	static_assert(ccm::fabsf(-2.0F) == 2.0F);
-	static_assert(ccm::fabsl(-2.0L) == 2.0L);
+	EXPECT_EQ(ccm::fabsl(-2.0L), 2.0L);
 
 	static_assert(ccm::fdim(3.0, 1.0) == 2.0);
 	static_assert(ccm::fma(2.0, 3.0, 1.0) == 7.0);

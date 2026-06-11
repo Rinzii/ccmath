@@ -190,7 +190,7 @@ namespace
 		alignas(64) std::int32_t a[16], b[16];
 		for (int i = 0; i < N; ++i)
 		{
-			a[i] = (i * 2654435761u) & 0x7fffffff;
+			a[i] = static_cast<std::int32_t>((static_cast<std::uint32_t>(i) * 2654435761u) & 0x7fffffffu);
 			b[i] = (i % 5) + 1; // 1..5, safe shift / nonzero modulo
 		}
 		V va(a, element_aligned);
