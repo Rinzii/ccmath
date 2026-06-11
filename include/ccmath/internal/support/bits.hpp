@@ -21,6 +21,8 @@
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
 
+#include <climits>
+#include <cstddef>
 #include <cstdint>
 #include <type_traits>
 
@@ -40,13 +42,34 @@ namespace ccm::support
 		template <typename To, typename From>
 		constexpr To bit_cast_float80_constexpr(const From & from) noexcept
 		{
-			if constexpr (std::is_same_v<To, long double> || std::is_same_v<From, long double>) { return __builtin_bit_cast(To, from); }
+			// Rebuilding a long double from its integer storage is safe in a constant expression: every
+			// bit of the result is sourced from the determinate integer, so the intrinsic handles it.
+			if constexpr (std::is_same_v<To, long double>) { return __builtin_bit_cast(To, from); }
+#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+			else
+			{
+				// The other direction cannot go through a single __builtin_bit_cast. An x87 80-bit long
+				// double carries indeterminate padding bytes, and those bytes may not initialize an
+				// integer in a constant expression. To inspect the underlying bits we bit-cast the value
+				// into a byte array matching its exact memory layout, then assemble the storage integer
+				// from just the 80 bits the format actually uses, never touching the padding.
+				struct byte_buffer
+				{
+					unsigned char bytes[sizeof(From)];
+				};
+				const byte_buffer buffer = __builtin_bit_cast(byte_buffer, from);
 
-			unsigned char buffer[sizeof(From)]{};
-			__builtin_memcpy(buffer, &from, sizeof(From));
-			To to{};
-			__builtin_memcpy(&to, buffer, sizeof(To));
-			return to;
+				constexpr std::size_t used_bytes = 10; // 1 sign + 15 exponent + 64 significand bits, low end first
+				To to{};
+				for (std::size_t i = 0; i < used_bytes; ++i) { to |= static_cast<To>(buffer.bytes[i]) << (i * CHAR_BIT); }
+				return to;
+			}
+#else
+			else
+			{
+				return __builtin_bit_cast(To, from);
+			}
+#endif
 		}
 	} // namespace detail
 
