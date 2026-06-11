@@ -11,6 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/compare/isnan.hpp"
+#include "ccmath/internal/support/fp/fp_bits.hpp"
 
 #include <type_traits>
 

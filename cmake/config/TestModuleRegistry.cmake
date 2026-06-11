@@ -12,6 +12,8 @@ set(CCMATH_UNIT_MODULE_nearest ccmath-simple-nearest)
 set(CCMATH_UNIT_MODULE_power ccmath-simple-power)
 set(CCMATH_UNIT_MODULE_trig ccmath-simple-trigonometric)
 set(CCMATH_UNIT_MODULE_ext ccmath-simple-ext)
+set(CCMATH_UNIT_MODULE_ext_EXCLUDE
+        src/ext/constexpr_smoke_test.cpp)
 
 set(CCMATH_UNIT_MATH_MODULE_ORDER
         basic

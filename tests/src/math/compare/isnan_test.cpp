@@ -10,15 +10,15 @@
 
 #include <gtest/gtest.h>
 
-#include <ccmath/ccmath.hpp>
+#include <ccmath/math/compare/isnan.hpp>
 
 #include <cmath>
 #include <limits>
 
 TEST(CcmathCompareTests, IsNan)
 {
-	// Test that isnan is static_assert-able
-	static_assert(ccm::isnan(1.0) == false, "isnan has failed testing that it is static_assert-able!");
+	static_assert(!ccm::isnan(1.0));
+	static_assert(ccm::isnan(std::numeric_limits<double>::quiet_NaN()));
 
 	EXPECT_EQ(ccm::isnan(1.0), std::isnan(1.0));
 	EXPECT_EQ(ccm::isnan(0.0), std::isnan(0.0));

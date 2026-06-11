@@ -10,8 +10,9 @@
 
 #pragma once
 
+#include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/support/floating_point_traits.hpp"
 #include "ccmath/math/basic/fabs.hpp"
-#include "ccmath/math/compare/signbit.hpp"
 
 #include <type_traits>
 
@@ -29,8 +30,9 @@ namespace ccm::ext
 	[[nodiscard]] constexpr T chgsign(T x, T y) noexcept
 	{
 		const T magnitude = ::ccm::abs(x);
+		const auto y_bits = ::ccm::support::bit_cast<::ccm::support::float_bits_t<T>>(y);
 
-		if (::ccm::signbit(y)) { return -magnitude; }
+		if ((y_bits & ::ccm::support::sign_mask_v<T>) != 0) { return -magnitude; }
 
 		return magnitude;
 	}

@@ -11,6 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/compare/signbit.hpp"
+#include "ccmath/internal/math/generic/func/compare/isnan.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/floating_point_traits.hpp"
 

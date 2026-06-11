@@ -38,6 +38,14 @@ ccmath_add_command_gtest(ccmath-simple-constexpr-fmaf-upward
         LABELS simple
         COMPILE_DEFINITIONS CCM_CONSTEXPR_ROUNDING_MODE=FE_UPWARD)
 
+ccmath_add_gtest_suite(ccmath-simple-math-constexpr
+        SOURCES ../src/math/constexpr_smoke_test.cpp
+        LABELS simple)
+
+ccmath_add_gtest_suite(ccmath-simple-ext-constexpr
+        SOURCES ../src/ext/constexpr_smoke_test.cpp
+        LABELS simple)
+
 if (CMAKE_CXX_STANDARD GREATER_EQUAL 20)
     set(_lerp_source ../src/math/misc/lerp_test_std.cpp)
 else ()
