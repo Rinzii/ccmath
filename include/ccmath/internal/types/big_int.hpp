@@ -215,12 +215,12 @@ namespace ccm::types
 				word lo_digit		= step1;
 				word hi_digit		= step4;
 				const word no_carry = 0;
-				word carry;
-				word _; // Placeholder variable for add_with_carry
-				lo_digit = ccm::support::add_with_carry<word>(lo_digit, shiftl(step2), no_carry, carry);
-				hi_digit = ccm::support::add_with_carry<word>(hi_digit, shiftr(step2), carry, _);
-				lo_digit = ccm::support::add_with_carry<word>(lo_digit, shiftl(step3), no_carry, carry);
-				hi_digit = ccm::support::add_with_carry<word>(hi_digit, shiftr(step3), carry, _);
+				word carry			= 0;
+				word _				= 0; // Placeholder variable for add_with_carry
+				lo_digit			= ccm::support::add_with_carry<word>(lo_digit, shiftl(step2), no_carry, carry);
+				hi_digit			= ccm::support::add_with_carry<word>(hi_digit, shiftr(step2), carry, _);
+				lo_digit			= ccm::support::add_with_carry<word>(lo_digit, shiftl(step3), no_carry, carry);
+				hi_digit			= ccm::support::add_with_carry<word>(hi_digit, shiftr(step3), carry, _);
 				return DoubleWide<word>(lo_digit, hi_digit);
 			}
 		}
