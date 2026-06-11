@@ -11,169 +11,116 @@
 #pragma once
 
 #include "ccmath/internal/predef/attributes/always_inline.hpp"
-#include "ccmath/internal/support/bits.hpp"
-#include "ccmath/internal/support/floating_point_traits.hpp"
 
-// ReSharper disable once CppUnusedIncludeDirective
-#include "assume_aligned.hpp"
-#include "fwddecl.hpp"
-#include "simd_config.hpp"
+#include <cstddef>
+#include <cstdint>
+#include <type_traits>
+
+// Load/store flags. The C++26 surface spells these as simd_flags<...> with the
+// simd_flag_default / simd_flag_aligned / simd_flag_overaligned objects; the
+// Parallelism TS spells the equivalents element_aligned / vector_aligned. Both
+// names are provided. An aligned flag promises the pointer is suitably aligned,
+// which is communicated to the optimizer (see flags_align_request /
+// assume_aligned_ptr) so the load/store can use aligned moves and so a
+// surrounding loop vectorizes more readily.
 
 namespace ccm::pp
 {
 	namespace detail
 	{
-		struct LoadStoreTag
+		struct flag_aligned
 		{
 		};
-
-		struct Convert : LoadStoreTag
-		{
-		};
-
-		template <typename T>
-		struct ConvertTo : LoadStoreTag
-		{
-			using type = T;
-		};
-
-		struct Aligned : LoadStoreTag
-		{
-			template <typename T, typename U>
-			CCM_SIMD_INTRINSIC static constexpr U *adjust_pointer(U *ptr)
-			{ return static_cast<U *>(pp::assume_aligned<simd_alignment_v<T, U>>(ptr)); }
-		};
-
 		template <std::size_t N>
-		struct Overaligned : LoadStoreTag
-		{
-			static_assert(support::has_single_bit(N));
-
-			template <typename, typename U>
-			CCM_SIMD_INTRINSIC static constexpr U *adjust_pointer(U *ptr)
-			{ return static_cast<U *>(pp::assume_aligned<N>(ptr)); }
-		};
-
-		struct Streaming : LoadStoreTag
+		struct flag_overaligned
 		{
 		};
+	} // namespace detail
 
-		template <int L1, int L2>
-		struct Prefetch : LoadStoreTag
+	template <typename... Flags>
+	struct simd_flags;
+
+	namespace detail
+	{
+		template <typename F>
+		struct overalign_value : std::integral_constant<std::size_t, 0>
 		{
-			template <typename, typename U>
-			CCM_ALWAYS_INLINE static U *adjust_pointer(U *ptr)
-			{
-				// one read: 0, 0
-				// L1: 0, 1
-				// L2: 0, 2
-				// L3: 0, 3
-				// (exclusive cache line) for writing: 1, 0 / 1, 1
-				/*          constexpr int write = 1;
-							constexpr int level = 0-3;
-				__builtin_prefetch(ptr, write, level)
-				_mm_prefetch(reinterpret_cast<char const*>(ptr), _MM_HINT_T0);
-				_mm_prefetch(reinterpret_cast<char const*>(ptr), _MM_HINT_T1);
-				_mm_prefetch(reinterpret_cast<char const*>(ptr), _MM_HINT_T2);
-				_mm_prefetch(reinterpret_cast<char const*>(ptr), _MM_HINT_ET0);
-				_mm_prefetch(reinterpret_cast<char const*>(ptr), _MM_HINT_ET1);
-				_mm_prefetch(reinterpret_cast<char const*>(ptr), _MM_HINT_NTA);*/
-				return ptr;
-			}
+		};
+		template <std::size_t N>
+		struct overalign_value<flag_overaligned<N>> : std::integral_constant<std::size_t, N>
+		{
 		};
 
-		template <typename T>
-		using is_loadstore_tag = std::is_base_of<LoadStoreTag, T>;
+		// Alignment a flag set promises for a load/store:
+		//   0  -> no promise (treat as unaligned)
+		//   1  -> the simd object's natural alignment
+		//   >1 -> an explicit overalignment N
+		template <typename Flags>
+		struct flags_align_request : std::integral_constant<std::size_t, 0>
+		{
+		};
+		template <typename... Fs>
+		struct flags_align_request<simd_flags<Fs...>>
+			: std::integral_constant<std::size_t,
+									 ((std::size_t{ 0 } + ... + overalign_value<Fs>::value) != 0)
+										 ? (std::size_t{ 0 } + ... + overalign_value<Fs>::value)
+										 : ((std::is_same<Fs, flag_aligned>::value || ...) ? std::size_t{ 1 } : std::size_t{ 0 })>
+		{
+		};
+
+		// Communicate a known alignment to the optimizer. The pointer value is
+		// unchanged; the compiler may then use aligned moves / assume alignment.
+		template <std::size_t A, typename T>
+		CCM_ALWAYS_INLINE T const *assume_aligned_ptr(T const *p)
+		{
+#if defined(__clang__) || defined(__GNUC__)
+			return static_cast<T const *>(__builtin_assume_aligned(p, A));
+#elif defined(_MSC_VER)
+			__assume((reinterpret_cast<std::uintptr_t>(p) & (A - 1)) == 0);
+			return p;
+#else
+			return p;
+#endif
+		}
+		template <std::size_t A, typename T>
+		CCM_ALWAYS_INLINE T *assume_aligned_ptr(T *p)
+		{
+#if defined(__clang__) || defined(__GNUC__)
+			return static_cast<T *>(__builtin_assume_aligned(p, A));
+#elif defined(_MSC_VER)
+			__assume((reinterpret_cast<std::uintptr_t>(p) & (A - 1)) == 0);
+			return p;
+#else
+			return p;
+#endif
+		}
 	} // namespace detail
 
 	template <typename... Flags>
 	struct simd_flags
 	{
-		static_assert((detail::is_loadstore_tag<Flags>::value && ...), "All Flags must derive from LoadStoreTag");
-
-		// ReSharper disable once CppMemberFunctionMayBeStatic
-		CCM_CONSTEVAL bool is_equal(simd_flags) const { return true; }
-
-		template <typename... Other>
-		CCM_CONSTEVAL bool is_equal([[maybe_unused]] simd_flags<Other...> other) const
-		{ return std::is_same_v<simd_flags<>, decltype(xor_flags(other))>; }
-
-		template <typename... Other>
-		CCM_CONSTEVAL bool test(simd_flags<Other...> other) const noexcept
-		{ return other.is_equal(and_flags(other)); }
-
-		friend CCM_CONSTEVAL auto operator|(simd_flags, simd_flags<>) { return simd_flags{}; }
-
-		template <typename T0, typename... More>
-		friend CCM_CONSTEVAL auto operator|(simd_flags, simd_flags<T0, More...>)
-		{
-			if constexpr ((std::is_same_v<Flags, T0> || ...)) { return simd_flags<Flags...>{} | simd_flags<More...>{}; }
-			else
-			{
-				return simd_flags<Flags..., T0>{} | simd_flags<More...>{};
-			}
-		}
-
-		// ReSharper disable once CppMemberFunctionMayBeStatic
-		CCM_CONSTEVAL auto and_flags(simd_flags<>) const { return simd_flags<>{}; }
-
-		template <typename T0, typename... More>
-		CCM_CONSTEVAL auto and_flags(simd_flags<T0, More...>) const
-		{
-			if constexpr ((std::is_same_v<Flags, T0> || ...)) { return simd_flags<T0>{} | (simd_flags{}.and_flags(simd_flags<More...>{})); }
-			else
-			{
-				return simd_flags{}.and_flags(simd_flags<More...>{});
-			}
-		}
-
-		CCM_CONSTEVAL auto xor_flags(simd_flags<>) const { return simd_flags{}; }
-
-		template <typename T0, typename... More>
-		CCM_CONSTEVAL auto xor_flags(simd_flags<T0, More...>) const
-		{
-			if constexpr ((std::is_same_v<Flags, T0> || ...))
-			{
-				constexpr auto removed = (std::conditional_t<std::is_same_v<Flags, T0>, simd_flags<>, simd_flags<Flags>>{} | ...);
-				return removed.xor_flags(simd_flags<More...>{});
-			}
-			else
-			{
-				return (simd_flags{} | simd_flags<T0>{}).xor_flags(simd_flags<More...>{});
-			}
-		}
-
-		template <typename F0, typename Tp, typename Ptr>
-		static constexpr void apply_adjust_pointer(Ptr &ptr)
-		{
-			if constexpr (std::is_same_v<decltype(F0::template adjust_pointer<Tp>(ptr)), void>) { ptr = F0::template adjust_pointer<Tp>(ptr); }
-		}
-
-		template <typename Tp, typename Up>
-		static constexpr Up *adjust_pointer(Up *ptr)
-		{
-			(apply_adjust_pointer<Flags, Tp>(ptr), ...);
-			return ptr;
-		}
 	};
 
-	// [simd.flags]
-	inline constexpr simd_flags<> simd_flag_default;
-
-	inline constexpr simd_flags<detail::Convert> simd_flag_convert;
-
-	inline constexpr simd_flags<detail::Aligned> simd_flag_aligned;
-
-	template <std::size_t N>
-	requires(support::has_single_bit(N)) inline constexpr simd_flags<detail::Overaligned<N>> simd_flag_overaligned;
-
-	// extensions
 	template <typename T>
-	inline constexpr simd_flags<detail::ConvertTo<T>> simd_flag_convert_to;
+	struct is_simd_flag_type : std::false_type
+	{
+	};
+	template <typename... Flags>
+	struct is_simd_flag_type<simd_flags<Flags...>> : std::true_type
+	{
+	};
+	template <typename T>
+	inline constexpr bool is_simd_flag_type_v = is_simd_flag_type<T>::value;
 
-	inline constexpr simd_flags<detail::Streaming> simd_flag_streaming;
+	// [simd.flags]
+	inline constexpr simd_flags<> simd_flag_default{};
+	inline constexpr simd_flags<detail::flag_aligned> simd_flag_aligned{};
+	template <std::size_t N>
+	inline constexpr simd_flags<detail::flag_overaligned<N>> simd_flag_overaligned{};
 
-	template <int L1, int L2>
-	inline constexpr simd_flags<detail::Prefetch<L1, L2>> simd_flag_prefetch;
-
+	// Parallelism TS spellings.
+	using element_aligned_tag = simd_flags<>;
+	using vector_aligned_tag  = simd_flags<detail::flag_aligned>;
+	inline constexpr element_aligned_tag element_aligned{};
+	inline constexpr vector_aligned_tag vector_aligned{};
 } // namespace ccm::pp

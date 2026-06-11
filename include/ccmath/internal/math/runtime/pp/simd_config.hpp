@@ -20,13 +20,15 @@
 	#define CCMATH_SIMD_HAVE_MMX 0
 #endif
 
-#if defined __SSE__ || defined __x86_64__
+// GNU/Clang/ICX/NVHPC spell these __SSE__ / __SSE2__ / __x86_64__; MSVC does not,
+// so also recognise its _M_X64 (x64 implies SSE2) and _M_IX86_FP levels.
+#if defined __SSE__ || defined __x86_64__ || defined _M_X64 || (defined(_M_IX86_FP) && _M_IX86_FP >= 1)
 	#define CCMATH_SIMD_HAVE_SSE 1
 #else
 	#define CCMATH_SIMD_HAVE_SSE 0
 #endif
 
-#if defined __SSE2__ || defined __x86_64__
+#if defined __SSE2__ || defined __x86_64__ || defined _M_X64 || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
 	#define CCMATH_SIMD_HAVE_SSE2 1
 #else
 	#define CCMATH_SIMD_HAVE_SSE2 0
