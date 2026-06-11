@@ -25,7 +25,7 @@ if get_option('disable_errno')
   _ccmath_defines += '-DCCM_CONFIG_DISABLE_ERRNO'
 endif
 if get_option('disable_reduced_precision_powl')
-    _ccmath_defines += '-DCCM_CONFIG_DISABLE_REDUCED_PRECISION_POWL'
+  _ccmath_defines += '-DCCM_CONFIG_DISABLE_REDUCED_PRECISION_POWL'
 endif
 
 _ccmath_simd_fma_probe = '''

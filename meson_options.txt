@@ -3,4 +3,4 @@
 
 option('enable_runtime_simd', type: 'boolean', value: true, description: 'Enable SIMD optimization for runtime evaluation (does not affect compile-time)')
 option('disable_errno', type: 'boolean', value: false, description: 'Disable the use of errno in ccmath during runtime (may lead to faster evaluations but is non-standard)')
-option('disable_reduced_precision_powl', type : 'boolean', value : false, description : 'Return quiet NaN from powl on non-binary80 long double instead of the default reduced-precision double fallback')
+option('disable_reduced_precision_powl', type: 'boolean', value: false, description: 'Return quiet NaN from powl on non-binary80 long double instead of the default reduced-precision double fallback')

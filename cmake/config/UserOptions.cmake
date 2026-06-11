@@ -99,6 +99,16 @@ option(CCMATH_DISABLE_SVML_USAGE
         "Disable the use of SVML functions in ccmath (if supported by compiler)"
         OFF)
 
+# CCMATH_SIMD_PREFER:
+# Opt-in: choose which SIMD instruction set ccmath builds compile for.
+#   DEFAULT - use whatever the toolchain / -march already selects (no extra flag).
+#   LOWEST  - the most portable baseline for the architecture (SSE2 on x86_64, NEON on AArch64).
+#   HIGHEST - the best instruction set in ccmath's supported ladder the compiler can emit (up to AVX2; AVX-512 excluded).
+# Defaults to DEFAULT (does nothing); downstream consumers may enable or disable it.
+set(CCMATH_SIMD_PREFER "DEFAULT" CACHE STRING
+        "Preferred SIMD instruction set for ccmath builds: DEFAULT, LOWEST or HIGHEST")
+set_property(CACHE CCMATH_SIMD_PREFER PROPERTY STRINGS DEFAULT LOWEST HIGHEST)
+
 # CCMATH_DISABLE_CMAKE_FEATURE_CHECKS:
 # Disable cmakes ability to check for certain features at the CMake level.
 option(CCMATH_DISABLE_CMAKE_FEATURE_CHECKS
