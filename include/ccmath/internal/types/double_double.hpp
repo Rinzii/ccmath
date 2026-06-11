@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "ccmath/internal/math/generic/builtins/basic/fma.hpp"
+#include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/fp/fma.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/multiply_add.hpp"
@@ -28,8 +28,11 @@ namespace ccm
 		constexpr double exact_fma(double x, double y, double z) noexcept
 		{
 			if (support::is_constant_evaluated()) { return support::fp::generic_fma(x, y, z); }
-			if constexpr (ccm::builtin::has_runtime_fma<double>) { return ccm::builtin::fma_rt(x, y, z); }
+#if CCM_HAS_BUILTIN(__builtin_fma)
+			return __builtin_fma(x, y, z);
+#else
 			return support::fp::generic_fma(x, y, z);
+#endif
 		}
 
 		// The output of Dekker's FastTwoSum algorithm is correct, i.e.:

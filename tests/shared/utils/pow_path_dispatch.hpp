@@ -108,13 +108,10 @@ namespace ccm::test::pow_path
 			return ccm::gen::pow_gen(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
 #endif
 		case validation_path::runtime_builtin:
-			// runtime_pow is only defined where has_runtime_pow<T> holds (GCC/Clang). On other
+			// pow_rt is only defined where has_runtime_pow<T> holds (GCC/Clang). On other
 			// toolchains this path reports unsupported via path_is_supported, but the switch must
 			// still compile, so fall back to the generic kernel in the discarded branch.
-			if constexpr (ccm::builtin::has_runtime_pow<T>)
-			{
-				return ccm::builtin::runtime_pow(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
-			}
+			if constexpr (ccm::builtin::has_runtime_pow<T>) { return ccm::builtin::pow_rt(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent)); }
 			else
 			{
 				return ccm::gen::pow_gen(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
