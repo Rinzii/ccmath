@@ -89,6 +89,29 @@ namespace ccm::gen::impl
 			0x1p0, 0x1.62e42fefa39efp-7, 0x1.ebfbdff82a23ap-15, 0x1.c6b08d7076268p-23, 0x1.3b2ad33f8b48bp-31, 0x1.5d870c4d84445p-40,
 		};
 
+		// Degree-5 double-double minimax for log2(1 + x)/x on the twice-reduced range.
+		//   P = fpminimax(log2(1 + x)/x, 5, [|DD...|], [-0x1.3ffcp-15, 0x1.3e3dp-15])
+		//   dirtyinfnorm(log2(1 + x)/x - P) = 0x1.8be5...p-96
+		inline constexpr std::array<DoubleDouble, 6> POW_DD_LOG2P_COEFFS = {
+			DoubleDouble{ 0x1.71547652b82fep0, 0x1.777d0ffda25ep-56 },	  DoubleDouble{ -0x1.71547652b82fep-1, -0x1.777d101cf0a84p-57 },
+			DoubleDouble{ 0x1.ec709dc3a03fdp-2, 0x1.ce04b5140d867p-56 },  DoubleDouble{ -0x1.71547652b82fbp-2, 0x1.137b47e635be5p-56 },
+			DoubleDouble{ 0x1.2776c516a92a2p-2, -0x1.b5a30b3bdb318p-58 }, DoubleDouble{ -0x1.ec70af1929ca6p-3, 0x1.2d2fbd081e657p-57 },
+		};
+
+		// Degree-9 double-double minimax for 2^(x/64), dirtyinfnorm ~ 2^-106.
+		inline constexpr std::array<DoubleDouble, 10> POW_DD_EXP2_COEFFS = {
+			DoubleDouble{ 0x1p0, 0 },
+			DoubleDouble{ 0x1.62e42fefa39efp-7, 0x1.abc9e3b398024p-62 },
+			DoubleDouble{ 0x1.ebfbdff82c58fp-15, -0x1.5e43a5429bddbp-69 },
+			DoubleDouble{ 0x1.c6b08d704a0cp-23, -0x1.d33162491268fp-77 },
+			DoubleDouble{ 0x1.3b2ab6fba4e77p-31, 0x1.4fb32d240a14ep-86 },
+			DoubleDouble{ 0x1.5d87fe78a6731p-40, 0x1.e84e916be83ep-97 },
+			DoubleDouble{ 0x1.430912f86bfb8p-49, -0x1.9a447bfddc5e6p-103 },
+			DoubleDouble{ 0x1.ffcbfc588ded9p-59, -0x1.31a55719de47fp-113 },
+			DoubleDouble{ 0x1.62c034beb8339p-68, -0x1.0ba57164eb36bp-122 },
+			DoubleDouble{ 0x1.b5251ff97bee1p-78, -0x1.8483eabd9642dp-132 },
+		};
+
 		// Exact-as-possible integer powers via double-double exponentiation by squaring.
 		// Used for small integer exponents, where the result can land within one ULP of a
 		// power of two (or be exactly representable) and the log2/exp2 reconstruction cannot
@@ -200,16 +223,13 @@ namespace ccm::gen::impl
 			const double dx2_hi			   = r2_prod.hi - 1.0; // Exact by Sterbenz, r2_prod.hi ~ 1
 			const DoubleDouble dx2		   = ccm::types::exact_add(dx2_hi, r2_prod.lo);
 
-			// Degree-5 double-double minimax for log2(1 + x)/x on the twice-reduced range.
-			//   P = fpminimax(log2(1 + x)/x, 5, [|DD...|], [-0x1.3ffcp-15, 0x1.3e3dp-15])
-			//   dirtyinfnorm(log2(1 + x)/x - P) = 0x1.8be5...p-96
-			constexpr std::array<DoubleDouble, 6> COEFFS = {
-				DoubleDouble{ 0x1.71547652b82fep0, 0x1.777d0ffda25ep-56 },	  DoubleDouble{ -0x1.71547652b82fep-1, -0x1.777d101cf0a84p-57 },
-				DoubleDouble{ 0x1.ec709dc3a03fdp-2, 0x1.ce04b5140d867p-56 },  DoubleDouble{ -0x1.71547652b82fbp-2, 0x1.137b47e635be5p-56 },
-				DoubleDouble{ 0x1.2776c516a92a2p-2, -0x1.b5a30b3bdb318p-58 }, DoubleDouble{ -0x1.ec70af1929ca6p-3, 0x1.2d2fbd081e657p-57 },
-			};
-
-			const DoubleDouble p = ::ccm::support::polyeval(dx2, COEFFS[0], COEFFS[1], COEFFS[2], COEFFS[3], COEFFS[4], COEFFS[5]);
+			const DoubleDouble p = ::ccm::support::polyeval(dx2,
+															POW_DD_LOG2P_COEFFS[0],
+															POW_DD_LOG2P_COEFFS[1],
+															POW_DD_LOG2P_COEFFS[2],
+															POW_DD_LOG2P_COEFFS[3],
+															POW_DD_LOG2P_COEFFS[4],
+															POW_DD_LOG2P_COEFFS[5]);
 
 			// log2(1 + dx2) ~ dx2 * P(dx2)
 			const DoubleDouble log2_1p = quick_mult(dx2, p);
@@ -251,31 +271,17 @@ namespace ccm::gen::impl
 
 			const DoubleDouble exp2_hm{ FPBits_t(exp2_hm_hi_i).get_val(), FPBits_t(exp2_hm_lo_i).get_val() };
 
-			// Degree-9 double-double minimax for 2^(x/64), dirtyinfnorm ~ 2^-106.
-			constexpr std::array<DoubleDouble, 10> EXP2_COEFFS = {
-				DoubleDouble{ 0x1p0, 0 },
-				DoubleDouble{ 0x1.62e42fefa39efp-7, 0x1.abc9e3b398024p-62 },
-				DoubleDouble{ 0x1.ebfbdff82c58fp-15, -0x1.5e43a5429bddbp-69 },
-				DoubleDouble{ 0x1.c6b08d704a0cp-23, -0x1.d33162491268fp-77 },
-				DoubleDouble{ 0x1.3b2ab6fba4e77p-31, 0x1.4fb32d240a14ep-86 },
-				DoubleDouble{ 0x1.5d87fe78a6731p-40, 0x1.e84e916be83ep-97 },
-				DoubleDouble{ 0x1.430912f86bfb8p-49, -0x1.9a447bfddc5e6p-103 },
-				DoubleDouble{ 0x1.ffcbfc588ded9p-59, -0x1.31a55719de47fp-113 },
-				DoubleDouble{ 0x1.62c034beb8339p-68, -0x1.0ba57164eb36bp-122 },
-				DoubleDouble{ 0x1.b5251ff97bee1p-78, -0x1.8483eabd9642dp-132 },
-			};
-
 			const DoubleDouble pp = ::ccm::support::polyeval(lo6,
-															 EXP2_COEFFS[0],
-															 EXP2_COEFFS[1],
-															 EXP2_COEFFS[2],
-															 EXP2_COEFFS[3],
-															 EXP2_COEFFS[4],
-															 EXP2_COEFFS[5],
-															 EXP2_COEFFS[6],
-															 EXP2_COEFFS[7],
-															 EXP2_COEFFS[8],
-															 EXP2_COEFFS[9]);
+															 POW_DD_EXP2_COEFFS[0],
+															 POW_DD_EXP2_COEFFS[1],
+															 POW_DD_EXP2_COEFFS[2],
+															 POW_DD_EXP2_COEFFS[3],
+															 POW_DD_EXP2_COEFFS[4],
+															 POW_DD_EXP2_COEFFS[5],
+															 POW_DD_EXP2_COEFFS[6],
+															 POW_DD_EXP2_COEFFS[7],
+															 POW_DD_EXP2_COEFFS[8],
+															 POW_DD_EXP2_COEFFS[9]);
 			const DoubleDouble rr = quick_mult(exp2_hm, pp);
 
 			// A single binary64 addition of a faithful double-double rounds once in the

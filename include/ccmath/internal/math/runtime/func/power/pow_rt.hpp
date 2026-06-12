@@ -12,6 +12,9 @@
 
 #include "ccmath/internal/math/generic/builtins/power/pow.hpp"
 #include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
+#include "ccmath/internal/math/generic/func/power/pow_impl/pow_simd_impl.hpp"
+#include "ccmath/internal/math/generic/func/power/pow_impl/powf_simd_impl.hpp"
+#include "ccmath/internal/math/runtime/pp/pp.hpp"
 #include "ccmath/internal/math/runtime/simd/func/catalog.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
@@ -36,10 +39,17 @@ namespace ccm::rt::simd_impl
 	#endif
 	[[nodiscard]] inline T pow_simd_impl(T base, T exp) noexcept
 	{
-		intrin::simd<T, intrin::abi::native> const base_m(base);
-		intrin::simd<T, intrin::abi::native> const exp_m(exp);
-		intrin::simd<T, intrin::abi::native> const pow_m = intrin::pow(base_m, exp_m);
-		return pow_m.convert();
+		pp::native_simd<T> const base_v(base);
+		pp::native_simd<T> const exp_v(exp);
+		// Single and double precision use the dedicated vectorized kernels, which are bit
+		// identical to the scalar correctly rounded powf and pow. Other types use the
+		// per-lane std::simd baseline for now.
+		if constexpr (std::is_same_v<T, float>) { return gen::impl::powf_simd(base_v, exp_v)[0]; }
+		else if constexpr (std::is_same_v<T, double>) { return gen::impl::pow_simd(base_v, exp_v)[0]; }
+		else
+		{
+			return pp::pow(base_v, exp_v)[0];
+		}
 	}
 #endif
 } // namespace ccm::rt::simd_impl
