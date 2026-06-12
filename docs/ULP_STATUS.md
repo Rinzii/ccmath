@@ -110,11 +110,11 @@
 <a id="fabs"></a>
 ### fabs
 
-| Precision   | Min ULP | Max ULP | Avg ULP | Notes |
-|-------------|---------|---------|---------|-------|
+| Precision   | Min ULP | Max ULP | Avg ULP | Notes                                                                                 |
+|-------------|---------|---------|---------|---------------------------------------------------------------------------------------|
 | float       | N/a     | N/a     | N/a     | See rigorous MPFR `fmaf` all-mode campaigns and simple constexpr residual regressions |
-| double      | N/a     | N/a     | N/a     | See rigorous MPFR `fma` all-mode campaigns and simple constexpr residual regressions |
-| long double | N/a     | N/a     | N/a     | `fmal` remains a target-format audit path in this pass |
+| double      | N/a     | N/a     | N/a     | See rigorous MPFR `fma` all-mode campaigns and simple constexpr residual regressions  |
+| long double | N/a     | N/a     | N/a     | `fmal` remains a target-format audit path in this pass                                |
 
 <a id="fdim"></a>
 ### fdim
@@ -583,16 +583,16 @@ Rigorous oracle quick campaigns (apple aarch64, clang 17, June 7 2026). Not proo
 
 Per-case logs with base, exponent, actual, and expected bit patterns live under [tests/rigorous/oracle_logs/README.md](../tests/rigorous/oracle_logs/README.md). Re-run the rigorous oracle ctest targets to refresh them.
 
-| Function    | Path / configuration                           | MPFR cases | MPFR Max ULP | MPFR hard failures | CORE-MATH cases | CORE-MATH Max ULP | CORE-MATH bit mismatches | Notes                                                                                    |
-|-------------|------------------------------------------------|------------|--------------|--------------------|-----------------|-------------------|--------------------------|------------------------------------------------------------------------------------------|
-| `ccm::pow`  | `public_default`                               | 3132       | 1            | 0                  | 2068            | 1                 | 59                       | MPFR structured binary64 corpus. CORE-MATH finite regular corpus.                          |
-| `ccm::pow`  | `runtime_no_builtin`, `generic_modeled_domain` | N/a        | N/a          | 0                  | N/a             | N/a               | N/a                      | Path-matrix quick campaign, no-builtin build only.                                         |
-| `ccm::powf` | `public_default`                               | 68036      | 1            | 2                  | 62372           | 1                 | 2050                     | Structured binary32 corpus. Directional modes carry most CORE-MATH mismatches.             |
-| `ccm::powf` | Reduced domains                                | 6144       | 1            | 0                  | 6144            | 1                 | 396                      | Mantissa/subnormal finite domains. Not evidence for NaN, infinity, or zero cases.          |
-| `ccm::powl` | ld64 alias                                     | 144        | 0            | 0                  | N/a             | N/a               | N/a                      | Double-shaped platform. ld64_conservative corpus.                                          |
-| `ccm::powl` | ld80 special + bounded int + general finite    | N/a        | N/a          | N/a                | N/a             | N/a               | N/a                      | Not exercised on double-shaped platforms.                                                  |
-| `ccm::powl` | ld128 / unknown strict                         | N/a        | N/a          | N/a                | N/a             | N/a               | N/a                      | Detection and NaN policy tests only.                                                       |
-| `ccm::powl` | reduced-precision fallback                     | N/a        | N/a          | N/a                | N/a             | N/a               | N/a                      | Only when CCMATH_ENABLE_REDUCED_PRECISION_POWL=ON.                                         |
+| Function    | Path / configuration                           | MPFR cases | MPFR Max ULP | MPFR hard failures | CORE-MATH cases | CORE-MATH Max ULP | CORE-MATH bit mismatches | Notes                                                                             |
+|-------------|------------------------------------------------|------------|--------------|--------------------|-----------------|-------------------|--------------------------|-----------------------------------------------------------------------------------|
+| `ccm::pow`  | `public_default`                               | 3132       | 1            | 0                  | 2068            | 1                 | 59                       | MPFR structured binary64 corpus. CORE-MATH finite regular corpus.                 |
+| `ccm::pow`  | `runtime_no_builtin`, `generic_modeled_domain` | N/a        | N/a          | 0                  | N/a             | N/a               | N/a                      | Path-matrix quick campaign, no-builtin build only.                                |
+| `ccm::powf` | `public_default`                               | 68036      | 1            | 2                  | 62372           | 1                 | 2050                     | Structured binary32 corpus. Directional modes carry most CORE-MATH mismatches.    |
+| `ccm::powf` | Reduced domains                                | 6144       | 1            | 0                  | 6144            | 1                 | 396                      | Mantissa/subnormal finite domains. Not evidence for NaN, infinity, or zero cases. |
+| `ccm::powl` | ld64 alias                                     | 144        | 0            | 0                  | N/a             | N/a               | N/a                      | Double-shaped platform. ld64_conservative corpus.                                 |
+| `ccm::powl` | ld80 special + bounded int + general finite    | N/a        | N/a          | N/a                | N/a             | N/a               | N/a                      | Not exercised on double-shaped platforms.                                         |
+| `ccm::powl` | ld128 / unknown strict                         | N/a        | N/a          | N/a                | N/a             | N/a               | N/a                      | Detection and NaN policy tests only.                                              |
+| `ccm::powl` | reduced-precision fallback                     | N/a        | N/a          | N/a                | N/a             | N/a               | N/a                      | Only when CCMATH_ENABLE_REDUCED_PRECISION_POWL=ON.                                |
 
 
 <a id="sqrt"></a>
