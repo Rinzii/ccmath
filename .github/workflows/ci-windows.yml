@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   build-cxx17:
-    runs-on: windows-latest
+    runs-on: windows-2022
     timeout-minutes: 45
     strategy:
       fail-fast: true
@@ -48,9 +48,9 @@ jobs:
             ./**/CMakeFiles
             ./**/CMakeCache.txt
             ./**/out
-          key: ${{ runner.os }}-${{ matrix.name }}-${{ hashFiles('CMakeLists.txt', 'CMakePresets.json', 'cmake/**', 'include/**', 'tests/**', 'thirdparty/**') }}
+          key: ${{ runner.os }}-${{ env.ImageVersion }}-${{ matrix.name }}-${{ hashFiles('CMakeLists.txt', 'CMakePresets.json', 'cmake/**', 'include/**', 'tests/**', 'thirdparty/**') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.name }}-
+            ${{ runner.os }}-${{ env.ImageVersion }}-${{ matrix.name }}-
 
       - name: Configure
         run: >
@@ -71,7 +71,7 @@ jobs:
 
   build-cxx20:
     needs: build-cxx17
-    runs-on: windows-latest
+    runs-on: windows-2022
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -104,9 +104,9 @@ jobs:
             ./**/CMakeFiles
             ./**/CMakeCache.txt
             ./**/out
-          key: ${{ runner.os }}-${{ matrix.name }}-${{ hashFiles('CMakeLists.txt', 'CMakePresets.json', 'cmake/**', 'include/**', 'tests/**', 'thirdparty/**') }}
+          key: ${{ runner.os }}-${{ env.ImageVersion }}-${{ matrix.name }}-${{ hashFiles('CMakeLists.txt', 'CMakePresets.json', 'cmake/**', 'include/**', 'tests/**', 'thirdparty/**') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.name }}-
+            ${{ runner.os }}-${{ env.ImageVersion }}-${{ matrix.name }}-
 
       - name: Configure
         run: >
@@ -127,7 +127,7 @@ jobs:
 
   rigorous:
     needs: build-cxx20
-    runs-on: windows-latest
+    runs-on: windows-2022
     timeout-minutes: 90
     env:
       CCMATH_VCPKG_BINARY_CACHE_DIR: ${{ github.workspace }}/.cache/vcpkg/archives
@@ -189,9 +189,9 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: out/build/vs22/vs22-release-rigorous
-          key: ${{ runner.os }}-vs22-release-rigorous-${{ hashFiles('CMakeLists.txt', 'cmake/**', 'tests/**', 'include/**', 'thirdparty/**') }}
+          key: ${{ runner.os }}-${{ env.ImageVersion }}-vs22-release-rigorous-${{ hashFiles('CMakeLists.txt', 'cmake/**', 'tests/**', 'include/**', 'thirdparty/**') }}
           restore-keys: |
-            ${{ runner.os }}-vs22-release-rigorous-
+            ${{ runner.os }}-${{ env.ImageVersion }}-vs22-release-rigorous-
 
       - name: Configure rigorous validation
         shell: pwsh
