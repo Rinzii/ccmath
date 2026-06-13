@@ -70,6 +70,14 @@ namespace
 		// (positive even-power overflow vs negative odd-power overflow).
 		{ 0xc4b2b5154aedb961ULL, 0x406dc00000000000ULL, { 0x7ff0000000000000ULL, 0x7fefffffffffffffULL, 0x7ff0000000000000ULL, 0x7fefffffffffffffULL } },
 		{ 0xc2886f7925646c38ULL, 0x4044800000000000ULL, { 0xfff0000000000000ULL, 0xffefffffffffffffULL, 0xffefffffffffffffULL, 0xfff0000000000000ULL } },
+		// x^(-1/2) = 1/sqrt(x) just past a power of two: a double-double 1/sqrt is a directed-mode
+		// ULP short, so an exact residual test pins the rounding (cr_rsqrt).
+		{ 0x3370000000000001ULL, 0xbfe0000000000000ULL, { 0x462fffffffffffffULL, 0x462fffffffffffffULL, 0x4630000000000000ULL, 0x462fffffffffffffULL } },
+		{ 0x336fffffffffffffULL, 0xbfe0000000000000ULL, { 0x4630000000000000ULL, 0x4630000000000000ULL, 0x4630000000000001ULL, 0x4630000000000000ULL } },
+		{ 0x3ff0000000000001ULL, 0xbfe0000000000000ULL, { 0x3fefffffffffffffULL, 0x3fefffffffffffffULL, 0x3ff0000000000000ULL, 0x3fefffffffffffffULL } },
+		// Integer power whose result is subnormal: the accurate squaring rounds straight onto the
+		// subnormal grid rather than double-rounding through the kernel.
+		{ 0x3b5fffffffffffffULL, 0x402c000000000000ULL, { 0x000ffffffffffff9ULL, 0x000ffffffffffff9ULL, 0x000ffffffffffffaULL, 0x000ffffffffffff9ULL } },
 	};
 
 	constexpr int kModes[4]			= { FE_TONEAREST, FE_TOWARDZERO, FE_UPWARD, FE_DOWNWARD };

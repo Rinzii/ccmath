@@ -22,6 +22,7 @@
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/multiply_add.hpp"
 #include "ccmath/internal/support/poly_eval.hpp"
+#include "ccmath/internal/types/big_int.hpp"
 #include "ccmath/internal/types/double_double.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 
@@ -264,6 +265,145 @@ namespace ccm::gen::impl
 
 			constexpr ScaledPow ipow_scaled(const DoubleDouble & base, std::uint64_t e) noexcept
 			{ return ipow_scaled(load_scaled(base), e); }
+
+			// Round (mant.hi + mant.lo) * 2^exp2 to a correctly rounded double in the active mode,
+			// with mant.hi in [1, 2) (or its negation). A normal result is a single power-of-two
+			// reattachment, exact, so collapsing the pair then scaling rounds once. A subnormal
+			// result instead double-rounds under collapse-then-scale, so the pair is rounded
+			// straight onto the subnormal grid (lsb 2^-1074) in a single active-mode rounding.
+			constexpr double reconstruct_scaled(const DoubleDouble & mant, long exp2, int mode) noexcept
+			{
+				if (exp2 >= -1022)
+				{
+					const double collapsed = mant.hi + mant.lo;
+					return support::helpers::internal_ldexp(collapsed, static_cast<int>(exp2));
+				}
+
+				const bool neg		 = mant.hi < 0.0;
+				const double abs_hi	 = neg ? -mant.hi : mant.hi;
+				const double abs_lo	 = neg ? -mant.lo : mant.lo;
+				const long shift	 = exp2 + 1074; // bring the 2^-1074 grid to the unit
+				const DoubleDouble v = ccm::types::exact_add(support::helpers::internal_ldexp(abs_hi, static_cast<int>(shift)),
+															 support::helpers::internal_ldexp(abs_lo, static_cast<int>(shift)));
+
+				auto units	= static_cast<std::int64_t>(v.hi); // trunc toward zero, v.hi >= 0
+				double frac = (v.hi - static_cast<double>(units)) + v.lo;
+				if (frac < 0.0)
+				{
+					units -= 1;
+					frac += 1.0;
+				}
+				const bool inexact = frac != 0.0;
+				bool round_up_mag  = false;
+				switch (mode)
+				{
+				case FE_TONEAREST: round_up_mag = frac > 0.5 || (frac == 0.5 && (units & 1) != 0); break;
+				case FE_UPWARD: round_up_mag = !neg && inexact; break;
+				case FE_DOWNWARD: round_up_mag = neg && inexact; break;
+				case FE_TOWARDZERO:
+				default: break;
+				}
+				if (round_up_mag) { units += 1; }
+				const double magnitude = static_cast<double>(units) * 0x1.0p-1074;
+				return neg ? -magnitude : magnitude;
+			}
+
+			// Exact sign of the sum of n doubles, computed with integer arithmetic so it is correct
+			// in every rounding mode (a floating-point TwoSum is exact only to nearest). Each term is
+			// placed by its exponent into a wide fixed-point accumulator at the scale 2^-kSumScale and
+			// the positive and negative magnitudes are compared. The callers feed terms that are
+			// products of doubles (exact via the FMA-based two_prod regardless of mode) spanning at
+			// most ~2^0 down to ~2^-160, which the chosen scale and width cover with margin.
+			inline constexpr int kSumScale = 230;
+			constexpr int exact_sign_of_sum(const double * terms, int n) noexcept
+			{
+				using FPBits_t = support::fp::FPBits<double>;
+				using Wide	   = types::UInt<256>;
+				Wide pos(0);
+				Wide neg(0);
+				for (int i = 0; i < n; ++i)
+				{
+					const FPBits_t b(terms[i]);
+					if (b.is_zero()) { continue; }
+					const std::uint64_t significand = static_cast<std::uint64_t>(b.get_explicit_mantissa());
+					const int shift					= (b.get_explicit_exponent() - static_cast<int>(FPBits_t::fraction_length)) + kSumScale;
+					if (shift < 0) { continue; } // below the accumulator resolution; never reached for the fed terms
+					const Wide term = Wide(significand) << static_cast<std::size_t>(shift);
+					if (b.sign().is_neg()) { neg += term; }
+					else
+					{
+						pos += term;
+					}
+				}
+				if (pos > neg) { return 1; }
+				if (pos < neg) { return -1; }
+				return 0;
+			}
+
+			// Exact sign of (c^2 * x - 1) for c = ch + cl, with cl a power of two (or zero) so that
+			// ch*cl and cl*cl are exact. c^2 = ch^2 + 2*ch*cl + cl^2 is exact in four doubles, each
+			// times x is exact in two via two_prod (exact in any rounding mode), and the nine-term sum
+			// minus one is signed exactly. This places a candidate r against the true 1/sqrt(x)
+			// without any approximation, in every mode.
+			constexpr int rsqrt_residual_sign(double ch, double cl, double x) noexcept
+			{
+				// sign(c^2*x - 1) is invariant under ch -> ch*2^-k, cl -> cl*2^-k, x -> x*2^2k. Scale so
+				// ch lands in [1,2); then c^2 and c^2*x stay in range (a raw 1/sqrt(x) for tiny x is
+				// huge and c^2 would overflow to infinity, breaking the sign and the caller's walk).
+				const int k = static_cast<int>(support::fp::FPBits<double>(ch).get_biased_exponent()) - support::fp::FPBits<double>::exponent_bias;
+				ch			= support::helpers::internal_ldexp(ch, -k);
+				cl			= support::helpers::internal_ldexp(cl, -k);
+				x			= support::helpers::internal_ldexp(x, 2 * k);
+
+				const DoubleDouble chh = two_prod(ch, ch);
+				const double cross	   = 2.0 * (ch * cl);
+				const double clsq	   = cl * cl;
+				const DoubleDouble t0  = two_prod(chh.hi, x);
+				const DoubleDouble t1  = two_prod(chh.lo, x);
+				const DoubleDouble t2  = two_prod(cross, x);
+				const DoubleDouble t3  = two_prod(clsq, x);
+				const double terms[9]  = { t0.hi, t0.lo, t1.hi, t1.lo, t2.hi, t2.lo, t3.hi, t3.lo, -1.0 };
+				return exact_sign_of_sum(terms, 9);
+			}
+
+			// Correctly rounded 1/sqrt(x) for finite x > 0, in every rounding mode. The exact residual
+			// sign of c^2*x - 1 brackets the true value between two consecutive doubles (walking from a
+			// faithful seed), then the active mode selects the neighbor, with an exact midpoint test for
+			// round to nearest. Because the bracketing is exact, no double-double precision shortfall or
+			// table-maker's dilemma can mis-round it.
+			constexpr double cr_rsqrt(double x, int mode) noexcept
+			{
+				using FPBits_t = support::fp::FPBits<double>;
+				double r	   = 1.0 / ccm::gen::sqrt_gen<double>(x);
+				if (const FPBits_t rb(r); !rb.is_finite() || rb.is_zero() || rb.is_subnormal()) { return r; }
+
+				const auto next_up	 = [](double v) { return FPBits_t(FPBits_t(v).uintval() + 1U).get_val(); };
+				const auto next_down = [](double v) { return FPBits_t(FPBits_t(v).uintval() - 1U).get_val(); };
+
+				// Walk to the floor: the largest double r with r^2*x <= 1, i.e. r <= 1/sqrt(x). The
+				// faithful seed is at most a few ulps away, so this is a short loop.
+				int s = rsqrt_residual_sign(r, 0.0, x);
+				if (s > 0)
+				{
+					do { r = next_down(r); } while (rsqrt_residual_sign(r, 0.0, x) > 0);
+				}
+				else if (s < 0)
+				{
+					while (rsqrt_residual_sign(next_up(r), 0.0, x) <= 0) { r = next_up(r); }
+				}
+
+				if (rsqrt_residual_sign(r, 0.0, x) == 0) { return r; } // exact
+
+				const double rp = next_up(r); // r < 1/sqrt(x) < rp
+				if (mode == FE_UPWARD) { return rp; }
+				if (mode != FE_TONEAREST) { return r; } // toward zero / downward
+
+				const double half = 0.5 * (rp - r); // half ulp, a power of two
+				const int sm	  = rsqrt_residual_sign(r, half, x);
+				if (sm > 0) { return r; }							// midpoint above the true value -> nearest is r
+				if (sm < 0) { return rp; }							// midpoint below -> nearest is rp
+				return (FPBits_t(r).uintval() & 1U) == 0U ? r : rp; // exact midpoint -> ties to even
+			}
 		} // namespace pow_int_detail
 
 		// Accurate double-double reconstruction of x^y for the in-range (non-clamped)
@@ -701,13 +841,30 @@ namespace ccm::gen::impl
 						sp.mantissa.hi = -sp.mantissa.hi;
 						sp.mantissa.lo = -sp.mantissa.lo;
 					}
-					// For positive exponents reattach the binary weight to the collapsed mantissa; for
-					// negative exponents reciprocate the mantissa first. Both reattachments are a single
-					// power-of-two scaling, exact whenever the final value is normal.
-					const double scaled	   = exp_i < 0 ? pow_int_detail::reciprocal(sp.mantissa) : (sp.mantissa.hi + sp.mantissa.lo);
-					const long result_exp2 = exp_i < 0 ? -sp.exp2 : sp.exp2;
-					const double r		   = support::helpers::internal_ldexp(scaled, result_exp2);
-					if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal()) { return r; }
+					if (exp_i < 0)
+					{
+						// Negative exponent: 1/base^|exp| via a correctly rounded double-double
+						// reciprocal then an exact power-of-two scale. Non-normal results (overflow of
+						// the reciprocal, or a subnormal that the single reciprocal cannot grid-round
+						// without double rounding) fall through to the kernel.
+						const double r = support::helpers::internal_ldexp(pow_int_detail::reciprocal(sp.mantissa), static_cast<int>(-sp.exp2));
+						if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal()) { return r; }
+					}
+					else
+					{
+						// Positive exponent: reconstruct_scaled rounds once in the active mode, using the
+						// subnormal grid below the normal floor so a tiny result does not double-round.
+						const double r = pow_int_detail::reconstruct_scaled(sp.mantissa, sp.exp2, support::fenv::get_rounding_mode());
+						if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero())
+						{
+							if (r_bits.is_subnormal())
+							{
+								support::fenv::set_errno_if_required(ERANGE);
+								support::fenv::raise_except_if_required(FE_UNDERFLOW);
+							}
+							return r;
+						}
+					}
 				}
 			}
 
@@ -717,19 +874,41 @@ namespace ccm::gen::impl
 			// the same exponent-tracked accumulator as the integer path so the smallest and largest
 			// reachable magnitudes keep full precision (a bare double-double drops its lo limb for a
 			// small base under a large odd power, e.g. 1/sqrt(x) for x just above a tiny power of two).
+			// Genuine half-integers only; integer exponents are fully owned by the integer path above
+			// (which also carries the result sign for a negative base).
 			const double two_exp = exp * 2.0;
-			if (is_integer(two_exp) && FPBits_t(two_exp).abs().get_val() <= 2048.0)
+			if (is_integer(two_exp) && !is_integer(exp) && FPBits_t(two_exp).abs().get_val() <= 2048.0)
 			{
-				// pow(x, 1/2) is exactly the correctly rounded sqrt. The double-double round
-				// trip below would re-round an exact midpoint to the wrong neighbor.
+				// pow(x, +/-1/2) are sqrt and 1/sqrt. sqrt is the correctly rounded sqrt_gen; 1/sqrt
+				// is correctly rounded by an exact residual test (a bare double-double 1/sqrt sits a
+				// directed-mode ULP short for x just past a power of two). The double-double squaring
+				// below cannot resolve those two, so they are intercepted first.
 				if (exp == 0.5) { return ccm::gen::sqrt_gen<double>(base); }
+				if (exp == -0.5) { return pow_int_detail::cr_rsqrt(base, support::fenv::get_rounding_mode()); }
 
 				const auto m					   = static_cast<std::int64_t>(two_exp);
 				const std::uint64_t mag			   = m < 0 ? static_cast<std::uint64_t>(-(m + 1)) + 1U : static_cast<std::uint64_t>(m);
 				const pow_int_detail::ScaledPow sp = pow_int_detail::ipow_scaled(pow_int_detail::dd_sqrt(base), mag);
-				const double scaled				   = m < 0 ? pow_int_detail::reciprocal(sp.mantissa) : (sp.mantissa.hi + sp.mantissa.lo);
-				const double r					   = support::helpers::internal_ldexp(scaled, m < 0 ? -sp.exp2 : sp.exp2);
-				if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal()) { return r; }
+				if (m < 0)
+				{
+					// Negative half-integer: reciprocal of the odd power then an exact scale; a
+					// non-normal result falls through to the kernel.
+					const double r = support::helpers::internal_ldexp(pow_int_detail::reciprocal(sp.mantissa), static_cast<int>(-sp.exp2));
+					if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal()) { return r; }
+				}
+				else
+				{
+					const double r = pow_int_detail::reconstruct_scaled(sp.mantissa, sp.exp2, support::fenv::get_rounding_mode());
+					if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero())
+					{
+						if (r_bits.is_subnormal())
+						{
+							support::fenv::set_errno_if_required(ERANGE);
+							support::fenv::raise_except_if_required(FE_UNDERFLOW);
+						}
+						return r;
+					}
+				}
 			}
 
 			// LLVM libc clamps huge finite exponents so the kernel can round overflow/underflow.
