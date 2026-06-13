@@ -108,7 +108,7 @@ set(CCMATH_ORACLE_MPFR_pow_search_CTESTS pow_search_smoke)
 
 set(CCMATH_ORACLE_MPFR_TEST_pow_search_smoke_NAME ccmath-rigorous-pow-search-smoke)
 set(CCMATH_ORACLE_MPFR_TEST_pow_search_smoke_TARGET ccmath-rigorous-pow-search)
-set(CCMATH_ORACLE_MPFR_TEST_pow_search_smoke_REQUIRES CCMATH_ENABLE_POW_SEARCH_TOOLS)
+set(CCMATH_ORACLE_MPFR_TEST_pow_search_smoke_REQUIRES CCMATH_ENABLE_SEARCH_TOOLS)
 set(CCMATH_ORACLE_MPFR_TEST_pow_search_smoke_TIMEOUT 60)
 set(CCMATH_ORACLE_MPFR_TEST_pow_search_smoke_LABELS rigorous mpfr)
 set(CCMATH_ORACLE_MPFR_TEST_pow_search_smoke_ARGS --mode=near-one --count=256 --path=public_default)
