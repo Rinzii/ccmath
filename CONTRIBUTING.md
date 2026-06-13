@@ -3,7 +3,7 @@
 For help understanding how to implement elementary functions in CCMath, see
 [Approximating Functions: A Practical Guide to Sollya and Function Implementation](docs/approximating_functions/APPROXIMATING_FUNCTIONS.pdf).
 
-PRs go to the `dev` branch. Bug reports and design questions belong in
+PRs go to the `main` branch. Bug reports and design questions belong in
 [Issues](https://github.com/Rinzii/ccmath/issues) or
 [Discord](https://discord.gg/p3mVxAbdmc).
 
@@ -27,7 +27,7 @@ Apache-2.0 WITH LLVM-exception.
 ```bash
 git clone https://github.com/<your-username>/ccmath.git
 cd ccmath
-git checkout dev
+git checkout main
 git checkout -b <topic-branch>
 ```
 
@@ -40,7 +40,7 @@ ctest --preset=test-ninja-gcc-debug --output-on-failure
 ```
 
 Commit with a one-line imperative subject (no trailing period). Open a PR against
-`dev` with a short summary of what changed and how you tested it.
+`main` with a short summary of what changed and how you tested it.
 
 Implementation work should stay under `include/ccmath/` using the patterns already
 present in the function family you touch. Do not add `<cmath>` includes under
@@ -61,7 +61,7 @@ present in the function family you touch. Do not add `<cmath>` includes under
 ```bash
 git clone https://github.com/Rinzii/ccmath.git
 cd ccmath
-git checkout dev
+git checkout main
 cmake --preset=ninja-gcc-debug
 cmake --build --preset=build-ninja-gcc-debug
 ctest --preset=test-ninja-gcc-debug --output-on-failure
@@ -76,7 +76,7 @@ configure line when you need a specific standard.
 ```powershell
 git clone https://github.com/Rinzii/ccmath.git
 cd ccmath
-git checkout dev
+git checkout main
 cmake --preset=vs22-debug
 cmake --build --preset=build-vs22-debug
 ctest --preset=test-vs22-debug --output-on-failure
