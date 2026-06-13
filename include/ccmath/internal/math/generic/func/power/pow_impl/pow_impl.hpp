@@ -18,6 +18,7 @@
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/fp/nearest_integer.hpp"
+#include "ccmath/internal/support/helpers/internal_ldexp.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/multiply_add.hpp"
 #include "ccmath/internal/support/poly_eval.hpp"
@@ -195,6 +196,61 @@ namespace ccm::gen::impl
 				};
 
 				return refine(refine(r0));
+			}
+
+			// Exponentiation by squaring that carries a separate binary exponent so the
+			// double-double mantissa never leaves the normal range. Plain ipow loses its lo limb
+			// once an intermediate nears the subnormal floor (a small base raised to a large power,
+			// or its reciprocal), which forces those near-power-of-two integer results onto the less
+			// accurate log/exp kernel and costs a directed-mode ULP. Here the mantissa hi is kept in
+			// [1, 2) after every product and the discarded exponent accumulates, so the squaring
+			// keeps full double-double precision for any reachable magnitude. The true value is
+			// (mantissa.hi + mantissa.lo) * 2^exp2.
+			struct ScaledPow
+			{
+				DoubleDouble mantissa;
+				long exp2;
+			};
+
+			// Rescale a pair whose hi sits in [1, 4) back to hi in [1, 2), shifting the exponent.
+			// Both limbs share the power-of-two factor, so the scaling is exact.
+			constexpr void scaled_pow_renormalize(ScaledPow & v) noexcept
+			{
+				const int e = static_cast<int>(support::fp::FPBits<double>(v.mantissa.hi).get_biased_exponent()) - support::fp::FPBits<double>::exponent_bias;
+				if (e != 0)
+				{
+					v.mantissa.hi = support::helpers::internal_ldexp(v.mantissa.hi, -e);
+					v.mantissa.lo = support::helpers::internal_ldexp(v.mantissa.lo, -e);
+					v.exp2 += e;
+				}
+			}
+
+			// |base|^e with base a finite normal double. base is split into a [1, 2) mantissa and a
+			// binary exponent up front (exact), then the same exact-FMA products as ipow run on the
+			// mantissa with a renormalization after each step.
+			constexpr ScaledPow ipow_scaled(double base, std::uint64_t e) noexcept
+			{
+				const int base_exp = static_cast<int>(support::fp::FPBits<double>(base).get_biased_exponent()) - support::fp::FPBits<double>::exponent_bias;
+				ScaledPow factor{ DoubleDouble{ support::helpers::internal_ldexp(base, -base_exp), 0.0 }, static_cast<long>(base_exp) };
+
+				ScaledPow result{ DoubleDouble{ 1.0, 0.0 }, 0 };
+				while (e > 0U)
+				{
+					if ((e & 1U) != 0U)
+					{
+						result.mantissa = mul(result.mantissa, factor.mantissa);
+						result.exp2 += factor.exp2;
+						scaled_pow_renormalize(result);
+					}
+					e >>= 1U;
+					if (e > 0U)
+					{
+						factor.mantissa = mul(factor.mantissa, factor.mantissa);
+						factor.exp2 += factor.exp2;
+						scaled_pow_renormalize(factor);
+					}
+				}
+				return result;
 			}
 		} // namespace pow_int_detail
 
@@ -612,35 +668,46 @@ namespace ccm::gen::impl
 				base = base_bits.abs().get_val();
 			}
 
-			// The accurate integer path requires its positive power |base|^|exp| (held as p) to
-			// stay in a comfortably normal band: once p.hi nears the subnormal floor the
-			// double-double lo limb underflows during squaring and the running product loses the
-			// extra precision the path exists to provide (this bites a tiny base with a large
-			// negative exponent, whose reciprocal is a large normal result). Powers outside the
-			// band, and non-normal results, fall through to the kernel, which owns errno and the
-			// floating-point exception signaling.
-			constexpr double kIntPowSafeHi = 0x1.0p960;
-			constexpr double kIntPowSafeLo = 0x1.0p-960;
+			// Screen, before the half-integer squaring runs, the powers that overflow: under
+			// directed rounding an overflowing product clamps to a finite garbage value rather than
+			// becoming infinity, so it cannot be detected after the fact. The exponent of base^mag
+			// is below mag*(e_base + 1) for base in [2^e_base, 2^(e_base+1)); keeping that <= 1023
+			// guarantees the power (and every intermediate, which never exceeds it for a base above
+			// one) stays finite. The low side is checked on the actual product magnitude.
+			constexpr double kIntPowSafeLo = 0x1.0p-968;
+			auto power_cannot_overflow	   = [](double ipow_base, std::uint64_t mag) noexcept
+			{
+				const int e_base = static_cast<int>(FPBits_t(ipow_base).get_biased_exponent()) - FPBits_t::exponent_bias;
+				return static_cast<long>(mag) * (e_base + 1) <= 1023;
+			};
 
 			// Small integer exponents: double-double exponentiation by squaring rounds correctly
 			// even for results sitting within one ULP of a power of two, which the log2/exp2 kernel
-			// cannot.
+			// cannot. ipow_scaled keeps the running product normal at every step (carrying a binary
+			// exponent), so this stays accurate for the smallest and largest reachable magnitudes;
+			// the final reattachment of the exponent is exact for a normal result and otherwise
+			// hands a non-normal result back to the kernel for the standard saturation and signaling.
 			if (is_integer(exp) && FPBits_t(exp).abs().get_val() <= 1024.0)
 			{
-				const auto exp_i			   = static_cast<std::int64_t>(exp);
-				const std::uint64_t mag		   = exp_i < 0 ? static_cast<std::uint64_t>(-(exp_i + 1)) + 1U : static_cast<std::uint64_t>(exp_i);
-				pow_int_detail::DoubleDouble p = pow_int_detail::ipow(base, mag);
-				if (const double p_abs = FPBits_t(p.hi).abs().get_val(); p_abs >= kIntPowSafeLo && p_abs <= kIntPowSafeHi)
+				const auto exp_i		= static_cast<std::int64_t>(exp);
+				const std::uint64_t mag = exp_i < 0 ? static_cast<std::uint64_t>(-(exp_i + 1)) + 1U : static_cast<std::uint64_t>(exp_i);
+				if (FPBits_t(base).is_normal())
 				{
+					pow_int_detail::ScaledPow sp = pow_int_detail::ipow_scaled(base, mag);
 					// Fold a negative result's sign into the pair before the final rounding. Negating
 					// a magnitude that was already rounded in the active mode flips directed rounding
 					// (-round_up(|v|) is round_down(-|v|)); rounding the signed value is correct.
 					if (sign != 0)
 					{
-						p.hi = -p.hi;
-						p.lo = -p.lo;
+						sp.mantissa.hi = -sp.mantissa.hi;
+						sp.mantissa.lo = -sp.mantissa.lo;
 					}
-					const double r = exp_i < 0 ? pow_int_detail::reciprocal(p) : (p.hi + p.lo);
+					// For positive exponents reattach the binary weight to the collapsed mantissa; for
+					// negative exponents reciprocate the mantissa first. Both reattachments are a single
+					// power-of-two scaling, exact whenever the final value is normal.
+					const double scaled	   = exp_i < 0 ? pow_int_detail::reciprocal(sp.mantissa) : (sp.mantissa.hi + sp.mantissa.lo);
+					const long result_exp2 = exp_i < 0 ? -sp.exp2 : sp.exp2;
+					const double r		   = support::helpers::internal_ldexp(scaled, result_exp2);
 					if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal()) { return r; }
 				}
 			}
@@ -655,13 +722,17 @@ namespace ccm::gen::impl
 				// trip below would re-round an exact midpoint to the wrong neighbor.
 				if (exp == 0.5) { return ccm::gen::sqrt_gen<double>(base); }
 
-				const auto m						 = static_cast<std::int64_t>(two_exp);
-				const std::uint64_t mag				 = m < 0 ? static_cast<std::uint64_t>(-(m + 1)) + 1U : static_cast<std::uint64_t>(m);
-				const pow_int_detail::DoubleDouble p = pow_int_detail::ipow(pow_int_detail::dd_sqrt(base), mag);
-				if (const double p_abs = FPBits_t(p.hi).abs().get_val(); p_abs >= kIntPowSafeLo && p_abs <= kIntPowSafeHi)
+				const auto m								 = static_cast<std::int64_t>(two_exp);
+				const std::uint64_t mag						 = m < 0 ? static_cast<std::uint64_t>(-(m + 1)) + 1U : static_cast<std::uint64_t>(m);
+				const pow_int_detail::DoubleDouble sqrt_base = pow_int_detail::dd_sqrt(base);
+				if (power_cannot_overflow(sqrt_base.hi, mag))
 				{
-					const double r = m < 0 ? pow_int_detail::reciprocal(p) : (p.hi + p.lo);
-					if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal()) { return r; }
+					const pow_int_detail::DoubleDouble p = pow_int_detail::ipow(sqrt_base, mag);
+					if (FPBits_t(p.hi).abs().get_val() >= kIntPowSafeLo)
+					{
+						const double r = m < 0 ? pow_int_detail::reciprocal(p) : (p.hi + p.lo);
+						if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal()) { return r; }
+					}
 				}
 			}
 

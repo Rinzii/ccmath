@@ -60,6 +60,16 @@ namespace
 		{ 0xbff8652519a8b58aULL, 0xc06de00000000000ULL, { 0xb6d7a6dd226e1be5ULL, 0xb6d7a6dd226e1be4ULL, 0xb6d7a6dd226e1be4ULL, 0xb6d7a6dd226e1be5ULL } },
 		{ 0xbffc8a7c01dee76eULL, 0x4074700000000000ULL, { 0xd1005d3d0c963798ULL, 0xd1005d3d0c963798ULL, 0xd1005d3d0c963798ULL, 0xd1005d3d0c963799ULL } },
 		{ 0x4173b2e892108fcaULL, 0x4037000000000000ULL, { 0x62dde05268d268ebULL, 0x62dde05268d268ebULL, 0x62dde05268d268ecULL, 0x62dde05268d268ebULL } },
+		// nextafter(2^k) bases raised to integer powers: results sit just below a power of two with
+		// a sub-ulp tail the double-double cannot place, so the exponent-tracked ipow must resolve
+		// the directed rounding. Tiny power, reciprocal of a tiny power, and a near-overflow power.
+		{ 0x3c4fffffffffffffULL, 0x4031000000000000ULL, { 0x024fffffffffffefULL, 0x024fffffffffffefULL, 0x024ffffffffffff0ULL, 0x024fffffffffffefULL } },
+		{ 0x3ca0000000000001ULL, 0xc033000000000000ULL, { 0x7edfffffffffffdaULL, 0x7edfffffffffffdaULL, 0x7edfffffffffffdbULL, 0x7edfffffffffffdaULL } },
+		{ 0x429fffffffffffffULL, 0x4037000000000000ULL, { 0x7dbfffffffffffe9ULL, 0x7dbfffffffffffe9ULL, 0x7dbfffffffffffeaULL, 0x7dbfffffffffffe9ULL } },
+		// Negative base with integer exponent overflowing: directed rounding must keep the sign
+		// (positive even-power overflow vs negative odd-power overflow).
+		{ 0xc4b2b5154aedb961ULL, 0x406dc00000000000ULL, { 0x7ff0000000000000ULL, 0x7fefffffffffffffULL, 0x7ff0000000000000ULL, 0x7fefffffffffffffULL } },
+		{ 0xc2886f7925646c38ULL, 0x4044800000000000ULL, { 0xfff0000000000000ULL, 0xffefffffffffffffULL, 0xffefffffffffffffULL, 0xfff0000000000000ULL } },
 	};
 
 	constexpr int kModes[4]			= { FE_TONEAREST, FE_TOWARDZERO, FE_UPWARD, FE_DOWNWARD };

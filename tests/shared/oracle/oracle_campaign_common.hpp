@@ -588,4 +588,74 @@ namespace ccm::test::oracle
 			}
 		}
 	}
+
+	// Targeted randomized cases that land in the finite normal/subnormal result bands. Full
+	// random bit patterns (add_random_cases) almost always overflow, underflow, or produce NaN,
+	// so they rarely exercise the reconstruction, the over/underflow scale branch, or the integer
+	// path. These generators draw bases and exponents that keep y*log2(x) bounded, plus the
+	// near-one, far-from-one-with-integer-exponent, and negative-base families that previously
+	// hid faithful-but-not-correctly-rounded results.
+	template <typename T>
+	inline void add_targeted_random_cases(std::vector<pow_case<T>>& cases, std::uint64_t seed, std::size_t count, const char* provenance)
+	{
+		using uint_t = std::conditional_t<std::is_same_v<T, float>, std::uint32_t, std::uint64_t>;
+
+		std::mt19937_64 rng(seed);
+		const int max_exp	  = std::is_same_v<T, float> ? 120 : 1000; // keep results finite
+		const int mant_bits	  = std::numeric_limits<T>::digits - 1;
+		const uint_t one_bits = ccm::support::bit_cast<uint_t>(static_cast<T>(1));
+
+		std::uniform_real_distribution<double> unit(1.0, 2.0);
+		std::uniform_int_distribution<int> base_exp(-(max_exp / 4), max_exp / 4);
+
+		auto add = [&](T base, T exponent) { cases.push_back(pow_case<T>{ base, exponent, provenance }); };
+
+		const std::size_t per = count / 4 + 1;
+
+		// 1. Base in [1,2) * 2^e with y chosen so |y*log2|base|| stays within +/-max_exp, which
+		//    sweeps the whole finite range including the over/underflow-adjacent scale band.
+		for (std::size_t i = 0; i < per; ++i)
+		{
+			T base = static_cast<T>(std::ldexp(unit(rng), base_exp(rng)));
+			if (rng() & 1U) { base = -base; }
+			const double l2 = std::log2(std::abs(static_cast<double>(base))) + 1e-300;
+			std::uniform_real_distribution<double> yd(-static_cast<double>(max_exp) / std::abs(l2), static_cast<double>(max_exp) / std::abs(l2));
+			T exponent = static_cast<T>(yd(rng));
+			if (base < static_cast<T>(0)) { exponent = std::trunc(exponent); } // negative base needs integer exponent
+			add(base, exponent);
+		}
+
+		// 2. Base very near 1 (hardest log2 reduction) with a large exponent.
+		for (std::size_t i = 0; i < per; ++i)
+		{
+			const auto off	 = static_cast<std::int64_t>(rng() % (uint_t(1) << (mant_bits - 4))) - (std::int64_t(1) << (mant_bits - 5));
+			const T base	 = ccm::support::bit_cast<T>(static_cast<uint_t>(static_cast<std::int64_t>(one_bits) + off));
+			const double mag = std::is_same_v<T, float> ? 1.0e6 : 1.0e9;
+			std::uniform_real_distribution<double> yd(-mag, mag);
+			add(base, static_cast<T>(yd(rng)));
+		}
+
+		// 3. Integer and half-integer exponents over a finite-result base range (integer ipow and
+		//    sqrt paths, including the negative-base sign fold under directed rounding).
+		for (std::size_t i = 0; i < per; ++i)
+		{
+			T base = static_cast<T>(std::ldexp(unit(rng), base_exp(rng) / 2));
+			if (rng() & 1U) { base = -base; }
+			std::uniform_int_distribution<int> nd(-700, 700);
+			T exponent = static_cast<T>(nd(rng));
+			if ((rng() & 1U) && base > static_cast<T>(0)) { exponent += static_cast<T>(0.5); } // half-integer only for base > 0
+			add(base, exponent);
+		}
+
+		// 4. Bases drawn near exact powers of two with small integer exponents, where results sit
+		//    within an ULP of a power of two and faithful rounding diverges from correct rounding.
+		for (std::size_t i = 0; i < per; ++i)
+		{
+			const T pot	  = static_cast<T>(std::ldexp(static_cast<T>(1), base_exp(rng) / 4));
+			const int dir = (rng() & 1U) ? 1 : -1;
+			const T base  = std::nextafter(pot, dir > 0 ? std::numeric_limits<T>::infinity() : static_cast<T>(0));
+			std::uniform_int_distribution<int> nd(-30, 30);
+			add(base, static_cast<T>(nd(rng)));
+		}
+	}
 } // namespace ccm::test::oracle

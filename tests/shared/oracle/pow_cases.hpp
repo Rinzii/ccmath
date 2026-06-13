@@ -103,6 +103,11 @@ namespace ccm::test::oracle::pow_cases
 		const std::size_t random_count = mode == campaign_mode::quick ? 512 : (mode == campaign_mode::extended ? 4096 : 16384);
 		std::vector<pow_case<double>> random_cases;
 		add_random_cases(random_cases, seed, random_count, "deterministic random bit-pattern campaign");
+		// Targeted random cases concentrate in the finite normal/subnormal result bands that the
+		// full bit-pattern stream above almost never reaches: near-one bases with huge exponents,
+		// over/underflow-adjacent scaled results, and integer/half-integer and negative-base
+		// exponents. The seed is offset so the two streams do not correlate.
+		add_targeted_random_cases(random_cases, seed ^ 0x9E3779B97F4A7C15ULL, random_count * 2, "targeted finite-band random campaign");
 		for (auto& test_case : random_cases)
 		{
 			if (eligible(test_case.base, test_case.exponent)) { cases.push_back(std::move(test_case)); }
