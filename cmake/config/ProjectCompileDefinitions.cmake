@@ -1,7 +1,13 @@
-if (CCMATH_ENABLE_RUNTIME_SIMD)
-    target_compile_definitions(ccmath INTERFACE CCM_CONFIG_USE_RT_SIMD)
-endif ()
+include(cmake/config/BuildManifest.cmake)
+ccmath_manifest_apply_library_compile_definitions(ccmath)
 
-if (CCMATH_DISABLE_ERRNO)
-    target_compile_definitions(ccmath INTERFACE CCM_CONFIG_DISABLE_ERRNO)
+# ccmath is header-only, so the math compiles in the consumer's translation unit.
+# Deterministic mode must stop the compiler from contracting stray a*b+c into a
+# hardware FMA (which would diverge between FMA and non-FMA targets); the flag has
+# to be INTERFACE so it reaches consumers. MSVC does not contract under the default
+# /fp:precise, so no MSVC flag is needed.
+if (CCMATH_ENABLE_DETERMINISTIC)
+    target_compile_options(ccmath INTERFACE
+            $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-ffp-contract=off>
+    )
 endif ()

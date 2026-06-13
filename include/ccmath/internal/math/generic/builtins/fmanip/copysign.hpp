@@ -49,6 +49,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_COPYSIGN
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for copysign that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_COPYSIGN
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_COPYSIGN
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -64,6 +79,15 @@ namespace ccm::builtin
 #endif
 	// clang-format on
 
+	// TODO: determine actual compiler/version support for runtime __builtin_copysign.
+	template <typename T>
+	inline constexpr bool has_runtime_copysign =
+#ifdef CCMATH_HAS_BUILTIN_COPYSIGN
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_copysign functions.
@@ -72,7 +96,7 @@ namespace ccm::builtin
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
-	constexpr auto copysign(T x, T y) -> std::enable_if_t<has_constexpr_copysign<T>, T>
+	constexpr auto copysign_ct(T x, T y) -> std::enable_if_t<has_constexpr_copysign<T>, T>
 	{
 		if constexpr (std::is_same_v<T, float>) { return __builtin_copysignf(x, y); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_copysign(x, y); }
@@ -80,7 +104,21 @@ namespace ccm::builtin
 		else
 		{
 			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_copysign");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for copysign");
+			return T{};
+		}
+	}
+
+	template <typename T>
+	auto copysign_rt(T x, T y) -> std::enable_if_t<has_runtime_copysign<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>) { return __builtin_copysignf(x, y); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_copysign(x, y); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_copysignl(x, y); }
+		else
+		{
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for copysign");
 			return T{};
 		}
 	}
@@ -88,3 +126,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
+#undef CCMATH_HAS_BUILTIN_COPYSIGN

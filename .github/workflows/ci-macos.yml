@@ -5,19 +5,20 @@ on:
     tags-ignore:
       - v*.*
     branches:
-      - '*'
+      - '**'
   pull_request:
     branches:
-      - '*'
+      - '**'
 
 permissions:
   contents: read
 
 jobs:
-  build:
+  build-cxx17:
     runs-on: macos-latest
+    timeout-minutes: 30
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - name: clang-debug-cxx17
@@ -26,23 +27,11 @@ jobs:
             testPreset: test-ninja-clang-debug
             cxx_version: 17
 
-          - name: clang-debug-cxx20
-            configurePreset: ninja-clang-debug
-            buildPreset: build-ninja-clang-debug
-            testPreset: test-ninja-clang-debug
-            cxx_version: 20
-
           - name: clang-release-cxx17
             configurePreset: ninja-clang-release
             buildPreset: build-ninja-clang-release
             testPreset: test-ninja-clang-release
             cxx_version: 17
-
-          - name: clang-release-cxx20
-            configurePreset: ninja-clang-release
-            buildPreset: build-ninja-clang-release
-            testPreset: test-ninja-clang-release
-            cxx_version: 20
 
           - name: gcc-debug-cxx17
             configurePreset: ninja-gcc-debug
@@ -50,17 +39,73 @@ jobs:
             testPreset: test-ninja-gcc-debug
             cxx_version: 17
 
-          - name: gcc-debug-cxx20
-            configurePreset: ninja-gcc-debug
-            buildPreset: build-ninja-gcc-debug
-            testPreset: test-ninja-gcc-debug
-            cxx_version: 20
-
           - name: gcc-release-cxx17
             configurePreset: ninja-gcc-release
             buildPreset: build-ninja-gcc-release
             testPreset: test-ninja-gcc-release
             cxx_version: 17
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Cache build
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ./**/CMakeFiles
+            ./**/CMakeCache.txt
+            ./**/out
+          key: ${{ runner.os }}-${{ matrix.name }}-${{ hashFiles('CMakeLists.txt', 'CMakePresets.json', 'cmake/**', 'include/**', 'tests/**', 'thirdparty/**') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.name }}-
+
+      - name: Configure
+        run: >
+          cmake --preset="${{ matrix.configurePreset }}"
+          -DCCMATH_DESIRED_CXX_STANDARD="cxx_std_${{ matrix.cxx_version }}"
+          -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON
+          -DCCMATH_ENABLE_WARNINGS_AS_ERRORS=ON
+          -DCCMATH_BUILD_SIMPLE_TESTS=ON
+          -DCCMATH_BUILD_RIGOROUS_TESTS=OFF
+          -DCCMATH_ENABLE_MPFR_TESTS=OFF
+          -DCCMATH_ENABLE_POW_SEARCH_TOOLS=OFF
+
+      - name: Build
+        run: cmake --build --preset="${{ matrix.buildPreset }}"
+
+      - name: Test
+        run: ctest --preset="${{ matrix.testPreset }}" --output-on-failure --schedule-random -L simple -F
+
+  build-cxx20:
+    needs: build-cxx17
+    runs-on: macos-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: clang-debug-cxx20
+            configurePreset: ninja-clang-debug
+            buildPreset: build-ninja-clang-debug
+            testPreset: test-ninja-clang-debug
+            cxx_version: 20
+
+          - name: clang-release-cxx20
+            configurePreset: ninja-clang-release
+            buildPreset: build-ninja-clang-release
+            testPreset: test-ninja-clang-release
+            cxx_version: 20
+
+          - name: gcc-debug-cxx20
+            configurePreset: ninja-gcc-debug
+            buildPreset: build-ninja-gcc-debug
+            testPreset: test-ninja-gcc-debug
+            cxx_version: 20
 
           - name: gcc-release-cxx20
             configurePreset: ninja-gcc-release
@@ -70,29 +115,99 @@ jobs:
 
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@v2.16.0
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Cache build
-        uses: actions/cache@v4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: |
             ./**/CMakeFiles
             ./**/CMakeCache.txt
             ./**/out
-          key: ${{ runner.os }}-${{ matrix.name }}
-
-      - name: Install Ninja
-        run: brew install ninja
+          key: ${{ runner.os }}-${{ matrix.name }}-${{ hashFiles('CMakeLists.txt', 'CMakePresets.json', 'cmake/**', 'include/**', 'tests/**', 'thirdparty/**') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.name }}-
 
       - name: Configure
-        run: cmake --preset="${{ matrix.configurePreset }}" -DCCMATH_DESIRED_CXX_STANDARD="cxx_std_${{ matrix.cxx_version }}" -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON -DCCMATH_ENABLE_WARNINGS_AS_ERRORS=ON
+        run: >
+          cmake --preset="${{ matrix.configurePreset }}"
+          -DCCMATH_DESIRED_CXX_STANDARD="cxx_std_${{ matrix.cxx_version }}"
+          -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON
+          -DCCMATH_ENABLE_WARNINGS_AS_ERRORS=ON
+          -DCCMATH_BUILD_SIMPLE_TESTS=ON
+          -DCCMATH_BUILD_RIGOROUS_TESTS=OFF
+          -DCCMATH_ENABLE_MPFR_TESTS=OFF
+          -DCCMATH_ENABLE_POW_SEARCH_TOOLS=OFF
 
       - name: Build
         run: cmake --build --preset="${{ matrix.buildPreset }}"
 
       - name: Test
-        run: ctest --preset="${{ matrix.testPreset }}" --output-on-failure --schedule-random -F
+        run: ctest --preset="${{ matrix.testPreset }}" --output-on-failure --schedule-random -L simple -F
+
+  rigorous:
+    needs: build-cxx17
+    runs-on: macos-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Cache rigorous build
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: build-rigorous
+          key: ${{ runner.os }}-rigorous-build-${{ hashFiles('CMakeLists.txt', 'cmake/**', 'tests/**', 'include/**', 'thirdparty/**') }}
+          restore-keys: |
+            ${{ runner.os }}-rigorous-build-
+
+      - name: Cache Homebrew downloads
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ~/Library/Caches/Homebrew
+          key: ${{ runner.os }}-brew-mpfr-gmp-ninja-pkgconfig-v1
+
+      - name: Cache CORE-MATH prefix
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: coremath-prefix
+          key: ${{ runner.os }}-coremath-prefix-v1-${{ hashFiles('cmake/coremath/**', 'tools/coremath/**') }}
+
+      - name: Install dependencies
+        run: brew install mpfr gmp
+
+      - name: Build CORE-MATH oracle prefix
+        run: |
+          if [[ ! -f coremath-prefix/include/crmath.h ]]; then
+            bash tools/coremath/build_prefix.sh "${GITHUB_WORKSPACE}/coremath-prefix"
+          fi
+
+      - name: Configure rigorous validation
+        run: >
+          cmake -S . -B build-rigorous -G Ninja
+          -DCCMATH_BUILD_TESTS=ON
+          -DCCMATH_BUILD_SIMPLE_TESTS=OFF
+          -DCCMATH_BUILD_RIGOROUS_TESTS=ON
+          -DCCMATH_ENABLE_MPFR_TESTS=ON
+          -DCCMATH_ENABLE_COREMATH_TESTS=ON
+          -DCCMATH_COREMATH_ROOT=${{ github.workspace }}/coremath-prefix
+          -DCCMATH_ENABLE_POW_SEARCH_TOOLS=ON
+          -DCCMATH_DESIRED_CXX_STANDARD=cxx_std_20
+          -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON
+          -DCCMATH_ENABLE_WARNINGS_AS_ERRORS=ON
+
+      - name: Build rigorous validation
+        run: cmake --build build-rigorous --parallel
+
+      - name: Run rigorous validation
+        run: ctest --test-dir build-rigorous --output-on-failure -L rigorous

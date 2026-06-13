@@ -10,9 +10,9 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/basic/fmax.hpp"
 #include "ccmath/internal/math/generic/func/basic/max_gen.hpp"
 #include "ccmath/internal/math/runtime/func/rt_dispatch.hpp"
-#include "ccmath/internal/predef/has_builtin.hpp"
 
 #include <type_traits>
 
@@ -21,13 +21,10 @@ namespace ccm::rt
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] inline T fmax_rt(T x, T y) noexcept
 	{
-#if CCM_HAS_BUILTIN(__builtin_fmax) || defined(__builtin_fmax)
-		if constexpr (std::is_same_v<T, float>) { return __builtin_fmaxf(x, y); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_fmax(x, y); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fmaxl(x, y); }
-		else { return static_cast<T>(__builtin_fmaxl(static_cast<long double>(x), static_cast<long double>(y))); }
-#else
-		return gen::max(x, y);
-#endif
+		if constexpr (ccm::builtin::has_runtime_fmax<T>) { return ccm::builtin::fmax_rt(x, y); }
+		else
+		{
+			return gen::max(x, y);
+		}
 	}
 } // namespace ccm::rt

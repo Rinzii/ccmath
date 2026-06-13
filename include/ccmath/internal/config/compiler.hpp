@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-// TODO: I'd like to redo how we detect platform information so we can worry less about
-//			poluting the global namespace with macros.
+// TODO(IanP): Redetect platform macros without polluting the global namespace.
 
 /*
  * Currently supported compilers:
@@ -26,6 +25,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 /// MSVC
 #if defined(_MSC_VER) && !defined(__clang__) && !defined(CCMATH_COMPILER_MSVC)
 	#define CCMATH_COMPILER_MSVC
@@ -40,8 +41,6 @@
 		#define CCMATH_COMPILER_CLANG_BASED
 	#endif
 
-// TODO: Add precise detection for specific compiler versions along with a warning if using unsupported compiler
-
 #elif defined(_MSC_VER) && defined(__clang__) && !defined(CCMATH_COMPILER_CLANG_CL)
 	#define CCMATH_COMPILER_CLANG_CL
 	#define CCMATH_COMPILER_CLANG_CL_VER	   ((__clang_major__ * 10000) + (__clang_minor__ * 100) + __clang_patchlevel__)
@@ -53,8 +52,6 @@
 		#define CCMATH_COMPILER_CLANG_BASED
 	#endif
 
-// TODO: Add precise detection for specific compiler versions along with a warning if using unsupported compiler
-
 /// Nvidia HPC SDK
 #elif defined(__NVCOMPILER) || defined(__NVCOMPILER_LLVM__) && !defined(CCMATH_COMPILER_NVIDIA_HPC)
 	#define CCMATH_COMPILER_NVIDIA_HPC
@@ -62,8 +59,6 @@
 	#define CCMATH_COMPILER_NVIDIA_HPC_VER_MAJOR __NVCOMPILER_MAJOR__
 	#define CCMATH_COMPILER_NVIDIA_HPC_VER_MINOR __NVCOMPILER_MINOR__
 	#define CCMATH_COMPILER_NVIDIA_HPC_VER_PATCH __NVCOMPILER_PATCHLEVEL__
-
-// TODO: Add precise detection for specific compiler versions along with a warning if using unsupported compiler
 
 /// Nvidia CUDA
 #elif defined(__CUDACC__) && !defined(CCMATH_COMPILER_NVIDIA_CUDA)
@@ -74,13 +69,9 @@
 	#define CCMATH_COMPILER_NVIDIA_CUDA
 	#define CCMATH_COMPILER_NVIDIA_CUDA_VER (CUDA_VERSION / 1000)
 
-// TODO: Add precise detection for specific compiler versions along with a warning if using unsupported compiler
-
 /// AMD HIP
 #elif defined(__HIP__) && !defined(CCMATH_COMPILER_AMD_HIP)
 	#define CCMATH_COMPILER_AMD_HIP
-
-// TODO: Add precise detection for specific compiler versions along with a warning if using unsupported compiler
 
 /// Apple Clang
 #elif defined(__apple_build_version__) && defined(__clang__) && !defined(CCMATH_COMPILER_APPLE_CLANG)
@@ -94,8 +85,6 @@
 		#define CCMATH_COMPILER_CLANG_BASED
 	#endif
 
-// TODO: Add precise detection for specific compiler versions along with a warning if using unsupported compiler
-
 /// Clang
 #elif defined(__clang__) && !defined(CCMATH_COMPILER_CLANG)
 	#define CCMATH_COMPILER_CLANG
@@ -107,8 +96,6 @@
 	#ifndef CCMATH_COMPILER_CLANG_BASED
 		#define CCMATH_COMPILER_CLANG_BASED
 	#endif
-
-// TODO: Add precise detection for specific compiler versions along with a warning if using unsupported compiler
 
 /// GCC
 #elif defined(__GNUC__) && !defined(CCMATH_COMPILER_GCC)
@@ -122,7 +109,8 @@
 	#define CCMATH_COMPILER_UNKNOWN
 #endif
 
-// TODO: Explore this idea further
+// TODO(IanP): Warn when compiler version is below the supported minimum.
+// TODO(IanP): Extend native_compiler for CUDA, HIP, and Apple Clang.
 
 namespace ccm::internal::platform
 {

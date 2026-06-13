@@ -50,8 +50,8 @@ namespace ccm
 	 * Additional overloads accept an integer \p num and treat it as double.
 	 *
 	 * <b>Parameters</b>
-	 * - \p num — Floating-point or integer value to be scaled.
-	 * - \p exp — Integer exponent by which \p num is multiplied (power of two).
+	 * - \p num: Floating-point or integer value to be scaled.
+	 * - \p exp: Integer exponent by which \p num is multiplied (power of two).
 	 *
 	 * <b>Return value</b>
 	 * - If no errors occur, returns the product \f$\text{num} \times 2^\text{exp}\f$.
@@ -101,24 +101,24 @@ namespace ccm
 	{
 		if constexpr (ccm::builtin::has_constexpr_ldexp<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return builtin::ldexp(num, exp); }
+			if (ccm::support::is_constant_evaluated()) { return builtin::ldexp_ct(num, exp); }
 		}
 		if (!ccm::support::is_constant_evaluated()) { return ccm::rt::ldexp_rt(num, exp); }
 		return support::helpers::internal_ldexp(num, exp);
 	}
 
 	/**
-	 * @brief Overload for integer \p num, multiplying it by 2 rose to the power \p exp.
+	 * @brief Overload for integer \p num, multiplying it by 2 raised to the power \p exp.
 	 *
 	 * The integer \p num is converted to \c double before the multiplication, and the result
 	 * is returned as a \c double.
 	 *
 	 * <b>Parameters</b>
-	 * - \p num — Integer value to be scaled (cast to \c double internally).
-	 * - \p exp — Integer exponent by which \p num is multiplied (power of two).
+	 * - \p num: Integer value to be scaled (cast to \c double internally).
+	 * - \p exp: Integer exponent by which \p num is multiplied (power of two).
 	 *
 	 * <b>Return value</b>
-	 * - If no errors occur, returns the product `num * 2^exp` as a \c double.
+	 * - If no errors occur, returns the product \f$\text{num} \times 2^\text{exp}\f$ as a \c double.
 	 * - If a range error due to overflow occurs, ±HUGE_VAL is returned.
 	 * - If a range error due to underflow occurs, the correct result (after rounding) is returned,
 	 *   which may be 0 or a denormalized value.
@@ -136,9 +136,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double ldexp(Integer num, int exp)
-	{
-		return ccm::ldexp<double>(static_cast<double>(num), exp);
-	}
+	{ return ccm::ldexp<double>(static_cast<double>(num), exp); }
 
 	/**
 	 * @brief Multiplies a float \p num by 2 raised to the power \p exp.
@@ -146,8 +144,8 @@ namespace ccm
 	 * Equivalent to calling \c ldexp<float>(num, exp).
 	 *
 	 * <b>Parameters</b>
-	 * - \p num — Floating-point (float) value to be scaled.
-	 * - \p exp — Integer exponent by which \p num is multiplied (power of two).
+	 * - \p num: Floating-point (float) value to be scaled.
+	 * - \p exp: Integer exponent by which \p num is multiplied (power of two).
 	 *
 	 * <b>Return value</b>
 	 * - The product \f$\text{num} \times 2^\text{exp}\f$ as a float.
@@ -162,16 +160,14 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/ldexp
 	 */
 	constexpr float ldexpf(float num, int exp) noexcept
-	{
-		return ccm::ldexp<float>(num, exp);
-	}
+	{ return ccm::ldexp<float>(num, exp); }
 
 	/**
 	 * @brief Multiplies a long double \p num by 2 raised to the power \p exp.
 	 *
 	 * <b>Parameters</b>
-	 * - \p num — A \c long double value to be scaled by a power of two.
-	 * - \p exp — An integer exponent by which \p num is multiplied (i.e., \f$2^\text{exp}\f$).
+	 * - \p num: A \c long double value to be scaled by a power of two.
+	 * - \p exp: An integer exponent by which \p num is multiplied (i.e., \f$2^\text{exp}\f$).
 	 *
 	 * <b>Return value</b>
 	 * - The product \f$\text{num} \times 2^\text{exp}\f$ as a \c long double.
@@ -192,8 +188,6 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/ldexp
 	 */
 	constexpr long double ldexpl(long double num, int exp) noexcept
-	{
-		return ccm::ldexp<long double>(num, exp);
-	}
+	{ return ccm::ldexp<long double>(num, exp); }
 
 } // namespace ccm

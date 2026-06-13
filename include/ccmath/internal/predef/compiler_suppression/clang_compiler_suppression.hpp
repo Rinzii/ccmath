@@ -10,8 +10,8 @@
 
 #pragma once
 
-// TODO: This should work fine on clang based compilers, but I still need to validate this is fact.
-// TODO: I need to validate that clang-cl works with this as well on windows.
+// TODO(IanP): This should work fine on clang based compilers, but I still need to validate this is fact.
+// TODO(IanP): I need to validate that clang-cl works with this as well on windows.
 
 ///
 /// \def CCM_DISABLE_CLANG_WARNING(w)

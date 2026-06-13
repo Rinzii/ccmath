@@ -47,7 +47,10 @@ namespace ccm
 	constexpr T remquo(T x, T y, int * quo)
 	{
 		if constexpr (std::is_same_v<T, float>) { return internal::remquo_float(x, y, quo); }
-		else { return internal::remquo_double(x, y, quo); }
+		else
+		{
+			return internal::remquo_double(x, y, quo);
+		}
 	}
 
 	/**
@@ -114,9 +117,7 @@ namespace ccm
 	 *  @endcode
 	 */
 	constexpr float remquof(float x, float y, int * quo)
-	{
-		return ccm::remquo<float>(x, y, quo);
-	}
+	{ return ccm::remquo<float>(x, y, quo); }
 
 	/**
 	 * @brief Signed remainder as well as the three last bits of the division operation

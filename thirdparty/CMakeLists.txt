@@ -12,9 +12,9 @@ set(CCMATH_RE2_VERSION 2024-07-02)
 
 
 #
-# Fetch Google Benchmark if building benchmarks
+# Fetch Google Benchmark if building benchmarks or showcase
 #
-if (CCMATH_BUILD_BENCHMARKS)
+if (CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_SHOWCASE)
     # Disable benchmark’s own tests
     set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
 
@@ -22,6 +22,7 @@ if (CCMATH_BUILD_BENCHMARKS)
             benchmark
             GIT_REPOSITORY https://github.com/google/benchmark.git
             GIT_TAG ${CCMATH_BENCHMARK_VERSION}
+            GIT_SHALLOW TRUE
     )
     FetchContent_MakeAvailable(benchmark)
 endif ()
@@ -31,7 +32,15 @@ endif ()
 #
 if (CCMATH_BUILD_TESTS)
     # Abseil config
+    if (CCMATH_DESIRED_CXX_STANDARD AND NOT CMAKE_CXX_STANDARD)
+        string(REGEX REPLACE "cxx_std_" "" _ccmath_requested_cxx_std "${CCMATH_DESIRED_CXX_STANDARD}")
+        set(CMAKE_CXX_STANDARD "${_ccmath_requested_cxx_std}")
+        set(CMAKE_CXX_STANDARD_REQUIRED ON)
+        set(CMAKE_CXX_EXTENSIONS OFF)
+    endif ()
     set(ABSL_PROPAGATE_CXX_STD ON)
+    set(ABSL_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+    set(ABSL_BUILD_TEST_HELPERS OFF CACHE BOOL "" FORCE)
     set(ABSL_ENABLE_INSTALL ON)
 
     # GTest config
@@ -49,14 +58,17 @@ if (CCMATH_BUILD_TESTS)
             abseil
             GIT_REPOSITORY https://github.com/abseil/abseil-cpp.git
             GIT_TAG ${CCMATH_ABSEIL_VERSION}
+            GIT_SHALLOW TRUE
     )
     FetchContent_MakeAvailable(abseil)
 
     # --- RE2 ---
+    set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
     FetchContent_Declare(
             re2
             GIT_REPOSITORY https://github.com/google/re2.git
             GIT_TAG ${CCMATH_RE2_VERSION}
+            GIT_SHALLOW TRUE
     )
     FetchContent_MakeAvailable(re2)
 
@@ -69,6 +81,7 @@ if (CCMATH_BUILD_TESTS)
                 googletest
                 GIT_REPOSITORY https://github.com/google/googletest.git
                 GIT_TAG ${CCMATH_GTEST_VERSION}
+                GIT_SHALLOW TRUE
         )
         FetchContent_MakeAvailable(googletest)
         if (CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM" OR CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
@@ -108,6 +121,6 @@ if (CCMATH_BUILD_TESTS)
     endif ()
 endif ()
 
-if (CCMATH_BUILD_BENCHMARKS)
+if (CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_SHOWCASE)
     target_link_libraries(ccmath-ext INTERFACE benchmark::benchmark)
 endif ()

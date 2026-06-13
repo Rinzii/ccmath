@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include "ccmath/internal/predef/attributes/never_inline.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 
@@ -25,17 +26,40 @@
 CCM_DISABLE_MSVC_WARNING(4702) // 4702: unreachable code
 #endif
 
+#if !defined(__FAST_MATH__) && !defined(CCM_CONFIG_DISABLE_ERRNO)
+	#if defined(_GNU_SOURCE) || defined(__GLIBC__) || defined(__ANDROID__)
+extern "C" int *__errno_location(void) __attribute__((__nothrow__, __const__));
+	#endif
+#endif
+
+namespace ccm::support::fenv::detail
+{
+	CCM_NEVER_INLINE inline void write_errno(int err) noexcept
+	{
+#if defined(__FAST_MATH__) || defined(CCM_CONFIG_DISABLE_ERRNO)
+		(void)err;
+#else
+	#if defined(_GNU_SOURCE) || defined(__GLIBC__) || defined(__ANDROID__)
+		volatile int *const loc = __errno_location();
+		*loc					= err;
+	#else
+		volatile int *const loc = &errno;
+		*loc					= err;
+	#endif
+	#if defined(__GNUC__) || defined(__clang__)
+		__asm__ __volatile__("" : : "r"(loc) : "memory");
+	#endif
+#endif
+	}
+} // namespace ccm::support::fenv::detail
+
 namespace ccm::support::fenv::internal
 {
 	inline int clear_except(const int err_code)
-	{
-		return std::feclearexcept(err_code);
-	}
+	{ return std::feclearexcept(err_code); }
 
 	inline int test_except(const int err_code)
-	{
-		return std::fetestexcept(err_code);
-	}
+	{ return std::fetestexcept(err_code); }
 
 	inline int get_except()
 	{
@@ -58,9 +82,7 @@ namespace ccm::support::fenv::internal
 	}
 
 	inline int raise_except(const int err_code)
-	{
-		return std::feraiseexcept(err_code);
-	}
+	{ return std::feraiseexcept(err_code); }
 
 	inline int enable_except([[maybe_unused]] int err_code)
 	{
@@ -82,24 +104,16 @@ namespace ccm::support::fenv::internal
 	}
 
 	inline int get_round()
-	{
-		return get_rounding_mode();
-	}
+	{ return get_rounding_mode(); }
 
 	inline int set_round(const int rounding_mode)
-	{
-		return std::fesetround(rounding_mode);
-	}
+	{ return std::fesetround(rounding_mode); }
 
-	inline int get_env(std::fenv_t * envp)
-	{
-		return std::fegetenv(envp);
-	}
+	inline int get_env(std::fenv_t *envp)
+	{ return std::fegetenv(envp); }
 
-	inline int set_env(const std::fenv_t * envp)
-	{
-		return std::fesetenv(envp);
-	}
+	inline int set_env(const std::fenv_t *envp)
+	{ return std::fesetenv(envp); }
 } // namespace ccm::support::fenv::internal
 
 namespace ccm::support::fenv
@@ -121,9 +135,7 @@ namespace ccm::support::fenv
 
 	// Helper function to convert the enum class to an integer to enable bitwise operations.
 	constexpr int get_mode(ccm_math_err_mode mode)
-	{
-		return static_cast<int>(mode);
-	}
+	{ return static_cast<int>(mode); }
 
 	constexpr int ccm_math_err_handling()
 	{
@@ -162,15 +174,11 @@ namespace ccm::support::fenv
 		return 0;
 	}
 
-	constexpr void set_errno_if_required(const int err)
+	inline void set_errno_if_required(const int err)
 	{
-		if (!is_constant_evaluated())
-		{
-			if constexpr (is_errno_enabled())
-			{
-				if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { errno = err; }
-			}
-		}
+		if (is_constant_evaluated()) { return; }
+		if constexpr (!is_errno_enabled()) { return; }
+		if ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrno)) != 0) { detail::write_errno(err); }
 	}
 } // namespace ccm::support::fenv
 

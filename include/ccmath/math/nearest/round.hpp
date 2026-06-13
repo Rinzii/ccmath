@@ -33,7 +33,7 @@ namespace ccm
 	{
 		if constexpr (ccm::builtin::has_constexpr_round<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::round(num); }
+			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::round_ct(num); }
 		}
 		{
 			// If num is NaN, NaN is returned.
@@ -56,9 +56,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double round(Integer num) noexcept
-	{
-		return static_cast<double>(num);
-	}
+	{ return static_cast<double>(num); }
 
 	/**
 	 * @brief Rounds a float to the nearest integer value, halfway cases away from zero.
@@ -67,9 +65,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/round
 	 */
 	constexpr float roundf(float num) noexcept
-	{
-		return ccm::round<float>(num);
-	}
+	{ return ccm::round<float>(num); }
 
 	/**
 	 * @brief Rounds a double to the nearest integer value, halfway cases away from zero.
@@ -77,10 +73,8 @@ namespace ccm
 	 * @return Rounded value as double.
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/round
 	 */
-	constexpr double roundl(double num) noexcept
-	{
-		return ccm::round<double>(num);
-	}
+	constexpr long double roundl(long double num) noexcept
+	{ return ccm::round<long double>(num); }
 } // namespace ccm
 
 /// @ingroup nearest

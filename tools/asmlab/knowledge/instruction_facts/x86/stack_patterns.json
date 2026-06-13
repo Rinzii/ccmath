@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "facts": [
+    {
+      "instruction": "vmovss_to_rsp",
+      "isa": "x86_64",
+      "category": "stack_spill",
+      "pattern": "vmovss %xmm, offset(%rsp)",
+      "latency_cycles": {"value": null, "source": "unknown", "confidence": "unknown"},
+      "reciprocal_throughput_cycles": {"value": null, "source": "unknown", "confidence": "unknown"},
+      "notes": [
+        "Volatile staging and spill/reload pairs appear in golden Horner chains.",
+        "Correlates with stack_serial_fma_candidate when followed by vfmadd from stack."
+      ],
+      "source_ids": ["asmlab_local_calibration"],
+      "pattern_rule_id": "x86_stack_serial_fma"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "apple_m1_calibration",
+  "arch": "apple-m1",
+  "source": "asmlab_local_calibration",
+  "confidence": "high_for_documented_runs",
+  "golden_status": "trusted",
+  "overall_status": "partially_trusted",
+  "calibration_version": 2,
+  "known_limitations": [
+    "powf_impl static slice is thin on M1",
+    "Clang on M1 emits bl to the kernel for powf_impl scenario artifacts",
+    "C1 spill/static claims should use x86-64-v3 scenario artifacts or benchmarks",
+    "Linux perf unavailable on macOS",
+    "Instruments not wired in asmlab perf.json",
+    "llvm-mca Apple M1 scheduling model is approximate"
+  ],
+  "trusted_on_this_host": [
+    "golden_horner_vs_estrin benchmark direction",
+    "golden validation after AArch64 heuristic update",
+    "powf_impl native impl benchmark low CV",
+    "sqrt hardware sqrt MCA port narrative"
+  ],
+  "benchmark_parsing": {
+    "rule": "use_cpu_ns_not_time_ns",
+    "source": "asmlab_local_calibration",
+    "confidence": "high"
+  },
+  "pattern_lessons": [
+    "AArch64 stack-serial FMA may appear as ldr from [sp] before fmadd",
+    "x86 stack-serial FMA uses different stack operand patterns than AArch64",
+    "Back-to-back fmadd on AArch64 can indicate Estrin-style parallelism"
+  ],
+  "recommendation": "proceed_to_c1_with_scenario_validation",
+  "artifact_paths": [
+    "out/asmlab/calibration/apple-m1/calibration.json",
+    "out/asmlab/calibration/apple-m1/calibration.md"
+  ]
+}

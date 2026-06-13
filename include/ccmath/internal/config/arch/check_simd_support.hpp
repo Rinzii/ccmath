@@ -90,7 +90,7 @@
 	#endif
 
 // ARM Scalable Vector Extension (SVE)
-/* TODO: At some point add proper SVE support.
+/* TODO: Add proper ARM SVE support.
 	#if defined(__ARM_FEATURE_SVE)
 		#ifndef CCMATH_HAS_SIMD
 			#define CCMATH_HAS_SIMD

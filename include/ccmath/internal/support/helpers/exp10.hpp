@@ -10,11 +10,12 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/func/expo/log2_gen.hpp"
 #include "ccmath/internal/support/multiply_add.hpp"
 #include "ccmath/internal/support/poly_eval.hpp"
 #include "ccmath/internal/types/double_double.hpp"
-#include "ccmath/internal/types/triple_double.hpp"
-#include "ccmath/math/expo/log2.hpp"
+#include "ccmath/math/expo/impl/exp2_double_impl.hpp"
+#include "ccmath/math/expo/impl/exp2_float_impl.hpp"
 
 #include <array>
 
@@ -22,9 +23,9 @@ namespace ccm::support::helpers
 {
 	namespace impl
 	{
-		using namespace ccm::type;
+		using namespace ccm::types;
 
-		constexpr double LOG2_10 = ccm::log2(10.0);
+		constexpr double LOG2_10 = ccm::gen::log2_gen(10.0);
 
 		// -2^-12 * log10(2)
 		// > a = -2^-12 * log10(2);
@@ -76,36 +77,32 @@ namespace ccm::support::helpers
 		}
 
 		constexpr double exp10_double_impl(double exp) noexcept
-		{
-
-			return 0;
-		}
+		{ return ccm::internal::exp2_double(exp * LOG2_10); }
 
 		constexpr double exp10_double_double_impl(double exp) noexcept
-		{
-
-			return 0;
-		}
+		{ return exp10_double_impl(exp); }
 
 		constexpr float exp10_float_impl(float exp) noexcept
 		{
-
-			return 0;
+			// Keep y * log2(10) in double precision through the exponentiation. Rounding the
+			// product to float before exp2 discards ~25 bits of the exponent, which exp2 then
+			// amplifies into tens of float ULPs (worst near y = 31). exp2_double is <= 1
+			// double-ULP over this range, so the single round back to float lands inside the
+			// 4-ULP contract.
+			const double t = static_cast<double>(exp) * LOG2_10;
+			// Outside the float-finite band defer to the float kernel, which raises FE_OVERFLOW
+			// / FE_UNDERFLOW and sets errno at the float boundary rather than the double one.
+			if (t >= 128.0 || t < -149.0) { return ccm::internal::exp2_float(static_cast<float>(t)); }
+			return static_cast<float>(ccm::internal::exp2_double(t));
 		}
 	} // namespace impl
 
 	constexpr double exp10_double(double exp) noexcept
-	{
-		return impl::exp10_double_impl(exp);
-	}
+	{ return impl::exp10_double_impl(exp); }
 
 	constexpr double exp10_double_double(double exp) noexcept
-	{
-		return impl::exp10_double_double_impl(exp);
-	}
+	{ return impl::exp10_double_double_impl(exp); }
 
 	constexpr float exp10_float(float exp) noexcept
-	{
-		return impl::exp10_float_impl(exp);
-	}
+	{ return impl::exp10_float_impl(exp); }
 } // namespace ccm::support::helpers

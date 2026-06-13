@@ -17,5 +17,7 @@
 #include "fmanip/logb.hpp"
 #include "fmanip/modf.hpp"
 #include "fmanip/nextafter.hpp"
+#include "fmanip/nextdown.hpp"
 #include "fmanip/nexttoward.hpp"
+#include "fmanip/nextup.hpp"
 #include "fmanip/scalbn.hpp"

@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 6,
   "cmakeMinimumRequired": {
     "major": 3,
     "minor": 18,
@@ -16,6 +16,16 @@
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
         "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
+        "CMAKE_CXX_STANDARD": "17"
+      }
+    },
+    {
+      "name": "base-clion",
+      "description": "Single-config Ninja for CLion",
+      "generator": "Ninja",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_CXX_STANDARD": "17"
       }
     },
@@ -146,6 +156,62 @@
       }
     },
     {
+      "name": "rigorous",
+      "hidden": true,
+      "cacheVariables": {
+        "CCMATH_BUILD_TESTS": "ON",
+        "CCMATH_BUILD_SIMPLE_TESTS": "OFF",
+        "CCMATH_BUILD_RIGOROUS_TESTS": "ON",
+        "CCMATH_ENABLE_MPFR_TESTS": "ON",
+        "CCMATH_ENABLE_POW_SEARCH_TOOLS": "ON",
+        "CCMATH_DESIRED_CXX_STANDARD": "cxx_std_20",
+        "CCMATH_ENABLE_AGGRESSIVE_WARNINGS": "ON",
+        "CCMATH_ENABLE_WARNINGS_AS_ERRORS": "ON"
+      }
+    },
+    {
+      "name": "rigorous-coremath",
+      "hidden": true,
+      "cacheVariables": {
+        "CCMATH_ENABLE_COREMATH_TESTS": "ON",
+        "CCMATH_COREMATH_ROOT": "${sourceDir}/coremath-prefix"
+      }
+    },
+    {
+      "name": "showcase",
+      "hidden": true,
+      "cacheVariables": {
+        "CCMATH_BUILD_SHOWCASE": "ON",
+        "CCMATH_BUILD_BENCHMARKS": "ON",
+        "CCMATH_BUILD_TESTS": "OFF",
+        "CCMATH_SHOWCASE_ENABLE_GCEM": "ON",
+        "CCMATH_SHOWCASE_ENABLE_MPFR": "ON",
+        "CCMATH_DESIRED_CXX_STANDARD": "cxx_std_20"
+      }
+    },
+    {
+      "name": "examples",
+      "hidden": true,
+      "cacheVariables": {
+        "CCMATH_BUILD_EXAMPLES": "ON",
+        "CCMATH_BUILD_TESTS": "OFF",
+        "CCMATH_BUILD_BENCHMARKS": "OFF",
+        "CCMATH_BUILD_SHOWCASE": "OFF"
+      }
+    },
+    {
+      "name": "rigorous-vcpkg",
+      "hidden": true,
+      "environment": {
+        "VCPKG_ROOT": "${sourceDir}/vcpkg"
+      },
+      "cacheVariables": {
+        "CCMATH_ENABLE_COREMATH_TESTS": "OFF",
+        "VCPKG_MANIFEST_DIR": "${sourceDir}/cmake/vcpkg",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      }
+    },
+    {
       "name": "ninja-gcc-debug",
       "inherits": [
         "base",
@@ -183,6 +249,86 @@
       "description": "Ninja Multi-config + Clang (Debug)"
     },
     {
+      "name": "clion-clang-debug",
+      "displayName": "CLion Clang Debug",
+      "inherits": [
+        "base-clion",
+        "clang",
+        "Debug"
+      ],
+      "binaryDir": "${sourceDir}/out/clang",
+      "description": "Single-config Ninja + Clang (Debug) for CLion"
+    },
+    {
+      "name": "clion-clang-debug-examples",
+      "displayName": "CLion Clang Debug + examples",
+      "inherits": [
+        "base-clion",
+        "clang",
+        "Debug",
+        "examples"
+      ],
+      "binaryDir": "${sourceDir}/out/clang-examples",
+      "description": "Single-config Ninja + Clang (Debug) for CLion examples"
+    },
+    {
+      "name": "clion-clang-debug-rigorous-dev",
+      "displayName": "CLion Clang Debug + rigorous",
+      "inherits": [
+        "base-clion",
+        "clang",
+        "Debug",
+        "rigorous"
+      ],
+      "binaryDir": "${sourceDir}/out/clang-rigorous-dev",
+      "description": "CLion Clang Debug with simple and rigorous test suites",
+      "cacheVariables": {
+        "CCMATH_BUILD_SIMPLE_TESTS": "ON",
+        "CCMATH_ENABLE_AGGRESSIVE_WARNINGS": "OFF",
+        "CCMATH_ENABLE_WARNINGS_AS_ERRORS": "OFF",
+        "CCMATH_ENABLE_COREMATH_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "clion-clang-release-showcase",
+      "displayName": "CLion Clang Release + showcase",
+      "inherits": [
+        "base-clion",
+        "clang",
+        "Release",
+        "showcase"
+      ],
+      "binaryDir": "${sourceDir}/out/clang-showcase",
+      "description": "Single-config Release showcase comparisons for CLion"
+    },
+    {
+      "name": "ninja-clang-debug-rigorous-dev",
+      "inherits": [
+        "base",
+        "clang",
+        "Debug",
+        "rigorous",
+        "rigorous-coremath"
+      ],
+      "description": "Clang Debug with simple and rigorous test suites for CLion",
+      "cacheVariables": {
+        "CCMATH_BUILD_SIMPLE_TESTS": "ON",
+        "CCMATH_ENABLE_AGGRESSIVE_WARNINGS": "OFF",
+        "CCMATH_ENABLE_WARNINGS_AS_ERRORS": "OFF"
+      }
+    },
+    {
+      "name": "ninja-clang-debug-rigorous",
+      "inherits": [
+        "base",
+        "clang",
+        "Debug",
+        "rigorous",
+        "rigorous-coremath"
+      ],
+      "description": "Clang Debug for rigorous validation only"
+    },
+    {
       "name": "ninja-fuzz-debug",
       "inherits": [
         "base",
@@ -199,6 +345,38 @@
         "Release"
       ],
       "description": "Ninja Multi-config + Clang (Release)"
+    },
+    {
+      "name": "ninja-clang-release-rigorous",
+      "inherits": [
+        "base",
+        "clang",
+        "Release",
+        "rigorous",
+        "rigorous-coremath"
+      ],
+      "description": "Ninja Multi-config + Clang (Release) for rigorous validation"
+    },
+    {
+      "name": "ninja-clang-release-showcase",
+      "inherits": [
+        "base",
+        "clang",
+        "Release",
+        "showcase"
+      ],
+      "description": "Ninja Multi-config + Clang (Release) for library showcase comparisons"
+    },
+    {
+      "name": "ninja-gcc-release-rigorous",
+      "inherits": [
+        "base",
+        "gcc",
+        "Release",
+        "rigorous",
+        "rigorous-coremath"
+      ],
+      "description": "Ninja Multi-config + GCC (Release) for rigorous validation"
     },
     {
       "name": "ninja-clang-minsizerel",
@@ -260,6 +438,17 @@
       "description": "VS2022 + Release"
     },
     {
+      "name": "vs22-release-rigorous",
+      "inherits": [
+        "base-vs22",
+        "Release",
+        "rigorous",
+        "rigorous-vcpkg"
+      ],
+      "description": "VS2022 + Release for rigorous MPFR validation via vcpkg",
+      "binaryDir": "${sourceDir}/out/build/vs22/vs22-release-rigorous"
+    },
+    {
       "name": "vs22-clang-debug",
       "inherits": [
         "base-vs22",
@@ -303,6 +492,52 @@
       ]
     },
     {
+      "name": "build-clion-clang-debug",
+      "configurePreset": "clion-clang-debug",
+      "targets": [
+        "all"
+      ]
+    },
+    {
+      "name": "build-clion-clang-debug-examples",
+      "configurePreset": "clion-clang-debug-examples",
+      "targets": [
+        "ccmath-example-all"
+      ]
+    },
+    {
+      "name": "build-clion-clang-debug-rigorous-dev",
+      "configurePreset": "clion-clang-debug-rigorous-dev",
+      "targets": [
+        "all"
+      ]
+    },
+    {
+      "name": "build-clion-clang-release-showcase",
+      "configurePreset": "clion-clang-release-showcase",
+      "targets": [
+        "showcase_bench_sqrt",
+        "showcase_bench_sin",
+        "showcase_accuracy"
+      ]
+    },
+    {
+      "name": "build-ninja-clang-debug-rigorous-dev",
+      "configurePreset": "ninja-clang-debug-rigorous-dev",
+      "configuration": "Debug",
+      "targets": [
+        "all"
+      ]
+    },
+    {
+      "name": "build-ninja-clang-debug-rigorous",
+      "configurePreset": "ninja-clang-debug-rigorous",
+      "configuration": "Debug",
+      "targets": [
+        "all"
+      ]
+    },
+    {
       "name": "build-ninja-fuzz-debug",
       "configurePreset": "ninja-fuzz-debug",
       "configuration": "Debug",
@@ -313,6 +548,32 @@
     {
       "name": "build-ninja-clang-release",
       "configurePreset": "ninja-clang-release",
+      "configuration": "Release",
+      "targets": [
+        "all"
+      ]
+    },
+    {
+      "name": "build-ninja-clang-release-rigorous",
+      "configurePreset": "ninja-clang-release-rigorous",
+      "configuration": "Release",
+      "targets": [
+        "all"
+      ]
+    },
+    {
+      "name": "build-ninja-clang-release-showcase",
+      "configurePreset": "ninja-clang-release-showcase",
+      "configuration": "Release",
+      "targets": [
+        "showcase_bench_sqrt",
+        "showcase_bench_sin",
+        "showcase_accuracy"
+      ]
+    },
+    {
+      "name": "build-ninja-gcc-release-rigorous",
+      "configurePreset": "ninja-gcc-release-rigorous",
       "configuration": "Release",
       "targets": [
         "all"
@@ -375,6 +636,14 @@
       ]
     },
     {
+      "name": "build-vs22-release-rigorous",
+      "configurePreset": "vs22-release-rigorous",
+      "configuration": "Release",
+      "targets": [
+        "ALL_BUILD"
+      ]
+    },
+    {
       "name": "build-vs22-clang-debug",
       "configurePreset": "vs22-clang-debug",
       "configuration": "Debug",
@@ -409,6 +678,55 @@
       "inheritConfigureEnvironment": true
     },
     {
+      "name": "test-clion-clang-debug",
+      "configurePreset": "clion-clang-debug",
+      "inheritConfigureEnvironment": true,
+      "output": {
+        "outputOnFailure": true
+      },
+      "filter": {
+        "include": {
+          "label": "simple"
+        }
+      }
+    },
+    {
+      "name": "test-clion-clang-debug-rigorous-dev",
+      "configurePreset": "clion-clang-debug-rigorous-dev",
+      "inheritConfigureEnvironment": true,
+      "output": {
+        "outputOnFailure": true
+      },
+      "filter": {
+        "include": {
+          "label": "rigorous"
+        }
+      }
+    },
+    {
+      "name": "test-ninja-clang-debug-rigorous-dev",
+      "configurePreset": "ninja-clang-debug-rigorous-dev",
+      "configuration": "Debug",
+      "inheritConfigureEnvironment": true,
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "test-ninja-clang-debug-rigorous",
+      "configurePreset": "ninja-clang-debug-rigorous",
+      "configuration": "Debug",
+      "inheritConfigureEnvironment": true,
+      "output": {
+        "outputOnFailure": true
+      },
+      "filter": {
+        "include": {
+          "label": "rigorous"
+        }
+      }
+    },
+    {
       "name": "test-ninja-fuzz-debug",
       "configurePreset": "ninja-fuzz-debug",
       "configuration": "Debug",
@@ -424,6 +742,34 @@
       "configurePreset": "ninja-clang-release",
       "configuration": "Release",
       "inheritConfigureEnvironment": true
+    },
+    {
+      "name": "test-ninja-clang-release-rigorous",
+      "configurePreset": "ninja-clang-release-rigorous",
+      "configuration": "Release",
+      "inheritConfigureEnvironment": true,
+      "output": {
+        "outputOnFailure": true
+      },
+      "filter": {
+        "include": {
+          "label": "rigorous"
+        }
+      }
+    },
+    {
+      "name": "test-ninja-gcc-release-rigorous",
+      "configurePreset": "ninja-gcc-release-rigorous",
+      "configuration": "Release",
+      "inheritConfigureEnvironment": true,
+      "output": {
+        "outputOnFailure": true
+      },
+      "filter": {
+        "include": {
+          "label": "rigorous"
+        }
+      }
     },
     {
       "name": "test-ninja-clang-minsizerel",
@@ -468,10 +814,151 @@
       "inheritConfigureEnvironment": true
     },
     {
+      "name": "test-vs22-release-rigorous",
+      "configurePreset": "vs22-release-rigorous",
+      "configuration": "Release",
+      "inheritConfigureEnvironment": true,
+      "output": {
+        "outputOnFailure": true
+      },
+      "filter": {
+        "include": {
+          "label": "rigorous"
+        }
+      }
+    },
+    {
       "name": "test-vs22-clang-debug",
       "configurePreset": "vs22-clang-debug",
       "configuration": "Debug",
       "inheritConfigureEnvironment": true
+    }
+  ],
+  "workflowPresets": [
+    {
+      "name": "workflow-clion-clang-debug-examples",
+      "displayName": "CLion examples",
+      "description": "Configure and build the example targets for CLion",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "clion-clang-debug-examples"
+        },
+        {
+          "type": "build",
+          "name": "build-clion-clang-debug-examples"
+        }
+      ]
+    },
+    {
+      "name": "workflow-clion-clang-debug-rigorous-dev",
+      "displayName": "CLion rigorous validation",
+      "description": "Configure, build, and run rigorous ctest for CLion",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "clion-clang-debug-rigorous-dev"
+        },
+        {
+          "type": "build",
+          "name": "build-clion-clang-debug-rigorous-dev"
+        },
+        {
+          "type": "test",
+          "name": "test-clion-clang-debug-rigorous-dev"
+        }
+      ]
+    },
+    {
+      "name": "workflow-clion-clang-release-showcase",
+      "displayName": "CLion showcase",
+      "description": "Configure and build showcase comparison targets for CLion",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "clion-clang-release-showcase"
+        },
+        {
+          "type": "build",
+          "name": "build-clion-clang-release-showcase"
+        }
+      ]
+    },
+    {
+      "name": "workflow-ninja-clang-debug-rigorous-dev",
+      "displayName": "Dev + rigorous (Clang Debug)",
+      "description": "Configure, build, and run all ctest suites for CLion development",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "ninja-clang-debug-rigorous-dev"
+        },
+        {
+          "type": "build",
+          "name": "build-ninja-clang-debug-rigorous-dev"
+        },
+        {
+          "type": "test",
+          "name": "test-ninja-clang-debug-rigorous-dev"
+        }
+      ]
+    },
+    {
+      "name": "workflow-ninja-clang-release-rigorous",
+      "displayName": "Rigorous validation (Clang Release)",
+      "description": "Configure, build, and run the rigorous ctest suite",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "ninja-clang-release-rigorous"
+        },
+        {
+          "type": "build",
+          "name": "build-ninja-clang-release-rigorous"
+        },
+        {
+          "type": "test",
+          "name": "test-ninja-clang-release-rigorous"
+        }
+      ]
+    },
+    {
+      "name": "workflow-ninja-gcc-release-rigorous",
+      "displayName": "Rigorous validation (GCC Release)",
+      "description": "Configure, build, and run the rigorous ctest suite",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "ninja-gcc-release-rigorous"
+        },
+        {
+          "type": "build",
+          "name": "build-ninja-gcc-release-rigorous"
+        },
+        {
+          "type": "test",
+          "name": "test-ninja-gcc-release-rigorous"
+        }
+      ]
+    },
+    {
+      "name": "workflow-vs22-release-rigorous",
+      "displayName": "Rigorous validation (VS2022 Release)",
+      "description": "Configure, build, and run the rigorous MPFR ctest suite via vcpkg",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "vs22-release-rigorous"
+        },
+        {
+          "type": "build",
+          "name": "build-vs22-release-rigorous"
+        },
+        {
+          "type": "test",
+          "name": "test-vs22-release-rigorous"
+        }
+      ]
     }
   ]
 }

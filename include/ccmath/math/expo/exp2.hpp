@@ -10,13 +10,11 @@
 
 #pragma once
 
-#include "ccmath/internal/config/builtin/exp2_support.hpp"
 #include "ccmath/internal/math/generic/builtins/expo/exp2.hpp"
+#include "ccmath/internal/math/generic/func/expo/exp2_gen.hpp"
 #include "ccmath/internal/math/runtime/func/expo/exp2_rt.hpp"
 #include "ccmath/internal/predef/has_const_builtin.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
-#include "ccmath/math/expo/impl/exp2_double_impl.hpp"
-#include "ccmath/math/expo/impl/exp2_float_impl.hpp"
 
 #include <type_traits>
 
@@ -37,15 +35,12 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T exp2(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_exp2<T>) { return ccm::builtin::exp2(num); }
+		if constexpr (ccm::builtin::has_constexpr_exp2<T>) { return ccm::builtin::exp2_ct(num); }
 		else
 		{
 			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::exp2_rt(num); }
 
-			if constexpr (std::is_same_v<T, float>) { return internal::exp2_float(num); }
-			if constexpr (std::is_same_v<T, double>) { return internal::exp2_double(num); }
-			if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::exp2_double(static_cast<double>(num))); }
-			return static_cast<T>(internal::exp2_double(static_cast<double>(num)));
+			return gen::exp2_gen(num);
 		}
 	}
 
@@ -58,9 +53,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double exp2(Integer num)
-	{
-		return ccm::exp2<double>(static_cast<double>(num));
-	}
+	{ return ccm::exp2<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Returns 2 raised to the given power (2^x)
@@ -69,9 +62,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp2
 	 */
 	constexpr float exp2f(float num)
-	{
-		return ccm::exp2<float>(num);
-	}
+	{ return ccm::exp2<float>(num); }
 
 	/**
 	 * @brief Returns 2 raised to the given power (2^x)
@@ -80,9 +71,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp2
 	 */
 	constexpr long double exp2l(long double num)
-	{
-		return ccm::exp2<long double>(num);
-	}
+	{ return ccm::exp2<long double>(num); }
 } // namespace ccm
 
 #if defined(_MSC_VER) && !defined(__clang__)

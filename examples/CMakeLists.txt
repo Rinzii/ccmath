@@ -1,7 +1,13 @@
-project(ccmath-examples)
+cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
-set(CMAKE_CXX_STANDARD 17)
+project(ccmath-examples LANGUAGES CXX)
 
-add_executable(${PROJECT_NAME} main.cpp)
+if (NOT TARGET ccmath)
+    find_package(ccmath CONFIG REQUIRED)
+endif ()
 
-target_link_libraries(${PROJECT_NAME} ccmath::ccmath)
+set(CCMATH_EXAMPLE_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/config/ExampleModuleRegistry.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/helpers/CcmExampleHelpers.cmake)
+
+ccmath_apply_example_registry()

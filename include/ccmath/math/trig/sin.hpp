@@ -29,7 +29,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T sin(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_sin<T>) { return ccm::builtin::sin(num); }
+		if constexpr (ccm::builtin::has_constexpr_sin<T>) { return ccm::builtin::sin_ct(num); }
 		else
 		{
 			if (ccm::support::is_constant_evaluated()) { return ccm::gen::sin_gen(num); }
@@ -46,9 +46,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double sin(Integer num)
-	{
-		return ccm::sin<double>(static_cast<double>(num));
-	}
+	{ return ccm::sin<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Computes the sine of a float angle in radians.
@@ -57,9 +55,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/sin
 	 */
 	constexpr float sinf(float num)
-	{
-		return ccm::sin<float>(num);
-	}
+	{ return ccm::sin<float>(num); }
 
 	/**
 	 * @brief Computes the sine of a long double angle in radians.
@@ -68,9 +64,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/sin
 	 */
 	constexpr long double sinl(long double num)
-	{
-		return ccm::sin<long double>(num);
-	}
+	{ return ccm::sin<long double>(num); }
 } // namespace ccm
 
 /// @ingroup trig

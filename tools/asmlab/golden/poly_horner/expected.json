@@ -1,0 +1,18 @@
+{
+  "fixture": "poly_horner",
+  "role": "baseline",
+  "description": "Serial Horner form with deep multiply-add dependency chain.",
+  "expected_findings": [
+    "dependency_chain_present",
+    "scalar_polynomial_kernel"
+  ],
+  "expected_metric_direction": {
+    "llvm_mca_rthroughput": "slower_than_estrin",
+    "benchmark_ns": "slower_than_estrin",
+    "register_pressure": "lower_than_estrin"
+  },
+  "expected_confidence": {
+    "dependency_chain_present": "high",
+    "scalar_polynomial_kernel": "medium"
+  }
+}

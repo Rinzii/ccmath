@@ -11,8 +11,8 @@
 #pragma once
 
 #include "ccmath/internal/config/compiler.hpp"
+#include "ccmath/internal/math/generic/builtins/nearest/rint.hpp"
 #include "ccmath/internal/math/runtime/func/rt_dispatch.hpp"
-#include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/fp/directional_rounding_utils.hpp"
 
@@ -23,18 +23,18 @@ namespace ccm::rt
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] inline T rint_rt(T num) noexcept
 	{
-#if CCM_HAS_BUILTIN(__builtin_rint) || defined(__builtin_rint)
-	#ifdef CCMATH_COMPILER_GCC
-		if constexpr (std::is_same_v<T, float>) { return __builtin_rintf(num); }
-		else { return ccm::support::fp::directional_round(num, ccm::support::fenv::get_rounding_mode()); }
-	#else
-		if constexpr (std::is_same_v<T, float>) { return __builtin_rintf(num); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_rint(num); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_rintl(num); }
-		else { return static_cast<T>(__builtin_rintl(static_cast<long double>(num))); }
-	#endif
+#ifdef CCMATH_COMPILER_GCC
+		if constexpr (ccm::builtin::has_runtime_rint<T> && std::is_same_v<T, float>) { return ccm::builtin::rint_rt(num); }
+		else
+		{
+			return ccm::support::fp::directional_round(num, ccm::support::fenv::get_rounding_mode());
+		}
 #else
-		return ccm::support::fp::directional_round(num, ccm::support::fenv::get_rounding_mode());
+		if constexpr (ccm::builtin::has_runtime_rint<T>) { return ccm::builtin::rint_rt(num); }
+		else
+		{
+			return ccm::support::fp::directional_round(num, ccm::support::fenv::get_rounding_mode());
+		}
 #endif
 	}
 } // namespace ccm::rt

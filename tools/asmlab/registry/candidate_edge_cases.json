@@ -1,0 +1,96 @@
+{
+  "_comment": "Edge-case group registry for isolated candidate accuracy. Runtime statuses come from variant accuracy gate files (out/asmlab/gates/candidates/). status fields here are schema defaults only. Simple std::powf probes wired via candidate_edge_case_inputs.json for powf_impl except rounding_sensitive and ziv_retry_path. Rigorous MPFR is not_wired.",
+  "candidate_accuracy_statuses": [
+    "pass",
+    "fail",
+    "not_run",
+    "not_wired",
+    "advisory",
+    "production_only"
+  ],
+  "functions": {
+    "powf_impl": {
+      "ulp_label": "powf",
+      "edge_case_groups": {
+        "positive_finite_general": {
+          "status": "not_wired",
+          "description": "Positive finite general kernel path.",
+          "scenario": "positive_finite_general",
+          "benchmark_profile": "positive_finite_general"
+        },
+        "near_one": {
+          "status": "not_wired",
+          "description": "Values near 1.0, log-sensitive reduction.",
+          "scenario": "near_one",
+          "benchmark_profile": "near_one"
+        },
+        "integer_exponent": {
+          "status": "not_wired",
+          "description": "Integer exponent inputs inside or near fast-path bounds.",
+          "scenario": "integer_exponent",
+          "benchmark_profile": "integer_exponent"
+        },
+        "negative_base_integer_exponent": {
+          "status": "not_wired",
+          "description": "Negative base with integer exponent, sign flip and sign_bits.",
+          "scenario": null,
+          "benchmark_profile": null
+        },
+        "negative_base_noninteger_exponent": {
+          "status": "not_wired",
+          "description": "Negative base with non-integer exponent, domain error path.",
+          "scenario": null,
+          "benchmark_profile": null
+        },
+        "zero_signed_zero": {
+          "status": "not_wired",
+          "description": "Zero and signed-zero base and exponent combinations.",
+          "scenario": null,
+          "benchmark_profile": null
+        },
+        "nan_inf": {
+          "status": "not_wired",
+          "description": "NaN and infinity propagation and specials.",
+          "scenario": "nan_inf_signed_zero",
+          "benchmark_profile": null
+        },
+        "subnormal": {
+          "status": "not_wired",
+          "description": "Denormal inputs and normalization exponent adjustment.",
+          "scenario": null,
+          "benchmark_profile": null
+        },
+        "overflow_boundary": {
+          "status": "not_wired",
+          "description": "Results near overflow and ERANGE behavior.",
+          "scenario": null,
+          "benchmark_profile": null
+        },
+        "underflow_boundary": {
+          "status": "not_wired",
+          "description": "Results near underflow and ERANGE behavior.",
+          "scenario": null,
+          "benchmark_profile": null
+        },
+        "rounding_sensitive": {
+          "status": "not_wired",
+          "description": "Cases sensitive to rounding mode when applicable.",
+          "scenario": null,
+          "benchmark_profile": null
+        },
+        "known_worst_ulp": {
+          "status": "not_wired",
+          "description": "Documented worst-ULP replay corpus for powf.",
+          "scenario": null,
+          "benchmark_profile": null
+        },
+        "ziv_retry_path": {
+          "status": "not_wired",
+          "description": "Ziv accuracy test failure and powf_double_double retry path.",
+          "scenario": null,
+          "benchmark_profile": null
+        }
+      }
+    }
+  }
+}

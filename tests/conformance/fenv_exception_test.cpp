@@ -8,7 +8,9 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "ccmath/internal/math/generic/func/power/pow_gen.hpp"
 #include "utils/conformance_suite.hpp"
+#include "utils/test_runtime.hpp"
 
 #include <gtest/gtest.h>
 
@@ -25,18 +27,13 @@
 
 namespace
 {
+	using ccm::test::runtime_value;
+
 	template <typename T>
 	void consume(T value)
 	{
 		volatile T sink = value;
 		(void)sink;
-	}
-
-	template <typename T>
-	T runtime_value(T value)
-	{
-		volatile T sink = value;
-		return sink;
 	}
 } // namespace
 
@@ -68,8 +65,12 @@ TEST(CcmathFenvExceptionTests, DomainErrorsRaiseInvalidLikeStd)
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::asin(runtime_value(2.0))); }, [] { consume(std::asin(runtime_value(2.0))); }, FE_INVALID);
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::acos(runtime_value(2.0))); }, [] { consume(std::acos(runtime_value(2.0))); }, FE_INVALID);
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::gamma(runtime_value(-1.0))); }, [] { consume(std::tgamma(runtime_value(-1.0))); }, FE_INVALID);
+	// [c.math]/1: pow inherits the C library domain-error semantics, including FE_INVALID for negative bases with non-integral exponents.
 	ccm::test::ExpectFenvFlagsMatchStd(
 		[] { consume(ccm::pow(runtime_value(-1.0), runtime_value(0.5))); }, [] { consume(std::pow(runtime_value(-1.0), runtime_value(0.5))); }, FE_INVALID);
+	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::gen::pow_gen(runtime_value(-1.0), runtime_value(0.5))); },
+									   [] { consume(std::pow(runtime_value(-1.0), runtime_value(0.5))); },
+									   FE_INVALID);
 }
 
 TEST(CcmathFenvExceptionTests, DomainErrorsIndependentOfRoundingMode)
@@ -81,6 +82,12 @@ TEST(CcmathFenvExceptionTests, DomainErrorsIndependentOfRoundingMode)
 			ccm::test::ForceRoundingMode force(mode);
 			ASSERT_TRUE(force);
 			ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::sqrt(runtime_value(-1.0))); }, [] { consume(std::sqrt(runtime_value(-1.0))); }, FE_INVALID);
+			ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::pow(runtime_value(-1.0), runtime_value(0.5))); },
+											   [] { consume(std::pow(runtime_value(-1.0), runtime_value(0.5))); },
+											   FE_INVALID);
+			ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::gen::pow_gen(runtime_value(-1.0), runtime_value(0.5))); },
+											   [] { consume(std::pow(runtime_value(-1.0), runtime_value(0.5))); },
+											   FE_INVALID);
 		});
 }
 
@@ -90,12 +97,33 @@ TEST(CcmathFenvExceptionTests, PoleErrorsRaiseDivByZeroLikeStd)
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::log(runtime_value(0.0))); }, [] { consume(std::log(runtime_value(0.0))); }, FE_DIVBYZERO);
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::log2(runtime_value(0.0))); }, [] { consume(std::log2(runtime_value(0.0))); }, FE_DIVBYZERO);
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::log10(runtime_value(0.0))); }, [] { consume(std::log10(runtime_value(0.0))); }, FE_DIVBYZERO);
+	// [c.math]/1: pow inherits the C library pole-error semantics, including FE_DIVBYZERO for zero raised to a negative exponent.
 	ccm::test::ExpectFenvFlagsMatchStd(
 		[] { consume(ccm::pow(runtime_value(0.0), runtime_value(-1.0))); }, [] { consume(std::pow(runtime_value(0.0), runtime_value(-1.0))); }, FE_DIVBYZERO);
+	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::gen::pow_gen(runtime_value(0.0), runtime_value(-1.0))); },
+									   [] { consume(std::pow(runtime_value(0.0), runtime_value(-1.0))); },
+									   FE_DIVBYZERO);
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::logb(runtime_value(0.0))); }, [] { consume(std::logb(runtime_value(0.0))); }, FE_DIVBYZERO);
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::logb(runtime_value(-0.0))); }, [] { consume(std::logb(runtime_value(-0.0))); }, FE_DIVBYZERO);
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::log1p(runtime_value(-1.0))); }, [] { consume(std::log1p(runtime_value(-1.0))); }, FE_DIVBYZERO);
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::gamma(runtime_value(0.0))); }, [] { consume(std::tgamma(runtime_value(0.0))); }, FE_DIVBYZERO);
+}
+
+TEST(CcmathFenvExceptionTests, PoleErrorsIndependentOfRoundingMode)
+{
+	CCMATH_SKIP_MSVC_FENV_EXCEPTIONS();
+	ccm::test::ForEachRoundingModeOrSkip(
+		[&](int mode)
+		{
+			ccm::test::ForceRoundingMode force(mode);
+			ASSERT_TRUE(force);
+			ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::pow(runtime_value(0.0), runtime_value(-1.0))); },
+											   [] { consume(std::pow(runtime_value(0.0), runtime_value(-1.0))); },
+											   FE_DIVBYZERO);
+			ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::gen::pow_gen(runtime_value(0.0), runtime_value(-1.0))); },
+											   [] { consume(std::pow(runtime_value(0.0), runtime_value(-1.0))); },
+											   FE_DIVBYZERO);
+		});
 }
 
 TEST(CcmathFenvExceptionTests, RangeErrorsRaiseOverflowOrUnderflowLikeStd)

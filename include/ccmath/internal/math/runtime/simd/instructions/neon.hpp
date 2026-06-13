@@ -48,14 +48,10 @@ namespace ccm::intrin
 	};
 
 	CCM_ALWAYS_INLINE bool all_of(simd_mask<float, abi::neon> const &a)
-	{
-		return vminvq_u32(a.get()) == static_cast<std::uint32_t>(-1);
-	}
+	{ return vminvq_u32(a.get()) == static_cast<std::uint32_t>(-1); }
 
 	CCM_ALWAYS_INLINE bool any_of(simd_mask<float, abi::neon> const &a)
-	{
-		return vmaxvq_u32(a.get()) == static_cast<std::uint32_t>(-1);
-	}
+	{ return vmaxvq_u32(a.get()) == static_cast<std::uint32_t>(-1); }
 
 	template <>
 	struct simd<float, abi::neon>
@@ -80,9 +76,7 @@ namespace ccm::intrin
 		}
 		template <class Flags>
 		CCM_ALWAYS_INLINE simd(float const *ptr, Flags flags)
-		{
-			copy_from(ptr, flags);
-		}
+		{ copy_from(ptr, flags); }
 		CCM_ALWAYS_INLINE simd(float const *ptr, int stride) : simd(ptr[0], ptr[stride], ptr[2 * stride], ptr[3 * stride]) {}
 		CCM_ALWAYS_INLINE constexpr simd(float32x4_t const &value_in) : m_value(value_in) {}
 		CCM_ALWAYS_INLINE simd operator*(simd const &other) const { return simd(vmulq_f32(m_value, other.m_value)); }
@@ -95,22 +89,16 @@ namespace ccm::intrin
 		[[nodiscard]] CCM_ALWAYS_INLINE constexpr float32x4_t get() const { return m_value; }
 		[[nodiscard]] CCM_ALWAYS_INLINE float convert() const { return vgetq_lane_f32(m_value, 0); }
 		CCM_ALWAYS_INLINE simd_mask<float, abi::neon> operator<(simd const &other) const
-		{
-			return simd_mask<float, abi::neon>(vcltq_f32(m_value, other.m_value));
-		}
+		{ return simd_mask<float, abi::neon>(vcltq_f32(m_value, other.m_value)); }
 		CCM_ALWAYS_INLINE simd_mask<float, abi::neon> operator==(simd const &other) const
-		{
-			return simd_mask<float, abi::neon>(vceqq_f32(m_value, other.m_value));
-		}
+		{ return simd_mask<float, abi::neon>(vceqq_f32(m_value, other.m_value)); }
 
 	private:
 		float32x4_t m_value;
 	};
 
 	CCM_ALWAYS_INLINE simd<float, abi::neon> choose(simd_mask<float, abi::neon> const &a, simd<float, abi::neon> const &b, simd<float, abi::neon> const &c)
-	{
-		return simd<float, abi::neon>(vreinterpretq_f32_u32(vbslq_u32(a.get(), vreinterpretq_u32_f32(b.get()), vreinterpretq_u32_f32(c.get()))));
-	}
+	{ return simd<float, abi::neon>(vreinterpretq_f32_u32(vbslq_u32(a.get(), vreinterpretq_u32_f32(b.get()), vreinterpretq_u32_f32(c.get())))); }
 
 	template <>
 	struct simd_mask<double, abi::neon>
@@ -132,14 +120,10 @@ namespace ccm::intrin
 	};
 
 	CCM_ALWAYS_INLINE bool all_of(simd_mask<double, abi::neon> const &a)
-	{
-		return all_of(simd_mask<float, abi::neon>(vreinterpretq_u32_u64(a.get())));
-	}
+	{ return all_of(simd_mask<float, abi::neon>(vreinterpretq_u32_u64(a.get()))); }
 
 	CCM_ALWAYS_INLINE bool any_of(simd_mask<double, abi::neon> const &a)
-	{
-		return any_of(simd_mask<float, abi::neon>(vreinterpretq_u32_u64(a.get())));
-	}
+	{ return any_of(simd_mask<float, abi::neon>(vreinterpretq_u32_u64(a.get()))); }
 
 	template <>
 	struct simd<double, abi::neon>
@@ -164,9 +148,7 @@ namespace ccm::intrin
 		}
 		template <class Flags>
 		CCM_ALWAYS_INLINE simd(double const *ptr, Flags flags)
-		{
-			copy_from(ptr, flags);
-		}
+		{ copy_from(ptr, flags); }
 		CCM_ALWAYS_INLINE simd(double const *ptr, int stride) : simd(ptr[0], ptr[stride]) {}
 		CCM_ALWAYS_INLINE constexpr simd(float64x2_t const &value_in) : m_value(value_in) {}
 		CCM_ALWAYS_INLINE simd operator*(simd const &other) const { return simd(vmulq_f64(m_value, other.m_value)); }
@@ -179,22 +161,16 @@ namespace ccm::intrin
 		[[nodiscard]] CCM_ALWAYS_INLINE constexpr float64x2_t get() const { return m_value; }
 		[[nodiscard]] CCM_ALWAYS_INLINE double convert() const { return vgetq_lane_f64(m_value, 0); }
 		CCM_ALWAYS_INLINE simd_mask<double, abi::neon> operator<(simd const &other) const
-		{
-			return simd_mask<double, abi::neon>(vcltq_f64(m_value, other.m_value));
-		}
+		{ return simd_mask<double, abi::neon>(vcltq_f64(m_value, other.m_value)); }
 		CCM_ALWAYS_INLINE simd_mask<double, abi::neon> operator==(simd const &other) const
-		{
-			return simd_mask<double, abi::neon>(vceqq_f64(m_value, other.m_value));
-		}
+		{ return simd_mask<double, abi::neon>(vceqq_f64(m_value, other.m_value)); }
 
 	private:
 		float64x2_t m_value;
 	};
 
 	CCM_ALWAYS_INLINE simd<double, abi::neon> choose(simd_mask<double, abi::neon> const &a, simd<double, abi::neon> const &b, simd<double, abi::neon> const &c)
-	{
-		return simd<double, abi::neon>(vreinterpretq_f64_u64(vbslq_u64(a.get(), vreinterpretq_u64_f64(b.get()), vreinterpretq_u64_f64(c.get()))));
-	}
+	{ return simd<double, abi::neon>(vreinterpretq_f64_u64(vbslq_u64(a.get(), vreinterpretq_u64_f64(b.get()), vreinterpretq_u64_f64(c.get())))); }
 } // namespace ccm::intrin
 	#endif // CCMATH_HAS_SIMD_NEON
 #endif	   // CCMATH_HAS_SIMD

@@ -11,6 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/expo/log1p.hpp"
+#include "ccmath/internal/math/generic/func/expo/log1p_gen.hpp"
 #include "ccmath/internal/math/runtime/func/expo/log1p_rt.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
@@ -38,7 +39,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T log1p(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_log1p<T>) { return ccm::builtin::log1p(num); }
+		if constexpr (ccm::builtin::has_constexpr_log1p<T>) { return ccm::builtin::log1p_ct(num); }
 		else
 		{
 			if (num == static_cast<T>(0))
@@ -65,13 +66,7 @@ namespace ccm
 				return -std::numeric_limits<T>::quiet_NaN();
 			}
 
-			if (ccm::support::is_constant_evaluated())
-			{
-				if constexpr (std::is_same_v<T, float>) { return internal::log1p_float(num); }
-				if constexpr (std::is_same_v<T, double>) { return internal::log1p_double(num); }
-				if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::log1p_double(static_cast<double>(num))); }
-				return static_cast<T>(internal::log1p_double(static_cast<double>(num)));
-			}
+			if (ccm::support::is_constant_evaluated()) { return gen::log1p_gen(num); }
 
 			return ccm::rt::log1p_rt(num);
 		}
@@ -86,9 +81,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double log1p(Integer num)
-	{
-		return ccm::log1p<double>(static_cast<double>(num));
-	}
+	{ return ccm::log1p<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Computes log(1 + num) for float.
@@ -97,9 +90,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/log1p
 	 */
 	constexpr float log1pf(float num)
-	{
-		return ccm::log1p<float>(num);
-	}
+	{ return ccm::log1p<float>(num); }
 
 	/**
 	 * @brief Computes log(1 + num) for long double.
@@ -108,7 +99,5 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/log1p
 	 */
 	constexpr long double log1pl(long double num)
-	{
-		return ccm::log1p<long double>(num);
-	}
+	{ return ccm::log1p<long double>(num); }
 } // namespace ccm

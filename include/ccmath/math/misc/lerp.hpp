@@ -59,7 +59,6 @@ namespace ccm
 		return lerp(static_cast<result_type>(a), static_cast<result_type>(b), static_cast<result_type>(t));
 	}
 
-	// TODO: Remove this once we confirm the new lerp is 100% stable
 	/**
 	 * @brief Deprecated fallback implementation of linear interpolation.
 	 * @tparam T Arithmetic type.

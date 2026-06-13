@@ -1,0 +1,30 @@
+// Sampled error curve for the degree-5 Taylor sine plot.
+
+prec = 200!;
+display = decimal!;
+rationalmode = off!;
+
+data_path = "docs/approximating_functions/data/sin_taylor_error.dat";
+
+I = [-pi / 2; pi / 2];
+n = 200!;
+p = x - x^3 / 6 + x^5 / 120;
+
+print("script:", "sin_taylor_error.sollya");
+version;
+print("interval:", I);
+print("samples:", n + 1);
+
+print("x", "abs_error") > data_path;
+
+for i from 0 to n do {
+  xi = round(-pi / 2 + pi * i / n, prec, RN);
+  abs_err = sup(evaluate(abs(p - sin(x)), xi));
+  print(xi, abs_err) >> data_path;
+};
+
+dirty_abs = dirtyinfnorm(abs(p - sin(x)), I);
+print("dirtyinfnorm absolute error:", dirty_abs);
+
+sup_abs = supnorm(p, sin(x), I, absolute, 1b-80);
+print("supnorm absolute error:", sup_abs);

@@ -19,7 +19,6 @@ namespace ccm
 	{
 		// Optimized version of lerp
 		// https://developer.nvidia.com/blog/lerp-faster-cuda/
-		// TODO: Validate this works for all cases of a lerp.
 		return ccm::fma(t, b, ccm::fma(-t, a, a));
 	}
 
@@ -32,7 +31,6 @@ namespace ccm
 		return lerp(static_cast<result_type>(a), static_cast<result_type>(b), static_cast<result_type>(t));
 	}
 
-	// TODO: Remove this once we confirm the new lerp is 100% stable
 	template <typename T>
 	[[maybe_unused]] [[deprecated(
 		"Do not use ccm::lerp_old it is only being kept as a fallback until ccm::lerp has been validated as conforming to std::lerp")]] constexpr T

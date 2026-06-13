@@ -1,0 +1,141 @@
+{
+  "_comment": "asmlab function registry. JSON (not TOML) so it parses on the stock Python 3.9 shipped with macOS, no third-party deps. Each entry is one analysis target. Fields: module (groups output), includes (headers the harness pulls in), signature {ret, args}, expr (the call to emit), harness_mode (runtime_flatten | runtime_no_flatten | path_direct | constexpr_probe), intended_path (expected path category), path_hints (optional classification hints), bench (CMake benchmark option), benchmark_filter (Google Benchmark name filter), ulp_label (accuracy manifest key), constexpr_cases (optional static_assert probe inputs).",
+  "functions": {
+    "sqrt": {
+      "module": "power",
+      "includes": ["ccmath/math/power/sqrt.hpp"],
+      "signature": {"ret": "double", "args": ["double"]},
+      "expr": "ccm::sqrt(a0)",
+      "harness_mode": "runtime_no_flatten",
+      "intended_path": "hardware_instruction_lowering",
+      "path_hints": {"expects_libm": false},
+      "bench": "CCM_BENCH_POWER",
+      "benchmark_filter": "BM_power_sqrt",
+      "ulp_label": "sqrt"
+    },
+    "sqrtf": {
+      "module": "power",
+      "includes": ["ccmath/math/power/sqrt.hpp"],
+      "signature": {"ret": "float", "args": ["float"]},
+      "expr": "ccm::sqrtf(a0)",
+      "harness_mode": "runtime_no_flatten",
+      "intended_path": "hardware_instruction_lowering",
+      "path_hints": {"expects_libm": false},
+      "bench": "CCM_BENCH_POWER",
+      "benchmark_filter": "BM_power_sqrt",
+      "ulp_label": "sqrtf"
+    },
+    "sqrt_rt": {
+      "module": "power",
+      "includes": ["ccmath/internal/math/runtime/func/power/sqrt_rt.hpp"],
+      "signature": {"ret": "double", "args": ["double"]},
+      "expr": "ccm::rt::sqrt_rt<double>(a0)",
+      "harness_mode": "runtime_flatten",
+      "intended_path": "ccmath_internal_kernel",
+      "path_hints": {"expects_libm": false},
+      "bench": "CCM_BENCH_POWER",
+      "benchmark_filter": "BM_power_sqrt",
+      "ulp_label": "sqrt"
+    },
+    "pow": {
+      "module": "power",
+      "includes": ["ccmath/math/power/pow.hpp"],
+      "signature": {"ret": "double", "args": ["double", "double"]},
+      "expr": "ccm::pow(a0, a1)",
+      "harness_mode": "runtime_no_flatten",
+      "intended_path": "ccmath_public_wrapper",
+      "path_hints": {"expects_libm": false},
+      "bench": "CCM_BENCH_POWER",
+      "benchmark_filter": "BM_power_pow",
+      "ulp_label": "pow"
+    },
+    "powf": {
+      "module": "power",
+      "includes": ["ccmath/math/power/pow.hpp"],
+      "signature": {"ret": "float", "args": ["float", "float"]},
+      "expr": "ccm::powf(a0, a1)",
+      "harness_mode": "runtime_no_flatten",
+      "intended_path": "ccmath_public_wrapper",
+      "path_hints": {"expects_libm": false},
+      "bench": "CCM_BENCH_POWER",
+      "benchmark_filter": "BM_power_powf",
+      "ulp_label": "powf"
+    },
+    "powl": {
+      "module": "power",
+      "includes": ["ccmath/math/power/pow.hpp"],
+      "signature": {"ret": "long double", "args": ["long double", "long double"]},
+      "expr": "ccm::powl(a0, a1)",
+      "harness_mode": "runtime_no_flatten",
+      "intended_path": "long_double_ld80_kernel_path",
+      "path_hints": {"long_double_format": "ld80", "expects_libm": false},
+      "bench": "CCM_BENCH_POWER",
+      "benchmark_filter": "BM_power_powl",
+      "ulp_label": "powl"
+    },
+    "pow_rt": {
+      "module": "power",
+      "includes": ["ccmath/math/power/pow.hpp"],
+      "signature": {"ret": "double", "args": ["double", "double"]},
+      "expr": "ccm::rt::pow_rt(a0, a1)",
+      "harness_mode": "runtime_flatten",
+      "intended_path": "ccmath_internal_kernel",
+      "path_hints": {"expects_libm": false},
+      "bench": "CCM_BENCH_POWER",
+      "benchmark_filter": "BM_power_pow",
+      "ulp_label": "pow"
+    },
+    "powf_rt": {
+      "module": "power",
+      "includes": ["ccmath/math/power/pow.hpp"],
+      "signature": {"ret": "float", "args": ["float", "float"]},
+      "expr": "ccm::rt::pow_rt(a0, a1)",
+      "harness_mode": "runtime_flatten",
+      "intended_path": "ccmath_internal_kernel",
+      "path_hints": {"expects_libm": false},
+      "bench": "CCM_BENCH_POWER",
+      "benchmark_filter": "BM_power_powf",
+      "ulp_label": "powf"
+    },
+    "pow_gen": {
+      "module": "power",
+      "includes": ["ccmath/internal/math/generic/func/power/pow_gen.hpp"],
+      "signature": {"ret": "double", "args": ["double", "double"]},
+      "expr": "ccm::gen::pow_gen(a0, a1)",
+      "harness_mode": "constexpr_probe",
+      "intended_path": "ccmath_constexpr_path",
+      "path_hints": {"expects_libm": false},
+      "bench": "CCM_BENCH_POWER",
+      "benchmark_filter": "BM_power_pow",
+      "ulp_label": "pow",
+      "constexpr_cases": [
+        {"args": [2.0, 3.0], "note": "integer exponent"},
+        {"args": [4.0, 0.5], "note": "fractional exponent"}
+      ]
+    },
+    "pow_impl": {
+      "module": "power",
+      "includes": ["ccmath/internal/math/generic/func/power/pow_impl/pow_impl.hpp"],
+      "signature": {"ret": "double", "args": ["double", "double"]},
+      "expr": "ccm::gen::impl::pow_impl(a0, a1)",
+      "harness_mode": "runtime_flatten",
+      "intended_path": "ccmath_internal_kernel",
+      "path_hints": {"expects_libm": false},
+      "bench": "CCM_BENCH_POWER",
+      "benchmark_filter": "BM_power_pow",
+      "ulp_label": "pow"
+    },
+    "powf_impl": {
+      "module": "power",
+      "includes": ["ccmath/internal/math/generic/func/power/pow_impl/powf_impl.hpp"],
+      "signature": {"ret": "float", "args": ["float", "float"]},
+      "expr": "ccm::gen::impl::powf_impl(a0, a1)",
+      "harness_mode": "runtime_flatten",
+      "intended_path": "ccmath_internal_kernel",
+      "path_hints": {"expects_libm": false},
+      "bench": "CCM_BENCH_POWER",
+      "benchmark_filter": "BM_asmlab_powf_impl_positive_finite_general",
+      "ulp_label": "powf"
+    }
+  }
+}

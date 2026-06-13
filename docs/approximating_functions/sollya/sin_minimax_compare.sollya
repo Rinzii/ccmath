@@ -1,0 +1,34 @@
+// Signed error curves comparing the degree-5 Taylor and minimax sine polynomials.
+
+prec = 200!;
+display = decimal!;
+rationalmode = off!;
+
+data_path = "docs/approximating_functions/data/sin_minimax_error.dat";
+
+I = [-pi / 2; pi / 2];
+n = 200!;
+
+t = x - x^3 / 6 + x^5 / 120;
+p = remez(sin(x), 5, I);
+
+print("script:", "sin_minimax_compare.sollya");
+version;
+print("interval:", I);
+print("samples:", n + 1);
+print("minimax polynomial:");
+p;
+
+print("x", "taylor_error", "minimax_error") > data_path;
+
+for i from 0 to n do {
+  xi = round(-pi / 2 + pi * i / n, prec, RN);
+  te = mid(evaluate(t - sin(x), xi));
+  me = mid(evaluate(p - sin(x), xi));
+  print(xi, te, me) >> data_path;
+};
+
+dirty_t = dirtyinfnorm(t - sin(x), I);
+dirty_p = dirtyinfnorm(p - sin(x), I);
+print("taylor dirtyinfnorm absolute error:", dirty_t);
+print("minimax dirtyinfnorm absolute error:", dirty_p);

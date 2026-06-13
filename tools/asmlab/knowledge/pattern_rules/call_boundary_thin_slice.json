@@ -1,0 +1,14 @@
+{
+  "id": "call_boundary_thin_slice",
+  "isa": "any",
+  "description": "A small analyzed region ending in a call or branch to the actual kernel is not sufficient for kernel-level static claims.",
+  "instruction_patterns": ["bl ", "call ", "local_call_to_kernel", "low_instruction_count_with_call"],
+  "meaning": "static_claim_scope_limited",
+  "confidence": "high",
+  "source_ids": ["asmlab_local_calibration"],
+  "used_for": ["report_scope_warnings", "scenario_reports", "candidate_validation"],
+  "thresholds": {
+    "max_instructions_with_call": 40,
+    "notes": "Heuristic only. Scenario flatten may still be incomplete on some hosts."
+  }
+}

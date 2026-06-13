@@ -41,7 +41,5 @@ namespace ccm::ext
 	 */
 	template <typename TStart, typename TEnd, typename TAplha>
 	constexpr std::common_type_t<TStart, TEnd, TAplha> mix(TStart x, TEnd y, TAplha a) noexcept
-	{
-		return (x * (1 - a)) + (y * a);
-	}
+	{ return (x * (1 - a)) + (y * a); }
 } // namespace ccm::ext

@@ -12,14 +12,13 @@
 
 #include "ccmath/internal/config/compiler.hpp"
 #include "ccmath/internal/math/generic/builtins/expo/log2.hpp"
+#include "ccmath/internal/math/generic/func/expo/log2_gen.hpp"
 #include "ccmath/internal/math/runtime/func/expo/log2_rt.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "ccmath/internal/support/fp/directional_rounding_utils.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/compare/signbit.hpp"
-#include "ccmath/math/expo/impl/log2_double_impl.hpp"
-#include "ccmath/math/expo/impl/log2_float_impl.hpp"
 
 #include <limits>
 #include <type_traits>
@@ -43,7 +42,7 @@ namespace ccm
 	{
 		if constexpr (ccm::builtin::has_constexpr_log2<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::log2(num); }
+			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::log2_ct(num); }
 		}
 		{
 			// If the argument is ±0, -∞ is returned
@@ -58,11 +57,8 @@ namespace ccm
 			if (num == static_cast<T>(1))
 			{
 				if (ccm::support::is_constant_evaluated()) { return static_cast<T>(0); }
-#if defined(CCMATH_COMPILER_APPLE_CLANG)
+#if defined(CCMATH_COMPILER_APPLE_CLANG) || (defined(_MSC_VER) && !defined(__clang__))
 				return ccm::support::fp::signed_zero_for_current_mode<T>();
-#elif defined(_MSC_VER) && !defined(__clang__)
-				if constexpr (std::is_same_v<T, float>) { return static_cast<T>(0); }
-				else { return ccm::support::fp::signed_zero_for_current_mode<T>(); }
 #else
 				return static_cast<T>(0);
 #endif
@@ -90,12 +86,7 @@ namespace ccm
 
 			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::log2_rt(num); }
 
-			// We cannot handle long double at this time due to problems
-			// with long double being platform-dependent with its bit size.
-			if constexpr (std::is_same_v<T, float>) { return internal::log2_float(num); }
-			if constexpr (std::is_same_v<T, double>) { return internal::log2_double(num); }
-			if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::log2_double(static_cast<double>(num))); }
-			return static_cast<T>(internal::log2_double(static_cast<double>(num)));
+			return gen::log2_gen(num);
 		}
 	}
 
@@ -108,9 +99,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double log2(Integer num) noexcept
-	{
-		return ccm::log2<double>(static_cast<double>(num));
-	}
+	{ return ccm::log2<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Returns the base 2 logarithm of a number.
@@ -119,9 +108,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/log2
 	 */
 	constexpr float log2f(float num)
-	{
-		return ccm::log2<float>(num);
-	}
+	{ return ccm::log2<float>(num); }
 
 	/**
 	 * @brief Returns the base 2 logarithm of a number.
@@ -130,9 +117,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/log2
 	 */
 	constexpr long double log2l(long double num)
-	{
-		return ccm::log2<long double>(num);
-	}
+	{ return ccm::log2<long double>(num); }
 } // namespace ccm
 
 #if defined(_MSC_VER) && !defined(__clang__)

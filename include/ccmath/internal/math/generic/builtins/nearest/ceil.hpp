@@ -35,6 +35,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_CEIL
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for ceil that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_CEIL
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_CEIL
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -50,6 +65,15 @@ namespace ccm::builtin
 	#endif
 	// clang-format on
 
+	// TODO: determine actual compiler/version support for runtime __builtin_ceil.
+	template <typename T>
+	inline constexpr bool has_runtime_ceil =
+#ifdef CCMATH_HAS_BUILTIN_CEIL
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_ceil functions.
@@ -58,7 +82,7 @@ namespace ccm::builtin
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
-	constexpr auto ceil(T x) -> std::enable_if_t<has_constexpr_ceil<T>, T>
+	constexpr auto ceil_ct(T x) -> std::enable_if_t<has_constexpr_ceil<T>, T>
 	{
 		if constexpr (std::is_same_v<T, float>) { return __builtin_ceilf(x); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_ceil(x); }
@@ -66,7 +90,21 @@ namespace ccm::builtin
 		else
 		{
 			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_ceil");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for ceil");
+			return T{};
+		}
+	}
+
+	template <typename T>
+	auto ceil_rt(T x) -> std::enable_if_t<has_runtime_ceil<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>) { return __builtin_ceilf(x); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_ceil(x); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_ceill(x); }
+		else
+		{
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for ceil");
 			return T{};
 		}
 	}
@@ -74,3 +112,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_CEIL
+#undef CCMATH_HAS_BUILTIN_CEIL

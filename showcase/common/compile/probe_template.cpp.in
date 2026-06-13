@@ -1,0 +1,10 @@
+// Generated compile probe template. @@TOKENS@@ are substituted by measure_compile.py
+
+@@INCLUDE_BLOCK@@
+
+namespace showcase_probe
+{
+@@CONSTEXPR_CASES@@
+} // namespace showcase_probe
+
+int main() { return 0; }

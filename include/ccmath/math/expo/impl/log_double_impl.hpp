@@ -34,16 +34,13 @@ namespace ccm::internal
 
 		constexpr double log_double_impl(double x)
 		{
-			// Declare variables for intermediate calculations
 			ccm::double_t workspace{};
 			ccm::double_t result{};
 			ccm::double_t lowPart{};
 
-			// Convert input double to uint64_t and extract top 16 bits
 			std::uint64_t intX		= ccm::support::double_to_uint64(x);
 			const std::uint32_t top = ccm::support::top16_bits_of_double(x);
 
-			// Constants for comparison
 			constexpr std::uint64_t low	 = ccm::support::double_to_uint64(1.0 - 0x1p-4);
 			constexpr std::uint64_t high = ccm::support::double_to_uint64(1.0 + 0x1p-4);
 
@@ -53,14 +50,13 @@ namespace ccm::internal
 				// Handle the case where x is exactly 1.0
 				if (CCM_UNLIKELY(intX == ccm::support::double_to_uint64(1.0))) { return 0; }
 
-				// Compute the logarithm using polynomial approximation
 				const ccm::double_t rem		 = x - 1.0;
 				const ccm::double_t remSqr	 = rem * rem;
 				const ccm::double_t remCubed = rem * remSqr;
-				result						 = remCubed * (log_poly1_values_dbl[1] + rem * log_poly1_values_dbl[2] + remSqr * log_poly1_values_dbl[3] +
-									   remCubed * (log_poly1_values_dbl[4] + rem * log_poly1_values_dbl[5] + remSqr * log_poly1_values_dbl[6] +
-												   remCubed * (log_poly1_values_dbl[7] + rem * log_poly1_values_dbl[8] + remSqr * log_poly1_values_dbl[9] +
-															   remCubed * log_poly1_values_dbl[10])));
+				result = remCubed * (log_poly1_values_dbl[1] + rem * log_poly1_values_dbl[2] + remSqr * log_poly1_values_dbl[3] +
+									 remCubed * (log_poly1_values_dbl[4] + rem * log_poly1_values_dbl[5] + remSqr * log_poly1_values_dbl[6] +
+												 remCubed * (log_poly1_values_dbl[7] + rem * log_poly1_values_dbl[8] + remSqr * log_poly1_values_dbl[9] +
+															 remCubed * log_poly1_values_dbl[10])));
 
 				// Additional error correction
 				// Worst-case error is around 0.507 ULP.
@@ -85,12 +81,11 @@ namespace ccm::internal
 			}
 
 			/*
-			 * x = 2^expo normVal; where normVal is in range [0x3fe6000000000000, 2 * 0x3fe6000000000000) and exact.
+			 * x = 2^expo normVal. normVal is in range [0x3fe6000000000000, 2 * 0x3fe6000000000000) and exact.
 			 * The range is split into k_logTableN sub-intervals.
 			 * The i-th sub-interval contains normVal and c is near its center.
 			 */
 
-			// Calculate logarithm for normalized inputs
 			const std::uint64_t tmp = intX - k_logTableOff_dbl;
 			// NOLINTBEGIN
 			const std::int64_t i	= (tmp >> (52 - ccm::internal::k_logTableBitsDbl)) % k_logTableN_dbl;
@@ -101,7 +96,6 @@ namespace ccm::internal
 			const ccm::double_t logarithmCoeff = log_tab_values_dbl.at(static_cast<unsigned long>(i)).logc;
 			const ccm::double_t normVal		   = support::uint64_to_double(intNorm);
 
-			// Calculate intermediate value for logarithm computation
 			// log(x) = log1p(normVal/c-1) + log(c) + expo*Ln2.
 			// r ~= z/c - 1, |r| < 1/(2*N)
 			const ccm::double_t rem =
@@ -109,13 +103,11 @@ namespace ccm::internal
 				inverseCoeff;
 			const auto scaleFactor = static_cast<ccm::double_t>(expo);
 
-			// Calculate high and low parts of logarithm
 			// hi + lo = r + log(c) + expo*Ln2.
 			workspace					 = scaleFactor * log_ln2hi_value_dbl + logarithmCoeff;
 			const ccm::double_t highPart = workspace + rem;
 			lowPart						 = workspace - highPart + rem + scaleFactor * log_ln2lo_value_dbl;
 
-			// Final computation of logarithm
 			// log(x) = lo + (log1p(rem) - rem) + hi.
 			const ccm::double_t remSqr = rem * rem; // rounding error: 0x1p-54/k_logTableN^2.
 			// Worst case error if |result| > 0x1p-4: 0.520 ULP
@@ -128,7 +120,5 @@ namespace ccm::internal
 	} // namespace impl
 
 	constexpr double log_double(double num) noexcept
-	{
-		return impl::log_double_impl(num);
-	}
+	{ return impl::log_double_impl(num); }
 } // namespace ccm::internal

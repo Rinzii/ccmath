@@ -130,7 +130,5 @@ namespace ccm::internal
 	} // namespace impl
 
 	constexpr double remquo_double(double x, double y, int * quo) noexcept
-	{
-		return impl::remquo_double_impl(x, y, quo);
-	}
+	{ return impl::remquo_double_impl(x, y, quo); }
 } // namespace ccm::internal

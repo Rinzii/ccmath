@@ -28,6 +28,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_NEXTTOWARD
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for nexttoward that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_NEXTTOWARD
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_NEXTTOWARD
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -43,6 +58,15 @@ namespace ccm::builtin
 #endif
 	// clang-format on
 
+	// TODO: determine actual compiler/version support for runtime __builtin_nexttoward.
+	template <typename T>
+	inline constexpr bool has_runtime_nexttoward =
+#ifdef CCMATH_HAS_BUILTIN_NEXTTOWARD
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_nexttoward functions.
@@ -51,7 +75,7 @@ namespace ccm::builtin
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
-	constexpr auto nexttoward(T x, long double y)
+	constexpr auto nexttoward_ct(T x, long double y)
 		-> std::enable_if_t<std::is_same_v<T, float> || std::is_same_v<T, double> || std::is_same_v<T, long double>, T>
 	{
 		if constexpr (std::is_same_v<T, float>) { return __builtin_nexttowardf(x, y); }
@@ -60,7 +84,21 @@ namespace ccm::builtin
 		else
 		{
 			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_nexttoward");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for nexttoward");
+			return T{};
+		}
+	}
+
+	template <typename T>
+	auto nexttoward_rt(T x, long double y) -> std::enable_if_t<has_runtime_nexttoward<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>) { return __builtin_nexttowardf(x, y); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_nexttoward(x, y); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_nexttowardl(x, y); }
+		else
+		{
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for nexttoward");
 			return T{};
 		}
 	}
@@ -68,3 +106,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_NEXTTOWARD
+#undef CCMATH_HAS_BUILTIN_NEXTTOWARD
