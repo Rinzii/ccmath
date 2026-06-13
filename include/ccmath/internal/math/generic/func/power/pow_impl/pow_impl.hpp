@@ -457,13 +457,20 @@ namespace ccm::gen::impl
 			using FPBits_t = support::fp::FPBits<double>;
 			using Sign	   = types::Sign;
 
-			if (exp == 0.0) { return 1.0; }	 // pow(x, +/-0) = 1, including NaN x
-			if (base == 1.0) { return 1.0; } // pow(1, y) = 1, including NaN y
-
-			if (ccm::isnan(base) || ccm::isnan(exp)) { return std::numeric_limits<double>::quiet_NaN(); }
-
 			FPBits_t base_bits(base);
 			FPBits_t exp_bits(exp);
+
+			// Screen the operands by bit inspection so no floating point compare touches a
+			// signaling NaN. UCRT's pow returns quietly for sNaN operands while glibc and
+			// Apple libm signal invalid, so the raise is explicit and platform scoped.
+#if !defined(_WIN32)
+			if (base_bits.is_signaling_nan() || exp_bits.is_signaling_nan()) { support::fenv::raise_except_if_required(FE_INVALID); }
+#endif
+
+			if (exp_bits.is_zero()) { return 1.0; }								// pow(x, +/-0) = 1, including NaN x
+			if (base_bits.uintval() == FPBits_t(1.0).uintval()) { return 1.0; } // pow(1, y) = 1, including NaN y
+
+			if (base_bits.is_nan() || exp_bits.is_nan()) { return std::numeric_limits<double>::quiet_NaN(); }
 
 			if (base_bits.is_zero())
 			{
