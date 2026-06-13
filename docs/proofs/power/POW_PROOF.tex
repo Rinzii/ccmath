@@ -665,7 +665,8 @@ which is negligible in comparison with the final cast to float.
 
 For finite non-exceptional inputs that do not clamp to overflow or underflow,
 the binary64 kernel reconstructs $x^y$ in double-double working precision and
-returns one binary64 rounding of $r_{\mathrm{hi}} + r_{\mathrm{lo}}$.  The
+returns one binary64 rounding of $r_{\mathrm{hi}} + r_{\mathrm{lo}}$ for a normal
+final value.  The
 single-double circuit of Sections~\ref{sec:poly}--\ref{sec:gappa} is retained
 only on the clamped over/underflow tail, where the result saturates to a signed
 infinity or zero.
@@ -673,9 +674,24 @@ infinity or zero.
 The accurate path repeats the second-stage range reduction of
 Lemma~\ref{lem:stage2} in double-double, evaluates a degree-5 double-double
 minimax for $\log_2(1+\cdot)$ and a degree-9 double-double minimax for
-$2^{\cdot/64}$, and collapses the final pair with one binary64 addition.  The
+$2^{\cdot/64}$, and collapses the final pair with one binary64 addition for a
+normal result.  The
 two minimax polynomials are the new numeric artifacts; their approximation
 error is certified below.
+
+Two reconstruction details are required for correct rounding in every mode and
+are worth recording, since neither is captured by the polynomial certificates.
+First, the high term $e_x + \log_2(r_1)$ is formed as an \texttt{exact\_add} so
+that its rounding residual survives in the low limb: for a base far from $1$ the
+integer $e_x$ is large and a bare single-double sum drops up to half an ulp of
+$e_x$, which the subsequent multiplication by $y$ amplifies past a full result
+ulp.  Second, when the over/underflow scale $2^{-512}$ is in force and the final
+value is subnormal, collapsing the pair to a normal double and then applying the
+scale rounds twice; a round-to-odd intermediate cannot repair this, because a
+$53$-bit double leaves only one guard bit over a $52$-bit subnormal while
+round-to-odd needs two.  The kernel therefore rounds the double-double directly
+onto the shared subnormal grid (lsb $2^{-1074}$) in a single active-mode
+rounding, after which the power-of-two reattachment is exact.
 
 \begin{lemma}[Accurate log2 double-double polynomial bound]
 \label{lem:supnorm-log-dd}
@@ -732,11 +748,22 @@ transformation
   \mathit{lo} = \mathrm{fma}(a,b,-\mathit{hi}),
 \]
 which is exact in every IEEE rounding mode, and a \textsc{FastTwoSum}
-renormalization.  For negative $y$ one Newton reciprocal of the resulting pair is
+renormalization.  Two guards make the algebraic path safe to trust.  First, the
+positive power $x^{|y|}$, held as the pair $p$, must satisfy
+$2^{-960} \le |p_{\mathrm{hi}}| \le 2^{960}$; outside that band the double-double
+low limb underflows or overflows during squaring and the pair loses the extra
+precision the path exists to provide (this bites a tiny base with a large
+negative exponent, whose reciprocal is a large normal result), so such inputs
+fall through to the kernel.  Second, a negative result's sign is folded into the
+pair before the final rounding rather than negated afterward: negating a
+magnitude that was already rounded in the active mode flips directed rounding,
+since $-\,\mathrm{RU}(|v|) = \mathrm{RD}(-|v|)$.  For negative $y$ one Newton
+reciprocal of the (signed) pair is
 taken.  For half-integer $y$ with $|2y| \le 2048$ the identity
 $x^{y} = (\sqrt{x})^{2y}$ is used: $y=\tfrac12$ returns the correctly-rounded
 \texttt{sqrt\_gen}, and otherwise the kernel raises a double-double $\sqrt{x}$ to
-the odd integer $2y$ by the same square-and-multiply. If the algebraic result is
+the odd integer $2y$ by the same square-and-multiply, subject to the same
+safe-band guard. If the algebraic result is
 not a finite normal double, the input is handed back to the kernel so that the
 overflow, underflow, and subnormal semantics of the standard are preserved.
 
@@ -748,9 +775,11 @@ and~\ref{lem:supnorm-exp-dd}) and the mode-independent exactness of the FMA
 error-free transformation used by the algebraic path.  They do not constitute a
 Gappa certificate for the full rounded double-double reconstruction circuit, and
 no bit-exact correct-rounding theorem is asserted here.  End-to-end
-correct-rounding in all four IEEE modes is validated empirically by the
-CORE-MATH all-mode campaign over the generic runtime path; that measurement is
-engineering evidence and is not part of the formal certificates.
+correct-rounding in all four IEEE modes, including the subnormal scale branch and
+the negative-base integer path discussed above, is validated empirically by the
+MPFR and CORE-MATH all-mode campaigns over the generic runtime path; those
+measurements are engineering evidence and are not part of the formal
+certificates.
 \end{remark}
 
 \section{The Ziv Test for \Powf}
