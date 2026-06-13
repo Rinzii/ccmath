@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "ccmath/internal/support/fp/fp_bits.hpp"
+
 #include <cstdint>
 #include <cstring>
 #include <limits>
@@ -42,6 +44,15 @@ namespace ccm::fuzz
 			return true;
 		}
 	}
+
+	// ISO C does not specify how the math functions treat signaling NaN operands, so the system
+	// libm used as the differential oracle disagrees with itself across platforms for them: for
+	// example glibc returns NaN for pow(sNaN, 0) while the Annex F rule that ccmath follows
+	// returns 1. Reject signaling-NaN operands so the comparison only covers behavior the
+	// standard actually pins down (quiet NaN classification is still exercised).
+	template <typename T>
+	bool is_testable_operand(T value)
+	{ return is_canonical_encoding(value) && !ccm::support::fp::FPBits<T>(value).is_signaling_nan(); }
 
 	template <typename T>
 	T load_floating(uint8_t const * data, size_t size, size_t byte_offset = 0)
@@ -128,7 +139,7 @@ namespace ccm::fuzz
 			if (size < sizeof(T)) { return false; }
 			x = load_floating<T>(data, size, 0);
 			apply_selector(x, data, size, sizeof(T));
-			return is_canonical_encoding(x);
+			return is_testable_operand(x);
 		}
 
 		bool load_xy(uint8_t const * data, size_t size)
@@ -138,7 +149,7 @@ namespace ccm::fuzz
 			y = load_floating<T>(data, size, sizeof(T));
 			apply_selector(x, data, size, 2 * sizeof(T));
 			apply_selector(y, data, size, 2 * sizeof(T) + 1);
-			return is_canonical_encoding(x) && is_canonical_encoding(y);
+			return is_testable_operand(x) && is_testable_operand(y);
 		}
 
 		bool load_xyz(uint8_t const * data, size_t size)
@@ -150,7 +161,7 @@ namespace ccm::fuzz
 			apply_selector(x, data, size, 3 * sizeof(T));
 			apply_selector(y, data, size, 3 * sizeof(T) + 1);
 			apply_selector(z, data, size, 3 * sizeof(T) + 2);
-			return is_canonical_encoding(x) && is_canonical_encoding(y) && is_canonical_encoding(z);
+			return is_testable_operand(x) && is_testable_operand(y) && is_testable_operand(z);
 		}
 
 		bool load_xy_i(uint8_t const * data, size_t size)
@@ -161,7 +172,7 @@ namespace ccm::fuzz
 			i = load_i32(data, size, 2 * sizeof(T));
 			apply_selector(x, data, size, 2 * sizeof(T) + sizeof(int32_t));
 			apply_selector(y, data, size, 2 * sizeof(T) + sizeof(int32_t) + 1);
-			return is_canonical_encoding(x) && is_canonical_encoding(y);
+			return is_testable_operand(x) && is_testable_operand(y);
 		}
 	};
 
