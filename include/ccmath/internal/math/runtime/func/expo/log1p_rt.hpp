@@ -21,6 +21,9 @@ namespace ccm::rt
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] inline T log1p_rt(T num) noexcept
 	{
+		// TODO(IanP): add the FE_TONEAREST guard the other expo runtime headers use once the generic
+		// log1p double kernel meets the accuracy contract. It is not accurate enough yet, so routing
+		// directed rounding to it would regress log1p below the libm builtin used here in every mode.
 		if constexpr (ccm::builtin::has_runtime_log1p<T>) { return ccm::builtin::log1p_rt(num); }
 		else
 		{

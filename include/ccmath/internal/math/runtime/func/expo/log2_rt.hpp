@@ -25,13 +25,22 @@ namespace ccm::rt
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] inline T log2_rt(T num) noexcept
 	{
+		const auto scalar = [](T value) { return detail::dispatch_float_double(value, ccm::internal::log2_float, ccm::internal::log2_double); };
 #if defined(_MSC_VER) && !defined(__clang__)
+		// MSVC routes to libm, which is not correctly rounded outside round to nearest.
+		// Outside FE_TONEAREST use the generic kernel instead.
+		if (CCM_UNLIKELY(ccm::support::fenv::get_rounding_mode() != FE_TONEAREST)) { return scalar(num); }
 		return detail::msvc_libm::log2_call(num);
 #else
-		if constexpr (ccm::builtin::has_runtime_log2<T>) { return ccm::builtin::log2_rt(num); }
+		if constexpr (ccm::builtin::has_runtime_log2<T>)
+		{
+			// The runtime builtin lowers to libm, which is not correctly rounded outside round to
+			// nearest. Outside FE_TONEAREST use the generic kernel instead.
+			if (CCM_UNLIKELY(ccm::support::fenv::get_rounding_mode() != FE_TONEAREST)) { return scalar(num); }
+			return ccm::builtin::log2_rt(num);
+		}
 		else
 		{
-			const auto scalar = [](T value) { return detail::dispatch_float_double(value, ccm::internal::log2_float, ccm::internal::log2_double); };
 	#if defined(CCMATH_HAS_SIMD) && defined(CCMATH_HAS_SIMD_SVML) && !defined(_MSC_VER)
 			return detail::unary_svml_or_impl(num, [](auto v) { return intrin::log2(v); }, scalar);
 	#else
