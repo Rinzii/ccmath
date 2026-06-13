@@ -225,14 +225,20 @@ namespace ccm::gen::impl
 				}
 			}
 
-			// |base|^e with base a finite normal double. base is split into a [1, 2) mantissa and a
-			// binary exponent up front (exact), then the same exact-FMA products as ipow run on the
-			// mantissa with a renormalization after each step.
-			constexpr ScaledPow ipow_scaled(double base, std::uint64_t e) noexcept
+			// Split a double-double base into a [1, 2) mantissa pair and a binary exponent. Both
+			// limbs take the same power-of-two factor, so the split is exact and the lo limb of an
+			// accurate sqrt input survives (the half-integer path raises a double-double sqrt).
+			constexpr ScaledPow load_scaled(const DoubleDouble & base) noexcept
 			{
-				const int base_exp = static_cast<int>(support::fp::FPBits<double>(base).get_biased_exponent()) - support::fp::FPBits<double>::exponent_bias;
-				ScaledPow factor{ DoubleDouble{ support::helpers::internal_ldexp(base, -base_exp), 0.0 }, static_cast<long>(base_exp) };
+				const int e = static_cast<int>(support::fp::FPBits<double>(base.hi).get_biased_exponent()) - support::fp::FPBits<double>::exponent_bias;
+				return ScaledPow{ DoubleDouble{ support::helpers::internal_ldexp(base.hi, -e), support::helpers::internal_ldexp(base.lo, -e) },
+								  static_cast<long>(e) };
+			}
 
+			// base^e with the same exact-FMA products as ipow, accumulated as a ScaledPow so the
+			// mantissa is renormalized to [1, 2) after every step and no limb leaves the normal range.
+			constexpr ScaledPow ipow_scaled(ScaledPow factor, std::uint64_t e) noexcept
+			{
 				ScaledPow result{ DoubleDouble{ 1.0, 0.0 }, 0 };
 				while (e > 0U)
 				{
@@ -252,6 +258,12 @@ namespace ccm::gen::impl
 				}
 				return result;
 			}
+
+			constexpr ScaledPow ipow_scaled(double base, std::uint64_t e) noexcept
+			{ return ipow_scaled(load_scaled(DoubleDouble{ base, 0.0 }), e); }
+
+			constexpr ScaledPow ipow_scaled(const DoubleDouble & base, std::uint64_t e) noexcept
+			{ return ipow_scaled(load_scaled(base), e); }
 		} // namespace pow_int_detail
 
 		// Accurate double-double reconstruction of x^y for the in-range (non-clamped)
@@ -668,19 +680,6 @@ namespace ccm::gen::impl
 				base = base_bits.abs().get_val();
 			}
 
-			// Screen, before the half-integer squaring runs, the powers that overflow: under
-			// directed rounding an overflowing product clamps to a finite garbage value rather than
-			// becoming infinity, so it cannot be detected after the fact. The exponent of base^mag
-			// is below mag*(e_base + 1) for base in [2^e_base, 2^(e_base+1)); keeping that <= 1023
-			// guarantees the power (and every intermediate, which never exceeds it for a base above
-			// one) stays finite. The low side is checked on the actual product magnitude.
-			constexpr double kIntPowSafeLo = 0x1.0p-968;
-			auto power_cannot_overflow	   = [](double ipow_base, std::uint64_t mag) noexcept
-			{
-				const int e_base = static_cast<int>(FPBits_t(ipow_base).get_biased_exponent()) - FPBits_t::exponent_bias;
-				return static_cast<long>(mag) * (e_base + 1) <= 1023;
-			};
-
 			// Small integer exponents: double-double exponentiation by squaring rounds correctly
 			// even for results sitting within one ULP of a power of two, which the log2/exp2 kernel
 			// cannot. ipow_scaled keeps the running product normal at every step (carrying a binary
@@ -714,7 +713,10 @@ namespace ccm::gen::impl
 
 			// Small half-integer exponents: x^(k + 1/2) = sqrt(x)^(2k + 1). Here base > 0
 			// (negative base with non-integer exponent already returned NaN), so the result is
-			// a correctly rounded integer power of an accurate double-double sqrt.
+			// a correctly rounded integer power of an accurate double-double sqrt. The squaring uses
+			// the same exponent-tracked accumulator as the integer path so the smallest and largest
+			// reachable magnitudes keep full precision (a bare double-double drops its lo limb for a
+			// small base under a large odd power, e.g. 1/sqrt(x) for x just above a tiny power of two).
 			const double two_exp = exp * 2.0;
 			if (is_integer(two_exp) && FPBits_t(two_exp).abs().get_val() <= 2048.0)
 			{
@@ -722,18 +724,12 @@ namespace ccm::gen::impl
 				// trip below would re-round an exact midpoint to the wrong neighbor.
 				if (exp == 0.5) { return ccm::gen::sqrt_gen<double>(base); }
 
-				const auto m								 = static_cast<std::int64_t>(two_exp);
-				const std::uint64_t mag						 = m < 0 ? static_cast<std::uint64_t>(-(m + 1)) + 1U : static_cast<std::uint64_t>(m);
-				const pow_int_detail::DoubleDouble sqrt_base = pow_int_detail::dd_sqrt(base);
-				if (power_cannot_overflow(sqrt_base.hi, mag))
-				{
-					const pow_int_detail::DoubleDouble p = pow_int_detail::ipow(sqrt_base, mag);
-					if (FPBits_t(p.hi).abs().get_val() >= kIntPowSafeLo)
-					{
-						const double r = m < 0 ? pow_int_detail::reciprocal(p) : (p.hi + p.lo);
-						if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal()) { return r; }
-					}
-				}
+				const auto m					   = static_cast<std::int64_t>(two_exp);
+				const std::uint64_t mag			   = m < 0 ? static_cast<std::uint64_t>(-(m + 1)) + 1U : static_cast<std::uint64_t>(m);
+				const pow_int_detail::ScaledPow sp = pow_int_detail::ipow_scaled(pow_int_detail::dd_sqrt(base), mag);
+				const double scaled				   = m < 0 ? pow_int_detail::reciprocal(sp.mantissa) : (sp.mantissa.hi + sp.mantissa.lo);
+				const double r					   = support::helpers::internal_ldexp(scaled, m < 0 ? -sp.exp2 : sp.exp2);
+				if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal()) { return r; }
 			}
 
 			// LLVM libc clamps huge finite exponents so the kernel can round overflow/underflow.
