@@ -18,8 +18,8 @@
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/fp/nearest_integer.hpp"
 #include "ccmath/internal/support/multiply_add.hpp"
-#include "ccmath/internal/types/double_double.hpp"
 #include "ccmath/math/trig/impl/sincos_float_data.hpp"
+#include "ccmath/math/trig/impl/sincos_payne_hanek.hpp"
 
 #include <cerrno>
 #include <cfenv>
@@ -29,9 +29,8 @@ namespace ccm::internal::impl
 {
 	namespace sincos_float_detail
 	{
-		using FPBits	   = support::fp::FPBits<float>;
-		using DoubleDouble = types::DoubleDouble;
-		namespace data	   = sincos_float_data;
+		using FPBits   = support::fp::FPBits<float>;
+		namespace data = sincos_float_data;
 
 		constexpr unsigned sincosf_range_reduction_small(float x, float & u)
 		{
@@ -44,42 +43,14 @@ namespace ccm::internal::impl
 			return static_cast<unsigned>(static_cast<int>(k));
 		}
 
-		constexpr unsigned sincosf_range_reduction_large(float x, float & u)
-		{
-			FPBits xbits(x);
-
-			const int x_e_m32  = xbits.get_biased_exponent() - (FPBits::exponent_bias + 32);
-			const unsigned idx = static_cast<unsigned>((x_e_m32 >> 3) + 2);
-
-			xbits.set_biased_exponent((x_e_m32 & 7) + FPBits::exponent_bias + 32);
-			const float x_reduced = xbits.get_val();
-
-			const DoubleDouble ph = types::exact_mult(x_reduced, data::EIGHT_OVER_PI[idx][0]);
-			const DoubleDouble pm = types::exact_mult(x_reduced, data::EIGHT_OVER_PI[idx][1]);
-			const DoubleDouble pl = types::exact_mult(x_reduced, data::EIGHT_OVER_PI[idx][2]);
-
-			const float sum_hi = static_cast<float>(ph.lo + pm.hi);
-			const float k	   = support::fp::nearest_integer(sum_hi);
-
-			const float y_hi		 = static_cast<float>((ph.lo - k) + pm.hi);
-			const DoubleDouble y_mid = types::exact_add(pm.lo, pl.hi);
-			const float y_lo		 = static_cast<float>(pl.lo);
-
-			const float y_l		 = support::multiply_add(x_reduced, data::EIGHT_OVER_PI[idx][3], y_lo);
-			const DoubleDouble y = types::exact_add(y_hi, y_mid.hi);
-			DoubleDouble y_total = y;
-			y_total.lo += (y_mid.lo + y_l);
-
-			u = static_cast<float>(support::multiply_add(y_total.hi, data::PI_OVER_8.hi, y_total.lo * data::PI_OVER_8.hi));
-
-			return static_cast<unsigned>(static_cast<int>(k));
-		}
-
 		template <bool IsSin>
 		constexpr float sincosf_eval(float x)
 		{
 			FPBits xbits(x);
 			const std::uint32_t x_abs = ccm::support::bit_cast<std::uint32_t>(x) & 0x7fff'ffffU;
+
+			// sin(+/-0) = +/-0, cos(+/-0) = 1. Returning x preserves the sign of a signed zero.
+			if (x_abs == 0) { return IsSin ? x : 1.0f; }
 
 			float y{};
 			unsigned k = 0;
@@ -103,7 +74,9 @@ namespace ccm::internal::impl
 					return x + FPBits::quiet_nan().get_val();
 				}
 
-				k = sincosf_range_reduction_large(x, y);
+				double yd = 0.0;
+				k		  = sincos_ph::payne_hanek_reduce(static_cast<double>(x), yd);
+				y		  = static_cast<float>(yd);
 			}
 
 			const float sin_k = data::SIN_K_PI_OVER_8[k & 15];

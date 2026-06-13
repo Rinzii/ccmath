@@ -85,7 +85,9 @@ namespace ccm::internal::impl
 		{
 			const T ax = ccm::fabs(x);
 
-			if (ax < static_cast<T>(0x1.0p-14)) { return x + x * x * x * static_cast<T>(-0x1.5555555555555p-3); }
+			// asin(x) = x + x^3/6 + O(x^5); the cubic coefficient is +1/6 (this fast path previously
+			// used -1/6, which underran by ~x^3/3 over the tiny-|x| band).
+			if (ax < static_cast<T>(0x1.0p-14)) { return x + x * x * x * static_cast<T>(0x1.5555555555555p-3); }
 
 			if constexpr (sizeof(T) == sizeof(float))
 			{
@@ -143,6 +145,11 @@ namespace ccm::internal::impl
 	template <typename T>
 	constexpr T atan_impl(T x) noexcept
 	{
+		// The |x|<=1 path composes sqrt, a division, and asin; in float those roundings compound to
+		// ~5 ULP. Evaluate float atan through the double kernel and round once (double atan is within
+		// a couple of double ULP, so the float result is effectively correctly rounded).
+		if constexpr (std::is_same_v<T, float>) { return static_cast<float>(atan_impl<double>(static_cast<double>(x))); }
+
 		if (CCM_UNLIKELY(ccm::isnan(x))) { return x; }
 
 		if (x == static_cast<T>(0)) { return x; }
