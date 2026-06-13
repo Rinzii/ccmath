@@ -83,7 +83,18 @@ namespace ccm::support::helpers
 		{ return exp10_double_impl(exp); }
 
 		constexpr float exp10_float_impl(float exp) noexcept
-		{ return ccm::internal::exp2_float(static_cast<float>(static_cast<double>(exp) * LOG2_10)); }
+		{
+			// Keep y * log2(10) in double precision through the exponentiation. Rounding the
+			// product to float before exp2 discards ~25 bits of the exponent, which exp2 then
+			// amplifies into tens of float ULPs (worst near y = 31). exp2_double is <= 1
+			// double-ULP over this range, so the single round back to float lands inside the
+			// 4-ULP contract.
+			const double t = static_cast<double>(exp) * LOG2_10;
+			// Outside the float-finite band defer to the float kernel, which raises FE_OVERFLOW
+			// / FE_UNDERFLOW and sets errno at the float boundary rather than the double one.
+			if (t >= 128.0 || t < -149.0) { return ccm::internal::exp2_float(static_cast<float>(t)); }
+			return static_cast<float>(ccm::internal::exp2_double(t));
+		}
 	} // namespace impl
 
 	constexpr double exp10_double(double exp) noexcept

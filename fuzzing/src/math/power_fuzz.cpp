@@ -16,7 +16,6 @@
 
 #include <cmath>
 #include <limits>
-#include <type_traits>
 
 namespace
 {
@@ -41,20 +40,7 @@ namespace
 #endif
 		if (!skip_hypot) { ccm::fuzz::fuzz_binary_vs_std(in.x, in.y, ccm::fuzz::calls::hypot<T>, [](T a, T b) { return std::hypot(a, b); }); }
 
-		// TODO(IanP): drop the base-10 guard once exp10_float is fixed; powf's x==10 shortcut
-		// routes to exp10_float, which is up to 41 ULP off (chip). All other bases are fine.
-		const bool base10_powf_gap = []
-		{
-#ifdef CCMATH_FUZZ_GENERIC
-			return std::is_same_v<T, float>;
-#else
-			return false;
-#endif
-		}();
-		if (!(base10_powf_gap && in.x == static_cast<T>(10)))
-		{
-			ccm::fuzz::fuzz_binary_vs_std(in.x, in.y, ccm::fuzz::calls::pow<T>, [](T a, T b) { return std::pow(a, b); });
-		}
+		ccm::fuzz::fuzz_binary_vs_std(in.x, in.y, ccm::fuzz::calls::pow<T>, [](T a, T b) { return std::pow(a, b); });
 	}
 
 	// Dedicated long double lane for pow only: powl has a native extended kernel, while the

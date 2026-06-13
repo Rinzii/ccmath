@@ -270,6 +270,20 @@ TEST(CcmathPowerUlpTests, PowfBaseTwoAndTenShortcutAccuracy)
 	}
 }
 
+// [c.math]/1: regression for the base-10 shortcut. powf(10, n) routes integer exponents outside
+// (2, 24] straight through exp10_float, which previously rounded y * log2(10) to float before
+// exp2 and drifted up to 41 ULP (worst at n = 31, with n = -10 giving 7 ULP). Cover every integer
+// power of 10 that stays finite and nonzero in float, both the small-int-loop band and the shortcut.
+TEST(CcmathPowerUlpTests, PowfBaseTenIntegerExponentAccuracy)
+{
+	for (int n = -44; n <= 38; ++n)
+	{
+		const auto exp = static_cast<float>(n);
+		SCOPED_TRACE(n);
+		ccm::test::ExpectSameFloatingAsStd(ccm::powf(10.0F, exp), static_cast<float>(std::pow(10.0F, exp)), 1);
+	}
+}
+
 // [c.math]/1: integer exponents in (2, 24] use an iterated double product when the base mantissa
 // is narrow enough (extra_bits * iterations <= 25). Bracket that boundary from both sides with
 // bases of known mantissa width so both the loop and the rejection into the main path are hit.
