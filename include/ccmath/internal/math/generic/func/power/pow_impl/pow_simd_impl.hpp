@@ -246,8 +246,11 @@ namespace ccm::gen::impl
 			const auto m1		 = sd::v_biased_exponent(log2_x_m.hi) >= sd::v_biased_exponent(log2_1p.hi);
 			const VDD log2_x_low = sd::v_add(sd::v_select(m1, log2_x_m, log2_1p), sd::v_select(m1, log2_1p, log2_x_m));
 
-			const VDD hi_dd{ log2_x_hi_part, DVec(0.0) };
-			const auto m2		  = sd::v_biased_exponent(log2_x_hi_part) >= sd::v_biased_exponent(log2_x_low.hi);
+			// e_x + lr_hi as an exact_add so the rounding residual of a far-from-one base survives
+			// into the accurate path, matching the scalar pow_double_double. The bare
+			// {log2_x_hi_part, 0} pair used previously dropped it and drifted up to ~1.5 ULP.
+			const VDD hi_dd		  = sd::v_exact_add(e_x, lr_hi);
+			const auto m2		  = sd::v_biased_exponent(hi_dd.hi) >= sd::v_biased_exponent(log2_x_low.hi);
 			const VDD log2_x_full = sd::v_add(sd::v_select(m2, hi_dd, log2_x_low), sd::v_select(m2, log2_x_low, hi_dd));
 
 			const VDD y6_log2_x = sd::v_quick_mult(y6_dd, log2_x_full);

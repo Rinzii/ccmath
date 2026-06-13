@@ -202,10 +202,11 @@ namespace ccm::gen::impl
 		// exponent region. The fast pow_kernel single-double path is good to a few ULP
 		// but loses the last bit near rounding boundaries under directed rounding. This
 		// path mirrors powf_double_double but keeps a full double-double log2(x) (binary64
-		// allows |y| up to ~2^53, so the powf lo6_hi single-double shortcut is unsafe) and
-		// collapses the normalized double-double with a single binary64 addition, which
-		// rounds once in the active mode and is therefore correctly rounded in all modes.
-		constexpr double pow_double_double(unsigned idx_x, double dx, double log2_x_hi_part, double y6, std::uint64_t sign, double scale) noexcept
+		// allows |y| up to ~2^53, so the powf lo6_hi single-double shortcut is unsafe). A
+		// normal final value collapses with a single binary64 addition, correctly rounded in
+		// every mode; a subnormal value (only reachable through the 2^-512 underflow scale) is
+		// instead rounded straight onto the subnormal grid to avoid a double rounding.
+		constexpr double pow_double_double(unsigned idx_x, double dx, double e_x, double y6, std::uint64_t sign, double scale) noexcept
 		{
 			using FPBits_t = support::fp::FPBits<double>;
 
@@ -244,8 +245,13 @@ namespace ccm::gen::impl
 			const DoubleDouble log2_x_low =
 				pow_kernel_detail::larger_exponent(log2_x_m.hi, log2_1p.hi) ? ccm::types::add(log2_x_m, log2_1p) : ccm::types::add(log2_1p, log2_x_m);
 
-			// Full log2(x) = (e_x - log2(r1) high part) + lower-order double-double.
-			const DoubleDouble hi_dd{ log2_x_hi_part, 0.0 };
+			// Full log2(x) = (e_x - log2(r1) high part) + lower-order double-double. e_x + lr.hi
+			// must be formed as an exact_add: for a base far from 1 the integer e_x is large and
+			// rounds off the low bits of lr.hi, a residual of up to half an ulp of e_x that y6
+			// then amplifies into more than a full result ulp. The single-double fast path keeps
+			// this residual via its own exact_add, so the accurate path has to as well.
+			const DoubleDouble hi_dd	= ccm::types::exact_add(e_x, lr.hi);
+			const double log2_x_hi_part = hi_dd.hi;
 			const DoubleDouble log2_x =
 				pow_kernel_detail::larger_exponent(log2_x_hi_part, log2_x_low.hi) ? ccm::types::add(hi_dd, log2_x_low) : ccm::types::add(log2_x_low, hi_dd);
 
@@ -291,10 +297,62 @@ namespace ccm::gen::impl
 			const DoubleDouble rr = quick_mult(exp2_hm, pp);
 
 			// A single binary64 addition of a faithful double-double rounds once in the
-			// active mode, yielding the correctly-rounded result without double rounding. For
-			// scaled results the final 2^+-512 multiply is exact because the reconstruction is a
-			// normal double, so a single rounding still happens in the addition.
-			return (rr.hi + rr.lo) * scale;
+			// active mode, yielding the correctly-rounded result for a normal final value. When
+			// scale != 1 the reconstruction is built at normal magnitude and shifted by a
+			// power-of-two scale; that shift is exact while the result stays normal, so the lone
+			// addition is still correctly rounded there.
+			const double collapsed = rr.hi + rr.lo;
+			double result		   = collapsed * scale;
+
+			// Once the scaled result lands in the subnormal range the 2^-512 shift rounds a second
+			// time, so the collapse above double-rounds (off by one ULP under FE_TONEAREST). A
+			// round-to-odd intermediate cannot rescue it: a 53-bit double leaves only one guard
+			// bit over a 52-bit subnormal, while round-to-odd needs two. Instead round the
+			// double-double straight onto the subnormal grid in one active-mode rounding; the
+			// following power-of-two shift is then exact. Normal results keep the fast path
+			// untouched (a normal reconstruction times a power-of-two scale is already exact).
+			if (scale < 1.0)
+			{
+				if (const FPBits_t rb(result); rb.is_subnormal() || rb.is_zero())
+				{
+					// Every subnormal shares the lsb 2^-1074; with scale = 2^-512 the pre-scale grid
+					// is 2^-562, so scaling the pair up by 2^562 makes that grid the unit and the
+					// magnitude at most 2^51 (exact, no overflow). Round the integer count of grid
+					// units in the active mode, then reattach the 2^-1074 weight exactly.
+					constexpr double kGridToUnit   = 0x1.0p562;
+					constexpr double kUnitToResult = 0x1.0p-1074;
+
+					const bool neg		 = rr.hi < 0.0;
+					const double abs_hi	 = neg ? -rr.hi : rr.hi;
+					const double abs_lo	 = neg ? -rr.lo : rr.lo;
+					const DoubleDouble v = ccm::types::exact_add(abs_hi * kGridToUnit, abs_lo * kGridToUnit);
+
+					auto units	= static_cast<std::int64_t>(v.hi); // trunc toward zero, v.hi >= 0
+					double frac = (v.hi - static_cast<double>(units)) + v.lo;
+					if (frac < 0.0)
+					{
+						units -= 1;
+						frac += 1.0;
+					}
+
+					const bool inexact = frac != 0.0;
+					bool round_up_mag  = false;
+					switch (support::fenv::get_rounding_mode())
+					{
+					case FE_TONEAREST: round_up_mag = frac > 0.5 || (frac == 0.5 && (units & 1) != 0); break;
+					case FE_UPWARD: round_up_mag = !neg && inexact; break;
+					case FE_DOWNWARD: round_up_mag = neg && inexact; break;
+					case FE_TOWARDZERO:
+					default: break;
+					}
+					if (round_up_mag) { units += 1; }
+
+					const double magnitude = static_cast<double>(units) * kUnitToResult; // exact, units <= 2^52
+					result				   = neg ? -magnitude : magnitude;
+				}
+			}
+
+			return result;
 		}
 
 		constexpr double pow_kernel(double base, double exp, std::uint64_t sign) noexcept
@@ -407,7 +465,7 @@ namespace ccm::gen::impl
 			// and only the raised flag matters.
 			if (!clamped)
 			{
-				const double dd = pow_double_double(idx_x, dx, log2_x_hi_part, y6, sign, scale);
+				const double dd = pow_double_double(idx_x, dx, static_cast<double>(e_x), y6, sign, scale);
 				if (scale != 1.0)
 				{
 					const FPBits_t dd_bits(dd);
@@ -554,17 +612,37 @@ namespace ccm::gen::impl
 				base = base_bits.abs().get_val();
 			}
 
-			// Small integer exponents: double-double exponentiation by squaring rounds
-			// correctly even for results sitting within one ULP of a power of two, which the
-			// log2/exp2 kernel cannot. Over/underflow (non-normal result) falls through to the
-			// kernel, which owns errno and floating-point exception signaling.
+			// The accurate integer path requires its positive power |base|^|exp| (held as p) to
+			// stay in a comfortably normal band: once p.hi nears the subnormal floor the
+			// double-double lo limb underflows during squaring and the running product loses the
+			// extra precision the path exists to provide (this bites a tiny base with a large
+			// negative exponent, whose reciprocal is a large normal result). Powers outside the
+			// band, and non-normal results, fall through to the kernel, which owns errno and the
+			// floating-point exception signaling.
+			constexpr double kIntPowSafeHi = 0x1.0p960;
+			constexpr double kIntPowSafeLo = 0x1.0p-960;
+
+			// Small integer exponents: double-double exponentiation by squaring rounds correctly
+			// even for results sitting within one ULP of a power of two, which the log2/exp2 kernel
+			// cannot.
 			if (is_integer(exp) && FPBits_t(exp).abs().get_val() <= 1024.0)
 			{
-				const auto exp_i					 = static_cast<std::int64_t>(exp);
-				const std::uint64_t mag				 = exp_i < 0 ? static_cast<std::uint64_t>(-(exp_i + 1)) + 1U : static_cast<std::uint64_t>(exp_i);
-				const pow_int_detail::DoubleDouble p = pow_int_detail::ipow(base, mag);
-				const double r						 = exp_i < 0 ? pow_int_detail::reciprocal(p) : (p.hi + p.lo);
-				if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal()) { return sign != 0 ? -r : r; }
+				const auto exp_i			   = static_cast<std::int64_t>(exp);
+				const std::uint64_t mag		   = exp_i < 0 ? static_cast<std::uint64_t>(-(exp_i + 1)) + 1U : static_cast<std::uint64_t>(exp_i);
+				pow_int_detail::DoubleDouble p = pow_int_detail::ipow(base, mag);
+				if (const double p_abs = FPBits_t(p.hi).abs().get_val(); p_abs >= kIntPowSafeLo && p_abs <= kIntPowSafeHi)
+				{
+					// Fold a negative result's sign into the pair before the final rounding. Negating
+					// a magnitude that was already rounded in the active mode flips directed rounding
+					// (-round_up(|v|) is round_down(-|v|)); rounding the signed value is correct.
+					if (sign != 0)
+					{
+						p.hi = -p.hi;
+						p.lo = -p.lo;
+					}
+					const double r = exp_i < 0 ? pow_int_detail::reciprocal(p) : (p.hi + p.lo);
+					if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal()) { return r; }
+				}
 			}
 
 			// Small half-integer exponents: x^(k + 1/2) = sqrt(x)^(2k + 1). Here base > 0
@@ -580,8 +658,11 @@ namespace ccm::gen::impl
 				const auto m						 = static_cast<std::int64_t>(two_exp);
 				const std::uint64_t mag				 = m < 0 ? static_cast<std::uint64_t>(-(m + 1)) + 1U : static_cast<std::uint64_t>(m);
 				const pow_int_detail::DoubleDouble p = pow_int_detail::ipow(pow_int_detail::dd_sqrt(base), mag);
-				const double r						 = m < 0 ? pow_int_detail::reciprocal(p) : (p.hi + p.lo);
-				if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal()) { return r; }
+				if (const double p_abs = FPBits_t(p.hi).abs().get_val(); p_abs >= kIntPowSafeLo && p_abs <= kIntPowSafeHi)
+				{
+					const double r = m < 0 ? pow_int_detail::reciprocal(p) : (p.hi + p.lo);
+					if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal()) { return r; }
+				}
 			}
 
 			// LLVM libc clamps huge finite exponents so the kernel can round overflow/underflow.
