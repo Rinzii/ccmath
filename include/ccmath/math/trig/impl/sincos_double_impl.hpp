@@ -100,8 +100,13 @@ namespace ccm::internal::impl
 			const double c1 = support::multiply_add(y_sq, cp, 1.0);
 			const double s1 = support::multiply_add(y3, sp, y);
 
+			// The cos tail is in the else so it is discarded for the sin instantiation rather than
+			// left as unreachable code, which MSVC rejects under /W4 (C4702).
 			if constexpr (IsSin) { return support::multiply_add(cos_k, s1, sin_k * c1); }
-			return support::multiply_add(cos_k, c1, -sin_k * s1);
+			else
+			{
+				return support::multiply_add(cos_k, c1, -sin_k * s1);
+			}
 		}
 
 	} // namespace sincos_double_detail
