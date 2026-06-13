@@ -17,6 +17,7 @@
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/power/sqrt.hpp"
 
+#include <limits>
 #include <type_traits>
 
 namespace ccm::internal::impl
@@ -44,6 +45,10 @@ namespace ccm::internal::impl
 		}
 
 		const T ratio = y / x;
-		return x * ccm::sqrt(static_cast<T>(1) + ratio * ratio);
+		const T scale = ccm::sqrt(static_cast<T>(1) + ratio * ratio);
+
+		if (x > std::numeric_limits<T>::max() / scale) { return fp_bits_t::inf().get_val(); }
+
+		return x * scale;
 	}
 } // namespace ccm::internal::impl

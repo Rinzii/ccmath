@@ -96,3 +96,13 @@ TEST(CcmathPowerTests, HypotCbrtCompileTime)
 	static_assert(ccm::hypot(3.0, 0.0) == 3.0);
 	static_assert(ccm::cbrt(8.0) == 2.0);
 }
+TEST(CcmathPowerTests, HypotOverflowBoundary)
+{
+    constexpr float x = 3.40282347e38f;
+    constexpr float y = 9.18e34f;
+
+    ccm::test::ExpectSameFloatingAsStd(
+        ccm::hypot(x, y),
+        std::hypot(x, y)
+    );
+}
