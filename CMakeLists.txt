@@ -39,6 +39,13 @@ message(STATUS "CCMath: Version: ${CCMATH_BUILD_VERSION}")
 # Load user-configurable options (e.g., BUILD_EXAMPLES, BUILD_TESTS, etc.)
 include(cmake/config/UserOptions.cmake)
 
+# Deterministic mode requires every call to route through the generic kernels, so
+# runtime SIMD (a separate, non-generic evaluation path) must be off regardless of
+# how CCMATH_DISABLE_RUNTIME_SIMD was set.
+if (CCMATH_ENABLE_DETERMINISTIC)
+    set(CCMATH_DISABLE_RUNTIME_SIMD ON CACHE BOOL "Disabled by deterministic mode" FORCE)
+endif ()
+
 if (CCMATH_DISABLE_RUNTIME_SIMD)
     set(CCMATH_ENABLE_RUNTIME_SIMD OFF)
 else ()

@@ -52,7 +52,7 @@ namespace ccm::builtin
 	template <typename T>
 	inline constexpr bool has_constexpr_pow =
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_POW
-		is_valid_builtin_type<T>;
+		is_valid_transcendental_builtin_type<T>;
 #else
 			false;
 	#endif
@@ -62,7 +62,7 @@ namespace ccm::builtin
 	// TODO: determine actual compiler/version support for runtime __builtin_pow.
 	inline constexpr bool has_runtime_pow =
 #ifdef CCMATH_HAS_BUILTIN_POW
-		is_valid_builtin_type<T>;
+		is_valid_transcendental_builtin_type<T>;
 #else
 		false;
 #endif

@@ -13,6 +13,7 @@ set(CCMATH_LIBRARY_MANIFEST_OPTION_KEYS
         runtime_simd
         disable_errno
         reduced_precision_powl
+        deterministic
 )
 
 set(CCMATH_LIBRARY_MANIFEST_OPTION_runtime_simd_CMAKE_VAR CCMATH_DISABLE_RUNTIME_SIMD)
@@ -38,6 +39,14 @@ set(CCMATH_LIBRARY_MANIFEST_OPTION_reduced_precision_powl_MESON_OPTION disable_r
 set(CCMATH_LIBRARY_MANIFEST_OPTION_reduced_precision_powl_DEFINE CCM_CONFIG_DISABLE_REDUCED_PRECISION_POWL)
 set(CCMATH_LIBRARY_MANIFEST_OPTION_reduced_precision_powl_DESCRIPTION
         "Return quiet NaN from powl on non-binary80 long double instead of the default reduced-precision double fallback")
+
+set(CCMATH_LIBRARY_MANIFEST_OPTION_deterministic_CMAKE_VAR CCMATH_ENABLE_DETERMINISTIC)
+set(CCMATH_LIBRARY_MANIFEST_OPTION_deterministic_CMAKE_DEFAULT OFF)
+set(CCMATH_LIBRARY_MANIFEST_OPTION_deterministic_CMAKE_INVERT FALSE)
+set(CCMATH_LIBRARY_MANIFEST_OPTION_deterministic_MESON_OPTION deterministic)
+set(CCMATH_LIBRARY_MANIFEST_OPTION_deterministic_DEFINE CCM_CONFIG_DETERMINISTIC)
+set(CCMATH_LIBRARY_MANIFEST_OPTION_deterministic_DESCRIPTION
+        "Produce bit-identical cross-hardware math: route transcendentals through the generic kernels (no libm), force the correctly-rounded FMA path, disable runtime SIMD, and evaluate long double in double precision (GCC/Clang)")
 
 function(ccmath_manifest_declare_library_options)
     foreach (_ccmath_manifest_key IN LISTS CCMATH_LIBRARY_MANIFEST_OPTION_KEYS)

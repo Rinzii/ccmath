@@ -35,6 +35,13 @@ newoption {
     default = "false",
 }
 
+newoption {
+    trigger = "ccmath-deterministic",
+    description = "Produce bit-identical cross-hardware math: route transcendentals through the generic kernels (no libm), force the correctly-rounded FMA path, disable runtime SIMD, and evaluate long double in double precision (GCC/Clang)",
+    allowed = { { "true", "Enable" }, { "false", "Disable" } },
+    default = "false",
+}
+
 ccmath = ccmath or {}
 
 local _ccmath_include_dirs = { "include", "out/secondary/include" }
@@ -47,6 +54,10 @@ local function _ccmath_option_enabled(trigger, default_value)
     return value == "true"
 end
 
+local function _ccmath_is_msvc()
+    return string.match(_ACTION or "", "vs") ~= nil
+end
+
 function ccmath.include_dirs()
     return _ccmath_include_dirs
 end
@@ -54,7 +65,7 @@ end
 function ccmath.defines()
     local defs = {}
 
-    if _ccmath_option_enabled("ccmath-enable-runtime-simd", true) then
+    if _ccmath_option_enabled("ccmath-enable-runtime-simd", true) and not _ccmath_option_enabled("ccmath-deterministic", false) then
         table.insert(defs, "CCM_CONFIG_USE_RT_SIMD")
     end
 
@@ -66,11 +77,26 @@ function ccmath.defines()
         table.insert(defs, "CCM_CONFIG_DISABLE_REDUCED_PRECISION_POWL")
     end
 
+    if _ccmath_option_enabled("ccmath-deterministic", false) then
+        table.insert(defs, "CCM_CONFIG_DETERMINISTIC")
+    end
+
     return defs
+end
+
+function ccmath.buildoptions()
+    local opts = {}
+
+    if _ccmath_option_enabled("ccmath-deterministic", false) and not _ccmath_is_msvc() then
+        table.insert(opts, "-ffp-contract=off")
+    end
+
+    return opts
 end
 
 function ccmath.use()
     includedirs(ccmath.include_dirs())
     defines(ccmath.defines())
+    buildoptions(ccmath.buildoptions())
 end
 -- END GENERATED LIBRARY MANIFEST

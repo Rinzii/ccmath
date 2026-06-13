@@ -18,7 +18,7 @@ if not cpp.compiles(_ccmath_builtin_bit_cast_probe, name : 'ccmath builtin bit_c
 endif
 
 _ccmath_defines = []
-if get_option('enable_runtime_simd')
+if get_option('enable_runtime_simd') and not get_option('deterministic')
   _ccmath_defines += '-DCCM_CONFIG_USE_RT_SIMD'
 endif
 if get_option('disable_errno')
@@ -26,6 +26,12 @@ if get_option('disable_errno')
 endif
 if get_option('disable_reduced_precision_powl')
   _ccmath_defines += '-DCCM_CONFIG_DISABLE_REDUCED_PRECISION_POWL'
+endif
+if get_option('deterministic')
+  _ccmath_defines += '-DCCM_CONFIG_DETERMINISTIC'
+endif
+if get_option('deterministic')
+  _ccmath_defines += '-ffp-contract=off'
 endif
 
 _ccmath_simd_fma_probe = '''
@@ -36,7 +42,7 @@ int main() {
 }
 '''
 
-if get_option('enable_runtime_simd') and cpp.compiles(_ccmath_simd_fma_probe, name : 'ccmath runtime SIMD FMA intrinsics')
+if get_option('enable_runtime_simd') and not get_option('deterministic') and cpp.compiles(_ccmath_simd_fma_probe, name : 'ccmath runtime SIMD FMA intrinsics')
   _ccmath_defines += '-DCCM_CONFIG_RT_SIMD_HAS_FMA'
 endif
 
@@ -48,7 +54,7 @@ int main() {
 }
 '''
 
-if get_option('enable_runtime_simd') and cpp.compiles(_ccmath_simd_svml_probe, name : 'ccmath runtime SIMD SVML intrinsics')
+if get_option('enable_runtime_simd') and not get_option('deterministic') and cpp.compiles(_ccmath_simd_svml_probe, name : 'ccmath runtime SIMD SVML intrinsics')
   _ccmath_defines += '-DCCM_CONFIG_RT_SIMD_HAS_SVML'
 endif
 

@@ -50,7 +50,18 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T pow(T base, T exp)
 	{
-		if constexpr (ccm::builtin::has_constexpr_pow<T>)
+#ifdef CCM_CONFIG_DETERMINISTIC
+		// long double has no cross-hardware-portable format, so deterministic mode evaluates it in
+		// double precision (overriding native powl and any reduced-precision-powl setting) to keep
+		// the public result bit-identical everywhere. The native long double kernel stays reachable
+		// through ccm::gen::pow_gen for internal use.
+		if constexpr (std::is_same_v<T, long double>)
+		{
+			return static_cast<long double>(ccm::pow<double>(static_cast<double>(base), static_cast<double>(exp)));
+		}
+		else
+#endif
+			if constexpr (ccm::builtin::has_constexpr_pow<T>)
 		{
 			// Constant evaluation always rounds to nearest, so the constexpr builtin is correct there.
 			// At runtime the builtin lowers to libm, so defer to the runtime dispatcher which only

@@ -26,6 +26,15 @@
 	#define CCMATH_TARGET_CPU_HAS_FMA
 #endif
 
+// Deterministic mode routes every multiply_add through the IEEE-correct __builtin_fma (hardware
+// where present, a software fma() call otherwise) so the result is bit-identical on FMA and
+// non-FMA targets, and forces the if constexpr(target_cpu_has_fma) kernel branches to a single
+// path. This does not assert that the CPU has an FMA instruction; it selects the correctly-rounded
+// fused operation regardless of hardware.
+#if defined(CCM_CONFIG_DETERMINISTIC) && !defined(CCMATH_TARGET_CPU_HAS_FMA)
+	#define CCMATH_TARGET_CPU_HAS_FMA
+#endif
+
 /// CCMATH_HAS_CONSTEXPR_BUILTIN_FMA
 /// This is a macro that is defined if the compiler has constexpr __builtin functions for fma that allow static_assert
 ///

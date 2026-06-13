@@ -76,15 +76,36 @@ def write_version_header(include_dir: Path, header: str) -> None:
     version_path.write_text(header, encoding="utf-8")
 
 
+def _deterministic_meson_option(options: list[dict[str, Any]]) -> str | None:
+    option = next((opt for opt in options if opt["key"] == "deterministic"), None)
+    return option["meson_option"] if option is not None else None
+
+
 def meson_define_lines(options: list[dict[str, Any]]) -> list[str]:
+    deterministic = _deterministic_meson_option(options)
     lines: list[str] = []
     for option in options:
         meson_name = option["meson_option"]
         define = option["define"]
+        # Deterministic mode routes every call through the generic kernels, so the runtime SIMD
+        # path (a separate, non-generic evaluation) must stay off even if the user left it enabled.
+        condition = f"get_option('{meson_name}')"
+        if deterministic is not None and option["key"] == "runtime_simd":
+            condition += f" and not get_option('{deterministic}')"
         lines.extend(
             [
-                f"if get_option('{meson_name}')",
+                f"if {condition}",
                 f"  _ccmath_defines += '-D{define}'",
+                "endif",
+            ]
+        )
+    if deterministic is not None:
+        # Stop the compiler from contracting stray a*b+c into a hardware FMA, which would diverge
+        # between FMA and non-FMA targets. Mirrors the CMake INTERFACE flag.
+        lines.extend(
+            [
+                f"if get_option('{deterministic}')",
+                "  _ccmath_defines += '-ffp-contract=off'",
                 "endif",
             ]
         )
@@ -97,13 +118,17 @@ def meson_runtime_probe_lines(options: list[dict[str, Any]]) -> list[str]:
         return []
 
     meson_name = runtime_option["meson_option"]
+    deterministic = _deterministic_meson_option(options)
+    guard = f"get_option('{meson_name}')"
+    if deterministic is not None:
+        guard += f" and not get_option('{deterministic}')"
     return [
         "",
         "_ccmath_simd_fma_probe = '''",
         SIMD_FMA_PROBE.rstrip(),
         "'''",
         "",
-        f"if get_option('{meson_name}') and cpp.compiles(_ccmath_simd_fma_probe, name : 'ccmath runtime SIMD FMA intrinsics')",
+        f"if {guard} and cpp.compiles(_ccmath_simd_fma_probe, name : 'ccmath runtime SIMD FMA intrinsics')",
         "  _ccmath_defines += '-DCCM_CONFIG_RT_SIMD_HAS_FMA'",
         "endif",
         "",
@@ -111,7 +136,7 @@ def meson_runtime_probe_lines(options: list[dict[str, Any]]) -> list[str]:
         SIMD_SVML_PROBE.rstrip(),
         "'''",
         "",
-        f"if get_option('{meson_name}') and cpp.compiles(_ccmath_simd_svml_probe, name : 'ccmath runtime SIMD SVML intrinsics')",
+        f"if {guard} and cpp.compiles(_ccmath_simd_svml_probe, name : 'ccmath runtime SIMD SVML intrinsics')",
         "  _ccmath_defines += '-DCCM_CONFIG_RT_SIMD_HAS_SVML'",
         "endif",
     ]
@@ -222,6 +247,8 @@ def premake_options(options: list[dict[str, Any]]) -> str:
 
 
 def premake_defines_block(options: list[dict[str, Any]]) -> str:
+    deterministic = next((opt for opt in options if opt["key"] == "deterministic"), None)
+    deterministic_trigger = premake_trigger_name(deterministic["meson_option"]) if deterministic is not None else None
     lines = [
         "function ccmath.defines()",
         "    local defs = {}",
@@ -231,9 +258,14 @@ def premake_defines_block(options: list[dict[str, Any]]) -> str:
         trigger = premake_trigger_name(option["meson_option"])
         default = "true" if option["meson_default"] else "false"
         define = option["define"]
+        # Deterministic mode forces the runtime SIMD path off; the generic kernels are the only
+        # cross-hardware-stable evaluation.
+        condition = f'_ccmath_option_enabled("{trigger}", {default})'
+        if deterministic_trigger is not None and option["key"] == "runtime_simd":
+            condition += f' and not _ccmath_option_enabled("{deterministic_trigger}", false)'
         lines.extend(
             [
-                f'    if _ccmath_option_enabled("{trigger}", {default}) then',
+                f"    if {condition} then",
                 f'        table.insert(defs, "{define}")',
                 "    end",
                 "",
@@ -242,6 +274,35 @@ def premake_defines_block(options: list[dict[str, Any]]) -> str:
     lines.extend(
         [
             "    return defs",
+            "end",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def premake_buildoptions_block(options: list[dict[str, Any]]) -> str:
+    deterministic = next((opt for opt in options if opt["key"] == "deterministic"), None)
+    lines = [
+        "function ccmath.buildoptions()",
+        "    local opts = {}",
+        "",
+    ]
+    if deterministic is not None:
+        trigger = premake_trigger_name(deterministic["meson_option"])
+        # Stop the compiler from contracting stray a*b+c into a hardware FMA, which would diverge
+        # between FMA and non-FMA targets. Mirrors the CMake INTERFACE flag (skipped on MSVC).
+        lines.extend(
+            [
+                f'    if _ccmath_option_enabled("{trigger}", false) and not _ccmath_is_msvc() then',
+                '        table.insert(opts, "-ffp-contract=off")',
+                "    end",
+                "",
+            ]
+        )
+    lines.extend(
+        [
+            "    return opts",
             "end",
             "",
         ]
@@ -285,15 +346,22 @@ def premake_content(
             '    return value == "true"',
             "end",
             "",
+            "local function _ccmath_is_msvc()",
+            '    return string.match(_ACTION or "", "vs") ~= nil',
+            "end",
+            "",
             "function ccmath.include_dirs()",
             "    return _ccmath_include_dirs",
             "end",
             "",
             premake_defines_block(manifest["options"]).rstrip(),
             "",
+            premake_buildoptions_block(manifest["options"]).rstrip(),
+            "",
             "function ccmath.use()",
             "    includedirs(ccmath.include_dirs())",
             "    defines(ccmath.defines())",
+            "    buildoptions(ccmath.buildoptions())",
             "end",
             "",
         ]
