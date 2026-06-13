@@ -754,24 +754,35 @@ shift is accumulated, so neither limb leaves the normal range however small or
 large $x^{|y|}$ becomes (a naive accumulation loses the low limb once an
 intermediate nears the subnormal floor, for instance a small base raised to a
 large power or its reciprocal, which is exactly where these near-power-of-two
-integer results carry a sub-ULP tail that decides the directed rounding).  The
-binary weight is reattached at the end by a single power-of-two scaling, exact
-whenever the final value is normal.  Two further points make the path safe.
-First, a power whose exponent estimate $|y| \cdot (e_x + 1)$ exceeds $1023$ is
-screened out before the squaring, because an overflowing product clamps to a
-finite maximal value under directed rounding rather than becoming infinity and
-would otherwise be mistaken for a valid result.  Second, a negative result's
-sign is folded into the pair before the final rounding rather than negated
-afterward: negating a magnitude that was already rounded in the active mode flips
-directed rounding, since $-\,\mathrm{RU}(|v|) = \mathrm{RD}(-|v|)$.  For negative
-$y$ one Newton reciprocal of the (signed) mantissa pair is taken before the
-weight is reattached.  For half-integer $y$ with $|2y| \le 2048$ the identity
-$x^{y} = (\sqrt{x})^{2y}$ is used: $y=\tfrac12$ returns the correctly-rounded
-\texttt{sqrt\_gen}, and otherwise the kernel raises a double-double $\sqrt{x}$ to
-the odd integer $2y$ by double-double square-and-multiply, screened by the same
-overflow estimate and a low-limb magnitude check.  If the algebraic result is
-not a finite normal double, the input is handed back to the kernel so that the
-overflow, underflow, and subnormal semantics of the standard are preserved.
+integer results carry a sub-ULP tail that decides the directed rounding).  A
+negative result's sign is folded into the pair before the final rounding rather
+than negated afterward: negating a magnitude that was already rounded in the
+active mode flips directed rounding, since
+$-\,\mathrm{RU}(|v|) = \mathrm{RD}(-|v|)$.  For a positive exponent the binary
+weight is then reattached in a single active-mode rounding: a power-of-two scale
+when the result is normal (exact), and a direct rounding onto the subnormal grid
+(lsb $2^{-1074}$) when it falls below the normal floor, so a tiny result does not
+double-round.  For a negative exponent the pair is reciprocated and scaled, and a
+result that is not finite, non-zero, and normal is handed back to the kernel for
+the standard saturation and signaling.
+
+For half-integer $y$ with $|2y| \le 2048$ (and $y$ not an integer, which the
+integer path above already owns) the identity $x^{y} = (\sqrt{x})^{2y}$ is used.
+The endpoints are handled directly: $y = \tfrac12$ returns the correctly-rounded
+\texttt{sqrt\_gen}, and $y = -\tfrac12$ returns a correctly-rounded $1/\sqrt{x}$
+obtained by pinning a faithful candidate $r$ with the \emph{exact} sign of
+$r^2 x - 1$.  That residual is exact in every mode: $r$ and $x$ are doubles, so
+$r^2$ is exact in two doubles via the FMA transform, each term times $x$ is exact
+in two more, and the nine-term sum minus one is signed by an integer
+fixed-point accumulation (a floating-point compensated sum would be exact only to
+nearest).  The candidate is bracketed by walking with that sign and the active
+mode selects the neighbor, with an exact midpoint test for round to nearest, so a
+double-double $1/\sqrt{x}$ that would fall a directed-mode ULP short just past a
+power of two is corrected.  Other half-integers raise a double-double $\sqrt{x}$
+to the odd integer $2y$ by the same exponent-tracked square-and-multiply and
+reattach the weight as above.  Any non-normal algebraic result is handed back to
+the kernel so that the overflow, underflow, and subnormal semantics of the
+standard are preserved.
 
 \begin{remark}
 \label{rem:pow-accurate-scope}
