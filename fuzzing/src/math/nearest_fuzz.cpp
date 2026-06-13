@@ -32,4 +32,4 @@ namespace
 	}
 } // namespace
 
-CCMATH_FUZZ_DRIVER(nearest)
+CCMATH_FUZZ_DRIVER_ALL_TYPES(nearest)

@@ -39,4 +39,4 @@ namespace
 	}
 } // namespace
 
-CCMATH_FUZZ_DRIVER(compare)
+CCMATH_FUZZ_DRIVER_ALL_TYPES(compare)

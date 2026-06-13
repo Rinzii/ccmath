@@ -12,6 +12,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <limits>
 #include <type_traits>
 
 namespace ccm::fuzz
@@ -37,6 +38,57 @@ namespace ccm::fuzz
 		return value;
 	}
 
+	// Adversarial values raw byte mutation essentially never lands on exactly: format
+	// boundaries, integer and half-integer parity thresholds, kernel range-reduction and
+	// clamp constants. Indexed by the low selector bits so every entry stays reachable.
+	template <typename T>
+	T special_value(uint8_t index)
+	{
+		using limits = std::numeric_limits<T>;
+		switch (index % 24)
+		{
+		case 0: return T(0);
+		case 1: return limits::denorm_min();
+		case 2: return limits::min() - limits::denorm_min(); // largest subnormal
+		case 3: return limits::min();
+		case 4: return T(1);
+		case 5: return T(1) + limits::epsilon();
+		case 6: return T(1) - limits::epsilon() / T(2); // largest value below one
+		case 7: return T(2);
+		case 8: return T(10);
+		case 9: return T(0.5);
+		case 10: return limits::max();
+		case 11: return limits::infinity();
+		case 12: return limits::quiet_NaN();
+		case 13: return limits::signaling_NaN();
+		case 14: return T(1) / limits::epsilon();				// integer parity threshold 2^p
+		case 15: return T(2) / limits::epsilon();				// 2^(p+1), everything above is even
+		case 16: return T(2.5);									// half integer
+		case 17: return T(1023.5);								// pow half-integer bound region
+		case 18: return T(1024);								// pow integer ipow bound
+		case 19: return T(2048);								// pow two_exp bound
+		case 20: return static_cast<T>(0x1.74910d52d3052p+62); // pow huge-exponent clamp threshold
+		case 21: return static_cast<T>(0x1.62e42fefa39efp+9);	// near the exp overflow boundary
+		case 22: return T(0x1.0p-100);
+		case 23: return T(0x1.0p100);
+		default: return T(0);
+		}
+	}
+
+	// Optional per-operand selector bytes trail the raw operands. A set high bit swaps the
+	// operand for a table entry; bit 6 flips the sign. Inputs without trailing bytes (and
+	// every pre-existing seed) decode exactly as before.
+	template <typename T>
+	void apply_selector(T & value, uint8_t const * data, size_t size, size_t selector_offset)
+	{
+		if (selector_offset >= size) { return; }
+		const uint8_t selector = data[selector_offset];
+		if ((selector & 0x80U) == 0) { return; }
+		T substituted = special_value<T>(static_cast<uint8_t>(selector & 0x3FU));
+		if ((selector & 0x40U) != 0) { substituted = -substituted; }
+		value = substituted;
+	}
+
 	template <typename T>
 	struct Inputs
 	{
@@ -49,6 +101,7 @@ namespace ccm::fuzz
 		{
 			if (size < sizeof(T)) { return false; }
 			x = load_floating<T>(data, size, 0);
+			apply_selector(x, data, size, sizeof(T));
 			return true;
 		}
 
@@ -57,6 +110,8 @@ namespace ccm::fuzz
 			if (size < 2 * sizeof(T)) { return false; }
 			x = load_floating<T>(data, size, 0);
 			y = load_floating<T>(data, size, sizeof(T));
+			apply_selector(x, data, size, 2 * sizeof(T));
+			apply_selector(y, data, size, 2 * sizeof(T) + 1);
 			return true;
 		}
 
@@ -66,6 +121,9 @@ namespace ccm::fuzz
 			x = load_floating<T>(data, size, 0);
 			y = load_floating<T>(data, size, sizeof(T));
 			z = load_floating<T>(data, size, 2 * sizeof(T));
+			apply_selector(x, data, size, 3 * sizeof(T));
+			apply_selector(y, data, size, 3 * sizeof(T) + 1);
+			apply_selector(z, data, size, 3 * sizeof(T) + 2);
 			return true;
 		}
 
@@ -75,6 +133,8 @@ namespace ccm::fuzz
 			x = load_floating<T>(data, size, 0);
 			y = load_floating<T>(data, size, sizeof(T));
 			i = load_i32(data, size, 2 * sizeof(T));
+			apply_selector(x, data, size, 2 * sizeof(T) + sizeof(int32_t));
+			apply_selector(y, data, size, 2 * sizeof(T) + sizeof(int32_t) + 1);
 			return true;
 		}
 	};

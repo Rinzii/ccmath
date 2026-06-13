@@ -432,7 +432,9 @@ namespace ccm::gen::impl
 			int idx_y = hm_i & 0x3f;
 
 			// 2^hi
-			std::int64_t exp_hi_i = (hm_i >> 6) << DoubleBits::fraction_length;
+			// The shift goes through uint64 because left-shifting a negative value is undefined
+			// before C++20. The bit pattern is identical, matching the double kernel.
+			std::int64_t exp_hi_i = static_cast<std::int64_t>(static_cast<std::uint64_t>(hm_i >> 6) << DoubleBits::fraction_length);
 
 			// 2^mid
 			// NOLINTNEXTLINE(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)

@@ -57,7 +57,7 @@ function(ccmath_append_compiler_libcxx_flags compile_flags_var link_flags_var)
 endfunction()
 
 function(ccmath_detect_libfuzzer)
-	set(_compile_base "-fno-omit-frame-pointer" "-O1")
+	set(_compile_base "-fno-omit-frame-pointer" "-O1" "-fno-sanitize-recover=all")
 	set(_available FALSE)
 
 	if (DEFINED ENV{LIB_FUZZING_ENGINE})

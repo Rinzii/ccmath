@@ -24,6 +24,8 @@ if (NOT CCMATH_LIBFUZZER_AVAILABLE)
             "Reconfigure with -DCMAKE_CXX_COMPILER=... pointing at that toolchain.")
 endif ()
 
+option(CCMATH_FUZZ_GENERIC "Fuzz the generic kernels instead of the public dispatch" OFF)
+
 set(CCMATH_FUZZ_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/helpers/CcmFuzzHelpers.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/config/FuzzModuleRegistry.cmake)
@@ -33,8 +35,10 @@ foreach (_module IN LISTS CCMATH_FUZZ_MODULE_ORDER)
 endforeach ()
 
 add_custom_target(ccmath-fuzz-all)
+add_custom_target(ccmath-fuzz-campaign-all)
 foreach (_module IN LISTS CCMATH_FUZZ_MODULE_ORDER)
     add_dependencies(ccmath-fuzz-all ccmath-fuzz-${_module})
+    add_dependencies(ccmath-fuzz-campaign-all ccmath-fuzz-${_module}-campaign)
 endforeach ()
 
 set(_ccmath_fuzz_smoke_ctest_args --output-on-failure -R "ccmath-fuzz-.*-smoke")

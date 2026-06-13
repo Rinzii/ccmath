@@ -26,6 +26,13 @@ namespace ccm::fuzz
 {
 	inline constexpr int64_t kMaxAllowedUlp = 4;
 
+	// Differential fuzzing runs under the default round-to-nearest mode. Cycling the FPU
+	// rounding mode around the kernels is deliberately not done: ccmath is header-only and
+	// compiled without FENV_ACCESS (forbidden as unportable), so already-folded constants in
+	// the inlined kernels do not honor a dynamically set mode, which makes such a comparison
+	// nondeterministic and build-context dependent. Directed-mode correctness is covered by
+	// the dedicated all-modes unit tests instead.
+
 #define FUZZ_CHECK(cond)                                                                                                                                       \
 	do                                                                                                                                                         \
 	{                                                                                                                                                          \

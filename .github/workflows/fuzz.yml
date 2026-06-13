@@ -9,20 +9,28 @@ on:
   pull_request:
     branches:
       - '**'
+  schedule:
+    # Nightly deep campaign (corpus-accumulating, artifact-uploading).
+    - cron: '0 5 * * *'
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+env:
+  # Bounded smoke budget per target. The nightly campaign runs far longer.
+  CCMATH_FUZZ_SMOKE_RUNS: 30000
+
 jobs:
+  # Bounded, deterministic regression gate. Runs both build flavors:
+  #  - default: public dispatch (libm-backed transcendentals + complete kernels)
+  #  - generic: the in-house kernels directly, the high-value differential target
   libfuzzer-smoke:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: macos-latest
-            install: brew
-          - os: ubuntu-latest
-            install: apt
+        os: [macos-latest, ubuntu-latest]
+        fuzz_mode: [default, generic]
 
     runs-on: ${{ matrix.os }}
 
@@ -30,35 +38,99 @@ jobs:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Install dependencies (macOS)
-        if: matrix.install == 'brew'
+        if: runner.os == 'macOS'
         run: brew install ninja llvm lld
 
       - name: Install dependencies (Linux)
-        if: matrix.install == 'apt'
+        if: runner.os == 'Linux'
         run: >
           sudo apt-get update -qq &&
           sudo apt-get install -yqq --no-install-recommends
           cmake ninja-build git llvm-18 clang-18 lld-18 libclang-rt-18-dev
 
       - name: Configure fuzz targets (macOS)
-        if: matrix.install == 'brew'
+        if: runner.os == 'macOS'
         run: |
           LLVM_PREFIX="$(brew --prefix llvm)"
           cmake --preset=ninja-fuzz-debug \
             -DCMAKE_C_COMPILER="${LLVM_PREFIX}/bin/clang" \
             -DCMAKE_CXX_COMPILER="${LLVM_PREFIX}/bin/clang++" \
-            -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld"
+            -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld" \
+            -DCCMATH_FUZZ_GENERIC=${{ matrix.fuzz_mode == 'generic' && 'ON' || 'OFF' }}
 
       - name: Configure fuzz targets (Linux)
-        if: matrix.install == 'apt'
+        if: runner.os == 'Linux'
         run: |
           cmake --preset=ninja-fuzz-debug \
             -DCMAKE_C_COMPILER=/usr/lib/llvm-18/bin/clang \
             -DCMAKE_CXX_COMPILER=/usr/lib/llvm-18/bin/clang++ \
-            -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld-18"
+            -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld-18" \
+            -DCCMATH_FUZZ_GENERIC=${{ matrix.fuzz_mode == 'generic' && 'ON' || 'OFF' }}
 
       - name: Build fuzz targets
         run: cmake --build --preset=build-ninja-fuzz-debug
 
       - name: Fuzz smoke tests
         run: ctest --preset=test-ninja-fuzz-debug -C Debug --output-on-failure
+
+      - name: Upload crash artifacts
+        if: failure()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        with:
+          name: fuzz-crashes-${{ matrix.os }}-${{ matrix.fuzz_mode }}
+          path: out/build/ninja/ninja-fuzz-debug/fuzzing/artifacts/**/crash-*
+          if-no-files-found: ignore
+
+  # Nightly discovery: long campaigns with a persistent corpus. Non-blocking, since this is
+  # where new kernel bugs surface; reproducers are uploaded for triage.
+  libfuzzer-campaign:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        fuzz_mode: [default, generic]
+
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    env:
+      CCMATH_FUZZ_MAX_TOTAL_TIME: 120
+      CCMATH_FUZZ_KEEP_CORPUS: 1
+
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Install dependencies
+        run: >
+          sudo apt-get update -qq &&
+          sudo apt-get install -yqq --no-install-recommends
+          cmake ninja-build git llvm-18 clang-18 lld-18 libclang-rt-18-dev
+
+      - name: Restore fuzz corpus
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: out/build/ninja/ninja-fuzz-debug/fuzzing/corpus
+          key: fuzz-corpus-${{ matrix.fuzz_mode }}-${{ github.run_id }}
+          restore-keys: |
+            fuzz-corpus-${{ matrix.fuzz_mode }}-
+
+      - name: Configure fuzz targets
+        run: |
+          cmake --preset=ninja-fuzz-debug \
+            -DCMAKE_C_COMPILER=/usr/lib/llvm-18/bin/clang \
+            -DCMAKE_CXX_COMPILER=/usr/lib/llvm-18/bin/clang++ \
+            -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld-18" \
+            -DCCMATH_FUZZ_GENERIC=${{ matrix.fuzz_mode == 'generic' && 'ON' || 'OFF' }}
+
+      - name: Build fuzz targets
+        run: cmake --build --preset=build-ninja-fuzz-debug
+
+      - name: Run fuzz campaign
+        run: cmake --build --preset=build-ninja-fuzz-debug --target ccmath-fuzz-campaign-all
+
+      - name: Upload crash artifacts
+        if: failure()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        with:
+          name: fuzz-campaign-crashes-${{ matrix.fuzz_mode }}
+          path: out/build/ninja/ninja-fuzz-debug/fuzzing/artifacts/**/crash-*
+          if-no-files-found: ignore

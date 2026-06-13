@@ -42,6 +42,22 @@ def main() -> int:
     write_seed(out_dir, "lerp_triple.bin", pack_f64(1.0, 10.0, 0.25))
     write_seed(out_dir, "float_edge.bin", pack_f32(0.0, -0.0, 1.0))
 
+    # Domain-relevant pow/exp seeds: integer and half-integer exponents, base shortcuts,
+    # and the huge-exponent clamp region.
+    write_seed(out_dir, "pow_base10.bin", pack_f64(10.0, -10.0))
+    write_seed(out_dir, "pow_base2.bin", pack_f64(2.0, 0.5))
+    write_seed(out_dir, "pow_half_int.bin", pack_f64(3.0, 2.5))
+    write_seed(out_dir, "pow_near_one.bin", pack_f64(1.0000000000000002, 1.0e18))
+    write_seed(out_dir, "pow_neg_base.bin", pack_f64(-2.0, 3.0))
+    write_seed(out_dir, "expm1_large_neg.bin", pack_f64(-895.0))
+    write_seed(out_dir, "log1p_mid.bin", pack_f64(0.388235289741717726))
+
+    # Selector-byte seeds: trailing bytes with the high bit set substitute table specials
+    # (here index 10 = type max), exercising the special-value injection path for both the
+    # binary float and binary double decoders.
+    write_seed(out_dir, "select_double_pair.bin", pack_f64(1.0, 1.0) + bytes([0x8A, 0x8A]))
+    write_seed(out_dir, "select_float_pair.bin", pack_f32(1.0, 1.0) + bytes([0x8D, 0xCD]))
+
     return 0
 
 

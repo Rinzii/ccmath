@@ -38,4 +38,4 @@ namespace
 	}
 } // namespace
 
-CCMATH_FUZZ_DRIVER(fmanip)
+CCMATH_FUZZ_DRIVER_ALL_TYPES(fmanip)

@@ -57,6 +57,9 @@ function(ccmath_add_fuzz_target TARGET)
     target_include_directories(${TARGET} PRIVATE "${CCMATH_FUZZ_ROOT}/shared")
     target_compile_features(${TARGET} PRIVATE cxx_std_17)
     target_compile_options(${TARGET} PRIVATE ${CCMATH_FUZZ_COMPILE_FLAGS} -Wno-everything)
+    if (CCMATH_FUZZ_GENERIC)
+        target_compile_definitions(${TARGET} PRIVATE CCMATH_FUZZ_GENERIC)
+    endif ()
     target_link_options(${TARGET} PRIVATE ${CCMATH_FUZZ_LINK_FLAGS})
 
     set(_corpus_dir "${CMAKE_CURRENT_BINARY_DIR}/corpus/${TARGET}")
@@ -93,7 +96,7 @@ function(ccmath_add_fuzz_target TARGET)
             -DFUZZER=$<TARGET_FILE:${TARGET}>
             -DCCMATH_FUZZ_DICT=${CCMATH_FUZZ_DICT}
             -P ${CCMATH_FUZZ_ROOT}/cmake/run_fuzz_smoke.cmake)
-    set_tests_properties(${TARGET}-smoke PROPERTIES TIMEOUT 180 LABELS "fuzz")
+    set_tests_properties(${TARGET}-smoke PROPERTIES TIMEOUT 300 LABELS "fuzz")
 
     add_custom_target(${TARGET}-campaign
             COMMAND ${CMAKE_COMMAND}
