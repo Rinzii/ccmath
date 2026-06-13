@@ -1,0 +1,23 @@
+{
+  "_comment": "asmlab-only calibration fixtures. Never wired into include/ccmath or public API.",
+  "targets": {
+    "golden_poly_horner": {
+      "fixture_dir": "golden/poly_horner",
+      "kernel_header": "kernel.hpp",
+      "namespace_call": "asmlab::golden::poly_horner::poly_horner(a0)",
+      "signature": {"ret": "float", "args": ["float"]},
+      "harness_mode": "runtime_flatten",
+      "intended_path": "ccmath_internal_kernel",
+      "description": "Horner polynomial golden baseline"
+    },
+    "golden_poly_estrin": {
+      "fixture_dir": "golden/poly_estrin",
+      "kernel_header": "kernel.hpp",
+      "namespace_call": "asmlab::golden::poly_estrin::poly_estrin(a0)",
+      "signature": {"ret": "float", "args": ["float"]},
+      "harness_mode": "runtime_flatten",
+      "intended_path": "ccmath_internal_kernel",
+      "description": "Estrin polynomial golden candidate"
+    }
+  }
+}

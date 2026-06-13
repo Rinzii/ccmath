@@ -1,0 +1,29 @@
+{
+  "_comment": "Path classification categories for asmlab reports. classify.py maps assembly evidence to one category. Use unknown when evidence is insufficient.",
+  "categories": [
+    "ccmath_public_wrapper",
+    "ccmath_internal_kernel",
+    "ccmath_constexpr_path",
+    "ccmath_runtime_path",
+    "compiler_builtin_or_intrinsic",
+    "hardware_instruction_lowering",
+    "external_libm_call",
+    "special_case_path",
+    "finite_normal_hot_path",
+    "bounded_integer_path",
+    "long_double_ld64_alias_path",
+    "long_double_ld80_kernel_path",
+    "long_double_ld128_fallback_path",
+    "unknown"
+  ],
+  "libm_symbols": [
+    "pow", "powf", "powl", "_pow", "_powf", "_powl",
+    "sqrt", "sqrtf", "sqrtl", "_sqrt", "_sqrtf", "_sqrtl",
+    "sin", "cos", "exp", "log", "fabs", "copysign",
+    "__pow", "__powf", "__sqrt", "__sqrtf"
+  ],
+  "hardware_sqrt_mnemonics": [
+    "fsqrt", "sqrtsd", "sqrtss", "vsqrtsd", "vsqrtss", "fsqrtd", "fsqrts"
+  ],
+  "confidence_levels": ["high", "medium", "low"]
+}

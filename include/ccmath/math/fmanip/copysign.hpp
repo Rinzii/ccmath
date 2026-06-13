@@ -30,7 +30,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T copysign(T mag, T sgn)
 	{
-		if constexpr (ccm::builtin::has_constexpr_copysign<T>) { return ccm::builtin::copysign(mag, sgn); }
+		if constexpr (ccm::builtin::has_constexpr_copysign<T>) { return ccm::builtin::copysign_ct(mag, sgn); }
 		else
 		{
 			if (ccm::isnan(mag) || ccm::isnan(sgn))
@@ -56,9 +56,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double copysign(Integer mag, Integer sgn)
-	{
-		return ccm::copysign<double>(static_cast<double>(mag), static_cast<double>(sgn));
-	}
+	{ return ccm::copysign<double>(static_cast<double>(mag), static_cast<double>(sgn)); }
 
 	/**
 	 * @brief Copies the sign of a floating point value.
@@ -68,9 +66,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/copysign
 	 */
 	constexpr float copysignf(float mag, float sgn)
-	{
-		return ccm::copysign<float>(mag, sgn);
-	}
+	{ return ccm::copysign<float>(mag, sgn); }
 
 	/**
 	 * @brief Copies the sign of a floating point value.
@@ -80,7 +76,5 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/copysign
 	 */
 	constexpr long double copysignl(long double mag, long double sgn)
-	{
-		return ccm::copysign<long double>(mag, sgn);
-	}
+	{ return ccm::copysign<long double>(mag, sgn); }
 } // namespace ccm

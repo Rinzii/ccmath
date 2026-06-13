@@ -1,0 +1,14 @@
+{
+  "id": "x86_stack_serial_fma",
+  "isa": "x86_64",
+  "description": "FMA consuming stack memory operand indicates possible stack-serial FMA or spill-fed dependency.",
+  "instruction_patterns": ["vfmadd*", "fmadd*", "stack_memory_operand", "-4(%rsp)", "(%rsp)"],
+  "detection_hints": [
+    "vfmadd with memory operand at fixed stack offset",
+    "vmovss spill/reload bracketing vfmadd chain"
+  ],
+  "meaning": "stack_serial_fma_candidate",
+  "confidence": "medium",
+  "source_ids": ["asmlab_local_calibration", "agner_fog"],
+  "used_for": ["golden_findings", "dependency_chain_analysis", "register_pressure_analysis"]
+}

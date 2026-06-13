@@ -29,7 +29,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T cos(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_cos<T>) { return ccm::builtin::cos(num); }
+		if constexpr (ccm::builtin::has_constexpr_cos<T>) { return ccm::builtin::cos_ct(num); }
 		else
 		{
 			if (ccm::support::is_constant_evaluated()) { return ccm::gen::cos_gen(num); }
@@ -46,9 +46,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double cos(Integer num)
-	{
-		return ccm::cos<double>(static_cast<double>(num));
-	}
+	{ return ccm::cos<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Computes the cosine of a float angle in radians.
@@ -57,9 +55,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/cos
 	 */
 	constexpr float cosf(float num)
-	{
-		return ccm::cos<float>(num);
-	}
+	{ return ccm::cos<float>(num); }
 
 	/**
 	 * @brief Computes the cosine of a long double angle in radians.
@@ -68,9 +64,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/cos
 	 */
 	constexpr long double cosl(long double num)
-	{
-		return ccm::cos<long double>(num);
-	}
+	{ return ccm::cos<long double>(num); }
 } // namespace ccm
 
 /// @ingroup trig

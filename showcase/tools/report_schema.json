@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "showcase summary",
+  "type": "object",
+  "properties": {
+    "functions": { "type": "array", "items": { "type": "string" } },
+    "perf": { "type": "object" },
+    "accuracy": { "type": "object" },
+    "compile": { "type": "array" }
+  }
+}

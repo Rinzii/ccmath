@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.18.0)
 # Project Setup and Metadata
 # ----------------------------------------------------------------------
 set(CCMATH_TARGET_NAME "ccmath")
-set(CCMATH_BUILD_VERSION 0.2.0)
+set(CCMATH_BUILD_VERSION 0.3.0)
 
 project(
         ${CCMATH_TARGET_NAME}
@@ -38,6 +38,13 @@ message(STATUS "CCMath: Version: ${CCMATH_BUILD_VERSION}")
 
 # Load user-configurable options (e.g., BUILD_EXAMPLES, BUILD_TESTS, etc.)
 include(cmake/config/UserOptions.cmake)
+
+# Deterministic mode requires every call to route through the generic kernels, so
+# runtime SIMD (a separate, non-generic evaluation path) must be off regardless of
+# how CCMATH_DISABLE_RUNTIME_SIMD was set.
+if (CCMATH_ENABLE_DETERMINISTIC)
+    set(CCMATH_DISABLE_RUNTIME_SIMD ON CACHE BOOL "Disabled by deterministic mode" FORCE)
+endif ()
 
 if (CCMATH_DISABLE_RUNTIME_SIMD)
     set(CCMATH_ENABLE_RUNTIME_SIMD OFF)
@@ -127,6 +134,11 @@ set(CCMATH_VERSION_MINOR ${CMAKE_PROJECT_VERSION_MINOR})
 set(CCMATH_VERSION_PATCH ${CMAKE_PROJECT_VERSION_PATCH})
 configure_file("${PROJECT_SOURCE_DIR}/cmake/in/version.hpp.in" "${PROJECT_BINARY_DIR}/include/ccmath/version.hpp")
 
+if (CCMATH_PROJECT_IS_TOP_LEVEL)
+    include(cmake/config/EmitBuildManifest.cmake)
+    ccmath_setup_secondary_build_generation()
+endif ()
+
 
 # ----------------------------------------------------------------------
 # Installation Rules
@@ -140,7 +152,7 @@ endif ()
 # Subdirectories for Examples, Benchmarks, and Tests
 # ----------------------------------------------------------------------
 # Only add these if the user explicitly asked for them in the options.
-if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TESTS)
+if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TESTS OR CCMATH_BUILD_SHOWCASE)
     # Use SYSTEM to suppress warnings from external code if supported by cmake
     if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
         add_subdirectory(thirdparty SYSTEM)
@@ -174,6 +186,15 @@ if (CCMATH_BUILD_EXAMPLES OR CCMATH_BUILD_BENCHMARKS OR CCMATH_BUILD_TESTS)
             add_subdirectory(tests SYSTEM)
         else ()
             add_subdirectory(tests)
+        endif ()
+        include(cmake/config/TestCtestTargets.cmake)
+    endif ()
+
+    if (CCMATH_BUILD_SHOWCASE)
+        if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
+            add_subdirectory(showcase SYSTEM)
+        else ()
+            add_subdirectory(showcase)
         endif ()
     endif ()
 endif ()

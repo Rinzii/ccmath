@@ -1,0 +1,59 @@
+{
+  "_comment": "Benchmark input profiles for asmlab bench.sh. Not every function needs every profile.",
+  "profiles": {
+    "positive_finite_general": {
+      "description": "Default hot path: positive finite values in general range",
+      "benchmark_suffix": "",
+      "mode_default": "throughput"
+    },
+    "near_one": {
+      "description": "Values near 1.0 for pow/log sensitivity",
+      "benchmark_suffix": "near_one",
+      "mode_default": "latency"
+    },
+    "subnormal": {
+      "description": "Subnormal inputs",
+      "benchmark_suffix": "subnormal",
+      "mode_default": "latency"
+    },
+    "integer_exponent": {
+      "description": "Integer exponent fast path for pow",
+      "benchmark_suffix": "integer_exp",
+      "mode_default": "throughput"
+    },
+    "nan_inf_signed_zero": {
+      "description": "Special values: NaN, inf, signed zero",
+      "benchmark_suffix": "special",
+      "mode_default": "latency"
+    }
+  },
+  "function_profiles": {
+    "sqrt": ["positive_finite_general"],
+    "sqrtf": ["positive_finite_general"],
+    "sqrt_rt": ["positive_finite_general"],
+    "pow": ["positive_finite_general", "near_one", "integer_exponent", "nan_inf_signed_zero"],
+    "powf": ["positive_finite_general", "near_one", "integer_exponent", "nan_inf_signed_zero"],
+    "powl": ["positive_finite_general", "near_one"],
+    "pow_rt": ["positive_finite_general", "near_one", "integer_exponent"],
+    "powf_rt": ["positive_finite_general", "near_one", "integer_exponent"],
+    "pow_impl": ["positive_finite_general", "near_one", "integer_exponent"],
+    "powf_impl": ["positive_finite_general", "near_one", "integer_exponent"],
+    "pow_gen": []
+  },
+  "benchmark_targets": {
+    "sqrt": {"cmake_opt": "CCM_BENCH_POWER", "target": "ccm_benchmark_sqrt", "wired": true},
+    "sqrtf": {"cmake_opt": "CCM_BENCH_POWER", "target": "ccm_benchmark_sqrt", "wired": true},
+    "pow": {"cmake_opt": "CCM_BENCH_POWER", "target": "ccm_benchmark_pow", "wired": false},
+    "powf": {"cmake_opt": "CCM_BENCH_POWER", "target": "ccm_benchmark_pow", "wired": false},
+    "powl": {"cmake_opt": "CCM_BENCH_POWER", "target": "ccm_benchmark_pow", "wired": false},
+    "pow_impl": {"cmake_opt": "CCM_BENCH_POWER", "target": "ccm_benchmark_pow", "wired": false},
+    "powf_impl": {
+      "cmake_opt": "CCM_BENCH_POWER",
+      "target": "asmlab_bench_powf_impl",
+      "wired": true,
+      "bench_kind": "asmlab_impl",
+      "bench_runner": "bench_impl.py",
+      "candidate_target_pattern": "asmlab_bench_powf_impl_{variant}"
+    }
+  }
+}

@@ -49,9 +49,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double rint(Integer num) noexcept
-	{
-		return static_cast<double>(num);
-	}
+	{ return static_cast<double>(num); }
 
 	/**
 	 * @brief Rounds a float to an integer value using the current rounding mode.
@@ -60,9 +58,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/rint
 	 */
 	constexpr float rintf(float num) noexcept
-	{
-		return ccm::rint(num);
-	}
+	{ return ccm::rint(num); }
 
 	/**
 	 * @brief Rounds a long double to an integer value using the current rounding mode.
@@ -71,9 +67,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/rint
 	 */
 	constexpr long double rintl(long double num) noexcept
-	{
-		return ccm::rint(num);
-	}
+	{ return ccm::rint(num); }
 } // namespace ccm
 
 /// @ingroup nearest

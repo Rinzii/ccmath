@@ -22,7 +22,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T tan(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_tan<T>) { return ccm::builtin::tan(num); }
+		if constexpr (ccm::builtin::has_constexpr_tan<T>) { return ccm::builtin::tan_ct(num); }
 		else
 		{
 			if (ccm::support::is_constant_evaluated()) { return ccm::gen::tan_gen(num); }
@@ -32,19 +32,13 @@ namespace ccm
 
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double tan(Integer num)
-	{
-		return ccm::tan<double>(static_cast<double>(num));
-	}
+	{ return ccm::tan<double>(static_cast<double>(num)); }
 
 	constexpr float tanf(float num)
-	{
-		return ccm::tan<float>(num);
-	}
+	{ return ccm::tan<float>(num); }
 
 	constexpr long double tanl(long double num)
-	{
-		return ccm::tan<long double>(num);
-	}
+	{ return ccm::tan<long double>(num); }
 } // namespace ccm
 
 /// @ingroup trig

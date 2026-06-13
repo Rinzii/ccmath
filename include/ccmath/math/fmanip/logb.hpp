@@ -11,9 +11,9 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/fmanip/logb.hpp"
+#include "ccmath/internal/math/generic/func/fmanip/logb_gen.hpp"
 #include "ccmath/internal/math/runtime/func/fmanip/logb_rt.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
-#include "ccmath/math/fmanip/impl/logb_impl.hpp"
 
 #include <type_traits>
 
@@ -29,14 +29,12 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T logb(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_logb<T>) { return ccm::builtin::logb(num); }
-		else if (ccm::support::is_constant_evaluated())
+		if constexpr (ccm::builtin::has_constexpr_logb<T>) { return ccm::builtin::logb_ct(num); }
+		else
 		{
-			if constexpr (std::is_same_v<T, float>) { return internal::impl::logb_impl(num); }
-			else if constexpr (std::is_same_v<T, double>) { return internal::impl::logb_impl(num); }
-			else { return static_cast<long double>(internal::impl::logb_impl(static_cast<double>(num))); }
+			if (ccm::support::is_constant_evaluated()) { return ccm::gen::logb_gen(num); }
+			return ccm::rt::logb_rt(num);
 		}
-		else { return ccm::rt::logb_rt(num); }
 	}
 
 	/**
@@ -46,9 +44,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/logb
 	 */
 	constexpr float logbf(float num) noexcept
-	{
-		return ccm::logb(num);
-	}
+	{ return ccm::logb(num); }
 
 	/**
 	 * @brief Extracts the unbiased exponent of a long double.
@@ -57,7 +53,5 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/logb
 	 */
 	constexpr long double logbl(long double num) noexcept
-	{
-		return ccm::logb(num);
-	}
+	{ return ccm::logb(num); }
 } // namespace ccm

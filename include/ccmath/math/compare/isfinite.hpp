@@ -24,7 +24,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr bool isfinite(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_isfinite<T>) { return ccm::builtin::isfinite(num); }
+		if constexpr (ccm::builtin::has_constexpr_isfinite<T>) { return ccm::builtin::isfinite_ct(num); }
 		else
 		{
 			using FPBits_t = typename ccm::support::fp::FPBits<T>;
@@ -41,7 +41,7 @@ namespace ccm
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr bool isfinite(Integer /* x */)
 	{
-		return false; // All integers are finite
+		return true; // All integers are finite
 	}
 
 } // namespace ccm

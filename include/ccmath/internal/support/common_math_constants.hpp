@@ -80,7 +80,7 @@ namespace ccm::support::constants
 	// r(k) = 2^-8 * ceil(2^8 * (1 - 2^-8) / (1 + k*2^-7))
 	// The constants are chosen so that v = fma(r, m_x, -1) is exact in single
 	// precision, and -2^-8 <= v < 2^-7.
-	// TODO: Add reference to paper these constants are derived from once lntue has published the paper.
+	// TODO(IanP): Add reference to paper these constants are derived from once lntue has published the paper.
 	alignas(32) constexpr std::array<float, 128> R = {
 		0x1p0,	   0x1.fcp-1, 0x1.f8p-1, 0x1.f4p-1, 0x1.fp-1,  0x1.ecp-1, 0x1.e8p-1, 0x1.e4p-1, 0x1.ep-1,  0x1.dep-1, 0x1.dap-1, 0x1.d6p-1, 0x1.d4p-1,
 		0x1.dp-1,  0x1.ccp-1, 0x1.cap-1, 0x1.c6p-1, 0x1.c4p-1, 0x1.cp-1,  0x1.bep-1, 0x1.bap-1, 0x1.b8p-1, 0x1.b4p-1, 0x1.b2p-1, 0x1.aep-1, 0x1.acp-1,

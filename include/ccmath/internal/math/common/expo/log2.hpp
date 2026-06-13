@@ -12,11 +12,10 @@
 
 #include "ccmath/internal/config/compiler.hpp"
 #include "ccmath/internal/math/generic/builtins/expo/log2.hpp"
+#include "ccmath/internal/math/generic/func/expo/log2_gen.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/compare/signbit.hpp"
-#include "ccmath/math/expo/impl/log2_double_impl.hpp"
-#include "ccmath/math/expo/impl/log2_float_impl.hpp"
 
 #include <limits>
 #include <type_traits>
@@ -37,7 +36,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T log2(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_log2<T>) { return ccm::builtin::log2(num); }
+		if constexpr (ccm::builtin::has_constexpr_log2<T>) { return ccm::builtin::log2_ct(num); }
 		else
 		{
 			// If the argument is ±0, -∞ is returned
@@ -71,12 +70,7 @@ namespace ccm
 			}
 #endif
 
-			// We cannot handle long double at this time due to problems
-			// with long double being platform-dependent with its bit size.
-			if constexpr (std::is_same_v<T, float>) { return internal::log2_float(num); }
-			if constexpr (std::is_same_v<T, double>) { return internal::log2_double(num); }
-			if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::log2_double(static_cast<double>(num))); }
-			return static_cast<T>(internal::log2_double(static_cast<double>(num)));
+			return gen::log2_gen(num);
 		}
 	}
 
@@ -88,9 +82,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double log2(Integer num) noexcept
-	{
-		return ccm::log2<double>(static_cast<double>(num));
-	}
+	{ return ccm::log2<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Returns the base 2 logarithm of a number.
@@ -98,9 +90,7 @@ namespace ccm
 	 * @return The base 2 logarithm of the number as a float.
 	 */
 	constexpr float log2f(float num)
-	{
-		return ccm::log2<float>(num);
-	}
+	{ return ccm::log2<float>(num); }
 
 	/**
 	 * @brief Returns the base 2 logarithm of a number.
@@ -108,9 +98,7 @@ namespace ccm
 	 * @return The base 2 logarithm of the number as a double.
 	 */
 	constexpr long double log2l(long double num)
-	{
-		return ccm::log2<long double>(num);
-	}
+	{ return ccm::log2<long double>(num); }
 } // namespace ccm
 
 #if defined(_MSC_VER) && !defined(__clang__)

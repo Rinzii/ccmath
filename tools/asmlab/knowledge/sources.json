@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "id": "uops_info",
+      "name": "uops.info",
+      "kind": "measured_instruction_database",
+      "architectures": ["x86_64"],
+      "data": ["latency", "throughput", "uops", "ports"],
+      "trust": "high_for_supported_x86",
+      "url": "https://uops.info/",
+      "notes": "Measured microbenchmark data. Prefer for x86 instruction facts when available."
+    },
+    {
+      "id": "agner_fog",
+      "name": "Agner Fog instruction tables and optimization manuals",
+      "kind": "measured_instruction_tables",
+      "architectures": ["x86_64"],
+      "data": ["latency", "throughput", "uops", "ports", "optimization_guidance"],
+      "trust": "high_for_x86_when_table_matches_uarch",
+      "url": "https://www.agner.org/optimize/",
+      "notes": "Human-readable x86 optimization guidance and measured tables."
+    },
+    {
+      "id": "intel_opt_manual",
+      "name": "Intel 64 and IA-32 Architectures Optimization Reference Manual",
+      "kind": "vendor_manual",
+      "architectures": ["x86_64"],
+      "data": ["latency", "throughput", "optimization_guidance"],
+      "trust": "high_for_official_intel_semantics",
+      "url": "https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html",
+      "notes": "Official Intel optimization guidance. Use for semantics and vendor tables."
+    },
+    {
+      "id": "amd_opt_guide",
+      "name": "AMD Software Optimization Guide",
+      "kind": "vendor_manual",
+      "architectures": ["x86_64"],
+      "data": ["latency", "throughput", "optimization_guidance"],
+      "trust": "high_for_official_amd_semantics",
+      "url": "https://developer.amd.com/resources/developer-guides-manuals/",
+      "notes": "Official AMD Zen-family optimization guidance."
+    },
+    {
+      "id": "nanobench",
+      "name": "nanoBench",
+      "kind": "tool_documentation",
+      "architectures": ["x86_64"],
+      "data": ["local_microbenchmarks"],
+      "trust": "high_when_locally_run",
+      "url": "https://github.com/andreas-abel/nanoBench",
+      "notes": "Local x86 microbenchmarking tool used in uops.info-style workflows."
+    },
+    {
+      "id": "llvm_mca",
+      "name": "LLVM llvm-mca",
+      "kind": "static_model",
+      "architectures": ["x86_64", "aarch64"],
+      "data": ["reciprocal_throughput", "ipc", "port_pressure"],
+      "trust": "medium_advisory",
+      "url": "https://llvm.org/docs/CommandGuide/llvm-mca.html",
+      "notes": "Static scheduling model. Directional use only. Not measured hardware."
+    },
+    {
+      "id": "osaca",
+      "name": "OSACA",
+      "kind": "static_model",
+      "architectures": ["x86_64", "aarch64"],
+      "data": ["throughput", "critical_path"],
+      "trust": "medium_advisory",
+      "url": "https://github.com/RRZE-HPC/OSACA",
+      "notes": "Static throughput and critical-path analyzer."
+    },
+    {
+      "id": "uica",
+      "name": "uiCA",
+      "kind": "static_model",
+      "architectures": ["x86_64"],
+      "data": ["throughput"],
+      "trust": "medium_for_recent_intel",
+      "url": "https://github.com/andreas-abel/uiCA",
+      "notes": "Intel-focused basic-block throughput predictor."
+    },
+    {
+      "id": "arm_cortex_guides",
+      "name": "Arm Cortex-A software optimization guides",
+      "kind": "vendor_manual",
+      "architectures": ["aarch64"],
+      "data": ["latency", "throughput", "optimization_guidance"],
+      "trust": "high_for_cortex_specific_facts",
+      "url": "https://developer.arm.com/documentation",
+      "notes": "Core-specific latency and throughput where documented."
+    },
+    {
+      "id": "apple_silicon_opt_guide",
+      "name": "Apple Silicon CPU Optimization Guide",
+      "kind": "vendor_manual",
+      "architectures": ["aarch64"],
+      "data": ["optimization_guidance"],
+      "trust": "high_for_official_apple_guidance",
+      "url": "https://developer.apple.com/documentation/apple-silicon",
+      "notes": "Official high-level Apple Silicon guidance. Limited per-instruction tables."
+    },
+    {
+      "id": "dougallj_m1",
+      "name": "Dougall Johnson Apple M1 Firestorm/Icestorm notes",
+      "kind": "unofficial_microarchitecture_notes",
+      "architectures": ["aarch64"],
+      "data": ["microarchitecture_structure", "execution_ports"],
+      "trust": "medium_unofficial",
+      "url": "https://dougallj.github.io/applecpu/firestorm.html",
+      "notes": "Unofficial but useful M1 microarchitecture documentation. Verify against local calibration."
+    },
+    {
+      "id": "asmlab_local_calibration",
+      "name": "asmlab local calibration",
+      "kind": "local_calibration",
+      "architectures": ["x86_64", "aarch64"],
+      "data": ["benchmark_direction", "golden_validation", "static_slice_scope"],
+      "trust": "high_for_documented_host_runs",
+      "url": null,
+      "notes": "Repository calibration records under knowledge/calibration/ and out/asmlab/calibration/."
+    }
+  ]
+}

@@ -77,9 +77,7 @@ namespace ccm
 	 */
 	template <typename T>
 	constexpr auto fabs(T num) -> std::enable_if_t<std::is_floating_point_v<T>, T>
-	{
-		return ccm::abs<T>(num);
-	}
+	{ return ccm::abs<T>(num); }
 
 	/**
 	 * @brief Computes the absolute value of a number.
@@ -90,9 +88,7 @@ namespace ccm
 	 */
 	template <typename Integer>
 	constexpr auto fabs(Integer num) -> std::enable_if_t<std::is_integral_v<Integer>, double>
-	{
-		return ccm::abs<double>(static_cast<double>(num));
-	}
+	{ return ccm::abs<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Computes the absolute value of a number.
@@ -101,9 +97,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/fabs
 	 */
 	constexpr float fabsf(float num)
-	{
-		return ccm::abs<float>(num);
-	}
+	{ return ccm::abs<float>(num); }
 
 	/**
 	 * @brief Computes the absolute value of a number.
@@ -112,9 +106,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/fabs
 	 */
 	constexpr long double fabsl(long double num)
-	{
-		return ccm::abs<long double>(num);
-	}
+	{ return ccm::abs<long double>(num); }
 
 	/**
 	 * @brief Computes the absolute value of a number.
@@ -123,9 +115,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/fabs
 	 */
 	constexpr long labs(long num)
-	{
-		return ccm::abs<long>(num);
-	}
+	{ return ccm::abs<long>(num); }
 
 	/**
 	 * @brief Computes the absolute value of a number.
@@ -134,9 +124,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/fabs
 	 */
 	constexpr long long llabs(long long num)
-	{
-		return ccm::abs<long long>(num);
-	}
+	{ return ccm::abs<long long>(num); }
 } // namespace ccm
 
 /// @ingroup basic

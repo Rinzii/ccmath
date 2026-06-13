@@ -1,18 +1,24 @@
-#!/usr/bin/env python
-# Script requires matplotlib and pandas
-# Original script from here:
-# https://github.com/lakshayg/google_benchmark_plot/
-# Script has been modified to meet the needs of ccmath
-# TODO: Replace this with new script able to handle averaged data.
+#!/usr/bin/env python3
+# Copyright (c) Ian Pike
+# Copyright (c) CCMath contributors
+#
+# CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
+# See LICENSE for more information.
+#
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+"""Plot google-benchmark CSV or JSON output for CCMath benchmarks.
 
-"""Script to visualize google-benchmark output"""
+Derived from https://github.com/lakshayg/google_benchmark_plot/ with CCMath-specific tweaks.
+TODO: Support averaged or multi-run benchmark exports.
+"""
 import argparse
-import sys
-import logging
 import json
-import pandas as pd
-import matplotlib.pyplot as plt
+import logging
 import pathlib
+import sys
+
+import matplotlib.pyplot as plt
+import pandas as pd
 
 logging.basicConfig(format="[%(levelname)s] %(message)s")
 

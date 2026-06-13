@@ -29,7 +29,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T tan(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_tan<T>) { return ccm::builtin::tan(num); }
+		if constexpr (ccm::builtin::has_constexpr_tan<T>) { return ccm::builtin::tan_ct(num); }
 		else
 		{
 			if (ccm::support::is_constant_evaluated()) { return ccm::gen::tan_gen(num); }
@@ -46,9 +46,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double tan(Integer num)
-	{
-		return ccm::tan<double>(static_cast<double>(num));
-	}
+	{ return ccm::tan<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Computes the tangent of a float angle in radians.
@@ -57,9 +55,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/tan
 	 */
 	constexpr float tanf(float num)
-	{
-		return ccm::tan<float>(num);
-	}
+	{ return ccm::tan<float>(num); }
 
 	/**
 	 * @brief Computes the tangent of a long double angle in radians.
@@ -68,9 +64,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/tan
 	 */
 	constexpr long double tanl(long double num)
-	{
-		return ccm::tan<long double>(num);
-	}
+	{ return ccm::tan<long double>(num); }
 } // namespace ccm
 
 /// @ingroup trig

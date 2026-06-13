@@ -1,0 +1,105 @@
+{
+  "_comment": "Named path scenarios for targeted asmlab testing. Each scenario fixes harness inputs and declares the intended implementation path. Static assembly reflects input profile selection, not dynamic branch frequency.",
+  "scenarios": {
+    "sqrt": {
+      "positive_finite_general": {
+        "intended_path": "hardware_instruction_lowering",
+        "acceptable_paths": ["hardware_instruction_lowering", "ccmath_runtime_path"],
+        "description": "Positive finite sqrt on a typical hot input (4.0). Expect hardware sqrt lowering when inlined.",
+        "scenario_kind": "performance",
+        "forceability": "constant_input_probe",
+        "input_profile": "positive_finite_general",
+        "input_rationale": "a0=4.0 is positive finite and exercises the normal hardware sqrt path on common platforms.",
+        "inputs": {"a0": 4.0},
+        "harness_mode": "runtime_no_flatten",
+        "expected_external_calls": false,
+        "expected_builtin_lowering": true,
+        "accuracy_labels": ["sqrt"],
+        "accuracy_gate": "simple",
+        "benchmark_profile": "positive_finite_general"
+      },
+      "special_negative": {
+        "intended_path": "special_case_path",
+        "acceptable_paths": ["special_case_path", "ccmath_runtime_path", "hardware_instruction_lowering"],
+        "description": "Negative finite input (-1.0) for domain/special-case behavior.",
+        "scenario_kind": "correctness",
+        "forceability": "constant_input_probe",
+        "input_profile": "nan_inf_signed_zero",
+        "input_rationale": "Negative input may route through NaN/domain handling depending on dispatch layer.",
+        "inputs": {"a0": -1.0},
+        "harness_mode": "runtime_no_flatten",
+        "expected_external_calls": false,
+        "expected_builtin_lowering": false,
+        "accuracy_labels": ["sqrt"],
+        "accuracy_gate": "simple",
+        "benchmark_profile": null
+      }
+    },
+    "powf_impl": {
+      "positive_finite_general": {
+        "intended_path": "ccmath_internal_kernel",
+        "acceptable_paths": ["ccmath_internal_kernel", "finite_normal_hot_path"],
+        "description": "Positive finite powf kernel path (2.0f, 3.0f) excluding NaN/Inf/zero/negative-base specials.",
+        "scenario_kind": "performance",
+        "forceability": "constant_input_probe",
+        "input_profile": "positive_finite_general",
+        "input_rationale": "x=2, y=3 are positive finite values in the general runtime kernel.",
+        "inputs": {"a0": 2.0, "a1": 3.0},
+        "harness_mode": "runtime_flatten",
+        "expected_external_calls": false,
+        "expected_builtin_lowering": false,
+        "accuracy_labels": ["powf"],
+        "accuracy_gate": "simple",
+        "benchmark_profile": "positive_finite_general"
+      },
+      "near_one": {
+        "intended_path": "ccmath_internal_kernel",
+        "acceptable_paths": ["ccmath_internal_kernel", "finite_normal_hot_path"],
+        "description": "Values near 1.0 for log-sensitive powf kernel behavior.",
+        "scenario_kind": "performance",
+        "forceability": "constant_input_probe",
+        "input_profile": "near_one",
+        "input_rationale": "x=1.0001, y=1.5 stress near-one reduction without special-case classifiers.",
+        "inputs": {"a0": 1.0001, "a1": 1.5},
+        "harness_mode": "runtime_flatten",
+        "expected_external_calls": false,
+        "expected_builtin_lowering": false,
+        "accuracy_labels": ["powf"],
+        "accuracy_gate": "simple",
+        "benchmark_profile": "near_one"
+      },
+      "integer_exponent": {
+        "intended_path": "ccmath_internal_kernel",
+        "acceptable_paths": ["ccmath_internal_kernel", "bounded_integer_path", "finite_normal_hot_path"],
+        "description": "Integer exponent fast-path candidate (2.0f, 4.0f).",
+        "scenario_kind": "mixed",
+        "forceability": "constant_input_probe",
+        "input_profile": "integer_exponent",
+        "input_rationale": "y=4.0 is an exact integer exponent; may exercise integer fast path inside kernel.",
+        "inputs": {"a0": 2.0, "a1": 4.0},
+        "harness_mode": "runtime_flatten",
+        "expected_external_calls": false,
+        "expected_builtin_lowering": false,
+        "accuracy_labels": ["powf"],
+        "accuracy_gate": "simple",
+        "benchmark_profile": "integer_exponent"
+      },
+      "nan_inf_signed_zero": {
+        "intended_path": "special_case_path",
+        "acceptable_paths": ["special_case_path", "ccmath_internal_kernel"],
+        "description": "Special values: NaN base with finite exponent.",
+        "scenario_kind": "correctness",
+        "forceability": "constant_input_probe",
+        "input_profile": "nan_inf_signed_zero",
+        "input_rationale": "NaN propagation and special-case handling, not a performance hot path.",
+        "inputs": {"a0": "nan", "a1": 2.0},
+        "harness_mode": "runtime_flatten",
+        "expected_external_calls": false,
+        "expected_builtin_lowering": false,
+        "accuracy_labels": ["powf"],
+        "accuracy_gate": "rigorous",
+        "benchmark_profile": null
+      }
+    }
+  }
+}

@@ -30,7 +30,7 @@ namespace ccm::gen
 	template <typename T>
 	constexpr auto fdim(T x, T y) -> std::enable_if_t<std::is_floating_point_v<T>, T>
 	{
-		if constexpr (builtin::has_constexpr_fdim<T>) { return builtin::fdim(x, y); }
+		if constexpr (builtin::has_constexpr_fdim<T>) { return builtin::fdim_ct(x, y); }
 		else
 		{
 			using FPBits_t = typename ccm::support::fp::FPBits<T>;

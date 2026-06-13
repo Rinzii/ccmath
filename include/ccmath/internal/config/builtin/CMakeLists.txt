@@ -1,4 +1,4 @@
-# TODO: A lot of stuff here honestly can be removed now that our new system avoids needing to define macros.
+# TODO(IanP): Trim legacy builtin macro probes now that dispatch avoids most of them.
 
 ccm_add_headers(
         bit_cast_support.hpp

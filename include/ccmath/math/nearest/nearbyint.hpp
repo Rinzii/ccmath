@@ -49,9 +49,7 @@ namespace ccm
 	 */
 	template <class Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double nearbyint(Integer num) noexcept
-	{
-		return static_cast<double>(num);
-	}
+	{ return static_cast<double>(num); }
 
 	/**
 	 * @brief The nearest integer value to num, according to the rounding mode FE_TONEAREST, is returned.
@@ -60,9 +58,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/nearbyint
 	 */
 	constexpr float nearbyintf(float num) noexcept
-	{
-		return ccm::nearbyint(num);
-	}
+	{ return ccm::nearbyint(num); }
 
 	/**
 	 * @brief The nearest integer value to num, according to the rounding mode FE_TONEAREST, is returned.
@@ -71,8 +67,6 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/nearbyint
 	 */
 	constexpr long double nearbyintl(long double num) noexcept
-	{
-		return ccm::nearbyint(num);
-	}
+	{ return ccm::nearbyint(num); }
 
 } // namespace ccm

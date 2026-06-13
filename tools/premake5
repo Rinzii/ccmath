@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Run premake5, bootstrapping the official Linux binary when needed.
+
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+linux_premake="${repo_root}/out/tools/premake/premake5"
+
+if [[ "$(uname -s)" == Linux ]]; then
+    if [[ ! -x "${linux_premake}" ]]; then
+        bash "${repo_root}/tools/install_premake5_linux.sh"
+    fi
+    exec "${linux_premake}" "$@"
+fi
+
+if command -v premake5 >/dev/null 2>&1; then
+    exec premake5 "$@"
+fi
+
+echo "error: premake5 not found on PATH" >&2
+exit 1

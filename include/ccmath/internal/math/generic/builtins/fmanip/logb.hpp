@@ -28,6 +28,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_LOGB
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for logb that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_LOGB
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_LOGB
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -43,6 +58,15 @@ namespace ccm::builtin
 	#endif
 	// clang-format on
 
+	// TODO: determine actual compiler/version support for runtime __builtin_logb.
+	template <typename T>
+	inline constexpr bool has_runtime_logb =
+#ifdef CCMATH_HAS_BUILTIN_LOGB
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_logb functions.
@@ -51,7 +75,7 @@ namespace ccm::builtin
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
-	constexpr auto logb(T x) -> std::enable_if_t<has_constexpr_logb<T>, T>
+	constexpr auto logb_ct(T x) -> std::enable_if_t<has_constexpr_logb<T>, T>
 	{
 		if constexpr (std::is_same_v<T, float>) { return __builtin_logbf(x); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_logb(x); }
@@ -59,7 +83,21 @@ namespace ccm::builtin
 		else
 		{
 			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_logb");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for logb");
+			return T{};
+		}
+	}
+
+	template <typename T>
+	auto logb_rt(T x) -> std::enable_if_t<has_runtime_logb<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>) { return __builtin_logbf(x); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_logb(x); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_logbl(x); }
+		else
+		{
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for logb");
 			return T{};
 		}
 	}
@@ -67,3 +105,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_LOGB
+#undef CCMATH_HAS_BUILTIN_LOGB

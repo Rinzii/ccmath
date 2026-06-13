@@ -15,6 +15,8 @@
 #include "ccmath/math/compare/isinf.hpp"
 #include "ccmath/math/compare/isnan.hpp"
 
+#include <type_traits>
+
 namespace ccm
 {
 	/**

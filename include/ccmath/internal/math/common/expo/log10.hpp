@@ -11,10 +11,10 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/expo/log10.hpp"
+#include "ccmath/internal/math/generic/func/expo/log10_gen.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "ccmath/math/compare/isnan.hpp"
-#include "ccmath/math/expo/impl/log10_impl.hpp"
 
 #include <limits>
 #include <type_traits>
@@ -24,7 +24,7 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T log10(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_log10<T>) { return ccm::builtin::log10(num); }
+		if constexpr (ccm::builtin::has_constexpr_log10<T>) { return ccm::builtin::log10_ct(num); }
 		else
 		{
 			if (num == static_cast<T>(1)) { return static_cast<T>(0); }
@@ -43,26 +43,17 @@ namespace ccm
 			if (CCM_UNLIKELY(num == std::numeric_limits<T>::infinity())) { return std::numeric_limits<T>::infinity(); }
 			if (CCM_UNLIKELY(ccm::isnan(num))) { return std::numeric_limits<T>::quiet_NaN(); }
 
-			if constexpr (std::is_same_v<T, float>) { return internal::log10_float(num); }
-			if constexpr (std::is_same_v<T, double>) { return internal::log10_double(num); }
-			if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::log10_double(static_cast<double>(num))); }
-			return static_cast<T>(internal::log10_double(static_cast<double>(num)));
+			return gen::log10_gen(num);
 		}
 	}
 
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double log10(Integer num)
-	{
-		return ccm::log10<double>(static_cast<double>(num));
-	}
+	{ return ccm::log10<double>(static_cast<double>(num)); }
 
 	constexpr float log10f(float num)
-	{
-		return ccm::log10<float>(num);
-	}
+	{ return ccm::log10<float>(num); }
 
 	constexpr long double log10l(long double num)
-	{
-		return ccm::log10<long double>(num);
-	}
+	{ return ccm::log10<long double>(num); }
 } // namespace ccm

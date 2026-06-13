@@ -1,0 +1,70 @@
+// Full ld80 pow kernel math validation and table split design.
+// Run: sollya tools/proofs/math/power/validate_powl_ld80_kernel.sollya
+
+display = decimal;
+
+print("=== powl ld80 kernel sollya validation ===");
+
+split_hi = 64 - 24 - 8;
+
+// Production POW_EXP2_COEFFS (powl_ld80_tables.hpp): degree-6, double-extended.
+C0 = 0x1p0;
+C1 = 0x1.62e42fefa39ef366p-7;
+C2 = 0x1.ebfbdff82c58ea5ep-15;
+C3 = 0x1.c6b08d704846aad6p-23;
+C4 = 0x1.3b2ab6fba696a65ap-31;
+C5 = 0x1.5d881a9521b2c8b8p-40;
+C6 = 0x1.43090c2f8c21d398p-49;
+Pexp = C0 + x*C1 + x^2*C2 + x^3*C3 + x^4*C4 + x^5*C5 + x^6*C6;
+
+print("EXP2 poly max abs error on lo6 in [-0.5,0.5] (expect ~2^-71):");
+print(dirtyinfnorm(2^(x/64) - Pexp, [-0.5, 0.5]));
+
+// Production POW_LOG2_COEFFS (powl_ld80_tables.hpp): degree-7, double-extended.
+L0 = 0x1.71547652b82fe178p0;
+L1 = -0x1.71547652b82fe144p-1;
+L2 = 0x1.ec709dc3a03558dep-2;
+L3 = -0x1.71547652b7385bf8p-2;
+L4 = 0x1.2776c51d878b842ep-2;
+L5 = -0x1.ec70a8a71c0b750ap-3;
+L6 = 0x1.a60c087e7df298fap-3;
+L7 = -0x1.6987a26ef5e05516p-3;
+Plog = L0 + x*(L1 + x*(L2 + x*(L3 + x*(L4 + x*(L5 + x*(L6 + x*L7))))));
+
+print("LOG2 poly max rel error on dx in [-2^-8, 2^-7] (expect ~2^-66):");
+print(dirtyinfnorm(log2(1 + x)/x - Plog, [-2^(-8), 2^(-7)]));
+
+print("EXP2 hi+double-mid max abs error on idx=1..63:");
+procedure max_exp2_split_err() {
+  var err;
+  var t;
+  var hi;
+  err = 0;
+  for i from 1 to 63 do {
+    t = 2^(i/64);
+    hi = round(t, split_hi, RN);
+    err = max(err, abs(t - (hi + round(t - hi, double, RN))));
+  };
+  return err;
+};
+print(max_exp2_split_err());
+
+print("LOG2 hi+double-mid+double-lo max abs error sample at -log2(0.99):");
+f0 = -log2(0.99);
+b0 = round(f0, split_hi, RN);
+c0 = round(f0 - b0, double, RN);
+print(abs(f0 - (b0 + c0 + round(f0 - b0 - c0, double, RN))));
+
+print("EXP2 idx=1 split error:");
+t1 = 2^(1/64);
+hi1 = round(t1, split_hi, RN);
+print(abs(t1 - (hi1 + round(t1 - hi1, double, RN))));
+
+print("Routing: 10^1000 y6 (must use integer squaring, not kernel):");
+print(64 * 1000 * log2(10));
+print("pi^e y6 (kernel path):");
+print(64 * 2.71828182845904523536 * log2(3.14159265358979323846));
+print("pi^e reference:");
+print(exp(2.71828182845904523536 * log(3.14159265358979323846)));
+
+print("=== validation complete ===");

@@ -10,9 +10,9 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/basic/fabs.hpp"
 #include "ccmath/internal/math/generic/func/basic/abs_gen.hpp"
 #include "ccmath/internal/math/runtime/func/rt_dispatch.hpp"
-#include "ccmath/internal/predef/has_builtin.hpp"
 
 #include <type_traits>
 
@@ -21,13 +21,10 @@ namespace ccm::rt
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] inline T fabs_rt(T num) noexcept
 	{
-#if CCM_HAS_BUILTIN(__builtin_fabs) || defined(__builtin_fabs)
-		if constexpr (std::is_same_v<T, float>) { return __builtin_fabsf(num); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_fabs(num); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fabsl(num); }
-		else { return static_cast<T>(__builtin_fabsl(static_cast<long double>(num))); }
-#else
-		return gen::abs(num);
-#endif
+		if constexpr (ccm::builtin::has_runtime_abs<T>) { return ccm::builtin::abs_rt(num); }
+		else
+		{
+			return gen::abs(num);
+		}
 	}
 } // namespace ccm::rt

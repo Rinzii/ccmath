@@ -26,24 +26,16 @@ namespace ccm::support
 {
 
 	constexpr std::uint8_t operator""_u8(unsigned long long value)
-	{
-		return static_cast<std::uint8_t>(value);
-	}
+	{ return static_cast<std::uint8_t>(value); }
 
 	constexpr std::uint16_t operator""_u16(unsigned long long value)
-	{
-		return static_cast<std::uint16_t>(value);
-	}
+	{ return static_cast<std::uint16_t>(value); }
 
 	constexpr std::uint32_t operator""_u32(unsigned long long value)
-	{
-		return static_cast<std::uint32_t>(value);
-	}
+	{ return static_cast<std::uint32_t>(value); }
 
 	constexpr std::uint64_t operator""_u64(unsigned long long value)
-	{
-		return static_cast<std::uint64_t>(value);
-	}
+	{ return static_cast<std::uint64_t>(value); }
 
 	namespace internal
 	{
@@ -90,7 +82,7 @@ namespace ccm::support
 				for (char const ch : str) { push(ch); }
 			}
 
-			CCM_DISABLE_MSVC_WARNING(4127) // MSVC thinks the is_alpha is a constant expression; It is not.
+			CCM_DISABLE_MSVC_WARNING(4127) // MSVC treats is_alpha as a constant expression. It is not.
 			// Returns the digit for a particular character.
 			// Returns INVALID_DIGIT if the character is invalid.
 			static constexpr uint8_t get_digit_value(const char c)
@@ -115,10 +107,10 @@ namespace ccm::support
 				const std::uint8_t value = get_digit_value(c);
 				if (value == INVALID_DIGIT || size >= MAX_DIGITS)
 				{
-					// During constant evaluation `ccm::support::unreachable()` will halt the
-					// compiler as it is not executable. This is preferable over `assert` that
-					// will only trigger in debug mode. Also, we can't use `static_assert`
-					// because `value` and `size` are not constant.
+					// During constant evaluation ccm::support::unreachable() will halt the
+					// compiler as it is not executable. This is preferable over assert that
+					// will only trigger in debug mode. Also, we cannot use static_assert
+					// because value and size are not constant.
 					ccm::support::unreachable(); // invalid or too many characters.
 				}
 				digits.at(size) = value;
@@ -204,19 +196,13 @@ namespace ccm::support
 	} // namespace internal
 
 	constexpr ccm::types::UInt<96> operator""_u96(const char * x)
-	{
-		return internal::parse_with_prefix<ccm::types::UInt<96>>(x);
-	}
+	{ return internal::parse_with_prefix<ccm::types::UInt<96>>(x); }
 
 	constexpr ccm::types::uint128_t operator""_u128(const char * x)
-	{
-		return internal::parse_with_prefix<ccm::types::uint128_t>(x);
-	}
+	{ return internal::parse_with_prefix<ccm::types::uint128_t>(x); }
 
 	constexpr auto operator""_u256(const char * x)
-	{
-		return internal::parse_with_prefix<ccm::types::UInt<256>>(x);
-	}
+	{ return internal::parse_with_prefix<ccm::types::UInt<256>>(x); }
 
 	template <typename T>
 	constexpr T parse_bigint_internal(std::string_view view)

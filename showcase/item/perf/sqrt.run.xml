@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="showcase / perf / sqrt" type="CMakeRunConfiguration" factoryName="Application" folderName="showcase/perf" PROGRAM_PARAMS="--benchmark_out=$PROJECT_DIR$/showcase/reports/perf/sqrt.json --benchmark_out_format=json" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ccmath" TARGET_NAME="showcase_bench_sqrt" RUN_TARGET_PROJECT_NAME="ccmath" RUN_TARGET_NAME="showcase_bench_sqrt">
+    <option name="workingDir" value="$PROJECT_DIR$" />
+    <method v="2">
+      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+    </method>
+  </configuration>
+</component>

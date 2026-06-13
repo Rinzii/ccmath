@@ -29,14 +29,20 @@ namespace ccm
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T asin(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_asin<T>) { return ccm::builtin::asin(num); }
+		if constexpr (ccm::builtin::has_constexpr_asin<T>) { return ccm::builtin::asin_ct(num); }
 		else if (ccm::support::is_constant_evaluated())
 		{
 			if constexpr (std::is_same_v<T, float>) { return internal::impl::asin_float(num); }
 			else if constexpr (std::is_same_v<T, double>) { return internal::impl::asin_double(num); }
-			else { return static_cast<long double>(internal::impl::asin_double(static_cast<double>(num))); }
+			else
+			{
+				return static_cast<long double>(internal::impl::asin_double(static_cast<double>(num)));
+			}
 		}
-		else { return ccm::rt::asin_rt(num); }
+		else
+		{
+			return ccm::rt::asin_rt(num);
+		}
 	}
 
 	/**
@@ -48,9 +54,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double asin(Integer num)
-	{
-		return ccm::asin<double>(static_cast<double>(num));
-	}
+	{ return ccm::asin<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Computes inverse sine for float.
@@ -59,9 +63,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/asin
 	 */
 	constexpr float asinf(float num)
-	{
-		return ccm::asin<float>(num);
-	}
+	{ return ccm::asin<float>(num); }
 
 	/**
 	 * @brief Computes inverse sine for long double.
@@ -70,9 +72,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/asin
 	 */
 	constexpr long double asinl(long double num)
-	{
-		return ccm::asin<long double>(num);
-	}
+	{ return ccm::asin<long double>(num); }
 } // namespace ccm
 
 /// @ingroup trig

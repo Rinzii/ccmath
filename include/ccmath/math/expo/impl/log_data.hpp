@@ -160,7 +160,7 @@ namespace ccm::internal
 			TabEntry{ 0x1.84f00acb39a08p-1, 0x1.1980d67234800p-2 },	 TabEntry{ 0x1.82a49e8653e55p-1, 0x1.1f8ffe0cc8000p-2 },
 			TabEntry{ 0x1.8060195f40260p-1, 0x1.2595fd7636800p-2 },	 TabEntry{ 0x1.7e22563e0a329p-1, 0x1.2b9300914a800p-2 },
 			TabEntry{ 0x1.7beb377dcb5adp-1, 0x1.3187210436000p-2 },	 TabEntry{ 0x1.79baa679725c2p-1, 0x1.377266dec1800p-2 },
-			TabEntry{ 0x1.77907f2170657p-1, 0x1.3d54ffbaf3000p-2 },
+			TabEntry{ 0x1.77907f2170657p-1, 0x1.3d54ffbaf3000p-2 },	 TabEntry{ 0x1.756cadbd6130cp-1, 0x1.432eee32fe000p-2 },
 		};
 
 		struct Tab2Entry

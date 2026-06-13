@@ -46,9 +46,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double lgamma(Integer num)
-	{
-		return ccm::lgamma<double>(static_cast<double>(num));
-	}
+	{ return ccm::lgamma<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Computes log-gamma for float.
@@ -57,9 +55,7 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/lgamma
 	 */
 	constexpr float lgammaf(float num)
-	{
-		return ccm::lgamma<float>(num);
-	}
+	{ return ccm::lgamma<float>(num); }
 
 	/**
 	 * @brief Computes log-gamma for long double.
@@ -68,7 +64,5 @@ namespace ccm
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/lgamma
 	 */
 	constexpr long double lgammal(long double num)
-	{
-		return ccm::lgamma<long double>(num);
-	}
+	{ return ccm::lgamma<long double>(num); }
 } // namespace ccm

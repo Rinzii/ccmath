@@ -22,8 +22,6 @@ namespace ccm::ext
 	 * @param t Delta time, in seconds.
 	 * @param h Half-life, time until halfway, in seconds.
 	 * @return The smoothed value.
-	 *
-	 * @warning Currently waiting on ccm::exp2 to be implemented. Till then this will NOT work.
 	 */
 	template <typename T>
 	constexpr T lerp_smooth(T a, T b, T t, T h)

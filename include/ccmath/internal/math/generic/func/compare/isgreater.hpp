@@ -27,8 +27,11 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr bool isgreater(T x, T y) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_isgreater<T>) { return ccm::builtin::isgreater(x, y); }
-		else { return !ccm::isunordered(x, y) && (x > y); }
+		if constexpr (ccm::builtin::has_constexpr_isgreater<T>) { return ccm::builtin::isgreater_ct(x, y); }
+		else
+		{
+			return !ccm::isunordered(x, y) && (x > y);
+		}
 	}
 
 	/**
