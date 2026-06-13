@@ -17,14 +17,6 @@ on:
   pull_request:
     branches:
       - '**'
-    paths:
-      - '.clang-format'
-      - '.github/actions/install-clang-format/**'
-      - '.github/workflows/lint.yml'
-      - 'include/**/*.hpp'
-      - 'tools/apply_format.sh'
-      - 'tools/clang_format_version'
-      - 'tools/ensure_format.sh'
 
 concurrency:
   group: lint-${{ github.event.pull_request.number || github.ref }}
