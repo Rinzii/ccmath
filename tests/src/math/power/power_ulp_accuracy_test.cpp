@@ -234,9 +234,10 @@ TEST(CcmathPowerUlpTests, PowHalfIntegerTinySqrtBranch)
 // saturating to the same infinity or zero the C library produces.
 TEST(CcmathPowerUlpTests, PowHugeExponentClampThreshold)
 {
-	const double threshold			= ccm::support::bit_cast<double>(0x43d7'4910'd52d'3052ULL);
-	const std::array<double, 5> kExps = { std::nextafter(threshold, 0.0), threshold, std::nextafter(threshold, std::numeric_limits<double>::infinity()),
-										  1.0e19, 1.0e300 };
+	const double threshold			  = ccm::support::bit_cast<double>(0x43d7'4910'd52d'3052ULL);
+	const std::array<double, 5> kExps = {
+		std::nextafter(threshold, 0.0), threshold, std::nextafter(threshold, std::numeric_limits<double>::infinity()), 1.0e19, 1.0e300
+	};
 	constexpr std::array<double, 4> kBases = { 1.0000000000000002, 0.9999999999999999, 2.0, 0.5 };
 
 	for (double base : kBases)
