@@ -132,18 +132,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # CMake has no cxx_std_26 mapping for MSVC; its newest is cxx_std_23, which maps
+        # to /std:c++latest. So C++latest on MSVC is requested as cxx_std_23.
         include:
           - name: vs22-debug-cxxlatest
             configurePreset: vs22-debug
             buildPreset: build-vs22-debug
             testPreset: test-vs22-debug
-            cxx_version: 26
+            cxx_version: 23
 
           - name: vs22-release-cxxlatest
             configurePreset: vs22-release
             buildPreset: build-vs22-release
             testPreset: test-vs22-release
-            cxx_version: 26
+            cxx_version: 23
 
     steps:
       - name: Harden Runner

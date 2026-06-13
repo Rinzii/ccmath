@@ -234,29 +234,35 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # The default ubuntu-latest g++ is 13.3, which does not support C++26.
+          # GCC 14 is preinstalled on the image, so pin the gcc cells to it.
           - name: gcc-debug-cxxlatest
             configurePreset: ninja-gcc-debug
             buildPreset: build-ninja-gcc-debug
             testPreset: test-ninja-gcc-debug
             cxx_version: 26
+            compiler_args: -DCMAKE_C_COMPILER=gcc-14 -DCMAKE_CXX_COMPILER=g++-14
 
           - name: gcc-release-cxxlatest
             configurePreset: ninja-gcc-release
             buildPreset: build-ninja-gcc-release
             testPreset: test-ninja-gcc-release
             cxx_version: 26
+            compiler_args: -DCMAKE_C_COMPILER=gcc-14 -DCMAKE_CXX_COMPILER=g++-14
 
           - name: clang-debug-cxxlatest
             configurePreset: ninja-clang-debug
             buildPreset: build-ninja-clang-debug
             testPreset: test-ninja-clang-debug
             cxx_version: 26
+            compiler_args: ""
 
           - name: clang-release-cxxlatest
             configurePreset: ninja-clang-release
             buildPreset: build-ninja-clang-release
             testPreset: test-ninja-clang-release
             cxx_version: 26
+            compiler_args: ""
 
     steps:
       - name: Harden Runner
@@ -278,11 +284,12 @@ jobs:
             ${{ runner.os }}-${{ matrix.name }}-
 
       - name: Install dependencies
-        run: sudo apt-get update -qq && sudo apt-get install -yqq --no-install-recommends ninja-build
+        run: sudo apt-get update -qq && sudo apt-get install -yqq --no-install-recommends ninja-build g++-14
 
       - name: Configure
         run: >
           cmake --preset="${{ matrix.configurePreset }}"
+          ${{ matrix.compiler_args }}
           -DCCMATH_DESIRED_CXX_STANDARD="cxx_std_${{ matrix.cxx_version }}"
           -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON
           -DCCMATH_ENABLE_WARNINGS_AS_ERRORS=ON
