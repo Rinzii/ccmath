@@ -66,10 +66,17 @@ TEST(CcmathPowerUlpTests, PowGenDoubleRegressionCases)
 		double exp;
 	};
 
-	constexpr std::array<PowCase, 3> kCases = { {
+	constexpr std::array<PowCase, 6> kCases = { {
 		{ 10.0, 4.0 },
 		{ 30.637028068178267, -7.702539522452998 },
 		{ 945971881662.053466796875, 15.38309228199631562 },
+		// Base just above 1 with a huge exponent lands the result deep in the over/underflow
+		// scaled band (here ~2^-735). That region used to drop to the fast single-double path
+		// and lost ~38 ULP; it must now ride the accurate double-double reconstruction.
+		{ 0x1.00000000000ffp+0, -0x1.0p53 },
+		{ 0x1.000000000010p+0, -0x1.0p53 },
+		// Symmetric overflow-adjacent band (~2^+735).
+		{ 0x1.00000000000ffp+0, 0x1.0p53 },
 	} };
 
 	for (const PowCase & test_case : kCases)

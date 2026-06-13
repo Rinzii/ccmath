@@ -205,7 +205,7 @@ namespace ccm::gen::impl
 		// allows |y| up to ~2^53, so the powf lo6_hi single-double shortcut is unsafe) and
 		// collapses the normalized double-double with a single binary64 addition, which
 		// rounds once in the active mode and is therefore correctly rounded in all modes.
-		constexpr double pow_double_double(unsigned idx_x, double dx, double log2_x_hi_part, double y6, std::uint64_t sign) noexcept
+		constexpr double pow_double_double(unsigned idx_x, double dx, double log2_x_hi_part, double y6, std::uint64_t sign, double scale) noexcept
 		{
 			using FPBits_t = support::fp::FPBits<double>;
 
@@ -250,7 +250,13 @@ namespace ccm::gen::impl
 				pow_kernel_detail::larger_exponent(log2_x_hi_part, log2_x_low.hi) ? ccm::types::add(hi_dd, log2_x_low) : ccm::types::add(log2_x_low, hi_dd);
 
 			// 2^6 * y * log2(x). In the gated range |y6_log2_x.hi| < 512 * 2^6.
-			const DoubleDouble y6_log2_x = quick_mult(y6, log2_x);
+			DoubleDouble y6_log2_x = quick_mult(y6, log2_x);
+
+			// For over/underflow-adjacent results the caller passes scale = 2^+-512 and we shift
+			// the binary exponent so the power-of-two reconstruction below stays representable.
+			// The result is reassembled by multiplying the (normal) reconstruction by scale,
+			// which is exact for a normal final value, so it stays correctly rounded.
+			if (scale != 1.0) { y6_log2_x.hi += (scale > 1.0) ? -512.0 * 0x1.0p6 : 512.0 * 0x1.0p6; }
 
 			const double hm		   = support::fp::nearest_integer(y6_log2_x.hi);
 			const double lo6_hi	   = y6_log2_x.hi - hm; // Exact, |lo6_hi| <= 0.5
@@ -285,8 +291,10 @@ namespace ccm::gen::impl
 			const DoubleDouble rr = quick_mult(exp2_hm, pp);
 
 			// A single binary64 addition of a faithful double-double rounds once in the
-			// active mode, yielding the correctly-rounded result without double rounding.
-			return rr.hi + rr.lo;
+			// active mode, yielding the correctly-rounded result without double rounding. For
+			// scaled results the final 2^+-512 multiply is exact because the reconstruction is a
+			// normal double, so a single rounding still happens in the addition.
+			return (rr.hi + rr.lo) * scale;
 		}
 
 		constexpr double pow_kernel(double base, double exp, std::uint64_t sign) noexcept
@@ -358,6 +366,7 @@ namespace ccm::gen::impl
 			y6_log2_x.lo		   = support::multiply_add(y6, log2_x.lo, y6_log2_x.lo);
 
 			double scale					 = 1.0;
+			bool clamped					 = false;
 			constexpr double upper_exp_bound = 512.0 * 0x1.0p6;
 
 			if (FPBits_t(y6_log2_x.hi).abs().get_val() >= upper_exp_bound)
@@ -372,6 +381,7 @@ namespace ccm::gen::impl
 						// If hi is clamped, the huge double-double tail would dominate lo6 and
 						// reconstruct a spurious value instead of cleanly overflowing to infinity.
 						y6_log2_x.lo = 0.0;
+						clamped		 = true;
 					}
 				}
 				else
@@ -384,14 +394,36 @@ namespace ccm::gen::impl
 						// If hi is clamped, a huge double-double tail would dominate lo6 and
 						// reconstruct a spurious normal instead of flushing to zero.
 						y6_log2_x.lo = 0.0;
+						clamped		 = true;
 					}
 				}
 			}
 
-			// In-range exponents use the accurate double-double reconstruction so the
-			// result is correctly rounded in every mode. Clamped over/underflow cases keep
-			// the fast single-double path below, which saturates cleanly to inf/0.
-			if (scale == 1.0) { return pow_double_double(idx_x, dx, log2_x_hi_part, y6, sign); }
+			// Every finite result, including the over/underflow-adjacent band that needs a
+			// 2^+-512 scale, is reconstructed by the accurate double-double path so it stays
+			// correctly rounded in every mode (the single-double fast path below loses several
+			// ULP once the exponent leaves the unscaled range). Only genuine overflow/underflow
+			// whose exponent is clamped keeps the fast path, where the value saturates to inf/0
+			// and only the raised flag matters.
+			if (!clamped)
+			{
+				const double dd = pow_double_double(idx_x, dx, log2_x_hi_part, y6, sign, scale);
+				if (scale != 1.0)
+				{
+					const FPBits_t dd_bits(dd);
+					if (dd_bits.is_inf())
+					{
+						support::fenv::set_errno_if_required(ERANGE);
+						support::fenv::raise_except_if_required(FE_OVERFLOW);
+					}
+					else if (dd_bits.is_zero() || dd_bits.abs().uintval() < FPBits_t::min_normal().uintval())
+					{
+						support::fenv::set_errno_if_required(ERANGE);
+						support::fenv::raise_except_if_required(FE_UNDERFLOW);
+					}
+				}
+				return dd;
+			}
 
 			const double hm		= support::fp::nearest_integer(y6_log2_x.hi);
 			const double lo6_hi = y6_log2_x.hi - hm;
