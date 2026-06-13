@@ -194,6 +194,141 @@ TEST(CcmathPowerUlpTests, DISABLED_PowGenFloatExhaustiveMantissa)
 							 << " std::pow=" << first_fail_expect << " ulp=" << ulp_difference(first_fail_actual, first_fail_expect);
 }
 
+// [c.math]/1: half-integer exponents take the exact dd_sqrt plus integer-power route, which the
+// random and grid campaigns essentially never sample (half-integers are a measure-zero set).
+// Covers positive and negative k out to the |2 exp| <= 2048 bound, including saturation parity.
+TEST(CcmathPowerUlpTests, PowHalfIntegerExponentAccuracy)
+{
+	constexpr std::array<double, 4> kBases	   = { 3.7, 0.083, 1.001, 17.5 };
+	constexpr std::array<double, 12> kHalfExps = { 1.5, -1.5, 2.5, -2.5, 7.5, -7.5, 99.5, -99.5, 501.5, -501.5, 1023.5, -1023.5 };
+
+	for (double base : kBases)
+	{
+		for (double exp : kHalfExps)
+		{
+			SCOPED_TRACE(base);
+			SCOPED_TRACE(exp);
+			ccm::test::ExpectSameFloatingAsStd(ccm::pow(base, exp), std::pow(base, exp), 1);
+			ccm::test::ExpectSameFloatingAsStd(ccm::gen::pow_gen(base, exp), std::pow(base, exp), 1);
+		}
+	}
+}
+
+// [c.math]/1: the dd_sqrt kernel rescales bases below 2^-1000 so the two_prod residual stays
+// normal. Only exp = -0.5 can reach that branch with a normal result, so pin it directly,
+// including a subnormal base.
+TEST(CcmathPowerUlpTests, PowHalfIntegerTinySqrtBranch)
+{
+	constexpr std::array<double, 4> kTinyBases = { 0x1.0p-1010, 0x1.b333333333333p-1005, 0x1.0p-1040, 0x1.8p-1060 };
+
+	for (double base : kTinyBases)
+	{
+		SCOPED_TRACE(base);
+		ccm::test::ExpectSameFloatingAsStd(ccm::pow(base, -0.5), std::pow(base, -0.5), 1);
+		ccm::test::ExpectSameFloatingAsStd(ccm::gen::pow_gen(base, -0.5), std::pow(base, -0.5), 1);
+	}
+}
+
+// [c.math]/1: exponents beyond 0x43d74910d52d3052 are clamped to +/-2^100 before the kernel.
+// Straddle the threshold from both sides with bases on both sides of one so the clamp keeps
+// saturating to the same infinity or zero the C library produces.
+TEST(CcmathPowerUlpTests, PowHugeExponentClampThreshold)
+{
+	const double threshold			= ccm::support::bit_cast<double>(0x43d7'4910'd52d'3052ULL);
+	const std::array<double, 5> kExps = { std::nextafter(threshold, 0.0), threshold, std::nextafter(threshold, std::numeric_limits<double>::infinity()),
+										  1.0e19, 1.0e300 };
+	constexpr std::array<double, 4> kBases = { 1.0000000000000002, 0.9999999999999999, 2.0, 0.5 };
+
+	for (double base : kBases)
+	{
+		for (double exp : kExps)
+		{
+			SCOPED_TRACE(base);
+			SCOPED_TRACE(exp);
+			ccm::test::ExpectSameFloatingAsStd(ccm::pow(base, exp), std::pow(base, exp), 1);
+			ccm::test::ExpectSameFloatingAsStd(ccm::pow(base, -exp), std::pow(base, -exp), 1);
+			// The clamp itself lives in the generic kernel, which builtin platforms bypass.
+			ccm::test::ExpectSameFloatingAsStd(ccm::gen::pow_gen(base, exp), std::pow(base, exp), 1);
+			ccm::test::ExpectSameFloatingAsStd(ccm::gen::pow_gen(base, -exp), std::pow(base, -exp), 1);
+		}
+	}
+}
+
+// [c.math]/1: bases of exactly 2 and 10 short-circuit to the dedicated exp2 and exp10 kernels.
+// Integer exponents in (2, 24] are consumed by the small integer loop first, so non-integer and
+// larger exponents are what actually reach the shortcuts.
+TEST(CcmathPowerUlpTests, PowfBaseTwoAndTenShortcutAccuracy)
+{
+	constexpr std::array<float, 9> kExps = { 0.4F, 2.5F, -3.3F, 7.7F, -11.25F, 19.9F, 25.0F, 30.5F, -35.5F };
+
+	for (float exp : kExps)
+	{
+		SCOPED_TRACE(exp);
+		ccm::test::ExpectSameFloatingAsStd(ccm::powf(2.0F, exp), static_cast<float>(std::pow(2.0F, exp)), 1);
+		ccm::test::ExpectSameFloatingAsStd(ccm::powf(10.0F, exp), static_cast<float>(std::pow(10.0F, exp)), 1);
+	}
+}
+
+// [c.math]/1: integer exponents in (2, 24] use an iterated double product when the base mantissa
+// is narrow enough (extra_bits * iterations <= 25). Bracket that boundary from both sides with
+// bases of known mantissa width so both the loop and the rejection into the main path are hit.
+TEST(CcmathPowerUlpTests, PowfSmallIntegerLoopBoundary)
+{
+	// Mantissa widths: 1.5 -> 0 extra bits, 1.25 -> 1, 1 + 2^-8 -> 7, 1 + 2^-16 -> 15.
+	constexpr std::array<float, 4> kBases = { 1.5F, 1.25F, 1.00390625F, 1.0000152587890625F };
+	constexpr std::array<float, 6> kExps  = { 3.0F, 4.0F, 5.0F, 8.0F, 12.0F, 24.0F };
+
+	for (float base : kBases)
+	{
+		for (float exp : kExps)
+		{
+			SCOPED_TRACE(base);
+			SCOPED_TRACE(exp);
+			ccm::test::ExpectSameFloatingAsStd(ccm::powf(base, exp), static_cast<float>(std::pow(base, exp)), 1);
+		}
+	}
+}
+
+// [c.math]/1: inputs whose phase-1 Ziv test fails, forcing the double-double fallback and its
+// round-to-odd reconstruction. Mined by replaying the phase-1 kernel and kept only when the
+// fallback path is taken on FMA targets; expected bits are MPFR correctly rounded results.
+TEST(CcmathPowerUlpTests, PowfZivFallbackRegressionCases)
+{
+	struct ZivCase
+	{
+		std::uint32_t base_bits;
+		std::uint32_t exp_bits;
+		std::uint32_t expected_bits;
+	};
+
+	constexpr std::array<ZivCase, 10> kCases = { {
+		{ 0x42520505U, 0xc13230f3U, 0x1fa430e0U }, // powf(52.5049019, -11.1369505)
+		{ 0x4206bdd9U, 0x3fc4629cU, 0x435c8acbU }, // powf(33.6853981, 1.53425932)
+		{ 0x418d5c87U, 0xc164ebccU, 0x21d2e009U }, // powf(17.6701794, -14.3075676)
+		{ 0x3ea17657U, 0x40375250U, 0x3d163830U }, // powf(0.315355986, 2.86439896)
+		{ 0x3fa1f87aU, 0xc1a6e303U, 0x3bf180f6U }, // powf(1.2653954, -20.8608456)
+		{ 0x3f36eccdU, 0xc36ee3bbU, 0x79646ae2U }, // powf(0.714550793, -238.889572)
+		{ 0x3f7c682cU, 0xc2bee724U, 0x4076ad42U }, // powf(0.985964537, -95.4514465)
+		{ 0x3f7f61dbU, 0xc33977a4U, 0x3fc85c71U }, // powf(0.997586906, -185.467346)
+		{ 0x3faf9dddU, 0xc2d92ea4U, 0x26af067cU }, // powf(1.37200511, -108.591095)
+		{ 0x3f6aeda8U, 0x4390d2efU, 0x2d89c122U }, // powf(0.917688847, 289.647919)
+	} };
+
+	for (const ZivCase & test_case : kCases)
+	{
+		const float base	 = ccm::support::bit_cast<float>(test_case.base_bits);
+		const float exp		 = ccm::support::bit_cast<float>(test_case.exp_bits);
+		const float expected = ccm::support::bit_cast<float>(test_case.expected_bits);
+		SCOPED_TRACE(base);
+		SCOPED_TRACE(exp);
+		EXPECT_EQ(ccm::support::bit_cast<std::uint32_t>(ccm::gen::pow_gen(base, exp)), test_case.expected_bits)
+			<< "powf(" << base << ", " << exp << ") expected " << expected;
+		// The public entry point may route to the platform libm, which only promises faithful
+		// rounding, so it gets the 1 ulp bound rather than the exact MPFR bits.
+		ccm::test::ExpectSameFloatingAsStd(ccm::powf(base, exp), expected, 1);
+	}
+}
+
 TEST(CcmathPowerUlpTests, CbrtDouble)
 { ccm::test::ExpectUlpUnaryOver(ccm::test::samples::kCbrtDouble, ccm::cbrt<double>, static_cast<double (*)(double)>(std::cbrt)); }
 
