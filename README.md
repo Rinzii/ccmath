@@ -5,13 +5,15 @@
 ## A constexpr-first `<cmath>` library for C++17 and later
 
 [![Release](https://img.shields.io/github/v/release/Rinzii/ccmath?sort=semver&label=release)](https://github.com/Rinzii/ccmath/releases/latest)
-[![Windows CI (main)](https://github.com/Rinzii/ccmath/actions/workflows/ci-windows.yml/badge.svg?branch=main)](https://github.com/Rinzii/ccmath/actions/workflows/ci-windows.yml?query=branch%3Amain)
-[![Linux CI (main)](https://github.com/Rinzii/ccmath/actions/workflows/ci-linux.yml/badge.svg?branch=main)](https://github.com/Rinzii/ccmath/actions/workflows/ci-linux.yml?query=branch%3Amain)
-[![macOS CI (main)](https://github.com/Rinzii/ccmath/actions/workflows/ci-macos.yml/badge.svg?branch=main)](https://github.com/Rinzii/ccmath/actions/workflows/ci-macos.yml?query=branch%3Amain)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/Rinzii/ccmath/badge)](https://securityscorecards.dev/viewer/?uri=github.com/Rinzii/ccmath)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9402/badge)](https://www.bestpractices.dev/projects/9402)
 [![License](https://img.shields.io/badge/License-Apache%202.0%20WITH%20LLVM--exception-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Discord](https://img.shields.io/discord/1286067628456284244?label=Discord)](https://discord.gg/p3mVxAbdmc)
+
+| Branch          | Linux                                                                                                                                                                                                              | macOS                                                                                                                                                                                                              | Windows                                                                                                                                                                                                                  |
+|-----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `main`          | [![Linux main](https://github.com/Rinzii/ccmath/actions/workflows/ci-linux.yml/badge.svg?branch=main)](https://github.com/Rinzii/ccmath/actions/workflows/ci-linux.yml?query=branch%3Amain)                        | [![macOS main](https://github.com/Rinzii/ccmath/actions/workflows/ci-macos.yml/badge.svg?branch=main)](https://github.com/Rinzii/ccmath/actions/workflows/ci-macos.yml?query=branch%3Amain)                        | [![Windows main](https://github.com/Rinzii/ccmath/actions/workflows/ci-windows.yml/badge.svg?branch=main)](https://github.com/Rinzii/ccmath/actions/workflows/ci-windows.yml?query=branch%3Amain)                        |
+| `release/0.3.x` | [![Linux release](https://github.com/Rinzii/ccmath/actions/workflows/ci-linux.yml/badge.svg?branch=release/0.3.x)](https://github.com/Rinzii/ccmath/actions/workflows/ci-linux.yml?query=branch%3Arelease%2F0.3.x) | [![macOS release](https://github.com/Rinzii/ccmath/actions/workflows/ci-macos.yml/badge.svg?branch=release/0.3.x)](https://github.com/Rinzii/ccmath/actions/workflows/ci-macos.yml?query=branch%3Arelease%2F0.3.x) | [![Windows release](https://github.com/Rinzii/ccmath/actions/workflows/ci-windows.yml/badge.svg?branch=release/0.3.x)](https://github.com/Rinzii/ccmath/actions/workflows/ci-windows.yml?query=branch%3Arelease%2F0.3.x) |
 
 CCMath is a header-only library with a `<cmath>`-style API. The same entry points constexpr-evaluate where the standard and compiler allow, dispatch to portable runtime implementations elsewhere, and can use SIMD on selected functions when the target supports it.
 
@@ -131,6 +133,8 @@ Validation follows patterns from LLVM-libc, CORE-MATH, and glibc. CI covers:
 
 - C++17
 - C++20
+- C++23
+- C++26 / latest
 
 #### Build Configurations
 
@@ -384,7 +388,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 
 ## License
 
-Apache License v2.0 with LLVM Exceptions. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
+Apache License v2.0 with LLVM Exceptions. See [LICENSE](LICENSE).
 
 ---
 

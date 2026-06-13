@@ -36,9 +36,9 @@ set(CCMATH_COREMATH_ROOT "" CACHE PATH "Install prefix for CORE-MATH oracle libr
 # Last-resort FetchContent build when prefix/pkg-config discovery fails.
 option(CCMATH_FETCH_COREMATH "Fetch and build CORE-MATH sources when not found on the system" OFF)
 
-# CCMATH_ENABLE_POW_SEARCH_TOOLS:
-# Build standalone pow adversarial-search tools.
-option(CCMATH_ENABLE_POW_SEARCH_TOOLS "Build standalone pow adversarial-search tools" OFF)
+# CCMATH_ENABLE_SEARCH_TOOLS:
+# Build standalone adversarial-search tools (worst-case input hunting).
+option(CCMATH_ENABLE_SEARCH_TOOLS "Build standalone adversarial-search tools (worst-case input hunting)" OFF)
 
 # CCMATH_ENABLE_CROSS_LIBM_TESTS:
 # Build optional cross-libm differential pow validation tools.
