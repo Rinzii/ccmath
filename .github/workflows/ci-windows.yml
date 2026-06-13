@@ -61,7 +61,7 @@ jobs:
           -DCCMATH_BUILD_SIMPLE_TESTS=ON
           -DCCMATH_BUILD_RIGOROUS_TESTS=OFF
           -DCCMATH_ENABLE_MPFR_TESTS=OFF
-          -DCCMATH_ENABLE_POW_SEARCH_TOOLS=OFF
+          -DCCMATH_ENABLE_SEARCH_TOOLS=OFF
 
       - name: Build
         run: cmake --build --preset="${{ matrix.buildPreset }}"
@@ -117,7 +117,7 @@ jobs:
           -DCCMATH_BUILD_SIMPLE_TESTS=ON
           -DCCMATH_BUILD_RIGOROUS_TESTS=OFF
           -DCCMATH_ENABLE_MPFR_TESTS=OFF
-          -DCCMATH_ENABLE_POW_SEARCH_TOOLS=OFF
+          -DCCMATH_ENABLE_SEARCH_TOOLS=OFF
 
       - name: Build
         run: cmake --build --preset="${{ matrix.buildPreset }}"
@@ -203,7 +203,7 @@ jobs:
             -DCCMATH_BUILD_SIMPLE_TESTS=OFF `
             -DCCMATH_BUILD_RIGOROUS_TESTS=ON `
             -DCCMATH_ENABLE_MPFR_TESTS=ON `
-            -DCCMATH_ENABLE_POW_SEARCH_TOOLS=ON `
+            -DCCMATH_ENABLE_SEARCH_TOOLS=ON `
             -DCCMATH_ENABLE_COREMATH_TESTS=OFF `
             -DVCPKG_MANIFEST_DIR="${{ github.workspace }}/cmake/vcpkg" `
             -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
