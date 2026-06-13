@@ -748,22 +748,28 @@ transformation
   \mathit{lo} = \mathrm{fma}(a,b,-\mathit{hi}),
 \]
 which is exact in every IEEE rounding mode, and a \textsc{FastTwoSum}
-renormalization.  Two guards make the algebraic path safe to trust.  First, the
-positive power $x^{|y|}$, held as the pair $p$, must satisfy
-$2^{-960} \le |p_{\mathrm{hi}}| \le 2^{960}$; outside that band the double-double
-low limb underflows or overflows during squaring and the pair loses the extra
-precision the path exists to provide (this bites a tiny base with a large
-negative exponent, whose reciprocal is a large normal result), so such inputs
-fall through to the kernel.  Second, a negative result's sign is folded into the
-pair before the final rounding rather than negated afterward: negating a
-magnitude that was already rounded in the active mode flips directed rounding,
-since $-\,\mathrm{RU}(|v|) = \mathrm{RD}(-|v|)$.  For negative $y$ one Newton
-reciprocal of the (signed) pair is
-taken.  For half-integer $y$ with $|2y| \le 2048$ the identity
+renormalization.  The squaring carries a separate binary exponent: after each
+product the mantissa pair is rescaled so its high limb lies in $[1,2)$ and the
+shift is accumulated, so neither limb leaves the normal range however small or
+large $x^{|y|}$ becomes (a naive accumulation loses the low limb once an
+intermediate nears the subnormal floor, for instance a small base raised to a
+large power or its reciprocal, which is exactly where these near-power-of-two
+integer results carry a sub-ULP tail that decides the directed rounding).  The
+binary weight is reattached at the end by a single power-of-two scaling, exact
+whenever the final value is normal.  Two further points make the path safe.
+First, a power whose exponent estimate $|y| \cdot (e_x + 1)$ exceeds $1023$ is
+screened out before the squaring, because an overflowing product clamps to a
+finite maximal value under directed rounding rather than becoming infinity and
+would otherwise be mistaken for a valid result.  Second, a negative result's
+sign is folded into the pair before the final rounding rather than negated
+afterward: negating a magnitude that was already rounded in the active mode flips
+directed rounding, since $-\,\mathrm{RU}(|v|) = \mathrm{RD}(-|v|)$.  For negative
+$y$ one Newton reciprocal of the (signed) mantissa pair is taken before the
+weight is reattached.  For half-integer $y$ with $|2y| \le 2048$ the identity
 $x^{y} = (\sqrt{x})^{2y}$ is used: $y=\tfrac12$ returns the correctly-rounded
 \texttt{sqrt\_gen}, and otherwise the kernel raises a double-double $\sqrt{x}$ to
-the odd integer $2y$ by the same square-and-multiply, subject to the same
-safe-band guard. If the algebraic result is
+the odd integer $2y$ by double-double square-and-multiply, screened by the same
+overflow estimate and a low-limb magnitude check.  If the algebraic result is
 not a finite normal double, the input is handed back to the kernel so that the
 overflow, underflow, and subnormal semantics of the standard are preserved.
 
