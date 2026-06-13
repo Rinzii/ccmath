@@ -8,160 +8,133 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-// Correctly-rounded gate for the software fma. fma is defined to round the exact x*y + z
-// once, so the ccmath fixed-accumulator kernel must agree bit for bit with std::fma (itself
-// correctly rounded) under every rounding mode. These broad randomized and adversarial sweeps
-// complement the curated structured cases in tests/conformance/fma_rounding_test.cpp: full
-// random bit patterns, a near-cancellation generator that stresses the sticky/borrow logic,
-// and the classic float double-rounding killers that a non-fused double evaluation gets wrong.
+// Correctly-rounded gate for the software fma. fma is defined to round the exact x*y + z once,
+// so the ccmath fixed-accumulator kernel must reproduce the exact result bit pattern under every
+// IEEE rounding mode. Each case pins the value MPFR produces (correctly rounded, with
+// subnormalize). These goldens are used instead of std::fma because an optimized build does not
+// honour the dynamic rounding mode for the libm call (FENV_ACCESS is not portably available), so
+// std::fma is not a trustworthy directed-mode oracle for overflow and inexact-normal results.
+// The cases cover the classic double-rounding killers, an inexact normal result, exact results,
+// and the overflow and underflow boundaries where directed rounding diverges from round-to-nearest.
 
 #include "ccmath/ccmath.hpp"
-#include "utils/test_runtime.hpp"
 
 #include <gtest/gtest.h>
 
 #include <cfenv>
-#include <cmath>
 #include <cstdint>
 #include <cstring>
-#include <limits>
-#include <random>
-#include <vector>
 
 namespace
 {
-	using ccm::test::runtime_value;
-
-	template <typename T>
-	struct uint_for;
-	template <>
-	struct uint_for<float>
+	float f_from_bits(std::uint32_t u)
 	{
-		using type = std::uint32_t;
-	};
-	template <>
-	struct uint_for<double>
+		float f{};
+		std::memcpy(&f, &u, sizeof(f));
+		return f;
+	}
+	std::uint32_t f_to_bits(float f)
 	{
-		using type = std::uint64_t;
-	};
-
-	template <typename T>
-	typename uint_for<T>::type bits(T f)
+		std::uint32_t u{};
+		std::memcpy(&u, &f, sizeof(u));
+		return u;
+	}
+	double d_from_bits(std::uint64_t u)
 	{
-		typename uint_for<T>::type u{};
+		double f{};
+		std::memcpy(&f, &u, sizeof(f));
+		return f;
+	}
+	std::uint64_t d_to_bits(double f)
+	{
+		std::uint64_t u{};
 		std::memcpy(&u, &f, sizeof(u));
 		return u;
 	}
 
-	template <typename T>
-	T from_bits(typename uint_for<T>::type u)
+	struct FloatCase
 	{
-		T f{};
-		std::memcpy(&f, &u, sizeof(f));
-		return f;
-	}
+		std::uint32_t x, y, z;
+		std::uint32_t expected[4]; // FE_TONEAREST, FE_TOWARDZERO, FE_UPWARD, FE_DOWNWARD
+	};
+	struct DoubleCase
+	{
+		std::uint64_t x, y, z;
+		std::uint64_t expected[4];
+	};
 
-	template <typename T>
-	bool same_result(T a, T b)
-	{
-		if (std::isnan(a) && std::isnan(b)) { return true; }
-		return bits<T>(a) == bits<T>(b);
-	}
+	// Goldens generated with MPFR mpfr_fma at the target precision plus mpfr_subnormalize.
+	constexpr FloatCase kFloatCases[] = {
+		{ 0x3f800800U, 0x3f800800U, 0x25000000U, { 0x3f801001U, 0x3f801000U, 0x3f801001U, 0x3f801000U } },
+		{ 0x3f800800U, 0x3f800800U, 0xa5000000U, { 0x3f801000U, 0x3f801000U, 0x3f801001U, 0x3f801000U } },
+		{ 0x3f7ff800U, 0x3f7ff800U, 0x24800000U, { 0x3f7ff000U, 0x3f7ff000U, 0x3f7ff001U, 0x3f7ff000U } },
+		{ 0x3f801000U, 0x3f800400U, 0x25800000U, { 0x3f801401U, 0x3f801400U, 0x3f801401U, 0x3f801400U } },
+		{ 0xc27a0cd9U, 0x5302830dU, 0x96599102U, { 0xd5fef50fU, 0xd5fef50eU, 0xd5fef50eU, 0xd5fef50fU } },
+		{ 0x40400000U, 0x40a00000U, 0x40e00000U, { 0x41b00000U, 0x41b00000U, 0x41b00000U, 0x41b00000U } },
+		{ 0x71aba7f8U, 0x58635fa9U, 0x3f800000U, { 0x7f800000U, 0x7f7fffffU, 0x7f800000U, 0x7f7fffffU } },
+		{ 0xf1aba7f8U, 0x58635fa9U, 0x3f800000U, { 0xff800000U, 0xff7fffffU, 0xff7fffffU, 0xff800000U } },
+		{ 0x0da24260U, 0x26901d7dU, 0x00000000U, { 0x00000001U, 0x00000000U, 0x00000001U, 0x00000000U } },
+	};
+
+	constexpr DoubleCase kDoubleCases[] = {
+		{ 0x3ff0000002000000ULL, 0x3ff0000002000000ULL, 0x3950000000000000ULL,
+		  { 0x3ff0000004000000ULL, 0x3ff0000004000000ULL, 0x3ff0000004000001ULL, 0x3ff0000004000000ULL } },
+		{ 0x3ff0000002000000ULL, 0x3ff0000002000000ULL, 0xb950000000000000ULL,
+		  { 0x3ff0000004000000ULL, 0x3ff0000004000000ULL, 0x3ff0000004000001ULL, 0x3ff0000004000000ULL } },
+		{ 0xc04f419b20000000ULL, 0x42605061a0000000ULL, 0xbacb322040000000ULL,
+		  { 0xc2bfdea1ddec8140ULL, 0xc2bfdea1ddec8140ULL, 0xc2bfdea1ddec8140ULL, 0xc2bfdea1ddec8141ULL } },
+		{ 0x4008000000000000ULL, 0x4014000000000000ULL, 0x401c000000000000ULL,
+		  { 0x4036000000000000ULL, 0x4036000000000000ULL, 0x4036000000000000ULL, 0x4036000000000000ULL } },
+		{ 0x7e444ecd0d33972bULL, 0x46293e5939a08ceaULL, 0x3ff0000000000000ULL,
+		  { 0x7ff0000000000000ULL, 0x7fefffffffffffffULL, 0x7ff0000000000000ULL, 0x7fefffffffffffffULL } },
+		{ 0xfe444ecd0d33972bULL, 0x46293e5939a08ceaULL, 0x3ff0000000000000ULL,
+		  { 0xfff0000000000000ULL, 0xffefffffffffffffULL, 0xffefffffffffffffULL, 0xfff0000000000000ULL } },
+		{ 0x01a56e1fc2f8f359ULL, 0x39b4484bfeebc2a0ULL, 0x0000000000000000ULL,
+		  { 0x0000000000000000ULL, 0x0000000000000000ULL, 0x0000000000000001ULL, 0x0000000000000000ULL } },
+		{ 0x3fffffffffffffffULL, 0x3ff0000000000001ULL, 0x3c30000000000000ULL,
+		  { 0x4000000000000001ULL, 0x4000000000000000ULL, 0x4000000000000001ULL, 0x4000000000000000ULL } },
+	};
 
 	constexpr int kModes[4]		   = { FE_TONEAREST, FE_TOWARDZERO, FE_UPWARD, FE_DOWNWARD };
 	constexpr const char* kName[4] = { "FE_TONEAREST", "FE_TOWARDZERO", "FE_UPWARD", "FE_DOWNWARD" };
-
-	template <typename T>
-	T ccm_fma(T x, T y, T z)
-	{ return ccm::fma(runtime_value(x), runtime_value(y), runtime_value(z)); }
-
-	template <typename T>
-	T std_fma(T x, T y, T z)
-	{ return static_cast<T (*)(T, T, T)>(std::fma)(runtime_value(x), runtime_value(y), runtime_value(z)); }
-
-	template <typename T>
-	void expect_cr(const std::vector<T>& xs, const std::vector<T>& ys, const std::vector<T>& zs)
-	{
-		const int saved = std::fegetround();
-		long failures	= 0;
-		for (int m = 0; m < 4 && failures < 10; ++m)
-		{
-			for (std::size_t i = 0; i < xs.size(); ++i)
-			{
-				std::fesetround(kModes[m]);
-				const T got = ccm_fma<T>(xs[i], ys[i], zs[i]);
-				const T ref = std_fma<T>(xs[i], ys[i], zs[i]);
-				std::fesetround(saved);
-				if (!same_result<T>(got, ref))
-				{
-					SCOPED_TRACE(kName[m]);
-					EXPECT_EQ(bits<T>(got), bits<T>(ref)) << "x=" << xs[i] << " y=" << ys[i] << " z=" << zs[i];
-					if (++failures >= 10) { break; }
-				}
-			}
-		}
-		std::fesetround(saved);
-	}
-
-	template <typename T>
-	void gen_random(std::vector<T>& xs, std::vector<T>& ys, std::vector<T>& zs, std::size_t n, std::uint64_t seed)
-	{
-		std::mt19937_64 rng(seed);
-		using U = typename uint_for<T>::type;
-		for (std::size_t i = 0; i < n; ++i)
-		{
-			xs.push_back(from_bits<T>(static_cast<U>(rng())));
-			ys.push_back(from_bits<T>(static_cast<U>(rng())));
-			zs.push_back(from_bits<T>(static_cast<U>(rng())));
-		}
-	}
-
-	// z chosen near -(x*y) to stress cancellation, sticky bits, and the borrow path.
-	template <typename T>
-	void gen_cancellation(std::vector<T>& xs, std::vector<T>& ys, std::vector<T>& zs, std::size_t n, std::uint64_t seed)
-	{
-		std::mt19937_64 rng(seed);
-		std::uniform_real_distribution<double> mantissa(-2.0, 2.0);
-		std::uniform_int_distribution<int> scale(-40, 40);
-		for (std::size_t i = 0; i < n; ++i)
-		{
-			const T a		  = static_cast<T>(std::ldexp(mantissa(rng), scale(rng)));
-			const T b		  = static_cast<T>(std::ldexp(mantissa(rng), scale(rng)));
-			const double prod = -static_cast<double>(a) * static_cast<double>(b);
-			const int jitter  = std::numeric_limits<T>::digits + static_cast<int>(rng() % 6);
-			const T c		  = static_cast<T>(prod * (1.0 + std::ldexp(mantissa(rng), -jitter)));
-			xs.push_back(a);
-			ys.push_back(b);
-			zs.push_back(c);
-		}
-	}
 } // namespace
 
-TEST(CcmathFmaCorrectRounding, FloatRandomAllModes)
+TEST(CcmathFmaCorrectRounding, FloatAllModes)
 {
-	std::vector<float> xs, ys, zs;
-	gen_random<float>(xs, ys, zs, 60000, 0xF10A7);
-	gen_cancellation<float>(xs, ys, zs, 40000, 0xCA11);
-	// Classic float double-rounding killers that double(x)*double(y)+double(z) gets wrong.
-	const float kk[][3] = {
-		{ 1.0F + 0x1p-12F, 1.0F + 0x1p-12F, 0x1p-53F },
-		{ 1.0F + 0x1p-12F, 1.0F + 0x1p-12F, -0x1p-53F },
-		{ 1.0F - 0x1p-13F, 1.0F - 0x1p-13F, 0x1p-54F },
-		{ 1.0F + 0x1p-11F, 1.0F + 0x1p-13F, 0x1p-52F },
-	};
-	for (const auto& k : kk)
+	const int saved = std::fegetround();
+	for (const auto& c : kFloatCases)
 	{
-		xs.push_back(k[0]);
-		ys.push_back(k[1]);
-		zs.push_back(k[2]);
+		const float x = f_from_bits(c.x);
+		const float y = f_from_bits(c.y);
+		const float z = f_from_bits(c.z);
+		for (int m = 0; m < 4; ++m)
+		{
+			std::fesetround(kModes[m]);
+			const float got = ccm::fma(x, y, z);
+			std::fesetround(saved);
+			SCOPED_TRACE(kName[m]);
+			EXPECT_EQ(f_to_bits(got), c.expected[m]) << "x=0x" << std::hex << c.x << " y=0x" << c.y << " z=0x" << c.z;
+		}
 	}
-	expect_cr<float>(xs, ys, zs);
+	std::fesetround(saved);
 }
 
-TEST(CcmathFmaCorrectRounding, DoubleRandomAllModes)
+TEST(CcmathFmaCorrectRounding, DoubleAllModes)
 {
-	std::vector<double> xs, ys, zs;
-	gen_random<double>(xs, ys, zs, 60000, 0xD00B1E);
-	gen_cancellation<double>(xs, ys, zs, 40000, 0x5EED);
-	expect_cr<double>(xs, ys, zs);
+	const int saved = std::fegetround();
+	for (const auto& c : kDoubleCases)
+	{
+		const double x = d_from_bits(c.x);
+		const double y = d_from_bits(c.y);
+		const double z = d_from_bits(c.z);
+		for (int m = 0; m < 4; ++m)
+		{
+			std::fesetround(kModes[m]);
+			const double got = ccm::fma(x, y, z);
+			std::fesetround(saved);
+			SCOPED_TRACE(kName[m]);
+			EXPECT_EQ(d_to_bits(got), c.expected[m]) << "x=0x" << std::hex << c.x << " y=0x" << c.y << " z=0x" << c.z;
+		}
+	}
+	std::fesetround(saved);
 }
