@@ -132,6 +132,7 @@ Validation follows patterns from LLVM-libc, CORE-MATH, and glibc. CI covers:
 - C++17
 - C++20
 - C++23
+- C++26 / latest (on compilers that support it)
 
 #### Build Configurations
 

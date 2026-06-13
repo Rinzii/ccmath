@@ -217,6 +217,74 @@ jobs:
       - name: Test
         run: ctest --preset="${{ matrix.testPreset }}" --output-on-failure --schedule-random -L simple -F
 
+  build-cxxlatest:
+    needs: build-cxx23
+    runs-on: macos-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: clang-debug-cxxlatest
+            configurePreset: ninja-clang-debug
+            buildPreset: build-ninja-clang-debug
+            testPreset: test-ninja-clang-debug
+            cxx_version: 26
+
+          - name: clang-release-cxxlatest
+            configurePreset: ninja-clang-release
+            buildPreset: build-ninja-clang-release
+            testPreset: test-ninja-clang-release
+            cxx_version: 26
+
+          - name: gcc-debug-cxxlatest
+            configurePreset: ninja-gcc-debug
+            buildPreset: build-ninja-gcc-debug
+            testPreset: test-ninja-gcc-debug
+            cxx_version: 26
+
+          - name: gcc-release-cxxlatest
+            configurePreset: ninja-gcc-release
+            buildPreset: build-ninja-gcc-release
+            testPreset: test-ninja-gcc-release
+            cxx_version: 26
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Cache build
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ./**/CMakeFiles
+            ./**/CMakeCache.txt
+            ./**/out
+          key: ${{ runner.os }}-${{ matrix.name }}-${{ hashFiles('CMakeLists.txt', 'CMakePresets.json', 'cmake/**', 'include/**', 'tests/**', 'thirdparty/**') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.name }}-
+
+      - name: Configure
+        run: >
+          cmake --preset="${{ matrix.configurePreset }}"
+          -DCCMATH_DESIRED_CXX_STANDARD="cxx_std_${{ matrix.cxx_version }}"
+          -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON
+          -DCCMATH_ENABLE_WARNINGS_AS_ERRORS=ON
+          -DCCMATH_BUILD_SIMPLE_TESTS=ON
+          -DCCMATH_BUILD_RIGOROUS_TESTS=OFF
+          -DCCMATH_ENABLE_MPFR_TESTS=OFF
+          -DCCMATH_ENABLE_SEARCH_TOOLS=OFF
+
+      - name: Build
+        run: cmake --build --preset="${{ matrix.buildPreset }}"
+
+      - name: Test
+        run: ctest --preset="${{ matrix.testPreset }}" --output-on-failure --schedule-random -L simple -F
+
   rigorous:
     needs: build-cxx17
     runs-on: macos-latest
