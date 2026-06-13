@@ -110,12 +110,12 @@ namespace ccm::support
 
 		using uint_type = ccm::types::uint128_t;
 
-		static constexpr uint_type exponent_mask			 = 0x0000000000007FFFU; // (1ULL << exponent_bits) - 1
-		static constexpr uint_type normal_mantissa_mask		 = 0x0000FFFFFFFFFFFFU; // (1ULL << mantissa_bits) - 1
-		static constexpr uint_type denormal_mantissa_mask	 = 0x00007FFFFFFFFFFFU; // (1ULL << (mantissa_bits - 1)) - 1
-		static constexpr uint_type special_nan_mantissa_mask = 0x0000400000000000U; // 1ULL << (mantissa_bits - 2)
-		static constexpr uint_type shifted_sign_mask		 = 0x8000000000000000U; // 1ULL << sign_shift
-		static constexpr uint_type shifted_exponent_mask	 = 0x7FFF000000000000U; // exponent_mask << exponent_shift
+		static constexpr uint_type exponent_mask			 = 0x0000000000007FFFU;				 // (1ULL << exponent_bits) - 1
+		static constexpr uint_type normal_mantissa_mask		 = 0x0000FFFFFFFFFFFFU;				 // (1ULL << mantissa_bits) - 1
+		static constexpr uint_type denormal_mantissa_mask	 = 0x00007FFFFFFFFFFFU;				 // (1ULL << (mantissa_bits - 1)) - 1
+		static constexpr uint_type special_nan_mantissa_mask = 0x0000400000000000U;				 // 1ULL << (mantissa_bits - 2)
+		static constexpr uint_type shifted_sign_mask		 = static_cast<uint_type>(1) << 127; // sign bit of the 128-bit value
+		static constexpr uint_type shifted_exponent_mask	 = 0x7FFF000000000000U;				 // exponent_mask << exponent_shift
 
 		static constexpr long double normalize_factor = 340282366920938463463374607431768211456.0L; // 2^128
 
@@ -139,12 +139,12 @@ namespace ccm::support
 
 		using uint_type = ccm::types::uint128_t;
 
-		static constexpr uint_type exponent_mask			 = 0x0000000000007FFFU; // (1ULL << exponent_bits) - 1
-		static constexpr uint_type normal_mantissa_mask		 = 0x0000FFFFFFFFFFFFU; // (1ULL << mantissa_bits) - 1
-		static constexpr uint_type denormal_mantissa_mask	 = 0x00007FFFFFFFFFFFU; // (1ULL << (mantissa_bits - 1)) - 1
-		static constexpr uint_type special_nan_mantissa_mask = 0x0000400000000000U; // 1ULL << (mantissa_bits - 2)
-		static constexpr uint_type shifted_sign_mask		 = 0x8000000000000000U; // 1ULL << sign_shift
-		static constexpr uint_type shifted_exponent_mask	 = 0x7FFF000000000000U; // exponent_mask << exponent_shift
+		static constexpr uint_type exponent_mask			 = 0x0000000000007FFFU;				// (1ULL << exponent_bits) - 1
+		static constexpr uint_type normal_mantissa_mask		 = 0x0000FFFFFFFFFFFFU;				// (1ULL << mantissa_bits) - 1
+		static constexpr uint_type denormal_mantissa_mask	 = 0x00007FFFFFFFFFFFU;				// (1ULL << (mantissa_bits - 1)) - 1
+		static constexpr uint_type special_nan_mantissa_mask = 0x0000400000000000U;				// 1ULL << (mantissa_bits - 2)
+		static constexpr uint_type shifted_sign_mask		 = static_cast<uint_type>(1) << 79; // sign bit of the 80-bit value bit_cast into 128 bits
+		static constexpr uint_type shifted_exponent_mask	 = 0x7FFF000000000000U;				// exponent_mask << exponent_shift
 
 		// TODO(IanP): Not 100% sure if the normalize factor should be 2^128 or 2^80. I think it should be 2^128, but I've not yet tested this.
 		static constexpr long double normalize_factor = 340282366920938463463374607431768211456.0L; // 2^128

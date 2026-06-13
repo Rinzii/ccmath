@@ -17,6 +17,32 @@
 
 namespace ccm::fuzz
 {
+	// The x86 80-bit extended long double stores an explicit integer bit, so most bit patterns
+	// are non-canonical encodings: unnormals, pseudo-NaN, pseudo-infinity and pseudo-denormals.
+	// Both the C++ library and the x87 hardware give unspecified results for those, so comparing
+	// ccmath against the system libm on them is not a meaningful differential test (the same
+	// soundness reason the harness does not cycle rounding modes). Raw byte mutation lands on
+	// them constantly, so reject them. Every binary32/binary64/binary128 bit pattern is a valid
+	// encoding, so this is a no-op for those types.
+	template <typename T>
+	bool is_canonical_encoding(T value)
+	{
+		if constexpr (std::numeric_limits<T>::digits == 64 && sizeof(T) >= 10)
+		{
+			unsigned char bytes[sizeof(T)];
+			std::memcpy(bytes, &value, sizeof(T));
+			const bool integer_bit	= (bytes[7] & 0x80U) != 0;
+			const unsigned exponent = (static_cast<unsigned>(bytes[9] & 0x7FU) << 8) | bytes[8];
+			// Canonical iff the integer bit is set exactly when the biased exponent is non-zero.
+			return integer_bit == (exponent != 0);
+		}
+		else
+		{
+			static_cast<void>(value);
+			return true;
+		}
+	}
+
 	template <typename T>
 	T load_floating(uint8_t const * data, size_t size, size_t byte_offset = 0)
 	{
@@ -102,7 +128,7 @@ namespace ccm::fuzz
 			if (size < sizeof(T)) { return false; }
 			x = load_floating<T>(data, size, 0);
 			apply_selector(x, data, size, sizeof(T));
-			return true;
+			return is_canonical_encoding(x);
 		}
 
 		bool load_xy(uint8_t const * data, size_t size)
@@ -112,7 +138,7 @@ namespace ccm::fuzz
 			y = load_floating<T>(data, size, sizeof(T));
 			apply_selector(x, data, size, 2 * sizeof(T));
 			apply_selector(y, data, size, 2 * sizeof(T) + 1);
-			return true;
+			return is_canonical_encoding(x) && is_canonical_encoding(y);
 		}
 
 		bool load_xyz(uint8_t const * data, size_t size)
@@ -124,7 +150,7 @@ namespace ccm::fuzz
 			apply_selector(x, data, size, 3 * sizeof(T));
 			apply_selector(y, data, size, 3 * sizeof(T) + 1);
 			apply_selector(z, data, size, 3 * sizeof(T) + 2);
-			return true;
+			return is_canonical_encoding(x) && is_canonical_encoding(y) && is_canonical_encoding(z);
 		}
 
 		bool load_xy_i(uint8_t const * data, size_t size)
@@ -135,7 +161,7 @@ namespace ccm::fuzz
 			i = load_i32(data, size, 2 * sizeof(T));
 			apply_selector(x, data, size, 2 * sizeof(T) + sizeof(int32_t));
 			apply_selector(y, data, size, 2 * sizeof(T) + sizeof(int32_t) + 1);
-			return true;
+			return is_canonical_encoding(x) && is_canonical_encoding(y);
 		}
 	};
 

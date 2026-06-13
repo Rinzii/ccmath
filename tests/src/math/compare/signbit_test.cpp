@@ -30,3 +30,20 @@ TEST(CcmathCompareTests, Signbit)
 	EXPECT_EQ(ccm::signbit(std::numeric_limits<double>::quiet_NaN()), std::signbit(std::numeric_limits<double>::quiet_NaN()));
 	EXPECT_EQ(ccm::signbit(-std::numeric_limits<double>::quiet_NaN()), std::signbit(-std::numeric_limits<double>::quiet_NaN()));
 }
+
+TEST(CcmathCompareTests, SignbitLongDouble)
+{
+	// The sign bit of an 80-bit long double lives at bit 79 of the bit_cast representation, not
+	// at bit 63 (the explicit integer bit). Zero, NaN and infinity take the bit_cast path that
+	// reads sign_mask_v, so they regress if that mask points at the wrong bit.
+	EXPECT_EQ(ccm::signbit(1.0L), std::signbit(1.0L));
+	EXPECT_EQ(ccm::signbit(-1.0L), std::signbit(-1.0L));
+	EXPECT_EQ(ccm::signbit(0.0L), std::signbit(0.0L));
+	EXPECT_EQ(ccm::signbit(-0.0L), std::signbit(-0.0L));
+	EXPECT_EQ(ccm::signbit(std::numeric_limits<long double>::infinity()), std::signbit(std::numeric_limits<long double>::infinity()));
+	EXPECT_EQ(ccm::signbit(-std::numeric_limits<long double>::infinity()), std::signbit(-std::numeric_limits<long double>::infinity()));
+	EXPECT_EQ(ccm::signbit(std::numeric_limits<long double>::quiet_NaN()), std::signbit(std::numeric_limits<long double>::quiet_NaN()));
+	EXPECT_EQ(ccm::signbit(-std::numeric_limits<long double>::quiet_NaN()), std::signbit(-std::numeric_limits<long double>::quiet_NaN()));
+	EXPECT_EQ(ccm::signbit(std::numeric_limits<long double>::denorm_min()), std::signbit(std::numeric_limits<long double>::denorm_min()));
+	EXPECT_EQ(ccm::signbit(-std::numeric_limits<long double>::denorm_min()), std::signbit(-std::numeric_limits<long double>::denorm_min()));
+}
