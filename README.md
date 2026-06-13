@@ -25,14 +25,14 @@ in [APPROXIMATING_FUNCTIONS.pdf](docs/approximating_functions/APPROXIMATING_FUNC
 
 Most `<cmath>` implementations prioritize different tradeoffs. Few combine standards-oriented semantics, constexpr evaluation, full runtime paths, SIMD, and portable in-tree code.
 
-| Library | Standards-Oriented | Constexpr | Runtime | SIMD | Portable Implementation |
-|----------|----------|----------|----------|----------|----------|
-| `std::cmath` | Yes | Partial | Yes | Vendor dependent | No |
-| Compiler builtins | Partial | Partial | Yes | No | No |
-| GCEM | Partial | Yes | Limited | No | Yes |
-| OpenLibm | Yes | No | Yes | Limited | Yes |
-| SLEEF | Partial | No | Yes | Yes | Yes |
-| CCMath | Yes | Yes | Yes | Yes | Yes |
+| Library           | Standards-Oriented | Constexpr | Runtime | SIMD             | Portable Implementation |
+|-------------------|--------------------|-----------|---------|------------------|-------------------------|
+| `std::cmath`      | Yes                | Partial   | Yes     | Vendor dependent | No                      |
+| Compiler builtins | Partial            | Partial   | Yes     | No               | No                      |
+| GCEM              | Partial            | Yes       | Limited | No               | Yes                     |
+| OpenLibm          | Yes                | No        | Yes     | Limited          | Yes                     |
+| SLEEF             | Partial            | No        | Yes     | Yes              | Yes                     |
+| CCMath            | Yes                | Yes       | Yes     | Yes              | Yes                     |
 
 CCMath targets:
 
@@ -98,16 +98,6 @@ Selected functions pick up SIMD on supported targets:
 We aim for correct rounding under all four IEEE rounding modes. Coverage is function-by-function: some paths are validated today under all modes, while other functions still target round-to-nearest ties-to-even first.
 
 ULP harnesses, all-mode rounding probes, worst-case grids, and cross-compiler CI matrices live in-tree. The validation section below describes how they run in practice.
-
-### FMA Notes
-
-`ccm::fma` and `ccm::fmaf` now use explicit fused-operation selection rather than relying on `(x * y) + z` contraction.
-
-- Runtime prefers trusted native `__builtin_fma*` on validated AArch64 targets. Define `CCM_CONFIG_DISABLE_RUNTIME_BUILTIN_FMA` to force the software path.
-- Constexpr defaults to `FE_TONEAREST` and follows `CCM_CONSTEXPR_ROUNDING_MODE` when an explicit directed-mode policy is requested.
-- `fmaf` keeps a binary32-specific fast nearest-even software path and uses an exact/sticky fallback for directed modes.
-- `fma(double)` uses native fused runtime first, then a fixed-width exact software fallback. It does not assume `long double` is wide enough for general binary64 FMA.
-- Current validation is strongest on Apple Silicon / AArch64. x86_64 and broader compiler validation remain tracked follow-up work.
 
 ---
 
