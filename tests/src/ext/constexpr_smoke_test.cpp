@@ -14,7 +14,6 @@
 #include <ccmath/ext/align.hpp>
 #include <ccmath/ext/approximately.hpp>
 #include <ccmath/ext/ceil_div.hpp>
-#include <ccmath/ext/chgsign.hpp>
 #include <ccmath/ext/clamp.hpp>
 #include <ccmath/ext/cubic.hpp>
 #include <ccmath/ext/degrees.hpp>
@@ -49,7 +48,6 @@ TEST(CcmathExtConstexprSmokeTest, AllFunctions)
 	static_assert((ccm::ext::align<unsigned, 8, ccm::ext::AR::Direction::eUP>(9) == 16));
 	static_assert(ccm::ext::approximately(1.0, 1.0, 0.001));
 	static_assert(ccm::ext::ceil_div(7, 3) == 3);
-	static_assert(ccm::ext::chgsign(4.0, -1.0) == -4.0);
 	static_assert(ccm::ext::clamp(5.0, 0.0, 10.0) == 5.0);
 	static_assert(ccm::ext::cubic(0.0, 1.0, 2.0, 3.0, 0.5) == 1.5);
 	static_assert(ccm::ext::degrees(ccm::numbers::pi_v<double>) == 180.0);

@@ -3,7 +3,6 @@ ccm_add_headers(
         align.hpp
         approximately.hpp
         ceil_div.hpp
-        chgsign.hpp
         clamp.hpp
         cubic.hpp
         degrees.hpp
