@@ -47,7 +47,7 @@ namespace ccm::support::fenv::detail
 		*loc					= err;
 	#endif
 	#if defined(__GNUC__) || defined(__clang__)
-		__asm__ __volatile__("" : : "r"(loc) : "memory");
+		__asm__ __volatile__("" : : "r"(loc) : "memory"); // NOLINT(hicpp-no-assembler)
 	#endif
 #endif
 	}

@@ -24,7 +24,7 @@ namespace ccm::ext
 	 * @return True if the input is a power of two, false otherwise.
 	 */
 	template <typename T, std::enable_if_t<std::is_unsigned_v<T> && !std::is_same_v<T, bool>, bool> = true>
-	[[nodiscard]] constexpr bool is_power_of_two(T n) noexcept
+	constexpr bool is_power_of_two(T n) noexcept
 	{ return support::has_single_bit(n); }
 
 	/**
@@ -38,7 +38,7 @@ namespace ccm::ext
 	 * overflow on the minimum representable value.
 	 */
 	template <typename T, std::enable_if_t<std::is_signed_v<T> && !std::is_same_v<T, bool>, bool> = true>
-	[[nodiscard]] constexpr bool is_power_of_two(T n) noexcept
+	constexpr bool is_power_of_two(T n) noexcept
 	{ return n && !(n & (n - T(1))); }
 
 	/**
@@ -49,7 +49,7 @@ namespace ccm::ext
 	 * @return True if the input is a power of two, false otherwise.
 	 */
 	template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<T, bool>, bool> = true>
-	[[nodiscard]] constexpr bool ispow2(T n) noexcept
+	constexpr bool ispow2(T n) noexcept
 	{ return is_power_of_two(n); }
 
 	namespace safe
@@ -62,7 +62,7 @@ namespace ccm::ext
 		 * @return True if the input is a power of two, false otherwise.
 		 */
 		template <typename T, std::enable_if_t<std::is_unsigned_v<T> && !std::is_same_v<T, bool>, bool> = true>
-		[[nodiscard]] constexpr bool is_power_of_two(T n) noexcept
+		constexpr bool is_power_of_two(T n) noexcept
 		{ return support::has_single_bit(n); }
 
 		/**
@@ -73,7 +73,7 @@ namespace ccm::ext
 		 * @return True if the input is a positive power of two, false otherwise.
 		 */
 		template <typename T, std::enable_if_t<std::is_signed_v<T> && !std::is_same_v<T, bool>, bool> = true>
-		[[nodiscard]] constexpr bool is_power_of_two(T n) noexcept
+		constexpr bool is_power_of_two(T n) noexcept
 		{
 			using unsigned_type = std::make_unsigned_t<T>;
 
@@ -88,7 +88,7 @@ namespace ccm::ext
 		 * @return True if the input is a power of two, false otherwise.
 		 */
 		template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<T, bool>, bool> = true>
-		[[nodiscard]] constexpr bool ispow2(T n) noexcept
+		constexpr bool ispow2(T n) noexcept
 		{ return safe::is_power_of_two(n); }
 	} // namespace safe
 } // namespace ccm::ext

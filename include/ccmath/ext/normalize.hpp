@@ -25,7 +25,7 @@ namespace ccm::ext
 	 * @return The normalized value.
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] constexpr T normalize(T value, T min = T(0), T max = T(1)) noexcept
+	constexpr T normalize(T value, T min = T(0), T max = T(1)) noexcept
 	{ return ext::clamp((value - min) / (max - min), T(0), T(1)); }
 
 	namespace safe
@@ -45,7 +45,7 @@ namespace ccm::ext
 		 * @return The normalized value.
 		 */
 		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-		[[nodiscard]] constexpr T normalize(T value, T min = T(0), T max = T(1)) noexcept
+		constexpr T normalize(T value, T min = T(0), T max = T(1)) noexcept
 		{
 			const T length = max - min;
 

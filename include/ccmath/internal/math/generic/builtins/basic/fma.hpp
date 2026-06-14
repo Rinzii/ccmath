@@ -122,7 +122,7 @@ namespace ccm::builtin
 
 	template <typename T>
 	inline constexpr bool runtime_builtin_fma_long_double_supported =
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
 		true
 #else
 		!std::is_same_v<T, long double>

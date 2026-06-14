@@ -22,6 +22,6 @@ namespace ccm::ext
 	 * @return 0 if value is less than edge, otherwise 1.
 	 */
 	template <typename T, std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>, bool> = true>
-	[[nodiscard]] constexpr T step(T edge, T value) noexcept
+	constexpr T step(T edge, T value) noexcept
 	{ return value < edge ? T(0) : T(1); }
 } // namespace ccm::ext

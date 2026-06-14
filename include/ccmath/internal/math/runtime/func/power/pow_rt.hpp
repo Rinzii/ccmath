@@ -24,7 +24,7 @@
 
 namespace ccm::rt::simd_impl
 {
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 #else
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T> && !std::is_same_v<T, long double>, bool> = true>
@@ -59,7 +59,7 @@ namespace ccm::rt
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	T pow_rt(T base, T exp)
 	{
-#if !defined(CCM_CONFIG_TEST_DISABLE_RUNTIME_BUILTIN_POW)
+#ifndef CCM_CONFIG_TEST_DISABLE_RUNTIME_BUILTIN_POW
 		if constexpr (ccm::builtin::has_runtime_pow<T>)
 		{
 			// The runtime builtin lowers to libm, which is not correctly rounded outside round to
@@ -68,7 +68,7 @@ namespace ccm::rt
 			return ccm::builtin::pow_rt(base, exp);
 		}
 #endif
-#if defined(CCMATH_HAS_SIMD)
+#ifdef CCMATH_HAS_SIMD
 		// In the unlikely event, the rounding mode is not the default, use the runtime implementation instead.
 		if (CCM_UNLIKELY(ccm::support::fenv::get_rounding_mode() != FE_TONEAREST)) { return gen::pow_gen<T>(base, exp); }
 	#if !defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64) // If long double is different from double, use the generic implementation instead.

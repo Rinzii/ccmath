@@ -26,7 +26,7 @@ namespace ccm::ext
 	 * @return The moved angle, in degrees.
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] constexpr T move_towards_angle(T current, T target, T max_delta) noexcept
+	constexpr T move_towards_angle(T current, T target, T max_delta) noexcept
 	{
 		const T delta = ext::delta_angle(current, target);
 		return ext::move_towards(current, current + delta, max_delta);
@@ -43,7 +43,7 @@ namespace ccm::ext
 		 * @return The moved angle, in degrees.
 		 */
 		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-		[[nodiscard]] constexpr T move_towards_angle(T current, T target, T max_delta) noexcept
+		constexpr T move_towards_angle(T current, T target, T max_delta) noexcept
 		{
 			const T delta = ext::safe::delta_angle(current, target);
 			return ext::move_towards(current, current + delta, max_delta);

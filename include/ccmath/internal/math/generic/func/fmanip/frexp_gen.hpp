@@ -19,7 +19,7 @@ namespace ccm::gen
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T frexp_gen(T x, int & exp)
 	{
-		if constexpr (std::is_same_v<T, float>) { return ccm::internal::impl::frexp_impl(x, exp); }
+		if constexpr (std::is_same_v<T, float>) { return ccm::internal::impl::frexp_impl(x, exp); } // NOLINT(bugprone-branch-clone)
 		else if constexpr (std::is_same_v<T, double>) { return ccm::internal::impl::frexp_impl(x, exp); }
 		else
 		{

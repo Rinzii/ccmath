@@ -24,7 +24,7 @@ namespace ccm::ext
 	 * @return The repeated value in the range [0, length).
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] constexpr T repeat(T value, T length) noexcept
+	constexpr T repeat(T value, T length) noexcept
 	{ return value - (ccm::floor(value / length) * length); }
 
 	namespace safe
@@ -41,7 +41,7 @@ namespace ccm::ext
 		 * @return The repeated value in the range [0, length).
 		 */
 		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-		[[nodiscard]] constexpr T repeat(T value, T length) noexcept
+		constexpr T repeat(T value, T length) noexcept
 		{
 			if (length == T(0)) { return T(0); }
 

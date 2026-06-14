@@ -159,7 +159,7 @@ namespace ccm::types
 
 		[[nodiscard]] constexpr T convert_ieee() const
 		{
-			int biased_exponent				 = exponent + FPBits::exponent_bias;
+			int const biased_exponent		 = exponent + FPBits::exponent_bias;
 			constexpr int max_exponent_value = (1 << FPBits::exponent_length) - 2;
 			if (biased_exponent > max_exponent_value) { return FPBits::inf(sign).get_val(); }
 

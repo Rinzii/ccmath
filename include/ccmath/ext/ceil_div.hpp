@@ -25,7 +25,7 @@ namespace ccm::ext
 	 * @return The ceiling of value divided by divisor.
 	 */
 	template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<std::remove_cv_t<T>, bool>, bool> = true>
-	[[nodiscard]] constexpr T ceil_div(T value, T divisor) noexcept
+	constexpr T ceil_div(T value, T divisor) noexcept
 	{ return static_cast<T>((value + divisor - T(1)) / divisor); }
 
 	namespace safe
@@ -43,7 +43,7 @@ namespace ccm::ext
 		 * @return The ceiling of value divided by divisor.
 		 */
 		template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<std::remove_cv_t<T>, bool>, bool> = true>
-		[[nodiscard]] constexpr T ceil_div(T value, T divisor) noexcept
+		constexpr T ceil_div(T value, T divisor) noexcept
 		{
 			if (divisor == T(0)) { return T(0); }
 

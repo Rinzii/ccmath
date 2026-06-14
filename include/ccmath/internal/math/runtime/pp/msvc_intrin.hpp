@@ -12,7 +12,7 @@
 
 #include "ccmath/internal/math/runtime/pp/declaration.hpp"
 #include "ccmath/internal/math/runtime/pp/utility.hpp"
-#include "ccmath/internal/math/runtime/pp/vec_ext.hpp"
+#include "ccmath/internal/math/runtime/pp/vec_ext.hpp" // NOLINT(misc-header-include-cycle)
 #include "ccmath/internal/predef/attributes/always_inline.hpp"
 
 // SSE2 intrinsic backend for compilers without the GNU/Clang vector extensions

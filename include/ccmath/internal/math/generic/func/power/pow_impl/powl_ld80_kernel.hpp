@@ -10,7 +10,7 @@
 
 #pragma once
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
 
 	#include "ccmath/internal/math/generic/func/power/pow_impl/powl_ld80_tables.hpp"
 	#include "ccmath/internal/predef/has_builtin.hpp"

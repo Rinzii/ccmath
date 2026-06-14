@@ -28,7 +28,7 @@ namespace ccm::intrin
 
 	template <class T>
 	CCM_GPU_HOST_DEVICE constexpr T const& choose(bool a, T const& b, T const& c)
-	{ return a ? b : c; }
+	{ return a ? b : c; } // NOLINT(bugprone-return-const-ref-from-parameter) callers pass lvalues
 
 	template <class T, class Abi>
 	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, Abi>& operator+=(simd<T, Abi>& a, simd<T, Abi> const& b)

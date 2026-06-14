@@ -121,7 +121,7 @@ namespace ccm::support
 	// The carry out is stored in carry_out when provided, dropped otherwise.
 	// We keep the pass by pointer interface for consistency with the intrinsic.
 	template <typename T>
-	[[nodiscard]] inline constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> sub_with_borrow(T a, T b, T carry_in, T & carry_out)
+	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> sub_with_borrow(T a, T b, T carry_in, T & carry_out)
 	{
 		if (!is_constant_evaluated())
 		{

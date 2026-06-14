@@ -59,14 +59,16 @@ namespace ccm::pp
 		struct flags_align_request : std::integral_constant<std::size_t, 0>
 		{
 		};
+		// NOLINTBEGIN(readability-avoid-nested-conditional-operator)
 		template <typename... Fs>
 		struct flags_align_request<simd_flags<Fs...>>
 			: std::integral_constant<std::size_t,
 									 ((std::size_t{ 0 } + ... + overalign_value<Fs>::value) != 0)
 										 ? (std::size_t{ 0 } + ... + overalign_value<Fs>::value)
-										 : ((std::is_same<Fs, flag_aligned>::value || ...) ? std::size_t{ 1 } : std::size_t{ 0 })>
+										 : ((std::is_same_v<Fs, flag_aligned> || ...) ? std::size_t{ 1 } : std::size_t{ 0 })>
 		{
 		};
+		// NOLINTEND(readability-avoid-nested-conditional-operator)
 
 		// Communicate a known alignment to the optimizer. The pointer value is
 		// unchanged; the compiler may then use aligned moves / assume alignment.

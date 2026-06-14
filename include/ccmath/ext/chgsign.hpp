@@ -27,7 +27,7 @@ namespace ccm::ext
 	 * @return x with the sign of y.
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] constexpr T chgsign(T x, T y) noexcept
+	constexpr T chgsign(T x, T y) noexcept
 	{
 		const T magnitude = ::ccm::abs(x);
 		const auto y_bits = ::ccm::support::bit_cast<::ccm::support::float_bits_t<T>>(y);

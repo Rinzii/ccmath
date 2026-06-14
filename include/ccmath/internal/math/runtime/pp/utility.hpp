@@ -33,7 +33,7 @@ namespace ccm::pp
 		// Compile-time unrolled apply over the lane indices [0, N). The callback
 		// receives a plain index so it can be used to subscript a builtin vector.
 		template <typename F, std::size_t... Is>
-		CCM_ALWAYS_INLINE constexpr void unroll_impl(F && f, std::index_sequence<Is...> /*unused*/)
+		CCM_ALWAYS_INLINE constexpr void unroll_impl(F && f, std::index_sequence<Is...> /*unused*/) // NOLINT(cppcoreguidelines-missing-std-forward)
 		{ (f(static_cast<SimdSizeType>(Is)), ...); }
 
 		template <SimdSizeType N, typename F>
@@ -43,7 +43,7 @@ namespace ccm::pp
 		// As unroll, but passes a std::integral_constant so the callback can use
 		// the index in a constant-expression context (used by the generator ctor).
 		template <typename F, std::size_t... Is>
-		CCM_ALWAYS_INLINE constexpr void unroll_ic_impl(F && f, std::index_sequence<Is...> /*unused*/)
+		CCM_ALWAYS_INLINE constexpr void unroll_ic_impl(F && f, std::index_sequence<Is...> /*unused*/) // NOLINT(cppcoreguidelines-missing-std-forward)
 		{ (f(std::integral_constant<SimdSizeType, static_cast<SimdSizeType>(Is)>{}), ...); }
 
 		template <SimdSizeType N, typename F>
@@ -60,7 +60,7 @@ namespace ccm::pp
 		template <typename T>                                                                                                                                  \
 		CCM_ALWAYS_INLINE T NAME(T x)                                                                                                                          \
 		{                                                                                                                                                      \
-			if constexpr (std::is_same<T, float>::value) { return BF(x); }                                                                                     \
+			if constexpr (std::is_same_v<T, float>) { return BF(x); }                                                                                          \
 			else                                                                                                                                               \
 			{                                                                                                                                                  \
 				return BD(x);                                                                                                                                  \
@@ -79,7 +79,7 @@ namespace ccm::pp
 		template <typename T>
 		CCM_ALWAYS_INLINE T s_fma(T a, T b, T c)
 		{
-			if constexpr (std::is_same<T, float>::value) { return __builtin_fmaf(a, b, c); }
+			if constexpr (std::is_same_v<T, float>) { return __builtin_fmaf(a, b, c); }
 			else
 			{
 				return __builtin_fma(a, b, c);
@@ -88,7 +88,7 @@ namespace ccm::pp
 		template <typename T>
 		CCM_ALWAYS_INLINE T s_pow(T a, T b)
 		{
-			if constexpr (std::is_same<T, float>::value) { return __builtin_powf(a, b); }
+			if constexpr (std::is_same_v<T, float>) { return __builtin_powf(a, b); }
 			else
 			{
 				return __builtin_pow(a, b);
@@ -99,7 +99,7 @@ namespace ccm::pp
 		template <typename T>                                                                                                                                  \
 		CCM_ALWAYS_INLINE T NAME(T x)                                                                                                                          \
 		{                                                                                                                                                      \
-			if constexpr (std::is_same<T, float>::value) { return ::CF(x); }                                                                                   \
+			if constexpr (std::is_same_v<T, float>) { return ::CF(x); }                                                                                        \
 			else                                                                                                                                               \
 			{                                                                                                                                                  \
 				return ::CD(x);                                                                                                                                \
@@ -118,7 +118,7 @@ namespace ccm::pp
 		template <typename T>
 		CCM_ALWAYS_INLINE T s_fma(T a, T b, T c)
 		{
-			if constexpr (std::is_same<T, float>::value) { return ::fmaf(a, b, c); }
+			if constexpr (std::is_same_v<T, float>) { return ::fmaf(a, b, c); }
 			else
 			{
 				return ::fma(a, b, c);
@@ -127,7 +127,7 @@ namespace ccm::pp
 		template <typename T>
 		CCM_ALWAYS_INLINE T s_pow(T a, T b)
 		{
-			if constexpr (std::is_same<T, float>::value) { return ::powf(a, b); }
+			if constexpr (std::is_same_v<T, float>) { return ::powf(a, b); }
 			else
 			{
 				return ::pow(a, b);
@@ -161,7 +161,7 @@ namespace ccm::pp
 		template <typename T>                                                                                                                                  \
 		CCM_ALWAYS_INLINE T NAME(T x)                                                                                                                          \
 		{                                                                                                                                                      \
-			if constexpr (std::is_same<T, float>::value) { return CF(x); }                                                                                     \
+			if constexpr (std::is_same_v<T, float>) { return CF(x); }                                                                                          \
 			else                                                                                                                                               \
 			{                                                                                                                                                  \
 				return CD(x);                                                                                                                                  \
@@ -180,7 +180,7 @@ namespace ccm::pp
 		template <typename T>
 		CCM_ALWAYS_INLINE T s_fma(T a, T b, T c)
 		{
-			if constexpr (std::is_same<T, float>::value) { return fmaf(a, b, c); }
+			if constexpr (std::is_same_v<T, float>) { return fmaf(a, b, c); }
 			else
 			{
 				return fma(a, b, c);
@@ -189,7 +189,7 @@ namespace ccm::pp
 		template <typename T>
 		CCM_ALWAYS_INLINE T s_pow(T a, T b)
 		{
-			if constexpr (std::is_same<T, float>::value) { return powf(a, b); }
+			if constexpr (std::is_same_v<T, float>) { return powf(a, b); }
 			else
 			{
 				return pow(a, b);

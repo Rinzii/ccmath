@@ -21,7 +21,7 @@
 namespace ccm::pp::detail
 {
 	template <typename T, typename Abi>
-	class SimdReference
+	class SimdReference // NOLINT(cppcoreguidelines-special-member-functions)
 	{
 		using Traits = SimdTraits<T, Abi>;
 		typename Traits::SimdMember *data_;

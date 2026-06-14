@@ -22,7 +22,7 @@
 // Be aware that CLion Nova's C++ Engine does not recognize __builtin_assume as a valid symbol.
 // It is incorrect and this is a known bug that is fixed in CLion 2024.2.
 // The code will work fine, so ignore the warning it may emit.
-	#if defined(__clang__)
+	#ifdef __clang__
 		#define CCM_ASSUME(...)                                                                                                                                \
 			do { __builtin_assume(__VA_ARGS__); } while (0)
 	#elif defined(_MSC_VER)

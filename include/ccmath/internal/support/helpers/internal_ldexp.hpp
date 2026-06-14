@@ -28,7 +28,7 @@ namespace ccm::support::helpers
 	template <typename T, typename U>
 	constexpr std::enable_if_t<std::is_floating_point_v<T> && std::is_integral_v<U>, T> internal_ldexp(T x, U exp)
 	{
-		fp::FPBits<T> bits(x);
+		fp::FPBits<T> const bits(x);
 		if (CCM_UNLIKELY((exp == 0) || bits.is_zero() || bits.is_inf_or_nan())) { return x; }
 
 		constexpr int exponent_limit = fp::FPBits<T>::max_biased_exponent + fp::FPBits<T>::fraction_length + 1;
@@ -38,7 +38,7 @@ namespace ccm::support::helpers
 		if (CCM_UNLIKELY(exp > exponent_limit))
 		{
 			int const rounding_mode = fenv::get_rounding_mode();
-			types::Sign sign		= bits.sign();
+			types::Sign const sign	= bits.sign();
 
 			if ((sign == types::Sign::POS && rounding_mode == FE_DOWNWARD) || (sign == types::Sign::NEG && rounding_mode == FE_UPWARD) ||
 				(rounding_mode == FE_TOWARDZERO))
@@ -55,7 +55,7 @@ namespace ccm::support::helpers
 		if (CCM_UNLIKELY(exp < -exponent_limit))
 		{
 			int const rounding_mode = fenv::get_rounding_mode();
-			types::Sign sign		= bits.sign();
+			types::Sign const sign	= bits.sign();
 
 			if ((sign == types::Sign::POS && rounding_mode == FE_UPWARD) || (sign == types::Sign::NEG && rounding_mode == FE_DOWNWARD))
 			{

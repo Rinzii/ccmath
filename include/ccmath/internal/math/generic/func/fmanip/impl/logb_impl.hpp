@@ -24,7 +24,7 @@ namespace ccm::internal::impl
 	{
 		using fp_bits_t = ccm::support::fp::FPBits<T>;
 
-		fp_bits_t bits(x);
+		fp_bits_t const bits(x);
 
 		if (CCM_UNLIKELY(bits.is_nan())) { return x; }
 

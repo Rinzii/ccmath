@@ -10,11 +10,12 @@
 
 #pragma once
 
+#include <cstdint>
 #include <limits>
 
 namespace ccm::config
 {
-	enum class LongDoubleFormat
+	enum class LongDoubleFormat : std::uint8_t
 	{
 		Double,
 		X87Extended,

@@ -19,7 +19,7 @@ namespace ccm::gen
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T hypot_gen(T x, T y) noexcept
 	{
-		if constexpr (std::is_same_v<T, float>) { return ccm::internal::impl::hypot_impl(x, y); }
+		if constexpr (std::is_same_v<T, float>) { return ccm::internal::impl::hypot_impl(x, y); } // NOLINT(bugprone-branch-clone)
 		else if constexpr (std::is_same_v<T, double>) { return ccm::internal::impl::hypot_impl(x, y); }
 		else
 		{

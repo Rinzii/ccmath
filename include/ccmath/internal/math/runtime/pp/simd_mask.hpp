@@ -58,7 +58,7 @@ namespace ccm::pp
 			unsigned long long bits = 0;
 			for (detail::SimdSizeType i = 0; i < size(); ++i)
 			{
-				if (Traits::mget(data_, i)) { bits |= (1ull << i); }
+				if (Traits::mget(data_, i)) { bits |= (1ULL << i); }
 			}
 			return bits;
 		}
@@ -67,7 +67,7 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static basic_simd_mask from_bits(unsigned long long bits)
 		{
 			basic_simd_mask r;
-			for (detail::SimdSizeType i = 0; i < size(); ++i) { Traits::mset(r.data_, i, ((bits >> i) & 1ull) != 0); }
+			for (detail::SimdSizeType i = 0; i < size(); ++i) { Traits::mset(r.data_, i, ((bits >> i) & 1ULL) != 0); }
 			return r;
 		}
 

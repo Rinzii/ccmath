@@ -31,7 +31,7 @@ namespace ccm
 	 * to compile if you are not using the cmake build for ccmath or do not have access to __builtin_bit_cast.
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] constexpr bool signbit(T num) noexcept
+	constexpr bool signbit(T num) noexcept
 	{
 		if constexpr (builtin::has_constexpr_signbit<T>) { return builtin::signbit_ct(num); }
 		else
@@ -56,7 +56,7 @@ namespace ccm
 	 * @note This function is constexpr and will return the same values as std::signbit along with being static_assert-able.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer> && std::is_signed_v<Integer>, bool> = true>
-	[[nodiscard]] constexpr bool signbit(Integer num) noexcept
+	constexpr bool signbit(Integer num) noexcept
 	{
 		// There is no concept of -0 for integers. So we can just check if the number is less than 0.
 		return num < 0;
@@ -70,7 +70,7 @@ namespace ccm
 	 * @note This function is constexpr and will return the same values as std::signbit along with being static_assert-able.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer> && !std::is_signed_v<Integer>, bool> = true>
-	[[nodiscard]] constexpr bool signbit(Integer /* num */) noexcept
+	constexpr bool signbit(Integer /* num */) noexcept
 	{
 		// If the number is unsigned, then it can't be negative.
 		return false;

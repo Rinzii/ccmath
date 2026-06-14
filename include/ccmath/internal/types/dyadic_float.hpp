@@ -114,7 +114,7 @@ namespace ccm::types
 		constexpr DyadicFloat() = default;
 
 		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
-		constexpr DyadicFloat(T x)
+		constexpr DyadicFloat(T x) // NOLINT(google-explicit-constructor)
 		{
 			static_assert(support::fp::FPBits<T>::fraction_length < Bits);
 			support::fp::FPBits<T> x_bits(x);

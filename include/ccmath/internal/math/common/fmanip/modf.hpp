@@ -21,7 +21,7 @@ namespace ccm
 	constexpr T modf(T x, T * iptr) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_modf<T>) { return ccm::builtin::modf_ct(x, iptr); }
-		else if constexpr (std::is_same_v<T, float>) { return internal::impl::modf_impl(x, iptr); }
+		else if constexpr (std::is_same_v<T, float>) { return internal::impl::modf_impl(x, iptr); } // NOLINT(bugprone-branch-clone)
 		else if constexpr (std::is_same_v<T, double>) { return internal::impl::modf_impl(x, iptr); }
 		else
 		{

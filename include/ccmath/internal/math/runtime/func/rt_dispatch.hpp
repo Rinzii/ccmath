@@ -24,7 +24,7 @@ namespace ccm::rt::detail
 	[[nodiscard]] inline bool simd_runtime_ok() noexcept
 	{ return ccm::support::fenv::get_rounding_mode() == FE_TONEAREST; }
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
 	template <typename T>
 	inline constexpr bool simd_eligible_v = std::is_same_v<T, float> || std::is_same_v<T, double> || std::is_same_v<T, long double>;
 #else

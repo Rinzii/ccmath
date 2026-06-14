@@ -27,7 +27,7 @@ namespace ccm::ext
 	 * @return The interpolation parameter of value in the range [start, end].
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] constexpr T unlerp(T start, T end, T value) noexcept
+	constexpr T unlerp(T start, T end, T value) noexcept
 	{ return (value - start) / (end - start); }
 
 	namespace safe
@@ -48,7 +48,7 @@ namespace ccm::ext
 		 * @return The interpolation parameter of value in the range [start, end].
 		 */
 		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-		[[nodiscard]] constexpr T unlerp(T start, T end, T value) noexcept
+		constexpr T unlerp(T start, T end, T value) noexcept
 		{
 			const T length = end - start;
 

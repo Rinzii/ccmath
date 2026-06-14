@@ -85,7 +85,7 @@ namespace ccm::support
 
 	// TODO: Implement long double bit masks for both extended and quad precision.
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT128)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT128
 
 	// Values from this table:
 	// https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format/

@@ -24,7 +24,7 @@ namespace ccm::ext
 	 * @return The shortest signed angular difference in the range [-180, 180].
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] constexpr T delta_angle(T current, T target) noexcept
+	constexpr T delta_angle(T current, T target) noexcept
 	{
 		T delta = ext::repeat(target - current, T(360));
 
@@ -43,7 +43,7 @@ namespace ccm::ext
 		 * @return The shortest signed angular difference in the range [-180, 180].
 		 */
 		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-		[[nodiscard]] constexpr T delta_angle(T current, T target) noexcept
+		constexpr T delta_angle(T current, T target) noexcept
 		{
 			T delta = ext::safe::repeat(target - current, T(360));
 

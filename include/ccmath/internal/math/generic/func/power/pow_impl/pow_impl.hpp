@@ -39,7 +39,7 @@ namespace ccm::gen::impl
 		{
 			inline double fma_dx(double x, double y, double z) noexcept
 			{
-#if defined(CCMATH_TARGET_CPU_HAS_FMA)
+#ifdef CCMATH_TARGET_CPU_HAS_FMA
 				return support::multiply_add(x, y, z);
 #elif CCM_HAS_BUILTIN(__builtin_fma)
 				return __builtin_fma(x, y, z);
@@ -382,10 +382,10 @@ namespace ccm::gen::impl
 
 				// Walk to the floor: the largest double r with r^2*x <= 1, i.e. r <= 1/sqrt(x). The
 				// faithful seed is at most a few ulps away, so this is a short loop.
-				int s = rsqrt_residual_sign(r, 0.0, x);
+				int const s = rsqrt_residual_sign(r, 0.0, x);
 				if (s > 0)
 				{
-					do { r = next_down(r); } while (rsqrt_residual_sign(r, 0.0, x) > 0);
+					do { r = next_down(r); } while (rsqrt_residual_sign(r, 0.0, x) > 0); // NOLINT(cppcoreguidelines-avoid-do-while)
 				}
 				else if (s < 0)
 				{
@@ -414,7 +414,8 @@ namespace ccm::gen::impl
 		// normal final value collapses with a single binary64 addition, correctly rounded in
 		// every mode; a subnormal value (only reachable through the 2^-512 underflow scale) is
 		// instead rounded straight onto the subnormal grid to avoid a double rounding.
-		constexpr double pow_double_double(unsigned idx_x, double dx, double e_x, double y6, std::uint64_t sign, double scale) noexcept
+		constexpr double
+		pow_double_double(unsigned idx_x, double dx, double e_x, double y6, std::uint64_t sign, double scale) noexcept // NOLINT(bugprone-exception-escape)
 		{
 			using FPBits_t = support::fp::FPBits<double>;
 
@@ -563,7 +564,7 @@ namespace ccm::gen::impl
 			return result;
 		}
 
-		constexpr double pow_kernel(double base, double exp, std::uint64_t sign) noexcept
+		constexpr double pow_kernel(double base, double exp, std::uint64_t sign) noexcept // NOLINT(bugprone-exception-escape)
 		{
 			using FPBits_t = support::fp::FPBits<double>;
 
@@ -587,8 +588,8 @@ namespace ccm::gen::impl
 
 			if (support::is_constant_evaluated())
 			{
-				const typename FPBits_t::storage_type masked_mantissa = static_cast<typename FPBits_t::storage_type>(
-					FPBits_t(m_x).uintval() & static_cast<typename FPBits_t::storage_type>(0x3fff'e000'0000'0000ULL));
+				const typename FPBits_t::storage_type masked_mantissa =
+					static_cast<FPBits_t::storage_type>(FPBits_t(m_x).uintval() & static_cast<FPBits_t::storage_type>(0x3fff'e000'0000'0000ULL));
 				const double c = FPBits_t(masked_mantissa).get_val();
 				dx			   = support::multiply_add(
 					support::constants::RD.at(static_cast<std::size_t>(idx_x)), m_x - c, support::constants::CD.at(static_cast<std::size_t>(idx_x)));
@@ -603,8 +604,8 @@ namespace ccm::gen::impl
 				}
 				else
 				{
-					const typename FPBits_t::storage_type masked_mantissa = static_cast<typename FPBits_t::storage_type>(
-						FPBits_t(m_x).uintval() & static_cast<typename FPBits_t::storage_type>(0x3fff'e000'0000'0000ULL));
+					const typename FPBits_t::storage_type masked_mantissa =
+						static_cast<FPBits_t::storage_type>(FPBits_t(m_x).uintval() & static_cast<FPBits_t::storage_type>(0x3fff'e000'0000'0000ULL));
 					const double c = FPBits_t(masked_mantissa).get_val();
 					dx			   = support::multiply_add(
 						support::constants::RD.at(static_cast<std::size_t>(idx_x)), m_x - c, support::constants::CD.at(static_cast<std::size_t>(idx_x)));
@@ -722,7 +723,7 @@ namespace ccm::gen::impl
 			double final = result * scale;
 			if (sign == 0)
 			{
-				FPBits_t final_bits(final);
+				FPBits_t const final_bits(final);
 				if (final_bits.sign().is_neg())
 				{
 					if (final_bits.is_inf())
@@ -755,13 +756,13 @@ namespace ccm::gen::impl
 			using FPBits_t = support::fp::FPBits<double>;
 			using Sign	   = types::Sign;
 
-			FPBits_t base_bits(base);
-			FPBits_t exp_bits(exp);
+			FPBits_t const base_bits(base);
+			FPBits_t const exp_bits(exp);
 
 			// Screen the operands by bit inspection so no floating point compare touches a
 			// signaling NaN. UCRT's pow returns quietly for sNaN operands while glibc and
 			// Apple libm signal invalid, so the raise is explicit and platform scoped.
-#if !defined(_WIN32)
+#ifndef _WIN32
 			if (base_bits.is_signaling_nan() || exp_bits.is_signaling_nan()) { support::fenv::raise_except_if_required(FE_INVALID); }
 #endif
 

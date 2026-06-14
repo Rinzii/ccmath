@@ -23,6 +23,6 @@ namespace ccm::ext
 	 * @return The value clamped to the range [0, 1].
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] constexpr T saturate(T value) noexcept
+	constexpr T saturate(T value) noexcept
 	{ return ext::clamp(value, T(0), T(1)); }
 } // namespace ccm::ext

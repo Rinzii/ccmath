@@ -240,7 +240,7 @@
 
 // Intel Short Vector Math Library (SVML)
 // As far as I am aware, there is no reliable way to detect SVML support at compile-time.
-#if defined(CCM_CONFIG_RT_SIMD_HAS_SVML)
+#ifdef CCM_CONFIG_RT_SIMD_HAS_SVML
 	#ifndef CCMATH_HAS_SIMD
 		#define CCMATH_HAS_SIMD 1
 	#endif
@@ -252,7 +252,7 @@
 #endif
 
 // ARM macros
-#if defined __ARM_NEON
+#ifdef __ARM_NEON
 	#define CCMATH_SIMD_HAVE_NEON 1
 #else
 	#define CCMATH_SIMD_HAVE_NEON 0
@@ -274,7 +274,7 @@
 #endif
 
 // CCM_SIMD_INTRINSIC
-#if defined(CCM_CONFIG_NO_SIMD_INLINE)
+#ifdef CCM_CONFIG_NO_SIMD_INLINE
 	#define CCM_SIMD_INTRINSIC
 #elif defined(CCM_CONFIG_NO_FORCED_SIMD_INLINE)
 	#define CCM_SIMD_INTRINSIC inline
@@ -312,7 +312,8 @@
 namespace ccm::pp::config::detail
 {
 	template <int... PACK, typename F>
-	CCM_SIMD_ENFORCED_ALWAYS_INLINE constexpr void simd_int_pack(std::integer_sequence<int, PACK...>, F && code)
+	CCM_SIMD_ENFORCED_ALWAYS_INLINE constexpr void simd_int_pack(std::integer_sequence<int, PACK...> /*unused*/,
+																 F && code) // NOLINT(cppcoreguidelines-missing-std-forward)
 	{ code(std::integer_sequence<int, PACK...>{}); }
 } // namespace ccm::pp::config::detail
 

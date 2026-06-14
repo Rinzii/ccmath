@@ -25,7 +25,7 @@ namespace ccm::ext
 	 * @return The moved value.
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] constexpr T move_towards(T current, T target, T max_delta) noexcept
+	constexpr T move_towards(T current, T target, T max_delta) noexcept
 	{
 		const T delta = target - current;
 
