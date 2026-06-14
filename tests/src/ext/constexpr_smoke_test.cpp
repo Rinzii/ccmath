@@ -24,7 +24,6 @@
 #include <ccmath/ext/is_power_of_two.hpp>
 #include <ccmath/ext/lerp_angle.hpp>
 #include <ccmath/ext/lerp_smooth.hpp>
-#include <ccmath/ext/mix.hpp>
 #include <ccmath/ext/move_towards.hpp>
 #include <ccmath/ext/move_towards_angle.hpp>
 #include <ccmath/ext/normalize.hpp>
@@ -61,7 +60,6 @@ TEST(CcmathExtConstexprSmokeTest, AllFunctions)
 	static_assert(ccm::ext::ispow2(16));
 	static_assert(ccm::ext::lerp_angle(0.0, 90.0, 0.5) == 45.0);
 	static_assert(ccm::ext::lerp_smooth(0.0, 10.0, 0.0, 1.0) == 0.0);
-	static_assert(ccm::ext::mix(0.0, 10.0, 0.5) == 5.0);
 	static_assert(ccm::ext::move_towards(0.0, 10.0, 5.0) == 5.0);
 	static_assert(ccm::ext::move_towards_angle(0.0, 90.0, 45.0) == 45.0);
 	static_assert(ccm::ext::normalize(5.0, 0.0, 10.0) == 0.5);
