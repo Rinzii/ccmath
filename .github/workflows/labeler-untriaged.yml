@@ -1,0 +1,79 @@
+name: "Labels: Untriaged"
+
+on:
+    issues:
+        types:
+            - opened
+            - labeled
+    pull_request_target:
+        types:
+            - opened
+            - labeled
+
+permissions:
+    contents: read
+    pull-requests: write
+    issues: write
+
+jobs:
+    add-untriaged:
+        if: github.event.action == 'opened'
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Add Untriaged label when no labels exist
+              uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const labels =
+                        context.payload.issue?.labels ??
+                        context.payload.pull_request?.labels ??
+                        [];
+
+                      if (labels.length !== 0) {
+                        core.info('Issue or pull request already has labels');
+                        return;
+                      }
+
+                      const issue_number =
+                        context.payload.issue?.number ??
+                        context.payload.pull_request?.number;
+
+                      await github.rest.issues.addLabels({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number,
+                        labels: ['S: Untriaged']
+                      });
+
+    remove-untriaged-when-other-label-added:
+        if: "github.event.action == 'labeled' && github.event.label.name != 'S: Untriaged'"
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: "Remove S: Untriaged when any other label is added"
+              uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const untriaged = 'S: Untriaged';
+                      const item =
+                        context.payload.issue ?? context.payload.pull_request;
+                      if (!item) {
+                        core.setFailed('No issue or pull request in payload');
+                        return;
+                      }
+
+                      const hasUntriaged = item.labels.some(l => l.name === untriaged);
+                      if (!hasUntriaged) {
+                        core.info('S: Untriaged not present, nothing to remove');
+                        return;
+                      }
+
+                      await github.rest.issues.removeLabel({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: item.number,
+                        name: untriaged
+                      });

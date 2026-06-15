@@ -1,0 +1,29 @@
+name: "Labels: Size"
+
+on:
+    pull_request_target:
+
+permissions:
+    contents: read
+    pull-requests: write
+    issues: write
+
+jobs:
+    size-label:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Apply size label
+              uses: pascalgn/size-label-action@56b489b027932ec0cf60438a1a5f1a19c8fc71ff # v0.5.7
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  # Values are suffixes only. The action applies labels as size/<value> (size/XS, size/S, and so on).
+                  sizes: >
+                      {
+                        "0": "XS",
+                        "10": "S",
+                        "100": "M",
+                        "1000": "L",
+                        "5000": "XL"
+                      }

@@ -1,0 +1,119 @@
+# Path-based labels applied by .github/workflows/labeler-pr.yml (actions/labeler).
+# Helper file for that workflow. Does nothing on its own.
+
+"A: Basic":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "**/basic/**"
+                - "**/basic.hpp"
+
+"A: Compare":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "**/compare/**"
+                - "**/compare.hpp"
+
+"A: Expo":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "**/expo/**"
+                - "**/expo.hpp"
+
+"A: Fmanip":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "**/fmanip/**"
+                - "**/fmanip.hpp"
+
+"A: Hyper":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "**/hyper/**"
+                - "**/hyper.hpp"
+
+"A: Misc":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "**/misc/**"
+
+"A: Nearest":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "**/nearest/**"
+                - "**/nearest.hpp"
+
+"A: Power":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "**/power/**"
+                - "**/power.hpp"
+
+"A: Special":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "**/special/**"
+                - "**/special.hpp"
+
+"A: Trig":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "**/trig/**"
+                - "**/trig.hpp"
+
+"A: SIMD":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "**/runtime/simd/**"
+                - "**/runtime/pp/**"
+                - "**/intrin/**"
+
+"A: Runtime Kernel":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "**/internal/math/runtime/**"
+
+"A: Build":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "**/CMakeLists.txt"
+                - "**/*.cmake"
+                - "cmake/**"
+                - "CMakePresets.json"
+                - "meson.build"
+                - "meson_options.txt"
+                - "premake5.lua"
+
+"A: Tooling":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "tools/**"
+                - "benchmarks/**"
+                - "fuzzing/**"
+                - "integration/**"
+                - "examples/**"
+                - "showcase/**"
+
+"A: Numeric Proof":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "docs/proofs/**"
+                - "docs/approximating_functions/sollya/**"
+                - "docs/approximating_functions/gappa/**"
+
+"T: Tests":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "tests/**"
+
+"T: Documentation":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "**/*.md"
+                - "docs/**"
+
+"Changes: Public API":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "include/ccmath/*.hpp"
+                - "include/ccmath/math/**"
+                - "include/ccmath/ext/**"
