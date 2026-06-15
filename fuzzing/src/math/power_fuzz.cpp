@@ -38,7 +38,10 @@ namespace
 #else
 		const bool skip_hypot = false;
 #endif
-		if (!skip_hypot) { ccm::fuzz::fuzz_binary_vs_std(in.x, in.y, ccm::fuzz::calls::hypot<T>, [](T a, T b) { return std::hypot(a, b); }); }
+		if (!skip_hypot)
+		{
+			ccm::fuzz::fuzz_binary_vs_std(in.x, in.y, ccm::fuzz::calls::hypot<T>, [](T a, T b) { return std::hypot(a, b); });
+		}
 
 		ccm::fuzz::fuzz_binary_vs_std(in.x, in.y, ccm::fuzz::calls::pow<T>, [](T a, T b) { return std::pow(a, b); });
 	}

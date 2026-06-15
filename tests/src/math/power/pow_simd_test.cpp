@@ -66,11 +66,12 @@ namespace
 		const double maxd	= std::numeric_limits<double>::max();
 
 		// Exceptional grid: zeros, ones, infinities, NaN, denormals, extremes, negative bases.
-		const double special_bases[] = { 0.0,  -0.0, 1.0,	  -1.0,	   2.0,	 -2.0, 10.0, 0.5,
-										 inf,  -inf, qnan,	  denorm,  -denorm, minn, maxd, -maxd,
-										 1.0000000000000002, 0.9999999999999999, 1.5, -1.5 };
-		const double special_exps[]	 = { 0.0,	 -0.0,	 1.0,  -1.0, 2.0,	 3.0,	-3.0,  0.5,	 -0.5, 2.5,
-										 1023.0, -1074.0, 1025.0, inf, -inf, qnan, 1e300, -1e300, 0.3333333333333333, 5.5e18 };
+		const double special_bases[] = {
+			0.0, -0.0, 1.0, -1.0, 2.0, -2.0, 10.0, 0.5, inf, -inf, qnan, denorm, -denorm, minn, maxd, -maxd, 1.0000000000000002, 0.9999999999999999, 1.5, -1.5
+		};
+		const double special_exps[] = {
+			0.0, -0.0, 1.0, -1.0, 2.0, 3.0, -3.0, 0.5, -0.5, 2.5, 1023.0, -1074.0, 1025.0, inf, -inf, qnan, 1e300, -1e300, 0.3333333333333333, 5.5e18
+		};
 		for (double b : special_bases)
 		{
 			for (double e : special_exps) { add(b, e); }
@@ -143,7 +144,7 @@ namespace
 	}
 
 	template <typename V>
-	void expect_matches_scalar(const std::vector<double> & xs, const std::vector<double> & ys, const char * tag)
+	void expect_matches_scalar(const std::vector<double>& xs, const std::vector<double>& ys, const char* tag)
 	{
 		constexpr int width = static_cast<int>(V::size());
 		ASSERT_EQ(xs.size(), ys.size());
@@ -168,17 +169,15 @@ namespace
 			{
 				const double got = rv[i];
 				const double ref = ccm::gen::impl::pow_impl(xb[i], yb[i]);
-				EXPECT_TRUE(bit_equal(got, ref)) << tag << " pow(" << xb[i] << ", " << yb[i] << ") got=0x" << std::hex << double_bits(got)
-												 << " ref=0x" << double_bits(ref);
+				EXPECT_TRUE(bit_equal(got, ref)) << tag << " pow(" << xb[i] << ", " << yb[i] << ") got=0x" << std::hex << double_bits(got) << " ref=0x"
+												 << double_bits(ref);
 			}
 		}
 	}
 
 	template <typename V>
 	double scalar_lane(double x, double y)
-	{
-		return ccm::gen::impl::pow_simd(V(x), V(y))[0];
-	}
+	{ return ccm::gen::impl::pow_simd(V(x), V(y))[0]; }
 
 	struct FenvObservation
 	{
@@ -190,13 +189,16 @@ namespace
 	};
 
 	template <typename F>
-	FenvObservation observe_fenv(F && run)
+	FenvObservation observe_fenv(F&& run)
 	{
 		std::feclearexcept(FE_ALL_EXCEPT);
 		errno = 0;
 		run();
-		return { std::fetestexcept(FE_OVERFLOW) != 0, std::fetestexcept(FE_UNDERFLOW) != 0, std::fetestexcept(FE_INVALID) != 0,
-				 std::fetestexcept(FE_DIVBYZERO) != 0, errno };
+		return { std::fetestexcept(FE_OVERFLOW) != 0,
+				 std::fetestexcept(FE_UNDERFLOW) != 0,
+				 std::fetestexcept(FE_INVALID) != 0,
+				 std::fetestexcept(FE_DIVBYZERO) != 0,
+				 errno };
 	}
 } // namespace
 
@@ -290,10 +292,10 @@ TEST(CcmathPowSimd, FenvAndErrnoParityWithScalarKernel)
 		{ 1.0000001, 1e15 }, // overflow from a near-one base
 	};
 
-	for (const auto & c : cases)
+	for (const auto& c : cases)
 	{
-		volatile double simd_out = 0.0;
-		volatile double scal_out = 0.0;
+		volatile double simd_out	   = 0.0;
+		volatile double scal_out	   = 0.0;
 		const FenvObservation simd_obs = observe_fenv([&] { simd_out = ccm::gen::impl::pow_simd(V(c[0]), V(c[1]))[0]; });
 		const FenvObservation scal_obs = observe_fenv([&] { scal_out = ccm::gen::impl::pow_impl(c[0], c[1]); });
 

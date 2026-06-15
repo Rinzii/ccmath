@@ -7,10 +7,9 @@
 
 #include "io.hpp"
 
-#include <cmath>
-
 #include <ccmath/ccmath.hpp>
 
+#include <cmath>
 #include <limits>
 #include <string_view>
 
@@ -46,10 +45,7 @@ int main()
 
 	ccm::examples::table_header("value", "class", "signbit");
 
-	for (double v : kValues)
-	{
-		std::cout << std::left << std::setw(14) << v << std::setw(18) << classify(v) << std::setw(18) << ccm::signbit(v) << '\n';
-	}
+	for (double v : kValues) { std::cout << std::left << std::setw(14) << v << std::setw(18) << classify(v) << std::setw(18) << ccm::signbit(v) << '\n'; }
 
 	ccm::examples::section("ordering predicates");
 	ccm::examples::print_row("isfinite(1)", ccm::isfinite(1.0));

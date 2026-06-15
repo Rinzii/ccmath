@@ -61,8 +61,16 @@ namespace
 		std::uint32_t u = f_bits(v);
 		return (u & 0x80000000U) ? -static_cast<long long>(u & 0x7fffffffU) : static_cast<long long>(u | 0x80000000U);
 	}
-	long long d_ulp(double a, double b) { long long d = d_mono(a) - d_mono(b); return d < 0 ? -d : d; }
-	long long f_ulp(float a, float b) { long long d = f_mono(a) - f_mono(b); return d < 0 ? -d : d; }
+	long long d_ulp(double a, double b)
+	{
+		long long d = d_mono(a) - d_mono(b);
+		return d < 0 ? -d : d;
+	}
+	long long f_ulp(float a, float b)
+	{
+		long long d = f_mono(a) - f_mono(b);
+		return d < 0 ? -d : d;
+	}
 } // namespace
 
 TEST(CcmathTrigKernelRegression, DoubleWithinContract)
@@ -77,9 +85,9 @@ TEST(CcmathTrigKernelRegression, DoubleWithinContract)
 
 TEST(CcmathTrigKernelRegression, FloatWithinContract)
 {
-	EXPECT_LE(f_ulp(ccm::gen::sin_gen<float>(f_from(0x4b800000U)), f_from(0xbf47917cU)), 4); // sin(2^24)
-	EXPECT_LE(f_ulp(ccm::gen::cos_gen<float>(f_from(0x60ad78ecU)), f_from(0x3f411723U)), 4); // cos(1e20)
-	EXPECT_LE(f_ulp(ccm::gen::sin_gen<float>(f_from(0x494cccc6U)), f_from(0xbf7cc946U)), 4); // sin(838860.4)
+	EXPECT_LE(f_ulp(ccm::gen::sin_gen<float>(f_from(0x4b800000U)), f_from(0xbf47917cU)), 4);			  // sin(2^24)
+	EXPECT_LE(f_ulp(ccm::gen::cos_gen<float>(f_from(0x60ad78ecU)), f_from(0x3f411723U)), 4);			  // cos(1e20)
+	EXPECT_LE(f_ulp(ccm::gen::sin_gen<float>(f_from(0x494cccc6U)), f_from(0xbf7cc946U)), 4);			  // sin(838860.4)
 	EXPECT_LE(f_ulp(ccm::internal::impl::atan_impl<float>(f_from(0x3f210625U)), f_from(0x3f0fbc89U)), 4); // atan(0.629)
 }
 
@@ -87,7 +95,7 @@ TEST(CcmathTrigKernelRegression, AsinTinyArgument)
 {
 	// The tiny-|x| fast path used the wrong cubic sign (returned x - x^3/6 instead of x + x^3/6).
 	EXPECT_LE(d_ulp(ccm::internal::impl::asin_impl<double>(d_from(0x3f0f75104d551d69ULL)), d_from(0x3f0f75104da62dffULL)), 4); // asin(6e-5)
-	EXPECT_EQ(d_bits(ccm::internal::impl::asin_impl<double>(d_from(0x3ddb7cdfd9d7bdbbULL))), 0x3ddb7cdfd9d7bdbbULL);				// asin(1e-10) = x
+	EXPECT_EQ(d_bits(ccm::internal::impl::asin_impl<double>(d_from(0x3ddb7cdfd9d7bdbbULL))), 0x3ddb7cdfd9d7bdbbULL);		   // asin(1e-10) = x
 	// asin(x) must exceed x for small x > 0.
 	EXPECT_GT(ccm::internal::impl::asin_impl<double>(6e-5), 6e-5);
 }
@@ -97,7 +105,7 @@ TEST(CcmathTrigKernelRegression, SignOfZero)
 	EXPECT_EQ(d_bits(ccm::gen::sin_gen<double>(-0.0)), 0x8000000000000000ULL); // sin(-0) = -0
 	EXPECT_EQ(d_bits(ccm::gen::sin_gen<double>(0.0)), 0x0ULL);				   // sin(+0) = +0
 	EXPECT_EQ(ccm::gen::cos_gen<double>(-0.0), 1.0);						   // cos(-0) = 1
-	EXPECT_EQ(d_bits(ccm::gen::tan_gen<double>(-0.0)), 0x8000000000000000ULL);  // tan(-0) = -0
+	EXPECT_EQ(d_bits(ccm::gen::tan_gen<double>(-0.0)), 0x8000000000000000ULL); // tan(-0) = -0
 	EXPECT_EQ(f_bits(ccm::gen::sin_gen<float>(-0.0F)), 0x80000000U);
 	EXPECT_EQ(ccm::gen::cos_gen<float>(-0.0F), 1.0F);
 }

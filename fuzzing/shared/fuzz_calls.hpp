@@ -87,7 +87,7 @@ namespace ccm::fuzz::calls
 		template <typename T>                                                                                                                                  \
 		T name(T x)                                                                                                                                            \
 		{ return ccm::name(x); }
-	#define CCMATH_FUZZ_UNARY_CALL_POSITIVE(name) CCMATH_FUZZ_UNARY_CALL(name)
+	#define CCMATH_FUZZ_UNARY_CALL_POSITIVE(name)	   CCMATH_FUZZ_UNARY_CALL(name)
 	#define CCMATH_FUZZ_UNARY_CALL_ABOVE_NEG_ONE(name) CCMATH_FUZZ_UNARY_CALL(name)
 	#define CCMATH_FUZZ_BINARY_CALL(name)                                                                                                                      \
 		template <typename T>                                                                                                                                  \

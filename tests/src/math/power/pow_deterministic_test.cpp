@@ -72,10 +72,10 @@ TEST(PowDeterministic, LongDoubleDelegatesToDouble)
 	{
 		for (double exp : kExponents)
 		{
-			const auto b			= static_cast<long double>(base);
-			const auto e			= static_cast<long double>(exp);
-			const long double got	= ccm::pow(b, e);
-			const long double want	= static_cast<long double>(ccm::pow(static_cast<double>(b), static_cast<double>(e)));
+			const auto b		   = static_cast<long double>(base);
+			const auto e		   = static_cast<long double>(exp);
+			const long double got  = ccm::pow(b, e);
+			const long double want = static_cast<long double>(ccm::pow(static_cast<double>(b), static_cast<double>(e)));
 			EXPECT_TRUE(same_bits(got, want)) << "base=" << base << " exp=" << exp;
 		}
 	}

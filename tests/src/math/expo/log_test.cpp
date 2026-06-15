@@ -46,9 +46,8 @@ TEST(CcmathExponentialTests, LogDoubleLastTableBucket)
 
 	// Same patterns plus the bucket boundaries through the runtime generic kernel.
 	constexpr double inputs[] = {
-		0x1.5fdffffffff32p-1011, 0x1.5fdffffffff32p-1, 0x1.5fdffffffff32p+0, 0x1.5fdffffffff32p+1,
-		0x1.5ep+0,				 0x1.5ffffffffffffp+0, 0x1.5ep-512,			 0x1.5ffffffffffffp+512,
-		0x1.5dfffffffffffp+0,	 0x1.6p+0,
+		0x1.5fdffffffff32p-1011, 0x1.5fdffffffff32p-1, 0x1.5fdffffffff32p+0,   0x1.5fdffffffff32p+1, 0x1.5ep+0,
+		0x1.5ffffffffffffp+0,	 0x1.5ep-512,		   0x1.5ffffffffffffp+512, 0x1.5dfffffffffffp+0, 0x1.6p+0,
 	};
 	for (double input : inputs)
 	{

@@ -10,10 +10,9 @@
 
 #pragma once
 
-#include "input.hpp"
-
 #include "ccmath/ccmath.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
+#include "input.hpp"
 
 #include <cmath>
 #include <cstdint>

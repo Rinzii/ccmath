@@ -98,14 +98,14 @@ namespace ccm::fuzz
 		case 11: return limits::infinity();
 		case 12: return limits::quiet_NaN();
 		case 13: return limits::signaling_NaN();
-		case 14: return T(1) / limits::epsilon();				// integer parity threshold 2^p
-		case 15: return T(2) / limits::epsilon();				// 2^(p+1), everything above is even
-		case 16: return T(2.5);									// half integer
-		case 17: return T(1023.5);								// pow half-integer bound region
-		case 18: return T(1024);								// pow integer ipow bound
-		case 19: return T(2048);								// pow two_exp bound
+		case 14: return T(1) / limits::epsilon();			   // integer parity threshold 2^p
+		case 15: return T(2) / limits::epsilon();			   // 2^(p+1), everything above is even
+		case 16: return T(2.5);								   // half integer
+		case 17: return T(1023.5);							   // pow half-integer bound region
+		case 18: return T(1024);							   // pow integer ipow bound
+		case 19: return T(2048);							   // pow two_exp bound
 		case 20: return static_cast<T>(0x1.74910d52d3052p+62); // pow huge-exponent clamp threshold
-		case 21: return static_cast<T>(0x1.62e42fefa39efp+9);	// near the exp overflow boundary
+		case 21: return static_cast<T>(0x1.62e42fefa39efp+9);  // near the exp overflow boundary
 		case 22: return T(0x1.0p-100);
 		case 23: return T(0x1.0p100);
 		default: return T(0);

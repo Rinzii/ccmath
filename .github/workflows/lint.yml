@@ -10,7 +10,9 @@ on:
       - '.clang-format'
       - '.github/actions/install-clang-format/**'
       - '.github/workflows/lint.yml'
-      - 'include/**/*.hpp'
+      - '**/*.hpp'
+      - '**/*.cpp'
+      - '**/*.h'
       - 'tools/apply_format.sh'
       - 'tools/clang_format_version'
       - 'tools/ensure_format.sh'
@@ -67,14 +69,14 @@ jobs:
       - name: Commit clang-format fixes
         if: steps.check_format.outcome == 'failure'
         run: |
-          if git diff --quiet -- include; then
+          if git diff --quiet -- '*.hpp' '*.cpp' '*.h'; then
             echo "No formatting changes to commit."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add include
+          git add '*.hpp' '*.cpp' '*.h'
           git commit -m "ci: apply clang-format"
           git push origin HEAD:${{ github.ref_name }}
 
