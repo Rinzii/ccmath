@@ -17,6 +17,7 @@
 #include "ccmath/math/compare/isnan.hpp"
 #include "ccmath/math/power/sqrt.hpp"
 
+#include <limits>
 #include <type_traits>
 
 namespace ccm::internal::impl
@@ -44,6 +45,17 @@ namespace ccm::internal::impl
 		}
 
 		const T ratio = y / x;
-		return x * ccm::sqrt(static_cast<T>(1) + ratio * ratio);
+
+		// Compute scale in double precision to avoid float rounding scale to exactly
+		// 1.0 when ratio is tiny, which would make the overflow guard silently fail.
+		const double ratio_d = static_cast<double>(ratio);
+		const double scale_d = ccm::sqrt(1.0 + ratio_d * ratio_d);
+
+		if (static_cast<double>(x) > static_cast<double>(std::numeric_limits<T>::max()) / scale_d)
+		{
+			return fp_bits_t::inf().get_val();
+		}
+
+		return x * static_cast<T>(scale_d);
 	}
 } // namespace ccm::internal::impl
