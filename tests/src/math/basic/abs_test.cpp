@@ -249,6 +249,10 @@ TEST(CcmathBasicTests, CcmAbsCanBeEvaluatedAtCompileTime)
 {
 	constexpr auto abs{ ccm::abs(1) };
 	static_assert(abs == 1, "abs has failed testing that it is static_assert-able!");
+	// Integer abs avoids compiler builtins, so it must stay constexpr on every compiler even
+	// where __builtin_abs and __builtin_llabs are not usable in constant evaluation.
+	static_assert(ccm::abs(-1) == 1);
+	static_assert(ccm::abs(-1LL) == 1LL);
 	static_assert(ccm::fabs(-2.0) == 2.0);
 	static_assert(ccm::fabsf(-2.0F) == 2.0F);
 	EXPECT_EQ(ccm::fabsl(-2.0L), 2.0L);

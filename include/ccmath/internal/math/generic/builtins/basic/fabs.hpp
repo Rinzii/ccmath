@@ -10,6 +10,8 @@
 
 #pragma once
 
+// ReSharper disable once CppUnusedIncludeDirective
+#include "ccmath/internal/math/generic/builtins/builtin_helpers.hpp"
 #include "ccmath/internal/support/always_false.hpp"
 
 #include <type_traits>
@@ -71,27 +73,26 @@ namespace ccm::builtin
 	template <typename T>
 	inline constexpr bool has_constexpr_abs =
 		#ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_ABS
-		std::is_same_v<T, float> || std::is_same_v<T, double> || std::is_same_v<T, long double> || std::is_same_v<T, long long> || (
-			std::is_integral_v<T> && std::is_signed_v<T>) || (std::is_integral_v<T> && std::is_unsigned_v<T>);
+		is_valid_builtin_type<T>;
 	#else
         false;
 	#endif
 	// clang-format on
 
-	// TODO: determine actual compiler/version support for runtime __builtin_abs.
+	// TODO: determine actual compiler/version support for runtime __builtin_fabs.
 	template <typename T>
 	inline constexpr bool has_runtime_abs =
 #ifdef CCMATH_HAS_BUILTIN_ABS
-		has_constexpr_abs<T>;
+		is_valid_builtin_type<T>;
 #else
 		false;
 #endif
 
 	/**
 	 * @internal
-	 * Wrapper for constexpr __builtin_abs functions.
+	 * Wrapper for constexpr __builtin_fabs functions.
 	 * This should be used internally and always be wrapped in an if constexpr statement.
-	 * It exists only to allow for usage of __builtin_abs functions without triggering a compiler error
+	 * It exists only to allow for usage of __builtin_fabs functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
@@ -100,12 +101,6 @@ namespace ccm::builtin
 		if constexpr (std::is_same_v<T, float>) { return __builtin_fabsf(x); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_fabs(x); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fabsl(x); }
-		else if constexpr (std::is_same_v<T, long long>) { return __builtin_llabs(x); }
-		else if constexpr (std::is_integral_v<T> && std::is_signed_v<T>) { return __builtin_abs(x); }
-		else if constexpr (std::is_integral_v<T> && std::is_unsigned_v<T>)
-		{
-			return x; // Absolute value of unsigned is the value itself
-		}
 		else
 		{
 			// This should never be reached
@@ -120,12 +115,6 @@ namespace ccm::builtin
 		if constexpr (std::is_same_v<T, float>) { return __builtin_fabsf(x); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_fabs(x); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fabsl(x); }
-		else if constexpr (std::is_same_v<T, long long>) { return __builtin_llabs(x); }
-		else if constexpr (std::is_integral_v<T> && std::is_signed_v<T>) { return __builtin_abs(x); }
-		else if constexpr (std::is_integral_v<T> && std::is_unsigned_v<T>)
-		{
-			return x; // Absolute value of unsigned is the value itself
-		}
 		else
 		{
 			// This should never be reached
