@@ -44,6 +44,7 @@ CCMath targets:
 - Runtime execution
 - SIMD acceleration
 - Numerical correctness
+- Competitive performance
 - Cross-platform portability
 
 These goals overlap with the comparison columns plus numerical validation. Per-function progress is tracked in [STATUS.md](docs/STATUS.md).
@@ -98,9 +99,13 @@ Selected functions pick up SIMD on supported targets:
 
 ### Numerical Correctness
 
-We aim for correct rounding under all four IEEE rounding modes. Coverage is function-by-function: some paths are validated today under all modes, while other functions still target round-to-nearest ties-to-even first.
+The goal for every function is a correctly rounded result under all four IEEE rounding modes. Coverage is function-by-function: some paths are validated today under all modes, while other functions still target round-to-nearest ties-to-even first, or land within a documented bound of no more than 4 ULP while the correctly rounded version is in progress.
 
 ULP harnesses, all-mode rounding probes, worst-case grids, and cross-compiler CI matrices live in-tree. The validation section below describes how they run in practice.
+
+### Performance
+
+After numerical correctness, performance is the next priority. Once a function is correct it is expected to stay in the same ballpark as the platform libm on covered paths, with a fast path plus an accurate fallback rather than a single slow path. Benchmarks comparing `ccm::*` against the platform libm live in-tree.
 
 ---
 
@@ -213,7 +218,7 @@ CodeQL, OpenSSF Scorecard, warning-as-error builds, and strict compiler warning 
 
 ### Style and Consistency
 
-clang-format runs in CI on every platform matrix job and on pull requests that touch headers. clang-tidy is available locally via lint.sh and lint.bat.
+clang-format runs in CI on every platform matrix job and on pull requests that touch C++ sources. clang-tidy is available locally via lint.sh and lint.bat.
 
 ---
 
