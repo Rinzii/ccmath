@@ -51,10 +51,7 @@ namespace ccm::internal::impl
 		const double ratio_d = static_cast<double>(ratio);
 		const double scale_d = ccm::sqrt(1.0 + ratio_d * ratio_d);
 
-		if (static_cast<double>(x) > static_cast<double>(std::numeric_limits<T>::max()) / scale_d)
-		{
-			return fp_bits_t::inf().get_val();
-		}
+		if (static_cast<double>(x) > static_cast<double>(std::numeric_limits<T>::max()) / scale_d) { return fp_bits_t::inf().get_val(); }
 
 		return x * static_cast<T>(scale_d);
 	}
