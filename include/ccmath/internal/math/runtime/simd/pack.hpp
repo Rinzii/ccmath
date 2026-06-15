@@ -61,7 +61,7 @@ namespace ccm::intrin
 		}
 
 	private:
-		std::array<int, N> m_value;
+		std::array<int, static_cast<std::size_t>(N)> m_value;
 	};
 
 	template <int N>
@@ -102,7 +102,7 @@ namespace ccm::intrin
 		}
 
 	private:
-		std::array<std::int64_t, N> m_value;
+		std::array<std::int64_t, static_cast<std::size_t>(N)> m_value;
 	};
 
 	template <class T, int N>
@@ -214,7 +214,7 @@ namespace ccm::intrin
 		}
 
 	private:
-		std::array<T, N> m_value;
+		std::array<T, static_cast<std::size_t>(N)> m_value;
 	};
 
 	template <class T, int N>
