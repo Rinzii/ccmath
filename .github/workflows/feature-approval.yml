@@ -1,0 +1,103 @@
+name: "Labels: Feature approval"
+
+on:
+    issues:
+        types:
+            - opened
+            - labeled
+
+permissions:
+    contents: read
+    issues: write
+
+jobs:
+    mark-unapproved:
+        if: "github.event.action == 'opened' || github.event.label.name == 'T: New Feature'"
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Mark new feature requests as unapproved
+              uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const issue = context.payload.issue;
+                      const labels = issue.labels.map(l => l.name);
+
+                      if (!labels.includes('T: New Feature')) {
+                        core.info('Not a feature request, nothing to do');
+                        return;
+                      }
+                      if (labels.includes('Feature: Approved')) {
+                        core.info('Already approved, not marking unapproved');
+                        return;
+                      }
+                      if (labels.includes('Feature: Unapproved')) {
+                        core.info('Already marked unapproved');
+                        return;
+                      }
+
+                      await github.rest.issues.addLabels({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: issue.number,
+                        labels: ['Feature: Unapproved']
+                      });
+
+                      await github.rest.issues.createComment({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: issue.number,
+                        body: 'Thanks for the request. It is labeled `Feature: Unapproved` and waiting on a maintainer to approve it before implementation work begins.'
+                      });
+
+    approve:
+        if: "github.event.action == 'labeled' && github.event.label.name == 'Feature: Approved'"
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Clear unapproved when an admin approves
+              uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const actor = context.actor;
+                      const issue = context.payload.issue;
+
+                      const permission = await github.rest.repos.getCollaboratorPermissionLevel({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        username: actor
+                      });
+
+                      const admins = new Set(['admin', 'maintain']);
+
+                      if (!admins.has(permission.data.permission)) {
+                        core.info(`${actor} is not an admin, reverting the approval`);
+                        try {
+                          await github.rest.issues.removeLabel({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            issue_number: issue.number,
+                            name: 'Feature: Approved'
+                          });
+                        } catch (error) {
+                          if (error.status !== 404) {
+                            throw error;
+                          }
+                        }
+                        return;
+                      }
+
+                      try {
+                        await github.rest.issues.removeLabel({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: issue.number,
+                          name: 'Feature: Unapproved'
+                        });
+                      } catch (error) {
+                        if (error.status !== 404) {
+                          throw error;
+                        }
+                      }

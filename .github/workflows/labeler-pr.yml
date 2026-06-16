@@ -7,6 +7,10 @@ permissions:
     contents: read
     pull-requests: write
 
+concurrency:
+    group: labeler-pr-${{ github.event.pull_request.number }}
+    cancel-in-progress: true
+
 jobs:
     labeler:
         runs-on: ubuntu-latest

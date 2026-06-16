@@ -102,6 +102,7 @@ during triage. The groups are:
 - `D:` difficulty, from `D3: Low` for approachable work up to `D0: Irrational` for hard-to-round problems that may take unreasonable effort
 - `P:` priority, from `P1: Critical` to `P4: Low`
 - `S:` status through review (`S: Untriaged`, `S: Needs Discussion`, `S: Needs Review`, `S: Approved`, `S: Awaiting Changes`, `S: Blocked`, `S: Merge Conflict`, `S: Stale`, `S: DO NOT MERGE`, `S: Won't Fix`)
+- `Feature:` approval state for feature requests (`Feature: Unapproved`, `Feature: Approved`)
 - `Bug:` reproduction state (`Bug: Needs Replicating`, `Bug: Replicated`)
 - `Platform:`, `Arch:`, and `Compiler:` for environment-specific reports
 - `Branch:` for the branch a PR targets (`Branch: main`, `Branch: release`)
@@ -110,6 +111,10 @@ during triage. The groups are:
 
 A contributor looking for a starting point should filter on `D3: Low` and
 `good first issue`.
+
+The label set is managed as code in `.github/labels.yml` and synced on merge to
+`main`. Change that file in a pull request rather than editing labels in the
+GitHub UI, otherwise the next sync reverts the change.
 
 ### Filing an issue
 
@@ -196,12 +201,17 @@ a synchronous chat and write up the outcome.
 Several labels are applied for you, so you do not need to set them by hand:
 
 - `A:` area labels from the files a PR changes, plus `Changes: Public API`
+- `A:` and `Arch:` labels on a bug report, read from the function family and architecture answers in the issue form
 - `size/` from the number of lines changed
 - `Branch: main` or `Branch: release` from the base branch
-- `S: Untriaged` on new issues and PRs that open without labels, cleared once any other label is added
+- `S: Untriaged` on new issues and PRs that open without labels, cleared once a maintainer applies another label by hand (labels added by automation do not clear it)
 - `S: Merge Conflict` when a PR develops conflicts
 - `S: Needs Review`, `S: Approved`, and `S: Awaiting Changes` as a maintainer review progresses
 - `S: Stale` after 60 days of inactivity, removed on the next update
+- `Feature: Unapproved` on any issue labeled `T: New Feature`, until an admin adds `Feature: Approved`, which clears it
+
+A feature request stays `Feature: Unapproved` until a maintainer with admin
+rights approves it. Hold off on implementation work until a request is approved.
 
 PRs opened from a fork's `main`, `master`, or `develop` branch are closed
 automatically with a note to move the work to a topic branch.

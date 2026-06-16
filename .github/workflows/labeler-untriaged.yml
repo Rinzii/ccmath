@@ -5,14 +5,9 @@ on:
         types:
             - opened
             - labeled
-    pull_request_target:
-        types:
-            - opened
-            - labeled
 
 permissions:
     contents: read
-    pull-requests: write
     issues: write
 
 jobs:
@@ -62,6 +57,11 @@ jobs:
                         context.payload.issue ?? context.payload.pull_request;
                       if (!item) {
                         core.setFailed('No issue or pull request in payload');
+                        return;
+                      }
+
+                      if (context.actor.endsWith('[bot]')) {
+                        core.info(`Label added by ${context.actor}, leaving S: Untriaged for a human to clear`);
                         return;
                       }
 

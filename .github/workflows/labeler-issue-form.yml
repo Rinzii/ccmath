@@ -1,0 +1,64 @@
+name: "Labels: Issue form"
+
+on:
+    issues:
+        types:
+            - opened
+            - edited
+
+permissions:
+    contents: read
+    issues: write
+
+jobs:
+    autolabel:
+        if: "contains(github.event.issue.labels.*.name, 'T: Bugfix')"
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check out the repository
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+            - name: Parse the bug report form
+              id: parse
+              uses: stefanbuck/github-issue-parser@cb6e97157cbf851e3a393ff8d57c93a484cc323f # v3
+              with:
+                  template-path: .github/ISSUE_TEMPLATE/bug_report.yml
+
+            - name: Map form answers to labels
+              uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+              env:
+                  FORM_JSON: ${{ steps.parse.outputs.jsonString }}
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const data = JSON.parse(process.env.FORM_JSON);
+
+                      const familyMap = {
+                        basic: 'A: Basic', compare: 'A: Compare', expo: 'A: Expo',
+                        fmanip: 'A: Fmanip', hyper: 'A: Hyper', misc: 'A: Misc',
+                        nearest: 'A: Nearest', power: 'A: Power', special: 'A: Special',
+                        trig: 'A: Trig'
+                      };
+                      const archMap = {
+                        'x86-64': 'Arch: x86', 'x86': 'Arch: x86',
+                        'AArch64 / ARM': 'Arch: AArch64', 'RISC-V': 'Arch: RISC-V'
+                      };
+
+                      const toAdd = new Set();
+                      const family = (data.family || '').trim().toLowerCase();
+                      if (familyMap[family]) toAdd.add(familyMap[family]);
+                      const arch = (data.arch || '').trim();
+                      if (archMap[arch]) toAdd.add(archMap[arch]);
+
+                      if (toAdd.size === 0) {
+                        core.info('No mappable form fields, nothing to add');
+                        return;
+                      }
+
+                      await github.rest.issues.addLabels({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: context.issue.number,
+                        labels: [...toAdd]
+                      });

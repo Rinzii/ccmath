@@ -8,6 +8,10 @@ permissions:
     pull-requests: write
     issues: write
 
+concurrency:
+    group: labeler-size-${{ github.event.pull_request.number }}
+    cancel-in-progress: true
+
 jobs:
     size-label:
         runs-on: ubuntu-latest

@@ -13,6 +13,7 @@ permissions:
 
 jobs:
     update-review-labels:
+        if: github.event.pull_request.draft == false
         runs-on: ubuntu-latest
 
         steps:
