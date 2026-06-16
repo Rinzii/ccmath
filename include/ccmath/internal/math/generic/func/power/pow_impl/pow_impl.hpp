@@ -355,13 +355,13 @@ namespace ccm::gen::impl
 				cl			= support::helpers::internal_ldexp(cl, -k);
 				x			= support::helpers::internal_ldexp(x, 2 * k);
 
-				const DoubleDouble chh = two_prod(ch, ch);
-				const double cross	   = 2.0 * (ch * cl);
-				const double clsq	   = cl * cl;
-				const DoubleDouble t0  = two_prod(chh.hi, x);
-				const DoubleDouble t1  = two_prod(chh.lo, x);
-				const DoubleDouble t2  = two_prod(cross, x);
-				const DoubleDouble t3  = two_prod(clsq, x);
+				const DoubleDouble chh			  = two_prod(ch, ch);
+				const double cross				  = 2.0 * (ch * cl);
+				const double clsq				  = cl * cl;
+				const DoubleDouble t0			  = two_prod(chh.hi, x);
+				const DoubleDouble t1			  = two_prod(chh.lo, x);
+				const DoubleDouble t2			  = two_prod(cross, x);
+				const DoubleDouble t3			  = two_prod(clsq, x);
 				const std::array<double, 9> terms = { t0.hi, t0.lo, t1.hi, t1.lo, t2.hi, t2.lo, t3.hi, t3.lo, -1.0 };
 				return exact_sign_of_sum(terms.data(), static_cast<int>(terms.size()));
 			}
