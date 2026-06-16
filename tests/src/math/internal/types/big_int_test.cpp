@@ -498,7 +498,14 @@ namespace
 		out.push_back(carry_chain);
 
 		RefUint<Bits> sparse = RefUint<Bits>::zero();
-		for (std::size_t bit : { std::size_t(0), std::size_t(1), std::size_t(31), std::size_t(32), Bits / 2 - 1, Bits / 2, Bits - 2, Bits - 1 })
+		for (std::size_t bit : { static_cast<std::size_t>(0),
+								 static_cast<std::size_t>(1),
+								 static_cast<std::size_t>(31),
+								 static_cast<std::size_t>(32),
+								 Bits / 2 - 1,
+								 Bits / 2,
+								 Bits - 2,
+								 Bits - 1 })
 		{
 			sparse.set_bit(bit);
 		}

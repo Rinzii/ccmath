@@ -17,8 +17,6 @@ on:
       - 'tools/clang_format_version'
       - 'tools/ensure_format.sh'
       - 'tools/clang_tidy_version'
-      - 'tools/ensure_cast_style.sh'
-      - 'tools/ensure_cast_style_repo.sh'
       - 'tools/install_clang_tidy_linux.sh'
       - 'tools/run_clang_tidy.sh'
       - '.clang-tidy'
@@ -84,21 +82,7 @@ jobs:
         if: steps.check_format.outcome == 'failure'
         run: bash tools/ensure_format.sh
 
-  cast_style_check:
-    if: github.event_name == 'pull_request'
-    permissions:
-      contents: read
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-
-      - name: Install clang-tidy
-        run: bash tools/install_clang_tidy_linux.sh
-
-      - name: Check cast style (library headers)
-        run: bash tools/ensure_cast_style.sh
-
-  cast_style_repo_check:
+  clang_tidy:
     if: github.event_name == 'pull_request'
     permissions:
       contents: read
@@ -122,9 +106,5 @@ jobs:
           -DCCMATH_ENABLE_SEARCH_TOOLS=OFF
           -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
-      - name: Check cast style (entire repo)
-        run: CCM_CAST_COMPILE_DB=build-tidy/compile_commands.json bash tools/ensure_cast_style_repo.sh
-
-      - name: Run clang-tidy (advisory)
-        continue-on-error: true
+      - name: Run clang-tidy
         run: bash tools/run_clang_tidy.sh build-tidy/compile_commands.json

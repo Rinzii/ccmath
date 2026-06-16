@@ -119,7 +119,7 @@ TEST(CcmathInternalSupportTests, AddWithCarryUint8MatchesReferenceExhaustively)
 	{
 		for (int rhs = 0; rhs <= 0xFF; ++rhs)
 		{
-			for (std::uint8_t carry_in : { std::uint8_t(0), std::uint8_t(1) })
+			for (std::uint8_t carry_in : { static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1) })
 			{
 				std::uint8_t carry_out = 0;
 				const std::uint8_t actual =
@@ -139,7 +139,7 @@ TEST(CcmathInternalSupportTests, SubWithBorrowUint8MatchesReferenceExhaustively)
 	{
 		for (int rhs = 0; rhs <= 0xFF; ++rhs)
 		{
-			for (std::uint8_t borrow_in : { std::uint8_t(0), std::uint8_t(1) })
+			for (std::uint8_t borrow_in : { static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1) })
 			{
 				std::uint8_t borrow_out = 0;
 				const std::uint8_t actual =
