@@ -31,10 +31,7 @@ namespace
 
 	template <typename T>
 	void consume(T value)
-	{
-		volatile T sink = value;
-		(void)sink;
-	}
+	{ [[maybe_unused]] volatile T sink = value; }
 } // namespace
 
 TEST(CcmathFenvExceptionTests, DomainErrorsRaiseInvalidLikeStd)

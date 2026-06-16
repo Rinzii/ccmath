@@ -28,10 +28,7 @@ namespace
 
 	template <typename T>
 	void consume(T value)
-	{
-		volatile T sink = value;
-		(void)sink;
-	}
+	{ [[maybe_unused]] volatile T sink = value; }
 
 	CCM_NEVER_INLINE double invoke_pow_gen(double base, double exp)
 	{ return ccm::gen::pow_gen(base, exp); }
@@ -118,7 +115,7 @@ TEST(CcmathPowFenvTests, GenericPowfBaseTwoCorrectlyRoundedAtRangeThresholdsAllM
 	constexpr float kMax	= std::numeric_limits<float>::max();
 	constexpr float kMinSub = std::numeric_limits<float>::denorm_min();
 
-	// 2^128 and 2^129 overflow; 2^-150 and below sit beneath the smallest subnormal 2^-149.
+	// 2^128 and 2^129 overflow. 2^-150 and below sit beneath the smallest subnormal 2^-149.
 	constexpr std::array<ThresholdCase, 5> kCases = { {
 		{ 128.0F, kInf, kInf, kMax, kMax },
 		{ 129.0F, kInf, kInf, kMax, kMax },

@@ -34,7 +34,7 @@ namespace ccm
 	 * @brief Computes the base-10 logarithm of a floating-point value.
 	 * @tparam T Floating-point type.
 	 * @param num Floating-point value.
-	 * @return Base-10 logarithm of num; returns -inf for zero and NaN for negative inputs.
+	 * @return Base-10 logarithm of num. Returns -inf for zero and NaN for negative inputs.
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/log10
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>

@@ -18,7 +18,7 @@
 // SSE2 intrinsic backend for compilers without the GNU/Clang vector extensions
 // (i.e. MSVC cl.exe). It specializes the 128-bit native widths (float x4,
 // double x2, and the int32 x4 / int64 x2 used by their masks). Hot operations
-// map to <immintrin.h> intrinsics; the rest spill to a small stack array, run
+// map to <immintrin.h> intrinsics. The rest spill to a small stack array, run
 // the scalar logic, and reload (correct, used only for cold paths). Anything not
 // specialized here keeps the portable array fallback from vec_ext.hpp, so the
 // scalar fallback is always available. Validated on Clang via
@@ -446,7 +446,7 @@ namespace ccm::pp
 		}
 	};
 
-	// Mainly the mask type for double; SSE2 has few 64-bit integer ops, so most
+	// Mainly the mask type for double. SSE2 has few 64-bit integer ops, so most
 	// arithmetic/compares spill.
 	template <>
 	struct SimdTraits<std::int64_t, VecAbi<2>>
@@ -575,8 +575,8 @@ namespace ccm::pp
 		}
 	};
 
-	// 256-bit native widths. Floating-point ops need only AVX; integer mask and
-	// bitwise ops are done in the float domain (AVX-safe); 256-bit integer
+	// 256-bit native widths. Floating-point ops need only AVX. Integer mask and
+	// bitwise ops are done in the float domain (AVX-safe). 256-bit integer
 	// arithmetic / compares use AVX2 intrinsics when available and spill otherwise.
 	#if CCMATH_SIMD_HAVE_AVX
 	namespace detail

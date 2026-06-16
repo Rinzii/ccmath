@@ -33,7 +33,7 @@ namespace ccm
 	 * @brief Computes log(1 + num) with improved accuracy near zero.
 	 * @tparam T Floating-point type.
 	 * @param num Floating-point value.
-	 * @return Natural logarithm of 1 + num; returns -inf for num == -1 and NaN for num < -1.
+	 * @return Natural logarithm of 1 + num. Returns -inf for num == -1 and NaN for num < -1.
 	 * @see https://en.cppreference.com/w/cpp/numeric/math/log1p
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>

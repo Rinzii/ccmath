@@ -147,10 +147,9 @@ namespace ccm::test::oracle
 	inline bool is_modeled_generic_pow_case(T base, T exponent)
 	{ return std::isfinite(base) && std::isfinite(exponent) && base > T{}; }
 
-	inline bool uses_public_mpfr_oracle(ccm::test::pow_path::validation_path path)
+	inline bool uses_public_mpfr_oracle([[maybe_unused]] ccm::test::pow_path::validation_path path)
 	{
 #if defined(CCM_CONFIG_TEST_DISABLE_RUNTIME_BUILTIN_POW)
-		(void)path;
 		return false;
 #else
 		return path == ccm::test::pow_path::validation_path::public_default;
@@ -307,7 +306,7 @@ namespace ccm::test::oracle
 	}
 
 	// Echo hard-failure records to stdout so CI logs surface the offending input without an
-	// uploaded artifact. The JSON event log keeps the full record; this is the at-a-glance view.
+	// uploaded artifact. The JSON event log keeps the full record. This is the at-a-glance view.
 	template <typename T>
 	inline void print_hard_failures(const std::vector<failure_record<T>>& events)
 	{

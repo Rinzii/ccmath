@@ -16,7 +16,7 @@
 
 // Mutable lane proxy returned by basic_simd::operator[]. This is an extension
 // over the C++26 surface (which exposes read-only element access) kept for
-// ergonomics; it mirrors libc++'s reference.h.
+// ergonomics. It mirrors libc++'s reference.h.
 
 namespace ccm::pp::detail
 {

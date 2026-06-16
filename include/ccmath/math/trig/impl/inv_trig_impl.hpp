@@ -85,11 +85,11 @@ namespace ccm::internal::impl
 		{
 			const T ax = ccm::fabs(x);
 
-			// asin(x) = x + x^3/6 + O(x^5); the cubic coefficient is +1/6 (this fast path previously
+			// asin(x) = x + x^3/6 + O(x^5). The cubic coefficient is +1/6 (this fast path previously
 			// used -1/6, which underran by ~x^3/3 over the tiny-|x| band).
 			if (ax < static_cast<T>(0x1.0p-14)) { return x + x * x * x * static_cast<T>(0x1.5555555555555p-3); }
 
-			// Float evaluates in double then rounds once; the same-type path is in the else so it is
+			// Float evaluates in double then rounds once. The same-type path is in the else so it is
 			// discarded rather than left unreachable for the float instantiation (MSVC C4702).
 			if constexpr (sizeof(T) == sizeof(float))
 			{
@@ -149,7 +149,7 @@ namespace ccm::internal::impl
 	template <typename T>
 	constexpr T atan_impl(T x) noexcept
 	{
-		// The |x|<=1 path composes sqrt, a division, and asin; in float those roundings compound to
+		// The |x|<=1 path composes sqrt, a division, and asin. In float those roundings compound to
 		// ~5 ULP. Evaluate float atan through the double kernel and round once (double atan is within
 		// a couple of double ULP, so the float result is effectively correctly rounded). The double
 		// path lives in the else so it is discarded for float rather than left as unreachable code,

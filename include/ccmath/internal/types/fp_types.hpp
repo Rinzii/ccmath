@@ -32,11 +32,11 @@ namespace ccm
 	using float_t  = float;
 	using double_t = double;
 #elif CCM_FLT_EVAL_METHOD == 1
-	typedef double float_t;
-	typedef double double_t;
+	using float_t  = double;
+	using double_t = double;
 #elif CCM_FLT_EVAL_METHOD == 2
-	typedef long double float_t;
-	typedef long double double_t;
+	using float_t  = long double;
+	using double_t = long double;
 #else
 	#error "Unknown CCM_FLT_EVAL_METHOD"
 #endif

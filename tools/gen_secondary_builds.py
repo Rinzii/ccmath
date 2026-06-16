@@ -258,7 +258,7 @@ def premake_defines_block(options: list[dict[str, Any]]) -> str:
         trigger = premake_trigger_name(option["meson_option"])
         default = "true" if option["meson_default"] else "false"
         define = option["define"]
-        # Deterministic mode forces the runtime SIMD path off; the generic kernels are the only
+        # Deterministic mode forces the runtime SIMD path off. The generic kernels are the only
         # cross-hardware-stable evaluation.
         condition = f'_ccmath_option_enabled("{trigger}", {default})'
         if deterministic_trigger is not None and option["key"] == "runtime_simd":

@@ -72,7 +72,7 @@ TEST(CcmathPowerUlpTests, PowGenDoubleRegressionCases)
 		{ 945971881662.053466796875, 15.38309228199631562 },
 		// Base just above 1 with a huge exponent lands the result deep in the over/underflow
 		// scaled band (here ~2^-735). That region used to drop to the fast single-double path
-		// and lost ~38 ULP; it must now ride the accurate double-double reconstruction.
+		// and lost ~38 ULP. It must now ride the accurate double-double reconstruction.
 		{ 0x1.00000000000ffp+0, -0x1.0p53 },
 		{ 0x1.000000000010p+0, -0x1.0p53 },
 		// Symmetric overflow-adjacent band (~2^+735).
@@ -313,7 +313,7 @@ TEST(CcmathPowerUlpTests, PowfSmallIntegerLoopBoundary)
 
 // [c.math]/1: inputs whose phase-1 Ziv test fails, forcing the double-double fallback and its
 // round-to-odd reconstruction. Mined by replaying the phase-1 kernel and kept only when the
-// fallback path is taken on FMA targets; expected bits are MPFR correctly rounded results.
+// fallback path is taken on FMA targets. Expected bits are MPFR correctly rounded results.
 TEST(CcmathPowerUlpTests, PowfZivFallbackRegressionCases)
 {
 	struct ZivCase

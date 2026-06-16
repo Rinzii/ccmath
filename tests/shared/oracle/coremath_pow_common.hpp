@@ -26,7 +26,7 @@ namespace ccm::test::oracle
 	// Higher-precision correctly-rounded float reference, used only to cross-check
 	// disagreements with the primary float oracle (cr_powf). cr_powf has a fast path
 	// that flushes results extremely close to 1.0 to exactly 1.0 in every rounding
-	// mode (ignoring directed rounding) and mishandles (-1)^(large even); the double
+	// mode (ignoring directed rounding) and mishandles (-1)^(large even). The double
 	// oracle cr_pow does not. We evaluate cr_pow under round-up and round-down, take
 	// the round-to-odd double, and cast it to float in the active rounding mode, which
 	// yields the correctly rounded float without double rounding.
@@ -80,10 +80,10 @@ namespace ccm::test::oracle
 
 	// True when the function output disagrees with the primary oracle but is in fact
 	// correctly rounded (confirmed by a higher-precision cross-check), i.e. the oracle
-	// is wrong for this case. float cross-checks against the round-to-odd double oracle;
+	// is wrong for this case. float cross-checks against the round-to-odd double oracle,
 	// double resolves the near-1 region where cr_pow ignores directed rounding.
 	template <typename T>
-	inline bool function_matches_high_precision_truth(T base, T exponent, T actual)
+	inline bool function_matches_high_precision_truth([[maybe_unused]] T base, [[maybe_unused]] T exponent, [[maybe_unused]] T actual)
 	{
 		if constexpr (std::is_same_v<T, float>)
 		{
@@ -97,9 +97,6 @@ namespace ccm::test::oracle
 		}
 		else
 		{
-			(void)base;
-			(void)exponent;
-			(void)actual;
 			return false;
 		}
 	}

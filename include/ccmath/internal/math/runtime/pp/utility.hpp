@@ -52,7 +52,7 @@ namespace ccm::pp
 
 		// Per-lane scalar math primitives, used by the scalar backend and as the
 		// portable fallback for the vec_ext backend. Compiler builtins are used on
-		// GNU/Clang (no <cmath>, no errno, foldable); other toolchains (e.g. MSVC),
+		// GNU/Clang (no <cmath>, no errno, foldable). Other toolchains (e.g. MSVC),
 		// or builds that define CCM_PP_FORCE_PORTABLE, fall back to the C runtime
 		// entry points declared here.
 #if (defined(__GNUC__) || defined(__clang__)) && !defined(CCM_PP_FORCE_PORTABLE)

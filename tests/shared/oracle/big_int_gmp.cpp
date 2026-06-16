@@ -48,7 +48,7 @@ namespace
 	[[nodiscard]] Big make_big(const std::array<std::uint64_t, Big::WORD_COUNT>& words)
 	{ return Big(words); }
 
-	// GMP bit counts are mp_bitcnt_t (32-bit unsigned long on Windows); every count we pass is
+	// GMP bit counts are mp_bitcnt_t (32-bit unsigned long on Windows). Every count we pass is
 	// bounded well below that, so the narrowing cast is safe.
 	[[nodiscard]] constexpr mp_bitcnt_t to_bitcnt(std::size_t bits)
 	{ return static_cast<mp_bitcnt_t>(bits); }

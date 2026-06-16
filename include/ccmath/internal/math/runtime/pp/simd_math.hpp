@@ -69,7 +69,7 @@ namespace ccm::pp
 	CCM_ALWAYS_INLINE basic_simd<T, Abi> max(basic_simd<T, Abi> const & a, basic_simd<T, Abi> const & b)
 	{ return basic_simd<T, Abi>::from_member(SimdTraits<T, Abi>::op_max(a.get(), b.get())); }
 
-	// abs: floating point reuses the fabs primitive; integral negates negatives.
+	// abs: floating point reuses the fabs primitive. Integral negates negatives.
 	template <typename T, typename Abi, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 	CCM_ALWAYS_INLINE basic_simd<T, Abi> abs(basic_simd<T, Abi> const & v)
 	{ return basic_simd<T, Abi>::from_member(SimdTraits<T, Abi>::op_fabs(v.get())); }

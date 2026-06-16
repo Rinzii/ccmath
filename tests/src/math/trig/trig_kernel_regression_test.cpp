@@ -11,7 +11,7 @@
 // Regression coverage for the generic trig kernels (the path used for constexpr and the
 // non-builtin runtime). Pins the defects fixed in the trig overhaul: the large-argument
 // reduction collapse, the float-grade double kernel, the sign of a signed zero, the asin
-// tiny-|x| cubic sign, and the float atan accuracy. Goldens are MPFR correctly-rounded values;
+// tiny-|x| cubic sign, and the float atan accuracy. Goldens are MPFR correctly-rounded values,
 // the accuracy contract is 4 ULP.
 
 #include "ccmath/internal/math/generic/func/trig/cos_gen.hpp"
@@ -75,7 +75,7 @@ namespace
 
 TEST(CcmathTrigKernelRegression, DoubleWithinContract)
 {
-	// {arg_bits, golden_bits} from MPFR. sin(1.5) was float-grade; the large args collapsed.
+	// {arg_bits, golden_bits} from MPFR. sin(1.5) was float-grade. The large args collapsed.
 	EXPECT_LE(d_ulp(ccm::gen::sin_gen<double>(d_from(0x3ff8000000000000ULL)), d_from(0x3fefeb7a9b2c6d8bULL)), 4); // sin(1.5)
 	EXPECT_LE(d_ulp(ccm::gen::sin_gen<double>(d_from(0x4170000000000000ULL)), d_from(0xbfe8f22f8433d6eeULL)), 4); // sin(2^24)
 	EXPECT_LE(d_ulp(ccm::gen::sin_gen<double>(d_from(0x430c6bf526340000ULL)), d_from(0x3feb76f88136cebaULL)), 4); // sin(1e15)

@@ -124,7 +124,7 @@ namespace ccm::gen::impl
 			const DVec lo6_hi = pp::fma(y6, e_x + lr_hi, -hm);
 			const DVec lo6	  = pp::fma(y6, pp::fma(dx, p, lr_mid), lo6_hi);
 
-			// Clamp 2^(hi+mid) exponent into double range; out of range lanes round at the cast.
+			// Clamp 2^(hi+mid) exponent into double range. Out of range lanes round at the cast.
 			I64 hm_i(hm);
 			hm_i = pp::simd_select(hm_i > I64(1 << 15), I64(1 << 15), hm_i);
 			hm_i = pp::simd_select(hm_i < I64(-(1 << 15)), I64(-(1 << 15)), hm_i);

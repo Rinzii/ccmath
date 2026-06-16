@@ -20,10 +20,9 @@
  * @defgroup types
  * @brief Internal high-precision dyadic floating-point type for CCMath.
  *
- * This file contains the definition and implementation details for a high-precision
- * floating-point data type in “dyadic” form.
- * It is used internally by CCMath for dyadic floating-point computations
- * that don't fit inside the standard floating-point types.
+ * A high-precision floating-point type in dyadic form, that is a mantissa scaled by a
+ * power of two. CCMath uses it internally for computations that do not fit inside the
+ * standard floating-point types.
  *
  * @see ccmath/internal/support/fp/fp_bits.hpp
  * @see ccmath/internal/support/type_traits.hpp
@@ -377,10 +376,9 @@ namespace ccm::types
 				volatile T two = static_cast<T>(2.0);
 				T r			   = two * d_hi;
 
-				// TODO: Whether rounding down the absolute value to max_normal should
-				//		also raise FE_OVERFLOW and set ERANGE is debatable.
-				// TODO: Check what MSVC does for this case to match them when compiling with MSVC.
-				// This behavior matches Clang.
+				// TODO(IanP): decide whether rounding the absolute value down to max_normal
+				//		should also raise FE_OVERFLOW and set ERANGE. The current behavior matches Clang.
+				// TODO(IanP): check what MSVC does here and match it under MSVC.
 				if constexpr (ShouldSignalExceptions && support::fp::FPBits<T>(r).is_inf()) { support::fenv::set_errno_if_required(ERANGE); }
 
 				return r;
@@ -420,11 +418,11 @@ namespace ccm::types
 				// d_lo is denormal, but the output is normal.
 				int scale_up_exponent = 1 - exp_lo;
 				T scale_up_factor	  = support::fp::FPBits<T>::create_value(
-											Sign::POS, static_cast<output_bits_t>(support::fp::FPBits<T>::exponent_bias + scale_up_exponent), implicit_mask)
-											.get_val();
-				T scale_down_factor	  = support::fp::FPBits<T>::create_value(
-											Sign::POS, static_cast<output_bits_t>(support::fp::FPBits<T>::exponent_bias - scale_up_exponent), implicit_mask)
-											.get_val();
+										Sign::POS, static_cast<output_bits_t>(support::fp::FPBits<T>::exponent_bias + scale_up_exponent), implicit_mask)
+										.get_val();
+				T scale_down_factor = support::fp::FPBits<T>::create_value(
+										  Sign::POS, static_cast<output_bits_t>(support::fp::FPBits<T>::exponent_bias - scale_up_exponent), implicit_mask)
+										  .get_val();
 
 				d_lo = support::fp::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_lo + scale_up_exponent), implicit_mask).get_val();
 
@@ -449,10 +447,9 @@ namespace ccm::types
 					// long double.
 					r_bits -= implicit_mask;
 
-					// TODO: IEEE Std 754-2019 lets implementers choose whether to check for
-					// "tininess" before or after rounding for base-2 formats, as long as
-					// the same choice is made for all operations.
-					// Our choice to check after rounding might not be the same as the hardware's.
+					// TODO(IanP): IEEE Std 754-2019 lets implementers check for tininess before or
+					// after rounding for base-2 formats, as long as the same choice holds for all
+					// operations. We check after rounding, which might not match the hardware.
 					if constexpr (ShouldSignalExceptions && round_and_sticky)
 					{
 						support::fenv::set_errno_if_required(ERANGE);

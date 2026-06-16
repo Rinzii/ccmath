@@ -25,7 +25,7 @@
 namespace ccm::pp
 {
 	// [simd.class] A data-parallel value of N lanes of T. C++26 names ported to
-	// C++17; storage and operations come from the per-ABI SimdTraits backend.
+	// C++17. Storage and operations come from the per-ABI SimdTraits backend.
 	template <typename T, typename Abi>
 	class basic_simd
 	{
@@ -85,7 +85,7 @@ namespace ccm::pp
 			Traits::store(data_, ptr);
 		}
 
-		// Element access. Const returns by value (C++26); the mutable overload
+		// Element access. Const returns by value (C++26). The mutable overload
 		// returns a lane proxy (TS-style extension).
 		CCM_ALWAYS_INLINE value_type operator[](detail::SimdSizeType i) const { return Traits::get(data_, i); }
 		CCM_ALWAYS_INLINE detail::SimdReference<T, Abi> operator[](detail::SimdSizeType i) { return { &data_, i }; }

@@ -17,7 +17,7 @@
 #include <type_traits>
 
 // Load/store flags. The C++26 surface spells these as simd_flags<...> with the
-// simd_flag_default / simd_flag_aligned / simd_flag_overaligned objects; the
+// simd_flag_default / simd_flag_aligned / simd_flag_overaligned objects. The
 // Parallelism TS spells the equivalents element_aligned / vector_aligned. Both
 // names are provided. An aligned flag promises the pointer is suitably aligned,
 // which is communicated to the optimizer (see flags_align_request /
@@ -71,7 +71,7 @@ namespace ccm::pp
 		// NOLINTEND(readability-avoid-nested-conditional-operator)
 
 		// Communicate a known alignment to the optimizer. The pointer value is
-		// unchanged; the compiler may then use aligned moves / assume alignment.
+		// unchanged. The compiler may then use aligned moves / assume alignment.
 		template <std::size_t A, typename T>
 		CCM_ALWAYS_INLINE T const *assume_aligned_ptr(T const *p)
 		{

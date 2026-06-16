@@ -113,7 +113,7 @@ namespace ccm::fuzz
 	}
 
 	// Optional per-operand selector bytes trail the raw operands. A set high bit swaps the
-	// operand for a table entry; bit 6 flips the sign. Inputs without trailing bytes (and
+	// operand for a table entry. Bit 6 flips the sign. Inputs without trailing bytes (and
 	// every pre-existing seed) decode exactly as before.
 	template <typename T>
 	void apply_selector(T & value, uint8_t const * data, size_t size, size_t selector_offset)
