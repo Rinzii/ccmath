@@ -696,7 +696,8 @@ namespace ccm::types
 		 */
 		template <std::size_t N>
 		// NOLINTNEXTLINE(google-explicit-constructor) - Cannot be marked explicit.
-		constexpr BigInt(const WordType (&nums)[N]) // NOLINT(cppcoreguidelines-avoid-c-arrays) - We are intentionally using C-style arrays here.
+		constexpr BigInt(const WordType (&nums)[N]) // NOLINT(modernize-avoid-c-arrays, cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays) - We are
+													// intentionally using C-style arrays here.
 		{
 			static_assert(N == WORD_COUNT);
 			for (std::size_t i = 0; i < WORD_COUNT; ++i) { val[i] = nums[i]; }
