@@ -16,6 +16,36 @@
 #include <cstddef>
 #include <utility>
 
+// C runtime math entry points for the portable scalar fallback below. They are
+// declared at global scope to match math.h. Declaring them extern "C" inside a
+// namespace makes MSVC reject any translation unit that also pulls in cmath
+// (C2375 redefinition, C2733 cannot overload an extern "C" function).
+#if (!defined(__GNUC__) && !defined(__clang__)) || defined(CCM_PP_FORCE_PORTABLE)
+extern "C"
+{
+	float sqrtf(float);
+	double sqrt(double);
+	float floorf(float);
+	double floor(double);
+	float ceilf(float);
+	double ceil(double);
+	float truncf(float);
+	double trunc(double);
+	float roundf(float);
+	double round(double);
+	float fabsf(float);
+	double fabs(double);
+	float expf(float);
+	double exp(double);
+	float logf(float);
+	double log(double);
+	float fmaf(float, float, float);
+	double fma(double, double, double);
+	float powf(float, float);
+	double pow(double, double);
+}
+#endif
+
 namespace ccm::pp
 {
 	// Per-(T, Abi) storage and operation set. Specialized by the scalar and
@@ -50,7 +80,7 @@ namespace ccm::pp
 		// portable fallback for the vec_ext backend. Compiler builtins are used on
 		// GNU/Clang (no <cmath>, no errno, foldable). Other toolchains (e.g. MSVC),
 		// or builds that define CCM_PP_FORCE_PORTABLE, fall back to the C runtime
-		// entry points declared here.
+		// entry points declared at global scope above.
 #if (defined(__GNUC__) || defined(__clang__)) && !defined(CCM_PP_FORCE_PORTABLE)
 	#define CCM_PP_S_UNARY(NAME, BF, BD)                                                                                                                       \
 		template <typename T>                                                                                                                                  \
@@ -91,29 +121,6 @@ namespace ccm::pp
 			}
 		}
 #else
-		extern "C"
-		{
-			float sqrtf(float);
-			double sqrt(double);
-			float floorf(float);
-			double floor(double);
-			float ceilf(float);
-			double ceil(double);
-			float truncf(float);
-			double trunc(double);
-			float roundf(float);
-			double round(double);
-			float fabsf(float);
-			double fabs(double);
-			float expf(float);
-			double exp(double);
-			float logf(float);
-			double log(double);
-			float fmaf(float, float, float);
-			double fma(double, double, double);
-			float powf(float, float);
-			double pow(double, double);
-		}
 	#define CCM_PP_S_UNARY(NAME, CF, CD)                                                                                                                       \
 		template <typename T>                                                                                                                                  \
 		CCM_ALWAYS_INLINE T NAME(T x)                                                                                                                          \
