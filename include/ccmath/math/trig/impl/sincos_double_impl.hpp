@@ -34,7 +34,7 @@ namespace ccm::internal::impl
 
 		constexpr unsigned sincos_range_reduction_small(double x, double & u)
 		{
-			const double prod_hi = x * data::ONE_OVER_PI;
+			const double prod_hi = x * data::EIGHT_OVER_PI;
 			const double k		 = support::fp::nearest_integer(prod_hi);
 
 			const double y_hi = support::multiply_add(k, data::MPI[0], x);

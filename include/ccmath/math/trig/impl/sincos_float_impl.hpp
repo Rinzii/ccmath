@@ -34,7 +34,7 @@ namespace ccm::internal::impl
 
 		constexpr unsigned sincosf_range_reduction_small(float x, float & u)
 		{
-			const float prod_hi = x * data::ONE_OVER_PI;
+			const float prod_hi = x * data::EIGHT_OVER_PI;
 			const float k		= support::fp::nearest_integer(prod_hi);
 
 			const float y_hi = support::multiply_add(k, data::MPI[0], x);

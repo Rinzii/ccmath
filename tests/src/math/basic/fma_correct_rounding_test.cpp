@@ -21,6 +21,7 @@
 
 #include <gtest/gtest.h>
 
+#include <array>
 #include <cfenv>
 #include <cstdint>
 #include <cstring>
@@ -55,12 +56,12 @@ namespace
 	struct FloatCase
 	{
 		std::uint32_t x, y, z;
-		std::uint32_t expected[4]; // FE_TONEAREST, FE_TOWARDZERO, FE_UPWARD, FE_DOWNWARD
+		std::array<std::uint32_t, 4> expected; // FE_TONEAREST, FE_TOWARDZERO, FE_UPWARD, FE_DOWNWARD
 	};
 	struct DoubleCase
 	{
 		std::uint64_t x, y, z;
-		std::uint64_t expected[4];
+		std::array<std::uint64_t, 4> expected;
 	};
 
 	// Goldens generated with MPFR mpfr_fma at the target precision plus mpfr_subnormalize.
@@ -111,8 +112,8 @@ namespace
 		  { 0x4000000000000001ULL, 0x4000000000000000ULL, 0x4000000000000001ULL, 0x4000000000000000ULL } },
 	};
 
-	constexpr int kModes[4]		   = { FE_TONEAREST, FE_TOWARDZERO, FE_UPWARD, FE_DOWNWARD };
-	constexpr const char* kName[4] = { "FE_TONEAREST", "FE_TOWARDZERO", "FE_UPWARD", "FE_DOWNWARD" };
+	constexpr std::array<int, 4> kModes		   = { FE_TONEAREST, FE_TOWARDZERO, FE_UPWARD, FE_DOWNWARD };
+	constexpr std::array<const char*, 4> kName = { "FE_TONEAREST", "FE_TOWARDZERO", "FE_UPWARD", "FE_DOWNWARD" };
 } // namespace
 
 TEST(CcmathFmaCorrectRounding, FloatAllModes)
@@ -123,7 +124,7 @@ TEST(CcmathFmaCorrectRounding, FloatAllModes)
 		const float x = f_from_bits(c.x);
 		const float y = f_from_bits(c.y);
 		const float z = f_from_bits(c.z);
-		for (int m = 0; m < 4; ++m)
+		for (std::size_t m = 0; m < kModes.size(); ++m)
 		{
 			std::fesetround(kModes[m]);
 			const float got = ccm::fma(x, y, z);
@@ -143,7 +144,7 @@ TEST(CcmathFmaCorrectRounding, DoubleAllModes)
 		const double x = d_from_bits(c.x);
 		const double y = d_from_bits(c.y);
 		const double z = d_from_bits(c.z);
-		for (int m = 0; m < 4; ++m)
+		for (std::size_t m = 0; m < kModes.size(); ++m)
 		{
 			std::fesetround(kModes[m]);
 			const double got = ccm::fma(x, y, z);

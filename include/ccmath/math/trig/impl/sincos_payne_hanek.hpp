@@ -65,7 +65,7 @@ namespace ccm::internal::impl::sincos_ph
 
 	// Add a 64-bit word into the 256-bit accumulator (acc[0] low .. acc[3] high) at limb word,
 	// propagating carries. The accumulator wraps mod 2^256, which is exactly the mod-16 we want.
-	constexpr void add_at_word(std::uint64_t acc[4], std::uint64_t val, int word) noexcept
+	constexpr void add_at_word(std::array<std::uint64_t, 4>& acc, std::uint64_t val, int word) noexcept
 	{
 		while (val != 0 && word < 4)
 		{
@@ -78,7 +78,7 @@ namespace ccm::internal::impl::sincos_ph
 
 	// Add (w << bitpos) into the 256-bit accumulator, bitpos may be negative (low bits are dropped,
 	// they fall below the accumulator's 2^-252 resolution).
-	constexpr void add_word_at(std::uint64_t acc[4], std::uint64_t w, long bitpos) noexcept
+	constexpr void add_word_at(std::array<std::uint64_t, 4>& acc, std::uint64_t w, long bitpos) noexcept
 	{
 		if (w == 0) { return; }
 		if (bitpos < 0)
@@ -99,7 +99,7 @@ namespace ccm::internal::impl::sincos_ph
 	}
 
 	// Returns k (low bits of the pi/8 multiple) and sets y to the reduced argument in [-pi/16, pi/16].
-	constexpr unsigned payne_hanek_reduce(double x, double & y) noexcept
+	constexpr unsigned payne_hanek_reduce(double x, double& y) noexcept
 	{
 		using FPBits = support::fp::FPBits<double>;
 
@@ -112,7 +112,7 @@ namespace ccm::internal::impl::sincos_ph
 
 		// acc holds (x * 8/pi) mod 16 scaled by 2^252: top 4 bits (255..252) are the integer mod 16,
 		// the rest is the fraction. 8/pi = 2 + frac(8/pi). The integer part 2 contributes 2*x.
-		std::uint64_t acc[4] = { 0ULL, 0ULL, 0ULL, 0ULL };
+		std::array<std::uint64_t, 4> acc = { 0ULL, 0ULL, 0ULL, 0ULL };
 		add_word_at(acc, mantissa, binary_exp + 1 + 252);
 		for (int i = 0; i < 32; ++i)
 		{

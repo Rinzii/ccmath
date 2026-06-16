@@ -362,8 +362,8 @@ namespace ccm::gen::impl
 				const DoubleDouble t1  = two_prod(chh.lo, x);
 				const DoubleDouble t2  = two_prod(cross, x);
 				const DoubleDouble t3  = two_prod(clsq, x);
-				const double terms[9]  = { t0.hi, t0.lo, t1.hi, t1.lo, t2.hi, t2.lo, t3.hi, t3.lo, -1.0 };
-				return exact_sign_of_sum(terms, 9);
+				const std::array<double, 9> terms = { t0.hi, t0.lo, t1.hi, t1.lo, t2.hi, t2.lo, t3.hi, t3.lo, -1.0 };
+				return exact_sign_of_sum(terms.data(), static_cast<int>(terms.size()));
 			}
 
 			// Correctly rounded 1/sqrt(x) for finite x > 0, in every rounding mode. The exact residual

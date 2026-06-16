@@ -30,8 +30,8 @@ namespace ccm::internal::sincos_double_data
 	// |k| < 2^21.4). The lower parts carry pi/8 to ~115 bits total.
 	constexpr std::array<double, 3> MPI = { -0x1.921fb544p-2, -0x1.0b4611a8p-36, 0x1.d9cceba3f91f2p-68 };
 
-	// 8/pi as a double, the reciprocal of pi/8. The reduction computes k = round(x * 8/pi) from it.
-	constexpr double ONE_OVER_PI = 0x1.45f306dc9c883p+1;
+	// Reciprocal of pi/8. The reduction computes k = round(x * 8/pi) from it.
+	constexpr double EIGHT_OVER_PI = 0x1.45f306dc9c883p+1;
 
 	// sin(y)/y on [-pi/16, pi/16] = SIN_POLY[0] + y^2 (SIN_POLY[1] + y^2 (...)). Taylor coefficients
 	// rounded to double (realized error ~2^-63, well within the 4-ULP contract). sin(y) = y * poly.

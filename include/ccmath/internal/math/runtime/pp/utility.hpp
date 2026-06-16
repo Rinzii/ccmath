@@ -16,10 +16,6 @@
 #include <cstddef>
 #include <utility>
 
-#if defined(_MSC_VER) && !((defined(__GNUC__) || defined(__clang__)) && !defined(CCM_PP_FORCE_PORTABLE))
-	#include <math.h>
-#endif
-
 namespace ccm::pp
 {
 	// Per-(T, Abi) storage and operation set. Specialized by the scalar and
@@ -92,45 +88,6 @@ namespace ccm::pp
 			else
 			{
 				return __builtin_pow(a, b);
-			}
-		}
-#elif defined(_MSC_VER)
-	#define CCM_PP_S_UNARY(NAME, CF, CD)                                                                                                                       \
-		template <typename T>                                                                                                                                  \
-		CCM_ALWAYS_INLINE T NAME(T x)                                                                                                                          \
-		{                                                                                                                                                      \
-			if constexpr (std::is_same_v<T, float>) { return ::CF(x); }                                                                                        \
-			else                                                                                                                                               \
-			{                                                                                                                                                  \
-				return ::CD(x);                                                                                                                                \
-			}                                                                                                                                                  \
-		}
-		CCM_PP_S_UNARY(s_sqrt, sqrtf, sqrt)
-		CCM_PP_S_UNARY(s_floor, floorf, floor)
-		CCM_PP_S_UNARY(s_ceil, ceilf, ceil)
-		CCM_PP_S_UNARY(s_trunc, truncf, trunc)
-		CCM_PP_S_UNARY(s_round, roundf, round)
-		CCM_PP_S_UNARY(s_fabs, fabsf, fabs)
-		CCM_PP_S_UNARY(s_exp, expf, exp)
-		CCM_PP_S_UNARY(s_log, logf, log)
-	#undef CCM_PP_S_UNARY
-
-		template <typename T>
-		CCM_ALWAYS_INLINE T s_fma(T a, T b, T c)
-		{
-			if constexpr (std::is_same_v<T, float>) { return ::fmaf(a, b, c); }
-			else
-			{
-				return ::fma(a, b, c);
-			}
-		}
-		template <typename T>
-		CCM_ALWAYS_INLINE T s_pow(T a, T b)
-		{
-			if constexpr (std::is_same_v<T, float>) { return ::powf(a, b); }
-			else
-			{
-				return ::pow(a, b);
 			}
 		}
 #else

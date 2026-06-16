@@ -21,6 +21,7 @@
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
 
+#include <array>
 #include <cfenv>
 #include <optional>
 
@@ -42,7 +43,7 @@ namespace ccm::support::fp
 			StorageType rnd_tonearest_offset;
 		};
 
-		Mapping values[N];
+		std::array<Mapping, N> values;
 
 		[[nodiscard]] constexpr std::optional<T> lookup(StorageType x_bits) const
 		{

@@ -12,6 +12,7 @@
 
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 
+#include <array>
 #include <cstdint>
 #include <cstring>
 #include <limits>
@@ -31,8 +32,8 @@ namespace ccm::fuzz
 	{
 		if constexpr (std::numeric_limits<T>::digits == 64 && sizeof(T) >= 10)
 		{
-			unsigned char bytes[sizeof(T)];
-			std::memcpy(bytes, &value, sizeof(T));
+			std::array<unsigned char, sizeof(T)> bytes{};
+			std::memcpy(bytes.data(), &value, sizeof(T));
 			const bool integer_bit	= (bytes[7] & 0x80U) != 0;
 			const unsigned exponent = (static_cast<unsigned>(bytes[9] & 0x7FU) << 8) | bytes[8];
 			// Canonical iff the integer bit is set exactly when the biased exponent is non-zero.

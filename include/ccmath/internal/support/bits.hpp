@@ -21,6 +21,7 @@
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
 
+#include <array>
 #include <climits>
 #include <cstddef>
 #include <cstdint>
@@ -55,7 +56,7 @@ namespace ccm::support
 				// from just the 80 bits the format actually uses, never touching the padding.
 				struct byte_buffer
 				{
-					unsigned char bytes[sizeof(From)];
+					std::array<unsigned char, sizeof(From)> bytes;
 				};
 				const byte_buffer buffer = __builtin_bit_cast(byte_buffer, from);
 
