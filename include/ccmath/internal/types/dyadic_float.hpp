@@ -418,11 +418,11 @@ namespace ccm::types
 				// d_lo is denormal, but the output is normal.
 				int scale_up_exponent = 1 - exp_lo;
 				T scale_up_factor	  = support::fp::FPBits<T>::create_value(
-										Sign::POS, static_cast<output_bits_t>(support::fp::FPBits<T>::exponent_bias + scale_up_exponent), implicit_mask)
-										.get_val();
-				T scale_down_factor = support::fp::FPBits<T>::create_value(
-										  Sign::POS, static_cast<output_bits_t>(support::fp::FPBits<T>::exponent_bias - scale_up_exponent), implicit_mask)
-										  .get_val();
+											Sign::POS, static_cast<output_bits_t>(support::fp::FPBits<T>::exponent_bias + scale_up_exponent), implicit_mask)
+											.get_val();
+				T scale_down_factor	  = support::fp::FPBits<T>::create_value(
+											Sign::POS, static_cast<output_bits_t>(support::fp::FPBits<T>::exponent_bias - scale_up_exponent), implicit_mask)
+											.get_val();
 
 				d_lo = support::fp::FPBits<T>::create_value(sign, static_cast<output_bits_t>(exp_lo + scale_up_exponent), implicit_mask).get_val();
 
