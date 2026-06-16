@@ -34,11 +34,9 @@ extern "C" int *__errno_location(void) __attribute__((__nothrow__, __const__));
 
 namespace ccm::support::fenv::detail
 {
-	CCM_NEVER_INLINE inline void write_errno(int err) noexcept
+	CCM_NEVER_INLINE inline void write_errno([[maybe_unused]] int err) noexcept
 	{
-#if defined(__FAST_MATH__) || defined(CCM_CONFIG_DISABLE_ERRNO)
-		(void)err;
-#else
+#if !defined(__FAST_MATH__) && !defined(CCM_CONFIG_DISABLE_ERRNO)
 	#if defined(_GNU_SOURCE) || defined(__GLIBC__) || defined(__ANDROID__)
 		volatile int *const loc = __errno_location();
 		*loc					= err;
