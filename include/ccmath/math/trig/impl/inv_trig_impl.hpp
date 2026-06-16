@@ -32,6 +32,8 @@ namespace ccm::internal::impl
 {
 	namespace inv_trig_detail
 	{
+		// Evaluates the asin(x)/x approximation polynomial from inv_trig_data (argument x^2) in
+		// parallel Estrin form, for |x| <= 1/2.
 		template <typename T>
 		constexpr T asin_eval(T xsq) noexcept
 		{
@@ -51,6 +53,8 @@ namespace ccm::internal::impl
 			return ccm::support::polyeval(x8, d0, d1, d2);
 		}
 
+		// Two regions. For |x| <= 1/2, acos(x) = pi/2 - asin(x) via the asin polynomial. For
+		// |x| > 1/2, acos(|x|) = 2 asin(sqrt((1-|x|)/2)), reflected to pi - r when x < 0.
 		template <typename T>
 		constexpr T acos_kernel(T x) noexcept
 		{
@@ -200,6 +204,9 @@ namespace ccm::internal::impl
 		}
 	}
 
+	// Resolves the atan2 special values (NaN, infinite, or zero operands, including signed zero)
+	// first, then reduces the general case to atan(y/x) with a quadrant correction by the sign
+	// of x.
 	template <typename T>
 	constexpr T atan2_impl(T y, T x) noexcept
 	{

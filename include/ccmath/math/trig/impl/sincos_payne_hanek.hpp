@@ -46,7 +46,7 @@ namespace ccm::internal::impl::sincos_ph
 		std::uint64_t lo;
 	};
 
-	// 64 x 64 -> 128 unsigned multiply, portable and constexpr (no __int128).
+	// 64-bit by 64-bit unsigned multiply to a 128-bit result, portable and constexpr (no __int128).
 	constexpr U128 mul64(std::uint64_t a, std::uint64_t b) noexcept
 	{
 		const std::uint64_t a_lo = a & 0xffffffffULL;

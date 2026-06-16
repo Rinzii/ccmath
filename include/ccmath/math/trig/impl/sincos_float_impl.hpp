@@ -82,6 +82,8 @@ namespace ccm::internal::impl
 			const float sin_k = data::SIN_K_PI_OVER_8[k & 15];
 			const float cos_k = data::SIN_K_PI_OVER_8[(k + 4) & 15];
 
+			// sin(y) = y + y^3 p1(y^2) and cos(y) = 1 + y^2 q1(y^2) on |y| < pi/16, with float-grade
+			// two-term tails (the double kernel uses higher-order polynomials).
 			const float y_sq = y * y;
 			const float p1	 = support::multiply_add(y_sq, 0x1.111112p-7f, -0x1.555556p-3f);
 			const float q1	 = support::multiply_add(y_sq, 0x1.54b8bep-5f, -0x1.ffffc4p-2f);
