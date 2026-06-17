@@ -11,7 +11,6 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/basic/remainder.hpp"
-#include "ccmath/internal/math/runtime/func/detail/msvc_libm.hpp"
 #include "ccmath/internal/math/runtime/func/detail/trunc_scalar.hpp"
 #include "ccmath/internal/math/runtime/func/rt_dispatch.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
@@ -25,9 +24,6 @@ namespace ccm::rt
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] inline T remainder_rt(T x, T y) noexcept
 	{
-#if defined(_MSC_VER) && !defined(__clang__)
-		return detail::msvc_libm::remainder_call(x, y);
-#else
 		if constexpr (ccm::builtin::has_runtime_remainder<T>) { return ccm::builtin::remainder_rt(x, y); }
 		else
 		{
@@ -42,6 +38,5 @@ namespace ccm::rt
 			}
 			return static_cast<T>(x - (detail::trunc_scalar<T>(x / y) * y));
 		}
-#endif
 	}
 } // namespace ccm::rt
