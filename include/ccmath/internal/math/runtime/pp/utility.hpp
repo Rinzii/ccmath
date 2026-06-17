@@ -103,7 +103,6 @@ namespace ccm::pp
 			double trunc(double);
 			float roundf(float);
 			double round(double);
-			float fabsf(float);
 			double fabs(double);
 			float expf(float);
 			double exp(double);
@@ -129,10 +128,22 @@ namespace ccm::pp
 		CCM_PP_S_UNARY(s_ceil, ceilf, ceil)
 		CCM_PP_S_UNARY(s_trunc, truncf, trunc)
 		CCM_PP_S_UNARY(s_round, roundf, round)
-		CCM_PP_S_UNARY(s_fabs, fabsf, fabs)
 		CCM_PP_S_UNARY(s_exp, expf, exp)
 		CCM_PP_S_UNARY(s_log, logf, log)
 	#undef CCM_PP_S_UNARY
+
+		// MSVC does not always provide a linkable fabsf, so the float path routes
+		// through the double fabs. The widening to double and the narrowing back
+		// are both exact because fabs only clears the sign bit.
+		template <typename T>
+		CCM_ALWAYS_INLINE T s_fabs(T x)
+		{
+			if constexpr (std::is_same_v<T, float>) { return static_cast<float>(fabs(static_cast<double>(x))); }
+			else
+			{
+				return fabs(x);
+			}
+		}
 
 		template <typename T>
 		CCM_ALWAYS_INLINE T s_fma(T a, T b, T c)
