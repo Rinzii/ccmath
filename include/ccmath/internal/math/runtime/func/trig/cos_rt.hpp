@@ -12,6 +12,7 @@
 
 #include "ccmath/internal/math/generic/builtins/trig/cos.hpp"
 #include "ccmath/internal/math/generic/func/trig/cos_gen.hpp"
+#include "ccmath/internal/math/runtime/func/detail/system_math.hpp"
 #include "ccmath/internal/math/runtime/func/rt_dispatch.hpp"
 #include "ccmath/internal/math/runtime/func/svml_dispatch.hpp"
 #include "ccmath/internal/math/runtime/simd/func/catalog.hpp"
@@ -23,15 +24,19 @@ namespace ccm::rt
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] inline T cos_rt(T num) noexcept
 	{
+#if defined(CCM_CONFIG_SYSTEM_MATH)
+		return detail::sys::cos_call(num);
+#else
 		if constexpr (ccm::builtin::has_runtime_cos<T>) { return ccm::builtin::cos_rt(num); }
 		else
 		{
 			const auto scalar = [](T value) { return gen::cos_gen(value); };
-#if defined(CCMATH_HAS_SIMD) && defined(CCMATH_HAS_SIMD_SVML) && !defined(_MSC_VER)
+	#if defined(CCMATH_HAS_SIMD) && defined(CCMATH_HAS_SIMD_SVML) && !defined(_MSC_VER)
 			return detail::unary_trig_svml_or_impl(num, [](auto v) { return intrin::cos(v); }, scalar);
-#else
+	#else
 			return simd_impl::unary_via_scalar_abi(num, scalar);
-#endif
+	#endif
 		}
+#endif
 	}
 } // namespace ccm::rt

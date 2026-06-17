@@ -11,6 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/expo/log2.hpp"
+#include "ccmath/internal/math/runtime/func/detail/system_math.hpp"
 #include "ccmath/internal/math/runtime/func/rt_dispatch.hpp"
 #include "ccmath/internal/math/runtime/func/svml_dispatch.hpp"
 #include "ccmath/internal/math/runtime/simd/func/catalog.hpp"
@@ -25,6 +26,11 @@ namespace ccm::rt
 	[[nodiscard]] inline T log2_rt(T num) noexcept
 	{
 		const auto scalar = [](T value) { return detail::dispatch_float_double(value, ccm::internal::log2_float, ccm::internal::log2_double); };
+#if defined(CCM_CONFIG_SYSTEM_MATH)
+		// The system libm is not correctly rounded outside round to nearest, so use the generic kernel there.
+		if (CCM_UNLIKELY(ccm::support::fenv::get_rounding_mode() != FE_TONEAREST)) { return scalar(num); }
+		return detail::sys::log2_call(num);
+#else
 		if constexpr (ccm::builtin::has_runtime_log2<T>)
 		{
 			// The runtime builtin lowers to libm, which is not correctly rounded outside round to
@@ -34,11 +40,12 @@ namespace ccm::rt
 		}
 		else
 		{
-#if defined(CCMATH_HAS_SIMD) && defined(CCMATH_HAS_SIMD_SVML) && !defined(_MSC_VER)
+	#if defined(CCMATH_HAS_SIMD) && defined(CCMATH_HAS_SIMD_SVML) && !defined(_MSC_VER)
 			return detail::unary_svml_or_impl(num, [](auto v) { return intrin::log2(v); }, scalar);
-#else
+	#else
 			return simd_impl::unary_via_scalar_abi(num, scalar);
-#endif
+	#endif
 		}
+#endif
 	}
 } // namespace ccm::rt
