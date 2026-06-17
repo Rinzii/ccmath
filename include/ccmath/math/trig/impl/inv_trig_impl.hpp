@@ -124,7 +124,7 @@ namespace ccm::internal::impl
 		{
 			ccm::support::fenv::set_errno_if_required(EDOM);
 			ccm::support::fenv::raise_except_if_required(FE_INVALID);
-			return x + fp_bits_t::quiet_nan().get_val();
+			return fp_bits_t::quiet_nan().get_val();
 		}
 
 		const T ax = ccm::fabs(x);
@@ -132,7 +132,7 @@ namespace ccm::internal::impl
 		{
 			ccm::support::fenv::set_errno_if_required(EDOM);
 			ccm::support::fenv::raise_except_if_required(FE_INVALID);
-			return x + fp_bits_t::quiet_nan().get_val();
+			return fp_bits_t::quiet_nan().get_val();
 		}
 
 		if (ax == static_cast<T>(1)) { return x < static_cast<T>(0) ? static_cast<T>(ccm::numbers::pi_v<T>) : static_cast<T>(0); }

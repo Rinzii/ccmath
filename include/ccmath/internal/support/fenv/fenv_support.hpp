@@ -172,7 +172,7 @@ namespace ccm::support::fenv
 		return 0;
 	}
 
-	inline void set_errno_if_required(const int err)
+	constexpr void set_errno_if_required(const int err)
 	{
 		if (is_constant_evaluated()) { return; }
 		if constexpr (!is_errno_enabled()) { return; }

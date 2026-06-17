@@ -70,8 +70,14 @@ namespace ccm::internal::impl
 					{
 						support::fenv::set_errno_if_required(EDOM);
 						support::fenv::raise_except_if_required(FE_INVALID);
+						// sin/cos of an infinity is a domain error, so return a canonical quiet NaN.
+						// Forming it as x + quiet_nan is ill-formed in a constant expression, which
+						// rejects floating-point arithmetic that produces a NaN.
+						return FPBits::quiet_nan().get_val();
 					}
-					return x + FPBits::quiet_nan().get_val();
+
+					// x is a quiet NaN here. Return it unchanged so its sign and payload survive.
+					return x;
 				}
 
 				double yd = 0.0;
