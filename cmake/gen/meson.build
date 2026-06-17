@@ -58,14 +58,18 @@ if get_option('enable_runtime_simd') and not get_option('deterministic') and cpp
   _ccmath_defines += '-DCCM_CONFIG_RT_SIMD_HAS_SVML'
 endif
 
+# Generate ccmath/version.hpp natively so Meson consumers never depend on a CMake configure.
+subdir('ccmath')
+
 ccmath_inc = include_directories(
   '../../include',
-  '../../out/secondary/include',
+  '.',
 )
 
 ccmath_dep = declare_dependency(
   include_directories: ccmath_inc,
   compile_args: _ccmath_defines,
+  sources: ccmath_version_hpp,
 )
 
 meson.override_dependency('ccmath', ccmath_dep)
