@@ -46,50 +46,14 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE constexpr void unroll_ic(F && f)
 		{ unroll_ic_impl(std::forward<F>(f), std::make_index_sequence<static_cast<std::size_t>(N)>{}); }
 
-		// Per-lane scalar math primitives, used by the scalar backend and as the
-		// portable fallback for the vec_ext backend. Compiler builtins are used on
-		// GNU/Clang (no <cmath>, no errno, foldable). Other toolchains (e.g. MSVC),
-		// or builds that define CCM_PP_FORCE_PORTABLE, fall back to the C runtime
-		// entry points declared here.
+		// Per-lane scalar math primitives for the scalar backend and the vec_ext
+		// portable fallback. GNU/Clang use foldable, errno-free compiler builtins
+		// (no <cmath>). Other toolchains (e.g. MSVC) or CCM_PP_FORCE_PORTABLE builds
+		// call the C runtime entry points declared below. CCM_PP_F and CCM_PP_D
+		// select the float and double backend for a given function base name.
 #if (defined(__GNUC__) || defined(__clang__)) && !defined(CCM_PP_FORCE_PORTABLE)
-	#define CCM_PP_S_UNARY(NAME, BF, BD)                                                                                                                       \
-		template <typename T>                                                                                                                                  \
-		CCM_ALWAYS_INLINE T NAME(T x)                                                                                                                          \
-		{                                                                                                                                                      \
-			if constexpr (std::is_same_v<T, float>) { return BF(x); }                                                                                          \
-			else                                                                                                                                               \
-			{                                                                                                                                                  \
-				return BD(x);                                                                                                                                  \
-			}                                                                                                                                                  \
-		}
-		CCM_PP_S_UNARY(s_sqrt, __builtin_sqrtf, __builtin_sqrt)
-		CCM_PP_S_UNARY(s_floor, __builtin_floorf, __builtin_floor)
-		CCM_PP_S_UNARY(s_ceil, __builtin_ceilf, __builtin_ceil)
-		CCM_PP_S_UNARY(s_trunc, __builtin_truncf, __builtin_trunc)
-		CCM_PP_S_UNARY(s_round, __builtin_roundf, __builtin_round)
-		CCM_PP_S_UNARY(s_fabs, __builtin_fabsf, __builtin_fabs)
-		CCM_PP_S_UNARY(s_exp, __builtin_expf, __builtin_exp)
-		CCM_PP_S_UNARY(s_log, __builtin_logf, __builtin_log)
-	#undef CCM_PP_S_UNARY
-
-		template <typename T>
-		CCM_ALWAYS_INLINE T s_fma(T a, T b, T c)
-		{
-			if constexpr (std::is_same_v<T, float>) { return __builtin_fmaf(a, b, c); }
-			else
-			{
-				return __builtin_fma(a, b, c);
-			}
-		}
-		template <typename T>
-		CCM_ALWAYS_INLINE T s_pow(T a, T b)
-		{
-			if constexpr (std::is_same_v<T, float>) { return __builtin_powf(a, b); }
-			else
-			{
-				return __builtin_pow(a, b);
-			}
-		}
+	#define CCM_PP_F(BASE) __builtin_##BASE##f
+	#define CCM_PP_D(BASE) __builtin_##BASE
 #else
 		extern "C"
 		{
@@ -113,56 +77,70 @@ namespace ccm::pp
 			float powf(float, float);
 			double pow(double, double);
 		}
-	#define CCM_PP_S_UNARY(NAME, CF, CD)                                                                                                                       \
-		template <typename T>                                                                                                                                  \
-		CCM_ALWAYS_INLINE T NAME(T x)                                                                                                                          \
-		{                                                                                                                                                      \
-			if constexpr (std::is_same_v<T, float>) { return CF(x); }                                                                                          \
-			else                                                                                                                                               \
-			{                                                                                                                                                  \
-				return CD(x);                                                                                                                                  \
-			}                                                                                                                                                  \
-		}
-		CCM_PP_S_UNARY(s_sqrt, sqrtf, sqrt)
-		CCM_PP_S_UNARY(s_floor, floorf, floor)
-		CCM_PP_S_UNARY(s_ceil, ceilf, ceil)
-		CCM_PP_S_UNARY(s_trunc, truncf, trunc)
-		CCM_PP_S_UNARY(s_round, roundf, round)
-		CCM_PP_S_UNARY(s_exp, expf, exp)
-		CCM_PP_S_UNARY(s_log, logf, log)
-	#undef CCM_PP_S_UNARY
+	#define CCM_PP_F(BASE) BASE##f
+	#define CCM_PP_D(BASE) BASE
+#endif
 
-		// MSVC does not always provide a linkable fabsf, so the float path routes
-		// through the double fabs. The widening to double and the narrowing back
-		// are both exact because fabs only clears the sign bit.
-		template <typename T>
-		CCM_ALWAYS_INLINE T s_fabs(T x)
-		{
-			if constexpr (std::is_same_v<T, float>) { return static_cast<float>(fabs(static_cast<double>(x))); }
-			else
-			{
-				return fabs(x);
-			}
-		}
+#define CCM_PP_S_UNARY(NAME, BASE)                                                                                                                             \
+	template <typename T>                                                                                                                                      \
+	CCM_ALWAYS_INLINE T NAME(T x)                                                                                                                              \
+	{                                                                                                                                                          \
+		if constexpr (std::is_same_v<T, float>) { return CCM_PP_F(BASE)(x); }                                                                                  \
+		else                                                                                                                                                   \
+		{                                                                                                                                                      \
+			return CCM_PP_D(BASE)(x);                                                                                                                          \
+		}                                                                                                                                                      \
+	}
+		CCM_PP_S_UNARY(s_sqrt, sqrt)
+		CCM_PP_S_UNARY(s_floor, floor)
+		CCM_PP_S_UNARY(s_ceil, ceil)
+		CCM_PP_S_UNARY(s_trunc, trunc)
+		CCM_PP_S_UNARY(s_round, round)
+		CCM_PP_S_UNARY(s_exp, exp)
+		CCM_PP_S_UNARY(s_log, log)
+#undef CCM_PP_S_UNARY
 
 		template <typename T>
 		CCM_ALWAYS_INLINE T s_fma(T a, T b, T c)
 		{
-			if constexpr (std::is_same_v<T, float>) { return fmaf(a, b, c); }
+			if constexpr (std::is_same_v<T, float>) { return CCM_PP_F(fma)(a, b, c); }
 			else
 			{
-				return fma(a, b, c);
+				return CCM_PP_D(fma)(a, b, c);
 			}
 		}
 		template <typename T>
 		CCM_ALWAYS_INLINE T s_pow(T a, T b)
 		{
-			if constexpr (std::is_same_v<T, float>) { return powf(a, b); }
+			if constexpr (std::is_same_v<T, float>) { return CCM_PP_F(pow)(a, b); }
 			else
 			{
-				return pow(a, b);
+				return CCM_PP_D(pow)(a, b);
 			}
 		}
+
+#undef CCM_PP_F
+#undef CCM_PP_D
+
+		// MSVC does not always provide a linkable fabsf, so on the portable path the
+		// float case routes through the double fabs, which is exact because fabs only
+		// clears the sign bit.
+		template <typename T>
+		CCM_ALWAYS_INLINE T s_fabs(T x)
+		{
+#if (defined(__GNUC__) || defined(__clang__)) && !defined(CCM_PP_FORCE_PORTABLE)
+			if constexpr (std::is_same_v<T, float>) { return __builtin_fabsf(x); }
+			else
+			{
+				return __builtin_fabs(x);
+			}
+#else
+			if constexpr (std::is_same_v<T, float>) { return static_cast<float>(fabs(static_cast<double>(x))); }
+			else
+			{
+				return fabs(x);
+			}
 #endif
+		}
 	} // namespace detail
 } // namespace ccm::pp
