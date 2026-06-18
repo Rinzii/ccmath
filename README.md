@@ -2,7 +2,7 @@
 
 # CCMath
 
-## A constexpr-first `<cmath>` library for C++17 and later
+**A constexpr-first `<cmath>` for C++17 and later**
 
 [![Release](https://img.shields.io/github/v/release/Rinzii/ccmath?sort=semver&label=release)](https://github.com/Rinzii/ccmath/releases/latest)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/Rinzii/ccmath/badge)](https://securityscorecards.dev/viewer/?uri=github.com/Rinzii/ccmath)
@@ -15,18 +15,39 @@
 | `main`          | [![Linux main](https://github.com/Rinzii/ccmath/actions/workflows/ci-linux.yml/badge.svg?branch=main)](https://github.com/Rinzii/ccmath/actions/workflows/ci-linux.yml?query=branch%3Amain)                        | [![macOS main](https://github.com/Rinzii/ccmath/actions/workflows/ci-macos.yml/badge.svg?branch=main)](https://github.com/Rinzii/ccmath/actions/workflows/ci-macos.yml?query=branch%3Amain)                        | [![Windows main](https://github.com/Rinzii/ccmath/actions/workflows/ci-windows.yml/badge.svg?branch=main)](https://github.com/Rinzii/ccmath/actions/workflows/ci-windows.yml?query=branch%3Amain)                        |
 | `release/0.3.x` | [![Linux release](https://github.com/Rinzii/ccmath/actions/workflows/ci-linux.yml/badge.svg?branch=release/0.3.x)](https://github.com/Rinzii/ccmath/actions/workflows/ci-linux.yml?query=branch%3Arelease%2F0.3.x) | [![macOS release](https://github.com/Rinzii/ccmath/actions/workflows/ci-macos.yml/badge.svg?branch=release/0.3.x)](https://github.com/Rinzii/ccmath/actions/workflows/ci-macos.yml?query=branch%3Arelease%2F0.3.x) | [![Windows release](https://github.com/Rinzii/ccmath/actions/workflows/ci-windows.yml/badge.svg?branch=release/0.3.x)](https://github.com/Rinzii/ccmath/actions/workflows/ci-windows.yml?query=branch%3Arelease%2F0.3.x) |
 
-CCMath is a header-only library with a `<cmath>`-style API. The same entry points constexpr-evaluate where the standard and compiler allow, dispatch to portable runtime implementations elsewhere, and can use SIMD on selected functions when the target supports it.
+CCMath is a header-only library with a `<cmath>`-style API. The same entry points constexpr-evaluate where the standard
+and the compiler allow, dispatch to portable runtime implementations everywhere else, and pick up SIMD on selected
+functions when the target supports it.
 
-This README describes what CCMath is working toward. Some claims here reflect goals still in progress. See [STATUS.md](docs/STATUS.md) for current implementation status by module and function.
-
-For approximation-driven function work, see the implementation guide
-in [APPROXIMATING_FUNCTIONS.pdf](docs/approximating_functions/APPROXIMATING_FUNCTIONS.pdf).
+This README also describes what CCMath is working toward, so some of these claims are goals rather than finished
+work. [STATUS.md](docs/STATUS.md) tracks where each module and function actually stands today. For the
+approximation-driven function work, the implementation guide lives
+in [APPROXIMATING_FUNCTIONS.pdf](docs/approximating_functions/APPROXIMATING_FUNCTIONS.pdf). Questions and design
+discussion are welcome on [Discord](https://discord.gg/p3mVxAbdmc).
 
 ---
 
-## Why CCMath?
+## Contents
 
-Most `<cmath>` implementations prioritize different tradeoffs. Few combine standards-oriented semantics, constexpr evaluation, full runtime paths, SIMD, and portable in-tree code.
+- [Why CCMath](#why-ccmath)
+- [Quick start](#quick-start)
+- [Accuracy and conformance](#accuracy-and-conformance)
+- [Performance](#performance)
+- [Supported platforms and compilers](#supported-platforms-and-compilers)
+- [Installation](#installation)
+- [Validation](#validation)
+- [Contributing](#contributing)
+- [Projects using CCMath](#projects-using-ccmath)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
+
+---
+
+## Why CCMath
+
+Most `<cmath>` implementations are built around different tradeoffs, and few of them combine standards-oriented
+semantics, constexpr evaluation, full runtime execution, SIMD, and portable in-tree code in one place. That combination
+is what CCMath is after.
 
 | Library           | Standards-Oriented | Constexpr | Runtime | SIMD             | Portable Implementation |
 |-------------------|--------------------|-----------|---------|------------------|-------------------------|
@@ -37,194 +58,18 @@ Most `<cmath>` implementations prioritize different tradeoffs. Few combine stand
 | SLEEF             | Partial            | No        | Yes     | Yes              | Yes                     |
 | CCMath            | Yes                | Yes       | Yes     | Yes              | Yes                     |
 
-CCMath targets:
-
-- Standards conformance
-- Compile-time evaluation
-- Runtime execution
-- SIMD acceleration
-- Numerical correctness
-- Competitive performance
-- Cross-platform portability
-
-These goals overlap with the comparison columns plus numerical validation. Per-function progress is tracked in [STATUS.md](docs/STATUS.md).
+Numerical correctness and performance are not columns in the table, and each gets its own section below. Per-function
+progress is tracked in [STATUS.md](docs/STATUS.md).
 
 ---
 
-## Design Principles
+## Quick start
 
-### Standards Conformance
+There is no separate constexpr API. When constant evaluation is possible the public symbol participates in it, and when
+it is not, the same symbol dispatches to a runtime implementation. You write `ccm::sqrt` once and it works in both
+contexts.
 
-CCMath is designed to closely follow the behavior specified by the C and C++ standards for mathematical functions.
-
-This includes:
-
-- Function semantics
-- Domain handling
-- Range handling
-- NaN propagation
-- Infinity behavior
-- Floating-point classification
-- Rounding behavior
-- Edge-case handling
-
-Implemented functions follow the rules the C and C++ standards set for `<cmath>`.
-
-### Compile-Time Evaluation
-
-```cpp
-constexpr auto value = ccm::sin(0.5);
-
-static_assert(value > 0.0);
-```
-
-There is no separate constexpr API. When constant evaluation is possible, the public symbol participates in it.
-
-### Runtime Execution
-
-```cpp
-double result = ccm::exp(x);
-```
-
-When constant evaluation is not possible, the same symbols dispatch to runtime paths.
-
-### SIMD Acceleration
-
-Selected functions pick up SIMD on supported targets:
-
-- SSE2
-- SSE4
-- AVX2
-- ARM NEON
-
-### Numerical Correctness
-
-The goal for every function is a correctly rounded result under all four IEEE rounding modes. Coverage is function-by-function: some paths are validated today under all modes, while other functions still target round-to-nearest ties-to-even first, or land within a documented bound of no more than 4 ULP while the correctly rounded version is in progress.
-
-ULP harnesses, all-mode rounding probes, worst-case grids, and cross-compiler CI matrices live in-tree. The validation section below describes how they run in practice.
-
-### Performance
-
-After numerical correctness, performance is the next priority. Once a function is correct it is expected to stay in the same ballpark as the platform libm on covered paths, with a fast path plus an accurate fallback rather than a single slow path. Benchmarks comparing `ccm::*` against the platform libm live in-tree.
-
----
-
-## Function Coverage
-
-Work spans trigonometric, exponential, power, rounding, classification, and utility categories from the C and C++ mathematical library. Several modules are still in flight. [STATUS.md](docs/STATUS.md) lists what ships today and what remains open.
-
----
-
-## Validation and Verification
-
-Validation follows patterns from LLVM-libc, CORE-MATH, and glibc. CI covers:
-
-### Continuous Integration
-
-#### Platforms
-
-- Linux
-- macOS
-- Windows
-
-#### Compilers
-
-- GCC
-- Clang
-- Apple Clang
-- MSVC
-
-#### Language Standards
-
-- C++17
-- C++20
-- C++23
-- C++26 / latest
-
-#### Build Configurations
-
-- Debug
-- Release
-
-### Simple Validation Suite
-
-The `simple` suite runs on every CI job:
-
-```bash
-ctest -L simple
-```
-
-This suite exercises public `ccm::*` entry points and includes:
-
-- Smoke testing
-- Standards edge cases
-- ULP checks against the active platform libm
-- Regression testing
-
-### Rigorous Validation Suite
-
-The `rigorous` suite runs in dedicated CI jobs:
-
-```bash
-ctest -L rigorous
-```
-
-Rigorous jobs compare against MPFR and CORE-MATH oracles.
-
-#### MPFR Validation
-
-Within a rigorous build, MPFR-backed tests use the `mpfr` label:
-
-```bash
-ctest -L mpfr
-```
-
-Includes:
-
-- Extended function corpora
-- Exceptional-value matrices
-- Adversarial search
-
-Linux and macOS use system MPFR/GMP.
-
-Windows uses MPFR provided through vcpkg.
-
-#### CORE-MATH Validation
-
-Within a rigorous build, CORE-MATH-backed tests use the `coremath` label:
-
-```bash
-ctest -L coremath
-```
-
-Correctly-rounded reference comparisons under all four IEEE rounding modes on finite inputs.
-
-#### Proof Verification
-
-When available, CCMath uses:
-
-- Gappa
-- Sollya
-
-to refresh and verify proof artifacts for supported implementations.
-
-### Fuzz Testing
-
-Fuzz smoke tests run in dedicated macOS and Linux CI jobs with full LLVM Clang (libFuzzer requires the fuzzer sanitizer runtime). Windows matrix jobs use MSVC and are outside libFuzzer coverage today.
-
-### Static Analysis and Security
-
-CodeQL, OpenSSF Scorecard, warning-as-error builds, and strict compiler warning gates run in CI.
-
-### Style and Consistency
-
-clang-format runs in CI on every platform matrix job and on pull requests that touch C++ sources. clang-tidy is available locally via lint.sh and lint.bat.
-
----
-
-## Usage
-
-### Monolithic Include
+The monolithic header pulls in everything:
 
 ```cpp
 #include <ccmath/ccmath.hpp>
@@ -237,7 +82,7 @@ int main() {
 }
 ```
 
-### Per-Function Include
+You can also include a single function when that is all you need:
 
 ```cpp
 #include <ccmath/math/expo/log.hpp>
@@ -250,11 +95,79 @@ int main() {
 }
 ```
 
+Both the compile-time and the runtime forms go through the same entry point:
+
+```cpp
+// Compile time: usable in a constant expression.
+constexpr double a = ccm::sin(0.5);
+static_assert(a > 0.0);
+
+// Runtime: the same call on a value the compiler cannot fold.
+double exp_at(double x) { return ccm::exp(x); }
+```
+
+---
+
+## Accuracy and conformance
+
+Accuracy is the first priority, ahead of performance. The goal for every function is a correctly rounded result under
+all four IEEE-754 rounding modes. Coverage is function-by-function, so some already meet that bar today while others are
+still getting there.
+
+| Status                       | What it means                                                                      |
+|------------------------------|------------------------------------------------------------------------------------|
+| Correctly rounded, all modes | Bit-exact under all four IEEE-754 rounding modes                                   |
+| Correctly rounded, nearest   | Bit-exact under round-to-nearest ties-to-even, other modes not yet covered         |
+| Bounded error                | Within a documented bound of no more than 4 ULP until correct rounding is finished |
+
+Where each function sits on that scale is listed in [STATUS.md](docs/STATUS.md). A gap that is not written down there is
+a bug.
+
+Alongside accuracy, CCMath is designed to follow the behavior the C and C++ standards pin down for `<cmath>`. That
+covers function semantics, domain and range handling, NaN propagation, infinity behavior, floating-point classification,
+rounding behavior, and the edge cases the standards specify. Implemented functions follow those rules exactly.
+
+We cover the trigonometric, exponential, power, rounding, classification, and utility categories of the C and C++
+mathematical library, though several functions are not finished yet.
+
+---
+
+## Performance
+
+After accuracy, performance is the next thing we care about. The idea is that once a function is correct it should still
+keep pace with the platform libm, so the common case stays quick and we only fall back to the fully accurate version
+when we have to. A lot of functions also pick up SIMD where the hardware supports it, currently SSE2, SSE4, AVX2, and
+ARM NEON. We keep benchmarks against the platform libm in the tree, so a regression is easy to catch.
+
+---
+
+## Supported platforms and compilers
+
+CCMath builds and is tested across Linux, macOS, and Windows, under GCC, Clang, Apple Clang, and MSVC, on C++17 through
+C++26 in both Debug and Release. The CI matrix that enforces this is described under [validation](#validation).
+
+| Compiler       | Minimum version |
+|----------------|-----------------|
+| GCC            | 11.1            |
+| Clang          | 9.0.0           |
+| Apple Clang    | 14.0.3          |
+| MSVC           | 19.26           |
+| Intel DPC++    | 2022.0.0        |
+| NVIDIA HPC SDK | 22.7            |
+
+> [!NOTE]
+> Minimum compiler versions are not final yet, so treat them as guidance for now.
+
 ---
 
 ## Installation
 
+The library itself has no required dependencies, so consuming it is just a matter of putting the headers where your
+compiler can find them.
+
 ### CMake
+
+CMake is the primary build system.
 
 ```cmake
 include(FetchContent)
@@ -274,30 +187,26 @@ target_link_libraries(
 )
 ```
 
-You may also vendor the headers directly.
+You can also vendor the headers directly.
 
 ### Secondary build systems (Meson and Premake)
 
-CMake is the primary and authoritative build system. Meson and Premake support library consumption only: include paths, compile definitions, the generated `version.hpp`, and the library-required feature validation that a consumer needs. They do not define examples, smoke binaries, tests, benchmarks, fuzzing targets, or third-party dependency fetches.
+CMake is the primary build system, but the repository also ships ready-to-use `meson.build` and `premake5.lua`. Both are
+self-contained, since each generates `ccmath/version.hpp` itself, so a Meson or Premake consumer never needs a CMake
+configure first. They expose include directories and compile definitions only, not examples, tests, benchmarks, or
+fuzzing targets.
 
-After configuring CMake, regenerate the secondary build files:
-
-```bash
-cmake --preset ninja-clang-debug -DCCMATH_BUILD_TESTS=OFF -DCCMATH_BUILD_EXAMPLES=OFF
-cmake --build out/build/ninja/ninja-clang-debug --target ccmath-generate-secondary-builds
-```
-
-Meson consumer usage after regeneration:
+Meson, with ccmath as a subproject:
 
 ```meson
 ccmath_dep = dependency('ccmath', fallback : ['ccmath', 'ccmath_dep'])
 executable('my-app', 'main.cpp', dependencies : ccmath_dep)
 ```
 
-Premake consumer usage after regeneration:
+Premake:
 
 ```lua
-include("../ccmath/premake5.lua")
+include("path/to/ccmath/premake5.lua")
 
 project "my-app"
     kind "ConsoleApp"
@@ -306,88 +215,36 @@ project "my-app"
     ccmath.use()
 ```
 
-The generated root `meson.build` exposes `ccmath_dep` and overrides the `ccmath` dependency name for Meson consumers. The generated root `premake5.lua` exposes `ccmath.use()`, `ccmath.include_dirs()`, and `ccmath.defines()` for Premake consumers. Library-facing options are declared once in `cmake/config/BuildManifest.cmake` and exported through `ccmath-build-manifest.json`.
+---
 
-### Vendored integration testing
+## Validation
 
-[`integration/vendored-consumer`](integration/vendored-consumer) simulates an external project that vendors CCMath headers under `third_party/ccmath`. CI copies the public headers and generated `version.hpp`, then builds the consumer with CMake, Meson, and Premake.
+CCMath is validated thoroughly. The approach borrows from LLVM-libc, CORE-MATH, and glibc: every public entry point is
+checked for standards edge cases and ULP error against the platform libm. Beyond that, a rigorous suite cross-checks the
+harder cases against MPFR and CORE-MATH oracles under all four IEEE rounding modes, Gappa and Sollya back the proof
+artifacts, and differential fuzzing catches kernel disagreements. All of it runs in CI across Linux, macOS, and Windows,
+under GCC, Clang, Apple Clang, and MSVC, on C++17 through C++26, alongside CodeQL, OpenSSF Scorecard, and
+warning-as-error builds.
 
-```bash
-cmake --preset ninja-clang-debug -DCCMATH_BUILD_TESTS=OFF -DCCMATH_BUILD_EXAMPLES=OFF
-bash tools/integration/prepare_vendored_tree.sh out/build/ninja/ninja-clang-debug
-
-cmake -S integration/vendored-consumer -B integration/vendored-consumer/build-cmake -G Ninja
-cmake --build integration/vendored-consumer/build-cmake
-
-meson setup integration/vendored-consumer/build-meson integration/vendored-consumer
-meson compile -C integration/vendored-consumer/build-meson
-
-cd integration/vendored-consumer && premake5 gmake && make config=debug
-```
+How to run any of these suites locally is documented in [CONTRIBUTING.md](CONTRIBUTING.md), and per-function accuracy
+status is tracked in [STATUS.md](docs/STATUS.md).
 
 ---
 
-## Rigorous Testing Setup
+## Contributing
 
-Typical local configuration:
-
-```bash
-cmake -B build-rigorous -G Ninja \
-  -DCCMATH_BUILD_RIGOROUS_TESTS=ON \
-  -DCCMATH_ENABLE_MPFR_TESTS=ON \
-  -DCCMATH_ENABLE_COREMATH_TESTS=ON \
-  -DCCMATH_COREMATH_ROOT=/path/to/coremath-prefix
-```
-
-Build a CORE-MATH prefix using:
-
-```bash
-tools/coremath/build_prefix.sh
-```
-
-On Windows, pass:
-
-```bash
--DVCPKG_MANIFEST_DIR=cmake/vcpkg
-```
-
-along with a vcpkg toolchain file to obtain MPFR.
-
-See the workflow definitions in [`.github/workflows`](.github/workflows) for the exact CI configurations.
-
-The library itself has no required dependencies.
-
-Optional packages used for testing, benchmarking, and fuzzing are documented in [thirdparty/README.md](thirdparty/README.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and [SECURITY.md](SECURITY.md). Bug
+reports and design questions go to GitHub Issues or Discord.
 
 ---
 
-## Supported Compilers
-
-- GCC 11.1+
-- Clang 9.0.0+
-- Apple Clang 14.0.3+
-- MSVC 19.26+
-- Intel DPC++ 2022.0.0+
-- NVIDIA HPC SDK 22.7+
-
-> [!NOTE]
-> Minimum compiler versions are still being refined and should be considered guidance rather than a finalized support matrix.
-
----
-
-## Projects Using CCMath
+## Projects using CCMath
 
 The following projects publicly use CCMath:
 
 - [Fornani](https://github.com/swagween/fornani)
 
 If your project uses CCMath and is publicly available, open a PR to add it to this list.
-
----
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and [SECURITY.md](SECURITY.md). Bug reports and design questions go to GitHub Issues or Discord.
 
 ---
 
