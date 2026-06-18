@@ -22,7 +22,6 @@ namespace ccm
 	 * @param b End value.
 	 * @param t Interpolation factor.
 	 * @return Interpolated value equivalent to a + t * (b - a) with stability handling for edge cases.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/lerp
 	 */
 	template <typename T>
 	constexpr T lerp(T a, T b, T t) noexcept
@@ -48,7 +47,6 @@ namespace ccm
 	 * @param b End value.
 	 * @param t Interpolation factor.
 	 * @return Interpolated value in the common type of T, U, and V.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/lerp
 	 */
 	template <typename T, typename U, typename V>
 	constexpr std::enable_if_t<std::is_arithmetic_v<T> && std::is_arithmetic_v<U> && std::is_arithmetic_v<V>, std::common_type_t<T, U, V>>

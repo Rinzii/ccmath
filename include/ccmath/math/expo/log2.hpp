@@ -35,7 +35,6 @@ namespace ccm
 	 * @tparam T The type of the number.
 	 * @param num The number to calculate the base 2 logarithm of.
 	 * @return The base 2 logarithm of the number.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/log2
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T log2(T num) noexcept
@@ -95,7 +94,6 @@ namespace ccm
 	 * @tparam Integer The type of the integer.
 	 * @param num The number to calculate the base 2 logarithm of.
 	 * @return The base 2 logarithm of the number as a double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/log2
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double log2(Integer num) noexcept
@@ -105,7 +103,6 @@ namespace ccm
 	 * @brief Returns the base 2 logarithm of a number.
 	 * @param num The number to calculate the base 2 logarithm of.
 	 * @return The base 2 logarithm of the number as a float.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/log2
 	 */
 	constexpr float log2f(float num)
 	{ return ccm::log2<float>(num); }
@@ -114,7 +111,6 @@ namespace ccm
 	 * @brief Returns the base 2 logarithm of a number.
 	 * @param num The number to calculate the base 2 logarithm of.
 	 * @return The base 2 logarithm of the number as a double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/log2
 	 */
 	constexpr long double log2l(long double num)
 	{ return ccm::log2<long double>(num); }

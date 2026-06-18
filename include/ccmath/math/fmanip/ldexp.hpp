@@ -58,7 +58,6 @@ namespace ccm
 	 * @param exp Power of two to scale by.
 	 * @return \f$\text{num} \times 2^\text{exp}\f$.
 	 * @attention At compile time errno may or may not be set, depending on the compiler. Assume it is not.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/ldexp
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T ldexp(T num, int exp)
@@ -82,7 +81,6 @@ namespace ccm
 	 * @param exp Power of two to scale by.
 	 * @return \f$\text{num} \times 2^\text{exp}\f$ as a \c double.
 	 * @attention At compile time errno may or may not be set, depending on the compiler. Assume it is not.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/ldexp
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double ldexp(Integer num, int exp)
@@ -97,7 +95,6 @@ namespace ccm
 	 * @param exp Power of two to scale by.
 	 * @return \f$\text{num} \times 2^\text{exp}\f$ as a \c float.
 	 * @attention At compile time errno may or may not be set, depending on the compiler. Assume it is not.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/ldexp
 	 */
 	constexpr float ldexpf(float num, int exp) noexcept
 	{ return ccm::ldexp<float>(num, exp); }
@@ -114,7 +111,6 @@ namespace ccm
 	 * @param exp Power of two to scale by.
 	 * @return \f$\text{num} \times 2^\text{exp}\f$ as a \c long double.
 	 * @attention At compile time errno may or may not be set, depending on the compiler. Assume it is not.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/ldexp
 	 */
 	constexpr long double ldexpl(long double num, int exp) noexcept
 	{ return ccm::ldexp<long double>(num, exp); }

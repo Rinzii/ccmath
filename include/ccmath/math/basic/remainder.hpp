@@ -25,7 +25,6 @@ namespace ccm
 	 * @param x Dividend.
 	 * @param y Divisor.
 	 * @return The remainder of the division of x by y.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/remainder
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T remainder(T x, T y)
@@ -57,7 +56,6 @@ namespace ccm
 	 * @param x Dividend.
 	 * @param y Divisor.
 	 * @return The remainder of the division of x by y as a double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/remainder
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double remainder(Integer x, Integer y)
@@ -68,7 +66,6 @@ namespace ccm
 	 * @param x Dividend.
 	 * @param y Divisor.
 	 * @return The remainder of the division of x by y.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/remainder
 	 */
 	constexpr float remainderf(float x, float y)
 	{ return ccm::remainder<float>(x, y); }
@@ -78,7 +75,6 @@ namespace ccm
 	 * @param x Dividend.
 	 * @param y Divisor.
 	 * @return The remainder of the division of x by y.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/remainder
 	 */
 	constexpr long double remainderl(long double x, long double y)
 	{ return ccm::remainder<long double>(x, y); }

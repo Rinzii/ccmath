@@ -23,7 +23,6 @@ namespace ccm
 	 * @param x A floating-point or integer values
 	 * @param y A floating-point or integer values
 	 * @return If successful, returns the positive difference between x and y.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/fdim
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T fdim(T x, T y)
@@ -43,7 +42,6 @@ namespace ccm
 	 * @param x A floating-point value.
 	 * @param y A floating-point value.
 	 * @return If successful, returns the positive difference between x and y.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/fdim
 	 */
 	template <typename T, typename U, std::enable_if_t<std::is_floating_point_v<T> && std::is_floating_point_v<U>, bool> = true>
 	constexpr auto fdim(T x, U y)
@@ -59,7 +57,6 @@ namespace ccm
 	 * @param x An integral value.
 	 * @param y An integral value.
 	 * @return If successful, returns the positive difference between x and y.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/fdim
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double fdim(Integer x, Integer y)
@@ -70,7 +67,6 @@ namespace ccm
 	 * @param x A floating-point value.
 	 * @param y A floating-point value.
 	 * @return If successful, returns the positive difference between x and y.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/fdim
 	 */
 	constexpr float fdimf(float x, float y)
 	{ return ccm::fdim<float>(x, y); }
@@ -80,7 +76,6 @@ namespace ccm
 	 * @param x A floating-point value.
 	 * @param y A floating-point value.
 	 * @return If successful, returns the positive difference between x and y.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/fdim
 	 */
 	constexpr long double fdiml(long double x, long double y)
 	{ return ccm::fdim<long double>(x, y); }

@@ -35,7 +35,6 @@ namespace ccm
 	 * @tparam T Floating-point type.
 	 * @param num Floating-point value.
 	 * @return Base-10 logarithm of num. Returns -inf for zero and NaN for negative inputs.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/log10
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T log10(T num)
@@ -80,7 +79,6 @@ namespace ccm
 	 * @tparam Integer Integral type.
 	 * @param num Integer value.
 	 * @return Base-10 logarithm of num as double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/log10
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double log10(Integer num)
@@ -90,7 +88,6 @@ namespace ccm
 	 * @brief Computes the base-10 logarithm of a float.
 	 * @param num Floating-point value.
 	 * @return Base-10 logarithm as float.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/log10
 	 */
 	constexpr float log10f(float num)
 	{ return ccm::log10<float>(num); }
@@ -99,7 +96,6 @@ namespace ccm
 	 * @brief Computes the base-10 logarithm of a long double.
 	 * @param num Floating-point value.
 	 * @return Base-10 logarithm as long double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/log10
 	 */
 	constexpr long double log10l(long double num)
 	{ return ccm::log10<long double>(num); }

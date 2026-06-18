@@ -26,7 +26,6 @@ namespace ccm
 	 * @tparam T The type of the number.
 	 * @param num A floating-point or integer value.
 	 * @return The rounded value.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/round
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T round(T num) noexcept
@@ -52,7 +51,6 @@ namespace ccm
 	 * @tparam Integer Integral type.
 	 * @param num Integer value.
 	 * @return num converted to double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/round
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double round(Integer num) noexcept
@@ -62,7 +60,6 @@ namespace ccm
 	 * @brief Rounds a float to the nearest integer value, halfway cases away from zero.
 	 * @param num Floating-point value.
 	 * @return Rounded value as float.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/round
 	 */
 	constexpr float roundf(float num) noexcept
 	{ return ccm::round<float>(num); }
@@ -71,7 +68,6 @@ namespace ccm
 	 * @brief Rounds a double to the nearest integer value, halfway cases away from zero.
 	 * @param num Floating-point value.
 	 * @return Rounded value as double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/round
 	 */
 	constexpr long double roundl(long double num) noexcept
 	{ return ccm::round<long double>(num); }

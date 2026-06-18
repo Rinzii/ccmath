@@ -25,7 +25,6 @@ namespace ccm
 	 * @param mag A floating-point or integer value
 	 * @param sgn A floating-point or integer value
 	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/copysign
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T copysign(T mag, T sgn)
@@ -52,7 +51,6 @@ namespace ccm
 	 * @param mag A integer value
 	 * @param sgn A integer value
 	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/copysign
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double copysign(Integer mag, Integer sgn)
@@ -63,7 +61,6 @@ namespace ccm
 	 * @param mag A floating-point.
 	 * @param sgn A floating-point.
 	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/copysign
 	 */
 	constexpr float copysignf(float mag, float sgn)
 	{ return ccm::copysign<float>(mag, sgn); }
@@ -73,7 +70,6 @@ namespace ccm
 	 * @param mag A floating-point.
 	 * @param sgn A floating-point.
 	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/copysign
 	 */
 	constexpr long double copysignl(long double mag, long double sgn)
 	{ return ccm::copysign<long double>(mag, sgn); }
