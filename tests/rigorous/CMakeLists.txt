@@ -6,12 +6,17 @@ file(MAKE_DIRECTORY ${CCMATH_ORACLE_LOG_DIR})
 ccmath_add_conformance_suite(ccmath-rigorous-conformance
         APPLY_POW_VALIDATION
         EXCLUDE
+        conformance/fenv_disabled_test.cpp
         conformance/fma_software_fenv_test.cpp
         conformance/powl_platform_test.cpp)
 
 ccmath_add_rigorous_gtest_suite(ccmath-rigorous-fma-software
         SOURCES ../conformance/fma_software_fenv_test.cpp
         COMPILE_DEFINITIONS CCM_CONFIG_DISABLE_RUNTIME_BUILTIN_FMA)
+
+ccmath_add_rigorous_gtest_suite(ccmath-rigorous-fenv-disabled
+        SOURCES ../conformance/fenv_disabled_test.cpp
+        COMPILE_DEFINITIONS CCM_CONFIG_DISABLE_FENV)
 
 ccmath_add_rigorous_module_suite(ccmath-rigorous-power-boundaries
         MODULE power

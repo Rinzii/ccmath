@@ -29,6 +29,13 @@ newoption {
 }
 
 newoption {
+    trigger = "ccmath-disable-fenv",
+    description = "Completely disable the host floating-point environment: drop every <cfenv> and <fenv.h> include, assume round-to-nearest at runtime, and signal no fp-exceptions (auto-enabled when no host fenv header exists)",
+    allowed = { { "true", "Enable" }, { "false", "Disable" } },
+    default = "false",
+}
+
+newoption {
     trigger = "ccmath-disable-reduced-precision-powl",
     description = "Return quiet NaN from powl on non-binary80 long double instead of the default reduced-precision double fallback",
     allowed = { { "true", "Enable" }, { "false", "Disable" } },
@@ -113,6 +120,10 @@ function ccmath.defines()
 
     if _ccmath_option_enabled("ccmath-disable-errno", false) then
         table.insert(defs, "CCM_CONFIG_DISABLE_ERRNO")
+    end
+
+    if _ccmath_option_enabled("ccmath-disable-fenv", false) then
+        table.insert(defs, "CCM_CONFIG_DISABLE_FENV")
     end
 
     if _ccmath_option_enabled("ccmath-disable-reduced-precision-powl", false) then

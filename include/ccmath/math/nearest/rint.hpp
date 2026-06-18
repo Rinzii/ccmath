@@ -13,13 +13,13 @@
 #include "ccmath/internal/math/runtime/func/nearest/rint_rt.hpp"
 
 #include <ccmath/internal/support/fenv/fenv_support.hpp>
+#include <ccmath/internal/support/fenv/host_fenv.hpp>
 #include <ccmath/internal/support/fenv/rounding_mode.hpp>
 #include <ccmath/internal/support/fp/directional_rounding_utils.hpp>
 #include <ccmath/internal/support/is_constant_evaluated.hpp>
 #include <ccmath/math/compare/isinf.hpp>
 #include <ccmath/math/compare/isnan.hpp>
 
-#include <cfenv>
 #include <type_traits>
 
 namespace ccm

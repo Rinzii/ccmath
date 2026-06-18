@@ -10,9 +10,9 @@
 
 #pragma once
 
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 
-#include <cfenv>
 #include <limits>
 
 // Rounding mode assumed during constant evaluation. The C++ constant evaluator always performs
@@ -35,19 +35,19 @@ namespace ccm::support::fenv
 	namespace internal
 	{
 		inline bool rt_rounding_mode_is_round_up()
-		{ return std::fegetround() == FE_UPWARD; }
+		{ return host::get_round() == FE_UPWARD; }
 
 		inline bool rt_rounding_mode_is_round_down()
-		{ return std::fegetround() == FE_DOWNWARD; }
+		{ return host::get_round() == FE_DOWNWARD; }
 
 		inline bool rt_rounding_mode_is_round_to_nearest()
-		{ return std::fegetround() == FE_TONEAREST; }
+		{ return host::get_round() == FE_TONEAREST; }
 
 		inline bool rt_rounding_mode_is_round_to_zero()
-		{ return std::fegetround() == FE_TOWARDZERO; }
+		{ return host::get_round() == FE_TOWARDZERO; }
 
 		inline int rt_get_rounding_mode()
-		{ return std::fegetround(); }
+		{ return host::get_round(); }
 	} // namespace internal
 
 	/**

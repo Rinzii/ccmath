@@ -33,6 +33,7 @@
 
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/multiply_add.hpp"
@@ -41,7 +42,6 @@
 #include "ccmath/internal/types/big_int.hpp"
 
 #include <cerrno>
-#include <cfenv>
 #include <cstddef>
 #include <cstdint>
 

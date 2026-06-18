@@ -14,11 +14,11 @@
 #pragma once
 
 #include "ccmath/internal/predef/attributes/never_inline.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 
 #include <cerrno>
-#include <cfenv>
 #include <cstdint>
 
 #if defined(_MSC_VER) && !defined(__clang__)
@@ -51,69 +51,6 @@ namespace ccm::support::fenv::detail
 	}
 } // namespace ccm::support::fenv::detail
 
-namespace ccm::support::fenv::internal
-{
-	inline int clear_except(const int err_code)
-	{ return std::feclearexcept(err_code); }
-
-	inline int test_except(const int err_code)
-	{ return std::fetestexcept(err_code); }
-
-	inline int get_except()
-	{
-		// Only GNU-based compilers support this function.
-#ifdef __USE_GNU
-		return ::fegetexcept();
-#else
-		return 0;
-#endif
-	}
-
-	inline int set_except([[maybe_unused]] int err_code)
-	{
-		// Only GNU-based compilers support this function.
-#ifdef __USE_GNU
-		return ::fesetexcept(err_code);
-#else
-		return 0;
-#endif
-	}
-
-	inline int raise_except(const int err_code)
-	{ return std::feraiseexcept(err_code); }
-
-	inline int enable_except([[maybe_unused]] int err_code)
-	{
-		// Only GNU-based compilers support this function.
-#ifdef __USE_GNU
-		return ::feenableexcept(err_code);
-#else
-		return 0;
-#endif
-	}
-	inline int disable_except([[maybe_unused]] int err_code)
-	{
-// Only GNU-based compilers support this function.
-#ifdef __USE_GNU
-		return ::fedisableexcept(err_code);
-#else
-		return 0;
-#endif
-	}
-
-	inline int get_round()
-	{ return get_rounding_mode(); }
-
-	inline int set_round(const int rounding_mode)
-	{ return std::fesetround(rounding_mode); }
-
-	inline int get_env(std::fenv_t *envp)
-	{ return std::fegetenv(envp); }
-
-	inline int set_env(const std::fenv_t *envp)
-	{ return std::fesetenv(envp); }
-} // namespace ccm::support::fenv::internal
-
 namespace ccm::support::fenv
 {
 	enum class ccm_math_err_mode : std::uint8_t
@@ -139,12 +76,20 @@ namespace ccm::support::fenv
 	{
 #if defined(__FAST_MATH__) || defined(CCM_CONFIG_DISABLE_ERRNO)
 		return 0;
-#elif defined(__NO_MATH_ERRNO__)
-		return get_mode(ccm_math_err_mode::eErrnoExcept);
-#elif defined(__NVPTX__) || defined(__AMDGPU__)
-		return get_mode(ccm_math_err_mode::eErrno);
 #else
-		return get_mode(ccm_math_err_mode::eErrno) | get_mode(ccm_math_err_mode::eErrnoExcept);
+	#if defined(__NO_MATH_ERRNO__)
+		int mode = get_mode(ccm_math_err_mode::eErrnoExcept);
+	#elif defined(__NVPTX__) || defined(__AMDGPU__)
+		int mode = get_mode(ccm_math_err_mode::eErrno);
+	#else
+		int mode = get_mode(ccm_math_err_mode::eErrno) | get_mode(ccm_math_err_mode::eErrnoExcept);
+	#endif
+	#if !defined(CCM_CONFIG_HAS_FENV)
+		// No host floating-point environment, so fp-exception signaling is not available. errno
+		// writes stay on, since they go through <cerrno> and do not need the fenv.
+		mode &= ~get_mode(ccm_math_err_mode::eErrnoExcept);
+	#endif
+		return mode;
 #endif
 	}
 
@@ -155,7 +100,7 @@ namespace ccm::support::fenv
 
 		if constexpr (is_errno_enabled())
 		{
-			if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { return internal::set_except(excepts); }
+			if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { return host::set_except(excepts); }
 		}
 		// ReSharper disable once CppDFAUnreachableCode // This is unreachable code if the above constexpr if statement is true which is desired.
 		return 0;
@@ -166,7 +111,7 @@ namespace ccm::support::fenv
 		if (is_constant_evaluated()) { return 0; } // We cannot raise fenv exceptions in a constexpr context. So we return.
 		if constexpr (is_errno_enabled())
 		{
-			if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { return internal::raise_except(excepts); }
+			if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { return host::raise_except(excepts); }
 		}
 		// ReSharper disable once CppDFAUnreachableCode // This is unreachable code if the above constexpr if statement is true which is desired.
 		return 0;

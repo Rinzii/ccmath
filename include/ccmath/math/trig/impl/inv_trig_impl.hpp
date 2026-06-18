@@ -14,6 +14,7 @@
 
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/multiply_add.hpp"
 #include "ccmath/internal/support/poly_eval.hpp"
@@ -25,7 +26,6 @@
 #include "ccmath/math/trig/impl/inv_trig_data.hpp"
 
 #include <cerrno>
-#include <cfenv>
 #include <type_traits>
 
 namespace ccm::internal::impl

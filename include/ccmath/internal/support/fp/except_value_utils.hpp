@@ -16,13 +16,13 @@
 #pragma once
 
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
 
 #include <array>
-#include <cfenv>
 #include <optional>
 
 namespace ccm::support::fp

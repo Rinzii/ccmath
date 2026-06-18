@@ -10,10 +10,10 @@
 
 #pragma once
 
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "fp_bits.hpp"
 
-#include <cfenv>
 #include <cstdint>
 #include <type_traits>
 

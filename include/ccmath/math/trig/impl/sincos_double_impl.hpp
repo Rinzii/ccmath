@@ -15,6 +15,7 @@
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/fp/nearest_integer.hpp"
 #include "ccmath/internal/support/multiply_add.hpp"
@@ -22,7 +23,6 @@
 #include "ccmath/math/trig/impl/sincos_payne_hanek.hpp"
 
 #include <cerrno>
-#include <cfenv>
 #include <cstdint>
 
 namespace ccm::internal::impl

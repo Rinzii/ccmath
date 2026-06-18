@@ -17,6 +17,7 @@
 
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/math/basic/fabs.hpp"
 #include "ccmath/math/expo/log.hpp"
@@ -25,8 +26,6 @@
 #include "ccmath/math/nearest/floor.hpp"
 #include "ccmath/math/numbers.hpp"
 #include "ccmath/math/trig/sin.hpp"
-
-#include <cfenv>
 
 namespace ccm::internal::impl
 {
