@@ -26,6 +26,13 @@
 // CCM_CONFIG_FORCE_FENV_H to exercise the <fenv.h> tier on a host that also has <cfenv> (testing
 // only).
 //
+// Freestanding builds are supported and resolved in config/freestanding.hpp. The host floating-point
+// environment stays optional here, so a freestanding target needs no extra handling: this header
+// uses <cfenv> or <fenv.h> when the toolchain ships them and degrades to round-to-nearest when it
+// does not. errno is not a freestanding obstacle either, since <cerrno> is a freestanding header in
+// C++26 (Table 27 in [compliance]) and only supplies the EDOM and ERANGE macros plus the errno
+// lvalue. The actual errno write stays behind CCM_CONFIG_DISABLE_ERRNO in fenv_support.hpp.
+//
 // The detection rules out a missing __has_include first so that __has_include(...) is only used
 // once the compiler is known to provide it, which keeps every supported compiler (including MSVC)
 // happy.
