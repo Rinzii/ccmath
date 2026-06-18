@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "ccmath/internal/config/freestanding.hpp"
+
 // On MSVC there is no foldable __builtin math and no SVML transcendental path, so the runtime scalar
 // fallback would otherwise use ccmath's generic kernels, which are not accurate enough to match the
 // system libm. Including the real <math.h> and calling the global C runtime entry points gives UCRT
@@ -19,8 +21,11 @@
 //
 // CCM_CONFIG_SYSTEM_MATH is on by default for MSVC-proper. Define CCM_CONFIG_DISABLE_SYSTEM_MATH to
 // turn it off and keep the build free of <math.h> (the generic kernels are used instead). Define
-// CCM_CONFIG_FORCE_SYSTEM_MATH to exercise this path on other compilers for testing.
-#if !defined(CCM_CONFIG_DISABLE_SYSTEM_MATH) && (defined(CCM_CONFIG_FORCE_SYSTEM_MATH) || (defined(_MSC_VER) && !defined(__clang__)))
+// CCM_CONFIG_FORCE_SYSTEM_MATH to exercise this path on other compilers for testing. A freestanding
+// build never takes this path: <math.h> is not a freestanding header, so CCM_CONFIG_FREESTANDING
+// wins over both the MSVC default and CCM_CONFIG_FORCE_SYSTEM_MATH.
+#if !defined(CCM_CONFIG_DISABLE_SYSTEM_MATH) && !defined(CCM_CONFIG_FREESTANDING) &&                                                                           \
+	(defined(CCM_CONFIG_FORCE_SYSTEM_MATH) || (defined(_MSC_VER) && !defined(__clang__)))
 	#define CCM_CONFIG_SYSTEM_MATH 1
 #endif
 

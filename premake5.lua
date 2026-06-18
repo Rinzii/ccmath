@@ -36,6 +36,13 @@ newoption {
 }
 
 newoption {
+    trigger = "ccmath-freestanding",
+    description = "Build for a freestanding C++ environment: restrict to freestanding-conformant headers, dropping the test-only <bitset> path in the runtime SIMD layer and the MSVC <math.h> system-math path (auto-enabled when __STDC_HOSTED__ is 0)",
+    allowed = { { "true", "Enable" }, { "false", "Disable" } },
+    default = "false",
+}
+
+newoption {
     trigger = "ccmath-disable-reduced-precision-powl",
     description = "Return quiet NaN from powl on non-binary80 long double instead of the default reduced-precision double fallback",
     allowed = { { "true", "Enable" }, { "false", "Disable" } },
@@ -124,6 +131,10 @@ function ccmath.defines()
 
     if _ccmath_option_enabled("ccmath-disable-fenv", false) then
         table.insert(defs, "CCM_CONFIG_DISABLE_FENV")
+    end
+
+    if _ccmath_option_enabled("ccmath-freestanding", false) then
+        table.insert(defs, "CCM_CONFIG_FREESTANDING")
     end
 
     if _ccmath_option_enabled("ccmath-disable-reduced-precision-powl", false) then

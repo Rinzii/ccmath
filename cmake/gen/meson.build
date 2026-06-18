@@ -27,6 +27,9 @@ endif
 if get_option('disable_fenv')
   _ccmath_defines += '-DCCM_CONFIG_DISABLE_FENV'
 endif
+if get_option('freestanding')
+  _ccmath_defines += '-DCCM_CONFIG_FREESTANDING'
+endif
 if get_option('disable_reduced_precision_powl')
   _ccmath_defines += '-DCCM_CONFIG_DISABLE_REDUCED_PRECISION_POWL'
 endif
