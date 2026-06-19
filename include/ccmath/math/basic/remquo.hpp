@@ -49,7 +49,9 @@ namespace ccm
 		if constexpr (std::is_same_v<T, float>) { return internal::remquo_float(x, y, quo); }
 		else
 		{
-			return internal::remquo_double(x, y, quo);
+			// double runs natively. long double delegates to the double kernel, so the narrowing
+			// is made explicit to stay clean under -Wconversion.
+			return static_cast<T>(internal::remquo_double(static_cast<double>(x), static_cast<double>(y), quo));
 		}
 	}
 
