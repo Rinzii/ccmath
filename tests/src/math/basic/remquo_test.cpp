@@ -55,6 +55,11 @@ TEST(CcmathBasicTests, Remquo)
 	static_assert(sa_quotient == -4, "sa_quotient == -4");
 	static_assert(sa_remainder == 1, "sa_quotient == 1");
 
+	// abs(x / y) well above 2^53 must reduce exactly at compile time. remquo coarse-reduces with
+	// ccm::fmod, so this locks in that the exact fdlibm fmod reduction propagates through remquo.
+	static_assert(get_ccm_rem(1e30, 3.0) == 1.0, "remquo(1e30, 3) remainder must be 1");
+	static_assert(get_ccm_rem(-1e30, 3.0) == -1.0, "remquo(-1e30, 3) remainder must be -1");
+
 	// Test with positive values
 	ccm::test::ExpectRemquoMatchesStd(7.0, 2.0);
 

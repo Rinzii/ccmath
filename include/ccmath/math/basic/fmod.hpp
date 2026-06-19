@@ -15,7 +15,8 @@
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
-#include "ccmath/math/nearest/trunc.hpp"
+#include "ccmath/math/basic/impl/fmod_double_impl.hpp"
+#include "ccmath/math/basic/impl/fmod_float_impl.hpp"
 
 #include <limits>
 
@@ -68,7 +69,15 @@ namespace ccm
 				}
 			}
 
-			return static_cast<T>(x - (ccm::trunc<T>(x / y) * y));
+			// Exact, magnitude-independent reduction via the fdlibm integer bit-reduction. The old
+			// x - trunc(x / y) * y formula was only exact while x / y stayed representable, so it lost
+			// low bits once abs(x / y) reached 2^53. long double delegates to the double kernel, matching
+			// the remquol convention.
+			if constexpr (std::is_same_v<T, float>) { return internal::fmod_float(x, y); }
+			else
+			{
+				return static_cast<T>(internal::fmod_double(static_cast<double>(x), static_cast<double>(y)));
+			}
 		}
 
 		template <typename T, typename U, typename TC = std::common_type_t<T, U>>
