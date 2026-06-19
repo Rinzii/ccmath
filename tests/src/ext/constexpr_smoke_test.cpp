@@ -51,15 +51,15 @@ TEST(CcmathExtConstexprSmokeTest, AllFunctions)
 	static_assert(ccm::ext::clamp(5.0, 0.0, 10.0) == 5.0);
 	static_assert(ccm::ext::cubic(0.0, 1.0, 2.0, 3.0, 0.5) == 1.5);
 	static_assert(ccm::ext::degrees(ccm::numbers::pi_v<double>) == 180.0);
-	static_assert(ccm::ext::delta_angle(0.0, 90.0) == 90.0);
+	static_assert(ccm::ext::delta_angle(0.0, ccm::numbers::pi_v<double>) == ccm::numbers::pi_v<double>);
 	static_assert(ccm::ext::fract(3.25) == 0.25);
 	static_assert(ccm::ext::inverse_lerp(0.0, 10.0, 5.0) == 0.5);
 	static_assert(ccm::ext::is_power_of_two(8U));
 	static_assert(ccm::ext::ispow2(16));
-	static_assert(ccm::ext::lerp_angle(0.0, 90.0, 0.5) == 45.0);
+	static_assert(ccm::ext::lerp_angle(0.0, ccm::numbers::pi_v<double> / 2, 0.5) == ccm::numbers::pi_v<double> / 4);
 	static_assert(ccm::ext::lerp_smooth(0.0, 10.0, 0.0, 1.0) == 0.0);
 	static_assert(ccm::ext::move_towards(0.0, 10.0, 5.0) == 5.0);
-	static_assert(ccm::ext::move_towards_angle(0.0, 90.0, 45.0) == 45.0);
+	static_assert(ccm::ext::move_towards_angle(0.0, ccm::numbers::pi_v<double> / 2, ccm::numbers::pi_v<double> / 4) == ccm::numbers::pi_v<double> / 4);
 	static_assert(ccm::ext::normalize(5.0, 0.0, 10.0) == 0.5);
 	static_assert(ccm::ext::ping_pong(3.0, 4.0) == 3.0);
 	static_assert(ccm::ext::radians(180.0) > 3.0);
@@ -72,15 +72,17 @@ TEST(CcmathExtConstexprSmokeTest, AllFunctions)
 	static_assert(ccm::ext::step(1.0, 0.5) == 0.0);
 	static_assert(ccm::ext::unlerp(0.0, 10.0, 5.0) == 0.5);
 
-	static_assert(ccm::ext::safe::ceil_div(7, 0) == 0);
-	static_assert(ccm::ext::safe::delta_angle(350.0, 10.0) == 20.0);
-	static_assert(ccm::ext::safe::inverse_lerp(5.0, 5.0, 7.0) == 0.0);
-	static_assert(ccm::ext::safe::is_power_of_two(4));
-	static_assert(ccm::ext::safe::ispow2(32));
-	static_assert(ccm::ext::safe::lerp_angle(0.0, 90.0, 0.5) == 45.0);
-	static_assert(ccm::ext::safe::move_towards_angle(0.0, 90.0, 45.0) == 45.0);
-	static_assert(ccm::ext::safe::normalize(5.0, 5.0, 5.0) == 0.0);
-	static_assert(ccm::ext::safe::remap(5.0, 5.0, 1.0, 2.0, 7.0) == 1.0);
-	static_assert(ccm::ext::safe::repeat(5.0, 0.0) == 0.0);
-	static_assert(ccm::ext::safe::unlerp(5.0, 5.0, 7.0) == 0.0);
+	// Default helpers guard the degenerate input.
+	static_assert(ccm::ext::ceil_div(7, 0) == 0);
+	static_assert(ccm::ext::inverse_lerp(5.0, 5.0, 7.0) == 0.0);
+	static_assert(ccm::ext::normalize(5.0, 5.0, 5.0) == 0.0);
+	static_assert(ccm::ext::remap(5.0, 5.0, 1.0, 2.0, 7.0) == 1.0);
+	static_assert(ccm::ext::repeat(5.0, 0.0) == 0.0);
+	static_assert(ccm::ext::unlerp(5.0, 5.0, 7.0) == 0.0);
+
+	// The unsafe variants skip the guard.
+	static_assert(ccm::ext::unsafe::normalize(5.0, 0.0, 10.0) == 0.5);
+	static_assert(ccm::ext::unsafe::remap(0.0, 10.0, 0.0, 100.0, 5.0) == 50.0);
+	static_assert(ccm::ext::unsafe::repeat(5.0, 4.0) == 1.0);
+	static_assert(ccm::ext::unsafe::unlerp(0.0, 10.0, 5.0) == 0.5);
 }

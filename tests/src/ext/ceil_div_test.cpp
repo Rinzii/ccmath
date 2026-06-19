@@ -19,10 +19,10 @@ TEST(CcmathExtCeilDivTest, Smoke)
 	static_assert(ccm::ext::ceil_div(7, 3) == 3);
 	static_assert(ccm::ext::ceil_div(6, 3) == 2);
 	static_assert(ccm::ext::ceil_div(1, 4) == 1);
-	static_assert(ccm::ext::safe::ceil_div(7, 0) == 0);
+	static_assert(ccm::ext::ceil_div(7, 0) == 0);
 
 	EXPECT_EQ(ccm::ext::ceil_div(10, 4), 3);
-	EXPECT_EQ(ccm::ext::safe::ceil_div(10, 0), 0);
+	EXPECT_EQ(ccm::ext::ceil_div(10, 0), 0);
 }
 
 TEST(CcmathExtCeilDivTest, ExactDivisionDoesNotRoundUp)
@@ -43,7 +43,7 @@ TEST(CcmathExtCeilDivTest, NegativeOperands)
 
 	EXPECT_EQ(ccm::ext::ceil_div(-10, 4), -2); // ceil(-2.5)
 	EXPECT_EQ(ccm::ext::ceil_div(10, -4), -2);
-	EXPECT_EQ(ccm::ext::safe::ceil_div(-7, 2), -3);
+	EXPECT_EQ(ccm::ext::ceil_div(-7, 2), -3);
 }
 
 TEST(CcmathExtCeilDivTest, NoOverflowAtExtremes)

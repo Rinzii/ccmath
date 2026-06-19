@@ -11,45 +11,28 @@
 #pragma once
 
 #include "ccmath/ext/repeat.hpp"
+#include "ccmath/math/numbers.hpp"
 
 #include <type_traits>
 
 namespace ccm::ext
 {
 	/**
-	 * @brief Compute the shortest signed difference between two angles in degrees.
+	 * @brief Compute the shortest signed difference between two angles in radians.
 	 * @tparam T Type of the input and output.
-	 * @param current The current angle, in degrees.
-	 * @param target The target angle, in degrees.
-	 * @return The shortest signed angular difference in the range [-180, 180].
+	 * @param current The current angle, in radians.
+	 * @param target The target angle, in radians.
+	 * @return The shortest signed angular difference in the range [-pi, pi].
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T delta_angle(T current, T target) noexcept
 	{
-		T delta = ext::repeat(target - current, T(360));
+		const T two_pi = T(2) * ccm::numbers::pi_v<T>;
 
-		if (delta > T(180)) { delta -= T(360); }
+		T delta = ext::repeat(target - current, two_pi);
+
+		if (delta > ccm::numbers::pi_v<T>) { delta -= two_pi; }
 
 		return delta;
 	}
-
-	namespace safe
-	{
-		/**
-		 * @brief Safely compute the shortest signed difference between two angles in degrees.
-		 * @tparam T Type of the input and output.
-		 * @param current The current angle, in degrees.
-		 * @param target The target angle, in degrees.
-		 * @return The shortest signed angular difference in the range [-180, 180].
-		 */
-		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-		constexpr T delta_angle(T current, T target) noexcept
-		{
-			T delta = ext::safe::repeat(target - current, T(360));
-
-			if (delta > T(180)) { delta -= T(360); }
-
-			return delta;
-		}
-	} // namespace safe
 } // namespace ccm::ext

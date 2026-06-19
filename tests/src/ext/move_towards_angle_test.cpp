@@ -11,14 +11,16 @@
 #include <gtest/gtest.h>
 
 #include <ccmath/ext/move_towards_angle.hpp>
+#include <ccmath/math/numbers.hpp>
 
 TEST(CcmathExtMoveTowardsAngleTest, Smoke)
 {
-	static_assert(ccm::ext::move_towards_angle(0.0, 90.0, 45.0) == 45.0);
-	static_assert(ccm::ext::safe::move_towards_angle(0.0, 90.0, 45.0) == 45.0);
+	constexpr double pi = ccm::numbers::pi_v<double>;
 
-	EXPECT_DOUBLE_EQ(ccm::ext::move_towards_angle(0.0, 90.0, 45.0), 45.0);
-	EXPECT_DOUBLE_EQ(ccm::ext::move_towards_angle(0.0, 90.0, 200.0), 90.0);
-	EXPECT_DOUBLE_EQ(ccm::ext::move_towards_angle(350.0, 10.0, 15.0), 365.0);
-	EXPECT_DOUBLE_EQ(ccm::ext::safe::move_towards_angle(350.0, 10.0, 15.0), 365.0);
+	static_assert(ccm::ext::move_towards_angle(0.0, pi / 2, pi / 4) == pi / 4);
+	static_assert(ccm::ext::move_towards_angle(0.0, pi / 2, pi) == pi / 2);
+
+	EXPECT_DOUBLE_EQ(ccm::ext::move_towards_angle(0.0, pi / 2, pi / 4), pi / 4);
+	EXPECT_DOUBLE_EQ(ccm::ext::move_towards_angle(0.0, pi / 2, pi), pi / 2);
+	EXPECT_DOUBLE_EQ(ccm::ext::move_towards_angle(1.5 * pi, 0.0, 0.25 * pi), 1.75 * pi);
 }

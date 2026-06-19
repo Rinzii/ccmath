@@ -11,11 +11,15 @@
 #include <gtest/gtest.h>
 
 #include <ccmath/ext/lerp_angle.hpp>
+#include <ccmath/math/numbers.hpp>
 
 TEST(CcmathExtLerpAngleTest, Smoke)
 {
-	static_assert(ccm::ext::lerp_angle(0.0, 90.0, 0.5) == 45.0);
-	static_assert(ccm::ext::safe::lerp_angle(0.0, 90.0, 0.5) == 45.0);
+	constexpr double pi = ccm::numbers::pi_v<double>;
 
-	EXPECT_DOUBLE_EQ(ccm::ext::lerp_angle(0.0, 90.0, 0.5), 45.0);
+	static_assert(ccm::ext::lerp_angle(0.0, pi / 2, 0.5) == pi / 4);
+	static_assert(ccm::ext::lerp_angle(0.0, pi / 2, 0.0) == 0.0);
+
+	EXPECT_DOUBLE_EQ(ccm::ext::lerp_angle(0.0, pi / 2, 0.5), pi / 4);
+	EXPECT_DOUBLE_EQ(ccm::ext::lerp_angle(0.0, pi / 2, 1.0), pi / 2);
 }
