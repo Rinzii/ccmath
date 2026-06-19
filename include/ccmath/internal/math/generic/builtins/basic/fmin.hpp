@@ -29,8 +29,7 @@
 #endif
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_FMIN
-	#if defined(__clang__) && (__clang_major__ > 16 || (__clang_major__ == 16 && __clang_minor__ >= 0)) && !defined(__MSC_VER) &&                              \
-		!defined(__INTEL_LLVM_COMPILER)
+	#if defined(__clang__) && (__clang_major__ > 16 || (__clang_major__ == 16 && __clang_minor__ >= 0)) && !defined(_MSC_VER) && !defined(__INTEL_LLVM_COMPILER)
 		#define CCMATH_HAS_CONSTEXPR_BUILTIN_FMIN
 	#endif
 #endif

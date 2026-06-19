@@ -32,7 +32,7 @@
 #endif
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
-	#if defined(__clang__) && (__clang_major__ > 5 || (__clang_major__ == 5 && __clang_minor__ >= 0)) && !defined(__MSC_VER) && !defined(__INTEL_LLVM_COMPILER)
+	#if defined(__clang__) && (__clang_major__ > 5 || (__clang_major__ == 5 && __clang_minor__ >= 0)) && !defined(_MSC_VER) && !defined(__INTEL_LLVM_COMPILER)
 		#define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
 	#endif
 #endif
