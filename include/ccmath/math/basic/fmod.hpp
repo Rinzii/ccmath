@@ -15,8 +15,7 @@
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
-#include "ccmath/math/basic/impl/fmod_double_impl.hpp"
-#include "ccmath/math/basic/impl/fmod_float_impl.hpp"
+#include "ccmath/math/basic/impl/fmod_impl.hpp"
 
 #include <limits>
 
@@ -69,14 +68,13 @@ namespace ccm
 				}
 			}
 
-			// Exact, magnitude-independent reduction via the fdlibm integer bit-reduction. The old
-			// x - trunc(x / y) * y formula was only exact while x / y stayed representable, so it lost
-			// low bits once abs(x / y) reached 2^53. long double delegates to the double kernel, matching
-			// the remquol convention.
-			if constexpr (std::is_same_v<T, float>) { return internal::fmod_float(x, y); }
+			// Exact, magnitude-independent reduction over FPBits that gives the same result in every
+			// rounding mode. long double reduces through the double kernel, matching the fmodl and
+			// remquol convention.
+			if constexpr (std::is_same_v<T, float>) { return internal::fmod(x, y); }
 			else
 			{
-				return static_cast<T>(internal::fmod_double(static_cast<double>(x), static_cast<double>(y)));
+				return static_cast<T>(internal::fmod(static_cast<double>(x), static_cast<double>(y)));
 			}
 		}
 

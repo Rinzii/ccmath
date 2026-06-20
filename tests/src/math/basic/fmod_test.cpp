@@ -19,8 +19,7 @@
 
 TEST(CcmathBasicTests, FmodLargeQuotientCompileTime)
 {
-	// The exact fdlibm bit-reduction must reduce these at compile time even though abs(x / y) is far
-	// above 2^53. The old constexpr x - trunc(x / y) * y formula collapsed to 0 here.
+	// Large quotients must still reduce exactly at compile time, even when abs(x / y) is far above 2^53.
 	static_assert(ccm::fmod(1e30, 3.0) == 1.0, "fmod(1e30, 3) must be 1");
 	static_assert(ccm::fmod(-1e30, 3.0) == -1.0, "fmod(-1e30, 3) must be -1");
 	static_assert(ccm::fmod(1e300, 7.0) == 1.0, "fmod(1e300, 7) must reduce exactly to 1");
