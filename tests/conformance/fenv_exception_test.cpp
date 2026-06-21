@@ -42,6 +42,9 @@ TEST(CcmathFenvExceptionTests, DomainErrorsRaiseInvalidLikeStd)
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::log1p(runtime_value(-2.0))); }, [] { consume(std::log1p(runtime_value(-2.0))); }, FE_INVALID);
 	ccm::test::ExpectFenvFlagsMatchStd(
 		[] { consume(ccm::fmod(runtime_value(1.0), runtime_value(0.0))); }, [] { consume(std::fmod(runtime_value(1.0), runtime_value(0.0))); }, FE_INVALID);
+	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::fmod(runtime_value(std::numeric_limits<double>::infinity()), runtime_value(1.0))); },
+									   [] { consume(std::fmod(runtime_value(std::numeric_limits<double>::infinity()), runtime_value(1.0))); },
+									   FE_INVALID);
 	ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::remainder(runtime_value(1.0), runtime_value(0.0))); },
 									   [] { consume(std::remainder(runtime_value(1.0), runtime_value(0.0))); },
 									   FE_INVALID);

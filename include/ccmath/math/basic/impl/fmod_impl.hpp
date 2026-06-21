@@ -35,6 +35,10 @@ namespace ccm::internal
 		constexpr T fmod_impl(T x, T y) noexcept
 		{
 			static_assert(std::is_floating_point_v<T>, "fmod_impl requires a floating-point type");
+			// The reduction lifts the significand into a uint64_t and shifts it by chunk = 63 - mant_bits
+			// bits, so it only supports types up to binary64. Wider types (80-bit or 128-bit long double)
+			// would give a non-positive chunk and must reduce through the double kernel at the call site.
+			static_assert(std::numeric_limits<T>::digits <= 53, "fmod_impl only supports types up to binary64");
 			using FPBits_t = support::fp::FPBits<T>;
 
 			const FPBits_t x_bits(x);
