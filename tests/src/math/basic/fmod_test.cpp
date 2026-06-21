@@ -92,7 +92,7 @@ TEST(CcmathBasicTests, FmodKernelRandomBitExactVsStd)
 {
 	// Stress the runtime kernel against the host libm on random finite pairs, bit for bit.
 	std::mt19937_64 rng(0xF110D);
-	std::uniform_int_distribution<std::uint64_t> bd(0, ~std::uint64_t(0));
+	std::uniform_int_distribution<std::uint64_t> bd(0, std::numeric_limits<std::uint64_t>::max());
 	int checked = 0;
 	while (checked < 6000)
 	{
@@ -108,7 +108,7 @@ TEST(CcmathBasicTests, FmodKernelRandomBitExactVsStd)
 	}
 
 	std::mt19937 rngf(0xF110F);
-	std::uniform_int_distribution<std::uint32_t> bf(0, ~std::uint32_t(0));
+	std::uniform_int_distribution<std::uint32_t> bf(0, std::numeric_limits<std::uint32_t>::max());
 	checked = 0;
 	while (checked < 6000)
 	{
