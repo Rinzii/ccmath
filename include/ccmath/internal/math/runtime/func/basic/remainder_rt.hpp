@@ -12,12 +12,9 @@
 
 #include "ccmath/internal/math/generic/builtins/basic/remainder.hpp"
 #include "ccmath/internal/math/runtime/func/detail/system_math.hpp"
-#include "ccmath/internal/math/runtime/func/detail/trunc_scalar.hpp"
 #include "ccmath/internal/math/runtime/func/rt_dispatch.hpp"
-#include "ccmath/internal/predef/unlikely.hpp"
-#include "ccmath/internal/support/fp/fp_bits.hpp"
+#include "ccmath/math/basic/remquo.hpp"
 
-#include <limits>
 #include <type_traits>
 
 namespace ccm::rt
@@ -31,16 +28,11 @@ namespace ccm::rt
 		if constexpr (ccm::builtin::has_runtime_remainder<T>) { return ccm::builtin::remainder_rt(x, y); }
 		else
 		{
-			using FPBits_t = typename ccm::support::fp::FPBits<T>;
-			const FPBits_t x_bits(x);
-			const FPBits_t y_bits(y);
-			const bool x_is_nan = x_bits.is_nan();
-			const bool y_is_nan = y_bits.is_nan();
-			if (CCM_UNLIKELY((x_bits.is_inf() && !y_is_nan) || (y_bits.is_zero() && !x_is_nan) || (x_is_nan || y_is_nan)))
-			{
-				return -std::numeric_limits<T>::quiet_NaN();
-			}
-			return static_cast<T>(x - (detail::trunc_scalar<T>(x / y) * y));
+			// No builtin and no system math, so reuse the exact remquo reduction. It rounds the
+			// quotient to nearest, ties-to-even, and covers the special cases, unlike the trunc
+			// formula that the other no-builtin basic fallbacks share.
+			int quotient = 0;
+			return ccm::remquo<T>(x, y, &quotient);
 		}
 #endif
 	}

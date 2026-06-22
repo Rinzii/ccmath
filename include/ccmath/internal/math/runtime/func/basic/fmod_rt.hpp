@@ -12,8 +12,8 @@
 
 #include "ccmath/internal/math/generic/builtins/basic/fmod.hpp"
 #include "ccmath/internal/math/runtime/func/detail/system_math.hpp"
-#include "ccmath/internal/math/runtime/func/detail/trunc_scalar.hpp"
 #include "ccmath/internal/math/runtime/func/rt_dispatch.hpp"
+#include "ccmath/math/basic/impl/fmod_impl.hpp"
 
 #include <type_traits>
 
@@ -28,7 +28,12 @@ namespace ccm::rt
 		if constexpr (ccm::builtin::has_runtime_fmod<T>) { return ccm::builtin::fmod_rt(x, y); }
 		else
 		{
-			return static_cast<T>(x - (detail::trunc_scalar<T>(x / y) * y));
+			// No builtin and no system math, so use the exact FPBits reduction. It is exact for every magnitude.
+			if constexpr (std::is_same_v<T, long double>) { return static_cast<T>(ccm::internal::fmod(static_cast<double>(x), static_cast<double>(y))); }
+			else
+			{
+				return ccm::internal::fmod(x, y);
+			}
 		}
 #endif
 	}

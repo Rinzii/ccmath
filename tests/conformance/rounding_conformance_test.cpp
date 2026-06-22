@@ -168,6 +168,27 @@ TEST(CcmathRoundingConformanceTests, CeilTruncRoundFloorIndependentOfMode)
 	ccm::test::ExpectFpUnaryOverMatchesStdAllModes(ccm::test::samples::kNearbyIntProbeDouble, ccm::floor<double>, static_cast<double (*)(double)>(std::floor));
 }
 
+TEST(CcmathRoundingConformanceTests, FmodRemainderIndependentOfRoundingMode)
+{
+	// fmod and remainder are exact operations, so the result must not vary with the active rounding
+	// mode. Both operands go through runtime_value so the kernels read the dynamic mode at run time.
+	ccm::test::ForEachRoundingModeOrSkip(
+		[&](int mode)
+		{
+			ccm::test::ScopedRoundingMode scope(mode);
+			ASSERT_TRUE(scope.active());
+
+			ccm::test::ExpectFpEq(ccm::fmod(runtime_value(10.0), runtime_value(3.0)), 1.0);
+			ccm::test::ExpectFpEq(ccm::fmod(runtime_value(7.5), runtime_value(2.0)), 1.5);
+			ccm::test::ExpectFpEq(ccm::fmod(runtime_value(-10.0), runtime_value(3.0)), -1.0);
+			ccm::test::ExpectFpEq(ccm::fmod(runtime_value(1e30), runtime_value(3.0)), 1.0);
+			ccm::test::ExpectFpEq(ccm::internal::fmod(runtime_value(1e300), runtime_value(7.0)), 1.0);
+
+			ccm::test::ExpectFpEq(ccm::remainder(runtime_value(5.0), runtime_value(3.0)), -1.0);
+			ccm::test::ExpectFpEq(ccm::remainder(runtime_value(7.5), runtime_value(2.0)), -0.5);
+		});
+}
+
 // The following pin the FE_TONEAREST guard in the expo runtime headers: outside round to nearest
 // the runtime dispatch must fall back to the generic kernel, so it matches the generic wrapper bit
 // for bit over normal inputs.

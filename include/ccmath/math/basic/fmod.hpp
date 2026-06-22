@@ -15,7 +15,7 @@
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
-#include "ccmath/math/nearest/trunc.hpp"
+#include "ccmath/math/basic/impl/fmod_impl.hpp"
 
 #include <limits>
 
@@ -68,7 +68,14 @@ namespace ccm
 				}
 			}
 
-			return static_cast<T>(x - (ccm::trunc<T>(x / y) * y));
+			// Exact, magnitude-independent reduction over FPBits that gives the same result in every
+			// rounding mode. long double reduces through the double kernel, matching the fmodl and
+			// remquol convention.
+			if constexpr (std::is_same_v<T, float>) { return internal::fmod(x, y); }
+			else
+			{
+				return static_cast<T>(internal::fmod(static_cast<double>(x), static_cast<double>(y)));
+			}
 		}
 
 		template <typename T, typename U, typename TC = std::common_type_t<T, U>>
