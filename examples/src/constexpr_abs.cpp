@@ -22,7 +22,7 @@ int main()
 	ccm::examples::banner("constexpr abs");
 
 	constexpr auto compiled = ccm::abs(kInput);
-	const auto runtime	  = ccm::abs(kInput);
+	const auto runtime		= ccm::abs(kInput);
 
 	ccm::examples::print_row("input", kInput);
 	ccm::examples::print_row("constexpr result", compiled);

@@ -29,7 +29,6 @@ namespace ccm
 	 * @tparam T The type of the number.
 	 * @param num A floating-point value.
 	 * @return If no errors occur, the rounded floating point value. Otherwise, returns the input floating point value unmodified.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/nearbyint
 	 */
 	template <class T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T nearbyint(T num) noexcept
@@ -45,7 +44,6 @@ namespace ccm
 	 * @tparam Integer The type of the number.
 	 * @param num An integral value.
 	 * @return If no errors occur, the rounded floating point value. Otherwise, returns the input integer value unmodified.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/nearbyint
 	 */
 	template <class Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double nearbyint(Integer num) noexcept
@@ -55,7 +53,6 @@ namespace ccm
 	 * @brief The nearest integer value to num, according to the rounding mode FE_TONEAREST, is returned.
 	 * @param num A float value.
 	 * @return If no errors occur, the rounded floating point value. Otherwise, returns the input integer value unmodified.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/nearbyint
 	 */
 	constexpr float nearbyintf(float num) noexcept
 	{ return ccm::nearbyint(num); }
@@ -64,7 +61,6 @@ namespace ccm
 	 * @brief The nearest integer value to num, according to the rounding mode FE_TONEAREST, is returned.
 	 * @param num A long double value.
 	 * @return If no errors occur, the rounded floating point value. Otherwise, returns the input integer value unmodified.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/nearbyint
 	 */
 	constexpr long double nearbyintl(long double num) noexcept
 	{ return ccm::nearbyint(num); }

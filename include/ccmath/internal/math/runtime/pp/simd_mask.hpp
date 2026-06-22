@@ -10,14 +10,19 @@
 
 #pragma once
 
+#include "ccmath/internal/config/freestanding.hpp"
 #include "ccmath/internal/math/runtime/pp/declaration.hpp"
 #include "ccmath/internal/math/runtime/pp/scalar.hpp"
 #include "ccmath/internal/math/runtime/pp/utility.hpp"
 #include "ccmath/internal/math/runtime/pp/vec_ext.hpp"
 #include "ccmath/internal/predef/attributes/always_inline.hpp"
 
-#include <bitset>
 #include <cstddef>
+
+// <bitset> is not a freestanding header, so to_bitset() is only available in hosted builds.
+#if !defined(CCM_CONFIG_FREESTANDING)
+	#include <bitset>
+#endif
 
 namespace ccm::pp
 {
@@ -58,16 +63,18 @@ namespace ccm::pp
 			unsigned long long bits = 0;
 			for (detail::SimdSizeType i = 0; i < size(); ++i)
 			{
-				if (Traits::mget(data_, i)) { bits |= (1ull << i); }
+				if (Traits::mget(data_, i)) { bits |= (1ULL << i); }
 			}
 			return bits;
 		}
+#if !defined(CCM_CONFIG_FREESTANDING)
 		[[nodiscard]] CCM_ALWAYS_INLINE std::bitset<static_cast<std::size_t>(SimdTraits<detail::mask_integer_from<Bytes>, Abi>::size)> to_bitset() const
 		{ return std::bitset<static_cast<std::size_t>(size())>(to_ullong()); }
+#endif
 		CCM_ALWAYS_INLINE static basic_simd_mask from_bits(unsigned long long bits)
 		{
 			basic_simd_mask r;
-			for (detail::SimdSizeType i = 0; i < size(); ++i) { Traits::mset(r.data_, i, ((bits >> i) & 1ull) != 0); }
+			for (detail::SimdSizeType i = 0; i < size(); ++i) { Traits::mset(r.data_, i, ((bits >> i) & 1ULL) != 0); }
 			return r;
 		}
 

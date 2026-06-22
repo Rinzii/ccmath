@@ -44,6 +44,6 @@ namespace ccm::internal::impl
 		}
 
 		const T ratio = y / x;
-		return x * ccm::sqrt(static_cast<T>(1) + ratio * ratio);
+		return x * ccm::sqrt(static_cast<T>(1) + (ratio * ratio));
 	}
 } // namespace ccm::internal::impl

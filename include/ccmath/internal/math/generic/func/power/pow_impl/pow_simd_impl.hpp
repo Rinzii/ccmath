@@ -76,10 +76,10 @@ namespace ccm::gen::impl
 			const VDD<Abi> as = v_split(a);
 			const VDD<Abi> bs = v_split(b);
 			const DVec hi	  = a * b;
-			const DVec t1	  = as.hi * bs.hi - hi;
-			const DVec t2	  = as.hi * bs.lo + t1;
-			const DVec t3	  = as.lo * bs.hi + t2;
-			return { hi, as.lo * bs.lo + t3 };
+			const DVec t1	  = (as.hi * bs.hi) - hi;
+			const DVec t2	  = (as.hi * bs.lo) + t1;
+			const DVec t3	  = (as.lo * bs.hi) + t2;
+			return { hi, (as.lo * bs.lo) + t3 };
 		}
 
 		// types::quick_mult(double, DoubleDouble).

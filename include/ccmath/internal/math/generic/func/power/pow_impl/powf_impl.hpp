@@ -117,7 +117,7 @@ namespace ccm::gen::impl
 			const DoubleDouble prod = quick_mult(y6, log2_x);
 
 			// 2^6 * (y * log2(x) - (hi + mid)) = 2^6 * lo
-			DoubleDouble lo6								   = larger_exponent(prod.hi, lo6_hi) ? add(prod, lo6_hi_dd) : add(lo6_hi_dd, prod);
+			DoubleDouble const lo6							   = larger_exponent(prod.hi, lo6_hi) ? add(prod, lo6_hi_dd) : add(lo6_hi_dd, prod);
 			constexpr std::array<DoubleDouble, 10> EXP2_COEFFS = {
 				DoubleDouble{ 0x1p0, 0 },
 				DoubleDouble{ 0x1.62e42fefa39efp-7, 0x1.abc9e3b398024p-62 },
@@ -131,7 +131,7 @@ namespace ccm::gen::impl
 				DoubleDouble{ 0x1.b5251ff97bee1p-78, -0x1.8483eabd9642dp-132 },
 			};
 
-			DoubleDouble pp		  = ::ccm::support::polyeval(lo6,
+			DoubleDouble const pp = ::ccm::support::polyeval(lo6,
 															 EXP2_COEFFS[0],
 															 EXP2_COEFFS[1],
 															 EXP2_COEFFS[2],
@@ -178,7 +178,7 @@ namespace ccm::gen::impl
 			{
 				if (y == 0.0F) { return 1.0F; }
 
-				switch (y_abs)
+				switch (y_abs) // NOLINT(hicpp-multiway-paths-covered)
 				{
 				case 0x7f800000:
 				{ // y is +/-infinity
@@ -326,7 +326,7 @@ namespace ccm::gen::impl
 			// Check for exceptional cases
 			if (auto exceptional_case = handle_exceptional_cases(x, y, xbits, ybits, x_u, ex, sign); CCM_UNLIKELY(exceptional_case.has_value()))
 			{
-				return *exceptional_case;
+				return *exceptional_case; // NOLINT(bugprone-unchecked-optional-access) guarded by has_value() above
 			}
 
 			if (x < 0.0F && !is_integer(y))
@@ -427,9 +427,9 @@ namespace ccm::gen::impl
 			// For those exponents that are out of range, the final conversion will round
 			// them correctly to inf/max float or 0/min float accordingly.
 			auto hm_i = static_cast<std::int64_t>(hm);
-			hm_i	  = (hm_i > (1 << 15)) ? (1 << 15) : (hm_i < (-(1 << 15)) ? -(1 << 15) : hm_i);
+			hm_i	  = (hm_i > (1 << 15)) ? (1 << 15) : (hm_i < (-(1 << 15)) ? -(1 << 15) : hm_i); // NOLINT(readability-avoid-nested-conditional-operator)
 
-			int idx_y = hm_i & 0x3f;
+			int const idx_y = static_cast<int>(hm_i & 0x3f);
 
 			// 2^hi
 			// The shift goes through uint64 because left-shifting a negative value is undefined
@@ -500,7 +500,7 @@ namespace ccm::gen::impl
 		}
 	} // namespace internal::impl
 
-	constexpr float powf_impl(float base, float exp) noexcept
+	constexpr float powf_impl(float base, float exp) noexcept // NOLINT(bugprone-exception-escape)
 	{
 		return internal::impl::powf_impl(base, exp);
 		// return internal::impl::powf_impl(base, exp);

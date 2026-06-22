@@ -28,7 +28,7 @@ namespace ccm::gen
 			static constexpr bool value = false;
 		};
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
 		template <>
 		struct Is80BitLongDouble<long double>
 		{
@@ -42,12 +42,12 @@ namespace ccm::gen
 		template <typename T>
 		constexpr void normalize(int& exponent, typename support::fp::FPBits<T>::storage_type& mantissa)
 		{
-			const int shift = support::countl_zero(mantissa) - (8 * static_cast<int>(sizeof(mantissa)) - 1 - support::fp::FPBits<T>::fraction_length);
+			const int shift = support::countl_zero(mantissa) - ((8 * static_cast<int>(sizeof(mantissa))) - 1 - support::fp::FPBits<T>::fraction_length);
 			exponent -= shift;
 			mantissa <<= shift;
 		}
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
 		template <>
 		constexpr void normalize<long double>(int& exponent, std::uint64_t& mantissa)
 		{ normalize<double>(exponent, mantissa); }
@@ -70,7 +70,7 @@ namespace ccm::gen
 				// ReSharper disable once CppFunctionIsNotImplemented
 				static constexpr long double sqrt_calc_80bits(long double x);
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
 				static constexpr long double sqrt_calc_80bits(long double x)
 				{
 					using Bits				   = support::fp::FPBits<long double>;

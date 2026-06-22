@@ -24,7 +24,6 @@ namespace ccm
 	 * @tparam T Floating-point type.
 	 * @param num Floating-point value.
 	 * @return Inverse tangent of num in radians.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/atan
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T atan(T num)
@@ -50,7 +49,6 @@ namespace ccm
 	 * @tparam Integer Integral type.
 	 * @param num Input value.
 	 * @return Inverse tangent in radians as double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/atan
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double atan(Integer num)
@@ -60,7 +58,6 @@ namespace ccm
 	 * @brief Computes inverse tangent for float.
 	 * @param num Input value.
 	 * @return Inverse tangent in radians as float.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/atan
 	 */
 	constexpr float atanf(float num)
 	{ return ccm::atan<float>(num); }
@@ -69,7 +66,6 @@ namespace ccm
 	 * @brief Computes inverse tangent for long double.
 	 * @param num Input value.
 	 * @return Inverse tangent in radians as long double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/atan
 	 */
 	constexpr long double atanl(long double num)
 	{ return ccm::atan<long double>(num); }

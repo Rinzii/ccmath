@@ -22,7 +22,7 @@ int main()
 {
 	ccm::examples::banner("decibel conversion");
 
-	double const ratios[] = {1.0, 2.0, 10.0, 100.0};
+	double const ratios[] = { 1.0, 2.0, 10.0, 100.0 };
 
 	ccm::examples::table_header("power ratio", "dB (10 log10)");
 

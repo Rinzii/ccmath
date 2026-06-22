@@ -162,9 +162,9 @@ namespace
 				{
 					const std::size_t out_index = i + j;
 					const std::uint64_t accum	= static_cast<std::uint64_t>(out.limbs[out_index]) +
-												static_cast<std::uint64_t>(limbs[i]) * static_cast<std::uint64_t>(other.limbs[j]) + carry;
-					out.limbs[out_index] = static_cast<std::uint32_t>(accum);
-					carry				 = accum >> limb_bits;
+												  static_cast<std::uint64_t>(limbs[i]) * static_cast<std::uint64_t>(other.limbs[j]) + carry;
+					out.limbs[out_index]		= static_cast<std::uint32_t>(accum);
+					carry						= accum >> limb_bits;
 				}
 				for (std::size_t out_index = i + RefUint<OtherBits>::limb_count; carry != 0 && out_index < RefUint<Bits + OtherBits>::limb_count; ++out_index)
 				{
@@ -498,7 +498,14 @@ namespace
 		out.push_back(carry_chain);
 
 		RefUint<Bits> sparse = RefUint<Bits>::zero();
-		for (std::size_t bit : { std::size_t(0), std::size_t(1), std::size_t(31), std::size_t(32), Bits / 2 - 1, Bits / 2, Bits - 2, Bits - 1 })
+		for (std::size_t bit : { static_cast<std::size_t>(0),
+								 static_cast<std::size_t>(1),
+								 static_cast<std::size_t>(31),
+								 static_cast<std::size_t>(32),
+								 Bits / 2 - 1,
+								 Bits / 2,
+								 Bits - 2,
+								 Bits - 1 })
 		{
 			sparse.set_bit(bit);
 		}

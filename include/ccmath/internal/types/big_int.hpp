@@ -434,7 +434,7 @@ namespace ccm::types
 			for (std::size_t i = 0; i < N; ++i) { carry += mul_add_with_carry(acc, lhs[i], rhs[N - 1 - i]); }
 
 			// Accumulate and propagate carry for the remaining elements.
-			for (std::size_t i = N; i < 2 * N - 1; ++i)
+			for (std::size_t i = N; i < (2 * N) - 1; ++i)
 			{
 				acc.advance(carry);
 				carry = 0;
@@ -696,7 +696,8 @@ namespace ccm::types
 		 */
 		template <std::size_t N>
 		// NOLINTNEXTLINE(google-explicit-constructor) - Cannot be marked explicit.
-		constexpr BigInt(const WordType (&nums)[N]) // NOLINT(cppcoreguidelines-avoid-c-arrays) - We are intentionally using C-style arrays here.
+		constexpr BigInt(const WordType (&nums)[N]) // NOLINT(modernize-avoid-c-arrays, cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays) - We are
+													// intentionally using C-style arrays here.
 		{
 			static_assert(N == WORD_COUNT);
 			for (std::size_t i = 0; i < WORD_COUNT; ++i) { val[i] = nums[i]; }
@@ -1091,7 +1092,7 @@ namespace ccm::types
 				// This uses the lower half (WORD_SIZE / 2) bits of the current WORD_SIZE-bit chunk.
 				rem <<= HALF_WORD_SIZE;
 				rem += val[pos] & HALF_MASK;
-				quotient.val[q_pos - 1] = (q_tmp << HALF_WORD_SIZE) + rem / x_word;
+				quotient.val[q_pos - 1] = (q_tmp << HALF_WORD_SIZE) + (rem / x_word);
 				rem %= x_word;
 			}
 
@@ -1475,7 +1476,7 @@ namespace std
 		static constexpr ccm::types::BigInt<Bits, Signed, WordType> max() { return ccm::types::BigInt<Bits, Signed, WordType>::max(); }
 		static constexpr ccm::types::BigInt<Bits, Signed, WordType> min() { return ccm::types::BigInt<Bits, Signed, WordType>::min(); }
 
-		static constexpr int digits = static_cast<int>(Bits - Signed);
+		static constexpr int digits = static_cast<int>(Bits - static_cast<std::size_t>(Signed));
 	};
 } // namespace std
 

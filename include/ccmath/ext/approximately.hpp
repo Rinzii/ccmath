@@ -25,6 +25,6 @@ namespace ccm::ext
 	 * @return True if the absolute difference between lhs and rhs is less than or equal to epsilon.
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] constexpr bool approximately(T lhs, T rhs, T epsilon) noexcept
+	constexpr bool approximately(T lhs, T rhs, T epsilon) noexcept
 	{ return ccm::abs(lhs - rhs) <= epsilon; }
 } // namespace ccm::ext

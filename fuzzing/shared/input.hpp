@@ -12,6 +12,7 @@
 
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 
+#include <array>
 #include <cstdint>
 #include <cstring>
 #include <limits>
@@ -31,8 +32,8 @@ namespace ccm::fuzz
 	{
 		if constexpr (std::numeric_limits<T>::digits == 64 && sizeof(T) >= 10)
 		{
-			unsigned char bytes[sizeof(T)];
-			std::memcpy(bytes, &value, sizeof(T));
+			std::array<unsigned char, sizeof(T)> bytes{};
+			std::memcpy(bytes.data(), &value, sizeof(T));
 			const bool integer_bit	= (bytes[7] & 0x80U) != 0;
 			const unsigned exponent = (static_cast<unsigned>(bytes[9] & 0x7FU) << 8) | bytes[8];
 			// Canonical iff the integer bit is set exactly when the biased exponent is non-zero.
@@ -98,14 +99,14 @@ namespace ccm::fuzz
 		case 11: return limits::infinity();
 		case 12: return limits::quiet_NaN();
 		case 13: return limits::signaling_NaN();
-		case 14: return T(1) / limits::epsilon();				// integer parity threshold 2^p
-		case 15: return T(2) / limits::epsilon();				// 2^(p+1), everything above is even
-		case 16: return T(2.5);									// half integer
-		case 17: return T(1023.5);								// pow half-integer bound region
-		case 18: return T(1024);								// pow integer ipow bound
-		case 19: return T(2048);								// pow two_exp bound
+		case 14: return T(1) / limits::epsilon();			   // integer parity threshold 2^p
+		case 15: return T(2) / limits::epsilon();			   // 2^(p+1), everything above is even
+		case 16: return T(2.5);								   // half integer
+		case 17: return T(1023.5);							   // pow half-integer bound region
+		case 18: return T(1024);							   // pow integer ipow bound
+		case 19: return T(2048);							   // pow two_exp bound
 		case 20: return static_cast<T>(0x1.74910d52d3052p+62); // pow huge-exponent clamp threshold
-		case 21: return static_cast<T>(0x1.62e42fefa39efp+9);	// near the exp overflow boundary
+		case 21: return static_cast<T>(0x1.62e42fefa39efp+9);  // near the exp overflow boundary
 		case 22: return T(0x1.0p-100);
 		case 23: return T(0x1.0p100);
 		default: return T(0);
@@ -113,7 +114,7 @@ namespace ccm::fuzz
 	}
 
 	// Optional per-operand selector bytes trail the raw operands. A set high bit swaps the
-	// operand for a table entry; bit 6 flips the sign. Inputs without trailing bytes (and
+	// operand for a table entry. Bit 6 flips the sign. Inputs without trailing bytes (and
 	// every pre-existing seed) decode exactly as before.
 	template <typename T>
 	void apply_selector(T & value, uint8_t const * data, size_t size, size_t selector_offset)

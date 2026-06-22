@@ -35,10 +35,7 @@ namespace
 
 	template <typename T>
 	void consume(T value)
-	{
-		volatile T sink = value;
-		(void)sink;
-	}
+	{ [[maybe_unused]] volatile T sink = value; }
 } // namespace
 
 // [cmath.syn]: Synopsis-level overloads are constexpr entry points.

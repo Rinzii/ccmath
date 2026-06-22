@@ -24,7 +24,7 @@ namespace ccm::rt
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] inline T round_rt(T num) noexcept
 	{
-#if !defined(CCMATH_COMPILER_GCC)
+#ifndef CCMATH_COMPILER_GCC
 		if constexpr (ccm::builtin::has_runtime_round<T>) { return ccm::builtin::round_rt(num); }
 		else
 #endif

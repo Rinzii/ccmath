@@ -56,8 +56,8 @@ namespace
 			ys.push_back(y);
 		};
 
-		const float inf	 = std::numeric_limits<float>::infinity();
-		const float qnan = std::numeric_limits<float>::quiet_NaN();
+		const float inf	   = std::numeric_limits<float>::infinity();
+		const float qnan   = std::numeric_limits<float>::quiet_NaN();
 		const float denorm = std::numeric_limits<float>::denorm_min();
 
 		// Exceptional grid: zeros, ones, powers of two, infinities, NaN, denormals, negative bases.
@@ -107,7 +107,7 @@ namespace
 	}
 
 	template <typename V>
-	void expect_matches_scalar(const std::vector<float> & xs, const std::vector<float> & ys, const char * tag)
+	void expect_matches_scalar(const std::vector<float>& xs, const std::vector<float>& ys, const char* tag)
 	{
 		constexpr int width = static_cast<int>(V::size());
 		ASSERT_EQ(xs.size(), ys.size());
@@ -132,17 +132,15 @@ namespace
 			{
 				const float got = rv[i];
 				const float ref = ccm::gen::impl::powf_impl(xb[i], yb[i]);
-				EXPECT_TRUE(bit_equal(got, ref)) << tag << " pow(" << xb[i] << ", " << yb[i] << ") got=0x" << std::hex << float_bits(got)
-												 << " ref=0x" << float_bits(ref);
+				EXPECT_TRUE(bit_equal(got, ref)) << tag << " pow(" << xb[i] << ", " << yb[i] << ") got=0x" << std::hex << float_bits(got) << " ref=0x"
+												 << float_bits(ref);
 			}
 		}
 	}
 
 	template <typename V>
 	float scalar_lane(float x, float y)
-	{
-		return ccm::gen::impl::powf_simd(V(x), V(y))[0];
-	}
+	{ return ccm::gen::impl::powf_simd(V(x), V(y))[0]; }
 } // namespace
 
 TEST(CcmathPowfSimd, BitIdenticalToScalarKernelNativeWidth)

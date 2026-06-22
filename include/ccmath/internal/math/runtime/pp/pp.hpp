@@ -11,7 +11,7 @@
 #pragma once
 
 // Umbrella for the C++17 port of the C++26 std::simd surface (ccm::pp). This is
-// a standalone library; it does not replace the live ccm::intrin SIMD system
+// a standalone library. It does not replace the live ccm::intrin SIMD system
 // until the project decides to switch over.
 
 #include "ccmath/internal/math/runtime/pp/conversion.hpp"

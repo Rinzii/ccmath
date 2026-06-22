@@ -27,7 +27,7 @@ namespace ccm
 	 * calculated as a single ternary floating-point operation).
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T fma(T x, T y, T z) noexcept
+	constexpr T fma(T x, T y, T z) noexcept // NOLINT(bugprone-exception-escape)
 	{ return support::fp::dispatch_fma(x, y, z); }
 
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>

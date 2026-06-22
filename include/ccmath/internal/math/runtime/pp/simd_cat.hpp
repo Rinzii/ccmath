@@ -42,7 +42,7 @@ namespace ccm::pp
 		return r;
 	}
 
-	template <typename V, typename T, typename Abi, std::enable_if_t<std::is_same<typename V::value_type, T>::value, int> = 0>
+	template <typename V, typename T, typename Abi, std::enable_if_t<std::is_same_v<typename V::value_type, T>, int> = 0>
 	CCM_ALWAYS_INLINE std::array<V, static_cast<std::size_t>(basic_simd<T, Abi>::size() / V::size())> simd_split(basic_simd<T, Abi> const &v)
 	{
 		constexpr detail::SimdSizeType parts = basic_simd<T, Abi>::size() / V::size();

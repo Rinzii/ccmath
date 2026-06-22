@@ -15,39 +15,32 @@
 namespace ccm::ext
 {
 	/**
-	 * @brief Divide two integral values and round the result toward positive infinity.
+	 * @brief Divide two integral values and round the quotient toward positive infinity.
 	 *
-	 * This function is intended for non-negative integral values.
+	 * If divisor is zero, this function returns 0. Otherwise it works for signed
+	 * and unsigned types and rounds correctly for negative operands. The behavior
+	 * is still undefined if the exact quotient is not representable in T, for
+	 * example the most negative value divided by minus one.
 	 *
-	 * @tparam T Type of the input and output.
+	 * @tparam T Integral type of the inputs and output.
 	 * @param value The dividend.
 	 * @param divisor The divisor.
 	 * @return The ceiling of value divided by divisor.
 	 */
 	template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<std::remove_cv_t<T>, bool>, bool> = true>
-	[[nodiscard]] constexpr T ceil_div(T value, T divisor) noexcept
-	{ return static_cast<T>((value + divisor - T(1)) / divisor); }
-
-	namespace safe
+	constexpr T ceil_div(T value, T divisor) noexcept
 	{
-		/**
-		 * @brief Safely divide two integral values and round the result toward positive infinity.
-		 *
-		 * If divisor is zero, this function returns 0.
-		 *
-		 * This function is intended for non-negative integral values.
-		 *
-		 * @tparam T Type of the input and output.
-		 * @param value The dividend.
-		 * @param divisor The divisor.
-		 * @return The ceiling of value divided by divisor.
-		 */
-		template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<std::remove_cv_t<T>, bool>, bool> = true>
-		[[nodiscard]] constexpr T ceil_div(T value, T divisor) noexcept
-		{
-			if (divisor == T(0)) { return T(0); }
+		if (divisor == T(0)) { return T(0); }
 
-			return ext::ceil_div(value, divisor);
+		// Divide first, then add the correction, so there is no pre-division addition that can overflow.
+		if constexpr (std::is_signed_v<T>)
+		{
+			const bool quotient_positive = (value < 0) == (divisor < 0);
+			return static_cast<T>(value / divisor + (value % divisor != 0 && quotient_positive));
 		}
-	} // namespace safe
+		else
+		{
+			return static_cast<T>(value / divisor + (value % divisor != 0));
+		}
+	}
 } // namespace ccm::ext

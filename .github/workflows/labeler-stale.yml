@@ -1,0 +1,33 @@
+name: "Labels: Stale"
+
+on:
+    schedule:
+        - cron: "0 6 * * *"
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    pull-requests: write
+    issues: write
+
+jobs:
+    stale:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Mark inactive issues and pull requests
+              uses: actions/stale@5bef64f19d7facfb25b37b414482c7164d639639 # v9
+              with:
+                  repo-token: ${{ secrets.GITHUB_TOKEN }}
+                  days-before-stale: 60
+                  days-before-close: -1
+                  stale-issue-label: "S: Stale"
+                  stale-pr-label: "S: Stale"
+                  remove-stale-when-updated: true
+                  exempt-draft-pr: true
+                  exempt-all-assignees: true
+                  exempt-all-milestones: true
+                  exempt-issue-labels: "P1: Critical, D0: Irrational, S: Blocked"
+                  exempt-pr-labels: "P1: Critical, S: Blocked, S: Approved"
+                  stale-issue-message: "This issue has been inactive for 60 days and is now marked stale. Comment to keep it open."
+                  stale-pr-message: "This pull request has been inactive for 60 days and is now marked stale. Push or comment to keep it open."

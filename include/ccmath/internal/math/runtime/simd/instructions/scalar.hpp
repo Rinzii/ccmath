@@ -90,8 +90,8 @@ namespace ccm::intrin
 		CCM_ALWAYS_INLINE simd &operator=(simd &&)		= default;
 		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE static constexpr int size() { return 1; }
 		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd(T value) : m_value(value) {} // NOLINT(google-explicit-constructor)
-		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd(storage_type const &value)
-		{ copy_from(value.data(), element_aligned_tag()); } // NOLINT(google-explicit-constructor)
+		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd(storage_type const &value)	// NOLINT(google-explicit-constructor)
+		{ copy_from(value.data(), element_aligned_tag()); }						// NOLINT(google-explicit-constructor)
 		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd &operator=(storage_type const &value)
 		{
 			copy_from(value.data(), element_aligned_tag());

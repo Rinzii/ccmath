@@ -24,7 +24,6 @@ namespace ccm
 	 * @tparam T Floating-point type.
 	 * @param num Floating-point value, typically in [-1, 1].
 	 * @return Inverse cosine of num in radians.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/acos
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T acos(T num)
@@ -50,7 +49,6 @@ namespace ccm
 	 * @tparam Integer Integral type.
 	 * @param num Input value.
 	 * @return Inverse cosine in radians as double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/acos
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double acos(Integer num)
@@ -60,7 +58,6 @@ namespace ccm
 	 * @brief Computes inverse cosine for float.
 	 * @param num Input value.
 	 * @return Inverse cosine in radians as float.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/acos
 	 */
 	constexpr float acosf(float num)
 	{ return ccm::acos<float>(num); }
@@ -69,7 +66,6 @@ namespace ccm
 	 * @brief Computes inverse cosine for long double.
 	 * @param num Input value.
 	 * @return Inverse cosine in radians as long double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/acos
 	 */
 	constexpr long double acosl(long double num)
 	{ return ccm::acos<long double>(num); }

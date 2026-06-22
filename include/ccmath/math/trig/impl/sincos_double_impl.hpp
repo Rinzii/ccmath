@@ -15,6 +15,7 @@
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/fp/nearest_integer.hpp"
 #include "ccmath/internal/support/multiply_add.hpp"
@@ -22,7 +23,6 @@
 #include "ccmath/math/trig/impl/sincos_payne_hanek.hpp"
 
 #include <cerrno>
-#include <cfenv>
 #include <cstdint>
 
 namespace ccm::internal::impl
@@ -34,7 +34,7 @@ namespace ccm::internal::impl
 
 		constexpr unsigned sincos_range_reduction_small(double x, double & u)
 		{
-			const double prod_hi = x * data::ONE_OVER_PI;
+			const double prod_hi = x * data::EIGHT_OVER_PI;
 			const double k		 = support::fp::nearest_integer(prod_hi);
 
 			const double y_hi = support::multiply_add(k, data::MPI[0], x);
@@ -71,8 +71,14 @@ namespace ccm::internal::impl
 					{
 						support::fenv::set_errno_if_required(EDOM);
 						support::fenv::raise_except_if_required(FE_INVALID);
+						// sin/cos of an infinity is a domain error, so return a canonical quiet NaN.
+						// Forming it as x + quiet_nan is ill-formed in a constant expression, which
+						// rejects floating-point arithmetic that produces a NaN.
+						return FPBits::quiet_nan().get_val();
 					}
-					return x + FPBits::quiet_nan().get_val();
+
+					// x is a quiet NaN here. Return it unchanged so its sign and payload survive.
+					return x;
 				}
 
 				k = sincos_ph::payne_hanek_reduce(x, y);

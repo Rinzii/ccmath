@@ -45,7 +45,6 @@ namespace ccm
 	 * @param base Base value.
 	 * @param exp Exponent value.
 	 * @return base raised to exp.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/pow
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T pow(T base, T exp)
@@ -83,7 +82,6 @@ namespace ccm
 	 * @param base Base value.
 	 * @param exp Exponent value.
 	 * @return base raised to exp in the promoted floating-point type.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/pow
 	 */
 	template <typename Arithmetic1,
 			  typename Arithmetic2,
@@ -101,7 +99,6 @@ namespace ccm
 	 * @param base Base value.
 	 * @param exp Exponent value.
 	 * @return base raised to exp as float.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/pow
 	 */
 	constexpr float powf(float base, float exp)
 	{ return ccm::pow<float>(base, exp); }
@@ -114,7 +111,6 @@ namespace ccm
 	 * @note Native long-double precision is available only when long double is x87 binary80.
 	 *       On other platforms the default path evaluates pow in double precision and casts
 	 *       the result to long double. That fallback is not native long-double accuracy yet.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/pow
 	 */
 	constexpr long double powl(long double base, long double exp)
 	{ return ccm::pow<long double>(base, exp); }

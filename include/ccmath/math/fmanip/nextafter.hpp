@@ -25,7 +25,6 @@ namespace ccm
 	 * @param from Starting value.
 	 * @param to Direction target.
 	 * @return Next representable value after from in the direction of to.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/nextafter
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T nextafter(T from, T to) noexcept
@@ -45,7 +44,6 @@ namespace ccm
 	 * @param from Starting value.
 	 * @param to Direction target.
 	 * @return Next representable value in the promoted common type.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/nextafter
 	 */
 	template <typename Arithmetic1, typename Arithmetic2, std::enable_if_t<std::is_arithmetic_v<Arithmetic1> && std::is_arithmetic_v<Arithmetic2>, bool> = true>
 	constexpr auto nextafter(Arithmetic1 from, Arithmetic2 to) noexcept
@@ -56,7 +54,6 @@ namespace ccm
 	 * @param from Starting value.
 	 * @param to Direction target.
 	 * @return Next representable float value.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/nextafter
 	 */
 	constexpr float nextafterf(float from, float to) noexcept
 	{ return ccm::nextafter<float>(from, to); }
@@ -66,7 +63,6 @@ namespace ccm
 	 * @param from Starting value.
 	 * @param to Direction target.
 	 * @return Next representable long double value.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/nextafter
 	 */
 	constexpr long double nextafterl(long double from, long double to) noexcept
 	{ return ccm::nextafter<long double>(from, to); }

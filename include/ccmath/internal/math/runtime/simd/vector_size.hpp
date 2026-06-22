@@ -46,7 +46,7 @@ namespace ccm::intrin
 		static constexpr int size() { return N / sizeof(T); }
 		CCM_ALWAYS_INLINE explicit simd_mask(bool value) : m_value(static_cast<int>(value)) {}
 		CCM_ALWAYS_INLINE explicit simd_mask(native_type value) : m_value(value) {}
-		CCM_ALWAYS_INLINE int operator[](int i) { return reinterpret_cast<int *>(&m_value)[i]; }
+		CCM_ALWAYS_INLINE int operator[](int i) { return reinterpret_cast<int *>(&m_value)[i]; } // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 		[[nodiscard]] CCM_ALWAYS_INLINE native_type const &get() const { return m_value; }
 		CCM_ALWAYS_INLINE simd_mask operator||(simd_mask const &other) const { return simd_mask(m_value || other.m_value); }
 		CCM_ALWAYS_INLINE simd_mask operator&&(simd_mask const &other) const { return simd_mask(m_value && other.m_value); }
@@ -70,7 +70,8 @@ namespace ccm::intrin
 		static constexpr int size() { return N / sizeof(long long); }
 		CCM_ALWAYS_INLINE explicit simd_mask(bool value) : m_value(static_cast<long long>(value)) {}
 		CCM_ALWAYS_INLINE explicit simd_mask(native_type value) : m_value(value) {}
-		CCM_ALWAYS_INLINE long long operator[](int i) { return reinterpret_cast<long long *>(&m_value)[i]; }
+		CCM_ALWAYS_INLINE long long operator[](int i)
+		{ return reinterpret_cast<long long *>(&m_value)[i]; } // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 		[[nodiscard]] CCM_ALWAYS_INLINE native_type const &get() const { return m_value; }
 		CCM_ALWAYS_INLINE simd_mask operator||(simd_mask const &other) const { return simd_mask(m_value || other.m_value); }
 		CCM_ALWAYS_INLINE simd_mask operator&&(simd_mask const &other) const { return simd_mask(m_value && other.m_value); }
@@ -113,7 +114,7 @@ namespace ccm::intrin
 		static constexpr int size() { return N / sizeof(T); }
 		CCM_ALWAYS_INLINE explicit simd(T value)
 		{
-			for (int i = 0; i < size(); i++) { reinterpret_cast<T *>(&m_value)[i] = value; }
+			for (int i = 0; i < size(); i++) { reinterpret_cast<T *>(&m_value)[i] = value; } // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 		}
 		explicit CCM_ALWAYS_INLINE simd(const native_type &value) : m_value(value) {}
 		CCM_ALWAYS_INLINE explicit simd(storage_type const &value) { copy_from(value.data(), element_aligned_tag()); }
@@ -135,14 +136,14 @@ namespace ccm::intrin
 		{
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
 			{
-				reinterpret_cast<T *>(&m_value)[i] = ptr[i]; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+				reinterpret_cast<T *>(&m_value)[i] = ptr[i]; // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 			}
 		}
 		CCM_ALWAYS_INLINE void copy_to(T *ptr, element_aligned_tag /*unused*/) const
 		{
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
 			{
-				ptr[i] = reinterpret_cast<T *>(&m_value)[i]; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+				ptr[i] = reinterpret_cast<T *>(&m_value)[i]; // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 			}
 		}
 		CCM_ALWAYS_INLINE constexpr T operator[](int i) const { return m_value[i]; }

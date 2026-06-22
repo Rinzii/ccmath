@@ -39,8 +39,10 @@ namespace ccm::pp
 
 		CCM_ALWAYS_INLINE where_expression(MaskType const& mask, SimdType& data) : mask_(mask), data_(&data) {}
 
+		// NOLINTBEGIN(cppcoreguidelines-c-copy-assignment-signature,misc-unconventional-assign-operator)
 		CCM_ALWAYS_INLINE void operator=(SimdType const& rhs) { *data_ = simd_select(mask_, rhs, *data_); }
 		CCM_ALWAYS_INLINE void operator=(value_type rhs) { *data_ = simd_select(mask_, SimdType(rhs), *data_); }
+		// NOLINTEND(cppcoreguidelines-c-copy-assignment-signature,misc-unconventional-assign-operator)
 
 		CCM_ALWAYS_INLINE void operator+=(SimdType const& rhs) { *data_ = simd_select(mask_, *data_ + rhs, *data_); }
 		CCM_ALWAYS_INLINE void operator-=(SimdType const& rhs) { *data_ = simd_select(mask_, *data_ - rhs, *data_); }

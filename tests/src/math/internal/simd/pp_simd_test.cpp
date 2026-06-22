@@ -8,11 +8,19 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+// clang-format off
+// <cmath> must come before pp.hpp. It pulls in the UCRT math declarations first,
+// so the ccm::pp MSVC scalar fallback, which forward declares the same C runtime
+// entry points, redeclares them rather than declaring them ahead of the UCRT.
+// Including pp.hpp first makes MSVC reject the later UCRT declarations (C2375
+// redefinition, C2733 cannot overload an extern "C" function).
+#include <cmath>
+
 #include "ccmath/internal/math/runtime/pp/pp.hpp"
+// clang-format on
 
 #include <gtest/gtest.h>
 
-#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>

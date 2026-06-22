@@ -179,10 +179,16 @@ namespace ccm::support
 		{
 			using P = Parser<T>;
 
-			if (view.size() >= 2 && view[0] == '0' && view[1] == 'b') { return P::template parse<2>(view.substr(2).data()); }
-			if (view.size() >= 2 && view[0] == '0' && view[1] == 'x') { return P::template parse<16>(view.substr(2).data()); }
+			if (view.size() >= 2 && view[0] == '0' && view[1] == 'b')
+			{
+				return P::template parse<2>(view.substr(2).data()); // NOLINT(bugprone-suspicious-stringview-data-usage)
+			}
+			if (view.size() >= 2 && view[0] == '0' && view[1] == 'x')
+			{
+				return P::template parse<16>(view.substr(2).data()); // NOLINT(bugprone-suspicious-stringview-data-usage)
+			}
 
-			return P::template parse<10>(view.data());
+			return P::template parse<10>(view.data()); // NOLINT(bugprone-suspicious-stringview-data-usage)
 		}
 
 		template <typename T>

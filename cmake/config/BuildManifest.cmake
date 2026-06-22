@@ -12,6 +12,8 @@ set(CCMATH_LIBRARY_MANIFEST_VERSION_TEMPLATE cmake/in/version.hpp.in)
 set(CCMATH_LIBRARY_MANIFEST_OPTION_KEYS
         runtime_simd
         disable_errno
+        disable_fenv
+        freestanding
         reduced_precision_powl
         deterministic
 )
@@ -31,6 +33,22 @@ set(CCMATH_LIBRARY_MANIFEST_OPTION_disable_errno_MESON_OPTION disable_errno)
 set(CCMATH_LIBRARY_MANIFEST_OPTION_disable_errno_DEFINE CCM_CONFIG_DISABLE_ERRNO)
 set(CCMATH_LIBRARY_MANIFEST_OPTION_disable_errno_DESCRIPTION
         "Disable the use of errno in ccmath during runtime (may lead to faster evaluations but is non-standard)")
+
+set(CCMATH_LIBRARY_MANIFEST_OPTION_disable_fenv_CMAKE_VAR CCMATH_DISABLE_FENV)
+set(CCMATH_LIBRARY_MANIFEST_OPTION_disable_fenv_CMAKE_DEFAULT OFF)
+set(CCMATH_LIBRARY_MANIFEST_OPTION_disable_fenv_CMAKE_INVERT FALSE)
+set(CCMATH_LIBRARY_MANIFEST_OPTION_disable_fenv_MESON_OPTION disable_fenv)
+set(CCMATH_LIBRARY_MANIFEST_OPTION_disable_fenv_DEFINE CCM_CONFIG_DISABLE_FENV)
+set(CCMATH_LIBRARY_MANIFEST_OPTION_disable_fenv_DESCRIPTION
+        "Completely disable the host floating-point environment: drop every <cfenv> and <fenv.h> include, assume round-to-nearest at runtime, and signal no fp-exceptions (auto-enabled when no host fenv header exists)")
+
+set(CCMATH_LIBRARY_MANIFEST_OPTION_freestanding_CMAKE_VAR CCMATH_FREESTANDING)
+set(CCMATH_LIBRARY_MANIFEST_OPTION_freestanding_CMAKE_DEFAULT OFF)
+set(CCMATH_LIBRARY_MANIFEST_OPTION_freestanding_CMAKE_INVERT FALSE)
+set(CCMATH_LIBRARY_MANIFEST_OPTION_freestanding_MESON_OPTION freestanding)
+set(CCMATH_LIBRARY_MANIFEST_OPTION_freestanding_DEFINE CCM_CONFIG_FREESTANDING)
+set(CCMATH_LIBRARY_MANIFEST_OPTION_freestanding_DESCRIPTION
+        "Build for a freestanding C++ environment: restrict to freestanding-conformant headers, dropping the test-only <bitset> path in the runtime SIMD layer and the MSVC <math.h> system-math path (auto-enabled when __STDC_HOSTED__ is 0)")
 
 set(CCMATH_LIBRARY_MANIFEST_OPTION_reduced_precision_powl_CMAKE_VAR CCMATH_DISABLE_REDUCED_PRECISION_POWL)
 set(CCMATH_LIBRARY_MANIFEST_OPTION_reduced_precision_powl_CMAKE_DEFAULT OFF)

@@ -29,7 +29,7 @@
 // Deterministic mode routes every multiply_add through the IEEE-correct __builtin_fma (hardware
 // where present, a software fma() call otherwise) so the result is bit-identical on FMA and
 // non-FMA targets, and forces the if constexpr(target_cpu_has_fma) kernel branches to a single
-// path. This does not assert that the CPU has an FMA instruction; it selects the correctly-rounded
+// path. This does not assert that the CPU has an FMA instruction. It selects the correctly-rounded
 // fused operation regardless of hardware.
 #if defined(CCM_CONFIG_DETERMINISTIC) && !defined(CCMATH_TARGET_CPU_HAS_FMA)
 	#define CCMATH_TARGET_CPU_HAS_FMA
@@ -122,7 +122,7 @@ namespace ccm::builtin
 
 	template <typename T>
 	inline constexpr bool runtime_builtin_fma_long_double_supported =
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
 		true
 #else
 		!std::is_same_v<T, long double>

@@ -12,13 +12,13 @@
 
 #include "ccmath/internal/math/runtime/pp/declaration.hpp"
 #include "ccmath/internal/math/runtime/pp/utility.hpp"
-#include "ccmath/internal/math/runtime/pp/vec_ext.hpp"
+#include "ccmath/internal/math/runtime/pp/vec_ext.hpp" // NOLINT(misc-header-include-cycle)
 #include "ccmath/internal/predef/attributes/always_inline.hpp"
 
 // SSE2 intrinsic backend for compilers without the GNU/Clang vector extensions
 // (i.e. MSVC cl.exe). It specializes the 128-bit native widths (float x4,
 // double x2, and the int32 x4 / int64 x2 used by their masks). Hot operations
-// map to <immintrin.h> intrinsics; the rest spill to a small stack array, run
+// map to <immintrin.h> intrinsics. The rest spill to a small stack array, run
 // the scalar logic, and reload (correct, used only for cold paths). Anything not
 // specialized here keeps the portable array fallback from vec_ext.hpp, so the
 // scalar fallback is always available. Validated on Clang via
@@ -28,6 +28,7 @@
 
 	#include <immintrin.h>
 
+	#include <array>
 	#include <cstdint>
 	#include <cstring>
 
@@ -47,16 +48,16 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static SimdMember broadcast(float v) { return _mm_set1_ps(v); }
 		CCM_ALWAYS_INLINE static float get(SimdMember const &m, detail::SimdSizeType i)
 		{
-			float a[4];
-			_mm_storeu_ps(a, m);
+			std::array<float, 4> a;
+			_mm_storeu_ps(a.data(), m);
 			return a[i];
 		}
 		CCM_ALWAYS_INLINE static void set(SimdMember &m, detail::SimdSizeType i, float v)
 		{
-			float a[4];
-			_mm_storeu_ps(a, m);
+			std::array<float, 4> a;
+			_mm_storeu_ps(a.data(), m);
 			a[i] = v;
-			m	 = _mm_loadu_ps(a);
+			m	 = _mm_loadu_ps(a.data());
 		}
 		CCM_ALWAYS_INLINE static SimdMember load(float const *p) { return _mm_loadu_ps(p); }
 		CCM_ALWAYS_INLINE static void store(SimdMember const &m, float *p) { _mm_storeu_ps(p, m); }
@@ -77,16 +78,16 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static MaskMember mbroadcast(bool b) { return _mm_set1_epi32(b ? -1 : 0); }
 		CCM_ALWAYS_INLINE static bool mget(MaskMember const &m, detail::SimdSizeType i)
 		{
-			std::int32_t a[4];
-			_mm_storeu_si128(reinterpret_cast<__m128i *>(a), m);
+			std::array<std::int32_t, 4> a;
+			_mm_storeu_si128(reinterpret_cast<__m128i *>(a.data()), m);
 			return a[i] != 0;
 		}
 		CCM_ALWAYS_INLINE static void mset(MaskMember &m, detail::SimdSizeType i, bool b)
 		{
-			std::int32_t a[4];
-			_mm_storeu_si128(reinterpret_cast<__m128i *>(a), m);
+			std::array<std::int32_t, 4> a;
+			_mm_storeu_si128(reinterpret_cast<__m128i *>(a.data()), m);
 			a[i] = b ? -1 : 0;
-			m	 = _mm_loadu_si128(reinterpret_cast<__m128i const *>(a));
+			m	 = _mm_loadu_si128(reinterpret_cast<__m128i const *>(a.data()));
 		}
 		CCM_ALWAYS_INLINE static MaskMember mand(MaskMember a, MaskMember b) { return _mm_and_si128(a, b); }
 		CCM_ALWAYS_INLINE static MaskMember mor(MaskMember a, MaskMember b) { return _mm_or_si128(a, b); }
@@ -96,8 +97,8 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static bool any_of(MaskMember m) { return _mm_movemask_ps(_mm_castsi128_ps(m)) != 0; }
 		CCM_ALWAYS_INLINE static detail::SimdSizeType popcount(MaskMember m)
 		{
-			std::int32_t a[4];
-			_mm_storeu_si128(reinterpret_cast<__m128i *>(a), m);
+			std::array<std::int32_t, 4> a;
+			_mm_storeu_si128(reinterpret_cast<__m128i *>(a.data()), m);
 			detail::SimdSizeType c = 0;
 			for (int i = 0; i < 4; ++i) { c += (a[i] != 0) ? 1 : 0; }
 			return c;
@@ -115,10 +116,10 @@ namespace ccm::pp
 	#define CCM_PP_MSVC_F32_ROUND(NAME, SFN)                                                                                                                   \
 		CCM_ALWAYS_INLINE static SimdMember NAME(SimdMember v)                                                                                                 \
 		{                                                                                                                                                      \
-			float a[4];                                                                                                                                        \
-			_mm_storeu_ps(a, v);                                                                                                                               \
+			std::array<float, 4> a;                                                                                                                            \
+			_mm_storeu_ps(a.data(), v);                                                                                                                        \
 			for (int i = 0; i < 4; ++i) { a[i] = detail::SFN<float>(a[i]); }                                                                                   \
-			return _mm_loadu_ps(a);                                                                                                                            \
+			return _mm_loadu_ps(a.data());                                                                                                                     \
 		}
 		CCM_PP_MSVC_F32_ROUND(op_floor, s_floor)
 		CCM_PP_MSVC_F32_ROUND(op_ceil, s_ceil)
@@ -127,31 +128,31 @@ namespace ccm::pp
 	#undef CCM_PP_MSVC_F32_ROUND
 		CCM_ALWAYS_INLINE static SimdMember op_fma(SimdMember a, SimdMember b, SimdMember c)
 		{
-			float aa[4], bb[4], cc[4];
-			_mm_storeu_ps(aa, a);
-			_mm_storeu_ps(bb, b);
-			_mm_storeu_ps(cc, c);
+			std::array<float, 4> aa, bb, cc;
+			_mm_storeu_ps(aa.data(), a);
+			_mm_storeu_ps(bb.data(), b);
+			_mm_storeu_ps(cc.data(), c);
 			for (int i = 0; i < 4; ++i) { aa[i] = detail::s_fma<float>(aa[i], bb[i], cc[i]); }
-			return _mm_loadu_ps(aa);
+			return _mm_loadu_ps(aa.data());
 		}
 		CCM_ALWAYS_INLINE static float hadd(SimdMember v)
 		{
-			float a[4];
-			_mm_storeu_ps(a, v);
+			std::array<float, 4> a;
+			_mm_storeu_ps(a.data(), v);
 			return a[0] + a[1] + a[2] + a[3];
 		}
 		CCM_ALWAYS_INLINE static float hmin(SimdMember v)
 		{
-			float a[4];
-			_mm_storeu_ps(a, v);
+			std::array<float, 4> a;
+			_mm_storeu_ps(a.data(), v);
 			float s = a[0];
 			for (int i = 1; i < 4; ++i) { s = a[i] < s ? a[i] : s; }
 			return s;
 		}
 		CCM_ALWAYS_INLINE static float hmax(SimdMember v)
 		{
-			float a[4];
-			_mm_storeu_ps(a, v);
+			std::array<float, 4> a;
+			_mm_storeu_ps(a.data(), v);
 			float s = a[0];
 			for (int i = 1; i < 4; ++i) { s = a[i] > s ? a[i] : s; }
 			return s;
@@ -160,8 +161,8 @@ namespace ccm::pp
 		template <typename U>
 		CCM_ALWAYS_INLINE static typename SimdTraits<U, VecAbi<4>>::SimdMember convert(SimdMember v)
 		{
-			float a[4];
-			_mm_storeu_ps(a, v);
+			std::array<float, 4> a;
+			_mm_storeu_ps(a.data(), v);
 			typename SimdTraits<U, VecAbi<4>>::SimdMember r;
 			for (detail::SimdSizeType i = 0; i < 4; ++i) { SimdTraits<U, VecAbi<4>>::set(r, i, static_cast<U>(a[i])); }
 			return r;
@@ -189,16 +190,16 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static SimdMember broadcast(double v) { return _mm_set1_pd(v); }
 		CCM_ALWAYS_INLINE static double get(SimdMember const &m, detail::SimdSizeType i)
 		{
-			double a[2];
-			_mm_storeu_pd(a, m);
+			std::array<double, 2> a;
+			_mm_storeu_pd(a.data(), m);
 			return a[i];
 		}
 		CCM_ALWAYS_INLINE static void set(SimdMember &m, detail::SimdSizeType i, double v)
 		{
-			double a[2];
-			_mm_storeu_pd(a, m);
+			std::array<double, 2> a;
+			_mm_storeu_pd(a.data(), m);
 			a[i] = v;
-			m	 = _mm_loadu_pd(a);
+			m	 = _mm_loadu_pd(a.data());
 		}
 		CCM_ALWAYS_INLINE static SimdMember load(double const *p) { return _mm_loadu_pd(p); }
 		CCM_ALWAYS_INLINE static void store(SimdMember const &m, double *p) { _mm_storeu_pd(p, m); }
@@ -219,16 +220,16 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static MaskMember mbroadcast(bool b) { return _mm_set1_epi64x(b ? -1 : 0); }
 		CCM_ALWAYS_INLINE static bool mget(MaskMember const &m, detail::SimdSizeType i)
 		{
-			std::int64_t a[2];
-			_mm_storeu_si128(reinterpret_cast<__m128i *>(a), m);
+			std::array<std::int64_t, 2> a;
+			_mm_storeu_si128(reinterpret_cast<__m128i *>(a.data()), m);
 			return a[i] != 0;
 		}
 		CCM_ALWAYS_INLINE static void mset(MaskMember &m, detail::SimdSizeType i, bool b)
 		{
-			std::int64_t a[2];
-			_mm_storeu_si128(reinterpret_cast<__m128i *>(a), m);
+			std::array<std::int64_t, 2> a;
+			_mm_storeu_si128(reinterpret_cast<__m128i *>(a.data()), m);
 			a[i] = b ? -1 : 0;
-			m	 = _mm_loadu_si128(reinterpret_cast<__m128i const *>(a));
+			m	 = _mm_loadu_si128(reinterpret_cast<__m128i const *>(a.data()));
 		}
 		CCM_ALWAYS_INLINE static MaskMember mand(MaskMember a, MaskMember b) { return _mm_and_si128(a, b); }
 		CCM_ALWAYS_INLINE static MaskMember mor(MaskMember a, MaskMember b) { return _mm_or_si128(a, b); }
@@ -238,8 +239,8 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static bool any_of(MaskMember m) { return _mm_movemask_pd(_mm_castsi128_pd(m)) != 0; }
 		CCM_ALWAYS_INLINE static detail::SimdSizeType popcount(MaskMember m)
 		{
-			std::int64_t a[2];
-			_mm_storeu_si128(reinterpret_cast<__m128i *>(a), m);
+			std::array<std::int64_t, 2> a;
+			_mm_storeu_si128(reinterpret_cast<__m128i *>(a.data()), m);
 			return (a[0] != 0 ? 1 : 0) + (a[1] != 0 ? 1 : 0);
 		}
 		CCM_ALWAYS_INLINE static SimdMember select(MaskMember m, SimdMember a, SimdMember b)
@@ -255,11 +256,11 @@ namespace ccm::pp
 	#define CCM_PP_MSVC_F64_ROUND(NAME, SFN)                                                                                                                   \
 		CCM_ALWAYS_INLINE static SimdMember NAME(SimdMember v)                                                                                                 \
 		{                                                                                                                                                      \
-			double a[2];                                                                                                                                       \
-			_mm_storeu_pd(a, v);                                                                                                                               \
+			std::array<double, 2> a;                                                                                                                           \
+			_mm_storeu_pd(a.data(), v);                                                                                                                        \
 			a[0] = detail::SFN<double>(a[0]);                                                                                                                  \
 			a[1] = detail::SFN<double>(a[1]);                                                                                                                  \
-			return _mm_loadu_pd(a);                                                                                                                            \
+			return _mm_loadu_pd(a.data());                                                                                                                     \
 		}
 		CCM_PP_MSVC_F64_ROUND(op_floor, s_floor)
 		CCM_PP_MSVC_F64_ROUND(op_ceil, s_ceil)
@@ -268,38 +269,38 @@ namespace ccm::pp
 	#undef CCM_PP_MSVC_F64_ROUND
 		CCM_ALWAYS_INLINE static SimdMember op_fma(SimdMember a, SimdMember b, SimdMember c)
 		{
-			double aa[2], bb[2], cc[2];
-			_mm_storeu_pd(aa, a);
-			_mm_storeu_pd(bb, b);
-			_mm_storeu_pd(cc, c);
+			std::array<double, 2> aa, bb, cc;
+			_mm_storeu_pd(aa.data(), a);
+			_mm_storeu_pd(bb.data(), b);
+			_mm_storeu_pd(cc.data(), c);
 			aa[0] = detail::s_fma<double>(aa[0], bb[0], cc[0]);
 			aa[1] = detail::s_fma<double>(aa[1], bb[1], cc[1]);
-			return _mm_loadu_pd(aa);
+			return _mm_loadu_pd(aa.data());
 		}
 		CCM_ALWAYS_INLINE static double hadd(SimdMember v)
 		{
-			double a[2];
-			_mm_storeu_pd(a, v);
+			std::array<double, 2> a;
+			_mm_storeu_pd(a.data(), v);
 			return a[0] + a[1];
 		}
 		CCM_ALWAYS_INLINE static double hmin(SimdMember v)
 		{
-			double a[2];
-			_mm_storeu_pd(a, v);
+			std::array<double, 2> a;
+			_mm_storeu_pd(a.data(), v);
 			return a[0] < a[1] ? a[0] : a[1];
 		}
 		CCM_ALWAYS_INLINE static double hmax(SimdMember v)
 		{
-			double a[2];
-			_mm_storeu_pd(a, v);
+			std::array<double, 2> a;
+			_mm_storeu_pd(a.data(), v);
 			return a[0] > a[1] ? a[0] : a[1];
 		}
 
 		template <typename U>
 		CCM_ALWAYS_INLINE static typename SimdTraits<U, VecAbi<2>>::SimdMember convert(SimdMember v)
 		{
-			double a[2];
-			_mm_storeu_pd(a, v);
+			std::array<double, 2> a;
+			_mm_storeu_pd(a.data(), v);
 			typename SimdTraits<U, VecAbi<2>>::SimdMember r;
 			for (detail::SimdSizeType i = 0; i < 2; ++i) { SimdTraits<U, VecAbi<2>>::set(r, i, static_cast<U>(a[i])); }
 			return r;
@@ -338,16 +339,16 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static SimdMember broadcast(std::int32_t v) { return _mm_set1_epi32(v); }
 		CCM_ALWAYS_INLINE static std::int32_t get(SimdMember const &m, detail::SimdSizeType i)
 		{
-			std::int32_t a[4];
-			detail::si128_store<std::int32_t, 4>(m, a);
+			std::array<std::int32_t, 4> a;
+			detail::si128_store<std::int32_t, 4>(m, a.data());
 			return a[i];
 		}
 		CCM_ALWAYS_INLINE static void set(SimdMember &m, detail::SimdSizeType i, std::int32_t v)
 		{
-			std::int32_t a[4];
-			detail::si128_store<std::int32_t, 4>(m, a);
+			std::array<std::int32_t, 4> a;
+			detail::si128_store<std::int32_t, 4>(m, a.data());
 			a[i] = v;
-			m	 = detail::si128_load(a);
+			m	 = detail::si128_load(a.data());
 		}
 		CCM_ALWAYS_INLINE static SimdMember load(std::int32_t const *p) { return detail::si128_load(p); }
 		CCM_ALWAYS_INLINE static void store(SimdMember const &m, std::int32_t *p) { detail::si128_store<std::int32_t, 4>(m, p); }
@@ -374,8 +375,8 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static bool any_of(MaskMember m) { return _mm_movemask_ps(_mm_castsi128_ps(m)) != 0; }
 		CCM_ALWAYS_INLINE static detail::SimdSizeType popcount(MaskMember m)
 		{
-			std::int32_t a[4];
-			detail::si128_store<std::int32_t, 4>(m, a);
+			std::array<std::int32_t, 4> a;
+			detail::si128_store<std::int32_t, 4>(m, a.data());
 			detail::SimdSizeType c = 0;
 			for (int i = 0; i < 4; ++i) { c += (a[i] != 0) ? 1 : 0; }
 			return c;
@@ -387,11 +388,11 @@ namespace ccm::pp
 	#define CCM_PP_MSVC_I32_BIN(NAME, OP)                                                                                                                      \
 		CCM_ALWAYS_INLINE static SimdMember NAME(SimdMember a, SimdMember b)                                                                                   \
 		{                                                                                                                                                      \
-			std::int32_t x[4], y[4];                                                                                                                           \
-			detail::si128_store<std::int32_t, 4>(a, x);                                                                                                        \
-			detail::si128_store<std::int32_t, 4>(b, y);                                                                                                        \
+			std::array<std::int32_t, 4> x, y;                                                                                                                  \
+			detail::si128_store<std::int32_t, 4>(a, x.data());                                                                                                 \
+			detail::si128_store<std::int32_t, 4>(b, y.data());                                                                                                 \
 			for (int i = 0; i < 4; ++i) { x[i] = static_cast<std::int32_t>(x[i] OP y[i]); }                                                                    \
-			return detail::si128_load(x);                                                                                                                      \
+			return detail::si128_load(x.data());                                                                                                               \
 		}
 		CCM_PP_MSVC_I32_BIN(mul, *)
 		CCM_PP_MSVC_I32_BIN(div, /)
@@ -407,22 +408,22 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static SimdMember op_max(SimdMember a, SimdMember b) { return select(gt(a, b), a, b); }
 		CCM_ALWAYS_INLINE static std::int32_t hadd(SimdMember v)
 		{
-			std::int32_t a[4];
-			detail::si128_store<std::int32_t, 4>(v, a);
+			std::array<std::int32_t, 4> a;
+			detail::si128_store<std::int32_t, 4>(v, a.data());
 			return static_cast<std::int32_t>(a[0] + a[1] + a[2] + a[3]);
 		}
 		CCM_ALWAYS_INLINE static std::int32_t hmin(SimdMember v)
 		{
-			std::int32_t a[4];
-			detail::si128_store<std::int32_t, 4>(v, a);
+			std::array<std::int32_t, 4> a;
+			detail::si128_store<std::int32_t, 4>(v, a.data());
 			std::int32_t s = a[0];
 			for (int i = 1; i < 4; ++i) { s = a[i] < s ? a[i] : s; }
 			return s;
 		}
 		CCM_ALWAYS_INLINE static std::int32_t hmax(SimdMember v)
 		{
-			std::int32_t a[4];
-			detail::si128_store<std::int32_t, 4>(v, a);
+			std::array<std::int32_t, 4> a;
+			detail::si128_store<std::int32_t, 4>(v, a.data());
 			std::int32_t s = a[0];
 			for (int i = 1; i < 4; ++i) { s = a[i] > s ? a[i] : s; }
 			return s;
@@ -431,8 +432,8 @@ namespace ccm::pp
 		template <typename U>
 		CCM_ALWAYS_INLINE static typename SimdTraits<U, VecAbi<4>>::SimdMember convert(SimdMember v)
 		{
-			std::int32_t a[4];
-			detail::si128_store<std::int32_t, 4>(v, a);
+			std::array<std::int32_t, 4> a;
+			detail::si128_store<std::int32_t, 4>(v, a.data());
 			typename SimdTraits<U, VecAbi<4>>::SimdMember r;
 			for (detail::SimdSizeType i = 0; i < 4; ++i) { SimdTraits<U, VecAbi<4>>::set(r, i, static_cast<U>(a[i])); }
 			return r;
@@ -446,7 +447,7 @@ namespace ccm::pp
 		}
 	};
 
-	// Mainly the mask type for double; SSE2 has few 64-bit integer ops, so most
+	// Mainly the mask type for double. SSE2 has few 64-bit integer ops, so most
 	// arithmetic/compares spill.
 	template <>
 	struct SimdTraits<std::int64_t, VecAbi<2>>
@@ -462,16 +463,16 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static SimdMember broadcast(std::int64_t v) { return _mm_set1_epi64x(v); }
 		CCM_ALWAYS_INLINE static std::int64_t get(SimdMember const &m, detail::SimdSizeType i)
 		{
-			std::int64_t a[2];
-			detail::si128_store<std::int64_t, 2>(m, a);
+			std::array<std::int64_t, 2> a;
+			detail::si128_store<std::int64_t, 2>(m, a.data());
 			return a[i];
 		}
 		CCM_ALWAYS_INLINE static void set(SimdMember &m, detail::SimdSizeType i, std::int64_t v)
 		{
-			std::int64_t a[2];
-			detail::si128_store<std::int64_t, 2>(m, a);
+			std::array<std::int64_t, 2> a;
+			detail::si128_store<std::int64_t, 2>(m, a.data());
 			a[i] = v;
-			m	 = detail::si128_load(a);
+			m	 = detail::si128_load(a.data());
 		}
 		CCM_ALWAYS_INLINE static SimdMember load(std::int64_t const *p) { return detail::si128_load(p); }
 		CCM_ALWAYS_INLINE static void store(SimdMember const &m, std::int64_t *p) { detail::si128_store<std::int64_t, 2>(m, p); }
@@ -483,12 +484,12 @@ namespace ccm::pp
 	#define CCM_PP_MSVC_I64_CMP(NAME, OP)                                                                                                                      \
 		CCM_ALWAYS_INLINE static MaskMember NAME(SimdMember a, SimdMember b)                                                                                   \
 		{                                                                                                                                                      \
-			std::int64_t x[2], y[2], r[2];                                                                                                                     \
-			detail::si128_store<std::int64_t, 2>(a, x);                                                                                                        \
-			detail::si128_store<std::int64_t, 2>(b, y);                                                                                                        \
+			std::array<std::int64_t, 2> x, y, r;                                                                                                               \
+			detail::si128_store<std::int64_t, 2>(a, x.data());                                                                                                 \
+			detail::si128_store<std::int64_t, 2>(b, y.data());                                                                                                 \
 			r[0] = (x[0] OP y[0]) ? -1 : 0;                                                                                                                    \
 			r[1] = (x[1] OP y[1]) ? -1 : 0;                                                                                                                    \
-			return detail::si128_load(r);                                                                                                                      \
+			return detail::si128_load(r.data());                                                                                                               \
 		}
 		CCM_PP_MSVC_I64_CMP(eq, ==)
 		CCM_PP_MSVC_I64_CMP(ne, !=)
@@ -509,8 +510,8 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static bool any_of(MaskMember m) { return _mm_movemask_pd(_mm_castsi128_pd(m)) != 0; }
 		CCM_ALWAYS_INLINE static detail::SimdSizeType popcount(MaskMember m)
 		{
-			std::int64_t a[2];
-			detail::si128_store<std::int64_t, 2>(m, a);
+			std::array<std::int64_t, 2> a;
+			detail::si128_store<std::int64_t, 2>(m, a.data());
 			return (a[0] != 0 ? 1 : 0) + (a[1] != 0 ? 1 : 0);
 		}
 		CCM_ALWAYS_INLINE static SimdMember select(MaskMember m, SimdMember a, SimdMember b)
@@ -523,12 +524,12 @@ namespace ccm::pp
 	#define CCM_PP_MSVC_I64_BIN(NAME, OP)                                                                                                                      \
 		CCM_ALWAYS_INLINE static SimdMember NAME(SimdMember a, SimdMember b)                                                                                   \
 		{                                                                                                                                                      \
-			std::int64_t x[2], y[2];                                                                                                                           \
-			detail::si128_store<std::int64_t, 2>(a, x);                                                                                                        \
-			detail::si128_store<std::int64_t, 2>(b, y);                                                                                                        \
+			std::array<std::int64_t, 2> x, y;                                                                                                                  \
+			detail::si128_store<std::int64_t, 2>(a, x.data());                                                                                                 \
+			detail::si128_store<std::int64_t, 2>(b, y.data());                                                                                                 \
 			x[0] = static_cast<std::int64_t>(x[0] OP y[0]);                                                                                                    \
 			x[1] = static_cast<std::int64_t>(x[1] OP y[1]);                                                                                                    \
-			return detail::si128_load(x);                                                                                                                      \
+			return detail::si128_load(x.data());                                                                                                               \
 		}
 		CCM_PP_MSVC_I64_BIN(mul, *)
 		CCM_PP_MSVC_I64_BIN(div, /)
@@ -540,28 +541,28 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static SimdMember op_max(SimdMember a, SimdMember b) { return select(gt(a, b), a, b); }
 		CCM_ALWAYS_INLINE static std::int64_t hadd(SimdMember v)
 		{
-			std::int64_t a[2];
-			detail::si128_store<std::int64_t, 2>(v, a);
+			std::array<std::int64_t, 2> a;
+			detail::si128_store<std::int64_t, 2>(v, a.data());
 			return static_cast<std::int64_t>(a[0] + a[1]);
 		}
 		CCM_ALWAYS_INLINE static std::int64_t hmin(SimdMember v)
 		{
-			std::int64_t a[2];
-			detail::si128_store<std::int64_t, 2>(v, a);
+			std::array<std::int64_t, 2> a;
+			detail::si128_store<std::int64_t, 2>(v, a.data());
 			return a[0] < a[1] ? a[0] : a[1];
 		}
 		CCM_ALWAYS_INLINE static std::int64_t hmax(SimdMember v)
 		{
-			std::int64_t a[2];
-			detail::si128_store<std::int64_t, 2>(v, a);
+			std::array<std::int64_t, 2> a;
+			detail::si128_store<std::int64_t, 2>(v, a.data());
 			return a[0] > a[1] ? a[0] : a[1];
 		}
 
 		template <typename U>
 		CCM_ALWAYS_INLINE static typename SimdTraits<U, VecAbi<2>>::SimdMember convert(SimdMember v)
 		{
-			std::int64_t a[2];
-			detail::si128_store<std::int64_t, 2>(v, a);
+			std::array<std::int64_t, 2> a;
+			detail::si128_store<std::int64_t, 2>(v, a.data());
 			typename SimdTraits<U, VecAbi<2>>::SimdMember r;
 			for (detail::SimdSizeType i = 0; i < 2; ++i) { SimdTraits<U, VecAbi<2>>::set(r, i, static_cast<U>(a[i])); }
 			return r;
@@ -575,8 +576,8 @@ namespace ccm::pp
 		}
 	};
 
-	// 256-bit native widths. Floating-point ops need only AVX; integer mask and
-	// bitwise ops are done in the float domain (AVX-safe); 256-bit integer
+	// 256-bit native widths. Floating-point ops need only AVX. Integer mask and
+	// bitwise ops are done in the float domain (AVX-safe). 256-bit integer
 	// arithmetic / compares use AVX2 intrinsics when available and spill otherwise.
 	#if CCMATH_SIMD_HAVE_AVX
 	namespace detail
@@ -611,16 +612,16 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static SimdMember broadcast(float v) { return _mm256_set1_ps(v); }
 		CCM_ALWAYS_INLINE static float get(SimdMember const &m, detail::SimdSizeType i)
 		{
-			float a[8];
-			_mm256_storeu_ps(a, m);
+			std::array<float, 8> a;
+			_mm256_storeu_ps(a.data(), m);
 			return a[i];
 		}
 		CCM_ALWAYS_INLINE static void set(SimdMember &m, detail::SimdSizeType i, float v)
 		{
-			float a[8];
-			_mm256_storeu_ps(a, m);
+			std::array<float, 8> a;
+			_mm256_storeu_ps(a.data(), m);
 			a[i] = v;
-			m	 = _mm256_loadu_ps(a);
+			m	 = _mm256_loadu_ps(a.data());
 		}
 		CCM_ALWAYS_INLINE static SimdMember load(float const *p) { return _mm256_loadu_ps(p); }
 		CCM_ALWAYS_INLINE static void store(SimdMember const &m, float *p) { _mm256_storeu_ps(p, m); }
@@ -641,16 +642,16 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static MaskMember mbroadcast(bool b) { return _mm256_set1_epi32(b ? -1 : 0); }
 		CCM_ALWAYS_INLINE static bool mget(MaskMember const &m, detail::SimdSizeType i)
 		{
-			std::int32_t a[8];
-			detail::si256_store(m, a);
+			std::array<std::int32_t, 8> a;
+			detail::si256_store(m, a.data());
 			return a[i] != 0;
 		}
 		CCM_ALWAYS_INLINE static void mset(MaskMember &m, detail::SimdSizeType i, bool b)
 		{
-			std::int32_t a[8];
-			detail::si256_store(m, a);
+			std::array<std::int32_t, 8> a;
+			detail::si256_store(m, a.data());
 			a[i] = b ? -1 : 0;
-			m	 = detail::si256_load(a);
+			m	 = detail::si256_load(a.data());
 		}
 		CCM_ALWAYS_INLINE static MaskMember mand(MaskMember a, MaskMember b) { return detail::avx_and(a, b); }
 		CCM_ALWAYS_INLINE static MaskMember mor(MaskMember a, MaskMember b) { return detail::avx_or(a, b); }
@@ -660,8 +661,8 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static bool any_of(MaskMember m) { return _mm256_movemask_ps(_mm256_castsi256_ps(m)) != 0; }
 		CCM_ALWAYS_INLINE static detail::SimdSizeType popcount(MaskMember m)
 		{
-			std::int32_t a[8];
-			detail::si256_store(m, a);
+			std::array<std::int32_t, 8> a;
+			detail::si256_store(m, a.data());
 			detail::SimdSizeType c = 0;
 			for (int i = 0; i < 8; ++i) { c += (a[i] != 0) ? 1 : 0; }
 			return c;
@@ -675,10 +676,10 @@ namespace ccm::pp
 		#define CCM_PP_MSVC_F32X8_ROUND(NAME, SFN)                                                                                                             \
 			CCM_ALWAYS_INLINE static SimdMember NAME(SimdMember v)                                                                                             \
 			{                                                                                                                                                  \
-				float a[8];                                                                                                                                    \
-				_mm256_storeu_ps(a, v);                                                                                                                        \
+				std::array<float, 8> a;                                                                                                                        \
+				_mm256_storeu_ps(a.data(), v);                                                                                                                 \
 				for (int i = 0; i < 8; ++i) { a[i] = detail::SFN<float>(a[i]); }                                                                               \
-				return _mm256_loadu_ps(a);                                                                                                                     \
+				return _mm256_loadu_ps(a.data());                                                                                                              \
 			}
 		CCM_PP_MSVC_F32X8_ROUND(op_floor, s_floor)
 		CCM_PP_MSVC_F32X8_ROUND(op_ceil, s_ceil)
@@ -690,34 +691,34 @@ namespace ccm::pp
 		#if CCMATH_SIMD_HAVE_FMA
 			return _mm256_fmadd_ps(a, b, c);
 		#else
-			float aa[8], bb[8], cc[8];
-			_mm256_storeu_ps(aa, a);
-			_mm256_storeu_ps(bb, b);
-			_mm256_storeu_ps(cc, c);
+			std::array<float, 8> aa, bb, cc;
+			_mm256_storeu_ps(aa.data(), a);
+			_mm256_storeu_ps(bb.data(), b);
+			_mm256_storeu_ps(cc.data(), c);
 			for (int i = 0; i < 8; ++i) { aa[i] = detail::s_fma<float>(aa[i], bb[i], cc[i]); }
-			return _mm256_loadu_ps(aa);
+			return _mm256_loadu_ps(aa.data());
 		#endif
 		}
 		CCM_ALWAYS_INLINE static float hadd(SimdMember v)
 		{
-			float a[8];
-			_mm256_storeu_ps(a, v);
+			std::array<float, 8> a;
+			_mm256_storeu_ps(a.data(), v);
 			float s = 0;
 			for (int i = 0; i < 8; ++i) { s += a[i]; }
 			return s;
 		}
 		CCM_ALWAYS_INLINE static float hmin(SimdMember v)
 		{
-			float a[8];
-			_mm256_storeu_ps(a, v);
+			std::array<float, 8> a;
+			_mm256_storeu_ps(a.data(), v);
 			float s = a[0];
 			for (int i = 1; i < 8; ++i) { s = a[i] < s ? a[i] : s; }
 			return s;
 		}
 		CCM_ALWAYS_INLINE static float hmax(SimdMember v)
 		{
-			float a[8];
-			_mm256_storeu_ps(a, v);
+			std::array<float, 8> a;
+			_mm256_storeu_ps(a.data(), v);
 			float s = a[0];
 			for (int i = 1; i < 8; ++i) { s = a[i] > s ? a[i] : s; }
 			return s;
@@ -725,8 +726,8 @@ namespace ccm::pp
 		template <typename U>
 		CCM_ALWAYS_INLINE static typename SimdTraits<U, VecAbi<8>>::SimdMember convert(SimdMember v)
 		{
-			float a[8];
-			_mm256_storeu_ps(a, v);
+			std::array<float, 8> a;
+			_mm256_storeu_ps(a.data(), v);
 			typename SimdTraits<U, VecAbi<8>>::SimdMember r;
 			for (detail::SimdSizeType i = 0; i < 8; ++i) { SimdTraits<U, VecAbi<8>>::set(r, i, static_cast<U>(a[i])); }
 			return r;
@@ -754,16 +755,16 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static SimdMember broadcast(double v) { return _mm256_set1_pd(v); }
 		CCM_ALWAYS_INLINE static double get(SimdMember const &m, detail::SimdSizeType i)
 		{
-			double a[4];
-			_mm256_storeu_pd(a, m);
+			std::array<double, 4> a;
+			_mm256_storeu_pd(a.data(), m);
 			return a[i];
 		}
 		CCM_ALWAYS_INLINE static void set(SimdMember &m, detail::SimdSizeType i, double v)
 		{
-			double a[4];
-			_mm256_storeu_pd(a, m);
+			std::array<double, 4> a;
+			_mm256_storeu_pd(a.data(), m);
 			a[i] = v;
-			m	 = _mm256_loadu_pd(a);
+			m	 = _mm256_loadu_pd(a.data());
 		}
 		CCM_ALWAYS_INLINE static SimdMember load(double const *p) { return _mm256_loadu_pd(p); }
 		CCM_ALWAYS_INLINE static void store(SimdMember const &m, double *p) { _mm256_storeu_pd(p, m); }
@@ -784,16 +785,16 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static MaskMember mbroadcast(bool b) { return _mm256_set1_epi64x(b ? -1 : 0); }
 		CCM_ALWAYS_INLINE static bool mget(MaskMember const &m, detail::SimdSizeType i)
 		{
-			std::int64_t a[4];
-			detail::si256_store(m, a);
+			std::array<std::int64_t, 4> a;
+			detail::si256_store(m, a.data());
 			return a[i] != 0;
 		}
 		CCM_ALWAYS_INLINE static void mset(MaskMember &m, detail::SimdSizeType i, bool b)
 		{
-			std::int64_t a[4];
-			detail::si256_store(m, a);
+			std::array<std::int64_t, 4> a;
+			detail::si256_store(m, a.data());
 			a[i] = b ? -1 : 0;
-			m	 = detail::si256_load(a);
+			m	 = detail::si256_load(a.data());
 		}
 		CCM_ALWAYS_INLINE static MaskMember mand(MaskMember a, MaskMember b) { return detail::avx_and(a, b); }
 		CCM_ALWAYS_INLINE static MaskMember mor(MaskMember a, MaskMember b) { return detail::avx_or(a, b); }
@@ -803,8 +804,8 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static bool any_of(MaskMember m) { return _mm256_movemask_pd(_mm256_castsi256_pd(m)) != 0; }
 		CCM_ALWAYS_INLINE static detail::SimdSizeType popcount(MaskMember m)
 		{
-			std::int64_t a[4];
-			detail::si256_store(m, a);
+			std::array<std::int64_t, 4> a;
+			detail::si256_store(m, a.data());
 			detail::SimdSizeType c = 0;
 			for (int i = 0; i < 4; ++i) { c += (a[i] != 0) ? 1 : 0; }
 			return c;
@@ -818,10 +819,10 @@ namespace ccm::pp
 		#define CCM_PP_MSVC_F64X4_ROUND(NAME, SFN)                                                                                                             \
 			CCM_ALWAYS_INLINE static SimdMember NAME(SimdMember v)                                                                                             \
 			{                                                                                                                                                  \
-				double a[4];                                                                                                                                   \
-				_mm256_storeu_pd(a, v);                                                                                                                        \
+				std::array<double, 4> a;                                                                                                                       \
+				_mm256_storeu_pd(a.data(), v);                                                                                                                 \
 				for (int i = 0; i < 4; ++i) { a[i] = detail::SFN<double>(a[i]); }                                                                              \
-				return _mm256_loadu_pd(a);                                                                                                                     \
+				return _mm256_loadu_pd(a.data());                                                                                                              \
 			}
 		CCM_PP_MSVC_F64X4_ROUND(op_floor, s_floor)
 		CCM_PP_MSVC_F64X4_ROUND(op_ceil, s_ceil)
@@ -833,32 +834,32 @@ namespace ccm::pp
 		#if CCMATH_SIMD_HAVE_FMA
 			return _mm256_fmadd_pd(a, b, c);
 		#else
-			double aa[4], bb[4], cc[4];
-			_mm256_storeu_pd(aa, a);
-			_mm256_storeu_pd(bb, b);
-			_mm256_storeu_pd(cc, c);
+			std::array<double, 4> aa, bb, cc;
+			_mm256_storeu_pd(aa.data(), a);
+			_mm256_storeu_pd(bb.data(), b);
+			_mm256_storeu_pd(cc.data(), c);
 			for (int i = 0; i < 4; ++i) { aa[i] = detail::s_fma<double>(aa[i], bb[i], cc[i]); }
-			return _mm256_loadu_pd(aa);
+			return _mm256_loadu_pd(aa.data());
 		#endif
 		}
 		CCM_ALWAYS_INLINE static double hadd(SimdMember v)
 		{
-			double a[4];
-			_mm256_storeu_pd(a, v);
+			std::array<double, 4> a;
+			_mm256_storeu_pd(a.data(), v);
 			return a[0] + a[1] + a[2] + a[3];
 		}
 		CCM_ALWAYS_INLINE static double hmin(SimdMember v)
 		{
-			double a[4];
-			_mm256_storeu_pd(a, v);
+			std::array<double, 4> a;
+			_mm256_storeu_pd(a.data(), v);
 			double s = a[0];
 			for (int i = 1; i < 4; ++i) { s = a[i] < s ? a[i] : s; }
 			return s;
 		}
 		CCM_ALWAYS_INLINE static double hmax(SimdMember v)
 		{
-			double a[4];
-			_mm256_storeu_pd(a, v);
+			std::array<double, 4> a;
+			_mm256_storeu_pd(a.data(), v);
 			double s = a[0];
 			for (int i = 1; i < 4; ++i) { s = a[i] > s ? a[i] : s; }
 			return s;
@@ -866,8 +867,8 @@ namespace ccm::pp
 		template <typename U>
 		CCM_ALWAYS_INLINE static typename SimdTraits<U, VecAbi<4>>::SimdMember convert(SimdMember v)
 		{
-			double a[4];
-			_mm256_storeu_pd(a, v);
+			std::array<double, 4> a;
+			_mm256_storeu_pd(a.data(), v);
 			typename SimdTraits<U, VecAbi<4>>::SimdMember r;
 			for (detail::SimdSizeType i = 0; i < 4; ++i) { SimdTraits<U, VecAbi<4>>::set(r, i, static_cast<U>(a[i])); }
 			return r;
@@ -895,16 +896,16 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static SimdMember broadcast(std::int32_t v) { return _mm256_set1_epi32(v); }
 		CCM_ALWAYS_INLINE static std::int32_t get(SimdMember const &m, detail::SimdSizeType i)
 		{
-			std::int32_t a[8];
-			detail::si256_store(m, a);
+			std::array<std::int32_t, 8> a;
+			detail::si256_store(m, a.data());
 			return a[i];
 		}
 		CCM_ALWAYS_INLINE static void set(SimdMember &m, detail::SimdSizeType i, std::int32_t v)
 		{
-			std::int32_t a[8];
-			detail::si256_store(m, a);
+			std::array<std::int32_t, 8> a;
+			detail::si256_store(m, a.data());
 			a[i] = v;
-			m	 = detail::si256_load(a);
+			m	 = detail::si256_load(a.data());
 		}
 		CCM_ALWAYS_INLINE static SimdMember load(std::int32_t const *p) { return detail::si256_load(p); }
 		CCM_ALWAYS_INLINE static void store(SimdMember const &m, std::int32_t *p) { detail::si256_store(m, p); }
@@ -920,30 +921,30 @@ namespace ccm::pp
 			#define CCM_PP_I32X8_SPILL2(NAME, OP)                                                                                                              \
 				CCM_ALWAYS_INLINE static SimdMember NAME(SimdMember a, SimdMember b)                                                                           \
 				{                                                                                                                                              \
-					std::int32_t x[8], y[8];                                                                                                                   \
-					detail::si256_store(a, x);                                                                                                                 \
-					detail::si256_store(b, y);                                                                                                                 \
+					std::array<std::int32_t, 8> x, y;                                                                                                          \
+					detail::si256_store(a, x.data());                                                                                                          \
+					detail::si256_store(b, y.data());                                                                                                          \
 					for (int i = 0; i < 8; ++i) { x[i] = static_cast<std::int32_t>(x[i] OP y[i]); }                                                            \
-					return detail::si256_load(x);                                                                                                              \
+					return detail::si256_load(x.data());                                                                                                       \
 				}
 		CCM_PP_I32X8_SPILL2(add, +)
 		CCM_PP_I32X8_SPILL2(sub, -)
 			#undef CCM_PP_I32X8_SPILL2
 		CCM_ALWAYS_INLINE static SimdMember negate(SimdMember a)
 		{
-			std::int32_t x[8];
-			detail::si256_store(a, x);
+			std::array<std::int32_t, 8> x;
+			detail::si256_store(a, x.data());
 			for (int i = 0; i < 8; ++i) { x[i] = static_cast<std::int32_t>(-x[i]); }
-			return detail::si256_load(x);
+			return detail::si256_load(x.data());
 		}
 			#define CCM_PP_I32X8_SPILLCMP(NAME, OP)                                                                                                            \
 				CCM_ALWAYS_INLINE static MaskMember NAME(SimdMember a, SimdMember b)                                                                           \
 				{                                                                                                                                              \
-					std::int32_t x[8], y[8], r[8];                                                                                                             \
-					detail::si256_store(a, x);                                                                                                                 \
-					detail::si256_store(b, y);                                                                                                                 \
+					std::array<std::int32_t, 8> x, y, r;                                                                                                       \
+					detail::si256_store(a, x.data());                                                                                                          \
+					detail::si256_store(b, y.data());                                                                                                          \
 					for (int i = 0; i < 8; ++i) { r[i] = (x[i] OP y[i]) ? -1 : 0; }                                                                            \
-					return detail::si256_load(r);                                                                                                              \
+					return detail::si256_load(r.data());                                                                                                       \
 				}
 		CCM_PP_I32X8_SPILLCMP(eq, ==)
 		CCM_PP_I32X8_SPILLCMP(gt, >)
@@ -965,8 +966,8 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static bool any_of(MaskMember m) { return _mm256_movemask_ps(_mm256_castsi256_ps(m)) != 0; }
 		CCM_ALWAYS_INLINE static detail::SimdSizeType popcount(MaskMember m)
 		{
-			std::int32_t a[8];
-			detail::si256_store(m, a);
+			std::array<std::int32_t, 8> a;
+			detail::si256_store(m, a.data());
 			detail::SimdSizeType c = 0;
 			for (int i = 0; i < 8; ++i) { c += (a[i] != 0) ? 1 : 0; }
 			return c;
@@ -981,11 +982,11 @@ namespace ccm::pp
 		#define CCM_PP_I32X8_SPILLBIN(NAME, OP)                                                                                                                \
 			CCM_ALWAYS_INLINE static SimdMember NAME(SimdMember a, SimdMember b)                                                                               \
 			{                                                                                                                                                  \
-				std::int32_t x[8], y[8];                                                                                                                       \
-				detail::si256_store(a, x);                                                                                                                     \
-				detail::si256_store(b, y);                                                                                                                     \
+				std::array<std::int32_t, 8> x, y;                                                                                                              \
+				detail::si256_store(a, x.data());                                                                                                              \
+				detail::si256_store(b, y.data());                                                                                                              \
 				for (int i = 0; i < 8; ++i) { x[i] = static_cast<std::int32_t>(x[i] OP y[i]); }                                                                \
-				return detail::si256_load(x);                                                                                                                  \
+				return detail::si256_load(x.data());                                                                                                           \
 			}
 		CCM_PP_I32X8_SPILLBIN(mul, *)
 		CCM_PP_I32X8_SPILLBIN(div, /)
@@ -997,24 +998,24 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static SimdMember op_max(SimdMember a, SimdMember b) { return select(gt(a, b), a, b); }
 		CCM_ALWAYS_INLINE static std::int32_t hadd(SimdMember v)
 		{
-			std::int32_t a[8];
-			detail::si256_store(v, a);
+			std::array<std::int32_t, 8> a;
+			detail::si256_store(v, a.data());
 			std::int32_t s = 0;
 			for (int i = 0; i < 8; ++i) { s = static_cast<std::int32_t>(s + a[i]); }
 			return s;
 		}
 		CCM_ALWAYS_INLINE static std::int32_t hmin(SimdMember v)
 		{
-			std::int32_t a[8];
-			detail::si256_store(v, a);
+			std::array<std::int32_t, 8> a;
+			detail::si256_store(v, a.data());
 			std::int32_t s = a[0];
 			for (int i = 1; i < 8; ++i) { s = a[i] < s ? a[i] : s; }
 			return s;
 		}
 		CCM_ALWAYS_INLINE static std::int32_t hmax(SimdMember v)
 		{
-			std::int32_t a[8];
-			detail::si256_store(v, a);
+			std::array<std::int32_t, 8> a;
+			detail::si256_store(v, a.data());
 			std::int32_t s = a[0];
 			for (int i = 1; i < 8; ++i) { s = a[i] > s ? a[i] : s; }
 			return s;
@@ -1022,8 +1023,8 @@ namespace ccm::pp
 		template <typename U>
 		CCM_ALWAYS_INLINE static typename SimdTraits<U, VecAbi<8>>::SimdMember convert(SimdMember v)
 		{
-			std::int32_t a[8];
-			detail::si256_store(v, a);
+			std::array<std::int32_t, 8> a;
+			detail::si256_store(v, a.data());
 			typename SimdTraits<U, VecAbi<8>>::SimdMember r;
 			for (detail::SimdSizeType i = 0; i < 8; ++i) { SimdTraits<U, VecAbi<8>>::set(r, i, static_cast<U>(a[i])); }
 			return r;
@@ -1051,16 +1052,16 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static SimdMember broadcast(std::int64_t v) { return _mm256_set1_epi64x(v); }
 		CCM_ALWAYS_INLINE static std::int64_t get(SimdMember const &m, detail::SimdSizeType i)
 		{
-			std::int64_t a[4];
-			detail::si256_store(m, a);
+			std::array<std::int64_t, 4> a;
+			detail::si256_store(m, a.data());
 			return a[i];
 		}
 		CCM_ALWAYS_INLINE static void set(SimdMember &m, detail::SimdSizeType i, std::int64_t v)
 		{
-			std::int64_t a[4];
-			detail::si256_store(m, a);
+			std::array<std::int64_t, 4> a;
+			detail::si256_store(m, a.data());
 			a[i] = v;
-			m	 = detail::si256_load(a);
+			m	 = detail::si256_load(a.data());
 		}
 		CCM_ALWAYS_INLINE static SimdMember load(std::int64_t const *p) { return detail::si256_load(p); }
 		CCM_ALWAYS_INLINE static void store(SimdMember const &m, std::int64_t *p) { detail::si256_store(m, p); }
@@ -1075,35 +1076,35 @@ namespace ccm::pp
 		#else
 		CCM_ALWAYS_INLINE static SimdMember add(SimdMember a, SimdMember b)
 		{
-			std::int64_t x[4], y[4];
-			detail::si256_store(a, x);
-			detail::si256_store(b, y);
+			std::array<std::int64_t, 4> x, y;
+			detail::si256_store(a, x.data());
+			detail::si256_store(b, y.data());
 			for (int i = 0; i < 4; ++i) { x[i] = static_cast<std::int64_t>(x[i] + y[i]); }
-			return detail::si256_load(x);
+			return detail::si256_load(x.data());
 		}
 		CCM_ALWAYS_INLINE static SimdMember sub(SimdMember a, SimdMember b)
 		{
-			std::int64_t x[4], y[4];
-			detail::si256_store(a, x);
-			detail::si256_store(b, y);
+			std::array<std::int64_t, 4> x, y;
+			detail::si256_store(a, x.data());
+			detail::si256_store(b, y.data());
 			for (int i = 0; i < 4; ++i) { x[i] = static_cast<std::int64_t>(x[i] - y[i]); }
-			return detail::si256_load(x);
+			return detail::si256_load(x.data());
 		}
 		CCM_ALWAYS_INLINE static SimdMember negate(SimdMember a)
 		{
-			std::int64_t x[4];
-			detail::si256_store(a, x);
+			std::array<std::int64_t, 4> x;
+			detail::si256_store(a, x.data());
 			for (int i = 0; i < 4; ++i) { x[i] = static_cast<std::int64_t>(-x[i]); }
-			return detail::si256_load(x);
+			return detail::si256_load(x.data());
 		}
 			#define CCM_PP_I64X4_SPILLCMP(NAME, OP)                                                                                                            \
 				CCM_ALWAYS_INLINE static MaskMember NAME(SimdMember a, SimdMember b)                                                                           \
 				{                                                                                                                                              \
-					std::int64_t x[4], y[4], r[4];                                                                                                             \
-					detail::si256_store(a, x);                                                                                                                 \
-					detail::si256_store(b, y);                                                                                                                 \
+					std::array<std::int64_t, 4> x, y, r;                                                                                                       \
+					detail::si256_store(a, x.data());                                                                                                          \
+					detail::si256_store(b, y.data());                                                                                                          \
 					for (int i = 0; i < 4; ++i) { r[i] = (x[i] OP y[i]) ? -1 : 0; }                                                                            \
-					return detail::si256_load(r);                                                                                                              \
+					return detail::si256_load(r.data());                                                                                                       \
 				}
 		CCM_PP_I64X4_SPILLCMP(eq, ==)
 		CCM_PP_I64X4_SPILLCMP(gt, >)
@@ -1125,8 +1126,8 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static bool any_of(MaskMember m) { return _mm256_movemask_pd(_mm256_castsi256_pd(m)) != 0; }
 		CCM_ALWAYS_INLINE static detail::SimdSizeType popcount(MaskMember m)
 		{
-			std::int64_t a[4];
-			detail::si256_store(m, a);
+			std::array<std::int64_t, 4> a;
+			detail::si256_store(m, a.data());
 			detail::SimdSizeType c = 0;
 			for (int i = 0; i < 4; ++i) { c += (a[i] != 0) ? 1 : 0; }
 			return c;
@@ -1141,11 +1142,11 @@ namespace ccm::pp
 		#define CCM_PP_I64X4_SPILLBIN(NAME, OP)                                                                                                                \
 			CCM_ALWAYS_INLINE static SimdMember NAME(SimdMember a, SimdMember b)                                                                               \
 			{                                                                                                                                                  \
-				std::int64_t x[4], y[4];                                                                                                                       \
-				detail::si256_store(a, x);                                                                                                                     \
-				detail::si256_store(b, y);                                                                                                                     \
+				std::array<std::int64_t, 4> x, y;                                                                                                              \
+				detail::si256_store(a, x.data());                                                                                                              \
+				detail::si256_store(b, y.data());                                                                                                              \
 				for (int i = 0; i < 4; ++i) { x[i] = static_cast<std::int64_t>(x[i] OP y[i]); }                                                                \
-				return detail::si256_load(x);                                                                                                                  \
+				return detail::si256_load(x.data());                                                                                                           \
 			}
 		CCM_PP_I64X4_SPILLBIN(mul, *)
 		CCM_PP_I64X4_SPILLBIN(div, /)
@@ -1157,22 +1158,22 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static SimdMember op_max(SimdMember a, SimdMember b) { return select(gt(a, b), a, b); }
 		CCM_ALWAYS_INLINE static std::int64_t hadd(SimdMember v)
 		{
-			std::int64_t a[4];
-			detail::si256_store(v, a);
+			std::array<std::int64_t, 4> a;
+			detail::si256_store(v, a.data());
 			return static_cast<std::int64_t>(a[0] + a[1] + a[2] + a[3]);
 		}
 		CCM_ALWAYS_INLINE static std::int64_t hmin(SimdMember v)
 		{
-			std::int64_t a[4];
-			detail::si256_store(v, a);
+			std::array<std::int64_t, 4> a;
+			detail::si256_store(v, a.data());
 			std::int64_t s = a[0];
 			for (int i = 1; i < 4; ++i) { s = a[i] < s ? a[i] : s; }
 			return s;
 		}
 		CCM_ALWAYS_INLINE static std::int64_t hmax(SimdMember v)
 		{
-			std::int64_t a[4];
-			detail::si256_store(v, a);
+			std::array<std::int64_t, 4> a;
+			detail::si256_store(v, a.data());
 			std::int64_t s = a[0];
 			for (int i = 1; i < 4; ++i) { s = a[i] > s ? a[i] : s; }
 			return s;
@@ -1180,8 +1181,8 @@ namespace ccm::pp
 		template <typename U>
 		CCM_ALWAYS_INLINE static typename SimdTraits<U, VecAbi<4>>::SimdMember convert(SimdMember v)
 		{
-			std::int64_t a[4];
-			detail::si256_store(v, a);
+			std::array<std::int64_t, 4> a;
+			detail::si256_store(v, a.data());
 			typename SimdTraits<U, VecAbi<4>>::SimdMember r;
 			for (detail::SimdSizeType i = 0; i < 4; ++i) { SimdTraits<U, VecAbi<4>>::set(r, i, static_cast<U>(a[i])); }
 			return r;

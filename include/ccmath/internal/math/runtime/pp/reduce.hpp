@@ -31,7 +31,7 @@ namespace ccm::pp
 		template <typename T>
 		CCM_ALWAYS_INLINE T reduce_min_identity()
 		{
-			if constexpr (std::is_floating_point<T>::value) { return std::numeric_limits<T>::infinity(); }
+			if constexpr (std::is_floating_point_v<T>) { return std::numeric_limits<T>::infinity(); }
 			else
 			{
 				return std::numeric_limits<T>::max();
@@ -40,7 +40,7 @@ namespace ccm::pp
 		template <typename T>
 		CCM_ALWAYS_INLINE T reduce_max_identity()
 		{
-			if constexpr (std::is_floating_point<T>::value) { return -std::numeric_limits<T>::infinity(); }
+			if constexpr (std::is_floating_point_v<T>) { return -std::numeric_limits<T>::infinity(); }
 			else
 			{
 				return std::numeric_limits<T>::lowest();

@@ -42,7 +42,6 @@ namespace ccm
 	 *      return quotient;
 	 *  }
 	 *  @endcode
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/remquo
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T remquo(T x, T y, int * quo)
@@ -50,7 +49,9 @@ namespace ccm
 		if constexpr (std::is_same_v<T, float>) { return internal::remquo_float(x, y, quo); }
 		else
 		{
-			return internal::remquo_double(x, y, quo);
+			// double runs natively. long double delegates to the double kernel, so the narrowing
+			// is made explicit to stay clean under -Wconversion.
+			return static_cast<T>(internal::remquo_double(static_cast<double>(x), static_cast<double>(y), quo));
 		}
 	}
 
@@ -82,7 +83,6 @@ namespace ccm
 	 *      return quotient;
 	 *  }
 	 *  @endcode
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/remquo
 	 */
 	template <class Arithmetic1, class Arithmetic2, std::enable_if_t<std::is_arithmetic_v<Arithmetic1> && std::is_arithmetic_v<Arithmetic2>, bool> = true>
 	constexpr std::common_type_t<Arithmetic1, Arithmetic2> remquo(Arithmetic1 x, Arithmetic2 y, int * quo)
@@ -117,7 +117,6 @@ namespace ccm
 	 *      return quotient;
 	 *  }
 	 *  @endcode
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/remquo
 	 */
 	constexpr float remquof(float x, float y, int * quo)
 	{ return ccm::remquo<float>(x, y, quo); }
@@ -148,7 +147,6 @@ namespace ccm
 	 *      return quotient;
 	 *  }
 	 *  @endcode
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/remquo
 	 */
 	constexpr long double remquol(long double x, long double y, int * quo)
 	{

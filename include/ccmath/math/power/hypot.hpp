@@ -25,7 +25,6 @@ namespace ccm
 	 * @param x First value.
 	 * @param y Second value.
 	 * @return sqrt(x*x + y*y) computed with scaling behavior suitable for floating-point range.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/hypot
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T hypot(T x, T y) noexcept
@@ -45,7 +44,6 @@ namespace ccm
 	 * @param y Second value.
 	 * @param z Third value.
 	 * @return sqrt(x*x + y*y + z*z) computed with the same scaling behavior as the 2-argument overload.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/hypot
 	 */
 	constexpr float hypot(float x, float y, float z) noexcept
 	{ return ccm::hypot(ccm::hypot(x, y), z); }
@@ -71,7 +69,6 @@ namespace ccm
 	 * @param x First value.
 	 * @param y Second value.
 	 * @return Hypotenuse length as float.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/hypot
 	 */
 	constexpr float hypotf(float x, float y) noexcept
 	{ return ccm::hypot(x, y); }
@@ -81,7 +78,6 @@ namespace ccm
 	 * @param x First value.
 	 * @param y Second value.
 	 * @return Hypotenuse length as long double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/hypot
 	 */
 	constexpr long double hypotl(long double x, long double y) noexcept
 	{ return ccm::hypot(x, y); }

@@ -56,7 +56,7 @@ namespace ccm::support
 	template <>
 	struct floating_point_traits<double>
 	{
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT128)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT128
 		using upgraded_floating_type = long double;
 #elif defined(CCM_TYPES_HAS_FLOAT128)
 		using upgraded_floating_type = ccm::types::float128;
@@ -92,7 +92,7 @@ namespace ccm::support
 		static constexpr double max_safe_integer = 0x1p+53; // 9007199254740992.0 (2^53)
 	};
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT128)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT128
 	template <>
 	struct floating_point_traits<long double>
 	{

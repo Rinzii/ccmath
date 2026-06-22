@@ -10,10 +10,10 @@
 
 #pragma once
 
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "fp_bits.hpp"
 
-#include <cfenv>
 #include <cstdint>
 #include <type_traits>
 
@@ -44,12 +44,12 @@ namespace ccm::support::fp
 		using FPBits_t	= ccm::support::fp::FPBits<T>;
 		using Storage_t = typename FPBits_t::storage_type;
 
-		FPBits_t bits(val);
+		FPBits_t const bits(val);
 
 		if (bits.is_inf_or_nan() || bits.is_zero()) { return val; }
 
-		bool is_neg	 = bits.is_neg();
-		int exponent = bits.get_exponent();
+		bool const is_neg  = bits.is_neg();
+		int const exponent = bits.get_exponent();
 
 		// If our exponent is greater than the most negative possible mantissa, then x is in fact already an integral.
 		if (exponent >= static_cast<int>(FPBits_t::fraction_length)) { return val; }
@@ -90,12 +90,12 @@ namespace ccm::support::fp
 		if (truncated_value == val) { return val; }
 
 		// Bits below the rounding point and the half-way bit for tie handling.
-		Storage_t trimmed_value = bits.get_mantissa() & ((Storage_t(1) << trimming_length) - 1);
-		Storage_t half_value	= Storage_t(1) << (trimming_length - 1);
+		Storage_t const trimmed_value = bits.get_mantissa() & ((Storage_t(1) << trimming_length) - 1);
+		Storage_t const half_value	  = Storage_t(1) << (trimming_length - 1);
 
 		// If the event that the exponent is 0, the trimmed_length variable will be equal to the width of the mantissa and truncated_value_is_odd
 		// will not be the correct value. In such instances, we handle this special case below inside the switch statement.
-		Storage_t truncated_value_is_odd = new_bits.get_mantissa() & (Storage_t(1) << trimming_length);
+		Storage_t const truncated_value_is_odd = new_bits.get_mantissa() & (Storage_t(1) << trimming_length);
 
 		switch (provided_round_mode)
 		{

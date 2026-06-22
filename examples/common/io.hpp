@@ -8,9 +8,7 @@
 namespace ccm::examples
 {
 	inline void banner(std::string_view title)
-	{
-		std::cout << "\n=== " << title << " ===\n";
-	}
+	{ std::cout << "\n=== " << title << " ===\n"; }
 
 	inline void section(std::string_view name)
 	{ std::cout << '\n' << name << '\n'; }

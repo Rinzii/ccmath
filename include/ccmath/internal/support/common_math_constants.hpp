@@ -75,12 +75,15 @@ namespace ccm::support::constants
 		0x1.5ee02a9241675p-1, 0x1.60e32f44788d8p-1
 	};
 
-	// Range reduction constants for logarithms.
+	// Range reduction constants for logarithms, adapted from LLVM-libc
+	// (libc/src/__support/math/common_constants.h). The algorithm is described at
+	// https://libc.llvm.org/headers/math/log.html.
 	// r(0) = 1, r(127) = 0.5
 	// r(k) = 2^-8 * ceil(2^8 * (1 - 2^-8) / (1 + k*2^-7))
 	// The constants are chosen so that v = fma(r, m_x, -1) is exact in single
 	// precision, and -2^-8 <= v < 2^-7.
-	// TODO(IanP): Add reference to paper these constants are derived from once lntue has published the paper.
+	// TODO(IanP): Add the formal paper reference once it is published. The citation is still
+	// pending upstream too, as TODO(lntue) in LLVM-libc common_constants.h.
 	alignas(32) constexpr std::array<float, 128> R = {
 		0x1p0,	   0x1.fcp-1, 0x1.f8p-1, 0x1.f4p-1, 0x1.fp-1,  0x1.ecp-1, 0x1.e8p-1, 0x1.e4p-1, 0x1.ep-1,  0x1.dep-1, 0x1.dap-1, 0x1.d6p-1, 0x1.d4p-1,
 		0x1.dp-1,  0x1.ccp-1, 0x1.cap-1, 0x1.c6p-1, 0x1.c4p-1, 0x1.cp-1,  0x1.bep-1, 0x1.bap-1, 0x1.b8p-1, 0x1.b4p-1, 0x1.b2p-1, 0x1.aep-1, 0x1.acp-1,

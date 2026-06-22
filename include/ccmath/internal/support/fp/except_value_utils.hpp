@@ -16,12 +16,13 @@
 #pragma once
 
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
 
-#include <cfenv>
+#include <array>
 #include <optional>
 
 namespace ccm::support::fp
@@ -42,7 +43,7 @@ namespace ccm::support::fp
 			StorageType rnd_tonearest_offset;
 		};
 
-		Mapping values[N];
+		std::array<Mapping, N> values;
 
 		[[nodiscard]] constexpr std::optional<T> lookup(StorageType x_bits) const
 		{

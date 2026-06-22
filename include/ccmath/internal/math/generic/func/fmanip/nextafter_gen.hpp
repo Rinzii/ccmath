@@ -26,7 +26,7 @@ namespace ccm::gen
 		ccm::support::fp::FPBits<TFrom> from_bits(from);
 		if (from_bits.is_nan()) { return from; }
 
-		ccm::support::fp::FPBits<TTo> to_bits(to);
+		ccm::support::fp::FPBits<TTo> const to_bits(to);
 		if (to_bits.is_nan()) { return static_cast<TFrom>(to); }
 
 		// This evaluation will only work so long as 'Arithmetic2' is a greater than or equal to the precision of 'Arithmetic1'
@@ -54,7 +54,7 @@ namespace ccm::gen
 		return from_bits.get_val();
 	}
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
 	// Specialization for 80-bit long double
 	// NOLINTNEXTLINE(readability-function-cognitive-complexity) - This function is complex by nature due to the nature of handling 80-bit long double
 	constexpr long double nextafter(long double from, long double to)

@@ -17,11 +17,11 @@
 
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
 #include "ccmath/internal/types/dyadic_float.hpp"
 
-#include <cfenv>
 #include <type_traits>
 
 namespace ccm::support::fp

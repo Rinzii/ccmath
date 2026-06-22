@@ -12,7 +12,7 @@
 
 #include "ccmath/internal/math/generic/builtins/trig/sin.hpp"
 #include "ccmath/internal/math/generic/func/trig/sin_gen.hpp"
-#include "ccmath/internal/math/runtime/func/detail/msvc_libm.hpp"
+#include "ccmath/internal/math/runtime/func/detail/system_math.hpp"
 #include "ccmath/internal/math/runtime/func/rt_dispatch.hpp"
 #include "ccmath/internal/math/runtime/func/svml_dispatch.hpp"
 #include "ccmath/internal/math/runtime/simd/func/catalog.hpp"
@@ -24,8 +24,8 @@ namespace ccm::rt
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	[[nodiscard]] inline T sin_rt(T num) noexcept
 	{
-#if defined(_MSC_VER) && !defined(__clang__)
-		return detail::msvc_libm::sin_call(num);
+#if defined(CCM_CONFIG_SYSTEM_MATH)
+		return detail::sys::sin_call(num);
 #else
 		if constexpr (ccm::builtin::has_runtime_sin<T>) { return ccm::builtin::sin_rt(num); }
 		else

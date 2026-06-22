@@ -27,7 +27,6 @@ namespace ccm
 	 * @param x Left-hand side of the comparison.
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the smaller of two floating point values. The value returned is exact and does not depend on any rounding modes.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/fmin
 	 */
 	template <typename T>
 	constexpr T min(const T x, const T y) noexcept
@@ -51,7 +50,6 @@ namespace ccm
 	 * @param x Left-hand side of the comparison.
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the smaller of two floating point values. The value returned is exact and does not depend on any rounding modes.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/fmin
 	 */
 	template <typename T, typename U>
 	constexpr T min(const T x, const U y) noexcept
@@ -69,7 +67,6 @@ namespace ccm
 	 * @param x Left-hand side of the comparison.
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the smaller of two floating point values. The value returned is exact and does not depend on any rounding modes.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/fmin
 	 */
 	template <typename Real, std::enable_if_t<!std::is_integral_v<Real>, bool> = true>
 	constexpr Real fmin(const Real x, const Real y) noexcept
@@ -82,7 +79,6 @@ namespace ccm
 	 * @param x Left-hand side of the comparison.
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the smaller of two floating point values. The value returned is exact and does not depend on any rounding modes.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/fmin
 	 */
 	template <typename T, typename U>
 	constexpr auto fmin(const T x, const U y) noexcept
@@ -100,7 +96,6 @@ namespace ccm
 	 * @param x Right-hand side of the comparison.
 	 * @param y Left-hand side of the comparison.
 	 * @return If successful, returns the smaller of two floating point values. The value returned is exact and does not depend on any rounding modes.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/fmin
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr Integer fmin(const Integer x, const Integer y) noexcept

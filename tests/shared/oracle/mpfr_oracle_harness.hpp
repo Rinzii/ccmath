@@ -219,7 +219,7 @@ namespace ccm::test::oracle
 
 			if (is_exceptional_or_zero_result(actual) || is_exceptional_or_zero_result(fallback_expected))
 			{
-				// MPFR is the correctly-rounded oracle; std::pow is only the fallback for IEEE
+				// MPFR is the correctly-rounded oracle. std::pow is only the fallback for IEEE
 				// special-case conventions MPFR may not model (signed zeros, inf/NaN from C rules).
 				// A result that matches the correctly-rounded MPFR value is never a failure, even
 				// when the platform std::pow disagrees: e.g. pow(2, -1074) is exactly the smallest

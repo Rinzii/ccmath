@@ -35,7 +35,6 @@ namespace ccm::ext
 	 * @tparam mode Alignment direction (eUP or eDOWN).
 	 * @param value Value to align.
 	 * @return value rounded to the nearest aligned multiple according to mode.
-	 * @see https://en.cppreference.com/w/cpp/memory/align
 	 */
 	template <typename T, std::size_t alignment, AR::Direction mode, std::enable_if_t<std::is_integral_v<T>, bool> = true>
 	constexpr T align(T value) noexcept
@@ -92,7 +91,6 @@ namespace ccm::ext
 	 * @tparam alignment Alignment boundary as a compile-time constant.
 	 * @param value Value to align.
 	 * @return value rounded up to the alignment boundary.
-	 * @see https://en.cppreference.com/w/cpp/memory/align
 	 */
 	template <typename T, std::size_t alignment, std::enable_if_t<std::is_integral_v<T>, bool> = true>
 	constexpr T align_up(T value) noexcept
@@ -104,7 +102,6 @@ namespace ccm::ext
 	 * @tparam alignment Alignment boundary as a compile-time constant.
 	 * @param value Value to align.
 	 * @return value rounded down to the alignment boundary.
-	 * @see https://en.cppreference.com/w/cpp/memory/align
 	 */
 	template <typename T, std::size_t alignment, std::enable_if_t<std::is_integral_v<T>, bool> = true>
 	constexpr T align_down(T value) noexcept

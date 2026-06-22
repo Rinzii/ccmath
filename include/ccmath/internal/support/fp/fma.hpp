@@ -14,6 +14,7 @@
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
@@ -21,7 +22,6 @@
 #include "ccmath/internal/types/dyadic_float.hpp"
 #include "ccmath/internal/types/sign.hpp"
 
-#include <cfenv>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
@@ -164,7 +164,7 @@ namespace ccm::support::fp
 
 				// When the addend is a quiet NaN, glibc std::fma does not raise FE_INVALID for an
 				// inf*0 product. Apple libm does. Match the platform libm observable behavior.
-#if defined(__APPLE__)
+#ifdef __APPLE__
 				if (CCM_UNLIKELY((x_bits.is_zero() && y_bits.is_inf()) || (x_bits.is_inf() && y_bits.is_zero())))
 #else
 				if (CCM_UNLIKELY(!z_bits.is_quiet_nan() && ((x_bits.is_zero() && y_bits.is_inf()) || (x_bits.is_inf() && y_bits.is_zero()))))
@@ -363,9 +363,9 @@ namespace ccm::support::fp
 			using AccInt	  = typename Traits::acc_int;
 			using Sign		  = types::Sign;
 
-			FPBits x_bits(x);
-			FPBits y_bits(y);
-			FPBits z_bits(z);
+			FPBits const x_bits(x);
+			FPBits const y_bits(y);
+			FPBits const z_bits(z);
 
 			T special_result{};
 			if (special_case_fma<T, ShouldSignalExceptions>(x_bits, y_bits, z_bits, special_result)) { return special_result; }
@@ -510,7 +510,7 @@ namespace ccm::support::fp
 				return FPBits::quiet_nan().get_val();
 			}
 
-			if (CCM_UNLIKELY(x == T(0) || y == T(0) || z == T(0))) { return x * y + z; }
+			if (CCM_UNLIKELY(x == T(0) || y == T(0) || z == T(0))) { return (x * y) + z; }
 
 			int x_exp = 0;
 			int y_exp = 0;
@@ -549,7 +549,7 @@ namespace ccm::support::fp
 			if (CCM_UNLIKELY(x_exp == FPBits::max_biased_exponent || y_exp == FPBits::max_biased_exponent || z_exp == FPBits::max_biased_exponent))
 			{
 				if (CCM_UNLIKELY(x_exp != FPBits::max_biased_exponent && y_exp != FPBits::max_biased_exponent && z_bits.is_inf())) { return z; }
-				return x * y + z;
+				return (x * y) + z;
 			}
 
 			const StorageType x_mant = x_bits.get_explicit_mantissa();
@@ -557,13 +557,13 @@ namespace ccm::support::fp
 			TmpResultType z_mant	 = TmpResultType(z_bits.get_explicit_mantissa());
 
 			TmpResultType prod_mant = TmpResultType(x_mant) * TmpResultType(y_mant);
-			int prod_lsb_exp		= x_exp + y_exp - (FPBits::exponent_bias + 2 * static_cast<int>(FPBits::fraction_length));
+			int prod_lsb_exp		= x_exp + y_exp - (FPBits::exponent_bias + (2 * static_cast<int>(FPBits::fraction_length)));
 
 			constexpr int RESULT_MIN_LEN = static_cast<int>(PROD_LEN) - static_cast<int>(FPBits::fraction_length);
 			z_mant <<= static_cast<std::size_t>(RESULT_MIN_LEN);
-			int z_lsb_exp	 = z_exp - (static_cast<int>(FPBits::fraction_length) + RESULT_MIN_LEN);
-			bool sticky_bits = false;
-			bool z_shifted	 = false;
+			int const z_lsb_exp = z_exp - (static_cast<int>(FPBits::fraction_length) + RESULT_MIN_LEN);
+			bool sticky_bits	= false;
+			bool z_shifted		= false;
 
 			if (prod_lsb_exp < z_lsb_exp)
 			{
@@ -640,7 +640,7 @@ namespace ccm::support::fp
 	template <typename T, bool HasConstexprBuiltinFma = ccm::builtin::has_constexpr_fma<T>>
 	struct dispatch_fma_constexpr_builtin
 	{
-		static constexpr T tonearest(T, T, T) { return T{}; }
+		static constexpr T tonearest(T /*unused*/, T /*unused*/, T /*unused*/) { return T{}; }
 	};
 
 	template <typename T>

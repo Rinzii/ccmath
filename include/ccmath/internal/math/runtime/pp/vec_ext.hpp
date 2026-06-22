@@ -29,7 +29,7 @@
 // Compilers that support the GNU/Clang vector extensions: GCC, Clang, Intel's
 // modern oneAPI compiler (ICX, defines __clang__), and the NVIDIA HPC compiler
 // (nvc++, defines __GNUC__). They are listed explicitly for clarity even though
-// ICX/nvc++ already imply __clang__/__GNUC__. Anything else (notably MSVC cl.exe)
+// ICX/nvc++ already imply __clang__/__GNUC__. Anything else (in particular MSVC cl.exe)
 // takes the intrinsic backend or the scalar array fallback.
 #if !defined(CCM_PP_FORCE_ARRAY_BACKEND) && !defined(CCM_PP_FORCE_PORTABLE) && !defined(CCM_PP_FORCE_MSVC_INTRIN) &&                                           \
 	(defined(__clang__) || defined(__GNUC__) || defined(__INTEL_LLVM_COMPILER) || defined(__NVCOMPILER))
@@ -111,7 +111,7 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static SimdMember negate(SimdMember a) { return -a; }
 
 		// A same-size vector comparison yields a vector of the matching signed
-		// integer with all-ones / zero lanes; the cast reinterprets it as our
+		// integer with all-ones / zero lanes. The cast reinterprets it as our
 		// canonical MaskMember type.
 		CCM_ALWAYS_INLINE static MaskMember eq(SimdMember a, SimdMember b) { return reinterpret_mask(a == b); }
 		CCM_ALWAYS_INLINE static MaskMember ne(SimdMember a, SimdMember b) { return reinterpret_mask(a != b); }
@@ -199,7 +199,7 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static detail::vec_builtin_t<U, N> bitcast(SimdMember v)
 		{ return reinterpret_cast<detail::vec_builtin_t<U, N>>(v); }
 
-		// Math primitives. Clang lowers these to packed instructions; GCC takes the
+		// Math primitives. Clang lowers these to packed instructions. GCC takes the
 		// per-lane fallback.
 		CCM_ALWAYS_INLINE static SimdMember op_sqrt(SimdMember v)
 		{

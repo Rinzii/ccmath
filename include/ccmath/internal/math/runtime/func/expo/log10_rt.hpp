@@ -11,7 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/expo/log10.hpp"
-#include "ccmath/internal/math/runtime/func/detail/msvc_libm.hpp"
+#include "ccmath/internal/math/runtime/func/detail/system_math.hpp"
 #include "ccmath/internal/math/runtime/func/rt_dispatch.hpp"
 #include "ccmath/internal/math/runtime/func/svml_dispatch.hpp"
 #include "ccmath/internal/math/runtime/simd/func/catalog.hpp"
@@ -25,11 +25,10 @@ namespace ccm::rt
 	[[nodiscard]] inline T log10_rt(T num) noexcept
 	{
 		const auto scalar = [](T value) { return detail::dispatch_float_double(value, ccm::internal::log10_float, ccm::internal::log10_double); };
-#if defined(_MSC_VER) && !defined(__clang__)
-		// MSVC routes to libm, which is not correctly rounded outside round to nearest.
-		// Outside FE_TONEAREST use the generic kernel instead.
+#if defined(CCM_CONFIG_SYSTEM_MATH)
+		// The system libm is not correctly rounded outside round to nearest, so use the generic kernel there.
 		if (CCM_UNLIKELY(ccm::support::fenv::get_rounding_mode() != FE_TONEAREST)) { return scalar(num); }
-		return detail::msvc_libm::log10_call(num);
+		return detail::sys::log10_call(num);
 #else
 		if constexpr (ccm::builtin::has_runtime_log10<T>)
 		{

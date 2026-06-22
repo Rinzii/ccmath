@@ -13,7 +13,7 @@
 #include "ccmath/internal/config/powl_policy.hpp"
 #include "ccmath/internal/config/type_support.hpp"
 #include "ccmath/internal/math/generic/func/power/pow_impl/pow_impl.hpp"
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
 	#include "ccmath/internal/math/generic/func/power/pow_impl/powl_ld80_kernel.hpp"
 #endif
 #include "ccmath/internal/support/bits.hpp"
@@ -62,7 +62,7 @@ namespace ccm::gen
 				return static_cast<std::int64_t>(unit) << static_cast<unsigned>(scale);
 			}
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
 			constexpr typename PowlFPBits_t::storage_type float80_unit_mantissa(const PowlFPBits_t & bits) noexcept
 			{
 				typename PowlFPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
@@ -99,7 +99,7 @@ namespace ccm::gen
 
 			constexpr bool is_integer(const PowlFPBits_t & bits) noexcept
 			{
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
 				return is_integer_float80_bits(bits);
 #else
 				if (bits.is_nan() || bits.is_inf()) { return false; }
@@ -116,7 +116,7 @@ namespace ccm::gen
 
 			constexpr bool is_odd_integer(const PowlFPBits_t & bits) noexcept
 			{
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
 				std::int64_t magnitude = 0;
 				if (try_extract_int64(bits, magnitude)) { return (magnitude & 1) != 0; }
 				return is_odd_integer_float80_bits(bits);
@@ -144,15 +144,15 @@ namespace ccm::gen
 				if (!is_integer(bits)) { return false; }
 
 				const int exponent = bits.get_explicit_exponent();
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
 				typename PowlFPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
 				if (bits.get_implicit_bit()) { mantissa |= PowlFPBits_t::EXPLICIT_BIT_MASK; }
 				const int trailing_zeros = storage_countr_zero(mantissa);
 				const int scale			 = exponent + trailing_zeros - static_cast<int>(PowlFPBits_t::fraction_length);
 #else
-				typename PowlFPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
-				const int trailing_zeros					 = storage_countr_zero(mantissa);
-				const int scale								 = exponent + trailing_zeros - static_cast<int>(PowlFPBits_t::fraction_length);
+				PowlFPBits_t::storage_type mantissa = bits.get_explicit_mantissa();
+				const int trailing_zeros			= storage_countr_zero(mantissa);
+				const int scale						= exponent + trailing_zeros - static_cast<int>(PowlFPBits_t::fraction_length);
 #endif
 				if (scale < 0) { return false; }
 
@@ -189,7 +189,7 @@ namespace ccm::gen
 			constexpr long double powl_reduced_precision_double_fallback(long double base, long double exp) noexcept
 			{ return static_cast<long double>(::ccm::gen::impl::pow_impl(static_cast<double>(base), static_cast<double>(exp))); }
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
 			// Double-double (compensated) arithmetic for integer powers. Naive exponentiation by
 			// squaring loses the bits past the 64-bit significand on every multiply, which for large
 			// |exp| (e.g. 10^1000) drifts well past the 4 ULP budget. Accumulating the squaring in a
@@ -247,11 +247,11 @@ namespace ccm::gen
 			} // namespace powl_dd
 #endif
 
-			constexpr long double powl_bounded_integer(long double base, std::int64_t exp) noexcept
+			constexpr long double powl_bounded_integer(long double base, std::int64_t exp) noexcept // NOLINT(misc-no-recursion)
 			{
 				if (exp == 0) { return 1.0L; }
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
 				const std::uint64_t magnitude = exp < 0 ? static_cast<std::uint64_t>(-(exp + 1)) + 1U : static_cast<std::uint64_t>(exp);
 				const powl_dd::Pair p		  = powl_dd::ipow(base, magnitude);
 				if (exp < 0) { return powl_dd::reciprocal(p); }
@@ -272,7 +272,7 @@ namespace ccm::gen
 #endif
 			}
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
 			inline constexpr long double kPowlHugeExponentThreshold =
 				2.0L * static_cast<long double>(-LDBL_MIN_EXP + LDBL_MANT_DIG + 1) / static_cast<long double>(LDBL_EPSILON);
 
@@ -393,7 +393,7 @@ namespace ccm::gen
 
 			constexpr long double powl_impl(long double base, long double exp) noexcept
 			{
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
 				// long double is a double alias. Same kernel as pow, not extended precision.
 				return static_cast<long double>(::ccm::gen::impl::pow_impl(static_cast<double>(base), static_cast<double>(exp)));
 #elif defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)

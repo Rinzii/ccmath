@@ -33,8 +33,7 @@ namespace ccm
 	 * @brief Computes log(1 + num) with improved accuracy near zero.
 	 * @tparam T Floating-point type.
 	 * @param num Floating-point value.
-	 * @return Natural logarithm of 1 + num; returns -inf for num == -1 and NaN for num < -1.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/log1p
+	 * @return Natural logarithm of 1 + num. Returns -inf for num == -1 and NaN for num < -1.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T log1p(T num)
@@ -77,7 +76,6 @@ namespace ccm
 	 * @tparam Integer Integral type.
 	 * @param num Integer value.
 	 * @return Natural logarithm of 1 + num as double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/log1p
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double log1p(Integer num)
@@ -87,7 +85,6 @@ namespace ccm
 	 * @brief Computes log(1 + num) for float.
 	 * @param num Floating-point value.
 	 * @return Natural logarithm of 1 + num as float.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/log1p
 	 */
 	constexpr float log1pf(float num)
 	{ return ccm::log1p<float>(num); }
@@ -96,7 +93,6 @@ namespace ccm
 	 * @brief Computes log(1 + num) for long double.
 	 * @param num Floating-point value.
 	 * @return Natural logarithm of 1 + num as long double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/log1p
 	 */
 	constexpr long double log1pl(long double num)
 	{ return ccm::log1p<long double>(num); }

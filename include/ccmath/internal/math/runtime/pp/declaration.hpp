@@ -105,7 +105,7 @@ namespace ccm::pp
 		{ return n > 0 && (n & (n - 1)) == 0; }
 	} // namespace detail
 
-	// [simd.abi] ABI tags. ScalarAbi holds a single element; VecAbi<N> holds N
+	// [simd.abi] ABI tags. ScalarAbi holds a single element. VecAbi<N> holds N
 	// lanes backed by a compiler vector extension (or an array fallback).
 	struct ScalarAbi
 	{

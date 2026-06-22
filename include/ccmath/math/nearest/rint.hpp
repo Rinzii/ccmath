@@ -13,13 +13,13 @@
 #include "ccmath/internal/math/runtime/func/nearest/rint_rt.hpp"
 
 #include <ccmath/internal/support/fenv/fenv_support.hpp>
+#include <ccmath/internal/support/fenv/host_fenv.hpp>
 #include <ccmath/internal/support/fenv/rounding_mode.hpp>
 #include <ccmath/internal/support/fp/directional_rounding_utils.hpp>
 #include <ccmath/internal/support/is_constant_evaluated.hpp>
 #include <ccmath/math/compare/isinf.hpp>
 #include <ccmath/math/compare/isnan.hpp>
 
-#include <cfenv>
 #include <type_traits>
 
 namespace ccm
@@ -29,7 +29,6 @@ namespace ccm
 	 * @tparam T The type of the number.
 	 * @param num A floating-point or integer value.
 	 * @return The rounded value.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/rint
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T rint(T num) noexcept
@@ -45,7 +44,6 @@ namespace ccm
 	 * @tparam Integer Integral type.
 	 * @param num Integer value.
 	 * @return num converted to double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/rint
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double rint(Integer num) noexcept
@@ -55,7 +53,6 @@ namespace ccm
 	 * @brief Rounds a float to an integer value using the current rounding mode.
 	 * @param num Floating-point value.
 	 * @return Rounded value as float.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/rint
 	 */
 	constexpr float rintf(float num) noexcept
 	{ return ccm::rint(num); }
@@ -64,7 +61,6 @@ namespace ccm
 	 * @brief Rounds a long double to an integer value using the current rounding mode.
 	 * @param num Floating-point value.
 	 * @return Rounded value as long double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/rint
 	 */
 	constexpr long double rintl(long double num) noexcept
 	{ return ccm::rint(num); }

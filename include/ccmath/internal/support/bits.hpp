@@ -21,6 +21,7 @@
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
 
+#include <array>
 #include <climits>
 #include <cstddef>
 #include <cstdint>
@@ -44,8 +45,8 @@ namespace ccm::support
 		{
 			// Rebuilding a long double from its integer storage is safe in a constant expression: every
 			// bit of the result is sourced from the determinate integer, so the intrinsic handles it.
-			if constexpr (std::is_same_v<To, long double>) { return __builtin_bit_cast(To, from); }
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+			if constexpr (std::is_same_v<To, long double>) { return __builtin_bit_cast(To, from); } // NOLINT(bugprone-branch-clone)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
 			else
 			{
 				// The other direction cannot go through a single __builtin_bit_cast. An x87 80-bit long
@@ -55,7 +56,7 @@ namespace ccm::support
 				// from just the 80 bits the format actually uses, never touching the padding.
 				struct byte_buffer
 				{
-					unsigned char bytes[sizeof(From)];
+					std::array<unsigned char, sizeof(From)> bytes;
 				};
 				const byte_buffer buffer = __builtin_bit_cast(byte_buffer, from);
 
@@ -79,7 +80,7 @@ namespace ccm::support
 							   To>
 	bit_cast(const From & from)
 	{
-#if defined(__clang__)
+#ifdef __clang__
 		if constexpr (sizeof(long double) != sizeof(double))
 		{
 			if constexpr ((std::is_same_v<From, long double> || std::is_same_v<To, long double>) && sizeof(To) == sizeof(From))
