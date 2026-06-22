@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "facts": [
+    {
+      "instruction": "ldr_from_sp",
+      "isa": "aarch64",
+      "category": "stack_reload",
+      "pattern": "ldr s*, [sp, #offset]",
+      "latency_cycles": {"value": null, "source": "unknown", "confidence": "unknown"},
+      "reciprocal_throughput_cycles": {"value": null, "source": "unknown", "confidence": "unknown"},
+      "notes": [
+        "When immediately followed by fmadd, treat as stack_serial_fma_candidate per M1 calibration.",
+        "Different surface syntax than x86 (%rsp) patterns."
+      ],
+      "source_ids": ["asmlab_local_calibration"],
+      "pattern_rule_id": "aarch64_stack_serial_fma"
+    },
+    {
+      "instruction": "bl",
+      "isa": "aarch64",
+      "category": "call",
+      "pattern": "bl symbol",
+      "latency_cycles": {"value": null, "source": "unknown", "confidence": "unknown"},
+      "reciprocal_throughput_cycles": {"value": null, "source": "unknown", "confidence": "unknown"},
+      "notes": [
+        "powf_impl scenario on M1 may retain bl to kernel.",
+        "Triggers call_boundary_thin_slice scope warning when region is small."
+      ],
+      "source_ids": ["asmlab_local_calibration"],
+      "pattern_rule_id": "call_boundary_thin_slice"
+    }
+  ]
+}

@@ -10,12 +10,13 @@
 
 #pragma once
 
+// TODO(IanP): Wire ldexp.hpp constexpr dispatch through ldexp_gen like pow_gen.
 #include "ccmath/internal/config/builtin/bit_cast_support.hpp"
 #include "ccmath/internal/config/builtin/ldexp_support.hpp"
 #include "ccmath/internal/predef/has_const_builtin.hpp"
 #include "ccmath/internal/support/helpers/internal_ldexp.hpp"
 
-/* TODO: Move, remove, or change this to not use bit_cast.
+/* TODO(IanP): Move, remove, or change this to not use bit_cast.
 	#include "ccmath/internal/support/bits.hpp"
 	#include "ccmath/internal/support/fenv/fenv_support.hpp"
 	#include "ccmath/internal/support/floating_point_traits.hpp"
@@ -46,7 +47,7 @@ namespace ccm
 		return static_cast<T>(__builtin_ldexpl(num, exp));
 #else
 		return support::helpers::internal_ldexp(num, exp);
-		/* TODO: Move, remove, or change this to not use bit_cast.
+		/* TODO(IanP): Move, remove, or change this to not use bit_cast.
 		// Fallback option. Does not give perfect results, but generally good enough.
 		int old_exp = static_cast<int>(support::get_exponent_of_floating_point<T>(num));
 
@@ -118,9 +119,7 @@ namespace ccm
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double ldexp(Integer num, int exp) noexcept
-	{
-		return ccm::ldexp<double>(static_cast<double>(num), exp);
-	}
+	{ return ccm::ldexp<double>(static_cast<double>(num), exp); }
 	/**
 	 * @brief Returns the floating-point remainder of the division operation x/y.
 	 * @note
@@ -129,9 +128,7 @@ namespace ccm
 	 * @return The result of parameter num multiplied by 2 to the power of parameter exp.
 	 */
 	constexpr float ldexpf(float num, int exp) noexcept
-	{
-		return ccm::ldexp<float>(num, exp);
-	}
+	{ return ccm::ldexp<float>(num, exp); }
 	/**
 	 * @brief Returns the floating-point remainder of the division operation x/y.
 	 * @note

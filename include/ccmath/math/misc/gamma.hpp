@@ -20,16 +20,15 @@
 namespace ccm
 {
 	/**
-	 * @brief Computes the gamma function.
+	 * @brief Computes the gamma function using the standard std::tgamma entry point.
 	 * @tparam T floating-point or integer type
 	 * @param num floating-point or integer value
 	 * @return If no errors occur, the gamma function value of num is returned.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/tgamma
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T gamma(T num)
+	constexpr T tgamma(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_gamma<T>) { return ccm::builtin::gamma(num); }
+		if constexpr (ccm::builtin::has_constexpr_gamma<T>) { return ccm::builtin::gamma_ct(num); }
 		else
 		{
 			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::gamma_rt(num); }
@@ -46,33 +45,32 @@ namespace ccm
 	 * @tparam Integer Integral type.
 	 * @param num Integer value.
 	 * @return Gamma function value of num as double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/tgamma
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
+	constexpr double tgamma(Integer num)
+	{ return ccm::tgamma<double>(static_cast<double>(num)); }
+
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
+	constexpr T gamma(T num)
+	{ return ccm::tgamma(num); }
+
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double gamma(Integer num)
-	{
-		return ccm::gamma<double>(static_cast<double>(num));
-	}
+	{ return ccm::tgamma(num); }
 
 	/**
 	 * @brief Computes the gamma function for float.
 	 * @param num Floating-point value.
 	 * @return Gamma function value of num as float.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/tgamma
 	 */
 	constexpr float tgammaf(float num)
-	{
-		return ccm::gamma<float>(num);
-	}
+	{ return ccm::tgamma<float>(num); }
 
 	/**
 	 * @brief Computes the gamma function for long double.
 	 * @param num Floating-point value.
 	 * @return Gamma function value of num as long double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/tgamma
 	 */
 	constexpr long double tgammal(long double num)
-	{
-		return ccm::gamma<long double>(num);
-	}
+	{ return ccm::tgamma<long double>(num); }
 } // namespace ccm

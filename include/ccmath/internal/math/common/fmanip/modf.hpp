@@ -20,8 +20,8 @@ namespace ccm
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T modf(T x, T * iptr) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_modf<T>) { return ccm::builtin::modf(x, iptr); }
-		else if constexpr (std::is_same_v<T, float>) { return internal::impl::modf_impl(x, iptr); }
+		if constexpr (ccm::builtin::has_constexpr_modf<T>) { return ccm::builtin::modf_ct(x, iptr); }
+		else if constexpr (std::is_same_v<T, float>) { return internal::impl::modf_impl(x, iptr); } // NOLINT(bugprone-branch-clone)
 		else if constexpr (std::is_same_v<T, double>) { return internal::impl::modf_impl(x, iptr); }
 		else
 		{
@@ -33,12 +33,8 @@ namespace ccm
 	}
 
 	constexpr float modff(float x, float * iptr) noexcept
-	{
-		return ccm::modf(x, iptr);
-	}
+	{ return ccm::modf(x, iptr); }
 
 	constexpr long double modfl(long double x, long double * iptr) noexcept
-	{
-		return ccm::modf(x, iptr);
-	}
+	{ return ccm::modf(x, iptr); }
 } // namespace ccm

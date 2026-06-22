@@ -28,6 +28,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_LOG10
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for log10 that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_LOG10
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_LOG10
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -37,11 +52,20 @@ namespace ccm::builtin
 	template <typename T>
 	inline constexpr bool has_constexpr_log10 =
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_LOG10
-		is_valid_builtin_type<T>;
+		is_valid_transcendental_builtin_type<T>;
 	#else
 			false;
 	#endif
 	// clang-format on
+
+	// TODO: determine actual compiler/version support for runtime __builtin_log10.
+	template <typename T>
+	inline constexpr bool has_runtime_log10 =
+#ifdef CCMATH_HAS_BUILTIN_LOG10
+		is_valid_transcendental_builtin_type<T>;
+#else
+		false;
+#endif
 
 	/**
 	 * @internal
@@ -51,7 +75,7 @@ namespace ccm::builtin
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
-	constexpr auto log10(T x) -> std::enable_if_t<has_constexpr_log10<T>, T>
+	constexpr auto log10_ct(T x) -> std::enable_if_t<has_constexpr_log10<T>, T>
 	{
 		if constexpr (std::is_same_v<T, float>) { return __builtin_log10f(x); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_log10(x); }
@@ -59,7 +83,21 @@ namespace ccm::builtin
 		else
 		{
 			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_log10");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for log10");
+			return T{};
+		}
+	}
+
+	template <typename T>
+	auto log10_rt(T x) -> std::enable_if_t<has_runtime_log10<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>) { return __builtin_log10f(x); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_log10(x); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_log10l(x); }
+		else
+		{
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for log10");
 			return T{};
 		}
 	}
@@ -67,3 +105,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_LOG10
+#undef CCMATH_HAS_BUILTIN_LOG10

@@ -26,7 +26,7 @@ namespace ccm::gen
 		ccm::support::fp::FPBits<TFrom> from_bits(from);
 		if (from_bits.is_nan()) { return from; }
 
-		ccm::support::fp::FPBits<TTo> to_bits(to);
+		ccm::support::fp::FPBits<TTo> const to_bits(to);
 		if (to_bits.is_nan()) { return static_cast<TFrom>(to); }
 
 		// This evaluation will only work so long as 'Arithmetic2' is a greater than or equal to the precision of 'Arithmetic1'
@@ -38,9 +38,15 @@ namespace ccm::gen
 		if (from != TFrom(0))
 		{
 			if ((static_cast<TTo>(from) < to) == (from > TFrom(0))) { from_bits = ccm::support::fp::FPBits<TFrom>(Storage_t(from_bits.uintval() + 1)); }
-			else { from_bits = ccm::support::fp::FPBits<TFrom>(Storage_t(from_bits.uintval() - 1)); }
+			else
+			{
+				from_bits = ccm::support::fp::FPBits<TFrom>(Storage_t(from_bits.uintval() - 1));
+			}
 		}
-		else { from_bits = ccm::support::fp::FPBits<TFrom>::min_subnormal(to_bits.sign()); }
+		else
+		{
+			from_bits = ccm::support::fp::FPBits<TFrom>::min_subnormal(to_bits.sign());
+		}
 
 		if (from_bits.is_subnormal()) { ccm::support::fenv::raise_except_if_required(FE_UNDERFLOW | FE_INEXACT); }
 		else if (from_bits.is_inf()) { ccm::support::fenv::raise_except_if_required(FE_OVERFLOW | FE_INEXACT); }
@@ -48,7 +54,7 @@ namespace ccm::gen
 		return from_bits.get_val();
 	}
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
 	// Specialization for 80-bit long double
 	// NOLINTNEXTLINE(readability-function-cognitive-complexity) - This function is complex by nature due to the nature of handling 80-bit long double
 	constexpr long double nextafter(long double from, long double to)
@@ -89,7 +95,10 @@ namespace ccm::gen
 					if (from_bits.is_inf()) { support::fenv::raise_except_if_required(FE_OVERFLOW | FE_INEXACT); }
 					return from_bits.get_val();
 				}
-				else { from_bits = FPBits_t(static_cast<Storage_t>(from_bits.uintval() + 1)); }
+				else
+				{
+					from_bits = FPBits_t(static_cast<Storage_t>(from_bits.uintval() + 1));
+				}
 			}
 			else // toward +Inf
 			{
@@ -106,7 +115,10 @@ namespace ccm::gen
 					from_bits.set_biased_exponent(from_bits.get_biased_exponent() - 1);
 					return from_bits.get_val();
 				}
-				else { from_bits = FPBits_t(static_cast<Storage_t>(from_bits.uintval() - 1)); }
+				else
+				{
+					from_bits = FPBits_t(static_cast<Storage_t>(from_bits.uintval() - 1));
+				}
 			}
 		}
 		else
@@ -121,7 +133,10 @@ namespace ccm::gen
 					from_bits.set_biased_exponent(from_bits.get_biased_exponent() - 1);
 					return from_bits.get_val();
 				}
-				else { from_bits = FPBits_t(static_cast<Storage_t>(from_bits.uintval() - 1)); }
+				else
+				{
+					from_bits = FPBits_t(static_cast<Storage_t>(from_bits.uintval() - 1));
+				}
 			}
 			else // toward +Inf
 			{
@@ -135,7 +150,10 @@ namespace ccm::gen
 					if (from_bits.is_inf()) { support::fenv::raise_except_if_required(FE_OVERFLOW | FE_INEXACT); }
 					return from_bits.get_val();
 				}
-				else { from_bits = FPBits_t(static_cast<Storage_t>(from_bits.uintval() + 1)); }
+				else
+				{
+					from_bits = FPBits_t(static_cast<Storage_t>(from_bits.uintval() + 1));
+				}
 			}
 		}
 

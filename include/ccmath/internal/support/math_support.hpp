@@ -18,6 +18,7 @@
 #include "ccmath/internal/support/type_traits.hpp"
 
 #include <climits>
+#include <limits>
 
 // CCM_DISABLE_GCC_WARNING(-Wpedantic)
 
@@ -31,34 +32,27 @@ namespace ccm::support
 #if CCM_HAS_BUILTIN(__builtin_add_overflow)
 		return __builtin_add_overflow(a, b, &res);
 #else
-		// This is a fallback implementation that should work on all compilers.
 		static_assert(std::is_integral_v<T>, "T must be an integral type");
 		static_assert(!std::is_same_v<T, bool>, "T must not be a boolean type");
 		static_assert(!std::is_enum_v<T>, "T must not be an enumerated type");
 
-		// Get the largest integral type that can hold the sum of a and b
-		using LargerType = long long;
-		auto la			 = static_cast<LargerType>(a);
-		auto lb			 = static_cast<LargerType>(b);
+		using UnsignedT		 = std::make_unsigned_t<T>;
+		const UnsignedT ua	 = static_cast<UnsignedT>(a);
+		const UnsignedT ub	 = static_cast<UnsignedT>(b);
+		const UnsignedT usum = ua + ub;
 
-		// Perform the addition
-		LargerType const lres = la + lb;
-
-		// Check for overflow by comparing the signs
-		bool overflow = false;
-		if constexpr (std::is_signed_v<T>)
+		if constexpr (std::is_unsigned_v<T>)
 		{
-			if ((a > 0 && b > 0 && lres < 0) || (a < 0 && b < 0 && lres > 0)) { overflow = true; }
+			res = static_cast<T>(usum);
+			return usum < ua;
 		}
 		else
 		{
-			if (static_cast<unsigned long long>(lres) < 0 || static_cast<unsigned long long>(lres) > std::numeric_limits<T>::max()) { overflow = true; }
+			constexpr UnsignedT SIGN_BIT = UnsignedT(1) << (std::numeric_limits<UnsignedT>::digits - 1);
+			const bool overflow			 = ((~(ua ^ ub) & (ua ^ usum)) & SIGN_BIT) != 0;
+			if (!overflow) { res = static_cast<T>(usum); }
+			return overflow;
 		}
-
-		// Store the result if no overflow
-		if (!overflow) { res = static_cast<T>(lres); }
-
-		return overflow;
 #endif
 	}
 
@@ -73,29 +67,23 @@ namespace ccm::support
 		static_assert(!std::is_same_v<T, bool>, "T must not be a boolean type");
 		static_assert(!std::is_enum_v<T>, "T must not be an enumerated type");
 
-		// Get the largest integral type that can hold the sum of a and b
-		using LargerType = long long;
-		auto la			 = static_cast<LargerType>(a);
-		auto lb			 = static_cast<LargerType>(b);
+		using UnsignedT		  = std::make_unsigned_t<T>;
+		const UnsignedT ua	  = static_cast<UnsignedT>(a);
+		const UnsignedT ub	  = static_cast<UnsignedT>(b);
+		const UnsignedT udiff = ua - ub;
 
-		// Perform the subtraction
-		LargerType const lres = la - lb;
-
-		// Check for overflow by comparing the signs
-		bool overflow = false;
-		if constexpr (std::is_signed_v<T>)
+		if constexpr (std::is_unsigned_v<T>)
 		{
-			if ((b > 0 && a < std::numeric_limits<T>::min() + b) || (b < 0 && a > std::numeric_limits<T>::max() + b)) { overflow = true; }
+			res = static_cast<T>(udiff);
+			return ua < ub;
 		}
 		else
 		{
-			if (a < b) { overflow = true; }
+			constexpr UnsignedT SIGN_BIT = UnsignedT(1) << (std::numeric_limits<UnsignedT>::digits - 1);
+			const bool overflow			 = (((ua ^ ub) & (ua ^ udiff)) & SIGN_BIT) != 0;
+			if (!overflow) { res = static_cast<T>(udiff); }
+			return overflow;
 		}
-
-		// Store the result if no overflow
-		if (!overflow) { res = static_cast<T>(lres); }
-
-		return overflow;
 #endif
 	}
 
@@ -103,7 +91,7 @@ namespace ccm::support
 	if constexpr (std::is_same_v<T, TYPE>) { return BUILTIN(a, b, carry_in, &carry_out); }
 
 	// Returns the result of 'a + b' taking into account 'carry_in'.
-	// The carry out is stored in 'carry_out' it not 'nullptr', dropped otherwise.
+	// The carry out is stored in carry_out when provided, dropped otherwise.
 	// We keep the pass by pointer interface for consistency with the intrinsic.
 	template <typename T>
 	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> add_with_carry(T a, T b, T carry_in, T & carry_out)
@@ -130,10 +118,10 @@ namespace ccm::support
 	}
 
 	// Returns the result of 'a - b' taking into account 'carry_in'.
-	// The carry out is stored in 'carry_out' if not 'nullptr', dropped otherwise.
+	// The carry out is stored in carry_out when provided, dropped otherwise.
 	// We keep the pass by pointer interface for consistency with the intrinsic.
 	template <typename T>
-	[[nodiscard]] inline constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> sub_with_borrow(T a, T b, T carry_in, T & carry_out)
+	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> sub_with_borrow(T a, T b, T carry_in, T & carry_out)
 	{
 		if (!is_constant_evaluated())
 		{
@@ -165,43 +153,38 @@ namespace ccm::support
 	CCM_DISABLE_MSVC_WARNING(4293)
 	CCM_DISABLE_CLANG_WARNING(-Wshift-count-overflow) // Disabled for same reasons stated above
 
-	// Create a bitmask with the count right-most bits set to 1, and all other bits
-	// set to 0.  Only unsigned types are allowed.
+	// Rightmost count bits set to 1. Unsigned T only.
 	template <typename T, std::size_t count>
 	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_trailing_ones()
 	{
 		constexpr unsigned T_BITS = CHAR_BIT * sizeof(T);
 		static_assert(count <= T_BITS && "Invalid bit index");
-		return count == 0 ? 0 : (T(-1) >> (T_BITS - count));
+		if constexpr (count == 0) { return T(0); }
+		else
+		{
+			return T(~T(0)) >> (T_BITS - count);
+		}
 	}
 
 	CCM_RESTORE_MSVC_WARNING()
 	CCM_RESTORE_CLANG_WARNING()
 
-	// Create a bitmask with the count left-most bits set to 1, and all other bits
-	// set to 0.  Only unsigned types are allowed.
+	// Only unsigned types are allowed.
 	template <typename T, std::size_t count>
 	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_leading_ones()
-	{
-		return T(~mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>());
-	}
+	{ return T(~mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>()); }
 
-	// Create a bitmask with the count right-most bits set to 0, and all other bits
-	// set to 1.  Only unsigned types are allowed.
+	// Only unsigned types are allowed.
 	template <typename T, std::size_t count>
 	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_trailing_zeros()
-	{
-		return mask_leading_ones<T, CHAR_BIT * sizeof(T) - count>();
-	}
+	{ return mask_leading_ones<T, CHAR_BIT * sizeof(T) - count>(); }
 
-	// Create a bitmask with the count left-most bits set to 0, and all other bits
-	// set to 1.  Only unsigned types are allowed.
+	// Only unsigned types are allowed.
 	template <typename T, std::size_t count>
 	static constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, T> mask_leading_zeros()
-	{
-		return mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>();
-	}
+	{ return mask_trailing_ones<T, CHAR_BIT * sizeof(T) - count>(); }
 
+	// TODO(IanP): Review whether these helpers should replace or merge with exact_add and split in double_double.hpp.
 	/**
 	 * @brief Add a + b, such that &hi + &lo approximates a + b.
 	 *

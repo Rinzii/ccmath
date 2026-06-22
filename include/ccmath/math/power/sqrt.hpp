@@ -25,12 +25,11 @@ namespace ccm
 	 * @tparam T Floating-point type or integer type.
 	 * @param num Floating-point or integer number.
 	 * @return If no errors occur, square root of num (√num), is returned.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/sqrt
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T sqrt(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_sqrt<T>) { return ccm::builtin::sqrt(num); }
+		if constexpr (ccm::builtin::has_constexpr_sqrt<T>) { return ccm::builtin::sqrt_ct(num); }
 		else
 		{
 			if (ccm::support::is_constant_evaluated()) { return ccm::gen::sqrt_gen<T>(num); }
@@ -43,35 +42,26 @@ namespace ccm
 	 * @tparam Integer Integer type.
 	 * @param num Integer number.
 	 * @return If no errors occur, square root of num (√num), is returned.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/sqrt
 	 */
 	template <typename Integer, std::enable_if_t<!std::is_floating_point_v<Integer>, bool> = true>
 	constexpr double sqrt(Integer num)
-	{
-		return ccm::sqrt<double>(static_cast<double>(num));
-	}
+	{ return ccm::sqrt<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Calculates the square root of a number.
 	 * @param num Floating-point number.
 	 * @return If no errors occur, square root of num (√num), is returned.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/sqrt
 	 */
 	constexpr float sqrtf(float num)
-	{
-		return ccm::sqrt<float>(num);
-	}
+	{ return ccm::sqrt<float>(num); }
 
 	/**
 	 * @brief Calculates the square root of a number.
 	 * @param num Floating-point number.
 	 * @return If no errors occur, square root of num (√num), is returned.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/sqrt
 	 */
 	constexpr long double sqrtl(long double num)
-	{
-		return ccm::sqrt<long double>(num);
-	}
+	{ return ccm::sqrt<long double>(num); }
 } // namespace ccm
 
 /// @ingroup power

@@ -1,0 +1,34 @@
+# Floating-point evaluation error of the restricted sine kernel from the
+# approximation guide.  s is the computed value, Ms the same polynomial
+# evaluated without rounding.  Sollya bounds the distance from Ms to sin,
+# this file bounds the distance from s to Ms.
+#
+# Run from the repository root:
+#   gappa docs/approximating_functions/gappa/sin_small_eval.gappa
+
+@rnd = float<ieee_64, ne>;
+
+c1 = 1;
+c3 = -0x1.5555555555555p-3;
+c5 = 0x1.1111111111111p-7;
+c7 = -0x1.a01a01a01a01ap-13;
+c9 = 0x1.71de3a556c734p-19;
+
+# x_ is an arbitrary real, x the double actually passed to the kernel.
+x = rnd(x_);
+
+# The compiled operation sequence, every step rounded.
+z rnd= x * x;
+p rnd= (((c9 * z + c7) * z + c5) * z + c3) * z + c1;
+s rnd= x * p;
+
+# The same polynomial over the reals.
+Mz = x * x;
+Mp = (((c9 * Mz + c7) * Mz + c5) * Mz + c3) * Mz + c1;
+Ms = x * Mp;
+
+# Absolute bound over the full interval, relative bound on the positive
+# half.  The kernel is odd under exact negation, so the relative bound
+# extends to the negative half unchanged.
+{ |x| <= 0x1p-4 -> |s - Ms| <= 0x1.02p-57 /\
+  x in [0x1p-60, 0x1p-4] -> |s -/ Ms| <= 1b-52 }

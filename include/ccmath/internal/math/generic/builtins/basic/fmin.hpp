@@ -29,8 +29,7 @@
 #endif
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_FMIN
-	#if defined(__clang__) && (__clang_major__ > 16 || (__clang_major__ == 16 && __clang_minor__ >= 0)) && !defined(__MSC_VER) &&                              \
-		!defined(__INTEL_LLVM_COMPILER)
+	#if defined(__clang__) && (__clang_major__ > 16 || (__clang_major__ == 16 && __clang_minor__ >= 0)) && !defined(_MSC_VER) && !defined(__INTEL_LLVM_COMPILER)
 		#define CCMATH_HAS_CONSTEXPR_BUILTIN_FMIN
 	#endif
 #endif
@@ -38,6 +37,21 @@
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_FMIN
 	#if defined(__INTEL_LLVM_COMPILER) && (__INTEL_LLVM_COMPILER >= 20230100)
 		#define CCMATH_HAS_CONSTEXPR_BUILTIN_FMIN
+	#endif
+#endif
+
+/// CCMATH_HAS_BUILTIN_FMIN
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for fmin that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_FMIN
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_FMIN
 	#endif
 #endif
 
@@ -56,6 +70,15 @@ namespace ccm::builtin
 	#endif
 	// clang-format on
 
+	// TODO: determine actual compiler/version support for runtime __builtin_fmin.
+	template <typename T>
+	inline constexpr bool has_runtime_fmin =
+#ifdef CCMATH_HAS_BUILTIN_FMIN
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_fmin functions.
@@ -64,7 +87,7 @@ namespace ccm::builtin
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
-	constexpr auto fmin(T x, T y) -> std::enable_if_t<has_constexpr_fmin<T>, T>
+	constexpr auto fmin_ct(T x, T y) -> std::enable_if_t<has_constexpr_fmin<T>, T>
 	{
 		if constexpr (std::is_same_v<T, float>) { return __builtin_fminf(x, y); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_fmin(x, y); }
@@ -72,7 +95,21 @@ namespace ccm::builtin
 		else
 		{
 			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_fmin");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for fmin");
+			return T{};
+		}
+	}
+
+	template <typename T>
+	auto fmin_rt(T x, T y) -> std::enable_if_t<has_runtime_fmin<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>) { return __builtin_fminf(x, y); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_fmin(x, y); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fminl(x, y); }
+		else
+		{
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for fmin");
 			return T{};
 		}
 	}
@@ -80,3 +117,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_FMIN
+#undef CCMATH_HAS_BUILTIN_FMIN

@@ -46,7 +46,6 @@
 #endif
 
 // Apple Clang 5.0.0+ has constexpr __builtin_copysign that DOES allow static_assert.
-// TODO: Verify Apple Clang shares functionality with Clang for all builtin support
 #if defined(CCMATH_COMPILER_APPLE_CLANG) && CCMATH_COMPILER_APPLE_CLANG_VER_MAJOR >= 5
 	#ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN
 		#define CCMATH_HAS_CONSTEXPR_BUILTIN_COPYSIGN

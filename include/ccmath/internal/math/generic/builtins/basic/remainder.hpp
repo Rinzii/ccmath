@@ -28,6 +28,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_REMAINDER
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for remainder that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_REMAINDER
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_REMAINDER
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -44,8 +59,9 @@ namespace ccm::builtin
 	// clang-format on
 
 	template <typename T>
+	// TODO: determine actual compiler/version support for runtime __builtin_remainder.
 	inline constexpr bool has_runtime_remainder =
-#if defined(__GNUC__) || defined(__clang__)
+#ifdef CCMATH_HAS_BUILTIN_REMAINDER
 		is_valid_builtin_type<T>;
 #else
 		false;
@@ -59,7 +75,7 @@ namespace ccm::builtin
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
-	constexpr auto remainder(T x, T y) -> std::enable_if_t<has_constexpr_remainder<T>, T>
+	constexpr auto remainder_ct(T x, T y) -> std::enable_if_t<has_constexpr_remainder<T>, T>
 	{
 		if constexpr (std::is_same_v<T, float>) { return __builtin_remainderf(x, y); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_remainder(x, y); }
@@ -67,20 +83,20 @@ namespace ccm::builtin
 		else
 		{
 			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_remainder");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for remainder");
 			return T{};
 		}
 	}
 
 	template <typename T>
-	auto runtime_remainder(T x, T y) -> std::enable_if_t<has_runtime_remainder<T>, T>
+	auto remainder_rt(T x, T y) -> std::enable_if_t<has_runtime_remainder<T>, T>
 	{
 		if constexpr (std::is_same_v<T, float>) { return __builtin_remainderf(x, y); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_remainder(x, y); }
 		else if constexpr (std::is_same_v<T, long double>) { return __builtin_remainderl(x, y); }
 		else
 		{
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_remainder");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for remainder");
 			return T{};
 		}
 	}
@@ -88,3 +104,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_REMAINDER
+#undef CCMATH_HAS_BUILTIN_REMAINDER

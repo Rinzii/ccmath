@@ -22,9 +22,7 @@ namespace ccm
 	 * @return The quiet NaN value that corresponds to the identifying string arg or zero if the implementation does not support quiet NaNs.
 	 */
 	constexpr double nan(const char * arg) noexcept
-	{
-		return internal::impl::nan_double_impl(arg);
-	}
+	{ return internal::impl::nan_double_impl(arg); }
 
 	/**
 	 * @brief not-a-number (NaN) function
@@ -32,9 +30,7 @@ namespace ccm
 	 * @return The quiet NaN value that corresponds to the identifying string arg or zero if the implementation does not support quiet NaNs.
 	 */
 	constexpr float nanf(const char * arg) noexcept
-	{
-		return internal::impl::nan_float_impl(arg);
-	}
+	{ return internal::impl::nan_float_impl(arg); }
 
 	/**
 	 * @brief not-a-number (NaN) function
@@ -43,7 +39,7 @@ namespace ccm
 	 */
 	constexpr long double nanl(const char * arg) noexcept
 	{
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
 		return static_cast<long double>(ccm::nan(arg));
 #else
 		return internal::impl::nan_ldouble_impl(arg);

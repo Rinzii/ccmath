@@ -18,13 +18,13 @@
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/fp/nearest_integer.hpp"
 #include "ccmath/internal/support/multiply_add.hpp"
 #include "ccmath/math/misc/impl/gamma_data.hpp"
 #include "ccmath/math/nearest/floor.hpp"
 
-#include <cfenv>
 #include <cstdint>
 
 namespace ccm::internal::impl
@@ -128,7 +128,10 @@ namespace ccm::internal::impl
 				ccm::support::fenv::raise_except_if_required(FE_OVERFLOW | FE_INEXACT);
 				ccm::support::fenv::set_errno_if_required(ERANGE);
 			}
-			else { ccm::support::fenv::raise_except_if_required(FE_INEXACT); }
+			else
+			{
+				ccm::support::fenv::raise_except_if_required(FE_INEXACT);
+			}
 			return f;
 		}
 

@@ -1,0 +1,50 @@
+// Residual kernel polynomial for the teaching log2 core.
+
+prec = 240!;
+display = decimal!;
+rationalmode = off!;
+
+data_path = "docs/approximating_functions/data/log2_core_poly_error.dat";
+
+U = [-1 / 32; 1 / 32];
+n = 200!;
+poly_degree = 5!;
+g = log2(1 + x) / x;
+p = fpminimax(g, poly_degree, [|D...|], U, relative);
+
+print("script:", "log2_core_poly.sollya");
+version;
+print("kernel function:", "log2(1 + u) / u");
+print("interval:", U);
+print("polynomial degree:", poly_degree);
+print("coefficient formats:", "[|D...|]");
+
+display = hexadecimal!;
+print("generated polynomial canonical:");
+canonical(p);
+print("generated polynomial horner:");
+horner(p);
+
+display = decimal!;
+print("u", "abs_error", "rel_error") > data_path;
+
+for i from 0 to n do {
+  ui = round(-1 / 32 + (1 / 16) * i / n, prec, RN);
+  abs_err = sup(evaluate(abs(x * p - log2(1 + x)), ui));
+  if (i == n / 2) then {
+    rel_err = sup(evaluate(abs(p / (1 / log(2)) - 1), ui));
+  } else {
+    rel_err = sup(evaluate(abs(p / g - 1), ui));
+  };
+  print(ui, abs_err, rel_err) >> data_path;
+};
+
+dirty_abs = dirtyinfnorm(abs(x * p - log2(1 + x)), U);
+dirty_rel = dirtyinfnorm(abs(p / g - 1), U);
+print("dirtyinfnorm absolute error:", dirty_abs);
+print("dirtyinfnorm relative error:", dirty_rel);
+
+sup_abs = supnorm(x * p, log2(1 + x), U, absolute, 1b-80);
+sup_rel = supnorm(p, g, U, relative, 1b-80);
+print("supnorm absolute error:", sup_abs);
+print("supnorm relative error:", sup_rel);

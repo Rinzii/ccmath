@@ -31,8 +31,7 @@
 #endif
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_FMAX
-	#if defined(__clang__) && (__clang_major__ > 16 || (__clang_major__ == 16 && __clang_minor__ >= 0)) && !defined(__MSC_VER) &&                              \
-		!defined(__INTEL_LLVM_COMPILER)
+	#if defined(__clang__) && (__clang_major__ > 16 || (__clang_major__ == 16 && __clang_minor__ >= 0)) && !defined(_MSC_VER) && !defined(__INTEL_LLVM_COMPILER)
 		#define CCMATH_HAS_CONSTEXPR_BUILTIN_FMAX
 	#endif
 #endif
@@ -40,6 +39,21 @@
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_FMAX
 	#if defined(__INTEL_LLVM_COMPILER) && (__INTEL_LLVM_COMPILER >= 20230100)
 		#define CCMATH_HAS_CONSTEXPR_BUILTIN_FMAX
+	#endif
+#endif
+
+/// CCMATH_HAS_BUILTIN_FMAX
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for fmax that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_FMAX
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_FMAX
 	#endif
 #endif
 
@@ -58,6 +72,15 @@ namespace ccm::builtin
 	#endif
 	// clang-format on
 
+	// TODO: determine actual compiler/version support for runtime __builtin_fmax.
+	template <typename T>
+	inline constexpr bool has_runtime_fmax =
+#ifdef CCMATH_HAS_BUILTIN_FMAX
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_fmax functions.
@@ -66,7 +89,7 @@ namespace ccm::builtin
 	 * when the compiler does not support them.
 	 */
 	template <typename T>
-	constexpr auto fmax(T x, T y) -> std::enable_if_t<has_constexpr_fmax<T>, T>
+	constexpr auto fmax_ct(T x, T y) -> std::enable_if_t<has_constexpr_fmax<T>, T>
 	{
 		if constexpr (std::is_same_v<T, float>) { return __builtin_fmaxf(x, y); }
 		else if constexpr (std::is_same_v<T, double>) { return __builtin_fmax(x, y); }
@@ -74,7 +97,21 @@ namespace ccm::builtin
 		else
 		{
 			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_fmax");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for fmax");
+			return T{};
+		}
+	}
+
+	template <typename T>
+	auto fmax_rt(T x, T y) -> std::enable_if_t<has_runtime_fmax<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>) { return __builtin_fmaxf(x, y); }
+		else if constexpr (std::is_same_v<T, double>) { return __builtin_fmax(x, y); }
+		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fmaxl(x, y); }
+		else
+		{
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for fmax");
 			return T{};
 		}
 	}
@@ -82,3 +119,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_FMAX
+#undef CCMATH_HAS_BUILTIN_FMAX

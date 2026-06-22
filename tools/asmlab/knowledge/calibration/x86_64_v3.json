@@ -1,0 +1,32 @@
+{
+  "id": "x86_64_v3_calibration",
+  "arch": "x86-64-v3",
+  "source": "asmlab_local_calibration",
+  "confidence": "high_for_documented_runs",
+  "golden_status": "trusted",
+  "overall_status": "partially_trusted",
+  "known_limitations": [
+    "llvm-mca RThroughput may disagree with benchmark on some kernels",
+    "Cross-compile from macOS host is not measured hardware",
+    "Exact cycle counts require uops.info or local bench"
+  ],
+  "trusted_on_this_arch": [
+    "golden validation passes",
+    "scenario flatten exposes more of powf_impl than M1 harness",
+    "stack-serial FMA heuristic via vfmadd and -4(%rsp) patterns"
+  ],
+  "preferred_for": [
+    "C1 static spill claims when scenario kernel is exposed in source map",
+    "C1 dependency chain analysis via stack-serial FMA counts",
+    "golden calibration cross-check"
+  ],
+  "pattern_lessons": [
+    "x86 stack-serial FMA may appear as vfmadd consuming stack memory operand",
+    "Register pressure may track instruction count and stack spill pairs"
+  ],
+  "recommendation": "preferred_static_target_for_c1_spill_dependency_when_kernel_exposed",
+  "artifact_paths": [
+    "out/asmlab/golden/golden_report.json",
+    "out/asmlab/powf_impl/scenarios/"
+  ]
+}

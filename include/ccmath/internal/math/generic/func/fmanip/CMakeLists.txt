@@ -8,3 +8,5 @@ ccm_add_headers(
         nextafter_gen.hpp
         scalbn_gen.hpp
 )
+
+add_subdirectory(impl)

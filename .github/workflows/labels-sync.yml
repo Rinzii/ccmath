@@ -1,0 +1,34 @@
+name: "Labels: Sync"
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - .github/labels.yml
+            - .github/workflows/labels-sync.yml
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    issues: write
+
+jobs:
+    sync:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Harden the runner
+              uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+              with:
+                  egress-policy: audit
+
+            - name: Check out the repository
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+            - name: Sync labels from .github/labels.yml
+              uses: crazy-max/ghaction-github-labeler@24d110aa46a59976b8a7f35518cb7f14f434c916 # v5
+              with:
+                  yaml-file: .github/labels.yml
+                  skip-delete: false
+                  dry-run: false

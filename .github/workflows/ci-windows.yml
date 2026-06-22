@@ -5,19 +5,20 @@ on:
     tags-ignore:
       - v*.*
     branches:
-      - '*'
+      - '**'
   pull_request:
     branches:
-      - '*'
+      - '**'
 
 permissions:
   contents: read
 
 jobs:
-  build:
-    runs-on: windows-latest
+  build-cxx17:
+    runs-on: windows-2022
+    timeout-minutes: 45
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - name: vs22-debug-cxx17
@@ -26,17 +27,61 @@ jobs:
             testPreset: test-vs22-debug
             cxx_version: 17
 
-          - name: vs22-debug-cxx20
-            configurePreset: vs22-debug
-            buildPreset: build-vs22-debug
-            testPreset: test-vs22-debug
-            cxx_version: 20
-
           - name: vs22-release-cxx17
             configurePreset: vs22-release
             buildPreset: build-vs22-release
             testPreset: test-vs22-release
             cxx_version: 17
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Cache build
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ./**/CMakeFiles
+            ./**/CMakeCache.txt
+            ./**/out
+          key: ${{ runner.os }}-${{ env.ImageVersion }}-${{ matrix.name }}-${{ hashFiles('CMakeLists.txt', 'CMakePresets.json', 'cmake/**', 'include/**', 'tests/**', 'thirdparty/**') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.ImageVersion }}-${{ matrix.name }}-
+
+      - name: Configure
+        run: >
+          cmake --preset="${{ matrix.configurePreset }}"
+          -DCCMATH_DESIRED_CXX_STANDARD="cxx_std_${{ matrix.cxx_version }}"
+          -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON
+          -DCCMATH_ENABLE_WARNINGS_AS_ERRORS=ON
+          -DCCMATH_BUILD_SIMPLE_TESTS=ON
+          -DCCMATH_BUILD_RIGOROUS_TESTS=OFF
+          -DCCMATH_ENABLE_MPFR_TESTS=OFF
+          -DCCMATH_ENABLE_SEARCH_TOOLS=OFF
+
+      - name: Build
+        run: cmake --build --preset="${{ matrix.buildPreset }}"
+
+      - name: Test
+        run: ctest --preset="${{ matrix.testPreset }}" --output-on-failure --schedule-random -L simple -F
+
+  build-cxx20:
+    needs: build-cxx17
+    runs-on: windows-2022
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: vs22-debug-cxx20
+            configurePreset: vs22-debug
+            buildPreset: build-vs22-debug
+            testPreset: test-vs22-debug
+            cxx_version: 20
 
           - name: vs22-release-cxx20
             configurePreset: vs22-release
@@ -46,26 +91,183 @@ jobs:
 
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@v2.16.0
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Cache build
-        uses: actions/cache@v4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: |
             ./**/CMakeFiles
             ./**/CMakeCache.txt
             ./**/out
-          key: ${{ runner.os }}-${{ matrix.name }}
+          key: ${{ runner.os }}-${{ env.ImageVersion }}-${{ matrix.name }}-${{ hashFiles('CMakeLists.txt', 'CMakePresets.json', 'cmake/**', 'include/**', 'tests/**', 'thirdparty/**') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.ImageVersion }}-${{ matrix.name }}-
 
       - name: Configure
-        run: cmake --preset="${{ matrix.configurePreset }}" -DCCMATH_DESIRED_CXX_STANDARD="cxx_std_${{ matrix.cxx_version }}" -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON -DCCMATH_ENABLE_WARNINGS_AS_ERRORS=ON
+        run: >
+          cmake --preset="${{ matrix.configurePreset }}"
+          -DCCMATH_DESIRED_CXX_STANDARD="cxx_std_${{ matrix.cxx_version }}"
+          -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON
+          -DCCMATH_ENABLE_WARNINGS_AS_ERRORS=ON
+          -DCCMATH_BUILD_SIMPLE_TESTS=ON
+          -DCCMATH_BUILD_RIGOROUS_TESTS=OFF
+          -DCCMATH_ENABLE_MPFR_TESTS=OFF
+          -DCCMATH_ENABLE_SEARCH_TOOLS=OFF
 
       - name: Build
         run: cmake --build --preset="${{ matrix.buildPreset }}"
 
       - name: Test
-        run: ctest --preset="${{ matrix.testPreset }}" --output-on-failure --schedule-random -F
+        run: ctest --preset="${{ matrix.testPreset }}" --output-on-failure --schedule-random -L simple -F
+
+  build-cxxlatest:
+    needs: build-cxx20
+    runs-on: windows-2022
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        # CMake has no cxx_std_26 mapping for MSVC; its newest is cxx_std_23, which maps
+        # to /std:c++latest. So C++latest on MSVC is requested as cxx_std_23.
+        include:
+          - name: vs22-debug-cxxlatest
+            configurePreset: vs22-debug
+            buildPreset: build-vs22-debug
+            testPreset: test-vs22-debug
+            cxx_version: 23
+
+          - name: vs22-release-cxxlatest
+            configurePreset: vs22-release
+            buildPreset: build-vs22-release
+            testPreset: test-vs22-release
+            cxx_version: 23
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Cache build
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ./**/CMakeFiles
+            ./**/CMakeCache.txt
+            ./**/out
+          key: ${{ runner.os }}-${{ env.ImageVersion }}-${{ matrix.name }}-${{ hashFiles('CMakeLists.txt', 'CMakePresets.json', 'cmake/**', 'include/**', 'tests/**', 'thirdparty/**') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.ImageVersion }}-${{ matrix.name }}-
+
+      - name: Configure
+        run: >
+          cmake --preset="${{ matrix.configurePreset }}"
+          -DCCMATH_DESIRED_CXX_STANDARD="cxx_std_${{ matrix.cxx_version }}"
+          -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON
+          -DCCMATH_ENABLE_WARNINGS_AS_ERRORS=ON
+          -DCCMATH_BUILD_SIMPLE_TESTS=ON
+          -DCCMATH_BUILD_RIGOROUS_TESTS=OFF
+          -DCCMATH_ENABLE_MPFR_TESTS=OFF
+          -DCCMATH_ENABLE_SEARCH_TOOLS=OFF
+
+      - name: Build
+        run: cmake --build --preset="${{ matrix.buildPreset }}"
+
+      - name: Test
+        run: ctest --preset="${{ matrix.testPreset }}" --output-on-failure --schedule-random -L simple -F
+
+  rigorous:
+    needs: build-cxx20
+    runs-on: windows-2022
+    timeout-minutes: 90
+    env:
+      CCMATH_VCPKG_BINARY_CACHE_DIR: ${{ github.workspace }}/.cache/vcpkg/archives
+      CCMATH_VCPKG_DOWNLOADS_DIR: ${{ github.workspace }}/.cache/vcpkg/downloads
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Cache vcpkg downloads
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ env.CCMATH_VCPKG_DOWNLOADS_DIR }}
+          key: ${{ runner.os }}-vcpkg-downloads-${{ hashFiles('cmake/vcpkg/vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-downloads-
+
+      - name: Cache vcpkg installed tree
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ github.workspace }}/cmake/vcpkg/vcpkg_installed
+          key: ${{ runner.os }}-vcpkg-installed-${{ hashFiles('cmake/vcpkg/vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-installed-
+
+      - name: Cache vcpkg binary archives
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ env.CCMATH_VCPKG_BINARY_CACHE_DIR }}
+          key: ${{ runner.os }}-vcpkg-binary-${{ hashFiles('cmake/vcpkg/vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-binary-
+
+      - name: Bootstrap vcpkg
+        shell: pwsh
+        run: |
+          if (-not (Test-Path vcpkg)) {
+            git clone --depth 1 https://github.com/microsoft/vcpkg.git vcpkg
+            # Fetch the exact builtin-baseline commit so manifest version resolution can read
+            # versions/baseline.json from it; a depth-1 clone of HEAD alone does not contain it.
+            git -C vcpkg fetch --depth 1 origin 10ceb139a610ebf3c6aa49cdc4a4b7f3db5d3f2b
+            git -C vcpkg checkout 10ceb139a610ebf3c6aa49cdc4a4b7f3db5d3f2b
+          }
+          if (-not (Test-Path vcpkg/vcpkg.exe)) {
+            .\vcpkg\bootstrap-vcpkg.bat -disableMetrics
+          }
+          New-Item -ItemType Directory -Force -Path "${{ env.CCMATH_VCPKG_DOWNLOADS_DIR }}" | Out-Null
+          New-Item -ItemType Directory -Force -Path "${{ env.CCMATH_VCPKG_BINARY_CACHE_DIR }}" | Out-Null
+          echo "VCPKG_ROOT=$((Get-Location).Path)\vcpkg" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "VCPKG_DOWNLOADS=${{ env.CCMATH_VCPKG_DOWNLOADS_DIR }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "VCPKG_DEFAULT_BINARY_CACHE=${{ env.CCMATH_VCPKG_BINARY_CACHE_DIR }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "VCPKG_BINARY_SOURCES=clear;files,${{ env.CCMATH_VCPKG_BINARY_CACHE_DIR }},readwrite" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Cache rigorous build
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: out/build/vs22/vs22-release-rigorous
+          key: ${{ runner.os }}-${{ env.ImageVersion }}-vs22-release-rigorous-${{ hashFiles('CMakeLists.txt', 'cmake/**', 'tests/**', 'include/**', 'thirdparty/**') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.ImageVersion }}-vs22-release-rigorous-
+
+      - name: Configure rigorous validation
+        shell: pwsh
+        run: |
+          cmake --preset=vs22-release-rigorous `
+            -DCCMATH_DESIRED_CXX_STANDARD=cxx_std_20 `
+            -DCCMATH_ENABLE_AGGRESSIVE_WARNINGS=ON `
+            -DCCMATH_ENABLE_WARNINGS_AS_ERRORS=ON `
+            -DCCMATH_BUILD_SIMPLE_TESTS=OFF `
+            -DCCMATH_BUILD_RIGOROUS_TESTS=ON `
+            -DCCMATH_ENABLE_MPFR_TESTS=ON `
+            -DCCMATH_ENABLE_SEARCH_TOOLS=ON `
+            -DCCMATH_ENABLE_COREMATH_TESTS=OFF `
+            -DVCPKG_MANIFEST_DIR="${{ github.workspace }}/cmake/vcpkg" `
+            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+      - name: Build rigorous validation
+        run: cmake --build --preset=build-vs22-release-rigorous --config Release
+
+      - name: Run rigorous MPFR validation
+        run: ctest --preset=test-vs22-release-rigorous -C Release --output-on-failure -L rigorous

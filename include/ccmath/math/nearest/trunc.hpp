@@ -23,14 +23,13 @@ namespace ccm
 	 * @tparam T The type of the input.
 	 * @param num The value to truncate.
 	 * @return Returns a truncated value.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/trunc
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
 	constexpr T trunc(T num) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_trunc<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::trunc(num); }
+			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::trunc_ct(num); }
 		}
 		if (ccm::support::is_constant_evaluated())
 		{
@@ -60,7 +59,10 @@ namespace ccm
 			bits.set_mantissa(truncated_mantissa);
 			return bits.get_val();
 		}
-		else { return ccm::rt::trunc_rt(num); }
+		else
+		{
+			return ccm::rt::trunc_rt(num);
+		}
 	}
 
 	/**
@@ -68,34 +70,25 @@ namespace ccm
 	 * @tparam Integer The type of the input.
 	 * @param num The value to truncate.
 	 * @return Returns a truncated value.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/trunc
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr double trunc(Integer num) noexcept
-	{
-		return static_cast<double>(num);
-	}
+	{ return static_cast<double>(num); }
 
 	/**
 	 * @brief Specialization for float that returns the integral value nearest to x with the magnitude of the integral value always less than or equal to x.
 	 * @param num The float to truncate.
 	 * @return Returns a truncated float.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/trunc
 	 */
 	constexpr float truncf(float num) noexcept
-	{
-		return ccm::trunc<float>(num);
-	}
+	{ return ccm::trunc<float>(num); }
 
 	/**
 	 * @brief Specialization for long double that returns the integral value nearest to x with the magnitude of the integral value always less than or equal to
 	 * x.
 	 * @param num The long double to truncate.
 	 * @return Returns a truncated long double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/trunc
 	 */
 	constexpr long double truncl(long double num) noexcept
-	{
-		return ccm::trunc<long double>(num);
-	}
+	{ return ccm::trunc<long double>(num); }
 } // namespace ccm

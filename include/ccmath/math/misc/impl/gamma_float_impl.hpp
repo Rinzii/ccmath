@@ -17,11 +17,10 @@
 
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/math/misc/impl/gamma_double_impl.hpp"
 #include "ccmath/math/nearest/floor.hpp"
-
-#include <cfenv>
 
 namespace ccm::internal::impl
 {

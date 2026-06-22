@@ -1,15 +1,28 @@
 ccm_add_headers(
+        abs_diff.hpp
         align.hpp
+        approximately.hpp
+        ceil_div.hpp
         clamp.hpp
         cubic.hpp
         degrees.hpp
+        delta_angle.hpp
         fract.hpp
+        inverse_lerp.hpp
         is_power_of_two.hpp
+        lerp_angle.hpp
         lerp_smooth.hpp
-        mix.hpp
+        move_towards.hpp
+        move_towards_angle.hpp
         normalize.hpp
         ping_pong.hpp
         radians.hpp
         rcp.hpp
+        remap.hpp
+        repeat.hpp
+        saturate.hpp
+        sign.hpp
         smoothstep.hpp
+        step.hpp
+        unlerp.hpp
 )

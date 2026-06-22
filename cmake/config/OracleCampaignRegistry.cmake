@@ -1,0 +1,192 @@
+# Declarative rigorous oracle registry.
+# Add an executable: set TARGET and SOURCE, append ID to CCMATH_ORACLE_<BACKEND>_EXECUTABLE_IDS.
+# Add ctests: append test ID to CCMATH_ORACLE_<BACKEND>_<exe_id>_CTESTS and define CCMATH_ORACLE_<BACKEND>_TEST_<test_id>_*.
+
+set(CCMATH_ORACLE_MPFR_EXECUTABLE_IDS
+        mpfr_pow_double
+        mpfr_pow_float
+        mpfr_fma_double
+        mpfr_fmaf
+        mpfr_powl
+        powl_characterization
+        pow_search
+        cross_libm_pow
+        mpfr_unary
+)
+
+set(CCMATH_ORACLE_MPFR_mpfr_pow_double_TARGET ccmath-rigorous-mpfr-pow)
+set(CCMATH_ORACLE_MPFR_mpfr_pow_double_SOURCE ../shared/oracle/mpfr_pow_double.cpp)
+set(CCMATH_ORACLE_MPFR_mpfr_pow_double_CTESTS mpfr_pow_double_public mpfr_pow_double_nobuiltin)
+
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_double_public_NAME ccmath-rigorous-mpfr-pow)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_double_public_TARGET ccmath-rigorous-mpfr-pow)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_double_public_REQUIRES "NOT CCMATH_TEST_DISABLE_RUNTIME_BUILTIN")
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_double_public_TIMEOUT 600)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_double_public_LABELS rigorous mpfr)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_double_public_ARGS --mode=quick --path=public_default)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_double_public_LOG_OUTPUT mpfr-pow-double-public_default.json)
+
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_double_nobuiltin_NAME ccmath-rigorous-mpfr-pow-nobuiltin)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_double_nobuiltin_TARGET ccmath-rigorous-mpfr-pow)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_double_nobuiltin_REQUIRES CCMATH_TEST_DISABLE_RUNTIME_BUILTIN)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_double_nobuiltin_TIMEOUT 600)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_double_nobuiltin_LABELS rigorous mpfr)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_double_nobuiltin_ARGS --mode=quick --path=runtime_no_builtin,generic_modeled_domain)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_double_nobuiltin_LOG_OUTPUT mpfr-pow-double-nobuiltin.json)
+
+set(CCMATH_ORACLE_MPFR_mpfr_pow_float_TARGET ccmath-rigorous-mpfr-powf)
+set(CCMATH_ORACLE_MPFR_mpfr_pow_float_SOURCE ../shared/oracle/mpfr_pow_float.cpp)
+set(CCMATH_ORACLE_MPFR_mpfr_pow_float_CTESTS mpfr_pow_float_public mpfr_pow_float_reduced mpfr_pow_float_nobuiltin)
+
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_float_public_NAME ccmath-rigorous-mpfr-powf)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_float_public_TARGET ccmath-rigorous-mpfr-powf)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_float_public_TIMEOUT 900)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_float_public_LABELS rigorous mpfr)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_float_public_ARGS --mode=quick --path=public_default)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_float_public_LOG_OUTPUT mpfr-powf-public_default.json)
+
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_float_reduced_NAME ccmath-rigorous-mpfr-powf-reduced)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_float_reduced_TARGET ccmath-rigorous-mpfr-powf)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_float_reduced_TIMEOUT 900)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_float_reduced_LABELS rigorous mpfr)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_float_reduced_ARGS --mode=quick --path=public_default --domain=mantissa-sweep,subnormal-x)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_float_reduced_LOG_OUTPUT mpfr-powf-reduced-domains.json)
+
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_float_nobuiltin_NAME ccmath-rigorous-mpfr-powf-nobuiltin)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_float_nobuiltin_TARGET ccmath-rigorous-mpfr-powf)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_float_nobuiltin_REQUIRES CCMATH_TEST_DISABLE_RUNTIME_BUILTIN)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_float_nobuiltin_TIMEOUT 900)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_float_nobuiltin_LABELS rigorous mpfr)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_float_nobuiltin_ARGS --mode=quick --path=runtime_no_builtin,generic_modeled_domain)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_pow_float_nobuiltin_LOG_OUTPUT mpfr-powf-nobuiltin.json)
+
+set(CCMATH_ORACLE_MPFR_mpfr_fma_double_TARGET ccmath-rigorous-mpfr-fma)
+set(CCMATH_ORACLE_MPFR_mpfr_fma_double_SOURCE ../shared/oracle/mpfr_fma_double.cpp)
+set(CCMATH_ORACLE_MPFR_mpfr_fma_double_CTESTS mpfr_fma_double)
+
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_fma_double_NAME ccmath-rigorous-mpfr-fma)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_fma_double_TARGET ccmath-rigorous-mpfr-fma)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_fma_double_TIMEOUT 600)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_fma_double_LABELS rigorous mpfr)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_fma_double_ARGS --mode=quick --path=public_default,software_fallback,quiet_generic --rounding-modes=all)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_fma_double_LOG_OUTPUT mpfr-fma-double.json)
+
+set(CCMATH_ORACLE_MPFR_mpfr_fmaf_TARGET ccmath-rigorous-mpfr-fmaf)
+set(CCMATH_ORACLE_MPFR_mpfr_fmaf_SOURCE ../shared/oracle/mpfr_fma_float.cpp)
+set(CCMATH_ORACLE_MPFR_mpfr_fmaf_CTESTS mpfr_fmaf)
+
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_fmaf_NAME ccmath-rigorous-mpfr-fmaf)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_fmaf_TARGET ccmath-rigorous-mpfr-fmaf)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_fmaf_TIMEOUT 600)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_fmaf_LABELS rigorous mpfr)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_fmaf_ARGS --mode=quick --path=public_default,software_fallback,quiet_generic --rounding-modes=all)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_fmaf_LOG_OUTPUT mpfr-fmaf.json)
+
+set(CCMATH_ORACLE_MPFR_mpfr_powl_TARGET ccmath-rigorous-mpfr-powl)
+set(CCMATH_ORACLE_MPFR_mpfr_powl_SOURCE ../shared/oracle/mpfr_powl.cpp)
+set(CCMATH_ORACLE_MPFR_mpfr_powl_CTESTS mpfr_powl)
+
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_powl_NAME ccmath-rigorous-mpfr-powl)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_powl_TARGET ccmath-rigorous-mpfr-powl)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_powl_TIMEOUT 300)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_powl_LABELS rigorous mpfr)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_powl_ARGS --mode=quick)
+set(CCMATH_ORACLE_MPFR_TEST_mpfr_powl_JSON_OUTPUT mpfr-powl.json)
+
+set(CCMATH_ORACLE_MPFR_powl_characterization_TARGET ccmath-rigorous-powl-characterization)
+set(CCMATH_ORACLE_MPFR_powl_characterization_SOURCE ../shared/oracle/powl_platform_characterization.cpp)
+set(CCMATH_ORACLE_MPFR_powl_characterization_CTESTS powl_characterization)
+
+set(CCMATH_ORACLE_MPFR_TEST_powl_characterization_NAME ccmath-rigorous-powl-characterization)
+set(CCMATH_ORACLE_MPFR_TEST_powl_characterization_TARGET ccmath-rigorous-powl-characterization)
+set(CCMATH_ORACLE_MPFR_TEST_powl_characterization_TIMEOUT 120)
+set(CCMATH_ORACLE_MPFR_TEST_powl_characterization_LABELS rigorous mpfr)
+set(CCMATH_ORACLE_MPFR_TEST_powl_characterization_JSON_OUTPUT powl-platform.json)
+
+set(CCMATH_ORACLE_MPFR_pow_search_TARGET ccmath-rigorous-pow-search)
+set(CCMATH_ORACLE_MPFR_pow_search_SOURCE ../shared/oracle/pow_adversarial_search.cpp)
+set(CCMATH_ORACLE_MPFR_pow_search_CTESTS pow_search_smoke)
+
+set(CCMATH_ORACLE_MPFR_TEST_pow_search_smoke_NAME ccmath-rigorous-pow-search-smoke)
+set(CCMATH_ORACLE_MPFR_TEST_pow_search_smoke_TARGET ccmath-rigorous-pow-search)
+set(CCMATH_ORACLE_MPFR_TEST_pow_search_smoke_REQUIRES CCMATH_ENABLE_SEARCH_TOOLS)
+set(CCMATH_ORACLE_MPFR_TEST_pow_search_smoke_TIMEOUT 60)
+set(CCMATH_ORACLE_MPFR_TEST_pow_search_smoke_LABELS rigorous mpfr)
+set(CCMATH_ORACLE_MPFR_TEST_pow_search_smoke_ARGS --mode=near-one --count=256 --path=public_default)
+
+set(CCMATH_ORACLE_MPFR_cross_libm_pow_TARGET ccmath-rigorous-cross-libm-pow)
+set(CCMATH_ORACLE_MPFR_cross_libm_pow_SOURCE ../shared/oracle/cross_libm_pow.cpp)
+set(CCMATH_ORACLE_MPFR_cross_libm_pow_CTESTS cross_libm_pow_smoke)
+
+set(CCMATH_ORACLE_MPFR_TEST_cross_libm_pow_smoke_NAME ccmath-rigorous-cross-libm-pow-smoke)
+set(CCMATH_ORACLE_MPFR_TEST_cross_libm_pow_smoke_TARGET ccmath-rigorous-cross-libm-pow)
+set(CCMATH_ORACLE_MPFR_TEST_cross_libm_pow_smoke_REQUIRES CCMATH_ENABLE_CROSS_LIBM_TESTS)
+set(CCMATH_ORACLE_MPFR_TEST_cross_libm_pow_smoke_TIMEOUT 60)
+set(CCMATH_ORACLE_MPFR_TEST_cross_libm_pow_smoke_LABELS rigorous mpfr)
+set(CCMATH_ORACLE_MPFR_TEST_cross_libm_pow_smoke_ARGS --corpus=quick --format=json --output=cross-libm-pow-quick.json)
+
+set(CCMATH_ORACLE_MPFR_mpfr_unary_TARGET ccmath-rigorous-mpfr-unary)
+set(CCMATH_ORACLE_MPFR_mpfr_unary_SOURCE ../shared/oracle/mpfr_unary.cpp)
+
+# Sampled, CI-friendly smoke per unary function. The doc-quality numbers (large sampled binary64
+# and exhaustive binary32) come from tools/measure_ulp.sh, not from these ctests, so these stay
+# bounded and do not write the canonical summary JSON the doc generator consumes.
+set(CCMATH_ORACLE_MPFR_UNARY_DOUBLE_FUNCTIONS
+        exp exp2 expm1 log log1p log2 log10 sin cos tan asin acos atan cbrt sqrt tgamma lgamma)
+set(CCMATH_ORACLE_MPFR_UNARY_FLOAT_FUNCTIONS exp log sin sqrt tgamma)
+
+set(CCMATH_ORACLE_MPFR_mpfr_unary_CTESTS "")
+foreach (_ccm_unary_fn IN LISTS CCMATH_ORACLE_MPFR_UNARY_DOUBLE_FUNCTIONS)
+    set(_ccm_unary_id unary_${_ccm_unary_fn}_double)
+    list(APPEND CCMATH_ORACLE_MPFR_mpfr_unary_CTESTS ${_ccm_unary_id})
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_NAME ccmath-rigorous-mpfr-unary-${_ccm_unary_fn}-double)
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_TARGET ccmath-rigorous-mpfr-unary)
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_TIMEOUT 300)
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_LABELS rigorous mpfr)
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_ARGS
+            --function=${_ccm_unary_fn} --type=double --mode=quick --count=20000 --rounding-modes=all)
+endforeach ()
+foreach (_ccm_unary_fn IN LISTS CCMATH_ORACLE_MPFR_UNARY_FLOAT_FUNCTIONS)
+    set(_ccm_unary_id unary_${_ccm_unary_fn}_float)
+    list(APPEND CCMATH_ORACLE_MPFR_mpfr_unary_CTESTS ${_ccm_unary_id})
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_NAME ccmath-rigorous-mpfr-unary-${_ccm_unary_fn}-float)
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_TARGET ccmath-rigorous-mpfr-unary)
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_TIMEOUT 300)
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_LABELS rigorous mpfr)
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_ARGS
+            --function=${_ccm_unary_fn} --type=float --mode=quick --count=20000 --rounding-modes=all)
+endforeach ()
+
+set(CCMATH_ORACLE_COREMATH_EXECUTABLE_IDS
+        coremath_pow_double
+        coremath_pow_float
+)
+
+set(CCMATH_ORACLE_COREMATH_coremath_pow_double_TARGET ccmath-rigorous-coremath-pow)
+set(CCMATH_ORACLE_COREMATH_coremath_pow_double_SOURCE ../shared/oracle/coremath_pow_double.cpp)
+set(CCMATH_ORACLE_COREMATH_coremath_pow_double_CTESTS coremath_pow_double)
+
+set(CCMATH_ORACLE_COREMATH_TEST_coremath_pow_double_NAME ccmath-rigorous-coremath-pow)
+set(CCMATH_ORACLE_COREMATH_TEST_coremath_pow_double_TARGET ccmath-rigorous-coremath-pow)
+set(CCMATH_ORACLE_COREMATH_TEST_coremath_pow_double_TIMEOUT 900)
+set(CCMATH_ORACLE_COREMATH_TEST_coremath_pow_double_LABELS rigorous coremath)
+set(CCMATH_ORACLE_COREMATH_TEST_coremath_pow_double_ARGS --mode=quick --path=generic_runtime --rounding-modes=all)
+set(CCMATH_ORACLE_COREMATH_TEST_coremath_pow_double_LOG_OUTPUT coremath-pow-double-generic_runtime.json)
+
+set(CCMATH_ORACLE_COREMATH_coremath_pow_float_TARGET ccmath-rigorous-coremath-powf)
+set(CCMATH_ORACLE_COREMATH_coremath_pow_float_SOURCE ../shared/oracle/coremath_pow_float.cpp)
+set(CCMATH_ORACLE_COREMATH_coremath_pow_float_CTESTS coremath_pow_float coremath_pow_float_reduced)
+
+set(CCMATH_ORACLE_COREMATH_TEST_coremath_pow_float_NAME ccmath-rigorous-coremath-powf)
+set(CCMATH_ORACLE_COREMATH_TEST_coremath_pow_float_TARGET ccmath-rigorous-coremath-powf)
+set(CCMATH_ORACLE_COREMATH_TEST_coremath_pow_float_TIMEOUT 1200)
+set(CCMATH_ORACLE_COREMATH_TEST_coremath_pow_float_LABELS rigorous coremath)
+set(CCMATH_ORACLE_COREMATH_TEST_coremath_pow_float_ARGS --mode=quick --path=generic_runtime --rounding-modes=all)
+set(CCMATH_ORACLE_COREMATH_TEST_coremath_pow_float_LOG_OUTPUT coremath-powf-generic_runtime.json)
+
+set(CCMATH_ORACLE_COREMATH_TEST_coremath_pow_float_reduced_NAME ccmath-rigorous-coremath-powf-reduced)
+set(CCMATH_ORACLE_COREMATH_TEST_coremath_pow_float_reduced_TARGET ccmath-rigorous-coremath-powf)
+set(CCMATH_ORACLE_COREMATH_TEST_coremath_pow_float_reduced_TIMEOUT 1200)
+set(CCMATH_ORACLE_COREMATH_TEST_coremath_pow_float_reduced_LABELS rigorous coremath)
+set(CCMATH_ORACLE_COREMATH_TEST_coremath_pow_float_reduced_ARGS --mode=quick --path=generic_runtime --rounding-modes=all --domain=mantissa-sweep,subnormal-x)
+set(CCMATH_ORACLE_COREMATH_TEST_coremath_pow_float_reduced_LOG_OUTPUT coremath-powf-reduced-domains.json)

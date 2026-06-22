@@ -48,7 +48,7 @@ namespace ccm::support
 	constexpr int ctz(T value) noexcept
 	{
 #if CCM_HAS_BUILTIN(__builtin_ctzg)
-		return __builtin_ctzg(value);
+		return __builtin_ctzg(value); // NOLINT(cppcoreguidelines-pro-type-vararg)
 #else
 		return internal::generic_ctz(value);
 #endif

@@ -52,8 +52,8 @@ namespace ccm::internal
 				intX -= 23 << 23;
 			}
 
-			// x = 2^expo * normVal; where normVal is in range [k_logTableOff_flt, 2 * k_logTableOff_flt] and exact.
-			// We split the rang into N sub-intervals.
+			// x = 2^expo * normVal. normVal is in range [k_logTableOff_flt, 2 * k_logTableOff_flt] and exact.
+			// We split the range into N sub-intervals.
 			// The i-th sub-interval contains normVal and c is near its center.
 			const std::uint32_t tmp		= intX - k_log2TableOff_flt;
 			const int i					= (tmp >> (23 - ccm::internal::k_log2TableBitsFlt)) % k_log2TableN_flt; // NOLINT
@@ -81,7 +81,5 @@ namespace ccm::internal
 	} // namespace impl
 
 	constexpr float log2_float(float num) noexcept
-	{
-		return impl::log2_float_impl(num);
-	}
+	{ return impl::log2_float_impl(num); }
 } // namespace ccm::internal

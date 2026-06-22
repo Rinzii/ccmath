@@ -23,7 +23,6 @@ namespace ccm
 	 * @tparam T Numeric type.
 	 * @param num Floating-point or integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/fabs
 	 */
 	template <typename T>
 	constexpr auto abs(T num) -> std::enable_if_t<std::is_floating_point_v<T> && std::is_signed_v<T>, T>
@@ -37,35 +36,29 @@ namespace ccm
 	 * @tparam T Numeric type.
 	 * @param num Floating-point or integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/fabs
 	 */
 	template <typename T>
 	constexpr auto abs(T num) -> std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>, T>
 	{
-		// If num is less than zero, return -num, otherwise return num.
-		return num < 0 ? -num : num;
+		// If num is less than zero, return -num, otherwise return num. The explicit cast keeps the
+		// result in T, where -num integer-promotes to int and would otherwise narrow on return for
+		// types narrower than int such as signed char and short.
+		return static_cast<T>(num < 0 ? -num : num);
 	}
 
 	/**
-	 * @brief Computes the absolute value of a number.
-	 * @tparam T Unsigned numeric type.
-	 * @param num Floating-point or integer value.
-	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/fabs
+	 * @brief Computes the absolute value of an unsigned value.
+	 * @tparam T Unsigned integer type.
+	 * @param num Unsigned value.
+	 * @return num unchanged. An unsigned value is already non-negative, so its absolute value is itself.
 	 */
 	template <typename T>
 	constexpr auto abs(T num) -> std::enable_if_t<std::is_unsigned_v<T>, T>
 	{
-		// If abs is called with an argument of type X for which is_unsigned_v<X> is true, and
-		// if X cannot be converted to int by integral promotion, the program is ill-formed.
-		// See: http://eel.is/c++draft/c.math.abs#3
-		// See: ISO/IEC 9899:2018, 7.12.7.2, 7.22.6.1
-		if constexpr (std::is_convertible_v<T, int>) { return ccm::abs<int>(static_cast<int>(num)); }
-		else
-		{
-			static_assert(sizeof(T) == 0, "Taking the absolute value of an unsigned type that cannot be converted to int by integral promotion is ill-formed.");
-			return static_cast<T>(0);
-		}
+		// An unsigned value is already non-negative, so the absolute value is the value itself.
+		// Returning num directly is lossless and type-preserving, where routing through int would
+		// narrow wide unsigned values and trip -Wsign-conversion.
+		return num;
 	}
 
 	/**
@@ -73,70 +66,52 @@ namespace ccm
 	 * @tparam T Floating-point type.
 	 * @param num Floating-point value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/fabs
 	 */
 	template <typename T>
 	constexpr auto fabs(T num) -> std::enable_if_t<std::is_floating_point_v<T>, T>
-	{
-		return ccm::abs<T>(num);
-	}
+	{ return ccm::abs<T>(num); }
 
 	/**
 	 * @brief Computes the absolute value of a number.
 	 * @tparam Integer Integer type.
 	 * @param num Integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/fabs
 	 */
 	template <typename Integer>
 	constexpr auto fabs(Integer num) -> std::enable_if_t<std::is_integral_v<Integer>, double>
-	{
-		return ccm::abs<double>(static_cast<double>(num));
-	}
+	{ return ccm::abs<double>(static_cast<double>(num)); }
 
 	/**
 	 * @brief Computes the absolute value of a number.
 	 * @param num Floating-point value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/fabs
 	 */
 	constexpr float fabsf(float num)
-	{
-		return ccm::abs<float>(num);
-	}
+	{ return ccm::abs<float>(num); }
 
 	/**
 	 * @brief Computes the absolute value of a number.
 	 * @param num Floating-point value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/fabs
 	 */
 	constexpr long double fabsl(long double num)
-	{
-		return ccm::abs<long double>(num);
-	}
+	{ return ccm::abs<long double>(num); }
 
 	/**
 	 * @brief Computes the absolute value of a number.
 	 * @param num Integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/fabs
 	 */
 	constexpr long labs(long num)
-	{
-		return ccm::abs<long>(num);
-	}
+	{ return ccm::abs<long>(num); }
 
 	/**
 	 * @brief Computes the absolute value of a number.
 	 * @param num Integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/fabs
 	 */
 	constexpr long long llabs(long long num)
-	{
-		return ccm::abs<long long>(num);
-	}
+	{ return ccm::abs<long long>(num); }
 } // namespace ccm
 
 /// @ingroup basic

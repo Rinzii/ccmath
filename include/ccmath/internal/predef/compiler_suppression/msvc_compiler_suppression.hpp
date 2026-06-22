@@ -10,7 +10,7 @@
 
 #pragma once
 
-// TODO: Need to validate these macros have no issue when clang-cl is installed alongside MSVC. My assumption is it's fine though at the moment.
+// TODO(IanP): Need to validate these macros have no issue when clang-cl is installed alongside MSVC. My assumption is it's fine though at the moment.
 
 ///
 /// \def CCM_DISABLE_MSVC_WARNING(w)

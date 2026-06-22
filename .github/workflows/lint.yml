@@ -1,25 +1,113 @@
 name: lint
 
 on:
-  pull_request:
+  push:
+    tags-ignore:
+      - v*.*
+    branches:
+      - '**'
     paths:
-      - '**.hpp'
+      - '.clang-format'
+      - '.github/actions/install-clang-format/**'
+      - '.github/workflows/lint.yml'
+      - '**/*.hpp'
+      - '**/*.cpp'
+      - '**/*.h'
+      - 'tools/apply_format.sh'
+      - 'tools/clang_format_version'
+      - 'tools/ensure_format.sh'
+      - 'tools/clang_tidy_version'
+      - 'tools/install_clang_tidy_linux.sh'
+      - 'tools/run_clang_tidy.sh'
+      - '.clang-tidy'
+  pull_request:
+    branches:
+      - '**'
 
 permissions:
   contents: read
 
+concurrency:
+  group: lint-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  format_code:
+  format_check:
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
-      - name: Install clang-format
-        uses: aminya/setup-cpp@3aac37c3fbde6cb1d2fa0a0a7e945b63b10561d5 # v1.1.0
+      - uses: ./.github/actions/install-clang-format
+
+      - name: Check clang-format
+        run: bash tools/ensure_format.sh
+
+  format_autofix:
+    if: github.event_name == 'push'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
-          clangformat: 17.0.5
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
 
-      - name: Run clang-format
+      - uses: ./.github/actions/install-clang-format
+
+      - name: Check clang-format
+        id: check_format
+        run: bash tools/ensure_format.sh
+        continue-on-error: true
+
+      - name: Apply clang-format
+        if: steps.check_format.outcome == 'failure'
+        run: bash tools/apply_format.sh
+
+      - name: Commit clang-format fixes
+        if: steps.check_format.outcome == 'failure'
         run: |
-          find include -name '*.hpp' |  xargs clang-format -i -style=file -fallback-style=none
-          git diff --exit-code
+          if git diff --quiet -- '*.hpp' '*.cpp' '*.h'; then
+            echo "No formatting changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add '*.hpp' '*.cpp' '*.h'
+          git commit -m "ci: apply clang-format"
+          git push origin HEAD:${{ github.ref_name }}
+
+      - name: Verify clang-format after auto-fix
+        if: steps.check_format.outcome == 'failure'
+        run: bash tools/ensure_format.sh
+
+  clang_tidy:
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Install dependencies
+        run: sudo apt-get update -qq && sudo apt-get install -yqq --no-install-recommends ninja-build
+
+      - name: Install clang-tidy
+        run: bash tools/install_clang_tidy_linux.sh
+
+      - name: Configure for compile database
+        run: >
+          cmake -S . -B build-tidy -G Ninja
+          -DCCMATH_BUILD_TESTS=ON
+          -DCCMATH_BUILD_SIMPLE_TESTS=ON
+          -DCCMATH_BUILD_RIGOROUS_TESTS=OFF
+          -DCCMATH_ENABLE_MPFR_TESTS=OFF
+          -DCCMATH_ENABLE_SEARCH_TOOLS=OFF
+          -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+      - name: Run clang-tidy
+        run: bash tools/run_clang_tidy.sh build-tidy/compile_commands.json

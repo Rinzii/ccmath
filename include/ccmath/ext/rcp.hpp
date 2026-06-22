@@ -22,7 +22,5 @@ namespace ccm::ext
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T rcp(T x) noexcept
-	{
-		return static_cast<T>(1) / x;
-	}
+	{ return static_cast<T>(1) / x; }
 } // namespace ccm::ext

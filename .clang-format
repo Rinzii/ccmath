@@ -62,6 +62,7 @@ IncludeCategories:
     Priority: 50
 IndentPPDirectives: BeforeHash
 IndentWidth: 4
+InsertNewlineAtEOF: true
 Language: Cpp
 NamespaceIndentation: All
 PointerAlignment: Middle

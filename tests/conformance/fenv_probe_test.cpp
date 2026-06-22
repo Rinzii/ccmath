@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
-
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "utils/fenv_fixture.hpp"
+
+#include <gtest/gtest.h>
 
 TEST(CcmathFenvProbeTests, StdFenvSupportsAllRoundingModes)
 {

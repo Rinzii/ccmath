@@ -24,7 +24,5 @@ namespace ccm::ext
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T fract(T x) noexcept
-	{
-		return x - ccm::floor(x);
-	}
+	{ return x - ccm::floor(x); }
 } // namespace ccm::ext

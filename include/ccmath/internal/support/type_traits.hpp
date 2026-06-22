@@ -97,7 +97,7 @@ namespace ccm::support::traits
 	template <> struct internal_is_floating_point_helper<_Float128> : public std::true_type{};
 #endif
 #ifdef __STDCPP_BFLOAT16_T__
-	template <> struct internal_is_floating_point_helper<__gnu_cxx::__bfloat16_t> : std::public true_type{};
+	template <> struct internal_is_floating_point_helper<__gnu_cxx::__bfloat16_t> : public std::true_type{};
 #endif
 #ifdef CCM_TYPES_HAS_FLOAT128
 	template <> struct internal_is_floating_point_helper<types::float128> : std::true_type{};
@@ -132,7 +132,7 @@ namespace ccm::support::traits
 
 	template <typename T>
 struct ccm_is_unsigned : std::bool_constant<(ccm_is_arithmetic_v<T> && (T(-1) > T(0)))> {
-		constexpr operator bool() const { return ccm_is_unsigned::value; }
+		constexpr operator bool() const { return ccm_is_unsigned::value; } // NOLINT(google-explicit-constructor)
 		constexpr bool operator()() const { return ccm_is_unsigned::value; }
 	};
 	template <typename T>

@@ -38,7 +38,7 @@ namespace ccm::intrin
 {
 	namespace abi
 	{
-#if defined(CCMATH_HAS_SIMD_AVX2)
+#ifdef CCMATH_HAS_SIMD_AVX2
 		using native = avx2;
 #elif defined(CCMATH_HAS_SIMD_SSE4)
 		using native = sse4;

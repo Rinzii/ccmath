@@ -11,9 +11,9 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/power/cbrt.hpp"
+#include "ccmath/internal/math/generic/func/power/cbrt_gen.hpp"
 #include "ccmath/internal/math/runtime/func/power/cbrt_rt.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
-#include "ccmath/math/power/impl/cbrt_impl.hpp"
 
 #include <type_traits>
 
@@ -24,42 +24,33 @@ namespace ccm
 	 * @tparam T Floating-point type.
 	 * @param num Floating-point value.
 	 * @return Cube root of num.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/cbrt
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 	constexpr T cbrt(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_cbrt<T>) { return ccm::builtin::cbrt(num); }
-		else if (ccm::support::is_constant_evaluated())
+		if constexpr (ccm::builtin::has_constexpr_cbrt<T>) { return ccm::builtin::cbrt_ct(num); }
+		else
 		{
-			if constexpr (std::is_same_v<T, float>) { return internal::impl::cbrt_impl(num); }
-			else if constexpr (std::is_same_v<T, double>) { return internal::impl::cbrt_impl(num); }
-			else { return static_cast<long double>(internal::impl::cbrt_impl(static_cast<double>(num))); }
+			if (ccm::support::is_constant_evaluated()) { return ccm::gen::cbrt_gen<T>(num); }
+			return ccm::rt::cbrt_rt<T>(num);
 		}
-		else { return ccm::rt::cbrt_rt(num); }
 	}
 
 	/**
 	 * @brief Computes the cube root of a float.
 	 * @param num Floating-point value.
 	 * @return Cube root of num as float.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/cbrt
 	 */
 	constexpr float cbrtf(float num) noexcept
-	{
-		return ccm::cbrt(num);
-	}
+	{ return ccm::cbrt(num); }
 
 	/**
 	 * @brief Computes the cube root of a long double.
 	 * @param num Floating-point value.
 	 * @return Cube root of num as long double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/cbrt
 	 */
 	constexpr long double cbrtl(long double num) noexcept
-	{
-		return ccm::cbrt(num);
-	}
+	{ return ccm::cbrt(num); }
 } // namespace ccm
 
 /// @ingroup power

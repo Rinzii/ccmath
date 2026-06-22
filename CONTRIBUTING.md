@@ -1,225 +1,215 @@
-# Contribution Guidelines
-
-> [!IMPORTANT]
-> Currently the contribution guidelines are a work in progress. Please check back later for more information.
-
 # Contributing to CCMath
 
-First off, thanks for taking the time to contribute! ❤️
+For help understanding how to implement elementary functions in CCMath, see
+[Approximating Functions: A Practical Guide to Sollya and Function Implementation](docs/approximating_functions/APPROXIMATING_FUNCTIONS.pdf).
 
-All types of contributions are encouraged and valued. See the [Table of Contents](#table-of-contents) for different ways to help and details about how this project handles them. Please make sure to read the relevant section before making your contribution. It will make it a lot easier for us maintainers and smooth out the experience for all involved. The community looks forward to your contributions. 🎉
+PRs go to the `main` branch. Bug reports and design questions belong in
+[Issues](https://github.com/Rinzii/ccmath/issues).
 
-If you enjoy this project but don’t have the time or ability to contribute code, you can still show your support in the following ways:
-- Star the repository
-- Mention this project in your own project's documentation
-- Share this project on social media or at community meetups
+By contributing you confirm the change is yours to license and compatible with
+Apache-2.0 WITH LLVM-exception.
 
+## Project layout
 
-## Table of Contents
+A quick map of the repository:
 
-- [I Have a Question](#i-have-a-question)
-- [I Want To Contribute](#i-want-to-contribute)
-  - [Core Tenets of CCMath](#core-tenets-of-ccmath)
-  - [Your First Code Contribution](#your-first-code-contribution)
-- [How to manually build CCMath with the command line](#how-to-manually-build-ccmath-with-the-command-line)
-  - [Prerequisites](#prerequisites)
-  - [How to clone project from GitHub](#how-to-clone-project-from-github)
-  - [How to build the project](#how-to-build-the-project)
-  - [How to run tests](#how-to-run-tests)
-- [Additional Notes](#additional-notes)
+- `include/ccmath/` is the header-only library. Each function sits under its family
+  (`math/power/`, `math/trig/`, and so on), and the internals, including the
+  `builtin`, `gen`, and `rt` kernels, sit under `include/ccmath/internal/`.
+- `tests/` holds the test suites, with the ULP and conformance harnesses under
+  `tests/shared/utils` and the MPFR oracles under `tests/shared/oracle`.
+- `docs/` has the longer guides, and `cmake/`, `CMakeLists.txt`, and `CMakePresets.json`
+  drive the build.
 
+## Core tenets
 
-## I Have a Question
+1. Always follow the C and C++ standard requirements for `<cmath>`. Match the specified semantics, domain and range
+   handling, special values, and error reporting (errno and the floating-point exception flags).
+2. Aim for a correctly rounded result in all four rounding modes, with documented compromises up to 4 ULP or fewer modes
+   allowed to ship sooner. See [Accuracy and rounding goals](#accuracy-and-rounding-goals).
+3. Prefer constexpr evaluation where the standard allows it (`gen` kernels, `static_assert` smoke).
+4. Keep runtime performance in the same ballpark as the platform libm on the cases it covers.
+5. Follow the existing dispatch layout (`builtin` / `gen` / `rt`, or impl-direct where the family already does).
+6. Prefer portable generic kernels over platform forks when both satisfy the standard.
+7. Mirror supported compiler behavior where the standard leaves details unspecified (for example `fpclassify` payload
+   bits).
+8. Add tests in the same change. Cover standards-mandated edge cases and ULP checks on public APIs.
+9. Doxygen on exported entry points (`@brief`, `@param`, `@return`).
+10. Keep the public header layout and naming conventions aligned with [cppreference
+    `<cmath>`](https://en.cppreference.com/w/cpp/header/cmath).
 
-> If you want to ask a question, we assume that you have read the available [Documentation]().
+## Accuracy and rounding goals
 
-Before you ask a question, it is best to search for existing [Issues](https://github.com/Rinzii/ccmath/issues) that might help you. In case you have found a suitable issue and still need clarification, you can write your question in this issue. It is also advisable to search the internet for answers first.
+The end goal for every function is a correctly rounded result, bit-for-bit the
+infinitely precise value rounded to the destination type, in all four IEEE
+rounding modes (`FE_TONEAREST`, `FE_DOWNWARD`, `FE_UPWARD`, `FE_TOWARDZERO`). That
+is the bar the library is held to.
 
-If you then still feel the need to ask a question and need clarification, we recommend the following:
+We accept documented compromises that ship in-contract functionality
+sooner:
 
-- Open an [Issue](https://github.com/Rinzii/ccmath/issues/new).
-- Provide as much context as you can about what you're running into.
-- Provide project and platform versions (nodejs, npm, etc), depending on what seems relevant.
+- A function that is not yet correctly rounded may ship with a stated, tested
+  error bound of no more than 4 ULP. The ULP suites under `tests/shared/utils`
+  check against the platform libm, and an MPFR oracle checks against the correctly
+  rounded value where one is targeted.
+- A function may support fewer than the four rounding modes. Shipping
+  `FE_TONEAREST` first, with the directed modes to follow, is fine.
 
-We will then take care of the issue as soon as possible.
+A compromise only counts if it is written down. State the current ULP bound and
+the supported rounding modes at the function, say what is missing, and leave a
+`TODO:` plus a tracking issue so the gap stays visible. An undocumented one
+is a bug. A documented one is a known limitation we can close later.
 
+Accuracy and standards conformance are the top priority. Performance is the next
+priority after that. Once a function is correct it should stay in the same ballpark
+as the platform libm where it is implemented, and the usual shape is a fast common
+case backed by an accurate fallback rather than one slow implementation. When the
+two genuinely conflict, correctness wins, but reach for a layered design before
+trading away speed.
 
-## I Want To Contribute
-
-> **Legal Notice**  
-> By contributing to this project, you agree that:
-> - You have authored 100% of the content, or the content is compatible with the project’s license and is marked as such
-> - You have the rights necessary to share the content
-> - The content may be provided under the project’s license
-
-***Before any code can be written, consider these core tenets of CCMath as you work on the project.***
-
-### Core Tenets of CCMath
-
-1. Code should be evaluable at compile time when possible and great effort should be taken to comply with this (e.g., `constexpr` and `static_assert`).
-2. Match the behavior of the standard library as closely as possible, with no compromises on accuracy.
-3. Strive for performance comparable to (or no worse than half the speed of) the standard library.
-4. Ensure code can work with `static_assert`.
-5. Favor generic solutions over platform-specific ones, when possible.
-6. Mimic the behavior of compilers we support (particularly relevant for `ccm::fpclassify`).
-7. Provide comprehensive tests covering all edge cases for any new code.
-8. Document thoroughly with Doxygen, ensuring clarity and completeness.
-9. Follow the same API layout as the standard library. Refer to [cppreference](https://en.cppreference.com/w/cpp/header/cmath) for guidance on `<cmath>'s api.
-
-### Your First Code Contribution
-
-If you’re ready to make your first contribution to CCMath, here’s a basic workflow you can follow:
-
-1. **Fork and Clone**
-  - Fork the CCMath repository on GitHub to your personal account.
-  - Clone your fork locally:
-    ```bash
-    git clone https://github.com/<your-username>/ccmath.git
-    cd ccmath
-    ```
-
-2. **Check Out the `dev` Branch**
-  - We recommend making changes off of the `dev` branch:
-    ```bash
-    git checkout dev
-    ```
-
-3. **Set Up Your Environment**
-  - Make sure you have the prerequisites installed (CMake, Ninja, Git, and a compatible compiler).
-  - Install any other dependencies specific to your platform (for example, using `apt`, `brew`, or `choco`).
-
-4. **Create a Feature Branch**
-  - Create a new branch for your proposed changes:
-    ```bash
-    git checkout -b feature/my-new-feature
-    ```
-
-5. **Implement Your Changes**
-  - Edit or add source/header files under `ccmath/`.
-  - Remember the [Core Tenets of CCMath](#core-tenets-of-ccmath)—aim for constexpr-friendly, standards-compliant, well-documented, and well-tested code.
-
-6. **Build and Test Locally**
-  - Use the provided CMake Presets to configure, build, and test:
-    ```bash
-    cmake --preset=ninja-gcc-debug
-    cmake --build --preset=build-ninja-gcc-debug
-    ctest --preset=test-ninja-gcc-debug --output-on-failure
-    ```
-  - If you encounter any build or test failures, consult the project’s [Issues](https://github.com/Rinzii/ccmath/issues) or open a new one if needed.
-
-7. **Document Your Code**
-  - Add or update Doxygen comments where appropriate to ensure comprehensive coverage of new or modified functions.
-  - If applicable, include references or code examples in docstrings.
-
-8. **Commit and Push**
-  - Once your changes pass locally, commit them with a meaningful message:
-    ```bash
-    git add .
-    git commit -m "Implement new math function with tests"
-    ```
-  - Push your branch to your fork:
-    ```bash
-    git push -u origin feature/my-new-feature
-    ```
-
-9. **Open a Pull Request**
-  - On GitHub, open a Pull Request (PR) from your branch to `Rinzii/ccmath`’s `dev` branch.
-  - Provide a clear title and description of your changes.
-  - Describe any related issue references (if applicable) and how you tested your changes.
-
-10. **Code Review**
-- A maintainer will review your PR. If changes are requested, address them and push updates to the same feature branch.
-- Once everything is approved, your PR will be merged into `dev`.
-
-That’s it! Thank you for contributing to CCMath. If you have any questions or run into any problems, don’t hesitate to open an issue or add a comment in your PR. We appreciate your help in making CCMath a robust, efficient, and user-friendly math library.
-
-
-## How to manually build CCMath with the command line
+## Build from the command line
 
 ### Prerequisites
-- [CMake 3.18+](https://cmake.org/download/)
-- [Git](https://git-scm.com/)
-- [Ninja](https://ninja-build.org/) (for Linux & macOS
-- [Clang](https://clang.llvm.org/) or [GCC](https://gcc.gnu.org/) (for Linux & macOS)
-- [Visual Studio 22](https://visualstudio.microsoft.com/) (for Windows)
 
-### How to clone project from GitHub
+- CMake 3.18+
+- Git
+- Ninja (Linux and macOS)
+- Clang or GCC (Linux and macOS)
+- Visual Studio 2022 (Windows)
 
-Step 1: Clone the repository
+### Linux and macOS
+
 ```bash
 git clone https://github.com/Rinzii/ccmath.git
+cd ccmath
+git checkout main
+cmake --preset=ninja-gcc-debug
+cmake --build --preset=build-ninja-gcc-debug
+ctest --preset=test-ninja-gcc-debug --output-on-failure
 ```
 
-Step 2: (recommended) Check out the dev branch
+Other configure presets are listed in `CMakePresets.json` (`ninja-clang-debug`,
+`ninja-clang-release`, and similar). Pass `-DCMAKE_CXX_STANDARD=17` or `20` on the
+configure line when you need a specific standard.
+
+### Windows (Visual Studio 2022)
+
+```powershell
+git clone https://github.com/Rinzii/ccmath.git
+cd ccmath
+git checkout main
+cmake --preset=vs22-debug
+cmake --build --preset=build-vs22-debug
+ctest --preset=test-vs22-debug --output-on-failure
+```
+
+Preset names vary. Read `CMakePresets.json` before assuming a name exists locally.
+
+## First PR
+
+Fork the repo, then branch off `main`:
+
 ```bash
-git checkout dev
+git clone https://github.com/<your-username>/ccmath.git
+cd ccmath
+git checkout main
+git checkout -b <topic-branch>
 ```
 
-## Building on Linux & macOS
+Build and test with the presets above. Implementation work stays under
+`include/ccmath/`, follows the patterns already present in the function family you
+touch, and does not add `<cmath>` includes. When the change is ready, open a PR
+against `main` as described in [Opening a pull request](#opening-a-pull-request).
 
-1. Pick a preset for your compiler and configuration.
-  - Examples (see `CMakePresets.json` for the full list):
-    - `ninja-gcc-debug`
-    - `ninja-gcc-release`
-    - `ninja-clang-debug`
-    - `ninja-clang-release`
-    - `ninja-clang-libcpp-relwithdebinfo`
-  - If you need a specific C++ standard, pass `-DCMAKE_CXX_STANDARD=17` (or 20, etc.) after specifying the preset.
-2. Configure using one of the presets (example shown uses GCC Debug with C++17):
-   ```bash
-   cmake --preset=ninja-gcc-debug -DCMAKE_CXX_STANDARD=17
-    ```
-3. Build the project
-   ```bash
-   cmake --preset=ninja-gcc-debug -DCMAKE_CXX_STANDARD=17
-    ```
-   Or, if you prefer a single step after configuring:
-  ```bash
-  cmake --preset=ninja-gcc-debug -DCMAKE_CXX_STANDARD=17
-  ```
-  You can also specify `--config Debug` or `--config Release` if needed
-4. Run the tests
-  ```bash
-  ctest --preset=test-ninja-gcc-debug --output-on-failure
-  ```
-  Or, if you prefer a one-liner after configuring and building:
-  ```bash
-  ctest -C Debug --output-on-failure
-  ```
-  (Ensure you built a Debug config if you’re testing Debug.)
+## Issue and pull request workflow
 
-## Building on Windows (Visual Studio 2022)
+### Branches
 
-1. Choose a preset, for example:
-  - `vs22-debug`
-  - `vs22-release`
-  - `vs22-clang-debug`
+`main` is the development trunk and the target for almost all PRs. `release/N.x`
+branches carry stabilization for a given minor series. Open fixes against `main`
+first. A maintainer backports to a release branch when it applies. Never
+force-push `main`.
 
-2. Configure:
-   ```powershell
-   cmake --preset=vs22-debug -DCMAKE_CXX_STANDARD=17
-    ```
-3. Build using the corresponding build preset:
-    ```powershell
-    cmake --build --preset=vs22-debug
-      ```
-   Or, if you prefer a single step after configuring:
-    ```powershell
-    # In the same directory where you ran cmake --preset=...
-    cmake --build . --config Debug
-    ```
-4. Run the tests
-    ```powershell
-    ctest --preset=test-vs22-debug --output-on-failure
-    ```
-    Or, if you prefer a one-liner after configuring and building:
-    ```powershell
-    ctest -C Debug --output-on-failure
-    ```
+### Releases and tags
 
-## Additional Notes
+Releases are annotated tags `vMAJOR.MINOR.PATCH`, with release candidates as
+`vMAJOR.MINOR.PATCH-rc.N`. Below `1.0`, a minor bump may carry breaking API changes.
 
-- The exact preset names may differ in your local `CMakePresets.json`. Check that file for the list of available presets.
-- Presets for coverage, sanitizer builds, or specialized compilers like Intel may also be available (for example, `ninja-intel-relwithdebinfo` or `ninja-gcc-ccache-debug`).
-- If you run into issues, confirm that your CMake, Ninja, and compiler versions are current and supported.
-- See our [Contribution Guidelines](CONTRIBUTING.md) for more detailed information on contributing and troubleshooting.
+### Filing an issue
+
+Bug reports use the form under `.github/ISSUE_TEMPLATE`. For a numeric defect,
+give the exact function, the affected evaluation (constexpr, runtime, SIMD, or
+deterministic mode), the scalar type, and the exact input, expected, and actual
+values. Hex float literals such as `0x1.0p+2` avoid precision loss. State the
+active rounding mode and the source of truth for the expected result (MPFR, the
+C++ standard, or a reference libm).
+
+### Agree on the approach first
+
+Hard numeric work gets a design review on the issue before you implement it. For a
+correctly-rounded function, or work on accuracy and ULP, rounding modes, or range
+reduction, comment on the issue with your intended approach and the exact inputs you
+plan to validate against, and wait for a maintainer to sign off before opening a
+non-draft PR. A draft PR holding only the acceptance tests and a validation plan is a
+good way to start that conversation. The point is to catch a wrong method in a short
+comment rather than in a finished kernel, so you do not pour effort into an approach
+that has to be redone. Likewise, hold off on implementing a new feature until a
+maintainer approves the request.
+
+### Opening a pull request
+
+PRs target `main` unless the fix is specific to a release branch. Keep the change
+minimal and aligned with the function family you touch. Use a one-line imperative
+subject with no trailing period. Open the PR from a topic branch, since a PR from
+your fork's `main`, `master`, or `develop` is closed automatically.
+
+Before you request review, read your own diff once outside the editor, make sure
+the warning-as-error build and the test presets are green, and write a short
+summary of what changed and why. Small focused PRs get reviewed faster and more
+carefully than large ones, so split unrelated work and leave drive-by refactors
+to their own change. Once review starts, answer every comment, even if only to
+say it is done. When a reviewer misreads the code, prefer making the code or a
+why comment clearer over explaining only in the thread, since the next reader
+sees the code and not the discussion.
+
+### Cite your sources
+
+Most numeric work builds on existing research, so share what you drew on. In the
+issue or PR, name the algorithm and the reference behind it, whether that is a paper,
+a worked derivation, or a reference implementation you studied for its behavior. Link
+any analysis or proof artifact too, a Sollya script, a Gappa proof, or the MPFR
+comparison you validated against. A reviewer can check a method far faster when its
+source is named than when they have to reconstruct it from the code, and a future
+maintainer can follow the reasoning rather than guess at it.
+
+Also, if any code is adapted from another source rather than written from scratch, name
+that source in a comment on the code itself, not only in the PR. Only adapt from a source
+whose license is compatible with Apache-2.0 WITH LLVM-exception.
+
+### Testing math changes
+
+Tests go in the same change as the code. A few specifics matter for math
+kernels and are easy to get wrong:
+
+- Exercise the code you changed. A public call such as `ccm::pow` can resolve to
+  a compiler builtin at runtime, so a plain runtime test may never reach the
+  ccmath kernel. Drive the kernel through a `constexpr` context (a
+  `static_assert`) or by calling the generic kernel directly (`ccm::gen::*_gen`).
+- Validate numeric changes against an oracle. Use MPFR, Sollya, or Gappa and note
+  the source of truth rather than eyeballing a value or trusting a system libm at
+  a boundary. The MPFR oracle harnesses under `tests/shared/oracle` are the
+  pattern to follow.
+- Test boundaries, not a single point. Cover overflow, underflow, subnormals, and
+  signed zero, along with the worst-case inputs for the function, not just one
+  representative value.
+- Cover every type the function is instantiated for, `float` and `double` at a
+  minimum.
+- For exception or errno behavior, use the fenv fixture at
+  `tests/shared/utils/fenv_fixture.hpp`. The ULP and conformance suites live under
+  `tests/shared/utils`.
+
+## More detail
+
+- [CONVENTIONS.md](CONVENTIONS.md) for the code-level conventions
+- [docs/STATUS.md](docs/STATUS.md) for module completion
+- [SECURITY.md](SECURITY.md) for vulnerability reports

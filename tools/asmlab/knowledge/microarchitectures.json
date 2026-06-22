@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "microarchitectures": [
+    {
+      "id": "apple_m1_firestorm",
+      "isa": "aarch64",
+      "vendor": "Apple",
+      "family": "Apple M-series",
+      "core": "Firestorm",
+      "asmlab_arch": "apple-m1",
+      "confidence": "partially_trusted",
+      "preferred_evidence": [
+        "local_benchmark",
+        "local_calibration",
+        "source_map",
+        "path_classification"
+      ],
+      "avoid_claims": [
+        "generic powf_impl spill claims from thin M1 harness-only reports",
+        "exact cycle counts without local measurement"
+      ],
+      "static_model_notes": "LLVM apple-m1 MCA model is approximate.",
+      "source_ids": ["apple_silicon_opt_guide", "dougallj_m1", "llvm_mca", "asmlab_local_calibration"]
+    },
+    {
+      "id": "x86_64_v3_generic",
+      "isa": "x86_64",
+      "vendor": "generic",
+      "family": "x86-64-v3",
+      "core": "portable_avx2_fma",
+      "asmlab_arch": "x86-64-v3",
+      "confidence": "partially_trusted",
+      "preferred_evidence": [
+        "scenario_source_map",
+        "llvm_mca",
+        "local_calibration",
+        "uops_info"
+      ],
+      "avoid_claims": [
+        "exact cycle counts without uops.info or local bench"
+      ],
+      "static_model_notes": "LLVM x86-64-v3 model is generic AVX2+FMA baseline.",
+      "source_ids": ["llvm_mca", "uops_info", "agner_fog", "intel_opt_manual", "asmlab_local_calibration"]
+    },
+    {
+      "id": "skylake",
+      "isa": "x86_64",
+      "vendor": "Intel",
+      "family": "Skylake",
+      "core": "Skylake",
+      "asmlab_arch": "skylake",
+      "confidence": "partially_trusted",
+      "preferred_evidence": ["uops_info", "agner_fog", "llvm_mca", "uica"],
+      "avoid_claims": ["apple_silicon_timing_on_skylake"],
+      "static_model_notes": "uiCA may apply on recent Intel when installed.",
+      "source_ids": ["uops_info", "agner_fog", "intel_opt_manual", "llvm_mca", "uica"]
+    },
+    {
+      "id": "ice_lake",
+      "isa": "x86_64",
+      "vendor": "Intel",
+      "family": "Ice Lake",
+      "core": "Ice Lake",
+      "asmlab_arch": "icelake-server",
+      "confidence": "partially_trusted",
+      "preferred_evidence": ["uops_info", "agner_fog", "llvm_mca", "uica"],
+      "avoid_claims": [],
+      "static_model_notes": null,
+      "source_ids": ["uops_info", "agner_fog", "intel_opt_manual", "llvm_mca", "uica"]
+    },
+    {
+      "id": "sapphire_rapids",
+      "isa": "x86_64",
+      "vendor": "Intel",
+      "family": "Sapphire Rapids",
+      "core": "Sapphire Rapids",
+      "asmlab_arch": "sapphire-rapids",
+      "confidence": "unknown",
+      "preferred_evidence": ["uops_info", "llvm_mca"],
+      "avoid_claims": ["unsourced_latency_tables"],
+      "static_model_notes": "Confirm asmlab arch wiring before claims.",
+      "source_ids": ["uops_info", "intel_opt_manual", "llvm_mca"]
+    },
+    {
+      "id": "zen3",
+      "isa": "x86_64",
+      "vendor": "AMD",
+      "family": "Zen 3",
+      "core": "Zen 3",
+      "asmlab_arch": "znver3",
+      "confidence": "partially_trusted",
+      "preferred_evidence": ["uops_info", "agner_fog", "llvm_mca"],
+      "avoid_claims": [],
+      "static_model_notes": null,
+      "source_ids": ["uops_info", "agner_fog", "amd_opt_guide", "llvm_mca"]
+    },
+    {
+      "id": "zen4",
+      "isa": "x86_64",
+      "vendor": "AMD",
+      "family": "Zen 4",
+      "core": "Zen 4",
+      "asmlab_arch": "znver4",
+      "confidence": "partially_trusted",
+      "preferred_evidence": ["uops_info", "agner_fog", "llvm_mca", "local_calibration"],
+      "avoid_claims": [],
+      "static_model_notes": "asmlab seed findings referenced znver4 LSU pressure for powf_impl.",
+      "source_ids": ["uops_info", "agner_fog", "amd_opt_guide", "llvm_mca", "asmlab_local_calibration"]
+    }
+  ]
+}
