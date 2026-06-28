@@ -31,7 +31,8 @@ namespace ccm::ext
 	 * @param value The value to evaluate.
 	 * @return The interpolation parameter of value in the range [start, end].
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T inverse_lerp(T start, T end, T value) noexcept
-	{ return ext::unlerp(start, end, value); }
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T inverse_lerp(T start, T end, T value) noexcept
+	{
+		return ext::unlerp(start, end, value);
+	}
 } // namespace ccm::ext

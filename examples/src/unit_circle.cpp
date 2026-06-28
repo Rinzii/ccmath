@@ -30,7 +30,7 @@ int main()
 
 	ccm::examples::table_header("deg", "sin", "cos");
 
-	for (auto const& angle : kAngles)
+	for (auto const & angle : kAngles)
 	{
 		double const s = ccm::sin(angle.radians);
 		double const c = ccm::cos(angle.radians);

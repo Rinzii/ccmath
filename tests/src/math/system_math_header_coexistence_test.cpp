@@ -48,8 +48,7 @@
 namespace
 {
 	// Force a genuine runtime call so the runtime dispatch is exercised rather than constant folded.
-	template <typename T>
-	T runtime(T value)
+	template <typename T> T runtime(T value)
 	{
 		volatile T sink = value;
 		return sink;

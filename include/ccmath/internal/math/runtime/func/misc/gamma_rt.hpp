@@ -19,14 +19,15 @@
 
 namespace ccm::rt
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T gamma_rt(T num) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T gamma_rt(T num) noexcept
 	{
 #if defined(CCM_CONFIG_SYSTEM_MATH)
 		return detail::sys::gamma_call(num);
 #else
-		if constexpr (ccm::builtin::has_runtime_gamma<T>) { return ccm::builtin::gamma_rt(num); }
-		else
+		if constexpr (ccm::builtin::has_runtime_gamma<T>)
+		{
+			return ccm::builtin::gamma_rt(num);
+		} else
 		{
 			const auto scalar = [](T value) { return detail::dispatch_float_double(value, ccm::internal::gamma_float, ccm::internal::gamma_double); };
 			return simd_impl::unary_via_scalar_abi(num, scalar);

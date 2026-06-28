@@ -11,8 +11,7 @@
 
 namespace ccm::pp
 {
-	template <std::size_t Alignment>
-	CCM_ALWAYS_INLINE void * assume_aligned(void * ptr)
+	template <std::size_t Alignment> CCM_ALWAYS_INLINE void * assume_aligned(void * ptr)
 	{
 		static_assert(Alignment != 0 && (Alignment & (Alignment - 1)) == 0, "Alignment must be a nonzero power of 2");
 #if defined(__GNUC__) || (defined(__clang__) && !defined(_MSC_VER))

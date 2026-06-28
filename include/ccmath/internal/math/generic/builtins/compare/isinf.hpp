@@ -94,13 +94,15 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_isinf functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto isinf_ct(T x) -> std::enable_if_t<has_constexpr_isinf<T>, bool>
-	{ return __builtin_isinf(x); }
+	template <typename T> constexpr auto isinf_ct(T x) -> std::enable_if_t<has_constexpr_isinf<T>, bool>
+	{
+		return __builtin_isinf(x);
+	}
 
-	template <typename T>
-	auto isinf_rt(T x) -> std::enable_if_t<has_runtime_isinf<T>, bool>
-	{ return __builtin_isinf(x); }
+	template <typename T> auto isinf_rt(T x) -> std::enable_if_t<has_runtime_isinf<T>, bool>
+	{
+		return __builtin_isinf(x);
+	}
 } // namespace ccm::builtin
 
 // Cleanup the global namespace

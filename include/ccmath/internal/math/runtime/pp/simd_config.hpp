@@ -314,7 +314,9 @@ namespace ccm::pp::config::detail
 	template <int... PACK, typename F>
 	CCM_SIMD_ENFORCED_ALWAYS_INLINE constexpr void simd_int_pack(std::integer_sequence<int, PACK...> /*unused*/,
 																 F && code) // NOLINT(cppcoreguidelines-missing-std-forward)
-	{ code(std::integer_sequence<int, PACK...>{}); }
+	{
+		code(std::integer_sequence<int, PACK...>{});
+	}
 } // namespace ccm::pp::config::detail
 
 #define CCMATH_SIMD_INT_PACK(N, CODE) ccm::pp::config::detail::simd_int_pack(std::make_integer_sequence<int, N>{}, CODE)

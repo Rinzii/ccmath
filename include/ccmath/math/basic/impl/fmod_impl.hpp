@@ -31,8 +31,7 @@ namespace ccm::internal
 		// exponents. The modular product is built a chunk of bits at a time with 64-bit arithmetic, so
 		// the loop runs in gap / chunk steps instead of one step per bit, and the result stays exact for
 		// every magnitude and independent of the active rounding mode.
-		template <typename T>
-		constexpr T fmod_impl(T x, T y) noexcept
+		template <typename T> constexpr T fmod_impl(T x, T y) noexcept
 		{
 			static_assert(std::is_floating_point_v<T>, "fmod_impl requires a floating-point type");
 			// The reduction lifts the significand into a uint64_t and shifts it by chunk = 63 - mant_bits
@@ -45,7 +44,10 @@ namespace ccm::internal
 			const FPBits_t y_bits(y);
 
 			// NaN for an infinite dividend, a zero divisor, or a NaN argument.
-			if (CCM_UNLIKELY(x_bits.is_inf() || y_bits.is_zero() || x_bits.is_nan() || y_bits.is_nan())) { return FPBits_t::quiet_nan().get_val(); }
+			if (CCM_UNLIKELY(x_bits.is_inf() || y_bits.is_zero() || x_bits.is_nan() || y_bits.is_nan()))
+			{
+				return FPBits_t::quiet_nan().get_val();
+			}
 
 			// Compare magnitudes through the exponent and significand bits. For finite values that integer
 			// order matches the floating-point order, so this also covers fmod(x, +/-inf) = x.
@@ -53,9 +55,15 @@ namespace ccm::internal
 			const auto y_mag = y_bits.abs().uintval();
 
 			// Any abs(x) < abs(y) returns x unchanged.
-			if (x_mag < y_mag) { return x; }
+			if (x_mag < y_mag)
+			{
+				return x;
+			}
 			// abs(x) == abs(y) leaves a zero that keeps the sign of x.
-			if (x_mag == y_mag) { return ccm::copysign(static_cast<T>(0), x); }
+			if (x_mag == y_mag)
+			{
+				return ccm::copysign(static_cast<T>(0), x);
+			}
 
 			constexpr int mant_bits = std::numeric_limits<T>::digits - 1;
 			// Largest shift that keeps a reduced significand (below 2^(mant_bits + 1)) inside 64 bits.
@@ -73,7 +81,10 @@ namespace ccm::internal
 				gap -= step;
 			}
 
-			if (r == 0) { return ccm::copysign(static_cast<T>(0), x); }
+			if (r == 0)
+			{
+				return ccm::copysign(static_cast<T>(0), x);
+			}
 			return ccm::copysign(ccm::scalbn(static_cast<T>(r), exp_y - mant_bits), x);
 		}
 	} // namespace impl
@@ -81,7 +92,8 @@ namespace ccm::internal
 	// Thin wrapper so the public dispatch reads the same as the other basic functions. float and
 	// double evaluate natively. long double is reduced through the double kernel by the caller,
 	// matching the existing fmodl and remquol convention.
-	template <typename T>
-	constexpr T fmod(T x, T y) noexcept
-	{ return impl::fmod_impl(x, y); }
+	template <typename T> constexpr T fmod(T x, T y) noexcept
+	{
+		return impl::fmod_impl(x, y);
+	}
 } // namespace ccm::internal

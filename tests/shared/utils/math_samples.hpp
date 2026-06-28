@@ -16,8 +16,7 @@
 
 namespace ccm::test::samples
 {
-	template <typename T>
-	struct ternary_input
+	template <typename T> struct ternary_input
 	{
 		T x;
 		T y;

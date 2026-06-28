@@ -19,14 +19,15 @@
 
 namespace ccm::rt
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T lgamma_rt(T num) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T lgamma_rt(T num) noexcept
 	{
 #if defined(CCM_CONFIG_SYSTEM_MATH)
 		return detail::sys::lgamma_call(num);
 #else
-		if constexpr (ccm::builtin::has_runtime_lgamma<T>) { return ccm::builtin::lgamma_rt(num); }
-		else
+		if constexpr (ccm::builtin::has_runtime_lgamma<T>)
+		{
+			return ccm::builtin::lgamma_rt(num);
+		} else
 		{
 			const auto scalar = [](T value) { return detail::dispatch_float_double(value, ccm::internal::lgamma_float, ccm::internal::lgamma_double); };
 			return simd_impl::unary_via_scalar_abi(num, scalar);

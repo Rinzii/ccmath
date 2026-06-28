@@ -29,9 +29,10 @@ namespace ccm::ext
 		 * @param length The length of the repeating interval.
 		 * @return The repeated value in the range [0, length).
 		 */
-		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-		constexpr T repeat(T value, T length) noexcept
-		{ return value - (ccm::floor(value / length) * length); }
+		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T repeat(T value, T length) noexcept
+		{
+			return value - (ccm::floor(value / length) * length);
+		}
 	} // namespace unsafe
 
 	/**
@@ -45,10 +46,12 @@ namespace ccm::ext
 	 * @param length The length of the repeating interval.
 	 * @return The repeated value in the range [0, length).
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T repeat(T value, T length) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T repeat(T value, T length) noexcept
 	{
-		if (length == T(0)) { return T(0); }
+		if (length == T(0))
+		{
+			return T(0);
+		}
 
 		return ext::unsafe::repeat(value, length);
 	}

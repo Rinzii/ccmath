@@ -23,10 +23,12 @@ namespace ccm
 	 * @param y Divisor.
 	 * @return The remainder of the division of x by y.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T remainder(T x, T y)
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T remainder(T x, T y)
 	{
-		if (!ccm::support::is_constant_evaluated()) { return ccm::rt::remainder_rt(x, y); }
+		if (!ccm::support::is_constant_evaluated())
+		{
+			return ccm::rt::remainder_rt(x, y);
+		}
 
 		// remainder is the remainder component of remquo, so reuse the exact iterative reduction
 		// already implemented there. The quotient rounds to nearest, ties-to-even, which keeps the
@@ -45,9 +47,10 @@ namespace ccm
 	 * @param y Divisor.
 	 * @return The remainder of the division of x by y as a double.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double remainder(Integer x, Integer y)
-	{ return ccm::remainder<double>(static_cast<double>(x), static_cast<double>(y)); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double remainder(Integer x, Integer y)
+	{
+		return ccm::remainder<double>(static_cast<double>(x), static_cast<double>(y));
+	}
 
 	/**
 	 * @brief Returns the remainder of the division of x by y.
@@ -56,7 +59,9 @@ namespace ccm
 	 * @return The remainder of the division of x by y.
 	 */
 	constexpr float remainderf(float x, float y)
-	{ return ccm::remainder<float>(x, y); }
+	{
+		return ccm::remainder<float>(x, y);
+	}
 
 	/**
 	 * @brief Returns the remainder of the division of x by y.
@@ -65,7 +70,9 @@ namespace ccm
 	 * @return The remainder of the division of x by y.
 	 */
 	constexpr long double remainderl(long double x, long double y)
-	{ return ccm::remainder<long double>(x, y); }
+	{
+		return ccm::remainder<long double>(x, y);
+	}
 } // namespace ccm
 
 /// @ingroup basic

@@ -58,8 +58,7 @@ TEST(PowlUnsupportedTier, PolicySelectsFallbackOrUnsupported)
 		const long double actual   = ccm::gen::pow_gen(base, exponent);
 		const long double expected = static_cast<long double>(ccm::gen::pow_gen(static_cast<double>(base), static_cast<double>(exponent)));
 		EXPECT_EQ(actual, expected);
-	}
-	else
+	} else
 	{
 		EXPECT_TRUE(path == ccm::test::oracle::PowlImplementationPath::Ld128Unsupported ||
 					path == ccm::test::oracle::PowlImplementationPath::UnknownUnsupported);

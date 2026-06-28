@@ -25,20 +25,24 @@ namespace ccm
 	 * @param num Floating-point value, typically in [-1, 1].
 	 * @return Inverse sine of num in radians.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T asin(T num)
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T asin(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_asin<T>) { return ccm::builtin::asin_ct(num); }
-		else if (ccm::support::is_constant_evaluated())
+		if constexpr (ccm::builtin::has_constexpr_asin<T>)
 		{
-			if constexpr (std::is_same_v<T, float>) { return internal::impl::asin_float(num); }
-			else if constexpr (std::is_same_v<T, double>) { return internal::impl::asin_double(num); }
-			else
+			return ccm::builtin::asin_ct(num);
+		} else if (ccm::support::is_constant_evaluated())
+		{
+			if constexpr (std::is_same_v<T, float>)
+			{
+				return internal::impl::asin_float(num);
+			} else if constexpr (std::is_same_v<T, double>)
+			{
+				return internal::impl::asin_double(num);
+			} else
 			{
 				return static_cast<long double>(internal::impl::asin_double(static_cast<double>(num)));
 			}
-		}
-		else
+		} else
 		{
 			return ccm::rt::asin_rt(num);
 		}
@@ -50,9 +54,10 @@ namespace ccm
 	 * @param num Input value.
 	 * @return Inverse sine in radians as double.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double asin(Integer num)
-	{ return ccm::asin<double>(static_cast<double>(num)); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double asin(Integer num)
+	{
+		return ccm::asin<double>(static_cast<double>(num));
+	}
 
 	/**
 	 * @brief Computes inverse sine for float.
@@ -60,7 +65,9 @@ namespace ccm
 	 * @return Inverse sine in radians as float.
 	 */
 	constexpr float asinf(float num)
-	{ return ccm::asin<float>(num); }
+	{
+		return ccm::asin<float>(num);
+	}
 
 	/**
 	 * @brief Computes inverse sine for long double.
@@ -68,7 +75,9 @@ namespace ccm
 	 * @return Inverse sine in radians as long double.
 	 */
 	constexpr long double asinl(long double num)
-	{ return ccm::asin<long double>(num); }
+	{
+		return ccm::asin<long double>(num);
+	}
 } // namespace ccm
 
 /// @ingroup trig

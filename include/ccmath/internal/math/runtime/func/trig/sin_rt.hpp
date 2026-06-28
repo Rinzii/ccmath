@@ -21,14 +21,15 @@
 
 namespace ccm::rt
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T sin_rt(T num) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T sin_rt(T num) noexcept
 	{
 #if defined(CCM_CONFIG_SYSTEM_MATH)
 		return detail::sys::sin_call(num);
 #else
-		if constexpr (ccm::builtin::has_runtime_sin<T>) { return ccm::builtin::sin_rt(num); }
-		else
+		if constexpr (ccm::builtin::has_runtime_sin<T>)
+		{
+			return ccm::builtin::sin_rt(num);
+		} else
 		{
 			const auto scalar = [](T value) { return gen::sin_gen(value); };
 	#if defined(CCMATH_HAS_SIMD) && defined(CCMATH_HAS_SIMD_SVML) && !defined(_MSC_VER)

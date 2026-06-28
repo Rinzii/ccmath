@@ -92,27 +92,38 @@ namespace ccm::test
 		return oss.str();
 	}
 
-	template <typename T>
-	inline constexpr const char * scalar_type_name()
+	template <typename T> inline constexpr const char * scalar_type_name()
 	{
-		if constexpr (std::is_same_v<T, float>) { return "float"; }
-		else if constexpr (std::is_same_v<T, double>) { return "double"; }
-		else if constexpr (std::is_same_v<T, long double>) { return "long double"; }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return "float";
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return "double";
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return "long double";
+		} else
 		{
 			return "unknown";
 		}
 	}
 
-	template <typename T>
-	inline constexpr const char * pow_builtin_status()
-	{ return ccm::builtin::has_runtime_pow<T> ? "available" : "unavailable"; }
-
-	template <typename T>
-	inline constexpr const char * fma_builtin_status()
+	template <typename T> inline constexpr const char * pow_builtin_status()
 	{
-		if constexpr (ccm::builtin::runtime_builtin_fma_trusted<T>) { return "trusted"; }
-		if constexpr (ccm::builtin::has_fma<T>) { return "available"; }
+		return ccm::builtin::has_runtime_pow<T> ? "available" : "unavailable";
+	}
+
+	template <typename T> inline constexpr const char * fma_builtin_status()
+	{
+		if constexpr (ccm::builtin::runtime_builtin_fma_trusted<T>)
+		{
+			return "trusted";
+		}
+		if constexpr (ccm::builtin::has_fma<T>)
+		{
+			return "available";
+		}
 		return "unavailable";
 	}
 
@@ -125,8 +136,7 @@ namespace ccm::test
 #endif
 	}
 
-	template <typename T>
-	inline std::string bits_hex(T value)
+	template <typename T> inline std::string bits_hex(T value)
 	{
 		using fp_bits	   = ccm::support::fp::FPBits<T>;
 		using storage_type = typename fp_bits::storage_type;
@@ -137,8 +147,7 @@ namespace ccm::test
 		if constexpr (sizeof(storage_type) <= sizeof(std::uint64_t))
 		{
 			oss << std::setw(static_cast<int>(sizeof(storage_type) * 2)) << static_cast<std::uint64_t>(bits);
-		}
-		else
+		} else
 		{
 			const auto hi = static_cast<std::uint64_t>(bits >> 64);
 			const auto lo = static_cast<std::uint64_t>(bits);
@@ -155,9 +164,9 @@ namespace ccm::test
 			switch (ch)
 			{
 			case '\\': oss << "\\\\"; break;
-			case '"': oss << "\\\""; break;
+			case '"' : oss << "\\\""; break;
 			case '\n': oss << "\\n"; break;
-			default: oss << ch; break;
+			default	 : oss << ch; break;
 			}
 		}
 		return oss.str();

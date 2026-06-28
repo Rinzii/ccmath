@@ -74,13 +74,18 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_log functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto log_ct(T x) -> std::enable_if_t<has_constexpr_log<T>, T>
+	template <typename T> constexpr auto log_ct(T x) -> std::enable_if_t<has_constexpr_log<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_logf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_log(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_logl(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_logf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_log(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_logl(x);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for log");
@@ -88,13 +93,18 @@ namespace ccm::builtin
 		}
 	}
 
-	template <typename T>
-	auto log_rt(T x) -> std::enable_if_t<has_runtime_log<T>, T>
+	template <typename T> auto log_rt(T x) -> std::enable_if_t<has_runtime_log<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_logf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_log(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_logl(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_logf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_log(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_logl(x);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for log");

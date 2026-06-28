@@ -39,91 +39,100 @@ namespace ccm::rt::detail::sys
 {
 	// Expensive transcendentals. The runtime path uses these only under FE_TONEAREST, since libm is
 	// not correctly rounded in the directed modes (the kernel handles those, like the builtin path).
-	template <typename T>
-	[[nodiscard]] inline T exp2_call(T x)
+	template <typename T> [[nodiscard]] inline T exp2_call(T x)
 	{
-		if constexpr (std::is_same_v<T, float>) { return ::exp2f(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return ::exp2f(x);
+		} else
 		{
 			return ::exp2(static_cast<double>(x));
 		}
 	}
 
-	template <typename T>
-	[[nodiscard]] inline T log_call(T x)
+	template <typename T> [[nodiscard]] inline T log_call(T x)
 	{
-		if constexpr (std::is_same_v<T, float>) { return ::logf(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return ::logf(x);
+		} else
 		{
 			return ::log(static_cast<double>(x));
 		}
 	}
 
-	template <typename T>
-	[[nodiscard]] inline T log2_call(T x)
+	template <typename T> [[nodiscard]] inline T log2_call(T x)
 	{
-		if constexpr (std::is_same_v<T, float>) { return ::log2f(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return ::log2f(x);
+		} else
 		{
 			return ::log2(static_cast<double>(x));
 		}
 	}
 
-	template <typename T>
-	[[nodiscard]] inline T log10_call(T x)
+	template <typename T> [[nodiscard]] inline T log10_call(T x)
 	{
-		if constexpr (std::is_same_v<T, float>) { return ::log10f(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return ::log10f(x);
+		} else
 		{
 			return ::log10(static_cast<double>(x));
 		}
 	}
 
-	template <typename T>
-	[[nodiscard]] inline T sin_call(T x)
+	template <typename T> [[nodiscard]] inline T sin_call(T x)
 	{
-		if constexpr (std::is_same_v<T, float>) { return ::sinf(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return ::sinf(x);
+		} else
 		{
 			return ::sin(static_cast<double>(x));
 		}
 	}
 
-	template <typename T>
-	[[nodiscard]] inline T cos_call(T x)
+	template <typename T> [[nodiscard]] inline T cos_call(T x)
 	{
-		if constexpr (std::is_same_v<T, float>) { return ::cosf(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return ::cosf(x);
+		} else
 		{
 			return ::cos(static_cast<double>(x));
 		}
 	}
 
-	template <typename T>
-	[[nodiscard]] inline T tan_call(T x)
+	template <typename T> [[nodiscard]] inline T tan_call(T x)
 	{
-		if constexpr (std::is_same_v<T, float>) { return ::tanf(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return ::tanf(x);
+		} else
 		{
 			return ::tan(static_cast<double>(x));
 		}
 	}
 
-	template <typename T>
-	[[nodiscard]] inline T gamma_call(T x)
+	template <typename T> [[nodiscard]] inline T gamma_call(T x)
 	{
-		if constexpr (std::is_same_v<T, float>) { return ::tgammaf(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return ::tgammaf(x);
+		} else
 		{
 			return ::tgamma(static_cast<double>(x));
 		}
 	}
 
-	template <typename T>
-	[[nodiscard]] inline T lgamma_call(T x)
+	template <typename T> [[nodiscard]] inline T lgamma_call(T x)
 	{
-		if constexpr (std::is_same_v<T, float>) { return ::lgammaf(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return ::lgammaf(x);
+		} else
 		{
 			return ::lgamma(static_cast<double>(x));
 		}
@@ -132,21 +141,23 @@ namespace ccm::rt::detail::sys
 	// fmod and remainder are exact in every rounding mode, so they are routed unconditionally. The
 	// generic *_rt formula (x - trunc(x / y) * y) loses all precision for large quotients, and the
 	// exact kernel cannot be reached here without pulling the nearest dispatch (and pp) back in.
-	template <typename T>
-	[[nodiscard]] inline T fmod_call(T x, T y)
+	template <typename T> [[nodiscard]] inline T fmod_call(T x, T y)
 	{
-		if constexpr (std::is_same_v<T, float>) { return ::fmodf(x, y); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return ::fmodf(x, y);
+		} else
 		{
 			return ::fmod(static_cast<double>(x), static_cast<double>(y));
 		}
 	}
 
-	template <typename T>
-	[[nodiscard]] inline T remainder_call(T x, T y)
+	template <typename T> [[nodiscard]] inline T remainder_call(T x, T y)
 	{
-		if constexpr (std::is_same_v<T, float>) { return ::remainderf(x, y); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return ::remainderf(x, y);
+		} else
 		{
 			return ::remainder(static_cast<double>(x), static_cast<double>(y));
 		}

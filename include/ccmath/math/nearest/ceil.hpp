@@ -28,22 +28,33 @@ namespace ccm
 	 * @param num A floating-point or integer value.
 	 * @return The smallest integer value not less than num.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T ceil(T num) noexcept
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T ceil(T num) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_ceil<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::ceil_ct(num); }
+			if (ccm::support::is_constant_evaluated())
+			{
+				return ccm::builtin::ceil_ct(num);
+			}
 		}
 		{
 			// If num is NaN, NaN is returned.
 			// If num is ±∞ or ±0, num is returned, unmodified.
-			if (ccm::isinf(num) || num == static_cast<T>(0) || ccm::isnan(num)) { return num; }
+			if (ccm::isinf(num) || num == static_cast<T>(0) || ccm::isnan(num))
+			{
+				return num;
+			}
 
-			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::ceil_rt(num); }
+			if (!ccm::support::is_constant_evaluated())
+			{
+				return ccm::rt::ceil_rt(num);
+			}
 
 			const T truncated = ccm::trunc(num);
-			if (truncated == num || num < static_cast<T>(0)) { return truncated; }
+			if (truncated == num || num < static_cast<T>(0))
+			{
+				return truncated;
+			}
 			return truncated + static_cast<T>(1);
 		}
 	}
@@ -54,9 +65,10 @@ namespace ccm
 	 * @param num Integer value.
 	 * @return num converted to double.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double ceil(Integer num) noexcept
-	{ return static_cast<double>(num); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double ceil(Integer num) noexcept
+	{
+		return static_cast<double>(num);
+	}
 
 	/**
 	 * @brief Computes the ceiling of a float value.
@@ -64,7 +76,9 @@ namespace ccm
 	 * @return Smallest integer value not less than num, as float.
 	 */
 	constexpr float ceilf(float num) noexcept
-	{ return ccm::ceil<float>(num); }
+	{
+		return ccm::ceil<float>(num);
+	}
 
 	/**
 	 * @brief Computes the ceiling of a double value.
@@ -72,7 +86,9 @@ namespace ccm
 	 * @return Smallest integer value not less than num, as double.
 	 */
 	constexpr long double ceill(long double num) noexcept
-	{ return ccm::ceil<long double>(num); }
+	{
+		return ccm::ceil<long double>(num);
+	}
 } // namespace ccm
 
 /// @ingroup nearest

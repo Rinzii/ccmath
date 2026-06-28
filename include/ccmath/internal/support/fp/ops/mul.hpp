@@ -48,7 +48,10 @@ namespace ccm::support::fp::op
 		{
 			if (x_bits.is_nan() || y_bits.is_nan())
 			{
-				if (x_bits.is_signaling_nan() || y_bits.is_signaling_nan()) { fenv::raise_except_if_required(FE_INVALID); }
+				if (x_bits.is_signaling_nan() || y_bits.is_signaling_nan())
+				{
+					fenv::raise_except_if_required(FE_INVALID);
+				}
 
 				if (x_bits.is_quiet_nan())
 				{

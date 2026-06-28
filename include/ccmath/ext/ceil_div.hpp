@@ -30,15 +30,17 @@ namespace ccm::ext
 	template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<std::remove_cv_t<T>, bool>, bool> = true>
 	constexpr T ceil_div(T value, T divisor) noexcept
 	{
-		if (divisor == T(0)) { return T(0); }
+		if (divisor == T(0))
+		{
+			return T(0);
+		}
 
 		// Divide first, then add the correction, so there is no pre-division addition that can overflow.
 		if constexpr (std::is_signed_v<T>)
 		{
 			const bool quotient_positive = (value < 0) == (divisor < 0);
 			return static_cast<T>(value / divisor + (value % divisor != 0 && quotient_positive));
-		}
-		else
+		} else
 		{
 			return static_cast<T>(value / divisor + (value % divisor != 0));
 		}

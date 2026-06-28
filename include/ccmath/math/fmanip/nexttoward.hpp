@@ -26,12 +26,15 @@ namespace ccm
 	 * @param to Direction target as long double.
 	 * @return Next representable value after from toward to.
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T nexttoward(T from, long double to) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T nexttoward(T from, long double to) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_nexttoward<T>) { return ccm::builtin::nexttoward_ct(from, to); }
-		else if (ccm::support::is_constant_evaluated()) { return gen::nextafter_gen(from, to); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_nexttoward<T>)
+		{
+			return ccm::builtin::nexttoward_ct(from, to);
+		} else if (ccm::support::is_constant_evaluated())
+		{
+			return gen::nextafter_gen(from, to);
+		} else
 		{
 			return ccm::rt::nexttoward_rt(from, to);
 		}
@@ -44,9 +47,10 @@ namespace ccm
 	 * @param to Direction target as long double.
 	 * @return Next representable double value after converting from to floating-point.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double nexttoward(Integer from, long double to) noexcept
-	{ return gen::nextafter_gen(from, to); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double nexttoward(Integer from, long double to) noexcept
+	{
+		return gen::nextafter_gen(from, to);
+	}
 
 	/**
 	 * @brief Returns the next representable float from from toward to.
@@ -55,7 +59,9 @@ namespace ccm
 	 * @return Next representable float value.
 	 */
 	constexpr float nexttowardf(float from, long double to) noexcept
-	{ return gen::nextafter_gen(from, to); }
+	{
+		return gen::nextafter_gen(from, to);
+	}
 
 	/**
 	 * @brief Returns the next representable long double from from toward to.
@@ -64,6 +70,8 @@ namespace ccm
 	 * @return Next representable long double value.
 	 */
 	constexpr long double nexttowardl(long double from, long double to) noexcept
-	{ return gen::nextafter_gen(from, to); }
+	{
+		return gen::nextafter_gen(from, to);
+	}
 
 } // namespace ccm

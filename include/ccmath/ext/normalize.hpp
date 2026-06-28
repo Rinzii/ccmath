@@ -31,9 +31,10 @@ namespace ccm::ext
 		 * @param max The maximum value of the range.
 		 * @return The normalized value.
 		 */
-		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-		constexpr T normalize(T value, T min = T(0), T max = T(1)) noexcept
-		{ return ext::clamp((value - min) / (max - min), T(0), T(1)); }
+		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T normalize(T value, T min = T(0), T max = T(1)) noexcept
+		{
+			return ext::clamp((value - min) / (max - min), T(0), T(1));
+		}
 	} // namespace unsafe
 
 	/**
@@ -51,12 +52,14 @@ namespace ccm::ext
 	 * @param max The maximum value of the range.
 	 * @return The normalized value.
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T normalize(T value, T min = T(0), T max = T(1)) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T normalize(T value, T min = T(0), T max = T(1)) noexcept
 	{
 		const T length = max - min;
 
-		if (length == T(0)) { return T(0); }
+		if (length == T(0))
+		{
+			return T(0);
+		}
 
 		return ext::unsafe::normalize(value, min, max);
 	}

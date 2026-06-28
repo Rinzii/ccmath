@@ -24,8 +24,14 @@ namespace ccm::support
 		template <typename T, std::enable_if_t<std::is_integral_v<T> && std::is_unsigned_v<T> && !std::is_same_v<T, bool>, bool> = true>
 		constexpr int generic_ctz(T value) noexcept
 		{
-			if (value == 0) { return std::numeric_limits<T>::digits; }
-			if (value & 0x1) { return 0; }
+			if (value == 0)
+			{
+				return std::numeric_limits<T>::digits;
+			}
+			if (value & 0x1)
+			{
+				return 0;
+			}
 			// Bisection method
 			unsigned zero_bits = 0;
 			unsigned shift	   = std::numeric_limits<T>::digits >> 1;
@@ -54,8 +60,7 @@ namespace ccm::support
 #endif
 	}
 
-	template <>
-	constexpr int ctz(unsigned short value) noexcept
+	template <> constexpr int ctz(unsigned short value) noexcept
 	{
 #if CCM_HAS_BUILTIN(__builtin_ctzs)
 		return __builtin_ctzs(value);
@@ -64,8 +69,7 @@ namespace ccm::support
 #endif
 	}
 
-	template <>
-	constexpr int ctz(unsigned int value) noexcept
+	template <> constexpr int ctz(unsigned int value) noexcept
 	{
 #if CCM_HAS_BUILTIN(__builtin_ctz)
 		return __builtin_ctz(value);
@@ -74,8 +78,7 @@ namespace ccm::support
 #endif
 	}
 
-	template <>
-	constexpr int ctz(unsigned long value) noexcept
+	template <> constexpr int ctz(unsigned long value) noexcept
 	{
 #if CCM_HAS_BUILTIN(__builtin_ctzl)
 		return __builtin_ctzl(value);
@@ -84,8 +87,7 @@ namespace ccm::support
 #endif
 	}
 
-	template <>
-	constexpr int ctz(unsigned long long value) noexcept
+	template <> constexpr int ctz(unsigned long long value) noexcept
 	{
 #if CCM_HAS_BUILTIN(__builtin_ctzll)
 		return __builtin_ctzll(value);

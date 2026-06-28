@@ -20,18 +20,21 @@
 
 namespace ccm::rt
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T rint_rt(T num) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T rint_rt(T num) noexcept
 	{
 #ifdef CCMATH_COMPILER_GCC
-		if constexpr (ccm::builtin::has_runtime_rint<T> && std::is_same_v<T, float>) { return ccm::builtin::rint_rt(num); }
-		else
+		if constexpr (ccm::builtin::has_runtime_rint<T> && std::is_same_v<T, float>)
+		{
+			return ccm::builtin::rint_rt(num);
+		} else
 		{
 			return ccm::support::fp::directional_round(num, ccm::support::fenv::get_rounding_mode());
 		}
 #else
-		if constexpr (ccm::builtin::has_runtime_rint<T>) { return ccm::builtin::rint_rt(num); }
-		else
+		if constexpr (ccm::builtin::has_runtime_rint<T>)
+		{
+			return ccm::builtin::rint_rt(num);
+		} else
 		{
 			return ccm::support::fp::directional_round(num, ccm::support::fenv::get_rounding_mode());
 		}

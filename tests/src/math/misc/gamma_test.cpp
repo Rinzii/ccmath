@@ -20,12 +20,14 @@
 
 namespace
 {
-	template <typename T, typename CcmFn, typename StdFn>
-	void ExpectRelativeNearStd(T input, CcmFn ccm_fn, StdFn std_fn, T rel_tol)
+	template <typename T, typename CcmFn, typename StdFn> void ExpectRelativeNearStd(T input, CcmFn ccm_fn, StdFn std_fn, T rel_tol)
 	{
 		const T actual	 = ccm_fn(input);
 		const T expected = std_fn(input);
-		if (actual == expected) { return; }
+		if (actual == expected)
+		{
+			return;
+		}
 		const T scale = std::fabs(expected) > T(1) ? std::fabs(expected) : T(1);
 		EXPECT_NEAR(actual, expected, rel_tol * scale);
 	}
@@ -56,7 +58,10 @@ TEST(CcmathMiscTests, GammaMatchesLibmDouble)
 	for (double x : ccm::test::samples::kGammaProbeDouble)
 	{
 		SCOPED_TRACE(x);
-		if (x < 0.0 && x == std::trunc(x)) { continue; }
+		if (x < 0.0 && x == std::trunc(x))
+		{
+			continue;
+		}
 #if defined(_MSC_VER) && !defined(__clang__)
 		ExpectRelativeNearStd(x, ccm::tgamma<double>, static_cast<double (*)(double)>(std::tgamma), 1e-6);
 #else
@@ -70,7 +75,10 @@ TEST(CcmathMiscTests, GammaMatchesLibmFloat)
 	for (float x : ccm::test::samples::kGammaProbeFloat)
 	{
 		SCOPED_TRACE(x);
-		if (x < 0.0F && x == std::trunc(x)) { continue; }
+		if (x < 0.0F && x == std::trunc(x))
+		{
+			continue;
+		}
 		ccm::test::ExpectUlpUnaryVsStd(x, ccm::tgamma<float>, static_cast<float (*)(float)>(std::tgamma));
 	}
 }

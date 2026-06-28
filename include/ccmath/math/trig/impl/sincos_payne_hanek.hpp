@@ -65,7 +65,7 @@ namespace ccm::internal::impl::sincos_ph
 
 	// Add a 64-bit word into the 256-bit accumulator (acc[0] low .. acc[3] high) at limb word,
 	// propagating carries. The accumulator wraps mod 2^256, which is exactly the mod-16 we want.
-	constexpr void add_at_word(std::array<std::uint64_t, 4>& acc, std::uint64_t val, int word) noexcept
+	constexpr void add_at_word(std::array<std::uint64_t, 4> & acc, std::uint64_t val, int word) noexcept
 	{
 		while (val != 0 && word < 4)
 		{
@@ -78,28 +78,43 @@ namespace ccm::internal::impl::sincos_ph
 
 	// Add (w << bitpos) into the 256-bit accumulator, bitpos may be negative (low bits are dropped,
 	// they fall below the accumulator's 2^-252 resolution).
-	constexpr void add_word_at(std::array<std::uint64_t, 4>& acc, std::uint64_t w, long bitpos) noexcept
+	constexpr void add_word_at(std::array<std::uint64_t, 4> & acc, std::uint64_t w, long bitpos) noexcept
 	{
-		if (w == 0) { return; }
+		if (w == 0)
+		{
+			return;
+		}
 		if (bitpos < 0)
 		{
 			const long s = -bitpos;
-			if (s >= 64) { return; }
+			if (s >= 64)
+			{
+				return;
+			}
 			w >>= static_cast<unsigned>(s);
 			bitpos = 0;
-			if (w == 0) { return; }
+			if (w == 0)
+			{
+				return;
+			}
 		}
-		if (bitpos >= 256) { return; }
+		if (bitpos >= 256)
+		{
+			return;
+		}
 		const int word			 = static_cast<int>(bitpos >> 6);
 		const int off			 = static_cast<int>(bitpos & 63);
 		const std::uint64_t low	 = w << off;
 		const std::uint64_t high = (off != 0) ? (w >> (64 - off)) : 0ULL;
 		add_at_word(acc, low, word);
-		if (high != 0 && word + 1 < 4) { add_at_word(acc, high, word + 1); }
+		if (high != 0 && word + 1 < 4)
+		{
+			add_at_word(acc, high, word + 1);
+		}
 	}
 
 	// Returns k (low bits of the pi/8 multiple) and sets y to the reduced argument in [-pi/16, pi/16].
-	constexpr unsigned payne_hanek_reduce(double x, double& y) noexcept
+	constexpr unsigned payne_hanek_reduce(double x, double & y) noexcept
 	{
 		using FPBits = support::fp::FPBits<double>;
 
@@ -117,7 +132,10 @@ namespace ccm::internal::impl::sincos_ph
 		for (int i = 0; i < 32; ++i)
 		{
 			const long shift = binary_exp - 64L * (i + 1) + 252;
-			if (shift <= -128 || shift >= 256) { continue; }
+			if (shift <= -128 || shift >= 256)
+			{
+				continue;
+			}
 			const U128 p = mul64(mantissa, FRAC_8_OVER_PI[static_cast<std::size_t>(i)]);
 			add_word_at(acc, p.lo, shift);
 			add_word_at(acc, p.hi, shift + 64);

@@ -113,25 +113,39 @@ namespace ccm::support::fenv::host
 	using fenv_t = CCM_FENV_HOST_QUAL ::fenv_t;
 
 	inline int get_round()
-	{ return CCM_FENV_HOST_QUAL ::fegetround(); }
+	{
+		return CCM_FENV_HOST_QUAL ::fegetround();
+	}
 
 	inline int set_round(const int rounding_mode)
-	{ return CCM_FENV_HOST_QUAL ::fesetround(rounding_mode); }
+	{
+		return CCM_FENV_HOST_QUAL ::fesetround(rounding_mode);
+	}
 
 	inline int raise_except(const int err_code)
-	{ return CCM_FENV_HOST_QUAL ::feraiseexcept(err_code); }
+	{
+		return CCM_FENV_HOST_QUAL ::feraiseexcept(err_code);
+	}
 
 	inline int clear_except(const int err_code)
-	{ return CCM_FENV_HOST_QUAL ::feclearexcept(err_code); }
+	{
+		return CCM_FENV_HOST_QUAL ::feclearexcept(err_code);
+	}
 
 	inline int test_except(const int err_code)
-	{ return CCM_FENV_HOST_QUAL ::fetestexcept(err_code); }
+	{
+		return CCM_FENV_HOST_QUAL ::fetestexcept(err_code);
+	}
 
 	inline int get_env(fenv_t * envp)
-	{ return CCM_FENV_HOST_QUAL ::fegetenv(envp); }
+	{
+		return CCM_FENV_HOST_QUAL ::fegetenv(envp);
+	}
 
 	inline int set_env(const fenv_t * envp)
-	{ return CCM_FENV_HOST_QUAL ::fesetenv(envp); }
+	{
+		return CCM_FENV_HOST_QUAL ::fesetenv(envp);
+	}
 
 	#undef CCM_FENV_HOST_QUAL
 
@@ -179,37 +193,59 @@ namespace ccm::support::fenv::host
 	using fenv_t = int;
 
 	inline int get_round()
-	{ return FE_TONEAREST; }
+	{
+		return FE_TONEAREST;
+	}
 
 	inline int set_round([[maybe_unused]] int rounding_mode)
-	{ return 0; }
+	{
+		return 0;
+	}
 
 	inline int raise_except([[maybe_unused]] int err_code)
-	{ return 0; }
+	{
+		return 0;
+	}
 
 	inline int clear_except([[maybe_unused]] int err_code)
-	{ return 0; }
+	{
+		return 0;
+	}
 
 	inline int test_except([[maybe_unused]] int err_code)
-	{ return 0; }
+	{
+		return 0;
+	}
 
 	inline int get_env([[maybe_unused]] fenv_t * envp)
-	{ return 0; }
+	{
+		return 0;
+	}
 
 	inline int set_env([[maybe_unused]] const fenv_t * envp)
-	{ return 0; }
+	{
+		return 0;
+	}
 
 	inline int set_except([[maybe_unused]] int err_code)
-	{ return 0; }
+	{
+		return 0;
+	}
 
 	inline int get_except()
-	{ return 0; }
+	{
+		return 0;
+	}
 
 	inline int enable_except([[maybe_unused]] int err_code)
-	{ return 0; }
+	{
+		return 0;
+	}
 
 	inline int disable_except([[maybe_unused]] int err_code)
-	{ return 0; }
+	{
+		return 0;
+	}
 
 #endif
 } // namespace ccm::support::fenv::host

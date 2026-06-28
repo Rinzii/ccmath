@@ -74,13 +74,18 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_fdim functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto fdim_ct(T x, T y) -> std::enable_if_t<has_constexpr_fdim<T>, T>
+	template <typename T> constexpr auto fdim_ct(T x, T y) -> std::enable_if_t<has_constexpr_fdim<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_fdimf(x, y); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_fdim(x, y); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fdiml(x, y); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_fdimf(x, y);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_fdim(x, y);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_fdiml(x, y);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for fdim");
@@ -88,13 +93,18 @@ namespace ccm::builtin
 		}
 	}
 
-	template <typename T>
-	auto fdim_rt(T x, T y) -> std::enable_if_t<has_runtime_fdim<T>, T>
+	template <typename T> auto fdim_rt(T x, T y) -> std::enable_if_t<has_runtime_fdim<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_fdimf(x, y); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_fdim(x, y); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fdiml(x, y); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_fdimf(x, y);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_fdim(x, y);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_fdiml(x, y);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for fdim");

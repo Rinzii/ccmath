@@ -25,20 +25,24 @@ namespace ccm
 	 * @param num Floating-point value.
 	 * @return Inverse tangent of num in radians.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T atan(T num)
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T atan(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_atan<T>) { return ccm::builtin::atan_ct(num); }
-		else if (ccm::support::is_constant_evaluated())
+		if constexpr (ccm::builtin::has_constexpr_atan<T>)
 		{
-			if constexpr (std::is_same_v<T, float>) { return internal::impl::atan_float(num); }
-			else if constexpr (std::is_same_v<T, double>) { return internal::impl::atan_double(num); }
-			else
+			return ccm::builtin::atan_ct(num);
+		} else if (ccm::support::is_constant_evaluated())
+		{
+			if constexpr (std::is_same_v<T, float>)
+			{
+				return internal::impl::atan_float(num);
+			} else if constexpr (std::is_same_v<T, double>)
+			{
+				return internal::impl::atan_double(num);
+			} else
 			{
 				return static_cast<long double>(internal::impl::atan_double(static_cast<double>(num)));
 			}
-		}
-		else
+		} else
 		{
 			return ccm::rt::atan_rt(num);
 		}
@@ -50,9 +54,10 @@ namespace ccm
 	 * @param num Input value.
 	 * @return Inverse tangent in radians as double.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double atan(Integer num)
-	{ return ccm::atan<double>(static_cast<double>(num)); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double atan(Integer num)
+	{
+		return ccm::atan<double>(static_cast<double>(num));
+	}
 
 	/**
 	 * @brief Computes inverse tangent for float.
@@ -60,7 +65,9 @@ namespace ccm
 	 * @return Inverse tangent in radians as float.
 	 */
 	constexpr float atanf(float num)
-	{ return ccm::atan<float>(num); }
+	{
+		return ccm::atan<float>(num);
+	}
 
 	/**
 	 * @brief Computes inverse tangent for long double.
@@ -68,7 +75,9 @@ namespace ccm
 	 * @return Inverse tangent in radians as long double.
 	 */
 	constexpr long double atanl(long double num)
-	{ return ccm::atan<long double>(num); }
+	{
+		return ccm::atan<long double>(num);
+	}
 } // namespace ccm
 
 /// @ingroup trig

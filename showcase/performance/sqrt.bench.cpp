@@ -5,26 +5,40 @@
 namespace
 {
 	static void BM_sqrt_std(benchmark::State & state)
-	{ ccm::showcase::bench::register_random_doubles(state, ccm::showcase::backends::std_lib::eval_sqrt); }
+	{
+		ccm::showcase::bench::register_random_doubles(state, ccm::showcase::backends::std_lib::eval_sqrt);
+	}
 
 	static void BM_sqrt_ccmath_public(benchmark::State & state)
-	{ ccm::showcase::bench::register_random_doubles(state, ccm::showcase::backends::ccmath_public::eval); }
+	{
+		ccm::showcase::bench::register_random_doubles(state, ccm::showcase::backends::ccmath_public::eval);
+	}
 
 	static void BM_sqrt_ccmath_generic(benchmark::State & state)
-	{ ccm::showcase::bench::register_random_doubles(state, ccm::showcase::backends::ccmath_generic_gen::eval); }
+	{
+		ccm::showcase::bench::register_random_doubles(state, ccm::showcase::backends::ccmath_generic_gen::eval);
+	}
 
 	static void BM_sqrt_ccmath_rt(benchmark::State & state)
-	{ ccm::showcase::bench::register_random_doubles(state, ccm::showcase::backends::ccmath_runtime_rt::eval); }
+	{
+		ccm::showcase::bench::register_random_doubles(state, ccm::showcase::backends::ccmath_runtime_rt::eval);
+	}
 
 	static void BM_sqrt_ccmath_simd(benchmark::State & state)
-	{ ccm::showcase::bench::register_random_doubles(state, ccm::showcase::backends::ccmath_runtime_simd::eval); }
+	{
+		ccm::showcase::bench::register_random_doubles(state, ccm::showcase::backends::ccmath_runtime_simd::eval);
+	}
 
 	static void BM_sqrt_ccmath_builtin(benchmark::State & state)
-	{ ccm::showcase::bench::register_random_doubles(state, ccm::showcase::backends::ccmath_runtime_builtin::eval); }
+	{
+		ccm::showcase::bench::register_random_doubles(state, ccm::showcase::backends::ccmath_runtime_builtin::eval);
+	}
 
 #if defined(CCMATH_SHOWCASE_HAS_GCEM)
 	static void BM_sqrt_gcem(benchmark::State & state)
-	{ ccm::showcase::bench::register_random_doubles(state, ccm::showcase::backends::gcem_lib::eval_sqrt); }
+	{
+		ccm::showcase::bench::register_random_doubles(state, ccm::showcase::backends::gcem_lib::eval_sqrt);
+	}
 #endif
 } // namespace
 

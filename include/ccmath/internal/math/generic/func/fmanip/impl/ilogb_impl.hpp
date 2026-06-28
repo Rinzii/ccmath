@@ -40,8 +40,7 @@ namespace ccm::internal::impl
 #endif
 	}
 
-	template <typename T>
-	constexpr int ilogb_impl(T x) noexcept
+	template <typename T> constexpr int ilogb_impl(T x) noexcept
 	{
 		using fp_bits_t = ccm::support::fp::FPBits<T>;
 

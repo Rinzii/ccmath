@@ -73,13 +73,15 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_islessgreater without triggering a compiler error
 	 * when the compiler does not support it.
 	 */
-	template <typename T>
-	constexpr auto islessgreater_ct(T x, T y) -> std::enable_if_t<has_constexpr_islessgreater<T>, bool>
-	{ return __builtin_islessgreater(x, y); }
+	template <typename T> constexpr auto islessgreater_ct(T x, T y) -> std::enable_if_t<has_constexpr_islessgreater<T>, bool>
+	{
+		return __builtin_islessgreater(x, y);
+	}
 
-	template <typename T>
-	auto islessgreater_rt(T x, T y) -> std::enable_if_t<has_runtime_islessgreater<T>, bool>
-	{ return __builtin_islessgreater(x, y); }
+	template <typename T> auto islessgreater_rt(T x, T y) -> std::enable_if_t<has_runtime_islessgreater<T>, bool>
+	{
+		return __builtin_islessgreater(x, y);
+	}
 } // namespace ccm::builtin
 
 // Cleanup the global namespace

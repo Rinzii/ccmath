@@ -24,81 +24,109 @@ namespace ccm::pp
 {
 	// Lane-wise blend: pick a where mask is set, else b.
 	template <typename T, typename Abi>
-	CCM_ALWAYS_INLINE basic_simd<T, Abi> simd_select(basic_simd_mask<sizeof(T), Abi> const& mask, basic_simd<T, Abi> const& a, basic_simd<T, Abi> const& b)
-	{ return basic_simd<T, Abi>::from_member(SimdTraits<T, Abi>::select(mask.get(), a.get(), b.get())); }
+	CCM_ALWAYS_INLINE basic_simd<T, Abi> simd_select(basic_simd_mask<sizeof(T), Abi> const & mask, basic_simd<T, Abi> const & a, basic_simd<T, Abi> const & b)
+	{
+		return basic_simd<T, Abi>::from_member(SimdTraits<T, Abi>::select(mask.get(), a.get(), b.get()));
+	}
 
 	// [simd.whereexpr] Masked, write-only view onto a simd object.
-	template <typename MaskType, typename SimdType>
-	class where_expression
+	template <typename MaskType, typename SimdType> class where_expression
 	{
 		MaskType mask_;
-		SimdType* data_;
+		SimdType * data_;
 
 	public:
 		using value_type = typename SimdType::value_type;
 
-		CCM_ALWAYS_INLINE where_expression(MaskType const& mask, SimdType& data) : mask_(mask), data_(&data) {}
+		CCM_ALWAYS_INLINE where_expression(MaskType const & mask, SimdType & data) : mask_(mask), data_(&data) {}
 
 		// NOLINTBEGIN(cppcoreguidelines-c-copy-assignment-signature,misc-unconventional-assign-operator)
-		CCM_ALWAYS_INLINE void operator=(SimdType const& rhs) { *data_ = simd_select(mask_, rhs, *data_); }
-		CCM_ALWAYS_INLINE void operator=(value_type rhs) { *data_ = simd_select(mask_, SimdType(rhs), *data_); }
+		CCM_ALWAYS_INLINE void operator=(SimdType const & rhs)
+		{
+			*data_ = simd_select(mask_, rhs, *data_);
+		}
+		CCM_ALWAYS_INLINE void operator=(value_type rhs)
+		{
+			*data_ = simd_select(mask_, SimdType(rhs), *data_);
+		}
 		// NOLINTEND(cppcoreguidelines-c-copy-assignment-signature,misc-unconventional-assign-operator)
 
-		CCM_ALWAYS_INLINE void operator+=(SimdType const& rhs) { *data_ = simd_select(mask_, *data_ + rhs, *data_); }
-		CCM_ALWAYS_INLINE void operator-=(SimdType const& rhs) { *data_ = simd_select(mask_, *data_ - rhs, *data_); }
-		CCM_ALWAYS_INLINE void operator*=(SimdType const& rhs) { *data_ = simd_select(mask_, *data_ * rhs, *data_); }
-		CCM_ALWAYS_INLINE void operator/=(SimdType const& rhs) { *data_ = simd_select(mask_, *data_ / rhs, *data_); }
+		CCM_ALWAYS_INLINE void operator+=(SimdType const & rhs)
+		{
+			*data_ = simd_select(mask_, *data_ + rhs, *data_);
+		}
+		CCM_ALWAYS_INLINE void operator-=(SimdType const & rhs)
+		{
+			*data_ = simd_select(mask_, *data_ - rhs, *data_);
+		}
+		CCM_ALWAYS_INLINE void operator*=(SimdType const & rhs)
+		{
+			*data_ = simd_select(mask_, *data_ * rhs, *data_);
+		}
+		CCM_ALWAYS_INLINE void operator/=(SimdType const & rhs)
+		{
+			*data_ = simd_select(mask_, *data_ / rhs, *data_);
+		}
 
 		// Masked load: read only the selected lanes from memory, leave the rest.
-		template <typename Flags = simd_flags<>>
-		CCM_ALWAYS_INLINE void copy_from(value_type const* ptr, Flags /*flags*/ = {})
+		template <typename Flags = simd_flags<>> CCM_ALWAYS_INLINE void copy_from(value_type const * ptr, Flags /*flags*/ = {})
 		{
 			for (detail::SimdSizeType i = 0; i < SimdType::size(); ++i)
 			{
-				if (mask_[i]) { (*data_)[i] = ptr[i]; }
+				if (mask_[i])
+				{
+					(*data_)[i] = ptr[i];
+				}
 			}
 		}
 		// Masked store: write only the selected lanes to memory, leave the rest.
-		template <typename Flags = simd_flags<>>
-		CCM_ALWAYS_INLINE void copy_to(value_type* ptr, Flags /*flags*/ = {}) const
+		template <typename Flags = simd_flags<>> CCM_ALWAYS_INLINE void copy_to(value_type * ptr, Flags /*flags*/ = {}) const
 		{
 			for (detail::SimdSizeType i = 0; i < SimdType::size(); ++i)
 			{
-				if (mask_[i]) { ptr[i] = (*data_)[i]; }
+				if (mask_[i])
+				{
+					ptr[i] = (*data_)[i];
+				}
 			}
 		}
 	};
 
 	// [simd.whereexpr] Masked, read-only view onto a const simd object.
-	template <typename MaskType, typename SimdType>
-	class const_where_expression
+	template <typename MaskType, typename SimdType> class const_where_expression
 	{
 		MaskType mask_;
-		SimdType const* data_;
+		SimdType const * data_;
 
 	public:
 		using value_type = typename SimdType::value_type;
 
-		CCM_ALWAYS_INLINE const_where_expression(MaskType const& mask, SimdType const& data) : mask_(mask), data_(&data) {}
+		CCM_ALWAYS_INLINE const_where_expression(MaskType const & mask, SimdType const & data) : mask_(mask), data_(&data) {}
 
 		// Masked store: write only the selected lanes to memory.
-		template <typename Flags = simd_flags<>>
-		CCM_ALWAYS_INLINE void copy_to(value_type* ptr, Flags /*flags*/ = {}) const
+		template <typename Flags = simd_flags<>> CCM_ALWAYS_INLINE void copy_to(value_type * ptr, Flags /*flags*/ = {}) const
 		{
 			for (detail::SimdSizeType i = 0; i < SimdType::size(); ++i)
 			{
-				if (mask_[i]) { ptr[i] = (*data_)[i]; }
+				if (mask_[i])
+				{
+					ptr[i] = (*data_)[i];
+				}
 			}
 		}
 	};
 
 	template <typename T, typename Abi>
-	CCM_ALWAYS_INLINE where_expression<basic_simd_mask<sizeof(T), Abi>, basic_simd<T, Abi>> where(basic_simd_mask<sizeof(T), Abi> const& mask,
-																								  basic_simd<T, Abi>& value)
-	{ return { mask, value }; }
+	CCM_ALWAYS_INLINE where_expression<basic_simd_mask<sizeof(T), Abi>, basic_simd<T, Abi>> where(basic_simd_mask<sizeof(T), Abi> const & mask,
+																								  basic_simd<T, Abi> & value)
+	{
+		return { mask, value };
+	}
 
 	template <typename T, typename Abi>
-	CCM_ALWAYS_INLINE const_where_expression<basic_simd_mask<sizeof(T), Abi>, basic_simd<T, Abi>> where(basic_simd_mask<sizeof(T), Abi> const& mask,
-																										basic_simd<T, Abi> const& value)
-	{ return { mask, value }; }
+	CCM_ALWAYS_INLINE const_where_expression<basic_simd_mask<sizeof(T), Abi>, basic_simd<T, Abi>> where(basic_simd_mask<sizeof(T), Abi> const & mask,
+																										basic_simd<T, Abi> const & value)
+	{
+		return { mask, value };
+	}
 } // namespace ccm::pp

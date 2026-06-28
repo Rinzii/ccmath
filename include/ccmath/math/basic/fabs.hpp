@@ -24,10 +24,12 @@ namespace ccm
 	 * @param num Floating-point or integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename T>
-	constexpr auto abs(T num) -> std::enable_if_t<std::is_floating_point_v<T> && std::is_signed_v<T>, T>
+	template <typename T> constexpr auto abs(T num) -> std::enable_if_t<std::is_floating_point_v<T> && std::is_signed_v<T>, T>
 	{
-		if (!ccm::support::is_constant_evaluated()) { return ccm::rt::fabs_rt(num); }
+		if (!ccm::support::is_constant_evaluated())
+		{
+			return ccm::rt::fabs_rt(num);
+		}
 		return func::fabs(num);
 	}
 
@@ -37,8 +39,7 @@ namespace ccm
 	 * @param num Floating-point or integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename T>
-	constexpr auto abs(T num) -> std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>, T>
+	template <typename T> constexpr auto abs(T num) -> std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>, T>
 	{
 		// If num is less than zero, return -num, otherwise return num. The explicit cast keeps the
 		// result in T, where -num integer-promotes to int and would otherwise narrow on return for
@@ -52,8 +53,7 @@ namespace ccm
 	 * @param num Unsigned value.
 	 * @return num unchanged. An unsigned value is already non-negative, so its absolute value is itself.
 	 */
-	template <typename T>
-	constexpr auto abs(T num) -> std::enable_if_t<std::is_unsigned_v<T>, T>
+	template <typename T> constexpr auto abs(T num) -> std::enable_if_t<std::is_unsigned_v<T>, T>
 	{
 		// An unsigned value is already non-negative, so the absolute value is the value itself.
 		// Returning num directly is lossless and type-preserving, where routing through int would
@@ -67,9 +67,10 @@ namespace ccm
 	 * @param num Floating-point value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename T>
-	constexpr auto fabs(T num) -> std::enable_if_t<std::is_floating_point_v<T>, T>
-	{ return ccm::abs<T>(num); }
+	template <typename T> constexpr auto fabs(T num) -> std::enable_if_t<std::is_floating_point_v<T>, T>
+	{
+		return ccm::abs<T>(num);
+	}
 
 	/**
 	 * @brief Computes the absolute value of a number.
@@ -77,9 +78,10 @@ namespace ccm
 	 * @param num Integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename Integer>
-	constexpr auto fabs(Integer num) -> std::enable_if_t<std::is_integral_v<Integer>, double>
-	{ return ccm::abs<double>(static_cast<double>(num)); }
+	template <typename Integer> constexpr auto fabs(Integer num) -> std::enable_if_t<std::is_integral_v<Integer>, double>
+	{
+		return ccm::abs<double>(static_cast<double>(num));
+	}
 
 	/**
 	 * @brief Computes the absolute value of a number.
@@ -87,7 +89,9 @@ namespace ccm
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
 	constexpr float fabsf(float num)
-	{ return ccm::abs<float>(num); }
+	{
+		return ccm::abs<float>(num);
+	}
 
 	/**
 	 * @brief Computes the absolute value of a number.
@@ -95,7 +99,9 @@ namespace ccm
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
 	constexpr long double fabsl(long double num)
-	{ return ccm::abs<long double>(num); }
+	{
+		return ccm::abs<long double>(num);
+	}
 
 	/**
 	 * @brief Computes the absolute value of a number.
@@ -103,7 +109,9 @@ namespace ccm
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
 	constexpr long labs(long num)
-	{ return ccm::abs<long>(num); }
+	{
+		return ccm::abs<long>(num);
+	}
 
 	/**
 	 * @brief Computes the absolute value of a number.
@@ -111,7 +119,9 @@ namespace ccm
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
 	constexpr long long llabs(long long num)
-	{ return ccm::abs<long long>(num); }
+	{
+		return ccm::abs<long long>(num);
+	}
 } // namespace ccm
 
 /// @ingroup basic

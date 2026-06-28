@@ -21,20 +21,31 @@
 
 namespace ccm::internal::impl
 {
-	template <typename T>
-	constexpr T hypot_impl(T x, T y) noexcept
+	template <typename T> constexpr T hypot_impl(T x, T y) noexcept
 	{
 		using fp_bits_t = ccm::support::fp::FPBits<T>;
 
-		if (CCM_UNLIKELY(ccm::isinf(x) || ccm::isinf(y))) { return fp_bits_t::inf().get_val(); }
+		if (CCM_UNLIKELY(ccm::isinf(x) || ccm::isinf(y)))
+		{
+			return fp_bits_t::inf().get_val();
+		}
 
-		if (CCM_UNLIKELY(ccm::isnan(x))) { return x + y; }
-		if (CCM_UNLIKELY(ccm::isnan(y))) { return x + y; }
+		if (CCM_UNLIKELY(ccm::isnan(x)))
+		{
+			return x + y;
+		}
+		if (CCM_UNLIKELY(ccm::isnan(y)))
+		{
+			return x + y;
+		}
 
 		x = ccm::fabs(x);
 		y = ccm::fabs(y);
 
-		if (CCM_UNLIKELY(x == static_cast<T>(0) && y == static_cast<T>(0))) { return static_cast<T>(0); }
+		if (CCM_UNLIKELY(x == static_cast<T>(0) && y == static_cast<T>(0)))
+		{
+			return static_cast<T>(0);
+		}
 
 		if (y > x)
 		{

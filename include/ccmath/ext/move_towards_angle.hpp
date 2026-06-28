@@ -25,8 +25,7 @@ namespace ccm::ext
 	 * @param max_delta The maximum angular change to apply, in radians.
 	 * @return The moved angle, in radians.
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T move_towards_angle(T current, T target, T max_delta) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T move_towards_angle(T current, T target, T max_delta) noexcept
 	{
 		const T delta = ext::delta_angle(current, target);
 		return ext::move_towards(current, current + delta, max_delta);

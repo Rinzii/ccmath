@@ -2,18 +2,23 @@
 AccessModifierOffset: -4
 AlignConsecutiveAssignments: Consecutive
 AlignConsecutiveMacros: Consecutive
+AlignConsecutiveShortCaseStatements:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCaseColons: true
 AlignEscapedNewlines: Right
 AlignTrailingComments:
   Kind: Always
-AllowShortBlocksOnASingleLine: Always
+AllowShortBlocksOnASingleLine: Empty
 AllowShortCaseLabelsOnASingleLine: true
-AllowShortEnumsOnASingleLine: true
-AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: WithoutElse
 AllowShortLambdasOnASingleLine: All
-AllowShortLoopsOnASingleLine: true
+AllowShortLoopsOnASingleLine: false
 AlwaysBreakBeforeMultilineStrings: true
-AlwaysBreakTemplateDeclarations: Yes
+AlwaysBreakTemplateDeclarations: MultiLine
 BasedOnStyle: LLVM
 BinPackArguments: false
 BinPackParameters: false
@@ -31,41 +36,43 @@ BraceWrapping:
   BeforeElse: false
   BeforeLambdaBody: false
   BeforeWhile: false
-  IndentBraces: true
-  SplitEmptyFunction: true
-  SplitEmptyNamespace: true
-  SplitEmptyRecord: true
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyNamespace: false
+  SplitEmptyRecord: false
+BracedInitializerIndentWidth: 4
 BreakAfterAttributes: Never
-BreakBeforeBraces: Allman
+BreakBeforeBraces: Custom
 ColumnLimit: 160
 CompactNamespaces: false
-ConstructorInitializerAllOnOneLineOrOnePerLine: true
 Cpp11BracedListStyle: false
-DerivePointerAlignment: true
+DerivePointerAlignment: false
 FixNamespaceComments: true
 IncludeBlocks: Regroup
 IncludeCategories:
   # Headers in "" with .h extension.
-  - Regex: '"([A-Za-z0-9\/-_])+\.h"'
+  - Regex: '"[-A-Za-z0-9_/]+\.h"'
     Priority: 10
   # Headers in "" with .hpp extension.
-  - Regex: '"([A-Za-z0-9\/-_])+\.hpp"'
+  - Regex: '"[-A-Za-z0-9_/]+\.hpp"'
     Priority: 20
   # Headers in <> with .h extension.
-  - Regex: '<([A-Za-z0-9\/-_])+\.h>'
+  - Regex: '<[-A-Za-z0-9_/]+\.h>'
     Priority: 30
   # Headers in <> with .hpp extension.
-  - Regex: '<([A-Za-z0-9\/-_])+\.hpp>'
+  - Regex: '<[-A-Za-z0-9_/]+\.hpp>'
     Priority: 40
   # Headers in <> without an extension.
-  - Regex: '<([A-Za-z0-9\/-_])+>'
+  - Regex: '<[-A-Za-z0-9_/]+>'
     Priority: 50
 IndentPPDirectives: BeforeHash
 IndentWidth: 4
 InsertNewlineAtEOF: true
 Language: Cpp
 NamespaceIndentation: All
+PackConstructorInitializers: CurrentLine
 PointerAlignment: Middle
+ReferenceAlignment: Middle
 SortIncludes: CaseInsensitive
 SpaceAfterTemplateKeyword: true
 SpaceBeforeParens: ControlStatements
@@ -75,11 +82,10 @@ Standard: c++17
 TabWidth: 4
 UseTab: Always
 WhitespaceSensitiveMacros:
-  # Specific macros that suffer from formatting issues with white spaces
+  # Specific macros that suffer from formatting issues with white spaces.
   - CCM_DISABLE_CLANG_WARNING
   - CCM_ENABLE_CLANG_WARNING_AS_ERROR
   - CCM_DISABLE_GCC_WARNING
   - CCM_ENABLE_GCC_WARNING_AS_ERROR
   - CCM_ENABLE_IGNORE_GCC_WARNING
   - CCM_DISABLE_IGNORE_GCC_WARNING
-...

@@ -25,13 +25,17 @@ namespace ccm
 	 * @param num Floating-point value.
 	 * @return Unbiased base-2 exponent as int (or implementation-defined special values for zero/NaN).
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr int ilogb(T num) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr int ilogb(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_ilogb<T>) { return ccm::builtin::ilogb_ct(num); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_ilogb<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::gen::ilogb_gen(num); }
+			return ccm::builtin::ilogb_ct(num);
+		} else
+		{
+			if (ccm::support::is_constant_evaluated())
+			{
+				return ccm::gen::ilogb_gen(num);
+			}
 			return ccm::rt::ilogb_rt(num);
 		}
 	}
@@ -42,7 +46,9 @@ namespace ccm
 	 * @return Unbiased base-2 exponent as int.
 	 */
 	constexpr int ilogbf(float num) noexcept
-	{ return ccm::ilogb(num); }
+	{
+		return ccm::ilogb(num);
+	}
 
 	/**
 	 * @brief Extracts the unbiased integer exponent of a long double.
@@ -50,5 +56,7 @@ namespace ccm
 	 * @return Unbiased base-2 exponent as int.
 	 */
 	constexpr int ilogbl(long double num) noexcept
-	{ return ccm::ilogb(num); }
+	{
+		return ccm::ilogb(num);
+	}
 } // namespace ccm

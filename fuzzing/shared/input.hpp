@@ -27,8 +27,7 @@ namespace ccm::fuzz
 	// soundness reason the harness does not cycle rounding modes). Raw byte mutation lands on
 	// them constantly, so reject them. Every binary32/binary64/binary128 bit pattern is a valid
 	// encoding, so this is a no-op for those types.
-	template <typename T>
-	bool is_canonical_encoding(T value)
+	template <typename T> bool is_canonical_encoding(T value)
 	{
 		if constexpr (std::numeric_limits<T>::digits == 64 && sizeof(T) >= 10)
 		{
@@ -38,8 +37,7 @@ namespace ccm::fuzz
 			const unsigned exponent = (static_cast<unsigned>(bytes[9] & 0x7FU) << 8) | bytes[8];
 			// Canonical iff the integer bit is set exactly when the biased exponent is non-zero.
 			return integer_bit == (exponent != 0);
-		}
-		else
+		} else
 		{
 			static_cast<void>(value);
 			return true;
@@ -51,17 +49,20 @@ namespace ccm::fuzz
 	// example glibc returns NaN for pow(sNaN, 0) while the Annex F rule that ccmath follows
 	// returns 1. Reject signaling-NaN operands so the comparison only covers behavior the
 	// standard actually pins down (quiet NaN classification is still exercised).
-	template <typename T>
-	bool is_testable_operand(T value)
-	{ return is_canonical_encoding(value) && !ccm::support::fp::FPBits<T>(value).is_signaling_nan(); }
+	template <typename T> bool is_testable_operand(T value)
+	{
+		return is_canonical_encoding(value) && !ccm::support::fp::FPBits<T>(value).is_signaling_nan();
+	}
 
-	template <typename T>
-	T load_floating(uint8_t const * data, size_t size, size_t byte_offset = 0)
+	template <typename T> T load_floating(uint8_t const * data, size_t size, size_t byte_offset = 0)
 	{
 		static_assert(std::is_floating_point_v<T>, "T must be floating-point");
 
 		T value{};
-		if (byte_offset + sizeof(T) > size) { return value; }
+		if (byte_offset + sizeof(T) > size)
+		{
+			return value;
+		}
 
 		std::memcpy(&value, data + byte_offset, sizeof(T));
 		return value;
@@ -70,7 +71,10 @@ namespace ccm::fuzz
 	inline int32_t load_i32(uint8_t const * data, size_t size, size_t byte_offset = 0)
 	{
 		int32_t value{};
-		if (byte_offset + sizeof(value) > size) { return 0; }
+		if (byte_offset + sizeof(value) > size)
+		{
+			return 0;
+		}
 
 		std::memcpy(&value, data + byte_offset, sizeof(value));
 		return value;
@@ -79,22 +83,21 @@ namespace ccm::fuzz
 	// Adversarial values raw byte mutation essentially never lands on exactly: format
 	// boundaries, integer and half-integer parity thresholds, kernel range-reduction and
 	// clamp constants. Indexed by the low selector bits so every entry stays reachable.
-	template <typename T>
-	T special_value(uint8_t index)
+	template <typename T> T special_value(uint8_t index)
 	{
 		using limits = std::numeric_limits<T>;
 		switch (index % 24)
 		{
-		case 0: return T(0);
-		case 1: return limits::denorm_min();
-		case 2: return limits::min() - limits::denorm_min(); // largest subnormal
-		case 3: return limits::min();
-		case 4: return T(1);
-		case 5: return T(1) + limits::epsilon();
-		case 6: return T(1) - limits::epsilon() / T(2); // largest value below one
-		case 7: return T(2);
-		case 8: return T(10);
-		case 9: return T(0.5);
+		case 0 : return T(0);
+		case 1 : return limits::denorm_min();
+		case 2 : return limits::min() - limits::denorm_min(); // largest subnormal
+		case 3 : return limits::min();
+		case 4 : return T(1);
+		case 5 : return T(1) + limits::epsilon();
+		case 6 : return T(1) - limits::epsilon() / T(2); // largest value below one
+		case 7 : return T(2);
+		case 8 : return T(10);
+		case 9 : return T(0.5);
 		case 10: return limits::max();
 		case 11: return limits::infinity();
 		case 12: return limits::quiet_NaN();
@@ -116,19 +119,26 @@ namespace ccm::fuzz
 	// Optional per-operand selector bytes trail the raw operands. A set high bit swaps the
 	// operand for a table entry. Bit 6 flips the sign. Inputs without trailing bytes (and
 	// every pre-existing seed) decode exactly as before.
-	template <typename T>
-	void apply_selector(T & value, uint8_t const * data, size_t size, size_t selector_offset)
+	template <typename T> void apply_selector(T & value, uint8_t const * data, size_t size, size_t selector_offset)
 	{
-		if (selector_offset >= size) { return; }
+		if (selector_offset >= size)
+		{
+			return;
+		}
 		const uint8_t selector = data[selector_offset];
-		if ((selector & 0x80U) == 0) { return; }
+		if ((selector & 0x80U) == 0)
+		{
+			return;
+		}
 		T substituted = special_value<T>(static_cast<uint8_t>(selector & 0x3FU));
-		if ((selector & 0x40U) != 0) { substituted = -substituted; }
+		if ((selector & 0x40U) != 0)
+		{
+			substituted = -substituted;
+		}
 		value = substituted;
 	}
 
-	template <typename T>
-	struct Inputs
+	template <typename T> struct Inputs
 	{
 		T x{};
 		T y{};
@@ -137,7 +147,10 @@ namespace ccm::fuzz
 
 		bool load_x(uint8_t const * data, size_t size)
 		{
-			if (size < sizeof(T)) { return false; }
+			if (size < sizeof(T))
+			{
+				return false;
+			}
 			x = load_floating<T>(data, size, 0);
 			apply_selector(x, data, size, sizeof(T));
 			return is_testable_operand(x);
@@ -145,7 +158,10 @@ namespace ccm::fuzz
 
 		bool load_xy(uint8_t const * data, size_t size)
 		{
-			if (size < 2 * sizeof(T)) { return false; }
+			if (size < 2 * sizeof(T))
+			{
+				return false;
+			}
 			x = load_floating<T>(data, size, 0);
 			y = load_floating<T>(data, size, sizeof(T));
 			apply_selector(x, data, size, 2 * sizeof(T));
@@ -155,7 +171,10 @@ namespace ccm::fuzz
 
 		bool load_xyz(uint8_t const * data, size_t size)
 		{
-			if (size < 3 * sizeof(T)) { return false; }
+			if (size < 3 * sizeof(T))
+			{
+				return false;
+			}
 			x = load_floating<T>(data, size, 0);
 			y = load_floating<T>(data, size, sizeof(T));
 			z = load_floating<T>(data, size, 2 * sizeof(T));
@@ -167,7 +186,10 @@ namespace ccm::fuzz
 
 		bool load_xy_i(uint8_t const * data, size_t size)
 		{
-			if (size < 2 * sizeof(T) + sizeof(int32_t)) { return false; }
+			if (size < 2 * sizeof(T) + sizeof(int32_t))
+			{
+				return false;
+			}
 			x = load_floating<T>(data, size, 0);
 			y = load_floating<T>(data, size, sizeof(T));
 			i = load_i32(data, size, 2 * sizeof(T));

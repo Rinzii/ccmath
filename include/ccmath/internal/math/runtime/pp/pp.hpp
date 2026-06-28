@@ -34,16 +34,12 @@
 namespace ccm::pp
 {
 	// [simd.alias] Width-parametrized aliases over the deduced ABI.
-	template <typename T, detail::SimdSizeType N = basic_simd<T>::size()>
-	using simd = basic_simd<T, detail::deduce_t<T, N>>;
+	template <typename T, detail::SimdSizeType N = basic_simd<T>::size()> using simd = basic_simd<T, detail::deduce_t<T, N>>;
 
-	template <typename T, detail::SimdSizeType N = basic_simd<T>::size()>
-	using simd_mask = basic_simd_mask<sizeof(T), detail::deduce_t<T, N>>;
+	template <typename T, detail::SimdSizeType N = basic_simd<T>::size()> using simd_mask = basic_simd_mask<sizeof(T), detail::deduce_t<T, N>>;
 
 	// Widest native register width for T.
-	template <typename T>
-	using native_simd = basic_simd<T, detail::NativeAbi<T>>;
+	template <typename T> using native_simd = basic_simd<T, detail::NativeAbi<T>>;
 
-	template <typename T>
-	using native_simd_mask = basic_simd_mask<sizeof(T), detail::NativeAbi<T>>;
+	template <typename T> using native_simd_mask = basic_simd_mask<sizeof(T), detail::NativeAbi<T>>;
 } // namespace ccm::pp

@@ -23,11 +23,12 @@ namespace ccm
 	 * @param num The number to check.
 	 * @return True if the number is NaN, false otherwise.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	[[nodiscard]] constexpr bool isnan(T num) noexcept
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> [[nodiscard]] constexpr bool isnan(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_isnan<T>) { return ccm::builtin::isnan_ct(num); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_isnan<T>)
+		{
+			return ccm::builtin::isnan_ct(num);
+		} else
 		{
 			// If we can't use the builtin, fallback to this comparison and hope for the best.
 			using FPBits_t = typename ccm::support::fp::FPBits<T>;
@@ -41,8 +42,7 @@ namespace ccm
 	 * @tparam Integer The type of the number to check.
 	 * @return False, as integers can never be NaN.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	[[nodiscard]] constexpr bool isnan(Integer /* num */)
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> [[nodiscard]] constexpr bool isnan(Integer /* num */)
 	{
 		return false; // Integers can never be NaN.
 	}

@@ -25,7 +25,7 @@ int main()
 
 	ccm::examples::table_header("x", "nearbyint", "round");
 
-	for (auto const& s : kSamples)
+	for (auto const & s : kSamples)
 	{
 		std::cout << std::left << std::setw(14) << s.x << std::setw(18) << ccm::nearbyint(s.x) << std::setw(18) << ccm::round(s.x) << '\n';
 	}

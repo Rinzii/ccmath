@@ -19,12 +19,12 @@ namespace
 	{
 		switch (ccm::fpclassify(x))
 		{
-		case FP_INFINITE: return "infinite";
-		case FP_NAN: return "nan";
-		case FP_NORMAL: return "normal";
+		case FP_INFINITE : return "infinite";
+		case FP_NAN		 : return "nan";
+		case FP_NORMAL	 : return "normal";
 		case FP_SUBNORMAL: return "subnormal";
-		case FP_ZERO: return "zero";
-		default: return "unknown";
+		case FP_ZERO	 : return "zero";
+		default			 : return "unknown";
 		}
 	}
 
@@ -45,7 +45,10 @@ int main()
 
 	ccm::examples::table_header("value", "class", "signbit");
 
-	for (double v : kValues) { std::cout << std::left << std::setw(14) << v << std::setw(18) << classify(v) << std::setw(18) << ccm::signbit(v) << '\n'; }
+	for (double v : kValues)
+	{
+		std::cout << std::left << std::setw(14) << v << std::setw(18) << classify(v) << std::setw(18) << ccm::signbit(v) << '\n';
+	}
 
 	ccm::examples::section("ordering predicates");
 	ccm::examples::print_row("isfinite(1)", ccm::isfinite(1.0));

@@ -24,12 +24,14 @@ namespace ccm::ext
 	 * @param max_delta The maximum change to apply.
 	 * @return The moved value.
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T move_towards(T current, T target, T max_delta) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T move_towards(T current, T target, T max_delta) noexcept
 	{
 		const T delta = target - current;
 
-		if (ccm::abs(delta) <= max_delta) { return target; }
+		if (ccm::abs(delta) <= max_delta)
+		{
+			return target;
+		}
 
 		return current + ((delta > T(0)) ? max_delta : -max_delta);
 	}

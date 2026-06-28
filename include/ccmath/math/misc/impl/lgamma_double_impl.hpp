@@ -34,7 +34,9 @@ namespace ccm::internal::impl
 		using fp_bits = ccm::support::fp::FPBits<double>;
 
 		constexpr double log_abs(double x) noexcept
-		{ return ccm::log(ccm::fabs(x)); }
+		{
+			return ccm::log(ccm::fabs(x));
+		}
 
 		constexpr double stirling(double x) noexcept
 		{
@@ -53,9 +55,15 @@ namespace ccm::internal::impl
 
 		constexpr double positive_lfactorial(std::int32_t k) noexcept
 		{
-			if (k <= 2) { return 0.0; }
+			if (k <= 2)
+			{
+				return 0.0;
+			}
 			double sum = 0.0;
-			for (std::int32_t i = 2; i < k; ++i) { sum += ccm::log(static_cast<double>(i)); }
+			for (std::int32_t i = 2; i < k; ++i)
+			{
+				sum += ccm::log(static_cast<double>(i));
+			}
 			return sum;
 		}
 
@@ -102,12 +110,21 @@ namespace ccm::internal::impl
 				return fp_bits::inf().get_val();
 			}
 			const auto k = static_cast<std::int32_t>(ccm::floor(x));
-			if (k <= 170) { return lgamma_detail::positive_lfactorial(k); }
+			if (k <= 170)
+			{
+				return lgamma_detail::positive_lfactorial(k);
+			}
 		}
 
-		if (CCM_UNLIKELY(ccm::fabs(x) <= 0x1p-53)) { return -lgamma_detail::log_abs(x); }
+		if (CCM_UNLIKELY(ccm::fabs(x) <= 0x1p-53))
+		{
+			return -lgamma_detail::log_abs(x);
+		}
 
-		if (CCM_UNLIKELY(x >= 8.0)) { return lgamma_detail::stirling(x); }
+		if (CCM_UNLIKELY(x >= 8.0))
+		{
+			return lgamma_detail::stirling(x);
+		}
 
 		if (CCM_UNLIKELY(x < 0.0))
 		{
@@ -119,5 +136,7 @@ namespace ccm::internal::impl
 	}
 
 	constexpr float lgamma_float_impl(float x) noexcept
-	{ return static_cast<float>(lgamma_double_impl(static_cast<double>(x))); }
+	{
+		return static_cast<float>(lgamma_double_impl(static_cast<double>(x)));
+	}
 } // namespace ccm::internal::impl

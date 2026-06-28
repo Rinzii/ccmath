@@ -27,7 +27,10 @@ namespace ccm
 		// raising spurious public FE_INEXACT / range exceptions.
 		constexpr double exact_fma(double x, double y, double z) noexcept // NOLINT(bugprone-exception-escape)
 		{
-			if (support::is_constant_evaluated()) { return support::fp::generic_fma(x, y, z); }
+			if (support::is_constant_evaluated())
+			{
+				return support::fp::generic_fma(x, y, z);
+			}
 #if CCM_HAS_BUILTIN(__builtin_fma)
 			return __builtin_fma(x, y, z);
 #else
@@ -115,6 +118,8 @@ namespace ccm
 		template <>
 		constexpr types::DoubleDouble
 		multiply_add<types::DoubleDouble>(const types::DoubleDouble & x, const types::DoubleDouble & y, const types::DoubleDouble & z)
-		{ return add(z, quick_mult(x, y)); }
+		{
+			return add(z, quick_mult(x, y));
+		}
 	} // namespace support
 } // namespace ccm

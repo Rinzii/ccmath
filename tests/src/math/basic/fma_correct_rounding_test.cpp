@@ -112,14 +112,14 @@ namespace
 		  { 0x4000000000000001ULL, 0x4000000000000000ULL, 0x4000000000000001ULL, 0x4000000000000000ULL } },
 	};
 
-	constexpr std::array<int, 4> kModes		   = { FE_TONEAREST, FE_TOWARDZERO, FE_UPWARD, FE_DOWNWARD };
-	constexpr std::array<const char*, 4> kName = { "FE_TONEAREST", "FE_TOWARDZERO", "FE_UPWARD", "FE_DOWNWARD" };
+	constexpr std::array<int, 4> kModes			= { FE_TONEAREST, FE_TOWARDZERO, FE_UPWARD, FE_DOWNWARD };
+	constexpr std::array<const char *, 4> kName = { "FE_TONEAREST", "FE_TOWARDZERO", "FE_UPWARD", "FE_DOWNWARD" };
 } // namespace
 
 TEST(CcmathFmaCorrectRounding, FloatAllModes)
 {
 	const int saved = std::fegetround();
-	for (const auto& c : kFloatCases)
+	for (const auto & c : kFloatCases)
 	{
 		const float x = f_from_bits(c.x);
 		const float y = f_from_bits(c.y);
@@ -139,7 +139,7 @@ TEST(CcmathFmaCorrectRounding, FloatAllModes)
 TEST(CcmathFmaCorrectRounding, DoubleAllModes)
 {
 	const int saved = std::fegetround();
-	for (const auto& c : kDoubleCases)
+	for (const auto & c : kDoubleCases)
 	{
 		const double x = d_from_bits(c.x);
 		const double y = d_from_bits(c.y);

@@ -20,11 +20,15 @@
 namespace
 {
 	constexpr double make_remainder(double x, double y)
-	{ return ccm::remainder(x, y); }
+	{
+		return ccm::remainder(x, y);
+	}
 
 	// Pulls the result of remainder(finite, inf) into a constant context.
 	constexpr double remainder_by_inf(double x)
-	{ return ccm::remainder(x, std::numeric_limits<double>::infinity()); }
+	{
+		return ccm::remainder(x, std::numeric_limits<double>::infinity());
+	}
 } // namespace
 
 TEST(CcmathBasicTests, RemainderCompileTime)
@@ -118,14 +122,20 @@ TEST(CcmathBasicTests, Remainder)
 		{ -1.0, 0.0 }, { 5.0, 3.0 }, { 7.5, 2.0 },	 { -5.0, 3.0 },	  { 5.0, -3.0 },	{ -7.5, 2.0 }, { 9.0, 4.0 },
 		{ 2.0, 1.0 },  { 3.0, 2.0 }, { 10.5, 3.25 }, { -10.5, 3.25 }, { 123.456, 7.0 }, { 0.1, 0.03 }, { -0.1, 0.03 },
 	};
-	for (const auto & c : doubles) { ccm::test::ExpectBinaryMatchesStd(c[0], c[1], ccm::remainder<double>, static_cast<double_fn>(std::remainder)); }
+	for (const auto & c : doubles)
+	{
+		ccm::test::ExpectBinaryMatchesStd(c[0], c[1], ccm::remainder<double>, static_cast<double_fn>(std::remainder));
+	}
 
 	// A spread of normal values, both signs, for float.
 	const float floats[][2] = {
 		{ 1.0F, 1.0F }, { 5.0F, 3.0F }, { 7.5F, 2.0F },	  { -5.0F, 3.0F },	  { 5.0F, -3.0F },
 		{ 9.0F, 4.0F }, { 2.0F, 1.0F }, { 10.5F, 3.25F }, { 123.456F, 7.0F }, { 0.1F, 0.03F },
 	};
-	for (const auto & c : floats) { ccm::test::ExpectBinaryMatchesStd(c[0], c[1], ccm::remainder<float>, static_cast<float_fn>(std::remainder)); }
+	for (const auto & c : floats)
+	{
+		ccm::test::ExpectBinaryMatchesStd(c[0], c[1], ccm::remainder<float>, static_cast<float_fn>(std::remainder));
+	}
 
 	// Subnormal operands.
 	constexpr double subnormal_dividend = -5.0166534782602e-198;

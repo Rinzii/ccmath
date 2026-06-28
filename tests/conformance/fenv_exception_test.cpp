@@ -29,9 +29,10 @@ namespace
 {
 	using ccm::test::runtime_value;
 
-	template <typename T>
-	void consume(T value)
-	{ [[maybe_unused]] volatile T sink = value; }
+	template <typename T> void consume(T value)
+	{
+		[[maybe_unused]] volatile T sink = value;
+	}
 } // namespace
 
 TEST(CcmathFenvExceptionTests, DomainErrorsRaiseInvalidLikeStd)
@@ -76,19 +77,16 @@ TEST(CcmathFenvExceptionTests, DomainErrorsRaiseInvalidLikeStd)
 TEST(CcmathFenvExceptionTests, DomainErrorsIndependentOfRoundingMode)
 {
 	CCMATH_SKIP_MSVC_FENV_EXCEPTIONS();
-	ccm::test::ForEachRoundingModeOrSkip(
-		[&](int mode)
-		{
-			ccm::test::ForceRoundingMode force(mode);
-			ASSERT_TRUE(force);
-			ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::sqrt(runtime_value(-1.0))); }, [] { consume(std::sqrt(runtime_value(-1.0))); }, FE_INVALID);
-			ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::pow(runtime_value(-1.0), runtime_value(0.5))); },
-											   [] { consume(std::pow(runtime_value(-1.0), runtime_value(0.5))); },
-											   FE_INVALID);
-			ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::gen::pow_gen(runtime_value(-1.0), runtime_value(0.5))); },
-											   [] { consume(std::pow(runtime_value(-1.0), runtime_value(0.5))); },
-											   FE_INVALID);
-		});
+	ccm::test::ForEachRoundingModeOrSkip([&](int mode) {
+		ccm::test::ForceRoundingMode force(mode);
+		ASSERT_TRUE(force);
+		ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::sqrt(runtime_value(-1.0))); }, [] { consume(std::sqrt(runtime_value(-1.0))); }, FE_INVALID);
+		ccm::test::ExpectFenvFlagsMatchStd(
+			[] { consume(ccm::pow(runtime_value(-1.0), runtime_value(0.5))); }, [] { consume(std::pow(runtime_value(-1.0), runtime_value(0.5))); }, FE_INVALID);
+		ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::gen::pow_gen(runtime_value(-1.0), runtime_value(0.5))); },
+										   [] { consume(std::pow(runtime_value(-1.0), runtime_value(0.5))); },
+										   FE_INVALID);
+	});
 }
 
 TEST(CcmathFenvExceptionTests, PoleErrorsRaiseDivByZeroLikeStd)
@@ -112,18 +110,16 @@ TEST(CcmathFenvExceptionTests, PoleErrorsRaiseDivByZeroLikeStd)
 TEST(CcmathFenvExceptionTests, PoleErrorsIndependentOfRoundingMode)
 {
 	CCMATH_SKIP_MSVC_FENV_EXCEPTIONS();
-	ccm::test::ForEachRoundingModeOrSkip(
-		[&](int mode)
-		{
-			ccm::test::ForceRoundingMode force(mode);
-			ASSERT_TRUE(force);
-			ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::pow(runtime_value(0.0), runtime_value(-1.0))); },
-											   [] { consume(std::pow(runtime_value(0.0), runtime_value(-1.0))); },
-											   FE_DIVBYZERO);
-			ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::gen::pow_gen(runtime_value(0.0), runtime_value(-1.0))); },
-											   [] { consume(std::pow(runtime_value(0.0), runtime_value(-1.0))); },
-											   FE_DIVBYZERO);
-		});
+	ccm::test::ForEachRoundingModeOrSkip([&](int mode) {
+		ccm::test::ForceRoundingMode force(mode);
+		ASSERT_TRUE(force);
+		ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::pow(runtime_value(0.0), runtime_value(-1.0))); },
+										   [] { consume(std::pow(runtime_value(0.0), runtime_value(-1.0))); },
+										   FE_DIVBYZERO);
+		ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::gen::pow_gen(runtime_value(0.0), runtime_value(-1.0))); },
+										   [] { consume(std::pow(runtime_value(0.0), runtime_value(-1.0))); },
+										   FE_DIVBYZERO);
+	});
 }
 
 TEST(CcmathFenvExceptionTests, RangeErrorsRaiseOverflowOrUnderflowLikeStd)

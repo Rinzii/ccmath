@@ -10,7 +10,7 @@
 namespace ccm::test::oracle
 {
 	template <typename T, typename ActualFn, typename ReferenceFn, typename EligibilityFn, typename TruthFn>
-	inline std::optional<failure_record<T>> evaluate_binary_coremath_case_in_mode(const pow_case<T>& test_case,
+	inline std::optional<failure_record<T>> evaluate_binary_coremath_case_in_mode(const pow_case<T> & test_case,
 																				  std::string_view function_name,
 																				  std::string_view path_name,
 																				  int rounding_mode,
@@ -18,11 +18,11 @@ namespace ccm::test::oracle
 																				  ReferenceFn reference_fn,
 																				  EligibilityFn is_reference_case_fn,
 																				  TruthFn matches_truth_fn,
-																				  run_summary<T>& summary,
+																				  run_summary<T> & summary,
 																				  std::uint64_t seed			 = 0,
 																				  std::string_view search_mode	 = {},
 																				  std::string_view mismatch_note = "bit-exact mismatch vs CORE-MATH reference",
-																				  std::vector<failure_record<T>>* event_log = nullptr)
+																				  std::vector<failure_record<T>> * event_log = nullptr)
 	{
 		if (!is_reference_case_fn(test_case.base, test_case.exponent))
 		{
@@ -43,7 +43,10 @@ namespace ccm::test::oracle
 		const T expected = reference_fn(test_case.base, test_case.exponent);
 		const T actual	 = actual_fn(test_case.base, test_case.exponent);
 
-		if (oracle_fp_bits_match(actual, expected)) { return std::nullopt; }
+		if (oracle_fp_bits_match(actual, expected))
+		{
+			return std::nullopt;
+		}
 
 		if (matches_truth_fn(test_case.base, test_case.exponent, actual))
 		{
@@ -69,7 +72,10 @@ namespace ccm::test::oracle
 		}
 
 		++summary.failure_count;
-		if (summary.max_observed_ulp == 0) { record_worst_case(summary, 1, test_case.base, test_case.exponent, actual, expected); }
+		if (summary.max_observed_ulp == 0)
+		{
+			record_worst_case(summary, 1, test_case.base, test_case.exponent, actual, expected);
+		}
 
 		auto record = make_failure_record(function_name,
 										  path_name,
@@ -85,25 +91,28 @@ namespace ccm::test::oracle
 										  search_mode,
 										  mismatch_note,
 										  "coremath_bit_mismatch");
-		if (event_log != nullptr) { event_log->push_back(record); }
+		if (event_log != nullptr)
+		{
+			event_log->push_back(record);
+		}
 		return record;
 	}
 
 	template <typename T, typename ActualFn, typename ReferenceFn, typename EligibilityFn, typename TruthFn>
-	inline void evaluate_binary_coremath_case_all_modes(const pow_case<T>& test_case,
+	inline void evaluate_binary_coremath_case_all_modes(const pow_case<T> & test_case,
 														std::string_view function_name,
 														std::string_view path_name,
-														const std::vector<int>& rounding_modes,
+														const std::vector<int> & rounding_modes,
 														ActualFn actual_fn,
 														ReferenceFn reference_fn,
 														EligibilityFn is_reference_case_fn,
 														TruthFn matches_truth_fn,
-														run_summary<T>& summary,
-														std::vector<failure_record<T>>& failures,
-														std::uint64_t seed						  = 0,
-														std::string_view search_mode			  = {},
-														std::string_view mismatch_note			  = "bit-exact mismatch vs CORE-MATH reference",
-														std::vector<failure_record<T>>* event_log = nullptr)
+														run_summary<T> & summary,
+														std::vector<failure_record<T>> & failures,
+														std::uint64_t seed						   = 0,
+														std::string_view search_mode			   = {},
+														std::string_view mismatch_note			   = "bit-exact mismatch vs CORE-MATH reference",
+														std::vector<failure_record<T>> * event_log = nullptr)
 	{
 		for (const int rounding_mode : rounding_modes)
 		{
@@ -121,7 +130,10 @@ namespace ccm::test::oracle
 																	 mismatch_note,
 																	 event_log))
 			{
-				if (event_log == nullptr) { failures.push_back(*failure); }
+				if (event_log == nullptr)
+				{
+					failures.push_back(*failure);
+				}
 			}
 		}
 	}

@@ -26,11 +26,9 @@ namespace ccm::internal
 	constexpr std::size_t k_log2PolyOrderDbl  = 7;
 	constexpr std::size_t k_log2Poly1OrderDbl = 11;
 
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	struct log2_data;
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> struct log2_data;
 
-	template <>
-	struct log2_data<float>
+	template <> struct log2_data<float>
 	{
 		struct TabEntry
 		{
@@ -58,8 +56,7 @@ namespace ccm::internal
 		} };
 	};
 
-	template <>
-	struct log2_data<double>
+	template <> struct log2_data<double>
 	{
 		// First coefficient: 0x1.71547652b82fe1777d0ffda0d24p0
 		double invln2hi{ 0x1.7154765200000p+0 };
@@ -162,8 +159,6 @@ namespace ccm::internal
 		};
 	};
 
-	template <>
-	struct log2_data<long double> : log2_data<double>
-	{
-	};
+	template <> struct log2_data<long double> : log2_data<double>
+	{};
 } // namespace ccm::internal

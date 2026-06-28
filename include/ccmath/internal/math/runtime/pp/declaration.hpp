@@ -41,38 +41,30 @@ namespace ccm::pp
 		using SimdSizeType = int;
 
 		// Signed integer type used to represent a mask lane of the given byte width.
-		template <std::size_t Bytes>
-		struct mask_int_from;
-		template <>
-		struct mask_int_from<1>
+		template <std::size_t Bytes> struct mask_int_from;
+		template <> struct mask_int_from<1>
 		{
 			using type = std::int8_t;
 		};
-		template <>
-		struct mask_int_from<2>
+		template <> struct mask_int_from<2>
 		{
 			using type = std::int16_t;
 		};
-		template <>
-		struct mask_int_from<4>
+		template <> struct mask_int_from<4>
 		{
 			using type = std::int32_t;
 		};
-		template <>
-		struct mask_int_from<8>
+		template <> struct mask_int_from<8>
 		{
 			using type = std::int64_t;
 		};
 
-		template <std::size_t Bytes>
-		using mask_integer_from = typename mask_int_from<Bytes>::type;
+		template <std::size_t Bytes> using mask_integer_from = typename mask_int_from<Bytes>::type;
 
 		// A type is vectorizable when std::simd may form a data-parallel object of
 		// it. long double is intentionally excluded: it has no vector_size form.
-		template <typename T>
-		struct is_vectorizable : std::false_type
-		{
-		};
+		template <typename T> struct is_vectorizable : std::false_type
+		{};
 		// clang-format off
 		template <> struct is_vectorizable<char>               : std::true_type {};
 		template <> struct is_vectorizable<wchar_t>            : std::true_type {};
@@ -92,38 +84,33 @@ namespace ccm::pp
 		template <> struct is_vectorizable<double>            : std::true_type {};
 		// clang-format on
 #if defined(__cpp_char8_t) && __cpp_char8_t >= 201811L
-		template <>
-		struct is_vectorizable<char8_t> : std::true_type
-		{
-		};
+		template <> struct is_vectorizable<char8_t> : std::true_type
+		{};
 #endif
 
-		template <typename T>
-		inline constexpr bool is_vectorizable_v = is_vectorizable<T>::value;
+		template <typename T> inline constexpr bool is_vectorizable_v = is_vectorizable<T>::value;
 
 		constexpr bool is_pow2(SimdSizeType n)
-		{ return n > 0 && (n & (n - 1)) == 0; }
+		{
+			return n > 0 && (n & (n - 1)) == 0;
+		}
 	} // namespace detail
 
 	// [simd.abi] ABI tags. ScalarAbi holds a single element. VecAbi<N> holds N
 	// lanes backed by a compiler vector extension (or an array fallback).
 	struct ScalarAbi
 	{
-		template <typename>
-		struct IsValid : std::true_type
-		{
-		};
+		template <typename> struct IsValid : std::true_type
+		{};
 		static constexpr detail::SimdSizeType size = 1;
 	};
 
-	template <detail::SimdSizeType N>
-	struct VecAbi
+	template <detail::SimdSizeType N> struct VecAbi
 	{
 		template <typename T>
 		struct IsValid
 			: std::bool_constant<detail::is_vectorizable_v<T> && N >= 2 && detail::is_pow2(N) && (N * static_cast<detail::SimdSizeType>(sizeof(T))) <= 64>
-		{
-		};
+		{};
 		static constexpr detail::SimdSizeType size = N;
 	};
 
@@ -151,42 +138,33 @@ namespace ccm::pp
 #endif
 		}
 
-		template <typename T, bool = is_vectorizable_v<T>>
-		struct NativeAbiImpl
+		template <typename T, bool = is_vectorizable_v<T>> struct NativeAbiImpl
 		{
 			using type = ScalarAbi;
 		};
-		template <typename T>
-		struct NativeAbiImpl<T, true>
+		template <typename T> struct NativeAbiImpl<T, true>
 		{
 			static constexpr SimdSizeType bytes = native_simd_bytes();
 			static constexpr SimdSizeType lanes = bytes / static_cast<SimdSizeType>(sizeof(T));
 			using type							= std::conditional_t<(lanes >= 2 && VecAbi<lanes>::template IsValid<T>::value), VecAbi<lanes>, ScalarAbi>;
 		};
 
-		template <typename T>
-		using NativeAbi = typename NativeAbiImpl<T>::type;
+		template <typename T> using NativeAbi = typename NativeAbiImpl<T>::type;
 
 		// deduce_t<T, N> selects the ABI for an N-wide simd<T, N> alias.
-		template <typename T, SimdSizeType N>
-		struct DeduceAbi
+		template <typename T, SimdSizeType N> struct DeduceAbi
 		{
 			using type = std::conditional_t<N == 1, ScalarAbi, VecAbi<N>>;
 		};
 
-		template <typename T, SimdSizeType N>
-		using deduce_t = typename DeduceAbi<T, N>::type;
+		template <typename T, SimdSizeType N> using deduce_t = typename DeduceAbi<T, N>::type;
 	} // namespace detail
 
-	template <typename T, typename Abi = detail::NativeAbi<T>>
-	class basic_simd;
+	template <typename T, typename Abi = detail::NativeAbi<T>> class basic_simd;
 
-	template <std::size_t Bytes, typename Abi = detail::NativeAbi<detail::mask_integer_from<Bytes>>>
-	class basic_simd_mask;
+	template <std::size_t Bytes, typename Abi = detail::NativeAbi<detail::mask_integer_from<Bytes>>> class basic_simd_mask;
 
-	template <typename MaskType, typename SimdType>
-	class const_where_expression;
+	template <typename MaskType, typename SimdType> class const_where_expression;
 
-	template <typename MaskType, typename SimdType>
-	class where_expression;
+	template <typename MaskType, typename SimdType> class where_expression;
 } // namespace ccm::pp

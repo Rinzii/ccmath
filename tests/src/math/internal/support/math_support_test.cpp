@@ -19,31 +19,43 @@
 
 namespace
 {
-	template <typename T>
-	[[nodiscard]] constexpr T trailing_ones_ref(std::size_t count)
+	template <typename T> [[nodiscard]] constexpr T trailing_ones_ref(std::size_t count)
 	{
 		constexpr std::size_t digits = std::numeric_limits<T>::digits;
-		if (count == 0) { return T(0); }
-		if (count == digits) { return std::numeric_limits<T>::max(); }
+		if (count == 0)
+		{
+			return T(0);
+		}
+		if (count == digits)
+		{
+			return std::numeric_limits<T>::max();
+		}
 		return static_cast<T>((T(1) << count) - T(1));
 	}
 
-	template <typename T>
-	[[nodiscard]] constexpr T leading_ones_ref(std::size_t count)
+	template <typename T> [[nodiscard]] constexpr T leading_ones_ref(std::size_t count)
 	{
 		constexpr std::size_t digits = std::numeric_limits<T>::digits;
-		if (count == 0) { return T(0); }
-		if (count == digits) { return std::numeric_limits<T>::max(); }
+		if (count == 0)
+		{
+			return T(0);
+		}
+		if (count == digits)
+		{
+			return std::numeric_limits<T>::max();
+		}
 		return static_cast<T>(~trailing_ones_ref<T>(digits - count));
 	}
 
-	template <typename T, std::size_t Count = 0>
-	void expect_masks_for_all_counts()
+	template <typename T, std::size_t Count = 0> void expect_masks_for_all_counts()
 	{
 		EXPECT_EQ((ccm::support::mask_trailing_ones<T, Count>()), trailing_ones_ref<T>(Count));
 		EXPECT_EQ((ccm::support::mask_leading_ones<T, Count>()), leading_ones_ref<T>(Count));
 
-		if constexpr (Count < std::numeric_limits<T>::digits) { expect_masks_for_all_counts<T, Count + 1>(); }
+		if constexpr (Count < std::numeric_limits<T>::digits)
+		{
+			expect_masks_for_all_counts<T, Count + 1>();
+		}
 	}
 } // namespace
 
@@ -91,7 +103,10 @@ TEST(CcmathInternalSupportTests, AddOverflowInt8MatchesReferenceExhaustively)
 			const bool expected_overflow = expected < std::numeric_limits<std::int8_t>::min() || expected > std::numeric_limits<std::int8_t>::max();
 
 			EXPECT_EQ(overflow, expected_overflow);
-			if (!expected_overflow) { EXPECT_EQ(out, static_cast<std::int8_t>(expected)); }
+			if (!expected_overflow)
+			{
+				EXPECT_EQ(out, static_cast<std::int8_t>(expected));
+			}
 		}
 	}
 }
@@ -108,7 +123,10 @@ TEST(CcmathInternalSupportTests, SubOverflowInt8MatchesReferenceExhaustively)
 			const bool expected_overflow = expected < std::numeric_limits<std::int8_t>::min() || expected > std::numeric_limits<std::int8_t>::max();
 
 			EXPECT_EQ(overflow, expected_overflow);
-			if (!expected_overflow) { EXPECT_EQ(out, static_cast<std::int8_t>(expected)); }
+			if (!expected_overflow)
+			{
+				EXPECT_EQ(out, static_cast<std::int8_t>(expected));
+			}
 		}
 	}
 }
@@ -175,7 +193,7 @@ TEST(CcmathInternalSupportTests, AddWithCarryUint64MatchesBoundaryCases)
 		{ 0x8000000000000000ULL, 0x8000000000000000ULL, 0ULL, 0ULL, 1ULL },
 	} };
 
-	for (const auto& test_case : cases)
+	for (const auto & test_case : cases)
 	{
 		std::uint64_t carry_out	   = 0;
 		const std::uint64_t actual = ccm::support::add_with_carry<std::uint64_t>(test_case.lhs, test_case.rhs, test_case.carry_in, carry_out);
@@ -207,7 +225,7 @@ TEST(CcmathInternalSupportTests, SubWithBorrowUint64MatchesBoundaryCases)
 		{ 0x7FFFFFFFFFFFFFFFULL, 0x8000000000000000ULL, 0ULL, std::numeric_limits<std::uint64_t>::max(), 1ULL },
 	} };
 
-	for (const auto& test_case : cases)
+	for (const auto & test_case : cases)
 	{
 		std::uint64_t borrow_out   = 0;
 		const std::uint64_t actual = ccm::support::sub_with_borrow<std::uint64_t>(test_case.lhs, test_case.rhs, test_case.borrow_in, borrow_out);

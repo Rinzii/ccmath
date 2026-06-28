@@ -24,12 +24,15 @@ namespace ccm
 	 * @param y A floating-point or integer values
 	 * @return If successful, returns the positive difference between x and y.
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T fdim(T x, T y)
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T fdim(T x, T y)
 	{
-		if constexpr (ccm::builtin::has_constexpr_fdim<T>) { return ccm::builtin::fdim_ct(x, y); }
-		else if (ccm::support::is_constant_evaluated()) { return func::fdim(x, y); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_fdim<T>)
+		{
+			return ccm::builtin::fdim_ct(x, y);
+		} else if (ccm::support::is_constant_evaluated())
+		{
+			return func::fdim(x, y);
+		} else
 		{
 			return ccm::rt::fdim_rt(x, y);
 		}
@@ -43,8 +46,7 @@ namespace ccm
 	 * @param y A floating-point value.
 	 * @return If successful, returns the positive difference between x and y.
 	 */
-	template <typename T, typename U, std::enable_if_t<std::is_floating_point_v<T> && std::is_floating_point_v<U>, bool> = true>
-	constexpr auto fdim(T x, U y)
+	template <typename T, typename U, std::enable_if_t<std::is_floating_point_v<T> && std::is_floating_point_v<U>, bool> = true> constexpr auto fdim(T x, U y)
 	{
 		using shared_type = std::common_type_t<T, U>;
 
@@ -58,9 +60,10 @@ namespace ccm
 	 * @param y An integral value.
 	 * @return If successful, returns the positive difference between x and y.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double fdim(Integer x, Integer y)
-	{ return ccm::fdim<double>(static_cast<double>(x), static_cast<double>(y)); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double fdim(Integer x, Integer y)
+	{
+		return ccm::fdim<double>(static_cast<double>(x), static_cast<double>(y));
+	}
 
 	/**
 	 * @brief Computes the positive difference of two floating point values (max(0,x−y))
@@ -69,7 +72,9 @@ namespace ccm
 	 * @return If successful, returns the positive difference between x and y.
 	 */
 	constexpr float fdimf(float x, float y)
-	{ return ccm::fdim<float>(x, y); }
+	{
+		return ccm::fdim<float>(x, y);
+	}
 
 	/**
 	 * @brief Computes the positive difference of two floating point values (max(0,x−y))
@@ -78,7 +83,9 @@ namespace ccm
 	 * @return If successful, returns the positive difference between x and y.
 	 */
 	constexpr long double fdiml(long double x, long double y)
-	{ return ccm::fdim<long double>(x, y); }
+	{
+		return ccm::fdim<long double>(x, y);
+	}
 } // namespace ccm
 
 /// @ingroup basic

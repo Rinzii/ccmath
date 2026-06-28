@@ -17,11 +17,13 @@
 
 namespace
 {
-	template <typename T>
-	void fmanip(uint8_t const * data, size_t size)
+	template <typename T> void fmanip(uint8_t const * data, size_t size)
 	{
 		ccm::fuzz::Inputs<T> in;
-		if (!in.load_xy_i(data, size)) { return; }
+		if (!in.load_xy_i(data, size))
+		{
+			return;
+		}
 
 		ccm::fuzz::fuzz_binary_vs_std(in.x, in.y, ccm::copysign<T>, [](T a, T b) { return std::copysign(a, b); });
 		ccm::fuzz::fuzz_binary_vs_std(in.x, in.y, ccm::nextafter<T>, [](T a, T b) { return std::nextafter(a, b); });

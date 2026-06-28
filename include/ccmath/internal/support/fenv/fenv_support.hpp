@@ -28,7 +28,7 @@ CCM_DISABLE_MSVC_WARNING(4702) // 4702: unreachable code
 
 #if !defined(__FAST_MATH__) && !defined(CCM_CONFIG_DISABLE_ERRNO)
 	#if defined(_GNU_SOURCE) || defined(__GLIBC__) || defined(__ANDROID__)
-extern "C" int *__errno_location(void) __attribute__((__nothrow__, __const__));
+extern "C" int * __errno_location(void) __attribute__((__nothrow__, __const__));
 	#endif
 #endif
 
@@ -38,11 +38,11 @@ namespace ccm::support::fenv::detail
 	{
 #if !defined(__FAST_MATH__) && !defined(CCM_CONFIG_DISABLE_ERRNO)
 	#if defined(_GNU_SOURCE) || defined(__GLIBC__) || defined(__ANDROID__)
-		volatile int *const loc = __errno_location();
-		*loc					= err;
+		volatile int * const loc = __errno_location();
+		*loc					 = err;
 	#else
-		volatile int *const loc = &errno;
-		*loc					= err;
+		volatile int * const loc = &errno;
+		*loc					 = err;
 	#endif
 	#if defined(__GNUC__) || defined(__clang__)
 		__asm__ __volatile__("" : : "r"(loc) : "memory"); // NOLINT(hicpp-no-assembler)
@@ -70,7 +70,9 @@ namespace ccm::support::fenv
 
 	// Helper function to convert the enum class to an integer to enable bitwise operations.
 	constexpr int get_mode(ccm_math_err_mode mode)
-	{ return static_cast<int>(mode); }
+	{
+		return static_cast<int>(mode);
+	}
 
 	constexpr int ccm_math_err_handling()
 	{
@@ -96,11 +98,17 @@ namespace ccm::support::fenv
 	// ReSharper disable once CppDFAConstantFunctionResult
 	constexpr int set_except_if_required(const int excepts)
 	{
-		if (is_constant_evaluated()) { return 0; } // We cannot raise fenv exceptions in a constexpr context. So we return.
+		if (is_constant_evaluated())
+		{
+			return 0;
+		} // We cannot raise fenv exceptions in a constexpr context. So we return.
 
 		if constexpr (is_errno_enabled())
 		{
-			if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { return host::set_except(excepts); }
+			if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0)
+			{
+				return host::set_except(excepts);
+			}
 		}
 		// ReSharper disable once CppDFAUnreachableCode // This is unreachable code if the above constexpr if statement is true which is desired.
 		return 0;
@@ -108,10 +116,16 @@ namespace ccm::support::fenv
 
 	constexpr int raise_except_if_required(const int excepts)
 	{
-		if (is_constant_evaluated()) { return 0; } // We cannot raise fenv exceptions in a constexpr context. So we return.
+		if (is_constant_evaluated())
+		{
+			return 0;
+		} // We cannot raise fenv exceptions in a constexpr context. So we return.
 		if constexpr (is_errno_enabled())
 		{
-			if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { return host::raise_except(excepts); }
+			if constexpr ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0)
+			{
+				return host::raise_except(excepts);
+			}
 		}
 		// ReSharper disable once CppDFAUnreachableCode // This is unreachable code if the above constexpr if statement is true which is desired.
 		return 0;
@@ -119,9 +133,18 @@ namespace ccm::support::fenv
 
 	constexpr void set_errno_if_required(const int err)
 	{
-		if (is_constant_evaluated()) { return; }
-		if constexpr (!is_errno_enabled()) { return; }
-		if ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrno)) != 0) { detail::write_errno(err); }
+		if (is_constant_evaluated())
+		{
+			return;
+		}
+		if constexpr (!is_errno_enabled())
+		{
+			return;
+		}
+		if ((ccm_math_err_handling() & get_mode(ccm_math_err_mode::eErrno)) != 0)
+		{
+			detail::write_errno(err);
+		}
 	}
 } // namespace ccm::support::fenv
 

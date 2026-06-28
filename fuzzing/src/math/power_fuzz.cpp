@@ -19,11 +19,13 @@
 
 namespace
 {
-	template <typename T>
-	void power(uint8_t const * data, size_t size)
+	template <typename T> void power(uint8_t const * data, size_t size)
 	{
 		ccm::fuzz::Inputs<T> in;
-		if (!in.load_xy(data, size)) { return; }
+		if (!in.load_xy(data, size))
+		{
+			return;
+		}
 
 		ccm::fuzz::fuzz_unary_vs_std(in.x, ccm::fuzz::calls::sqrt<T>, [](T v) { return std::sqrt(v); });
 		ccm::fuzz::fuzz_unary_vs_std(in.x, ccm::fuzz::calls::cbrt<T>, [](T v) { return std::cbrt(v); });
@@ -62,7 +64,10 @@ namespace
 		static_cast<void>(size);
 #else
 		ccm::fuzz::Inputs<long double> in;
-		if (!in.load_xy(data, size)) { return; }
+		if (!in.load_xy(data, size))
+		{
+			return;
+		}
 
 		ccm::fuzz::fuzz_binary_vs_std(in.x, in.y, ccm::fuzz::calls::pow<long double>, [](long double a, long double b) { return std::pow(a, b); });
 #endif

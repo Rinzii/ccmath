@@ -25,13 +25,17 @@ namespace ccm
 	 * @param num Floating-point value.
 	 * @return Cube root of num.
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T cbrt(T num) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T cbrt(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_cbrt<T>) { return ccm::builtin::cbrt_ct(num); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_cbrt<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::gen::cbrt_gen<T>(num); }
+			return ccm::builtin::cbrt_ct(num);
+		} else
+		{
+			if (ccm::support::is_constant_evaluated())
+			{
+				return ccm::gen::cbrt_gen<T>(num);
+			}
 			return ccm::rt::cbrt_rt<T>(num);
 		}
 	}
@@ -42,7 +46,9 @@ namespace ccm
 	 * @return Cube root of num as float.
 	 */
 	constexpr float cbrtf(float num) noexcept
-	{ return ccm::cbrt(num); }
+	{
+		return ccm::cbrt(num);
+	}
 
 	/**
 	 * @brief Computes the cube root of a long double.
@@ -50,7 +56,9 @@ namespace ccm
 	 * @return Cube root of num as long double.
 	 */
 	constexpr long double cbrtl(long double num) noexcept
-	{ return ccm::cbrt(num); }
+	{
+		return ccm::cbrt(num);
+	}
 } // namespace ccm
 
 /// @ingroup power

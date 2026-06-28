@@ -57,11 +57,12 @@ namespace ccm
 	 * @return \f$\text{num} \times 2^\text{exp}\f$.
 	 * @attention At compile time errno may or may not be set, depending on the compiler. Assume it is not.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T ldexp(T num, int exp) noexcept
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T ldexp(T num, int exp) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_ldexp<T>) { return builtin::ldexp_ct(num, exp); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_ldexp<T>)
+		{
+			return builtin::ldexp_ct(num, exp);
+		} else
 		{
 			return support::helpers::internal_ldexp(num, exp);
 		}
@@ -79,9 +80,10 @@ namespace ccm
 	 * @return \f$\text{num} \times 2^\text{exp}\f$ as a \c double.
 	 * @attention At compile time errno may or may not be set, depending on the compiler. Assume it is not.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double ldexp(Integer num, int exp) noexcept
-	{ return ccm::ldexp<double>(static_cast<double>(num), exp); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double ldexp(Integer num, int exp) noexcept
+	{
+		return ccm::ldexp<double>(static_cast<double>(num), exp);
+	}
 
 	/**
 	 * @brief Scales a \c float \p num by \f$2^\text{exp}\f$. Equivalent to \c ldexp<float>(num, exp).
@@ -94,7 +96,9 @@ namespace ccm
 	 * @attention At compile time errno may or may not be set, depending on the compiler. Assume it is not.
 	 */
 	constexpr float ldexpf(float num, int exp) noexcept
-	{ return ccm::ldexp<float>(num, exp); }
+	{
+		return ccm::ldexp<float>(num, exp);
+	}
 
 	/**
 	 * @brief Scales a \c long double \p num by \f$2^\text{exp}\f$ using native long double support.
@@ -110,6 +114,8 @@ namespace ccm
 	 * @attention At compile time errno may or may not be set, depending on the compiler. Assume it is not.
 	 */
 	constexpr long double ldexpl(long double num, int exp) noexcept
-	{ return ccm::ldexp<long double>(num, exp); }
+	{
+		return ccm::ldexp<long double>(num, exp);
+	}
 
 } // namespace ccm

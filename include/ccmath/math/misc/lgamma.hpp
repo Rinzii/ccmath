@@ -25,14 +25,25 @@ namespace ccm
 	 * @param num floating-point or integer value
 	 * @return If no errors occur, the natural logarithm of the absolute value of the gamma function at num is returned.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T lgamma(T num)
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T lgamma(T num)
 	{
-		if (!ccm::support::is_constant_evaluated()) { return ccm::rt::lgamma_rt(num); }
+		if (!ccm::support::is_constant_evaluated())
+		{
+			return ccm::rt::lgamma_rt(num);
+		}
 
-		if constexpr (std::is_same_v<T, float>) { return internal::lgamma_float(num); }
-		if constexpr (std::is_same_v<T, double>) { return internal::lgamma_double(num); }
-		if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::lgamma_double(static_cast<double>(num))); }
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return internal::lgamma_float(num);
+		}
+		if constexpr (std::is_same_v<T, double>)
+		{
+			return internal::lgamma_double(num);
+		}
+		if constexpr (std::is_same_v<T, long double>)
+		{
+			return static_cast<long double>(internal::lgamma_double(static_cast<double>(num)));
+		}
 		return static_cast<T>(internal::lgamma_double(static_cast<double>(num)));
 	}
 
@@ -42,9 +53,10 @@ namespace ccm
 	 * @param num Integer value.
 	 * @return Natural logarithm of |gamma(num)| as double.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double lgamma(Integer num)
-	{ return ccm::lgamma<double>(static_cast<double>(num)); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double lgamma(Integer num)
+	{
+		return ccm::lgamma<double>(static_cast<double>(num));
+	}
 
 	/**
 	 * @brief Computes log-gamma for float.
@@ -52,7 +64,9 @@ namespace ccm
 	 * @return Natural logarithm of |gamma(num)| as float.
 	 */
 	constexpr float lgammaf(float num)
-	{ return ccm::lgamma<float>(num); }
+	{
+		return ccm::lgamma<float>(num);
+	}
 
 	/**
 	 * @brief Computes log-gamma for long double.
@@ -60,5 +74,7 @@ namespace ccm
 	 * @return Natural logarithm of |gamma(num)| as long double.
 	 */
 	constexpr long double lgammal(long double num)
-	{ return ccm::lgamma<long double>(num); }
+	{
+		return ccm::lgamma<long double>(num);
+	}
 } // namespace ccm

@@ -73,7 +73,7 @@ namespace
 	// reference and the exceptional libm cross-check are unaffected by the choice.
 	template <typename T, typename GenFn, typename PublicFn, typename StdFn>
 	int run_standard(int argc,
-					 char** argv,
+					 char ** argv,
 					 std::string_view name,
 					 GenFn gen_scalar,
 					 PublicFn public_scalar,
@@ -87,26 +87,24 @@ namespace
 			argc,
 			argv,
 			name,
-			[gen_scalar, public_scalar, std_scalar, impl](const std::array<T, 1>& inputs) -> T
-			{
+			[gen_scalar, public_scalar, std_scalar, impl](const std::array<T, 1> & inputs) -> T {
 				switch (impl)
 				{
-				case oracle::impl_kind::libm: return std_scalar(inputs[0]);
+				case oracle::impl_kind::libm	  : return std_scalar(inputs[0]);
 				case oracle::impl_kind::public_api: return public_scalar(inputs[0]);
-				case oracle::impl_kind::generic: break;
+				case oracle::impl_kind::generic	  : break;
 				}
 				return gen_scalar(inputs[0]);
 			},
 			oracle::make_unary_ref<T>(op),
-			[std_scalar](const std::array<T, 1>& inputs) { return std_scalar(inputs[0]); },
+			[std_scalar](const std::array<T, 1> & inputs) { return std_scalar(inputs[0]); },
 			[dom](std::uint64_t seed, std::size_t count) { return oracle::build_unary_corpus<T>(dom, seed, count); },
 			std::array<domain, 1>{ dom },
 			oracle::unary_structured_seed<T>(std_scalar, family),
 			oracle::impl_token(impl));
 	}
 
-	template <typename T>
-	int dispatch(std::string_view function, int argc, char** argv)
+	template <typename T> int dispatch(std::string_view function, int argc, char ** argv)
 	{
 		if (function == "exp")
 		{
@@ -244,10 +242,11 @@ namespace
 				argc,
 				argv,
 				"ccm::asin",
-				[](T x) -> T
-				{
-					if constexpr (std::is_same_v<T, float>) { return ccm::internal::impl::asin_float(ccm::test::runtime_value(x)); }
-					else
+				[](T x) -> T {
+					if constexpr (std::is_same_v<T, float>)
+					{
+						return ccm::internal::impl::asin_float(ccm::test::runtime_value(x));
+					} else
 					{
 						return ccm::internal::impl::asin_double(ccm::test::runtime_value(x));
 					}
@@ -264,10 +263,11 @@ namespace
 				argc,
 				argv,
 				"ccm::acos",
-				[](T x) -> T
-				{
-					if constexpr (std::is_same_v<T, float>) { return ccm::internal::impl::acos_float(ccm::test::runtime_value(x)); }
-					else
+				[](T x) -> T {
+					if constexpr (std::is_same_v<T, float>)
+					{
+						return ccm::internal::impl::acos_float(ccm::test::runtime_value(x));
+					} else
 					{
 						return ccm::internal::impl::acos_double(ccm::test::runtime_value(x));
 					}
@@ -284,10 +284,11 @@ namespace
 				argc,
 				argv,
 				"ccm::atan",
-				[](T x) -> T
-				{
-					if constexpr (std::is_same_v<T, float>) { return ccm::internal::impl::atan_float(ccm::test::runtime_value(x)); }
-					else
+				[](T x) -> T {
+					if constexpr (std::is_same_v<T, float>)
+					{
+						return ccm::internal::impl::atan_float(ccm::test::runtime_value(x));
+					} else
 					{
 						return ccm::internal::impl::atan_double(ccm::test::runtime_value(x));
 					}
@@ -330,10 +331,11 @@ namespace
 				argc,
 				argv,
 				"ccm::tgamma",
-				[](T x) -> T
-				{
-					if constexpr (std::is_same_v<T, float>) { return ccm::internal::gamma_float(ccm::test::runtime_value(x)); }
-					else
+				[](T x) -> T {
+					if constexpr (std::is_same_v<T, float>)
+					{
+						return ccm::internal::gamma_float(ccm::test::runtime_value(x));
+					} else
 					{
 						return ccm::internal::gamma_double(ccm::test::runtime_value(x));
 					}
@@ -351,22 +353,23 @@ namespace
 				argc,
 				argv,
 				"ccm::lgamma",
-				[impl](const std::array<T, 1>& inputs) -> T
-				{
+				[impl](const std::array<T, 1> & inputs) -> T {
 					switch (impl)
 					{
-					case oracle::impl_kind::libm: return std::lgamma(inputs[0]);
+					case oracle::impl_kind::libm	  : return std::lgamma(inputs[0]);
 					case oracle::impl_kind::public_api: return ccm::lgamma(ccm::test::runtime_value(inputs[0]));
-					case oracle::impl_kind::generic: break;
+					case oracle::impl_kind::generic	  : break;
 					}
-					if constexpr (std::is_same_v<T, float>) { return ccm::internal::lgamma_float(ccm::test::runtime_value(inputs[0])); }
-					else
+					if constexpr (std::is_same_v<T, float>)
+					{
+						return ccm::internal::lgamma_float(ccm::test::runtime_value(inputs[0]));
+					} else
 					{
 						return ccm::internal::lgamma_double(ccm::test::runtime_value(inputs[0]));
 					}
 				},
 				oracle::make_lgamma_ref<T>(),
-				[](const std::array<T, 1>& inputs) { return std::lgamma(inputs[0]); },
+				[](const std::array<T, 1> & inputs) { return std::lgamma(inputs[0]); },
 				[](std::uint64_t seed, std::size_t count) { return oracle::build_unary_corpus<T>(domain{ -50.0, kInf, true }, seed, count); },
 				std::array<domain, 1>{ domain{ -50.0, kInf, true } },
 				oracle::unary_structured_seed<T>([](T x) { return std::lgamma(x); }, oracle::function_family::gamma),
@@ -379,18 +382,17 @@ namespace
 				argc,
 				argv,
 				"ccm::pow",
-				[impl](const std::array<T, 2>& inputs) -> T
-				{
+				[impl](const std::array<T, 2> & inputs) -> T {
 					switch (impl)
 					{
-					case oracle::impl_kind::libm: return std::pow(inputs[0], inputs[1]);
+					case oracle::impl_kind::libm	  : return std::pow(inputs[0], inputs[1]);
 					case oracle::impl_kind::public_api: return ccm::pow(ccm::test::runtime_value(inputs[0]), ccm::test::runtime_value(inputs[1]));
-					case oracle::impl_kind::generic: break;
+					case oracle::impl_kind::generic	  : break;
 					}
 					return ccm::gen::pow_gen(ccm::test::runtime_value(inputs[0]), ccm::test::runtime_value(inputs[1]));
 				},
 				oracle::make_pow_ref<T>(),
-				[](const std::array<T, 2>& inputs) { return std::pow(inputs[0], inputs[1]); },
+				[](const std::array<T, 2> & inputs) { return std::pow(inputs[0], inputs[1]); },
 				[](std::uint64_t seed, std::size_t count) { return oracle::build_pow_corpus<T>(seed, count); },
 				std::array<domain, 2>{ domain{ -kInf, kInf, true }, domain{ -kInf, kInf, true } },
 				oracle::pow_special_matrix<T>(),
@@ -402,19 +404,30 @@ namespace
 	}
 } // namespace
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
 	std::string function = "exp";
 	std::string type	 = "double";
 	for (int i = 1; i < argc; ++i)
 	{
 		const std::string_view arg(argv[i]);
-		if (arg.rfind("--function=", 0) == 0) { function = std::string(arg.substr(std::string_view("--function=").size())); }
-		else if (arg.rfind("--type=", 0) == 0) { type = std::string(arg.substr(std::string_view("--type=").size())); }
+		if (arg.rfind("--function=", 0) == 0)
+		{
+			function = std::string(arg.substr(std::string_view("--function=").size()));
+		} else if (arg.rfind("--type=", 0) == 0)
+		{
+			type = std::string(arg.substr(std::string_view("--type=").size()));
+		}
 	}
 
-	if (type == "float") { return dispatch<float>(function, argc, argv); }
-	if (type == "double") { return dispatch<double>(function, argc, argv); }
+	if (type == "float")
+	{
+		return dispatch<float>(function, argc, argv);
+	}
+	if (type == "double")
+	{
+		return dispatch<double>(function, argc, argv);
+	}
 
 	std::cerr << "unknown --type=" << type << " (expected float or double)\n";
 	return 2;

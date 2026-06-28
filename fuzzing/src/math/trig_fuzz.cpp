@@ -18,11 +18,13 @@
 
 namespace
 {
-	template <typename T>
-	void trig(uint8_t const * data, size_t size)
+	template <typename T> void trig(uint8_t const * data, size_t size)
 	{
 		ccm::fuzz::Inputs<T> in;
-		if (!in.load_xy(data, size)) { return; }
+		if (!in.load_xy(data, size))
+		{
+			return;
+		}
 
 #ifndef CCMATH_FUZZ_GENERIC
 		// Public-dispatch build: sin / cos / tan are differential-tested against libm.

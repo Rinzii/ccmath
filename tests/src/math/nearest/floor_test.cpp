@@ -58,8 +58,7 @@ namespace
 } // namespace
 
 class CcmathFloorTests : public TestWithParam<FloorTestParams>
-{
-};
+{};
 
 INSTANTIATE_TEST_SUITE_P(FloorTests, CcmathFloorTests, ValuesIn(kFloorTestsParams));
 

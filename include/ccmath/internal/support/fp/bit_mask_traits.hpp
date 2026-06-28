@@ -19,8 +19,7 @@
 
 namespace ccm::support
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	struct bitmask_traits
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> struct bitmask_traits
 	{
 		// If we've not specialized for the provided type then assume double.
 		using MaskType = std::uint64_t;
@@ -41,8 +40,7 @@ namespace ccm::support
 		static constexpr MaskType neg_nan		  = 0xFFF8000000000000;
 	};
 
-	template <>
-	struct bitmask_traits<float>
+	template <> struct bitmask_traits<float>
 	{
 		using MaskType = std::uint32_t;
 
@@ -62,8 +60,7 @@ namespace ccm::support
 		static constexpr MaskType neg_nan		  = 0xFFC00000;
 	};
 
-	template <>
-	struct bitmask_traits<double>
+	template <> struct bitmask_traits<double>
 	{
 		using MaskType = std::uint64_t;
 
@@ -89,8 +86,7 @@ namespace ccm::support
 
 	// Values from this table:
 	// https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format/
-	template <>
-	struct bitmask_traits<long double>
+	template <> struct bitmask_traits<long double>
 	{
 		using MaskType = ccm::types::uint128_t;
 
@@ -110,8 +106,7 @@ namespace ccm::support
 		static constexpr MaskType neg_nan		  = 0xFFFF8000000000000000000000000000_u128;
 	};
 #elif defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
-	template <>
-	struct bitmask_traits<long double>
+	template <> struct bitmask_traits<long double>
 	{
 		using MaskType = ccm::types::uint128_t;
 
@@ -131,8 +126,7 @@ namespace ccm::support
 		static constexpr MaskType neg_nan		  = 0xFFFF8000000000000000000000000000_u128;
 	};
 #else // long double is the same as double
-	template <>
-	struct bitmask_traits<long double>
+	template <> struct bitmask_traits<long double>
 	{
 		using MaskType = std::uint64_t;
 

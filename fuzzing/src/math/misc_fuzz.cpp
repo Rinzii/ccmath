@@ -17,28 +17,44 @@
 
 namespace
 {
-	template <typename T>
-	T reference_lerp(T a, T b, T t)
+	template <typename T> T reference_lerp(T a, T b, T t)
 	{
-		if (std::isnan(a) || std::isnan(b) || std::isnan(t)) { return a + b + t; }
+		if (std::isnan(a) || std::isnan(b) || std::isnan(t))
+		{
+			return a + b + t;
+		}
 
-		if ((a <= T{} && b >= T{}) || (a >= T{} && b <= T{})) { return t * b + (static_cast<T>(1) - t) * a; }
-		if (t == static_cast<T>(1)) { return b; }
+		if ((a <= T{} && b >= T{}) || (a >= T{} && b <= T{}))
+		{
+			return t * b + (static_cast<T>(1) - t) * a;
+		}
+		if (t == static_cast<T>(1))
+		{
+			return b;
+		}
 
 		T const x = a + t * (b - a);
-		if ((t > static_cast<T>(1)) == (b > a)) { return b < x ? x : b; }
+		if ((t > static_cast<T>(1)) == (b > a))
+		{
+			return b < x ? x : b;
+		}
 		return x < b ? x : b;
 	}
 
-	template <typename T>
-	void misc(uint8_t const * data, size_t size)
+	template <typename T> void misc(uint8_t const * data, size_t size)
 	{
 		ccm::fuzz::Inputs<T> in;
-		if (!in.load_xyz(data, size)) { return; }
+		if (!in.load_xyz(data, size))
+		{
+			return;
+		}
 
 		ccm::fuzz::check_same_floating(ccm::lerp(in.x, in.y, in.z), reference_lerp(in.x, in.y, in.z));
 
-		if (in.x < T{} && in.x == std::trunc(in.x)) { return; }
+		if (in.x < T{} && in.x == std::trunc(in.x))
+		{
+			return;
+		}
 		ccm::fuzz::fuzz_unary_vs_std(in.x, ccm::gamma<T>, [](T v) { return std::tgamma(v); });
 		ccm::fuzz::fuzz_unary_vs_std(in.x, ccm::lgamma<T>, [](T v) { return std::lgamma(v); });
 	}

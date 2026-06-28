@@ -30,7 +30,7 @@ int main()
 
 	ccm::examples::table_header("a", "b", "fdim(a,b)");
 
-	for (auto const& c : kCases)
+	for (auto const & c : kCases)
 	{
 		double const positive_diff = ccm::fdim(c.a, c.b);
 		double const magnitude	   = ccm::fabs(c.a);

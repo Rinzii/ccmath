@@ -34,8 +34,7 @@ namespace ccm::internal::impl
 	{
 		// Evaluates the asin(x)/x approximation polynomial from inv_trig_data (argument x^2) in
 		// parallel Estrin form, for |x| <= 1/2.
-		template <typename T>
-		constexpr T asin_eval(T xsq) noexcept
+		template <typename T> constexpr T asin_eval(T xsq) noexcept
 		{
 			using namespace inv_trig_data;
 
@@ -55,8 +54,7 @@ namespace ccm::internal::impl
 
 		// Two regions. For |x| <= 1/2, acos(x) = pi/2 - asin(x) via the asin polynomial. For
 		// |x| > 1/2, acos(|x|) = 2 asin(sqrt((1-|x|)/2)), reflected to pi - r when x < 0.
-		template <typename T>
-		constexpr T acos_kernel(T x) noexcept
+		template <typename T> constexpr T acos_kernel(T x) noexcept
 		{
 			using namespace inv_trig_data;
 			using fp_bits_t = ccm::support::fp::FPBits<T>;
@@ -84,14 +82,16 @@ namespace ccm::internal::impl
 			const T r  = ccm::support::multiply_add(cv * u, r3, cv);
 			return x < static_cast<T>(0) ? static_cast<T>(k_pi) - r : r;
 		}
-		template <typename T>
-		constexpr T asin_small_impl(T x) noexcept
+		template <typename T> constexpr T asin_small_impl(T x) noexcept
 		{
 			const T ax = ccm::fabs(x);
 
 			// asin(x) = x + x^3/6 + O(x^5). The cubic coefficient is +1/6 (this fast path previously
 			// used -1/6, which underran by ~x^3/3 over the tiny-|x| band).
-			if (ax < static_cast<T>(0x1.0p-14)) { return x + x * x * x * static_cast<T>(0x1.5555555555555p-3); }
+			if (ax < static_cast<T>(0x1.0p-14))
+			{
+				return x + x * x * x * static_cast<T>(0x1.5555555555555p-3);
+			}
 
 			// Float evaluates in double then rounds once. The same-type path is in the else so it is
 			// discarded rather than left unreachable for the float instantiation (MSVC C4702).
@@ -101,8 +101,7 @@ namespace ccm::internal::impl
 				const double xsq = dx * dx;
 				const double r	 = asin_eval<double>(xsq);
 				return static_cast<T>(dx + dx * xsq * r);
-			}
-			else
+			} else
 			{
 				const T xsq = x * x;
 				const T r	= asin_eval<T>(xsq);
@@ -111,14 +110,16 @@ namespace ccm::internal::impl
 		}
 	} // namespace inv_trig_detail
 
-	template <typename T>
-	constexpr T acos_impl(T x) noexcept
+	template <typename T> constexpr T acos_impl(T x) noexcept
 	{
 		using fp_bits_t = ccm::support::fp::FPBits<T>;
 
 		fp_bits_t bits(x);
 
-		if (CCM_UNLIKELY(bits.is_nan())) { return x; }
+		if (CCM_UNLIKELY(bits.is_nan()))
+		{
+			return x;
+		}
 
 		if (CCM_UNLIKELY(bits.is_inf()))
 		{
@@ -135,35 +136,50 @@ namespace ccm::internal::impl
 			return fp_bits_t::quiet_nan().get_val();
 		}
 
-		if (ax == static_cast<T>(1)) { return x < static_cast<T>(0) ? static_cast<T>(ccm::numbers::pi_v<T>) : static_cast<T>(0); }
+		if (ax == static_cast<T>(1))
+		{
+			return x < static_cast<T>(0) ? static_cast<T>(ccm::numbers::pi_v<T>) : static_cast<T>(0);
+		}
 
 		return inv_trig_detail::acos_kernel(x);
 	}
 
-	template <typename T>
-	constexpr T asin_impl(T x) noexcept
+	template <typename T> constexpr T asin_impl(T x) noexcept
 	{
-		if (x == static_cast<T>(0)) { return x; }
+		if (x == static_cast<T>(0))
+		{
+			return x;
+		}
 
-		if (ccm::fabs(x) <= static_cast<T>(0.5)) { return inv_trig_detail::asin_small_impl(x); }
+		if (ccm::fabs(x) <= static_cast<T>(0.5))
+		{
+			return inv_trig_detail::asin_small_impl(x);
+		}
 
 		return static_cast<T>(ccm::numbers::pi_v<T>) / static_cast<T>(2) - acos_impl(x);
 	}
 
-	template <typename T>
-	constexpr T atan_impl(T x) noexcept
+	template <typename T> constexpr T atan_impl(T x) noexcept
 	{
 		// The |x|<=1 path composes sqrt, a division, and asin. In float those roundings compound to
 		// ~5 ULP. Evaluate float atan through the double kernel and round once (double atan is within
 		// a couple of double ULP, so the float result is effectively correctly rounded). The double
 		// path lives in the else so it is discarded for float rather than left as unreachable code,
 		// which MSVC rejects under /W4 (C4702).
-		if constexpr (std::is_same_v<T, float>) { return static_cast<float>(atan_impl<double>(static_cast<double>(x))); }
-		else
+		if constexpr (std::is_same_v<T, float>)
 		{
-			if (CCM_UNLIKELY(ccm::isnan(x))) { return x; }
+			return static_cast<float>(atan_impl<double>(static_cast<double>(x)));
+		} else
+		{
+			if (CCM_UNLIKELY(ccm::isnan(x)))
+			{
+				return x;
+			}
 
-			if (x == static_cast<T>(0)) { return x; }
+			if (x == static_cast<T>(0))
+			{
+				return x;
+			}
 
 			const bool neg = x < static_cast<T>(0);
 			const T ax	   = ccm::fabs(x);
@@ -183,8 +199,7 @@ namespace ccm::internal::impl
 				{
 					const T recip_sq = recip * recip;
 					small			 = recip + recip_sq * recip * static_cast<T>(-0x1.5555555555555p-2);
-				}
-				else
+				} else
 				{
 					small = atan_impl(recip);
 				}
@@ -207,12 +222,14 @@ namespace ccm::internal::impl
 	// Resolves the atan2 special values (NaN, infinite, or zero operands, including signed zero)
 	// first, then reduces the general case to atan(y/x) with a quadrant correction by the sign
 	// of x.
-	template <typename T>
-	constexpr T atan2_impl(T y, T x) noexcept
+	template <typename T> constexpr T atan2_impl(T y, T x) noexcept
 	{
 		using fp_bits_t = ccm::support::fp::FPBits<T>;
 
-		if (CCM_UNLIKELY(ccm::isnan(y) || ccm::isnan(x))) { return y + x; }
+		if (CCM_UNLIKELY(ccm::isnan(y) || ccm::isnan(x)))
+		{
+			return y + x;
+		}
 
 		if (CCM_UNLIKELY(ccm::isinf(x)))
 		{
@@ -222,25 +239,49 @@ namespace ccm::internal::impl
 			{
 				if (CCM_UNLIKELY(ccm::isinf(y)))
 				{
-					if (y > static_cast<T>(0)) { return pi / static_cast<T>(4); }
-					if (y < static_cast<T>(0)) { return -pi / static_cast<T>(4); }
+					if (y > static_cast<T>(0))
+					{
+						return pi / static_cast<T>(4);
+					}
+					if (y < static_cast<T>(0))
+					{
+						return -pi / static_cast<T>(4);
+					}
 					return y;
 				}
 
-				if (y > static_cast<T>(0)) { return static_cast<T>(0); }
-				if (y < static_cast<T>(0)) { return static_cast<T>(-0.0); }
+				if (y > static_cast<T>(0))
+				{
+					return static_cast<T>(0);
+				}
+				if (y < static_cast<T>(0))
+				{
+					return static_cast<T>(-0.0);
+				}
 				return y;
 			}
 
 			if (CCM_UNLIKELY(ccm::isinf(y)))
 			{
-				if (y > static_cast<T>(0)) { return static_cast<T>(3) * pi / static_cast<T>(4); }
-				if (y < static_cast<T>(0)) { return -static_cast<T>(3) * pi / static_cast<T>(4); }
+				if (y > static_cast<T>(0))
+				{
+					return static_cast<T>(3) * pi / static_cast<T>(4);
+				}
+				if (y < static_cast<T>(0))
+				{
+					return -static_cast<T>(3) * pi / static_cast<T>(4);
+				}
 				return fp_bits_t(y).is_neg() ? -pi : pi;
 			}
 
-			if (y > static_cast<T>(0)) { return pi; }
-			if (y < static_cast<T>(0)) { return -pi; }
+			if (y > static_cast<T>(0))
+			{
+				return pi;
+			}
+			if (y < static_cast<T>(0))
+			{
+				return -pi;
+			}
 			return fp_bits_t(y).is_neg() ? -pi : pi;
 		}
 
@@ -254,8 +295,14 @@ namespace ccm::internal::impl
 		{
 			const T pi_over_2 = static_cast<T>(ccm::numbers::pi_v<T>) / static_cast<T>(2);
 
-			if (y > static_cast<T>(0)) { return pi_over_2; }
-			if (y < static_cast<T>(0)) { return -pi_over_2; }
+			if (y > static_cast<T>(0))
+			{
+				return pi_over_2;
+			}
+			if (y < static_cast<T>(0))
+			{
+				return -pi_over_2;
+			}
 			if (fp_bits_t(x).is_neg())
 			{
 				const T pi = static_cast<T>(ccm::numbers::pi_v<T>);
@@ -270,33 +317,52 @@ namespace ccm::internal::impl
 
 		if (x < static_cast<T>(0))
 		{
-			if (y >= static_cast<T>(0)) { return angle + static_cast<T>(ccm::numbers::pi_v<T>); }
+			if (y >= static_cast<T>(0))
+			{
+				return angle + static_cast<T>(ccm::numbers::pi_v<T>);
+			}
 			return angle - static_cast<T>(ccm::numbers::pi_v<T>);
 		}
 		return angle;
 	}
 
 	inline constexpr float acos_float(float x) noexcept
-	{ return acos_impl(x); }
+	{
+		return acos_impl(x);
+	}
 
 	inline constexpr double acos_double(double x) noexcept
-	{ return acos_impl(x); }
+	{
+		return acos_impl(x);
+	}
 
 	inline constexpr float asin_float(float x) noexcept
-	{ return asin_impl(x); }
+	{
+		return asin_impl(x);
+	}
 
 	inline constexpr double asin_double(double x) noexcept
-	{ return asin_impl(x); }
+	{
+		return asin_impl(x);
+	}
 
 	inline constexpr float atan_float(float x) noexcept
-	{ return atan_impl(x); }
+	{
+		return atan_impl(x);
+	}
 
 	inline constexpr double atan_double(double x) noexcept
-	{ return atan_impl(x); }
+	{
+		return atan_impl(x);
+	}
 
 	inline constexpr float atan2_float(float y, float x) noexcept
-	{ return atan2_impl(y, x); }
+	{
+		return atan2_impl(y, x);
+	}
 
 	inline constexpr double atan2_double(double y, double x) noexcept
-	{ return atan2_impl(y, x); }
+	{
+		return atan2_impl(y, x);
+	}
 } // namespace ccm::internal::impl

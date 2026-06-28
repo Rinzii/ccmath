@@ -108,7 +108,10 @@ namespace ccm::gen::internal::impl::bit80
 			const int e_x = static_cast<int>(base_bits.get_biased_exponent()) - static_cast<int>(FPBits_t::exponent_bias) + exponent_adjust;
 
 			typename FPBits_t::storage_type sig = base_bits.get_mantissa();
-			if (base_bits.get_implicit_bit()) { sig |= FPBits_t::EXPLICIT_BIT_MASK; }
+			if (base_bits.get_implicit_bit())
+			{
+				sig |= FPBits_t::EXPLICIT_BIT_MASK;
+			}
 
 			const unsigned idx_x = static_cast<unsigned>((sig & FPBits_t::fraction_mask) >> (FPBits_t::fraction_length - 7));
 
@@ -170,8 +173,7 @@ namespace ccm::gen::internal::impl::bit80
 						forced_overflow = true;
 						break;
 					}
-				}
-				else
+				} else
 				{
 					scale_exp512 -= 512;
 					scaled_down = true;
@@ -207,7 +209,10 @@ namespace ccm::gen::internal::impl::bit80
 			{
 				support::fenv::set_errno_if_required(ERANGE);
 				support::fenv::raise_except_if_required(FE_OVERFLOW);
-				if (!support::is_constant_evaluated()) { return support::helpers::internal_ldexp(1.0L, kOverflowShift); }
+				if (!support::is_constant_evaluated())
+				{
+					return support::helpers::internal_ldexp(1.0L, kOverflowShift);
+				}
 				return FPBits_t::inf(types::Sign::POS).get_val();
 			}
 
@@ -215,7 +220,10 @@ namespace ccm::gen::internal::impl::bit80
 			{
 				support::fenv::set_errno_if_required(ERANGE);
 				support::fenv::raise_except_if_required(FE_UNDERFLOW);
-				if (!support::is_constant_evaluated()) { return support::helpers::internal_ldexp(1.0L, kUnderflowShift); }
+				if (!support::is_constant_evaluated())
+				{
+					return support::helpers::internal_ldexp(1.0L, kUnderflowShift);
+				}
 				return FPBits_t::zero(types::Sign::POS).get_val();
 			}
 
@@ -256,7 +264,10 @@ namespace ccm::gen::internal::impl::bit80
 			result += exp2_hm_hi;
 
 			long double final = result;
-			if (scale_exp512 != 0) { final = support::helpers::internal_ldexp(final, scale_exp512); }
+			if (scale_exp512 != 0)
+			{
+				final = support::helpers::internal_ldexp(final, scale_exp512);
+			}
 			FPBits_t final_bits(final);
 			if (final_bits.sign().is_neg())
 			{
@@ -265,24 +276,20 @@ namespace ccm::gen::internal::impl::bit80
 					support::fenv::set_errno_if_required(ERANGE);
 					support::fenv::raise_except_if_required(FE_OVERFLOW);
 					final = FPBits_t::inf(types::Sign::POS).get_val();
-				}
-				else if (!final_bits.is_zero() && final_bits.abs().uintval() < FPBits_t::min_subnormal().uintval())
+				} else if (!final_bits.is_zero() && final_bits.abs().uintval() < FPBits_t::min_subnormal().uintval())
 				{
 					support::fenv::set_errno_if_required(ERANGE);
 					support::fenv::raise_except_if_required(FE_UNDERFLOW);
 					final = 0.0L;
-				}
-				else
+				} else
 				{
 					final = final_bits.abs().get_val();
 				}
-			}
-			else if (scale_exp512 > 0 && final_bits.is_inf() && final_bits.is_pos())
+			} else if (scale_exp512 > 0 && final_bits.is_inf() && final_bits.is_pos())
 			{
 				support::fenv::set_errno_if_required(ERANGE);
 				support::fenv::raise_except_if_required(FE_OVERFLOW);
-			}
-			else if (scaled_down && final_bits.is_finite() && !final_bits.is_zero() && final_bits.abs().uintval() < FPBits_t::min_subnormal().uintval())
+			} else if (scaled_down && final_bits.is_finite() && !final_bits.is_zero() && final_bits.abs().uintval() < FPBits_t::min_subnormal().uintval())
 			{
 				support::fenv::set_errno_if_required(ERANGE);
 				support::fenv::raise_except_if_required(FE_UNDERFLOW);
@@ -295,7 +302,9 @@ namespace ccm::gen::internal::impl::bit80
 	} // namespace powl_ld80_detail
 
 	constexpr long double powl_ld80_general_finite(long double base, long double exp) noexcept
-	{ return powl_ld80_detail::powl_ld80_general_finite(base, exp); }
+	{
+		return powl_ld80_detail::powl_ld80_general_finite(base, exp);
+	}
 
 } // namespace ccm::gen::internal::impl::bit80
 

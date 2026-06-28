@@ -27,22 +27,33 @@ namespace ccm
 	 * @param num A floating-point or integer value.
 	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T floor(T num) noexcept
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T floor(T num) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_floor<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::floor_ct(num); }
+			if (ccm::support::is_constant_evaluated())
+			{
+				return ccm::builtin::floor_ct(num);
+			}
 		}
 		{
 			// If num is NaN, NaN is returned.
 			// If num is ±∞ or ±0, num is returned, unmodified.
-			if (ccm::isinf(num) || num == static_cast<T>(0) || ccm::isnan(num)) { return num; }
+			if (ccm::isinf(num) || num == static_cast<T>(0) || ccm::isnan(num))
+			{
+				return num;
+			}
 
-			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::floor_rt(num); }
+			if (!ccm::support::is_constant_evaluated())
+			{
+				return ccm::rt::floor_rt(num);
+			}
 
 			const T truncated = ccm::trunc(num);
-			if (truncated == num || num > static_cast<T>(0)) { return truncated; }
+			if (truncated == num || num > static_cast<T>(0))
+			{
+				return truncated;
+			}
 			return truncated - static_cast<T>(1);
 		}
 	}
@@ -52,8 +63,7 @@ namespace ccm
 	 * @param num A integer value.
 	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double floor(Integer num) noexcept
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double floor(Integer num) noexcept
 	{
 		return static_cast<double>(num); // All integers already have a floor value. Just cast to double and return.
 	}
@@ -64,7 +74,9 @@ namespace ccm
 	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
 	 */
 	constexpr float floorf(float num) noexcept
-	{ return ccm::floor<float>(num); }
+	{
+		return ccm::floor<float>(num);
+	}
 
 	/**
 	 * @brief Computes the largest integer value not greater than num.
@@ -72,7 +84,9 @@ namespace ccm
 	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
 	 */
 	constexpr long double floorl(long double num) noexcept
-	{ return ccm::floor<long double>(num); }
+	{
+		return ccm::floor<long double>(num);
+	}
 } // namespace ccm
 
 /// @ingroup nearest

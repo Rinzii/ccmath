@@ -38,7 +38,7 @@ namespace
 		return out;
 	}
 
-	static void bench_pair(benchmark::State& state, float base_lit, float exp_lit)
+	static void bench_pair(benchmark::State & state, float base_lit, float exp_lit)
 	{
 		for (auto _ : state)
 		{
@@ -48,37 +48,54 @@ namespace
 		}
 	}
 
-	static void bench_rand_pairs(benchmark::State& state, float bmin, float bmax, float emin, float emax)
+	static void bench_rand_pairs(benchmark::State & state, float bmin, float bmax, float emin, float emax)
 	{
 		std::vector<float> bases(static_cast<std::size_t>(state.range(0)));
 		std::vector<float> exps(static_cast<std::size_t>(state.range(0)));
 		std::mt19937 gen(0xA51AB);
 		std::uniform_real_distribution<float> bdist(bmin, bmax);
 		std::uniform_real_distribution<float> edist(emin, emax);
-		for (auto& b : bases) { b = bdist(gen); }
-		for (auto& e : exps) { e = edist(gen); }
+		for (auto & b : bases)
+		{
+			b = bdist(gen);
+		}
+		for (auto & e : exps)
+		{
+			e = edist(gen);
+		}
 		while (state.KeepRunning())
 		{
-			for (std::size_t i = 0; i < bases.size(); ++i) { benchmark::DoNotOptimize(ASMLAB_POWF_IMPL_CALL(load_float(bases[i]), load_float(exps[i]))); }
+			for (std::size_t i = 0; i < bases.size(); ++i)
+			{
+				benchmark::DoNotOptimize(ASMLAB_POWF_IMPL_CALL(load_float(bases[i]), load_float(exps[i])));
+			}
 		}
 		state.SetItemsProcessed(static_cast<int64_t>(state.iterations()) * static_cast<int64_t>(bases.size()));
 	}
 } // namespace
 
-static void BM_asmlab_powf_impl_positive_finite_general(benchmark::State& state)
-{ bench_pair(state, 2.0f, 3.0f); }
+static void BM_asmlab_powf_impl_positive_finite_general(benchmark::State & state)
+{
+	bench_pair(state, 2.0f, 3.0f);
+}
 BENCHMARK(BM_asmlab_powf_impl_positive_finite_general);
 
-static void BM_asmlab_powf_impl_near_one(benchmark::State& state)
-{ bench_pair(state, 1.0001f, 1.5f); }
+static void BM_asmlab_powf_impl_near_one(benchmark::State & state)
+{
+	bench_pair(state, 1.0001f, 1.5f);
+}
 BENCHMARK(BM_asmlab_powf_impl_near_one);
 
-static void BM_asmlab_powf_impl_integer_exponent(benchmark::State& state)
-{ bench_pair(state, 2.0f, 4.0f); }
+static void BM_asmlab_powf_impl_integer_exponent(benchmark::State & state)
+{
+	bench_pair(state, 2.0f, 4.0f);
+}
 BENCHMARK(BM_asmlab_powf_impl_integer_exponent);
 
-static void BM_asmlab_powf_impl_rand_positive_finite(benchmark::State& state)
-{ bench_rand_pairs(state, 0.5f, 8.0f, 0.25f, 6.0f); }
+static void BM_asmlab_powf_impl_rand_positive_finite(benchmark::State & state)
+{
+	bench_rand_pairs(state, 0.5f, 8.0f, 0.25f, 6.0f);
+}
 BENCHMARK(BM_asmlab_powf_impl_rand_positive_finite)->RangeMultiplier(2)->Range(64, 64 << 4);
 
 BENCHMARK_MAIN();

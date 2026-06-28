@@ -30,15 +30,13 @@ namespace
 	using testing::TestWithParam;
 	using testing::ValuesIn;
 
-	template <typename T>
-	struct NearestUnaryParams
+	template <typename T> struct NearestUnaryParams
 	{
 		T input{};
 		T expected{};
 	};
 
-	template <typename T, T (*StdFn)(T)>
-	const std::vector<NearestUnaryParams<T>>& BasicNearestParams()
+	template <typename T, T (*StdFn)(T)> const std::vector<NearestUnaryParams<T>> & BasicNearestParams()
 	{
 		static const std::vector<NearestUnaryParams<T>> params{
 			{ static_cast<T>(1.0), StdFn(static_cast<T>(1.0)) },
@@ -61,15 +59,12 @@ namespace
 		return params;
 	}
 
-	template <typename T, T (*StdFn)(T), T (*CcmFn)(T)>
-	class NearestUnaryTest : public TestWithParam<NearestUnaryParams<T>>
-	{
-	};
+	template <typename T, T (*StdFn)(T), T (*CcmFn)(T)> class NearestUnaryTest : public TestWithParam<NearestUnaryParams<T>>
+	{};
 
 #define INSTANTIATE_NEAREST_UNARY_TEST(SuiteName, Type, StdFn, CcmFn)                                                                                          \
 	class SuiteName##Type##Tests : public NearestUnaryTest<Type, StdFn, CcmFn>                                                                                 \
-	{                                                                                                                                                          \
-	};                                                                                                                                                         \
+	{};                                                                                                                                                        \
 	INSTANTIATE_TEST_SUITE_P(SuiteName##Type, SuiteName##Type##Tests, ValuesIn(BasicNearestParams<Type, StdFn>()));                                            \
 	TEST_P(SuiteName##Type##Tests, MatchesStd)                                                                                                                 \
 	{                                                                                                                                                          \
@@ -88,8 +83,7 @@ namespace
 
 #undef INSTANTIATE_NEAREST_UNARY_TEST
 
-	template <typename T, T (*CcmFn)(T), T (*StdFn)(T)>
-	void ExpectNearestNanPropagation()
+	template <typename T, T (*CcmFn)(T), T (*StdFn)(T)> void ExpectNearestNanPropagation()
 	{
 		ccm::test::ExpectUnaryMatchesStd(std::numeric_limits<T>::quiet_NaN(), CcmFn, StdFn);
 		ccm::test::ExpectUnaryMatchesStd(-std::numeric_limits<T>::quiet_NaN(), CcmFn, StdFn);

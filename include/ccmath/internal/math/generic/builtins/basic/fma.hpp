@@ -141,13 +141,18 @@ namespace ccm::builtin
 	 * when the compiler does not support it.
 	 * This is thanks to taking advantage of ADL.
 	 */
-	template <typename T>
-	constexpr auto fma_ct(T x, T y, T z) -> std::enable_if_t<has_constexpr_fma<T>, T>
+	template <typename T> constexpr auto fma_ct(T x, T y, T z) -> std::enable_if_t<has_constexpr_fma<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_fmaf(x, y, z); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_fma(x, y, z); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fmal(x, y, z); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_fmaf(x, y, z);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_fma(x, y, z);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_fmal(x, y, z);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for fma");
@@ -163,13 +168,18 @@ namespace ccm::builtin
 	 * when the compiler does not support it.
 	 * This is thanks to taking advantage of ADL.
 	 */
-	template <typename T>
-	auto fma_rt(T x, T y, T z) -> std::enable_if_t<has_runtime_fma<T>, T>
+	template <typename T> auto fma_rt(T x, T y, T z) -> std::enable_if_t<has_runtime_fma<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_fmaf(x, y, z); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_fma(x, y, z); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fmal(x, y, z); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_fmaf(x, y, z);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_fma(x, y, z);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_fmal(x, y, z);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for fma");

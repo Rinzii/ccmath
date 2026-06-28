@@ -21,10 +21,12 @@ namespace
 	Vec3 const kSensor{ 12.0, -4.5, 1.25 };
 	Vec3 const kTarget{ 27.0, 18.0, 6.0 };
 
-	double planar_distance(Vec3 const& a, Vec3 const& b)
-	{ return ccm::hypot(b.x - a.x, b.y - a.y); }
+	double planar_distance(Vec3 const & a, Vec3 const & b)
+	{
+		return ccm::hypot(b.x - a.x, b.y - a.y);
+	}
 
-	double spatial_distance(Vec3 const& a, Vec3 const& b)
+	double spatial_distance(Vec3 const & a, Vec3 const & b)
 	{
 		double const dx = b.x - a.x;
 		double const dy = b.y - a.y;

@@ -8,7 +8,10 @@ namespace ccm::showcase::backends
 {
 	struct gcem_lib
 	{
-		static constexpr std::string_view label() { return "gcem"; }
+		static constexpr std::string_view label()
+		{
+			return "gcem";
+		}
 
 		static double eval_sqrt(double x)
 		{

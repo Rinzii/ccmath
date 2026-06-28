@@ -45,54 +45,66 @@ namespace ccm::fuzz::calls
 	// The kernel mappings reproduce that contract: special operands route through the
 	// public entry point and ordinary operands hit the kernel, so the kernel is fuzzed
 	// strictly inside its own domain.
-	template <typename T>
-	bool kernel_domain_finite(T x)
-	{ return x == x && x != std::numeric_limits<T>::infinity() && x != -std::numeric_limits<T>::infinity(); }
+	template <typename T> bool kernel_domain_finite(T x)
+	{
+		return x == x && x != std::numeric_limits<T>::infinity() && x != -std::numeric_limits<T>::infinity();
+	}
 
 	#define CCMATH_FUZZ_UNARY_CALL(name)                                                                                                                       \
-		template <typename T>                                                                                                                                  \
-		T name(T x)                                                                                                                                            \
+		template <typename T> T name(T x)                                                                                                                      \
 		{                                                                                                                                                      \
-			if (!kernel_domain_finite(x)) { return ccm::name(x); }                                                                                             \
+			if (!kernel_domain_finite(x))                                                                                                                      \
+			{                                                                                                                                                  \
+				return ccm::name(x);                                                                                                                           \
+			}                                                                                                                                                  \
 			return ccm::gen::name##_gen(x);                                                                                                                    \
 		}
 	#define CCMATH_FUZZ_UNARY_CALL_POSITIVE(name)                                                                                                              \
-		template <typename T>                                                                                                                                  \
-		T name(T x)                                                                                                                                            \
+		template <typename T> T name(T x)                                                                                                                      \
 		{                                                                                                                                                      \
-			if (!kernel_domain_finite(x) || !(x > T(0))) { return ccm::name(x); }                                                                              \
+			if (!kernel_domain_finite(x) || !(x > T(0)))                                                                                                       \
+			{                                                                                                                                                  \
+				return ccm::name(x);                                                                                                                           \
+			}                                                                                                                                                  \
 			return ccm::gen::name##_gen(x);                                                                                                                    \
 		}
 	#define CCMATH_FUZZ_UNARY_CALL_ABOVE_NEG_ONE(name)                                                                                                         \
-		template <typename T>                                                                                                                                  \
-		T name(T x)                                                                                                                                            \
+		template <typename T> T name(T x)                                                                                                                      \
 		{                                                                                                                                                      \
-			if (!kernel_domain_finite(x) || !(x > T(-1))) { return ccm::name(x); }                                                                             \
+			if (!kernel_domain_finite(x) || !(x > T(-1)))                                                                                                      \
+			{                                                                                                                                                  \
+				return ccm::name(x);                                                                                                                           \
+			}                                                                                                                                                  \
 			return ccm::gen::name##_gen(x);                                                                                                                    \
 		}
 	#define CCMATH_FUZZ_BINARY_CALL(name)                                                                                                                      \
-		template <typename T>                                                                                                                                  \
-		T name(T x, T y)                                                                                                                                       \
+		template <typename T> T name(T x, T y)                                                                                                                 \
 		{                                                                                                                                                      \
-			if (!kernel_domain_finite(x) || !kernel_domain_finite(y)) { return ccm::name(x, y); }                                                              \
+			if (!kernel_domain_finite(x) || !kernel_domain_finite(y))                                                                                          \
+			{                                                                                                                                                  \
+				return ccm::name(x, y);                                                                                                                        \
+			}                                                                                                                                                  \
 			return ccm::gen::name##_gen(x, y);                                                                                                                 \
 		}
 	// The pow kernel owns its full special-case matrix, so it is fuzzed unfiltered.
 	#define CCMATH_FUZZ_BINARY_CALL_COMPLETE(name)                                                                                                             \
-		template <typename T>                                                                                                                                  \
-		T name(T x, T y)                                                                                                                                       \
-		{ return ccm::gen::name##_gen(x, y); }
+		template <typename T> T name(T x, T y)                                                                                                                 \
+		{                                                                                                                                                      \
+			return ccm::gen::name##_gen(x, y);                                                                                                                 \
+		}
 #else
 	#define CCMATH_FUZZ_UNARY_CALL(name)                                                                                                                       \
-		template <typename T>                                                                                                                                  \
-		T name(T x)                                                                                                                                            \
-		{ return ccm::name(x); }
+		template <typename T> T name(T x)                                                                                                                      \
+		{                                                                                                                                                      \
+			return ccm::name(x);                                                                                                                               \
+		}
 	#define CCMATH_FUZZ_UNARY_CALL_POSITIVE(name)	   CCMATH_FUZZ_UNARY_CALL(name)
 	#define CCMATH_FUZZ_UNARY_CALL_ABOVE_NEG_ONE(name) CCMATH_FUZZ_UNARY_CALL(name)
 	#define CCMATH_FUZZ_BINARY_CALL(name)                                                                                                                      \
-		template <typename T>                                                                                                                                  \
-		T name(T x, T y)                                                                                                                                       \
-		{ return ccm::name(x, y); }
+		template <typename T> T name(T x, T y)                                                                                                                 \
+		{                                                                                                                                                      \
+			return ccm::name(x, y);                                                                                                                            \
+		}
 	#define CCMATH_FUZZ_BINARY_CALL_COMPLETE(name) CCMATH_FUZZ_BINARY_CALL(name)
 #endif
 
@@ -115,18 +127,22 @@ namespace ccm::fuzz::calls
 
 	// Inverse trig has no generic kernels yet, so the public dispatch is fuzzed in both
 	// build flavors and these calls run under round to nearest only.
-	template <typename T>
-	T asin(T x)
-	{ return ccm::asin(x); }
-	template <typename T>
-	T acos(T x)
-	{ return ccm::acos(x); }
-	template <typename T>
-	T atan(T x)
-	{ return ccm::atan(x); }
-	template <typename T>
-	T atan2(T x, T y)
-	{ return ccm::atan2(x, y); }
+	template <typename T> T asin(T x)
+	{
+		return ccm::asin(x);
+	}
+	template <typename T> T acos(T x)
+	{
+		return ccm::acos(x);
+	}
+	template <typename T> T atan(T x)
+	{
+		return ccm::atan(x);
+	}
+	template <typename T> T atan2(T x, T y)
+	{
+		return ccm::atan2(x, y);
+	}
 
 #undef CCMATH_FUZZ_UNARY_CALL
 #undef CCMATH_FUZZ_UNARY_CALL_POSITIVE

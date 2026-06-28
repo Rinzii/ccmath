@@ -42,8 +42,7 @@ namespace ccm::gen::impl
 			0x1p0, 0x1.62e42fefa39efp-7, 0x1.ebfbdff82a23ap-15, 0x1.c6b08d7076268p-23, 0x1.3b2ad33f8b48bp-31, 0x1.5d870c4d84445p-40
 		};
 
-		template <typename Abi>
-		[[nodiscard]] CCM_ALWAYS_INLINE pp::basic_simd<double, Abi> v_nearest_integer(pp::basic_simd<double, Abi> const & x) noexcept
+		template <typename Abi> [[nodiscard]] CCM_ALWAYS_INLINE pp::basic_simd<double, Abi> v_nearest_integer(pp::basic_simd<double, Abi> const & x) noexcept
 		{
 			using DVec = pp::basic_simd<double, Abi>;
 			const DVec off(0x1.0p52);
@@ -56,8 +55,7 @@ namespace ccm::gen::impl
 	} // namespace simd_detail
 
 	// x^y for a vector of single precision lanes.
-	template <typename Abi>
-	[[nodiscard]] inline pp::basic_simd<float, Abi> powf_simd(pp::basic_simd<float, Abi> x, pp::basic_simd<float, Abi> y) noexcept
+	template <typename Abi> [[nodiscard]] inline pp::basic_simd<float, Abi> powf_simd(pp::basic_simd<float, Abi> x, pp::basic_simd<float, Abi> y) noexcept
 	{
 		using FVec = pp::basic_simd<float, Abi>;
 		using DVec = pp::basic_simd<double, Abi>;
@@ -72,10 +70,12 @@ namespace ccm::gen::impl
 		if constexpr (!ccm::builtin::target_cpu_has_fma)
 		{
 			FVec out{};
-			for (int i = 0; i < N; ++i) { out[i] = ccm::gen::impl::powf_impl(x[i], y[i]); }
+			for (int i = 0; i < N; ++i)
+			{
+				out[i] = ccm::gen::impl::powf_impl(x[i], y[i]);
+			}
 			return out;
-		}
-		else
+		} else
 		{
 			namespace cst = ccm::support::constants;
 
@@ -161,7 +161,10 @@ namespace ccm::gen::impl
 			{
 				for (int i = 0; i < N; ++i)
 				{
-					if (needs_scalar[i]) { result[i] = ccm::gen::impl::powf_impl(x[i], y[i]); }
+					if (needs_scalar[i])
+					{
+						result[i] = ccm::gen::impl::powf_impl(x[i], y[i]);
+					}
 				}
 			}
 

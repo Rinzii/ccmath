@@ -26,12 +26,15 @@ namespace ccm
 	 * @param to Direction target.
 	 * @return Next representable value after from in the direction of to.
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T nextafter(T from, T to) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T nextafter(T from, T to) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_nextafter<T>) { return ccm::builtin::nextafter_ct(from, to); }
-		else if (ccm::support::is_constant_evaluated()) { return gen::nextafter_gen(from, to); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_nextafter<T>)
+		{
+			return ccm::builtin::nextafter_ct(from, to);
+		} else if (ccm::support::is_constant_evaluated())
+		{
+			return gen::nextafter_gen(from, to);
+		} else
 		{
 			return ccm::rt::nextafter_rt(from, to);
 		}
@@ -47,7 +50,9 @@ namespace ccm
 	 */
 	template <typename Arithmetic1, typename Arithmetic2, std::enable_if_t<std::is_arithmetic_v<Arithmetic1> && std::is_arithmetic_v<Arithmetic2>, bool> = true>
 	constexpr auto nextafter(Arithmetic1 from, Arithmetic2 to) noexcept
-	{ return gen::nextafter_gen(from, to); }
+	{
+		return gen::nextafter_gen(from, to);
+	}
 
 	/**
 	 * @brief Returns the next representable float from from toward to.
@@ -56,7 +61,9 @@ namespace ccm
 	 * @return Next representable float value.
 	 */
 	constexpr float nextafterf(float from, float to) noexcept
-	{ return ccm::nextafter<float>(from, to); }
+	{
+		return ccm::nextafter<float>(from, to);
+	}
 
 	/**
 	 * @brief Returns the next representable long double from from toward to.
@@ -65,5 +72,7 @@ namespace ccm
 	 * @return Next representable long double value.
 	 */
 	constexpr long double nextafterl(long double from, long double to) noexcept
-	{ return ccm::nextafter<long double>(from, to); }
+	{
+		return ccm::nextafter<long double>(from, to);
+	}
 } // namespace ccm

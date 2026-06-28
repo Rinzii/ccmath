@@ -74,13 +74,18 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_sqrt functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto sqrt_ct(T x) -> std::enable_if_t<has_constexpr_sqrt<T>, T>
+	template <typename T> constexpr auto sqrt_ct(T x) -> std::enable_if_t<has_constexpr_sqrt<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_sqrtf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_sqrt(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_sqrtl(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_sqrtf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_sqrt(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_sqrtl(x);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for sqrt");
@@ -88,13 +93,18 @@ namespace ccm::builtin
 		}
 	}
 
-	template <typename T>
-	auto sqrt_rt(T x) -> std::enable_if_t<has_runtime_sqrt<T>, T>
+	template <typename T> auto sqrt_rt(T x) -> std::enable_if_t<has_runtime_sqrt<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_sqrtf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_sqrt(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_sqrtl(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_sqrtf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_sqrt(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_sqrtl(x);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for sqrt");

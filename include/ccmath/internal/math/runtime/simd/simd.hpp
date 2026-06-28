@@ -61,6 +61,5 @@ namespace ccm::intrin
 #endif
 	} // namespace abi
 
-	template <class T>
-	using native_simd = simd<T, abi::native>;
+	template <class T> using native_simd = simd<T, abi::native>;
 } // namespace ccm::intrin

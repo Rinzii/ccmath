@@ -27,7 +27,8 @@ namespace ccm::ext
 	 * @param t The interpolation parameter.
 	 * @return The interpolated angle, in radians.
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T lerp_angle(T start, T end, T t) noexcept
-	{ return start + (ext::delta_angle(start, end) * t); }
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T lerp_angle(T start, T end, T t) noexcept
+	{
+		return start + (ext::delta_angle(start, end) * t);
+	}
 } // namespace ccm::ext

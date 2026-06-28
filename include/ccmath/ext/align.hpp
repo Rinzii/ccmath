@@ -36,8 +36,7 @@ namespace ccm::ext
 	 * @param value Value to align.
 	 * @return value rounded to the nearest aligned multiple according to mode.
 	 */
-	template <typename T, std::size_t alignment, AR::Direction mode, std::enable_if_t<std::is_integral_v<T>, bool> = true>
-	constexpr T align(T value) noexcept
+	template <typename T, std::size_t alignment, AR::Direction mode, std::enable_if_t<std::is_integral_v<T>, bool> = true> constexpr T align(T value) noexcept
 	{
 		static_assert(alignment != 0, "Alignment must be non-zero");
 		static_assert(support::has_single_bit(alignment), "Alignment must be a power of two");
@@ -63,8 +62,7 @@ namespace ccm::ext
 			 */
 			const T align_mask = static_cast<T>(alignment - 1);
 			return (value + align_mask) & ~align_mask;
-		}
-		else
+		} else
 		{
 			/*
 			 * What is happening here:
@@ -92,9 +90,10 @@ namespace ccm::ext
 	 * @param value Value to align.
 	 * @return value rounded up to the alignment boundary.
 	 */
-	template <typename T, std::size_t alignment, std::enable_if_t<std::is_integral_v<T>, bool> = true>
-	constexpr T align_up(T value) noexcept
-	{ return align<T, alignment, AR::Direction::eUP>(value); }
+	template <typename T, std::size_t alignment, std::enable_if_t<std::is_integral_v<T>, bool> = true> constexpr T align_up(T value) noexcept
+	{
+		return align<T, alignment, AR::Direction::eUP>(value);
+	}
 
 	/**
 	 * @brief Aligns a value downward to the previous multiple of alignment.
@@ -103,7 +102,8 @@ namespace ccm::ext
 	 * @param value Value to align.
 	 * @return value rounded down to the alignment boundary.
 	 */
-	template <typename T, std::size_t alignment, std::enable_if_t<std::is_integral_v<T>, bool> = true>
-	constexpr T align_down(T value) noexcept
-	{ return align<T, alignment, AR::Direction::eDOWN>(value); }
+	template <typename T, std::size_t alignment, std::enable_if_t<std::is_integral_v<T>, bool> = true> constexpr T align_down(T value) noexcept
+	{
+		return align<T, alignment, AR::Direction::eDOWN>(value);
+	}
 } // namespace ccm::ext

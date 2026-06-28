@@ -19,11 +19,9 @@
 
 namespace ccm::detail
 {
-	template <typename T>
-	using cmath_pow_argument_t = std::conditional_t<std::is_integral_v<std::remove_cv_t<T>>, double, std::remove_cv_t<T>>;
+	template <typename T> using cmath_pow_argument_t = std::conditional_t<std::is_integral_v<std::remove_cv_t<T>>, double, std::remove_cv_t<T>>;
 
-	template <typename T, typename U>
-	struct cmath_pow_result
+	template <typename T, typename U> struct cmath_pow_result
 	{
 		using left_type	 = cmath_pow_argument_t<T>;
 		using right_type = cmath_pow_argument_t<U>;
@@ -33,8 +31,7 @@ namespace ccm::detail
 										std::conditional_t<std::is_same_v<left_type, double> || std::is_same_v<right_type, double>, double, float>>;
 	};
 
-	template <typename T, typename U>
-	using cmath_pow_result_t = typename cmath_pow_result<T, U>::type;
+	template <typename T, typename U> using cmath_pow_result_t = typename cmath_pow_result<T, U>::type;
 } // namespace ccm::detail
 
 namespace ccm
@@ -46,8 +43,7 @@ namespace ccm
 	 * @param exp Exponent value.
 	 * @return base raised to exp.
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T pow(T base, T exp)
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T pow(T base, T exp)
 	{
 #ifdef CCM_CONFIG_DETERMINISTIC
 		// long double has no cross-hardware-portable format, so deterministic mode evaluates it in
@@ -57,20 +53,24 @@ namespace ccm
 		if constexpr (std::is_same_v<T, long double>)
 		{
 			return static_cast<long double>(ccm::pow<double>(static_cast<double>(base), static_cast<double>(exp)));
-		}
-		else
+		} else
 #endif
 			if constexpr (ccm::builtin::has_constexpr_pow<T>)
 		{
 			// Constant evaluation always rounds to nearest, so the constexpr builtin is correct there.
 			// At runtime the builtin lowers to libm, so defer to the runtime dispatcher which only
 			// trusts the builtin under round to nearest.
-			if (support::is_constant_evaluated()) { return ccm::builtin::pow_ct(base, exp); }
+			if (support::is_constant_evaluated())
+			{
+				return ccm::builtin::pow_ct(base, exp);
+			}
 			return rt::pow_rt(base, exp);
-		}
-		else
+		} else
 		{
-			if (support::is_constant_evaluated()) { return gen::pow_gen(base, exp); }
+			if (support::is_constant_evaluated())
+			{
+				return gen::pow_gen(base, exp);
+			}
 			return rt::pow_rt(base, exp);
 		}
 	}
@@ -101,7 +101,9 @@ namespace ccm
 	 * @return base raised to exp as float.
 	 */
 	constexpr float powf(float base, float exp)
-	{ return ccm::pow<float>(base, exp); }
+	{
+		return ccm::pow<float>(base, exp);
+	}
 
 	/**
 	 * @brief Raises long double inputs to a power.
@@ -113,5 +115,7 @@ namespace ccm
 	 *       the result to long double. That fallback is not native long-double accuracy yet.
 	 */
 	constexpr long double powl(long double base, long double exp)
-	{ return ccm::pow<long double>(base, exp); }
+	{
+		return ccm::pow<long double>(base, exp);
+	}
 } // namespace ccm

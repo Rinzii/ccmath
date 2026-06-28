@@ -24,7 +24,10 @@ namespace
 #define REQUIRE_POWL_LD80()                                                                                                                                    \
 	do                                                                                                                                                         \
 	{                                                                                                                                                          \
-		if (ccm::config::detect_long_double_format() != ccm::config::LongDoubleFormat::X87Extended) { GTEST_SKIP() << "x87 80-bit long double required"; }     \
+		if (ccm::config::detect_long_double_format() != ccm::config::LongDoubleFormat::X87Extended)                                                            \
+		{                                                                                                                                                      \
+			GTEST_SKIP() << "x87 80-bit long double required";                                                                                                 \
+		}                                                                                                                                                      \
 	} while (false)
 
 	void ExpectPowlMatchesStd(long double base, long double exponent)
@@ -81,7 +84,10 @@ TEST(PowlLd80GeneralFinite, RandomFinitePositiveBase)
 	{
 		const long double base	   = base_dist(rng);
 		const long double exponent = exp_dist(rng);
-		if (base == 1.0L) { continue; }
+		if (base == 1.0L)
+		{
+			continue;
+		}
 		ExpectPowlMatchesStd(base, exponent);
 	}
 }

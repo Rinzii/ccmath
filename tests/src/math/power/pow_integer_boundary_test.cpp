@@ -20,15 +20,13 @@
 
 namespace
 {
-	template <typename T>
-	void ExpectParityResult(T exponent, T expected)
+	template <typename T> void ExpectParityResult(T exponent, T expected)
 	{
 		const T actual = ccm::pow<T>(static_cast<T>(-1.0), exponent);
 		ccm::test::ExpectSameFloatingAsStd(actual, expected, 0);
 	}
 
-	template <typename T>
-	void ExpectNegativeBaseDomainError(T exponent)
+	template <typename T> void ExpectNegativeBaseDomainError(T exponent)
 	{
 		const T actual	 = ccm::pow<T>(static_cast<T>(-2.0), exponent);
 		const T expected = static_cast<T>(std::pow(static_cast<T>(-2.0), exponent));
@@ -36,15 +34,13 @@ namespace
 		ccm::test::ExpectSameFloatingAsStd(actual, expected);
 	}
 
-	template <typename T>
-	void ExpectGenParityResult(T exponent, T expected)
+	template <typename T> void ExpectGenParityResult(T exponent, T expected)
 	{
 		const T actual = ccm::gen::pow_gen(static_cast<T>(-1.0), exponent);
 		ccm::test::ExpectSameFloatingAsStd(actual, expected, 0);
 	}
 
-	template <typename T>
-	void ExpectGenNegativeBaseDomainError(T exponent)
+	template <typename T> void ExpectGenNegativeBaseDomainError(T exponent)
 	{
 		const T actual	 = ccm::gen::pow_gen(static_cast<T>(-2.0), exponent);
 		const T expected = static_cast<T>(std::pow(static_cast<T>(-2.0), exponent));

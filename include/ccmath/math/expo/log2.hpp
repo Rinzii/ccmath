@@ -36,12 +36,14 @@ namespace ccm
 	 * @param num The number to calculate the base 2 logarithm of.
 	 * @return The base 2 logarithm of the number.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T log2(T num) noexcept
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T log2(T num) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_log2<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::log2_ct(num); }
+			if (ccm::support::is_constant_evaluated())
+			{
+				return ccm::builtin::log2_ct(num);
+			}
 		}
 		{
 			// If the argument is ±0, -∞ is returned
@@ -55,7 +57,10 @@ namespace ccm
 			// If the argument is 1, exact zero is returned.
 			if (num == static_cast<T>(1))
 			{
-				if (ccm::support::is_constant_evaluated()) { return static_cast<T>(0); }
+				if (ccm::support::is_constant_evaluated())
+				{
+					return static_cast<T>(0);
+				}
 #if defined(CCMATH_COMPILER_APPLE_CLANG) || (defined(_MSC_VER) && !defined(__clang__))
 				return ccm::support::fp::signed_zero_for_current_mode<T>();
 #else
@@ -64,7 +69,10 @@ namespace ccm
 			}
 
 			// If the argument is NaN, NaN is returned.
-			if (ccm::isnan(num) || num == std::numeric_limits<T>::infinity()) { return num; }
+			if (ccm::isnan(num) || num == std::numeric_limits<T>::infinity())
+			{
+				return num;
+			}
 
 // If the argument is negative, -NaN is returned
 #ifdef CCMATH_COMPILER_APPLE_CLANG // Apple clang returns +qNaN
@@ -83,7 +91,10 @@ namespace ccm
 			}
 #endif
 
-			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::log2_rt(num); }
+			if (!ccm::support::is_constant_evaluated())
+			{
+				return ccm::rt::log2_rt(num);
+			}
 
 			return gen::log2_gen(num);
 		}
@@ -95,9 +106,10 @@ namespace ccm
 	 * @param num The number to calculate the base 2 logarithm of.
 	 * @return The base 2 logarithm of the number as a double.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double log2(Integer num) noexcept
-	{ return ccm::log2<double>(static_cast<double>(num)); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double log2(Integer num) noexcept
+	{
+		return ccm::log2<double>(static_cast<double>(num));
+	}
 
 	/**
 	 * @brief Returns the base 2 logarithm of a number.
@@ -105,7 +117,9 @@ namespace ccm
 	 * @return The base 2 logarithm of the number as a float.
 	 */
 	constexpr float log2f(float num)
-	{ return ccm::log2<float>(num); }
+	{
+		return ccm::log2<float>(num);
+	}
 
 	/**
 	 * @brief Returns the base 2 logarithm of a number.
@@ -113,7 +127,9 @@ namespace ccm
 	 * @return The base 2 logarithm of the number as a double.
 	 */
 	constexpr long double log2l(long double num)
-	{ return ccm::log2<long double>(num); }
+	{
+		return ccm::log2<long double>(num);
+	}
 } // namespace ccm
 
 #if defined(_MSC_VER) && !defined(__clang__)

@@ -43,20 +43,24 @@ namespace ccm::internal::impl
 			return static_cast<unsigned>(static_cast<int>(k));
 		}
 
-		template <bool IsSin>
-		constexpr float sincosf_eval(float x)
+		template <bool IsSin> constexpr float sincosf_eval(float x)
 		{
 			FPBits xbits(x);
 			const std::uint32_t x_abs = ccm::support::bit_cast<std::uint32_t>(x) & 0x7fff'ffffU;
 
 			// sin(+/-0) = +/-0, cos(+/-0) = 1. Returning x preserves the sign of a signed zero.
-			if (x_abs == 0) { return IsSin ? x : 1.0f; }
+			if (x_abs == 0)
+			{
+				return IsSin ? x : 1.0f;
+			}
 
 			float y{};
 			unsigned k = 0;
 
-			if (x_abs < 0x4880'0000U) { k = sincosf_range_reduction_small(x, y); }
-			else
+			if (x_abs < 0x4880'0000U)
+			{
+				k = sincosf_range_reduction_small(x, y);
+			} else
 			{
 				if (CCM_UNLIKELY(x_abs >= 0x7f80'0000U))
 				{
@@ -99,8 +103,10 @@ namespace ccm::internal::impl
 
 			// The cos tail is in the else so it is discarded for the sin instantiation rather than
 			// left as unreachable code, which MSVC rejects under /W4 (C4702).
-			if constexpr (IsSin) { return support::multiply_add(cos_k, s1, sin_k * c1); }
-			else
+			if constexpr (IsSin)
+			{
+				return support::multiply_add(cos_k, s1, sin_k * c1);
+			} else
 			{
 				return support::multiply_add(cos_k, c1, -sin_k * s1);
 			}
@@ -109,18 +115,26 @@ namespace ccm::internal::impl
 	} // namespace sincos_float_detail
 
 	constexpr float sin_float_impl(float x)
-	{ return sincos_float_detail::sincosf_eval<true>(x); }
+	{
+		return sincos_float_detail::sincosf_eval<true>(x);
+	}
 
 	constexpr float cos_float_impl(float x)
-	{ return sincos_float_detail::sincosf_eval<false>(x); }
+	{
+		return sincos_float_detail::sincosf_eval<false>(x);
+	}
 
 } // namespace ccm::internal::impl
 
 namespace ccm::internal
 {
 	constexpr float sin_float(float num) noexcept
-	{ return impl::sin_float_impl(num); }
+	{
+		return impl::sin_float_impl(num);
+	}
 
 	constexpr float cos_float(float num) noexcept
-	{ return impl::cos_float_impl(num); }
+	{
+		return impl::cos_float_impl(num);
+	}
 } // namespace ccm::internal

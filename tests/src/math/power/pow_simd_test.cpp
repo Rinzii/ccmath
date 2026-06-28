@@ -45,7 +45,10 @@ namespace
 	// NaN payloads are not part of the contract, so any NaN matches any NaN.
 	bool bit_equal(double a, double b)
 	{
-		if (std::isnan(a) && std::isnan(b)) { return true; }
+		if (std::isnan(a) && std::isnan(b))
+		{
+			return true;
+		}
 		return double_bits(a) == double_bits(b);
 	}
 
@@ -53,8 +56,7 @@ namespace
 	{
 		std::vector<double> xs;
 		std::vector<double> ys;
-		const auto add = [&](double x, double y)
-		{
+		const auto add = [&](double x, double y) {
 			xs.push_back(x);
 			ys.push_back(y);
 		};
@@ -74,25 +76,37 @@ namespace
 		};
 		for (double b : special_bases)
 		{
-			for (double e : special_exps) { add(b, e); }
+			for (double e : special_exps)
+			{
+				add(b, e);
+			}
 		}
 
 		// Normal range grid through the vector fast path.
 		for (double b = 0.001; b <= 1000.0; b *= 1.7)
 		{
-			for (double e = -150.0; e <= 150.0; e += 1.7) { add(b, e + 0.123456789); }
+			for (double e = -150.0; e <= 150.0; e += 1.7)
+			{
+				add(b, e + 0.123456789);
+			}
 		}
 
 		// Hard near-one region with large exponents (stresses the double-double pipeline).
 		for (double b = 0.95; b <= 1.05; b += 0.00037)
 		{
-			for (double e : { -4000.1, -750.3, -13.7, 13.7, 750.3, 4000.1 }) { add(b, e); }
+			for (double e : { -4000.1, -750.3, -13.7, 13.7, 750.3, 4000.1 })
+			{
+				add(b, e);
+			}
 		}
 
 		// Integer exponents (exact ipow path) including negative bases.
 		for (double b = -10.0; b <= 10.0; b += 0.375)
 		{
-			for (int e = -24; e <= 24; ++e) { add(b, static_cast<double>(e)); }
+			for (int e = -24; e <= 24; ++e)
+			{
+				add(b, static_cast<double>(e));
+			}
 		}
 
 		// Half-integer exponents (exact sqrt path) and just-off neighbors (vector path).
@@ -121,7 +135,10 @@ namespace
 		// Subnormal bases.
 		for (int e2 = -1074; e2 <= -1000; e2 += 7)
 		{
-			for (double e : { -2.5, -1.1, 0.7, 1.3, 2.9 }) { add(std::ldexp(1.2345, e2), e); }
+			for (double e : { -2.5, -1.1, 0.7, 1.3, 2.9 })
+			{
+				add(std::ldexp(1.2345, e2), e);
+			}
 		}
 
 		// Huge exponents straddling the clamp threshold 0x43d74910d52d3052.
@@ -138,13 +155,15 @@ namespace
 		std::mt19937_64 rng(20260612ULL);
 		std::uniform_real_distribution<double> base_dist(1.0e-12, 1.0e12);
 		std::uniform_real_distribution<double> exp_dist(-600.0, 600.0);
-		for (int i = 0; i < 40000; ++i) { add(base_dist(rng), exp_dist(rng)); }
+		for (int i = 0; i < 40000; ++i)
+		{
+			add(base_dist(rng), exp_dist(rng));
+		}
 
 		return { std::move(xs), std::move(ys) };
 	}
 
-	template <typename V>
-	void expect_matches_scalar(const std::vector<double>& xs, const std::vector<double>& ys, const char* tag)
+	template <typename V> void expect_matches_scalar(const std::vector<double> & xs, const std::vector<double> & ys, const char * tag)
 	{
 		constexpr int width = static_cast<int>(V::size());
 		ASSERT_EQ(xs.size(), ys.size());
@@ -175,9 +194,10 @@ namespace
 		}
 	}
 
-	template <typename V>
-	double scalar_lane(double x, double y)
-	{ return ccm::gen::impl::pow_simd(V(x), V(y))[0]; }
+	template <typename V> double scalar_lane(double x, double y)
+	{
+		return ccm::gen::impl::pow_simd(V(x), V(y))[0];
+	}
 
 	struct FenvObservation
 	{
@@ -188,8 +208,7 @@ namespace
 		int err;
 	};
 
-	template <typename F>
-	FenvObservation observe_fenv(F&& run)
+	template <typename F> FenvObservation observe_fenv(F && run)
 	{
 		std::feclearexcept(FE_ALL_EXCEPT);
 		errno = 0;
@@ -226,8 +245,7 @@ TEST(CcmathPowSimd, BitIdenticalToScalarKernelWidth8)
 	{
 		const auto [xs, ys] = build_inputs();
 		expect_matches_scalar<simd<double, 8>>(xs, ys, "w8");
-	}
-	else
+	} else
 	{
 		GTEST_SKIP() << "8-wide double simd not available on this target";
 	}
@@ -292,7 +310,7 @@ TEST(CcmathPowSimd, FenvAndErrnoParityWithScalarKernel)
 		{ 1.0000001, 1e15 }, // overflow from a near-one base
 	};
 
-	for (const auto& c : cases)
+	for (const auto & c : cases)
 	{
 		volatile double simd_out	   = 0.0;
 		volatile double scal_out	   = 0.0;

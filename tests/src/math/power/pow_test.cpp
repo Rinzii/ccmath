@@ -33,9 +33,10 @@ namespace
 {
 	using ccm::test::runtime_value;
 
-	template <typename T>
-	void consume(T value)
-	{ [[maybe_unused]] volatile T sink = value; }
+	template <typename T> void consume(T value)
+	{
+		[[maybe_unused]] volatile T sink = value;
+	}
 } // namespace
 
 // [cmath.syn]: Synopsis-level overloads are constexpr entry points.
@@ -624,18 +625,16 @@ TEST(CcmathPowerTests, PowDoubleUnderflowScalePathBoundary)
 
 TEST(CcmathPowerTests, PowRoundingModeConformance)
 {
-	ccm::test::ForEachRoundingModeOrSkip(
-		[](int mode)
-		{
-			SCOPED_TRACE(ccm::test::RoundingModeName(mode));
+	ccm::test::ForEachRoundingModeOrSkip([](int mode) {
+		SCOPED_TRACE(ccm::test::RoundingModeName(mode));
 
-			// Special cases must hold regardless of rounding mode
-			ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(1.0), runtime_value(42.0)), std::pow(1.0, 42.0));
-			ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(2.0), runtime_value(0.0)), std::pow(2.0, 0.0));
-			ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(0.0), runtime_value(3.0)), std::pow(0.0, 3.0));
+		// Special cases must hold regardless of rounding mode
+		ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(1.0), runtime_value(42.0)), std::pow(1.0, 42.0));
+		ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(2.0), runtime_value(0.0)), std::pow(2.0, 0.0));
+		ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(0.0), runtime_value(3.0)), std::pow(0.0, 3.0));
 
-			// Representative numeric cases
-			ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(2.0), runtime_value(10.0)), std::pow(2.0, 10.0));
-			ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(3.0), runtime_value(7.0)), std::pow(3.0, 7.0));
-		});
+		// Representative numeric cases
+		ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(2.0), runtime_value(10.0)), std::pow(2.0, 10.0));
+		ccm::test::ExpectSameFloatingAsStd(ccm::pow(runtime_value(3.0), runtime_value(7.0)), std::pow(3.0, 7.0));
+	});
 }

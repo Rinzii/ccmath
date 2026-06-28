@@ -42,8 +42,7 @@ namespace ccm::fuzz
 		}                                                                                                                                                      \
 	} while (0)
 
-	template <typename T>
-	int64_t ulp_difference(T a, T b)
+	template <typename T> int64_t ulp_difference(T a, T b)
 	{
 		static_assert(std::is_floating_point_v<T>, "T must be floating-point");
 
@@ -53,47 +52,65 @@ namespace ccm::fuzz
 		fp_bits_t fp_a(a);
 		fp_bits_t fp_b(b);
 
-		if (fp_a.is_nan() && fp_b.is_nan()) { return 0; }
-		if (fp_a.is_nan() || fp_b.is_nan()) { return std::numeric_limits<int64_t>::max(); }
-		if (fp_a.is_inf() && fp_b.is_inf())
+		if (fp_a.is_nan() && fp_b.is_nan())
 		{
-			if (fp_a.sign() == fp_b.sign()) { return 0; }
+			return 0;
+		}
+		if (fp_a.is_nan() || fp_b.is_nan())
+		{
 			return std::numeric_limits<int64_t>::max();
 		}
-		if (fp_a.is_inf() || fp_b.is_inf()) { return std::numeric_limits<int64_t>::max(); }
+		if (fp_a.is_inf() && fp_b.is_inf())
+		{
+			if (fp_a.sign() == fp_b.sign())
+			{
+				return 0;
+			}
+			return std::numeric_limits<int64_t>::max();
+		}
+		if (fp_a.is_inf() || fp_b.is_inf())
+		{
+			return std::numeric_limits<int64_t>::max();
+		}
 
 		using uint_type				  = typename fp_bits_t::storage_type;
 		constexpr uint_type sign_mask = uint_type{ 1 } << (sizeof(uint_type) * 8 - 1);
 
-		auto ordered_bits = [=](fp_bits_t bits)
-		{
+		auto ordered_bits = [=](fp_bits_t bits) {
 			uint_type const raw = bits.uintval();
-			if ((raw & sign_mask) != 0) { return sign_mask - (raw & ~sign_mask); }
+			if ((raw & sign_mask) != 0)
+			{
+				return sign_mask - (raw & ~sign_mask);
+			}
 			return sign_mask + raw;
 		};
 
 		uint_type const a_bits = ordered_bits(fp_a);
 		uint_type const b_bits = ordered_bits(fp_b);
 		uint_type const diff   = (a_bits > b_bits) ? a_bits - b_bits : b_bits - a_bits;
-		if (diff > static_cast<uint_type>(std::numeric_limits<int64_t>::max())) { return std::numeric_limits<int64_t>::max(); }
+		if (diff > static_cast<uint_type>(std::numeric_limits<int64_t>::max()))
+		{
+			return std::numeric_limits<int64_t>::max();
+		}
 		return static_cast<int64_t>(diff);
 	}
 
-	template <typename T>
-	bool values_equal(T a, T b)
+	template <typename T> bool values_equal(T a, T b)
 	{
 		using fp_bits_t = ccm::support::fp::FPBits<T>;
 
 		fp_bits_t fp_a(a);
 		fp_bits_t fp_b(b);
 
-		if (fp_a.is_nan() || fp_b.is_nan()) { return fp_a.is_nan() && fp_b.is_nan(); }
+		if (fp_a.is_nan() || fp_b.is_nan())
+		{
+			return fp_a.is_nan() && fp_b.is_nan();
+		}
 
 		return fp_a.uintval() == fp_b.uintval();
 	}
 
-	template <typename T>
-	void check_same_floating(T actual, T expected, int64_t max_ulp = kMaxAllowedUlp)
+	template <typename T> void check_same_floating(T actual, T expected, int64_t max_ulp = kMaxAllowedUlp)
 	{
 		using fp_bits_t = ccm::support::fp::FPBits<T>;
 
@@ -120,20 +137,19 @@ namespace ccm::fuzz
 		FUZZ_CHECK(ulp_difference(actual, expected) <= max_ulp);
 	}
 
-	template <typename T, typename CcmFn>
-	void check_ccm_negative_domain_nan(T input, CcmFn ccm_fn)
+	template <typename T, typename CcmFn> void check_ccm_negative_domain_nan(T input, CcmFn ccm_fn)
 	{
 		T const result = ccm_fn(input);
 		FUZZ_CHECK(std::isnan(result));
 		FUZZ_CHECK(std::signbit(result));
 	}
 
-	template <typename T, typename CcmFn, typename StdFn>
-	void fuzz_unary_vs_std(T input, CcmFn && ccm_fn, StdFn && std_fn, int64_t max_ulp = kMaxAllowedUlp)
-	{ check_same_floating(ccm_fn(input), std_fn(input), max_ulp); }
+	template <typename T, typename CcmFn, typename StdFn> void fuzz_unary_vs_std(T input, CcmFn && ccm_fn, StdFn && std_fn, int64_t max_ulp = kMaxAllowedUlp)
+	{
+		check_same_floating(ccm_fn(input), std_fn(input), max_ulp);
+	}
 
-	template <typename T, typename CcmFn, typename StdFn>
-	void fuzz_unary_log_family(T input, CcmFn && ccm_fn, StdFn && std_fn)
+	template <typename T, typename CcmFn, typename StdFn> void fuzz_unary_log_family(T input, CcmFn && ccm_fn, StdFn && std_fn)
 	{
 		if (input < T{} && !std::isnan(input))
 		{
@@ -144,8 +160,7 @@ namespace ccm::fuzz
 		fuzz_unary_vs_std(input, std::forward<CcmFn>(ccm_fn), std::forward<StdFn>(std_fn));
 	}
 
-	template <typename T, typename CcmFn, typename StdFn>
-	void fuzz_unary_log1p_family(T input, CcmFn && ccm_fn, StdFn && std_fn)
+	template <typename T, typename CcmFn, typename StdFn> void fuzz_unary_log1p_family(T input, CcmFn && ccm_fn, StdFn && std_fn)
 	{
 		if (input < static_cast<T>(-1) && !std::isnan(input))
 		{
@@ -156,16 +171,17 @@ namespace ccm::fuzz
 		fuzz_unary_vs_std(input, std::forward<CcmFn>(ccm_fn), std::forward<StdFn>(std_fn));
 	}
 
-	template <typename T, typename CcmFn, typename StdFn>
-	void fuzz_binary_vs_std(T x, T y, CcmFn && ccm_fn, StdFn && std_fn, int64_t max_ulp = kMaxAllowedUlp)
-	{ check_same_floating(ccm_fn(x, y), std_fn(x, y), max_ulp); }
+	template <typename T, typename CcmFn, typename StdFn> void fuzz_binary_vs_std(T x, T y, CcmFn && ccm_fn, StdFn && std_fn, int64_t max_ulp = kMaxAllowedUlp)
+	{
+		check_same_floating(ccm_fn(x, y), std_fn(x, y), max_ulp);
+	}
 
-	template <typename T, typename CcmFn, typename StdFn>
-	void fuzz_binary_exact_int(T x, T y, CcmFn && ccm_fn, StdFn && std_fn)
-	{ FUZZ_CHECK(ccm_fn(x, y) == std_fn(x, y)); }
+	template <typename T, typename CcmFn, typename StdFn> void fuzz_binary_exact_int(T x, T y, CcmFn && ccm_fn, StdFn && std_fn)
+	{
+		FUZZ_CHECK(ccm_fn(x, y) == std_fn(x, y));
+	}
 
-	template <typename T>
-	void check_remquo_vs_std(T x, T y)
+	template <typename T> void check_remquo_vs_std(T x, T y)
 	{
 		using fp_bits_t = ccm::support::fp::FPBits<T>;
 
@@ -194,8 +210,7 @@ namespace ccm::fuzz
 		FUZZ_CHECK(values_equal(ccm_rem, std_rem));
 	}
 
-	template <typename T>
-	void check_frexp_vs_std(T x)
+	template <typename T> void check_frexp_vs_std(T x)
 	{
 		int ccm_exp{};
 		int std_exp{};
@@ -203,8 +218,7 @@ namespace ccm::fuzz
 		FUZZ_CHECK(ccm_exp == std_exp);
 	}
 
-	template <typename T>
-	void check_modf_vs_std(T x)
+	template <typename T> void check_modf_vs_std(T x)
 	{
 		T ccm_intpart{};
 		T std_intpart{};

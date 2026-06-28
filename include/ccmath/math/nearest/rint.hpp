@@ -30,10 +30,12 @@ namespace ccm
 	 * @param num A floating-point or integer value.
 	 * @return The rounded value.
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T rint(T num) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T rint(T num) noexcept
 	{
-		if (!ccm::support::is_constant_evaluated()) { return ccm::rt::rint_rt(num); }
+		if (!ccm::support::is_constant_evaluated())
+		{
+			return ccm::rt::rint_rt(num);
+		}
 
 		constexpr auto rounding_mode{ ccm::support::fenv::get_rounding_mode() };
 		return ccm::support::fp::directional_round(num, rounding_mode);
@@ -45,9 +47,10 @@ namespace ccm
 	 * @param num Integer value.
 	 * @return num converted to double.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double rint(Integer num) noexcept
-	{ return static_cast<double>(num); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double rint(Integer num) noexcept
+	{
+		return static_cast<double>(num);
+	}
 
 	/**
 	 * @brief Rounds a float to an integer value using the current rounding mode.
@@ -55,7 +58,9 @@ namespace ccm
 	 * @return Rounded value as float.
 	 */
 	constexpr float rintf(float num) noexcept
-	{ return ccm::rint(num); }
+	{
+		return ccm::rint(num);
+	}
 
 	/**
 	 * @brief Rounds a long double to an integer value using the current rounding mode.
@@ -63,7 +68,9 @@ namespace ccm
 	 * @return Rounded value as long double.
 	 */
 	constexpr long double rintl(long double num) noexcept
-	{ return ccm::rint(num); }
+	{
+		return ccm::rint(num);
+	}
 } // namespace ccm
 
 /// @ingroup nearest

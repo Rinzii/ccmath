@@ -94,13 +94,15 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_isnan functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto isnan_ct(T x) -> std::enable_if_t<has_constexpr_isnan<T>, bool>
-	{ return __builtin_isnan(x); }
+	template <typename T> constexpr auto isnan_ct(T x) -> std::enable_if_t<has_constexpr_isnan<T>, bool>
+	{
+		return __builtin_isnan(x);
+	}
 
-	template <typename T>
-	auto isnan_rt(T x) -> std::enable_if_t<has_runtime_isnan<T>, bool>
-	{ return __builtin_isnan(x); }
+	template <typename T> auto isnan_rt(T x) -> std::enable_if_t<has_runtime_isnan<T>, bool>
+	{
+		return __builtin_isnan(x);
+	}
 } // namespace ccm::builtin
 
 // Cleanup the global namespace

@@ -52,7 +52,10 @@ namespace ccm::internal
 			intX = ccm::support::float_to_uint32(x);
 
 			// Correct the sign of zero with downward rounding when x is equal to 1.0
-			if (CCM_UNLIKELY(intX == 0x3f800000)) { return 0; }
+			if (CCM_UNLIKELY(intX == 0x3f800000))
+			{
+				return 0;
+			}
 
 			if (CCM_UNLIKELY(intX - 0x00800000 >= 0x7f800000 - 0x00800000))
 			{
@@ -85,5 +88,7 @@ namespace ccm::internal
 	} // namespace impl
 
 	constexpr float log_float(float num) noexcept
-	{ return impl::log_float_impl(num); }
+	{
+		return impl::log_float_impl(num);
+	}
 } // namespace ccm::internal

@@ -20,7 +20,8 @@ namespace ccm::ext
 	 * @param value The value whose sign is queried.
 	 * @return -1 if value is negative, 0 if value is zero, otherwise 1.
 	 */
-	template <typename T, std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>, bool> = true>
-	constexpr T sign(T value) noexcept
-	{ return static_cast<T>((T(0) < value) - (value < T(0))); }
+	template <typename T, std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>, bool> = true> constexpr T sign(T value) noexcept
+	{
+		return static_cast<T>((T(0) < value) - (value < T(0)));
+	}
 } // namespace ccm::ext

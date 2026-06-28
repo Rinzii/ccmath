@@ -43,21 +43,25 @@ namespace ccm::internal::impl
 			return static_cast<unsigned>(static_cast<int>(k));
 		}
 
-		template <bool IsSin>
-		constexpr double sincos_eval(double x)
+		template <bool IsSin> constexpr double sincos_eval(double x)
 		{
 			FPBits xbits(x);
 			const std::uint64_t x_abs = ccm::support::bit_cast<std::uint64_t>(x) & 0x7fff'ffff'ffff'ffffULL;
 
 			// sin(+/-0) = +/-0, cos(+/-0) = 1. Returning x preserves the sign of a signed zero,
 			// which the reconstruction below would otherwise flush to +0.
-			if (x_abs == 0) { return IsSin ? x : 1.0; }
+			if (x_abs == 0)
+			{
+				return IsSin ? x : 1.0;
+			}
 
 			double y{};
 			unsigned k = 0;
 
-			if (x_abs < 0x4130'0000'0000'0000ULL) { k = sincos_range_reduction_small(x, y); }
-			else
+			if (x_abs < 0x4130'0000'0000'0000ULL)
+			{
+				k = sincos_range_reduction_small(x, y);
+			} else
 			{
 				if (CCM_UNLIKELY(x_abs >= 0x7ff0'0000'0000'0000ULL))
 				{
@@ -108,8 +112,10 @@ namespace ccm::internal::impl
 
 			// The cos tail is in the else so it is discarded for the sin instantiation rather than
 			// left as unreachable code, which MSVC rejects under /W4 (C4702).
-			if constexpr (IsSin) { return support::multiply_add(cos_k, s1, sin_k * c1); }
-			else
+			if constexpr (IsSin)
+			{
+				return support::multiply_add(cos_k, s1, sin_k * c1);
+			} else
 			{
 				return support::multiply_add(cos_k, c1, -sin_k * s1);
 			}
@@ -118,18 +124,26 @@ namespace ccm::internal::impl
 	} // namespace sincos_double_detail
 
 	constexpr double sin_double_impl(double x)
-	{ return sincos_double_detail::sincos_eval<true>(x); }
+	{
+		return sincos_double_detail::sincos_eval<true>(x);
+	}
 
 	constexpr double cos_double_impl(double x)
-	{ return sincos_double_detail::sincos_eval<false>(x); }
+	{
+		return sincos_double_detail::sincos_eval<false>(x);
+	}
 
 } // namespace ccm::internal::impl
 
 namespace ccm::internal
 {
 	constexpr double sin_double(double num) noexcept
-	{ return impl::sin_double_impl(num); }
+	{
+		return impl::sin_double_impl(num);
+	}
 
 	constexpr double cos_double(double num) noexcept
-	{ return impl::cos_double_impl(num); }
+	{
+		return impl::cos_double_impl(num);
+	}
 } // namespace ccm::internal

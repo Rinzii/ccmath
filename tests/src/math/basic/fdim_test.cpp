@@ -23,8 +23,7 @@ namespace
 	using testing::TestWithParam;
 	using testing::ValuesIn;
 
-	template <typename T>
-	struct FDimTestParams
+	template <typename T> struct FDimTestParams
 	{
 		T x{};
 		T y{};
@@ -127,14 +126,11 @@ namespace
 } // namespace
 
 class CcmathFDimDoubleTests : public TestWithParam<FDimTestParams<double>>
-{
-};
+{};
 class CcmathFDimFloatTests : public TestWithParam<FDimTestParams<float>>
-{
-};
+{};
 class CcmathFDimLongDoubleTests : public TestWithParam<FDimTestParams<long double>>
-{
-};
+{};
 
 INSTANTIATE_TEST_SUITE_P(FDimDoubleTests, CcmathFDimDoubleTests, ValuesIn(kFDimDoubleTestParams));
 INSTANTIATE_TEST_SUITE_P(FDimFloatTests, CcmathFDimFloatTests, ValuesIn(kFDimFloatTestParams));

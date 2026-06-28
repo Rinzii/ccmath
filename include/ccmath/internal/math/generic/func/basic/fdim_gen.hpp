@@ -27,20 +27,33 @@ namespace ccm::gen
 	 * @param y A floating-point or integer values
 	 * @return If successful, returns the positive difference between x and y.
 	 */
-	template <typename T>
-	constexpr auto fdim(T x, T y) -> std::enable_if_t<std::is_floating_point_v<T>, T>
+	template <typename T> constexpr auto fdim(T x, T y) -> std::enable_if_t<std::is_floating_point_v<T>, T>
 	{
-		if constexpr (builtin::has_constexpr_fdim<T>) { return builtin::fdim_ct(x, y); }
-		else
+		if constexpr (builtin::has_constexpr_fdim<T>)
+		{
+			return builtin::fdim_ct(x, y);
+		} else
 		{
 			using FPBits_t = typename ccm::support::fp::FPBits<T>;
 			const FPBits_t x_bits(x);
 			const FPBits_t y_bits(y);
 
-			if (CCM_UNLIKELY(x_bits.is_nan())) { return x; }
-			if (CCM_UNLIKELY(y_bits.is_nan())) { return y; }
-			if (x <= y) { return static_cast<T>(+0.0); }
-			if (y < static_cast<T>(0.0) && x > std::numeric_limits<T>::max() + y) { return std::numeric_limits<T>::infinity(); }
+			if (CCM_UNLIKELY(x_bits.is_nan()))
+			{
+				return x;
+			}
+			if (CCM_UNLIKELY(y_bits.is_nan()))
+			{
+				return y;
+			}
+			if (x <= y)
+			{
+				return static_cast<T>(+0.0);
+			}
+			if (y < static_cast<T>(0.0) && x > std::numeric_limits<T>::max() + y)
+			{
+				return std::numeric_limits<T>::infinity();
+			}
 			return x - y;
 		}
 	}

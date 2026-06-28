@@ -19,11 +19,12 @@
 
 namespace ccm::rt
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T nearbyint_rt(T num) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T nearbyint_rt(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_runtime_nearbyint<T>) { return ccm::builtin::nearbyint_rt(num); }
-		else
+		if constexpr (ccm::builtin::has_runtime_nearbyint<T>)
+		{
+			return ccm::builtin::nearbyint_rt(num);
+		} else
 		{
 			return ccm::support::fp::directional_round(num, ccm::support::fenv::get_rounding_mode());
 		}

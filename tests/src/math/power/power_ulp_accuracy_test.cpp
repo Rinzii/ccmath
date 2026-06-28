@@ -22,10 +22,14 @@
 #include <limits>
 
 TEST(CcmathPowerUlpTests, SqrtDouble)
-{ ccm::test::ExpectUlpUnaryOver(ccm::test::samples::kSqrtDouble, ccm::sqrt<double>, static_cast<double (*)(double)>(std::sqrt)); }
+{
+	ccm::test::ExpectUlpUnaryOver(ccm::test::samples::kSqrtDouble, ccm::sqrt<double>, static_cast<double (*)(double)>(std::sqrt));
+}
 
 TEST(CcmathPowerUlpTests, SqrtFloat)
-{ ccm::test::ExpectUlpUnaryOver(ccm::test::samples::kSqrtFloat, ccm::sqrt<float>, static_cast<float (*)(float)>(std::sqrt)); }
+{
+	ccm::test::ExpectUlpUnaryOver(ccm::test::samples::kSqrtFloat, ccm::sqrt<float>, static_cast<float (*)(float)>(std::sqrt));
+}
 
 // [cmath.syn] and [c.math]/1: validates the primary double overload against the C library semantics used by the standard.
 TEST(CcmathPowerUlpTests, PowDouble)
@@ -36,7 +40,10 @@ TEST(CcmathPowerUlpTests, PowDouble)
 		{
 			SCOPED_TRACE(base);
 			SCOPED_TRACE(exp);
-			if (std::isnan(std::pow(base, exp))) { continue; }
+			if (std::isnan(std::pow(base, exp)))
+			{
+				continue;
+			}
 			ccm::test::ExpectUlpBinaryVsStd(base, exp, ccm::pow<double>, static_cast<double (*)(double, double)>(std::pow));
 		}
 	}
@@ -51,7 +58,10 @@ TEST(CcmathPowerUlpTests, PowGenDouble)
 		{
 			SCOPED_TRACE(base);
 			SCOPED_TRACE(exp);
-			if (std::isnan(std::pow(base, exp))) { continue; }
+			if (std::isnan(std::pow(base, exp)))
+			{
+				continue;
+			}
 			ccm::test::ExpectSameFloatingAsStd(ccm::gen::pow_gen(base, exp), std::pow(base, exp), 1);
 		}
 	}
@@ -96,7 +106,10 @@ TEST(CcmathPowerUlpTests, PowFloat)
 		const float exp	 = ccm::test::samples::kPowFloatPairsExp[i];
 		SCOPED_TRACE(base);
 		SCOPED_TRACE(exp);
-		if (std::isnan(std::pow(base, exp))) { continue; }
+		if (std::isnan(std::pow(base, exp)))
+		{
+			continue;
+		}
 		ccm::test::ExpectUlpBinaryVsStd(base, exp, ccm::powf, static_cast<float (*)(float, float)>(std::pow));
 	}
 }
@@ -137,7 +150,10 @@ TEST(CcmathPowerUlpTests, PowGenDoubleAllMantissaBuckets)
 		const double base = 1.0 + static_cast<double>(k) / 128.0;
 		for (double exp : ccm::test::samples::kPowExpGrid)
 		{
-			if (std::isnan(std::pow(base, exp))) { continue; }
+			if (std::isnan(std::pow(base, exp)))
+			{
+				continue;
+			}
 			SCOPED_TRACE(base);
 			SCOPED_TRACE(exp);
 			ccm::test::ExpectSameFloatingAsStd(ccm::gen::pow_gen(base, exp), std::pow(base, exp), 1);
@@ -153,7 +169,10 @@ TEST(CcmathPowerUlpTests, PowGenFloatAllMantissaBuckets)
 		const float base = 1.0F + static_cast<float>(k) / 128.0F;
 		for (float exp : ccm::test::samples::kPowExpGridFloat)
 		{
-			if (std::isnan(std::pow(base, exp))) { continue; }
+			if (std::isnan(std::pow(base, exp)))
+			{
+				continue;
+			}
 			SCOPED_TRACE(base);
 			SCOPED_TRACE(exp);
 			ccm::test::ExpectSameFloatingAsStd(ccm::gen::pow_gen(base, exp), std::pow(base, exp), 1);
@@ -181,7 +200,10 @@ TEST(CcmathPowerUlpTests, DISABLED_PowGenFloatExhaustiveMantissa)
 		for (float exp : exponents)
 		{
 			const float expected = std::pow(base, exp);
-			if (std::isnan(expected)) { continue; }
+			if (std::isnan(expected))
+			{
+				continue;
+			}
 			const float actual = ccm::gen::pow_gen(base, exp);
 			if (ulp_difference(actual, expected) > ccm::test::kMaxAllowedUlp)
 			{
@@ -352,10 +374,14 @@ TEST(CcmathPowerUlpTests, PowfZivFallbackRegressionCases)
 }
 
 TEST(CcmathPowerUlpTests, CbrtDouble)
-{ ccm::test::ExpectUlpUnaryOver(ccm::test::samples::kCbrtDouble, ccm::cbrt<double>, static_cast<double (*)(double)>(std::cbrt)); }
+{
+	ccm::test::ExpectUlpUnaryOver(ccm::test::samples::kCbrtDouble, ccm::cbrt<double>, static_cast<double (*)(double)>(std::cbrt));
+}
 
 TEST(CcmathPowerUlpTests, CbrtFloat)
-{ ccm::test::ExpectUlpUnaryOver(ccm::test::samples::kCbrtFloat, ccm::cbrt<float>, static_cast<float (*)(float)>(std::cbrt)); }
+{
+	ccm::test::ExpectUlpUnaryOver(ccm::test::samples::kCbrtFloat, ccm::cbrt<float>, static_cast<float (*)(float)>(std::cbrt));
+}
 
 TEST(CcmathPowerUlpTests, HypotDouble)
 {

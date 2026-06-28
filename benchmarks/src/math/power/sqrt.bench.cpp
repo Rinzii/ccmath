@@ -7,7 +7,9 @@
 namespace
 {
 	inline double sqrt_rt(double v)
-	{ return ccm::sqrt(v); }
+	{
+		return ccm::sqrt(v);
+	}
 } // namespace
 
 CCMATH_BENCH_UNARY_COMPARE_PATHS(

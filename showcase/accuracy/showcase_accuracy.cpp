@@ -13,15 +13,24 @@ namespace
 		for (int i = 1; i < argc; ++i)
 		{
 			const std::string_view arg = argv[i];
-			if (arg.rfind(prefix, 0) == 0) { return std::string(arg.substr(prefix.size())); }
+			if (arg.rfind(prefix, 0) == 0)
+			{
+				return std::string(arg.substr(prefix.size()));
+			}
 		}
 		return std::nullopt;
 	}
 
 	std::optional<ccm::showcase::accuracy::unary_function> parse_function(std::string_view raw)
 	{
-		if (raw == "sqrt") { return ccm::showcase::accuracy::unary_function::sqrt_fn; }
-		if (raw == "sin") { return ccm::showcase::accuracy::unary_function::sin_fn; }
+		if (raw == "sqrt")
+		{
+			return ccm::showcase::accuracy::unary_function::sqrt_fn;
+		}
+		if (raw == "sin")
+		{
+			return ccm::showcase::accuracy::unary_function::sin_fn;
+		}
 		return std::nullopt;
 	}
 } // namespace
@@ -52,10 +61,12 @@ int main(int argc, char ** argv)
 
 	int exit_code = 0;
 
-	const auto run_ccmath = [&](ccm::showcase::ccmath_path::path path)
-	{
+	const auto run_ccmath = [&](ccm::showcase::ccmath_path::path path) {
 		std::optional<std::string> path_log;
-		if (log_output.has_value()) { path_log = *log_output + "." + std::string(ccm::showcase::ccmath_path::name(path)) + ".json"; }
+		if (log_output.has_value())
+		{
+			path_log = *log_output + "." + std::string(ccm::showcase::ccmath_path::name(path)) + ".json";
+		}
 		exit_code |= ccm::showcase::accuracy::run_ccmath_path_campaign(*fn, path, precision, max_ulp, path_log);
 	};
 
@@ -68,9 +79,10 @@ int main(int argc, char ** argv)
 			run_ccmath(ccm::showcase::ccmath_path::path::runtime_rt);
 			run_ccmath(ccm::showcase::ccmath_path::path::runtime_simd);
 			run_ccmath(ccm::showcase::ccmath_path::path::runtime_builtin);
-		}
-		else if (const auto path = ccm::showcase::ccmath_path::parse(path_raw)) { run_ccmath(*path); }
-		else
+		} else if (const auto path = ccm::showcase::ccmath_path::parse(path_raw))
+		{
+			run_ccmath(*path);
+		} else
 		{
 			std::cerr << "unknown path: " << path_raw << '\n';
 			return 2;
@@ -80,7 +92,10 @@ int main(int argc, char ** argv)
 	if (backend_raw == "all" || backend_raw == "gcem")
 	{
 		std::optional<std::string> gcem_log;
-		if (log_output.has_value()) { gcem_log = *log_output + ".gcem.json"; }
+		if (log_output.has_value())
+		{
+			gcem_log = *log_output + ".gcem.json";
+		}
 		exit_code |= ccm::showcase::accuracy::run_gcem_campaign(*fn, precision, max_ulp, gcem_log);
 	}
 

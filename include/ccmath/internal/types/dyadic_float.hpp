@@ -50,10 +50,12 @@ namespace ccm::types
 
 	// Decide whether to round a UInt up, down, or not at all at a given bit position,
 	// based on the current rounding mode.
-	template <size_t Bits>
-	constexpr int rounding_direction(const UInt<Bits>& value, size_t rshift, Sign logical_sign)
+	template <size_t Bits> constexpr int rounding_direction(const UInt<Bits> & value, size_t rshift, Sign logical_sign)
 	{
-		if (rshift == 0 || (rshift < Bits && (value << (Bits - rshift)) == 0) || (rshift >= Bits && value == 0)) { return 0; }
+		if (rshift == 0 || (rshift < Bits && (value << (Bits - rshift)) == 0) || (rshift >= Bits && value == 0))
+		{
+			return 0;
+		}
 
 		switch (support::fenv::get_rounding_mode())
 		{
@@ -65,9 +67,9 @@ namespace ccm::types
 			}
 			return -1;
 		case FE_TOWARDZERO: return -1;
-		case FE_DOWNWARD: return logical_sign.is_neg() && (rshift < Bits && (value << (Bits - rshift)) != 0) ? +1 : -1;
-		case FE_UPWARD: return logical_sign.is_pos() && (rshift < Bits && (value << (Bits - rshift)) != 0) ? +1 : -1;
-		default: support::unreachable();
+		case FE_DOWNWARD  : return logical_sign.is_neg() && (rshift < Bits && (value << (Bits - rshift)) != 0) ? +1 : -1;
+		case FE_UPWARD	  : return logical_sign.is_pos() && (rshift < Bits && (value << (Bits - rshift)) != 0) ? +1 : -1;
+		default			  : support::unreachable();
 		}
 	}
 
@@ -100,8 +102,7 @@ namespace ccm::types
 	 *
 	 * @tparam Bits The length of the mantissa in bits.
 	 */
-	template <size_t Bits>
-	struct DyadicFloat
+	template <size_t Bits> struct DyadicFloat
 	{
 		using mantissa_type = UInt<Bits>;
 		using MantissaType	= mantissa_type;
@@ -112,8 +113,7 @@ namespace ccm::types
 
 		constexpr DyadicFloat() = default;
 
-		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
-		constexpr DyadicFloat(T x) // NOLINT(google-explicit-constructor)
+		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0> constexpr DyadicFloat(T x) // NOLINT(google-explicit-constructor)
 		{
 			static_assert(support::fp::FPBits<T>::fraction_length < Bits);
 			support::fp::FPBits<T> x_bits(x);
@@ -123,7 +123,10 @@ namespace ccm::types
 			normalize();
 		}
 
-		constexpr DyadicFloat(Sign s, int e, const mantissa_type& m) : sign(s), exponent(e), mantissa(m) { normalize(); }
+		constexpr DyadicFloat(Sign s, int e, const mantissa_type & m) : sign(s), exponent(e), mantissa(m)
+		{
+			normalize();
+		}
 
 		/**
 		 * @brief Normalizes the mantissa, bringing the leading 1 bit to the most significant bit.
@@ -133,7 +136,7 @@ namespace ccm::types
 		 *
 		 * @return A reference to the normalized DyadicFloat.
 		 */
-		constexpr DyadicFloat& normalize()
+		constexpr DyadicFloat & normalize()
 		{
 			if (!mantissa.is_zero())
 			{
@@ -153,14 +156,13 @@ namespace ccm::types
 		 * @param shift_length The number of bits to shift left.
 		 * @return A reference to the DyadicFloat after shifting.
 		 */
-		constexpr DyadicFloat& shift_left(unsigned shift_length)
+		constexpr DyadicFloat & shift_left(unsigned shift_length)
 		{
 			if (shift_length < Bits)
 			{
 				exponent -= static_cast<int>(shift_length);
 				mantissa <<= shift_length;
-			}
-			else
+			} else
 			{
 				exponent = 0;
 				mantissa = mantissa_type(0);
@@ -177,14 +179,13 @@ namespace ccm::types
 		 * @param shift_length The number of bits to shift right.
 		 * @return A reference to the DyadicFloat after shifting.
 		 */
-		constexpr DyadicFloat& shift_right(unsigned shift_length)
+		constexpr DyadicFloat & shift_right(unsigned shift_length)
 		{
 			if (shift_length < Bits)
 			{
 				exponent += static_cast<int>(shift_length);
 				mantissa >>= shift_length;
-			}
-			else
+			} else
 			{
 				exponent = 0;
 				mantissa = mantissa_type(0);
@@ -197,10 +198,13 @@ namespace ccm::types
 		 *
 		 * @return The unbiased exponent.
 		 */
-		[[nodiscard]] constexpr int get_unbiased_exponent() const { return exponent + static_cast<int>(Bits - 1); }
+		[[nodiscard]] constexpr int get_unbiased_exponent() const
+		{
+			return exponent + static_cast<int>(Bits - 1);
+		}
 
 		template <size_t InputBits>
-		static constexpr DyadicFloat round(Sign result_sign, int result_exponent, const UInt<InputBits>& input_mantissa, size_t rshift)
+		static constexpr DyadicFloat round(Sign result_sign, int result_exponent, const UInt<InputBits> & input_mantissa, size_t rshift)
 		{
 			mantissa_type result_mantissa(input_mantissa >> rshift);
 			if (rounding_direction(input_mantissa, rshift, result_sign) > 0)
@@ -222,7 +226,10 @@ namespace ccm::types
 
 			constexpr int EXTRA_FRACTION_LEN = static_cast<int>(Bits - 1 - FPBits::fraction_length);
 
-			if (mantissa.is_zero()) { return FPBits::zero(sign).get_val(); }
+			if (mantissa.is_zero())
+			{
+				return FPBits::zero(sign).get_val();
+			}
 
 			const int unbiased_exp = get_unbiased_exponent();
 
@@ -236,13 +243,19 @@ namespace ccm::types
 
 				switch (support::fenv::get_rounding_mode())
 				{
-				case FE_TONEAREST: return FPBits::inf(sign).get_val();
+				case FE_TONEAREST : return FPBits::inf(sign).get_val();
 				case FE_TOWARDZERO: return FPBits::max_normal(sign).get_val();
 				case FE_DOWNWARD:
-					if (sign.is_pos()) { return FPBits::max_normal(Sign::POS).get_val(); }
+					if (sign.is_pos())
+					{
+						return FPBits::max_normal(Sign::POS).get_val();
+					}
 					return FPBits::inf(Sign::NEG).get_val();
 				case FE_UPWARD:
-					if (sign.is_neg()) { return FPBits::max_normal(Sign::NEG).get_val(); }
+					if (sign.is_neg())
+					{
+						return FPBits::max_normal(Sign::NEG).get_val();
+					}
 					return FPBits::inf(Sign::POS).get_val();
 				default: support::unreachable();
 				}
@@ -258,15 +271,13 @@ namespace ccm::types
 			{
 				sticky	  = true;
 				underflow = true;
-			}
-			else if (unbiased_exp == -FPBits::exponent_bias - FPBits::fraction_length)
+			} else if (unbiased_exp == -FPBits::exponent_bias - FPBits::fraction_length)
 			{
 				round							= true;
 				underflow						= true;
 				const mantissa_type sticky_mask = (mantissa_type(1) << (Bits - 1)) - 1;
 				sticky							= (mantissa & sticky_mask) != 0;
-			}
-			else
+			} else
 			{
 				int extra_fraction_len = EXTRA_FRACTION_LEN;
 
@@ -274,8 +285,7 @@ namespace ccm::types
 				{
 					underflow = true;
 					extra_fraction_len += 1 - FPBits::exponent_bias - unbiased_exp;
-				}
-				else
+				} else
 				{
 					out_biased_exp = static_cast<StorageType>(unbiased_exp + FPBits::exponent_bias);
 				}
@@ -295,13 +305,22 @@ namespace ccm::types
 			switch (support::fenv::get_rounding_mode())
 			{
 			case FE_TONEAREST:
-				if (round && (lsb || sticky)) { ++result; }
+				if (round && (lsb || sticky))
+				{
+					++result;
+				}
 				break;
 			case FE_DOWNWARD:
-				if (sign.is_neg() && (round || sticky)) { ++result; }
+				if (sign.is_neg() && (round || sticky))
+				{
+					++result;
+				}
 				break;
 			case FE_UPWARD:
-				if (sign.is_pos() && (round || sticky)) { ++result; }
+				if (sign.is_pos() && (round || sticky))
+				{
+					++result;
+				}
 				break;
 			default: break;
 			}
@@ -315,8 +334,7 @@ namespace ccm::types
 					{
 						support::fenv::set_errno_if_required(ERANGE);
 						excepts |= FE_OVERFLOW;
-					}
-					else if (underflow)
+					} else if (underflow)
 					{
 						support::fenv::set_errno_if_required(ERANGE);
 						excepts |= FE_UNDERFLOW;
@@ -357,7 +375,10 @@ namespace ccm::types
 				  typename = std::enable_if_t<std::is_floating_point_v<T> && (support::fp::FPBits<T>::fraction_length < Bits), void>>
 		constexpr T fast_as() const
 		{
-			if (CCM_UNLIKELY(mantissa.is_zero())) { return support::fp::FPBits<T>::zero(sign).get_val(); }
+			if (CCM_UNLIKELY(mantissa.is_zero()))
+			{
+				return support::fp::FPBits<T>::zero(sign).get_val();
+			}
 
 			// Assume that it is normalized, and output is also normal.
 			constexpr std::uint32_t precision	  = support::fp::FPBits<T>::fraction_length + 1;
@@ -379,7 +400,10 @@ namespace ccm::types
 				// TODO(IanP): decide whether rounding the absolute value down to max_normal
 				//		should also raise FE_OVERFLOW and set ERANGE. The current behavior matches Clang.
 				// TODO(IanP): check what MSVC does here and match it under MSVC.
-				if constexpr (ShouldSignalExceptions && support::fp::FPBits<T>(r).is_inf()) { support::fenv::set_errno_if_required(ERANGE); }
+				if constexpr (ShouldSignalExceptions && support::fp::FPBits<T>(r).is_inf())
+				{
+					support::fenv::set_errno_if_required(ERANGE);
+				}
 
 				return r;
 			}
@@ -483,7 +507,9 @@ namespace ccm::types
 				  bool ShouldSignalExceptions,
 				  typename = std::enable_if_t<std::is_floating_point_v<T> && (support::fp::FPBits<T>::fraction_length < Bits), void>>
 		constexpr T as() const
-		{ return fast_as<T, ShouldSignalExceptions>(); }
+		{
+			return fast_as<T, ShouldSignalExceptions>();
+		}
 
 		/**
 		 * @brief Explicitly converts this DyadicFloat to the floating-point type \p T,
@@ -500,55 +526,83 @@ namespace ccm::types
 		 */
 		template <typename T, typename = std::enable_if_t<std::is_floating_point_v<T> && (support::fp::FPBits<T>::fraction_length < Bits), void>>
 		explicit constexpr operator T() const
-		{ return as<T, false>(); }
+		{
+			return as<T, false>();
+		}
 
 		constexpr mantissa_type as_mantissa_type() const
 		{
-			if (mantissa.is_zero()) { return 0; }
+			if (mantissa.is_zero())
+			{
+				return 0;
+			}
 
 			mantissa_type new_mant = mantissa;
-			if (exponent > 0) { new_mant <<= exponent; }
-			else
+			if (exponent > 0)
+			{
+				new_mant <<= exponent;
+			} else
 			{
 				const std::size_t shift = static_cast<std::size_t>(-static_cast<std::int64_t>(exponent));
 				new_mant >>= shift;
 			}
 
-			if (sign.is_neg()) { new_mant = (~new_mant) + 1; }
+			if (sign.is_neg())
+			{
+				new_mant = (~new_mant) + 1;
+			}
 
 			return new_mant;
 		}
 
-		constexpr mantissa_type as_mantissa_type_rounded(int* round_dir_out = nullptr) const
+		constexpr mantissa_type as_mantissa_type_rounded(int * round_dir_out = nullptr) const
 		{
 			int round_dir = 0;
 			mantissa_type new_mant;
-			if (mantissa.is_zero()) { new_mant = 0; }
-			else
+			if (mantissa.is_zero())
+			{
+				new_mant = 0;
+			} else
 			{
 				new_mant = mantissa;
-				if (exponent > 0) { new_mant <<= exponent; }
-				else if (exponent < 0)
+				if (exponent > 0)
+				{
+					new_mant <<= exponent;
+				} else if (exponent < 0)
 				{
 					const std::size_t shift = static_cast<std::size_t>(-static_cast<std::int64_t>(exponent));
-					if (shift >= Bits) { new_mant = 0; }
-					else
+					if (shift >= Bits)
+					{
+						new_mant = 0;
+					} else
 					{
 						new_mant >>= shift;
 					}
 					round_dir = rounding_direction(mantissa, shift, sign);
-					if (round_dir > 0) { ++new_mant; }
+					if (round_dir > 0)
+					{
+						++new_mant;
+					}
 				}
 
-				if (sign.is_neg()) { new_mant = (~new_mant) + 1; }
+				if (sign.is_neg())
+				{
+					new_mant = (~new_mant) + 1;
+				}
 			}
 
-			if (round_dir_out != nullptr) { *round_dir_out = round_dir; }
+			if (round_dir_out != nullptr)
+			{
+				*round_dir_out = round_dir;
+			}
 
 			return new_mant;
 		}
 
-		constexpr DyadicFloat operator-() const { return DyadicFloat(sign.is_neg() ? Sign::POS : Sign::NEG, exponent, mantissa); }
+		constexpr DyadicFloat operator-() const
+		{
+			return DyadicFloat(sign.is_neg() ? Sign::POS : Sign::NEG, exponent, mantissa);
+		}
 	};
 
 	/**
@@ -578,15 +632,25 @@ namespace ccm::types
 	 * @param b Second DyadicFloat operand.
 	 * @return A DyadicFloat<Bits> representing the approximate sum of \p a and \p b.
 	 */
-	template <size_t Bits>
-	constexpr DyadicFloat<Bits> quick_add(DyadicFloat<Bits> a, DyadicFloat<Bits> b)
+	template <size_t Bits> constexpr DyadicFloat<Bits> quick_add(DyadicFloat<Bits> a, DyadicFloat<Bits> b)
 	{
-		if (CCM_UNLIKELY(a.mantissa.is_zero())) { return b; }
-		if (CCM_UNLIKELY(b.mantissa.is_zero())) { return a; }
+		if (CCM_UNLIKELY(a.mantissa.is_zero()))
+		{
+			return b;
+		}
+		if (CCM_UNLIKELY(b.mantissa.is_zero()))
+		{
+			return a;
+		}
 
 		// Align exponents
-		if (a.exponent > b.exponent) { b.shift_right(static_cast<unsigned>(a.exponent - b.exponent)); }
-		else if (b.exponent > a.exponent) { a.shift_right(static_cast<unsigned>(b.exponent - a.exponent)); }
+		if (a.exponent > b.exponent)
+		{
+			b.shift_right(static_cast<unsigned>(a.exponent - b.exponent));
+		} else if (b.exponent > a.exponent)
+		{
+			a.shift_right(static_cast<unsigned>(b.exponent - a.exponent));
+		}
 
 		DyadicFloat<Bits> result;
 
@@ -613,8 +677,7 @@ namespace ccm::types
 			result.sign		= a.sign;
 			result.exponent = a.exponent;
 			result.mantissa = a.mantissa - b.mantissa;
-		}
-		else
+		} else
 		{
 			result.sign		= b.sign;
 			result.exponent = b.exponent;
@@ -648,8 +711,7 @@ namespace ccm::types
 	 * @param b Second dyadic float.
 	 * @return A new DyadicFloat<Bits> representing the approximate product.
 	 */
-	template <size_t Bits>
-	constexpr DyadicFloat<Bits> quick_mul(DyadicFloat<Bits> a, DyadicFloat<Bits> b)
+	template <size_t Bits> constexpr DyadicFloat<Bits> quick_mul(DyadicFloat<Bits> a, DyadicFloat<Bits> b)
 	{
 		DyadicFloat<Bits> result;
 		result.sign		= (a.sign != b.sign) ? Sign::NEG : Sign::POS;
@@ -664,8 +726,7 @@ namespace ccm::types
 			{
 				result.shift_left(1);
 			}
-		}
-		else
+		} else
 		{
 			result.mantissa = static_cast<typename DyadicFloat<Bits>::mantissa_type>(0);
 		}
@@ -684,9 +745,10 @@ namespace ccm::types
 	 * @param c The dyadic float to be added to the product of \p a and \p b.
 	 * @return A new DyadicFloat<Bits> containing the result of \p c + (\p a * \p b).
 	 */
-	template <size_t Bits>
-	constexpr DyadicFloat<Bits> multiply_add(const DyadicFloat<Bits>& a, const DyadicFloat<Bits>& b, const DyadicFloat<Bits>& c)
-	{ return quick_add(c, quick_mul(a, b)); }
+	template <size_t Bits> constexpr DyadicFloat<Bits> multiply_add(const DyadicFloat<Bits> & a, const DyadicFloat<Bits> & b, const DyadicFloat<Bits> & c)
+	{
+		return quick_add(c, quick_mul(a, b));
+	}
 
 	/**
 	 * @brief Simple exponentiation implementation for printing or other use.
@@ -701,15 +763,17 @@ namespace ccm::types
 	 * @param power The positive exponent.
 	 * @return A DyadicFloat<Bits> representing \f$a^\text{power}\f$.
 	 */
-	template <size_t Bits>
-	constexpr DyadicFloat<Bits> pow_n(DyadicFloat<Bits> a, uint32_t power)
+	template <size_t Bits> constexpr DyadicFloat<Bits> pow_n(DyadicFloat<Bits> a, uint32_t power)
 	{
 		DyadicFloat<Bits> result	= 1.0;
 		DyadicFloat<Bits> cur_power = a;
 
 		while (power > 0)
 		{
-			if ((power % 2) > 0) { result = quick_mul(result, cur_power); }
+			if ((power % 2) > 0)
+			{
+				result = quick_mul(result, cur_power);
+			}
 			power	  = power >> 1;
 			cur_power = quick_mul(cur_power, cur_power);
 		}
@@ -729,20 +793,19 @@ namespace ccm::types
 	 * \f$2^{-\text{pow\_2}}\f$.
 	 * @return The result of \f$a \times 2^{\text{pow\_2}}\f$.
 	 */
-	template <size_t Bits>
-	constexpr DyadicFloat<Bits> mul_pow_2(DyadicFloat<Bits> a, int32_t pow_2)
+	template <size_t Bits> constexpr DyadicFloat<Bits> mul_pow_2(DyadicFloat<Bits> a, int32_t pow_2)
 	{
 		DyadicFloat<Bits> result = a;
 		result.exponent += pow_2;
 		return result;
 	}
 
-	template <size_t Bits>
-	constexpr DyadicFloat<Bits> quick_sub(DyadicFloat<Bits> a, DyadicFloat<Bits> b)
-	{ return quick_add(a, -b); }
+	template <size_t Bits> constexpr DyadicFloat<Bits> quick_sub(DyadicFloat<Bits> a, DyadicFloat<Bits> b)
+	{
+		return quick_add(a, -b);
+	}
 
-	template <size_t Bits>
-	constexpr DyadicFloat<Bits> rounded_mul(const DyadicFloat<Bits>& a, const DyadicFloat<Bits>& b)
+	template <size_t Bits> constexpr DyadicFloat<Bits> rounded_mul(const DyadicFloat<Bits> & a, const DyadicFloat<Bits> & b)
 	{
 		using DblMant			   = UInt<(2 * Bits)>;
 		const Sign result_sign	   = (a.sign != b.sign) ? Sign::NEG : Sign::POS;
@@ -758,8 +821,7 @@ namespace ccm::types
 		return DyadicFloat<Bits>::round(result_sign, result_exponent, normalized_product, Bits);
 	}
 
-	template <size_t Bits, size_t StartBits = 32>
-	constexpr DyadicFloat<Bits> approx_reciprocal(const DyadicFloat<Bits>& a)
+	template <size_t Bits, size_t StartBits = 32> constexpr DyadicFloat<Bits> approx_reciprocal(const DyadicFloat<Bits> & a)
 	{
 		DyadicFloat<Bits> x(Sign::POS,
 							-32 - a.exponent - static_cast<int>(Bits),
@@ -776,14 +838,16 @@ namespace ccm::types
 		return x;
 	}
 
-	template <size_t Bits>
-	constexpr DyadicFloat<Bits> rounded_div(const DyadicFloat<Bits>& af, const DyadicFloat<Bits>& bf)
+	template <size_t Bits> constexpr DyadicFloat<Bits> rounded_div(const DyadicFloat<Bits> & af, const DyadicFloat<Bits> & bf)
 	{
 		using WideMant					 = UInt<(Bits * 2) + 64>;
 		constexpr std::size_t guard_bits = 64;
 		const Sign result_sign			 = (af.sign != bf.sign) ? Sign::NEG : Sign::POS;
 
-		if (af.mantissa.is_zero()) { return DyadicFloat<Bits>(result_sign, 0, typename DyadicFloat<Bits>::mantissa_type(0)); }
+		if (af.mantissa.is_zero())
+		{
+			return DyadicFloat<Bits>(result_sign, 0, typename DyadicFloat<Bits>::mantissa_type(0));
+		}
 
 		const bool quotient_in_unit_interval = af.mantissa < bf.mantissa;
 		const int result_exponent			 = af.exponent - bf.exponent - static_cast<int>(Bits) + (quotient_in_unit_interval ? 0 : 1);
@@ -797,7 +861,10 @@ namespace ccm::types
 
 		// Encode any truncated tail into the discarded region so DyadicFloat::round sees the
 		// correct sticky state when it drops the guard bits.
-		if (!remainder.is_zero()) { quotient |= WideMant(1); }
+		if (!remainder.is_zero())
+		{
+			quotient |= WideMant(1);
+		}
 
 		return DyadicFloat<Bits>::round(result_sign, result_exponent, quotient, guard_bits);
 	}

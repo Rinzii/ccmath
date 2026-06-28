@@ -17,12 +17,13 @@
 
 namespace ccm
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T nextafter(T from, T to) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T nextafter(T from, T to) noexcept
 	{
 		// TODO: Better define how this interacts with the builtin.
-		if constexpr (ccm::builtin::has_constexpr_nextafter<T>) { return ccm::builtin::nextafter_ct(from, to); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_nextafter<T>)
+		{
+			return ccm::builtin::nextafter_ct(from, to);
+		} else
 		{
 			return gen::nextafter_gen(from, to);
 		}
@@ -30,11 +31,17 @@ namespace ccm
 
 	template <typename Arithmetic1, typename Arithmetic2, std::enable_if_t<std::is_arithmetic_v<Arithmetic1> && std::is_arithmetic_v<Arithmetic2>, bool> = true>
 	constexpr auto nextafter(Arithmetic1 from, Arithmetic2 to) noexcept
-	{ return gen::nextafter_gen(from, to); }
+	{
+		return gen::nextafter_gen(from, to);
+	}
 
 	constexpr float nextafterf(float from, float to) noexcept
-	{ return ccm::nextafter<float>(from, to); }
+	{
+		return ccm::nextafter<float>(from, to);
+	}
 
 	constexpr long double nextafterl(long double from, long double to) noexcept
-	{ return ccm::nextafter<long double>(from, to); }
+	{
+		return ccm::nextafter<long double>(from, to);
+	}
 } // namespace ccm

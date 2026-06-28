@@ -19,12 +19,13 @@
 
 namespace ccm::rt
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T ceil_rt(T num) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T ceil_rt(T num) noexcept
 	{
 #ifndef CCMATH_COMPILER_GCC
-		if constexpr (ccm::builtin::has_runtime_ceil<T>) { return ccm::builtin::ceil_rt(num); }
-		else
+		if constexpr (ccm::builtin::has_runtime_ceil<T>)
+		{
+			return ccm::builtin::ceil_rt(num);
+		} else
 #endif
 		{
 			return detail::ceil_scalar(num);

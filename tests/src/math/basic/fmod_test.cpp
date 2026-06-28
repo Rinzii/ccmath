@@ -102,7 +102,10 @@ TEST(CcmathBasicTests, FmodKernelRandomBitExactVsStd)
 		const std::uint64_t by = bd(rng);
 		std::memcpy(&x, &bx, sizeof x);
 		std::memcpy(&y, &by, sizeof y);
-		if (!std::isfinite(x) || !std::isfinite(y) || y == 0.0) { continue; }
+		if (!std::isfinite(x) || !std::isfinite(y) || y == 0.0)
+		{
+			continue;
+		}
 		ccm::test::ExpectFpEq(ccm::internal::fmod(x, y), std::fmod(x, y));
 		++checked;
 	}
@@ -118,7 +121,10 @@ TEST(CcmathBasicTests, FmodKernelRandomBitExactVsStd)
 		const std::uint32_t by = bf(rngf);
 		std::memcpy(&x, &bx, sizeof x);
 		std::memcpy(&y, &by, sizeof y);
-		if (!std::isfinite(x) || !std::isfinite(y) || y == 0.0F) { continue; }
+		if (!std::isfinite(x) || !std::isfinite(y) || y == 0.0F)
+		{
+			continue;
+		}
 		ccm::test::ExpectFpEq(ccm::internal::fmod(x, y), std::fmod(x, y));
 		++checked;
 	}

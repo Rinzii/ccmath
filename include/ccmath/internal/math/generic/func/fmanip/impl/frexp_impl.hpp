@@ -15,8 +15,7 @@
 
 namespace ccm::internal::impl
 {
-	template <typename T>
-	constexpr T frexp_impl(T x, int & exp) noexcept
+	template <typename T> constexpr T frexp_impl(T x, int & exp) noexcept
 	{
 		using fp_bits_t = ccm::support::fp::FPBits<T>;
 
@@ -28,7 +27,10 @@ namespace ccm::internal::impl
 			return x;
 		}
 
-		if (CCM_UNLIKELY(bits.is_inf_or_nan())) { return x; }
+		if (CCM_UNLIKELY(bits.is_inf_or_nan()))
+		{
+			return x;
+		}
 
 		int exponent = bits.get_exponent();
 

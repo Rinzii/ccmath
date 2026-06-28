@@ -21,15 +21,19 @@
 
 namespace ccm::rt
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T round_rt(T num) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T round_rt(T num) noexcept
 	{
 #ifndef CCMATH_COMPILER_GCC
-		if constexpr (ccm::builtin::has_runtime_round<T>) { return ccm::builtin::round_rt(num); }
-		else
+		if constexpr (ccm::builtin::has_runtime_round<T>)
+		{
+			return ccm::builtin::round_rt(num);
+		} else
 #endif
 		{
-			if (ccm::isinf(num) || num == static_cast<T>(0) || ccm::isnan(num)) { return num; }
+			if (ccm::isinf(num) || num == static_cast<T>(0) || ccm::isnan(num))
+			{
+				return num;
+			}
 			constexpr int round_mode = static_cast<int>(ccm::support::fp::rounding_mode::eFE_TONEARESTFROMZERO);
 			return ccm::support::fp::directional_round(num, round_mode);
 		}

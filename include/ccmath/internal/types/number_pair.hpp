@@ -14,15 +14,13 @@
 
 namespace ccm::types
 {
-	template <typename T>
-	struct NumberPair
+	template <typename T> struct NumberPair
 	{
 		T hi;
 		T lo;
 	};
 
-	template <typename T>
-	std::enable_if_t<std::is_integral_v<T> && std::is_unsigned_v<T>, NumberPair<T>> split(T x)
+	template <typename T> std::enable_if_t<std::is_integral_v<T> && std::is_unsigned_v<T>, NumberPair<T>> split(T x)
 	{
 		constexpr std::size_t half_bits_width = sizeof(T) * 4;
 		constexpr T Low_mask				  = (T{ 1 } << half_bits_width) - T{ 1 };

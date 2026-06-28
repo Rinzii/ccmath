@@ -28,19 +28,16 @@ namespace ccm::test::oracle
 		release,
 	};
 
-	template <typename T>
-	struct pow_case
+	template <typename T> struct pow_case
 	{
 		T base;
 		T exponent;
 		std::string provenance;
 	};
 
-	template <typename T>
-	using binary_case = pow_case<T>;
+	template <typename T> using binary_case = pow_case<T>;
 
-	template <typename T>
-	struct failure_record
+	template <typename T> struct failure_record
 	{
 		std::string function_name;
 		std::string input_type;
@@ -72,8 +69,7 @@ namespace ccm::test::oracle
 		std::string event_kind;
 	};
 
-	template <typename T>
-	struct run_summary
+	template <typename T> struct run_summary
 	{
 		std::size_t case_count				   = 0;
 		std::size_t skipped_count			   = 0;
@@ -93,8 +89,7 @@ namespace ccm::test::oracle
 		T worst_expected{};
 	};
 
-	template <typename T>
-	struct campaign_report
+	template <typename T> struct campaign_report
 	{
 		std::string configuration_name;
 		std::string path;
@@ -128,24 +123,28 @@ namespace ccm::test::oracle
 	{
 		switch (std::fegetround())
 		{
-		case FE_TONEAREST: return "FE_TONEAREST";
-		case FE_UPWARD: return "FE_UPWARD";
-		case FE_DOWNWARD: return "FE_DOWNWARD";
+		case FE_TONEAREST : return "FE_TONEAREST";
+		case FE_UPWARD	  : return "FE_UPWARD";
+		case FE_DOWNWARD  : return "FE_DOWNWARD";
 		case FE_TOWARDZERO: return "FE_TOWARDZERO";
-		default: return "unknown";
+		default			  : return "unknown";
 		}
 	}
 
 	inline std::string configuration_name()
-	{ return pow_configuration_name(); }
+	{
+		return pow_configuration_name();
+	}
 
-	template <typename T>
-	inline constexpr const char* builtin_status()
-	{ return pow_builtin_status<T>(); }
+	template <typename T> inline constexpr const char * builtin_status()
+	{
+		return pow_builtin_status<T>();
+	}
 
-	template <typename T>
-	inline bool is_modeled_generic_pow_case(T base, T exponent)
-	{ return std::isfinite(base) && std::isfinite(exponent) && base > T{}; }
+	template <typename T> inline bool is_modeled_generic_pow_case(T base, T exponent)
+	{
+		return std::isfinite(base) && std::isfinite(exponent) && base > T{};
+	}
 
 	inline bool uses_public_mpfr_oracle([[maybe_unused]] ccm::test::pow_path::validation_path path)
 	{
@@ -158,44 +157,63 @@ namespace ccm::test::oracle
 
 	inline std::string oracle_policy_name(ccm::test::pow_path::validation_path path)
 	{
-		if (uses_public_mpfr_oracle(path)) { return "mpfr_full"; }
+		if (uses_public_mpfr_oracle(path))
+		{
+			return "mpfr_full";
+		}
 		return "kernel_finite_mpfr_with_std_exceptional";
 	}
 
 	inline std::string coremath_oracle_policy_name()
-	{ return "coremath_cr_finite_all_modes"; }
-
-	template <typename T>
-	inline std::optional<std::string> kernel_path_skip_reason(ccm::test::pow_path::validation_path path, T base, T exponent)
 	{
-		if (uses_public_mpfr_oracle(path)) { return std::nullopt; }
-		if (path == ccm::test::pow_path::validation_path::generic_modeled_domain)
+		return "coremath_cr_finite_all_modes";
+	}
+
+	template <typename T> inline std::optional<std::string> kernel_path_skip_reason(ccm::test::pow_path::validation_path path, T base, T exponent)
+	{
+		if (uses_public_mpfr_oracle(path))
 		{
-			if (!is_modeled_generic_pow_case(base, exponent)) { return "outside modeled generic positive finite domain"; }
 			return std::nullopt;
 		}
-		if (!is_modeled_generic_pow_case(base, exponent)) { return "exceptional input outside generic kernel finite domain"; }
+		if (path == ccm::test::pow_path::validation_path::generic_modeled_domain)
+		{
+			if (!is_modeled_generic_pow_case(base, exponent))
+			{
+				return "outside modeled generic positive finite domain";
+			}
+			return std::nullopt;
+		}
+		if (!is_modeled_generic_pow_case(base, exponent))
+		{
+			return "exceptional input outside generic kernel finite domain";
+		}
 		return std::nullopt;
 	}
 
-	template <typename T>
-	inline bool is_coremath_oracle_case(T base, T exponent)
+	template <typename T> inline bool is_coremath_oracle_case(T base, T exponent)
 	{
-		if (!std::isfinite(base) || !std::isfinite(exponent)) { return false; }
-		if (base == T{} || exponent == T{}) { return false; }
-		if (base < T{} && static_cast<T>(std::trunc(static_cast<double>(exponent))) != exponent) { return false; }
+		if (!std::isfinite(base) || !std::isfinite(exponent))
+		{
+			return false;
+		}
+		if (base == T{} || exponent == T{})
+		{
+			return false;
+		}
+		if (base < T{} && static_cast<T>(std::trunc(static_cast<double>(exponent))) != exponent)
+		{
+			return false;
+		}
 		return true;
 	}
 
-	template <typename T>
-	inline bool oracle_fp_bits_match(T actual, T expected)
+	template <typename T> inline bool oracle_fp_bits_match(T actual, T expected)
 	{
 		using fp_bits = ccm::support::fp::FPBits<T>;
 		return fp_bits(actual).uintval() == fp_bits(expected).uintval();
 	}
 
-	template <typename T>
-	inline void record_worst_case(run_summary<T>& summary, std::uint64_t ulp_distance, T base, T exponent, T actual, T expected)
+	template <typename T> inline void record_worst_case(run_summary<T> & summary, std::uint64_t ulp_distance, T base, T exponent, T actual, T expected)
 	{
 		if (ulp_distance >= summary.max_observed_ulp)
 		{
@@ -254,28 +272,30 @@ namespace ccm::test::oracle
 		};
 	}
 
-	template <typename T>
-	inline bool is_hard_oracle_failure(const failure_record<T>& event)
-	{ return event.event_kind == "mpfr_hard_failure" || event.event_kind == "coremath_bit_mismatch"; }
-
-	template <typename T>
-	inline bool has_hard_oracle_failure(const std::vector<failure_record<T>>& events)
+	template <typename T> inline bool is_hard_oracle_failure(const failure_record<T> & event)
 	{
-		for (const auto& event : events)
+		return event.event_kind == "mpfr_hard_failure" || event.event_kind == "coremath_bit_mismatch";
+	}
+
+	template <typename T> inline bool has_hard_oracle_failure(const std::vector<failure_record<T>> & events)
+	{
+		for (const auto & event : events)
 		{
-			if (is_hard_oracle_failure(event)) { return true; }
+			if (is_hard_oracle_failure(event))
+			{
+				return true;
+			}
 		}
 		return false;
 	}
 
-	template <typename T>
-	inline void write_failure_json(const std::string& output_path, const std::vector<failure_record<T>>& failures)
+	template <typename T> inline void write_failure_json(const std::string & output_path, const std::vector<failure_record<T>> & failures)
 	{
 		std::ofstream out(output_path, std::ios::trunc);
 		out << "[\n";
 		for (std::size_t i = 0; i < failures.size(); ++i)
 		{
-			const auto& failure = failures[i];
+			const auto & failure = failures[i];
 			out << "  {\n";
 			out << "    \"function_name\": \"" << json_escape(failure.function_name) << "\",\n";
 			out << "    \"input_type\": \"" << json_escape(failure.input_type) << "\",\n";
@@ -307,12 +327,14 @@ namespace ccm::test::oracle
 
 	// Echo hard-failure records to stdout so CI logs surface the offending input without an
 	// uploaded artifact. The JSON event log keeps the full record. This is the at-a-glance view.
-	template <typename T>
-	inline void print_hard_failures(const std::vector<failure_record<T>>& events)
+	template <typename T> inline void print_hard_failures(const std::vector<failure_record<T>> & events)
 	{
-		for (const auto& event : events)
+		for (const auto & event : events)
 		{
-			if (!is_hard_oracle_failure(event)) { continue; }
+			if (!is_hard_oracle_failure(event))
+			{
+				continue;
+			}
 			std::cout << "HARD FAILURE " << event.event_kind << " fn=" << event.function_name << " path=" << event.path << " rounding=" << event.rounding_mode
 					  << " fma=" << event.fma_enabled << " base=" << event.base_bits << " exponent=" << event.exponent_bits << " actual=" << event.actual_bits
 					  << " expected=" << event.expected_bits << " ulp=" << event.ulp_distance << " provenance=\"" << event.provenance << "\" notes=\""
@@ -320,41 +342,63 @@ namespace ccm::test::oracle
 		}
 	}
 
-	inline std::optional<std::string> option_value(int argc, char** argv, std::string_view prefix)
+	inline std::optional<std::string> option_value(int argc, char ** argv, std::string_view prefix)
 	{
 		for (int i = 1; i < argc; ++i)
 		{
 			const std::string_view arg(argv[i]);
-			if (arg.rfind(prefix, 0) == 0) { return std::string(arg.substr(prefix.size())); }
+			if (arg.rfind(prefix, 0) == 0)
+			{
+				return std::string(arg.substr(prefix.size()));
+			}
 		}
 		return std::nullopt;
 	}
 
-	inline std::optional<std::string> resolve_event_log_path(int argc, char** argv)
+	inline std::optional<std::string> resolve_event_log_path(int argc, char ** argv)
 	{
-		if (const auto log_output = option_value(argc, argv, "--log-output=")) { return *log_output; }
-		if (const auto json_output = option_value(argc, argv, "--json-output=")) { return *json_output; }
+		if (const auto log_output = option_value(argc, argv, "--log-output="))
+		{
+			return *log_output;
+		}
+		if (const auto json_output = option_value(argc, argv, "--json-output="))
+		{
+			return *json_output;
+		}
 		return std::nullopt;
 	}
 
-	inline bool has_flag(int argc, char** argv, std::string_view flag)
+	inline bool has_flag(int argc, char ** argv, std::string_view flag)
 	{
 		for (int i = 1; i < argc; ++i)
 		{
-			if (std::string_view(argv[i]) == flag) { return true; }
+			if (std::string_view(argv[i]) == flag)
+			{
+				return true;
+			}
 		}
 		return false;
 	}
 
-	template <typename T, typename Parser>
-	inline T parse_option_or(const std::optional<std::string>& raw_value, Parser parser, T fallback)
-	{ return raw_value.has_value() ? parser(*raw_value) : fallback; }
-
-	inline campaign_mode parse_mode(const std::optional<std::string>& raw_mode)
+	template <typename T, typename Parser> inline T parse_option_or(const std::optional<std::string> & raw_value, Parser parser, T fallback)
 	{
-		if (!raw_mode.has_value() || *raw_mode == "quick") { return campaign_mode::quick; }
-		if (*raw_mode == "extended") { return campaign_mode::extended; }
-		if (*raw_mode == "release" || *raw_mode == "full") { return campaign_mode::release; }
+		return raw_value.has_value() ? parser(*raw_value) : fallback;
+	}
+
+	inline campaign_mode parse_mode(const std::optional<std::string> & raw_mode)
+	{
+		if (!raw_mode.has_value() || *raw_mode == "quick")
+		{
+			return campaign_mode::quick;
+		}
+		if (*raw_mode == "extended")
+		{
+			return campaign_mode::extended;
+		}
+		if (*raw_mode == "release" || *raw_mode == "full")
+		{
+			return campaign_mode::release;
+		}
 		return campaign_mode::quick;
 	}
 
@@ -362,15 +406,15 @@ namespace ccm::test::oracle
 	{
 		switch (mode)
 		{
-		case campaign_mode::quick: return "quick";
+		case campaign_mode::quick	: return "quick";
 		case campaign_mode::extended: return "extended";
-		case campaign_mode::full:
-		case campaign_mode::release: return "release";
+		case campaign_mode::full	:
+		case campaign_mode::release : return "release";
 		}
 		return "quick";
 	}
 
-	inline std::vector<ccm::test::pow_path::validation_path> parse_paths(int argc, char** argv)
+	inline std::vector<ccm::test::pow_path::validation_path> parse_paths(int argc, char ** argv)
 	{
 		std::vector<ccm::test::pow_path::validation_path> paths;
 		const auto raw = option_value(argc, argv, "--path=");
@@ -381,19 +425,31 @@ namespace ccm::test::oracle
 			{
 				const std::size_t comma		 = view.find(',');
 				const std::string_view token = view.substr(0, comma);
-				if (auto parsed = ccm::test::pow_path::parse_path(token)) { paths.push_back(*parsed); }
-				if (comma == std::string_view::npos) { break; }
+				if (auto parsed = ccm::test::pow_path::parse_path(token))
+				{
+					paths.push_back(*parsed);
+				}
+				if (comma == std::string_view::npos)
+				{
+					break;
+				}
 				view.remove_prefix(comma + 1);
 			}
 		}
-		if (paths.empty()) { paths.push_back(ccm::test::pow_path::validation_path::public_default); }
+		if (paths.empty())
+		{
+			paths.push_back(ccm::test::pow_path::validation_path::public_default);
+		}
 		return paths;
 	}
 
-	inline std::vector<int> parse_rounding_modes(int argc, char** argv)
+	inline std::vector<int> parse_rounding_modes(int argc, char ** argv)
 	{
 		const auto raw = option_value(argc, argv, "--rounding-modes=");
-		if (!raw.has_value() || *raw == "all") { return { FE_TONEAREST, FE_UPWARD, FE_DOWNWARD, FE_TOWARDZERO }; }
+		if (!raw.has_value() || *raw == "all")
+		{
+			return { FE_TONEAREST, FE_UPWARD, FE_DOWNWARD, FE_TOWARDZERO };
+		}
 
 		std::vector<int> modes;
 		std::string_view view = *raw;
@@ -401,19 +457,33 @@ namespace ccm::test::oracle
 		{
 			const std::size_t comma		 = view.find(',');
 			const std::string_view token = view.substr(0, comma);
-			if (token == "nearest" || token == "FE_TONEAREST") { modes.push_back(FE_TONEAREST); }
-			else if (token == "upward" || token == "FE_UPWARD") { modes.push_back(FE_UPWARD); }
-			else if (token == "downward" || token == "FE_DOWNWARD") { modes.push_back(FE_DOWNWARD); }
-			else if (token == "towardzero" || token == "FE_TOWARDZERO") { modes.push_back(FE_TOWARDZERO); }
-			if (comma == std::string_view::npos) { break; }
+			if (token == "nearest" || token == "FE_TONEAREST")
+			{
+				modes.push_back(FE_TONEAREST);
+			} else if (token == "upward" || token == "FE_UPWARD")
+			{
+				modes.push_back(FE_UPWARD);
+			} else if (token == "downward" || token == "FE_DOWNWARD")
+			{
+				modes.push_back(FE_DOWNWARD);
+			} else if (token == "towardzero" || token == "FE_TOWARDZERO")
+			{
+				modes.push_back(FE_TOWARDZERO);
+			}
+			if (comma == std::string_view::npos)
+			{
+				break;
+			}
 			view.remove_prefix(comma + 1);
 		}
-		if (modes.empty()) { modes = { FE_TONEAREST, FE_UPWARD, FE_DOWNWARD, FE_TOWARDZERO }; }
+		if (modes.empty())
+		{
+			modes = { FE_TONEAREST, FE_UPWARD, FE_DOWNWARD, FE_TOWARDZERO };
+		}
 		return modes;
 	}
 
-	template <typename T>
-	inline void write_campaign_summary_json(const std::string& output_path, const campaign_report<T>& report)
+	template <typename T> inline void write_campaign_summary_json(const std::string & output_path, const campaign_report<T> & report)
 	{
 		std::ofstream out(output_path, std::ios::trunc);
 		out << "{\n";
@@ -430,14 +500,20 @@ namespace ccm::test::oracle
 		for (std::size_t i = 0; i < report.domains_covered.size(); ++i)
 		{
 			out << "\"" << json_escape(report.domains_covered[i]) << "\"";
-			if (i + 1 < report.domains_covered.size()) { out << ", "; }
+			if (i + 1 < report.domains_covered.size())
+			{
+				out << ", ";
+			}
 		}
 		out << "],\n";
 		out << "  \"domains_skipped\": [";
 		for (std::size_t i = 0; i < report.domains_skipped.size(); ++i)
 		{
 			out << "\"" << json_escape(report.domains_skipped[i]) << "\"";
-			if (i + 1 < report.domains_skipped.size()) { out << ", "; }
+			if (i + 1 < report.domains_skipped.size())
+			{
+				out << ", ";
+			}
 		}
 		out << "],\n";
 		out << "  \"case_count\": " << report.case_count << ",\n";
@@ -462,11 +538,11 @@ namespace ccm::test::oracle
 	inline campaign_report<T> make_campaign_report(std::string_view path_name,
 												   ccm::test::pow_path::validation_path path,
 												   campaign_mode mode,
-												   const run_summary<T>& summary,
+												   const run_summary<T> & summary,
 												   std::uint64_t seed,
 												   std::uint64_t elapsed_ms,
-												   const std::vector<std::string>& domains_covered,
-												   const std::vector<std::string>& domains_skipped)
+												   const std::vector<std::string> & domains_covered,
+												   const std::vector<std::string> & domains_skipped)
 	{
 		return campaign_report<T>{
 			configuration_name(),
@@ -501,11 +577,11 @@ namespace ccm::test::oracle
 	template <typename T>
 	inline campaign_report<T> make_coremath_campaign_report(std::string_view path_name,
 															campaign_mode mode,
-															const run_summary<T>& summary,
+															const run_summary<T> & summary,
 															std::uint64_t seed,
 															std::uint64_t elapsed_ms,
-															const std::vector<std::string>& domains_covered,
-															const std::vector<std::string>& domains_skipped)
+															const std::vector<std::string> & domains_covered,
+															const std::vector<std::string> & domains_skipped)
 	{
 		return campaign_report<T>{
 			configuration_name(),
@@ -539,7 +615,7 @@ namespace ccm::test::oracle
 
 	template <typename T, typename ExecuteFn, typename ReportFn, typename PrintFn>
 	inline void run_path_campaign(ccm::test::pow_path::validation_path path,
-								  run_summary<T>& summary,
+								  run_summary<T> & summary,
 								  std::string_view summary_prefix,
 								  ExecuteFn execute_cases,
 								  ReportFn build_report,
@@ -561,8 +637,7 @@ namespace ccm::test::oracle
 		print_report(report, summary_path);
 	}
 
-	template <typename T>
-	inline void add_random_cases(std::vector<pow_case<T>>& cases, std::uint64_t seed, std::size_t count, const char* provenance)
+	template <typename T> inline void add_random_cases(std::vector<pow_case<T>> & cases, std::uint64_t seed, std::size_t count, const char * provenance)
 	{
 		std::mt19937_64 rng(seed);
 		for (std::size_t i = 0; i < count; ++i)
@@ -576,8 +651,7 @@ namespace ccm::test::oracle
 					ccm::support::bit_cast<float>(exp_bits),
 					provenance,
 				});
-			}
-			else
+			} else
 			{
 				cases.push_back(pow_case<T>{
 					ccm::support::bit_cast<double>(rng()),
@@ -595,7 +669,7 @@ namespace ccm::test::oracle
 	// near-one, far-from-one-with-integer-exponent, and negative-base families that previously
 	// hid faithful-but-not-correctly-rounded results.
 	template <typename T>
-	inline void add_targeted_random_cases(std::vector<pow_case<T>>& cases, std::uint64_t seed, std::size_t count, const char* provenance)
+	inline void add_targeted_random_cases(std::vector<pow_case<T>> & cases, std::uint64_t seed, std::size_t count, const char * provenance)
 	{
 		using uint_t = std::conditional_t<std::is_same_v<T, float>, std::uint32_t, std::uint64_t>;
 
@@ -616,11 +690,17 @@ namespace ccm::test::oracle
 		for (std::size_t i = 0; i < per; ++i)
 		{
 			T base = static_cast<T>(std::ldexp(unit(rng), base_exp(rng)));
-			if (rng() & 1U) { base = -base; }
+			if (rng() & 1U)
+			{
+				base = -base;
+			}
 			const double l2 = std::log2(std::abs(static_cast<double>(base))) + 1e-300;
 			std::uniform_real_distribution<double> yd(-static_cast<double>(max_exp) / std::abs(l2), static_cast<double>(max_exp) / std::abs(l2));
 			T exponent = static_cast<T>(yd(rng));
-			if (base < static_cast<T>(0)) { exponent = std::trunc(exponent); } // negative base needs integer exponent
+			if (base < static_cast<T>(0))
+			{
+				exponent = std::trunc(exponent);
+			} // negative base needs integer exponent
 			add(base, exponent);
 		}
 
@@ -639,10 +719,16 @@ namespace ccm::test::oracle
 		for (std::size_t i = 0; i < per; ++i)
 		{
 			T base = static_cast<T>(std::ldexp(unit(rng), base_exp(rng) / 2));
-			if (rng() & 1U) { base = -base; }
+			if (rng() & 1U)
+			{
+				base = -base;
+			}
 			std::uniform_int_distribution<int> nd(-700, 700);
 			T exponent = static_cast<T>(nd(rng));
-			if ((rng() & 1U) && base > static_cast<T>(0)) { exponent += static_cast<T>(0.5); } // half-integer only for base > 0
+			if ((rng() & 1U) && base > static_cast<T>(0))
+			{
+				exponent += static_cast<T>(0.5);
+			} // half-integer only for base > 0
 			add(base, exponent);
 		}
 

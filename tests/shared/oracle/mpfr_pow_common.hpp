@@ -20,27 +20,44 @@ namespace ccm::test::oracle
 	{
 		switch (format)
 		{
-		case ccm::config::LongDoubleFormat::Double: return 256;
-		case ccm::config::LongDoubleFormat::X87Extended: return 256;
+		case ccm::config::LongDoubleFormat::Double		 : return 256;
+		case ccm::config::LongDoubleFormat::X87Extended	 : return 256;
 		case ccm::config::LongDoubleFormat::IEEEBinary128: return 256;
-		case ccm::config::LongDoubleFormat::Unknown: return 256;
+		case ccm::config::LongDoubleFormat::Unknown		 : return 256;
 		}
 		return 256;
 	}
 
 	inline bool powl_exceptional_case(long double base, long double exponent)
 	{
-		if (std::isnan(base) || std::isnan(exponent)) { return true; }
-		if (!std::isfinite(base) || !std::isfinite(exponent)) { return true; }
-		if (base == 0.0L) { return true; }
-		if (base < 0.0L) { return true; }
-		if (exponent == 0.0L) { return true; }
-		if (base == 1.0L) { return true; }
+		if (std::isnan(base) || std::isnan(exponent))
+		{
+			return true;
+		}
+		if (!std::isfinite(base) || !std::isfinite(exponent))
+		{
+			return true;
+		}
+		if (base == 0.0L)
+		{
+			return true;
+		}
+		if (base < 0.0L)
+		{
+			return true;
+		}
+		if (exponent == 0.0L)
+		{
+			return true;
+		}
+		if (base == 1.0L)
+		{
+			return true;
+		}
 		return false;
 	}
 
-	template <typename T>
-	inline T mpfr_pow_reference(T base, T exponent, mpfr_prec_t precision, mpfr_rnd_t rounding)
+	template <typename T> inline T mpfr_pow_reference(T base, T exponent, mpfr_prec_t precision, mpfr_rnd_t rounding)
 	{
 		mpfr_t base_mpfr;
 		mpfr_t exp_mpfr;
@@ -61,18 +78,18 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T, typename Fn>
-	inline std::optional<failure_record<T>> evaluate_case(const pow_case<T>& test_case,
+	inline std::optional<failure_record<T>> evaluate_case(const pow_case<T> & test_case,
 														  std::string_view function_name,
 														  std::string_view path_name,
 														  ccm::test::pow_path::validation_path path,
 														  Fn fn,
 														  mpfr_prec_t oracle_precision,
 														  std::uint64_t max_ulp,
-														  run_summary<T>& summary,
-														  std::uint64_t target_ulp					= 0,
-														  std::uint64_t seed						= 0,
-														  std::string_view search_mode				= {},
-														  std::vector<failure_record<T>>* event_log = nullptr)
+														  run_summary<T> & summary,
+														  std::uint64_t target_ulp					 = 0,
+														  std::uint64_t seed						 = 0,
+														  std::string_view search_mode				 = {},
+														  std::vector<failure_record<T>> * event_log = nullptr)
 	{
 		return evaluate_binary_mpfr_case(
 			test_case,

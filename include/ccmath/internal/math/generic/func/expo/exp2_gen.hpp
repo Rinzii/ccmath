@@ -18,12 +18,15 @@
 namespace ccm::gen
 {
 	// TODO(IanP): Wire internal poly_approx_* kernels here instead of delegating to exp2_*_impl.
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T exp2_gen(T num) noexcept // NOLINT(bugprone-exception-escape)
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T exp2_gen(T num) noexcept // NOLINT(bugprone-exception-escape)
 	{
-		if constexpr (std::is_same_v<T, float>) { return ccm::internal::exp2_float(num); }
-		else if constexpr (std::is_same_v<T, double>) { return ccm::internal::exp2_double(num); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return ccm::internal::exp2_float(num);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return ccm::internal::exp2_double(num);
+		} else
 		{
 			return static_cast<T>(ccm::internal::exp2_double(static_cast<double>(num)));
 		}

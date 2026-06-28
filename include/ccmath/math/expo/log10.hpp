@@ -36,17 +36,22 @@ namespace ccm
 	 * @param num Floating-point value.
 	 * @return Base-10 logarithm of num. Returns -inf for zero and NaN for negative inputs.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T log10(T num)
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T log10(T num)
 	{
 		if constexpr (ccm::builtin::has_constexpr_log10<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::log10_ct(num); }
+			if (ccm::support::is_constant_evaluated())
+			{
+				return ccm::builtin::log10_ct(num);
+			}
 		}
 		{
 			if (num == static_cast<T>(1))
 			{
-				if (ccm::support::is_constant_evaluated()) { return static_cast<T>(0); }
+				if (ccm::support::is_constant_evaluated())
+				{
+					return static_cast<T>(0);
+				}
 #if defined(CCMATH_COMPILER_APPLE_CLANG) || (defined(_MSC_VER) && !defined(__clang__))
 				return ccm::support::fp::signed_zero_for_current_mode<T>();
 #else
@@ -65,10 +70,19 @@ namespace ccm
 				ccm::support::fenv::raise_except_if_required(FE_INVALID);
 				return -std::numeric_limits<T>::quiet_NaN();
 			}
-			if (CCM_UNLIKELY(num == std::numeric_limits<T>::infinity())) { return std::numeric_limits<T>::infinity(); }
-			if (CCM_UNLIKELY(ccm::isnan(num))) { return std::numeric_limits<T>::quiet_NaN(); }
+			if (CCM_UNLIKELY(num == std::numeric_limits<T>::infinity()))
+			{
+				return std::numeric_limits<T>::infinity();
+			}
+			if (CCM_UNLIKELY(ccm::isnan(num)))
+			{
+				return std::numeric_limits<T>::quiet_NaN();
+			}
 
-			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::log10_rt(num); }
+			if (!ccm::support::is_constant_evaluated())
+			{
+				return ccm::rt::log10_rt(num);
+			}
 
 			return gen::log10_gen(num);
 		}
@@ -80,9 +94,10 @@ namespace ccm
 	 * @param num Integer value.
 	 * @return Base-10 logarithm of num as double.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double log10(Integer num)
-	{ return ccm::log10<double>(static_cast<double>(num)); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double log10(Integer num)
+	{
+		return ccm::log10<double>(static_cast<double>(num));
+	}
 
 	/**
 	 * @brief Computes the base-10 logarithm of a float.
@@ -90,7 +105,9 @@ namespace ccm
 	 * @return Base-10 logarithm as float.
 	 */
 	constexpr float log10f(float num)
-	{ return ccm::log10<float>(num); }
+	{
+		return ccm::log10<float>(num);
+	}
 
 	/**
 	 * @brief Computes the base-10 logarithm of a long double.
@@ -98,5 +115,7 @@ namespace ccm
 	 * @return Base-10 logarithm as long double.
 	 */
 	constexpr long double log10l(long double num)
-	{ return ccm::log10<long double>(num); }
+	{
+		return ccm::log10<long double>(num);
+	}
 } // namespace ccm

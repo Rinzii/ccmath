@@ -81,14 +81,14 @@ namespace
 		{ 0x3b5fffffffffffffULL, 0x402c000000000000ULL, { 0x000ffffffffffff9ULL, 0x000ffffffffffff9ULL, 0x000ffffffffffffaULL, 0x000ffffffffffff9ULL } },
 	};
 
-	constexpr std::array<int, 4> kModes			= { FE_TONEAREST, FE_TOWARDZERO, FE_UPWARD, FE_DOWNWARD };
-	constexpr std::array<const char*, 4> kNames = { "FE_TONEAREST", "FE_TOWARDZERO", "FE_UPWARD", "FE_DOWNWARD" };
+	constexpr std::array<int, 4> kModes			 = { FE_TONEAREST, FE_TOWARDZERO, FE_UPWARD, FE_DOWNWARD };
+	constexpr std::array<const char *, 4> kNames = { "FE_TONEAREST", "FE_TOWARDZERO", "FE_UPWARD", "FE_DOWNWARD" };
 } // namespace
 
 TEST(CcmathPowCorrectRounding, BinaryDoubleAllModes)
 {
 	const int saved = std::fegetround();
-	for (const auto& c : kCases)
+	for (const auto & c : kCases)
 	{
 		const double base = from_bits(c.base_bits);
 		const double exp  = from_bits(c.exp_bits);

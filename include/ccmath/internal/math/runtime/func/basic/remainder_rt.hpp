@@ -19,14 +19,15 @@
 
 namespace ccm::rt
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T remainder_rt(T x, T y) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T remainder_rt(T x, T y) noexcept
 	{
 #if defined(CCM_CONFIG_SYSTEM_MATH)
 		return detail::sys::remainder_call(x, y);
 #else
-		if constexpr (ccm::builtin::has_runtime_remainder<T>) { return ccm::builtin::remainder_rt(x, y); }
-		else
+		if constexpr (ccm::builtin::has_runtime_remainder<T>)
+		{
+			return ccm::builtin::remainder_rt(x, y);
+		} else
 		{
 			// No builtin and no system math, so reuse the exact remquo reduction. It rounds the
 			// quotient to nearest, ties-to-even, and covers the special cases, unlike the trunc

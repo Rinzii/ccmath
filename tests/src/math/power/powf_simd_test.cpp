@@ -42,7 +42,10 @@ namespace
 	// NaN payloads are not part of the contract, so any NaN matches any NaN.
 	bool bit_equal(float a, float b)
 	{
-		if (std::isnan(a) && std::isnan(b)) { return true; }
+		if (std::isnan(a) && std::isnan(b))
+		{
+			return true;
+		}
 		return float_bits(a) == float_bits(b);
 	}
 
@@ -50,8 +53,7 @@ namespace
 	{
 		std::vector<float> xs;
 		std::vector<float> ys;
-		const auto add = [&](float x, float y)
-		{
+		const auto add = [&](float x, float y) {
 			xs.push_back(x);
 			ys.push_back(y);
 		};
@@ -65,25 +67,37 @@ namespace
 		const float special_exps[]	= { 0.0f, -0.0f, 1.0f, -1.0f, 2.0f, 3.0f, -3.0f, 0.5f, -0.5f, 2.5f, inf, -inf, qnan, 127.0f, -149.0f, 0.3333333f };
 		for (float b : special_bases)
 		{
-			for (float e : special_exps) { add(b, e); }
+			for (float e : special_exps)
+			{
+				add(b, e);
+			}
 		}
 
 		// Normal range grid.
 		for (float b = 0.125f; b <= 64.0f; b *= 1.3f)
 		{
-			for (float e = -18.0f; e <= 18.0f; e += 0.7f) { add(b, e); }
+			for (float e = -18.0f; e <= 18.0f; e += 0.7f)
+			{
+				add(b, e);
+			}
 		}
 
 		// Hard near-one region with large exponents (stresses the Ziv resolution).
 		for (float b = 0.9f; b <= 1.1f; b += 0.0007f)
 		{
-			for (float e : { -240.0f, -50.0f, -7.5f, 7.5f, 50.0f, 240.0f }) { add(b, e); }
+			for (float e : { -240.0f, -50.0f, -7.5f, 7.5f, 50.0f, 240.0f })
+			{
+				add(b, e);
+			}
 		}
 
 		// Integer exponents (exact integer power fast paths) and negative bases.
 		for (float b = -12.0f; b <= 12.0f; b += 0.5f)
 		{
-			for (int e = -16; e <= 16; ++e) { add(b, static_cast<float>(e)); }
+			for (int e = -16; e <= 16; ++e)
+			{
+				add(b, static_cast<float>(e));
+			}
 		}
 
 		// Overflow and underflow edges.
@@ -101,13 +115,15 @@ namespace
 		std::mt19937 rng(20240611U);
 		std::uniform_real_distribution<float> base_dist(1.0e-6f, 1.0e6f);
 		std::uniform_real_distribution<float> exp_dist(-60.0f, 60.0f);
-		for (int i = 0; i < 40000; ++i) { add(base_dist(rng), exp_dist(rng)); }
+		for (int i = 0; i < 40000; ++i)
+		{
+			add(base_dist(rng), exp_dist(rng));
+		}
 
 		return { std::move(xs), std::move(ys) };
 	}
 
-	template <typename V>
-	void expect_matches_scalar(const std::vector<float>& xs, const std::vector<float>& ys, const char* tag)
+	template <typename V> void expect_matches_scalar(const std::vector<float> & xs, const std::vector<float> & ys, const char * tag)
 	{
 		constexpr int width = static_cast<int>(V::size());
 		ASSERT_EQ(xs.size(), ys.size());
@@ -138,9 +154,10 @@ namespace
 		}
 	}
 
-	template <typename V>
-	float scalar_lane(float x, float y)
-	{ return ccm::gen::impl::powf_simd(V(x), V(y))[0]; }
+	template <typename V> float scalar_lane(float x, float y)
+	{
+		return ccm::gen::impl::powf_simd(V(x), V(y))[0];
+	}
 } // namespace
 
 TEST(CcmathPowfSimd, BitIdenticalToScalarKernelNativeWidth)
@@ -161,8 +178,7 @@ TEST(CcmathPowfSimd, BitIdenticalToScalarKernelWidth8)
 	{
 		const auto [xs, ys] = build_inputs();
 		expect_matches_scalar<simd<float, 8>>(xs, ys, "w8");
-	}
-	else
+	} else
 	{
 		GTEST_SKIP() << "8-wide float/double simd not available on this target";
 	}

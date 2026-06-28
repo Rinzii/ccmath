@@ -24,14 +24,16 @@ namespace ccm::ext
 	 * @param target The target angle, in radians.
 	 * @return The shortest signed angular difference in the range [-pi, pi].
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T delta_angle(T current, T target) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T delta_angle(T current, T target) noexcept
 	{
 		const T two_pi = T(2) * ccm::numbers::pi_v<T>;
 
 		T delta = ext::repeat(target - current, two_pi);
 
-		if (delta > ccm::numbers::pi_v<T>) { delta -= two_pi; }
+		if (delta > ccm::numbers::pi_v<T>)
+		{
+			delta -= two_pi;
+		}
 
 		return delta;
 	}

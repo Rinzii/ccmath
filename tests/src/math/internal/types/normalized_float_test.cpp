@@ -46,7 +46,9 @@ TEST(CcmathInternalSupportTests, ExceptValuesLookupTowardZero)
 }
 
 TEST(CcmathInternalSupportTests, ExceptValuesLookupMissReturnsNullopt)
-{ EXPECT_FALSE(kFloatExcepts.lookup(0x40000000U).has_value()); }
+{
+	EXPECT_FALSE(kFloatExcepts.lookup(0x40000000U).has_value());
+}
 
 TEST(CcmathInternalTypesTests, DyadicFloatRoundedDivNearOne)
 {

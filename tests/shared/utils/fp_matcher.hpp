@@ -20,8 +20,7 @@
 namespace ccm::test
 {
 	/// Bit-exact floating-point equality (LLVM libc EXPECT_FP_EQ semantics).
-	template <typename T>
-	void ExpectFpEq(T actual, T expected)
+	template <typename T> void ExpectFpEq(T actual, T expected)
 	{
 		static_assert(std::is_floating_point_v<T>, "T must be floating-point");
 
@@ -38,23 +37,25 @@ namespace ccm::test
 		EXPECT_EQ(actual_bits.uintval(), expected_bits.uintval()) << "actual=" << actual << " expected=" << expected;
 	}
 
-	template <typename T>
-	void ExpectFpNe(T actual, T expected)
+	template <typename T> void ExpectFpNe(T actual, T expected)
 	{
 		using FPBits = ccm::support::fp::FPBits<T>;
 		FPBits actual_bits(actual);
 		FPBits expected_bits(expected);
 
-		if (actual_bits.is_nan()) { EXPECT_FALSE(expected_bits.is_nan()); }
-		else if (expected_bits.is_nan()) { EXPECT_TRUE(actual_bits.is_nan()); }
-		else
+		if (actual_bits.is_nan())
+		{
+			EXPECT_FALSE(expected_bits.is_nan());
+		} else if (expected_bits.is_nan())
+		{
+			EXPECT_TRUE(actual_bits.is_nan());
+		} else
 		{
 			EXPECT_NE(actual_bits.uintval(), expected_bits.uintval());
 		}
 	}
 
-	template <typename T>
-	void ExpectSignedZero(T value, bool negative)
+	template <typename T> void ExpectSignedZero(T value, bool negative)
 	{
 		EXPECT_EQ(value, T{});
 		EXPECT_EQ(std::signbit(value), negative);

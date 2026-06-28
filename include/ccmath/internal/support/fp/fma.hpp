@@ -31,60 +31,76 @@ namespace ccm::support::fp
 {
 	namespace fma_internal
 	{
-		template <typename Int>
-		[[nodiscard]] constexpr bool int_is_zero(const Int& value)
+		template <typename Int> [[nodiscard]] constexpr bool int_is_zero(const Int & value)
 		{
-			if constexpr (std::is_integral_v<Int>) { return value == Int(0); }
-			else
+			if constexpr (std::is_integral_v<Int>)
+			{
+				return value == Int(0);
+			} else
 			{
 				return value.is_zero();
 			}
 		}
 
-		template <typename Int>
-		[[nodiscard]] constexpr int int_bit_width(const Int& value)
+		template <typename Int> [[nodiscard]] constexpr int int_bit_width(const Int & value)
 		{
-			if (int_is_zero(value)) { return 0; }
+			if (int_is_zero(value))
+			{
+				return 0;
+			}
 			return support::bit_width(value);
 		}
 
-		template <typename Int>
-		[[nodiscard]] constexpr bool int_get_bit(const Int& value, int index)
+		template <typename Int> [[nodiscard]] constexpr bool int_get_bit(const Int & value, int index)
 		{
-			if (index < 0) { return false; }
-			if constexpr (std::is_integral_v<Int>) { return ((value >> index) & Int(1)) != Int(0); }
-			else
+			if (index < 0)
+			{
+				return false;
+			}
+			if constexpr (std::is_integral_v<Int>)
+			{
+				return ((value >> index) & Int(1)) != Int(0);
+			} else
 			{
 				return value.get_bit(static_cast<std::size_t>(index));
 			}
 		}
 
-		template <typename Int>
-		[[nodiscard]] constexpr bool lower_bits_nonzero(const Int& value, int bit_count)
+		template <typename Int> [[nodiscard]] constexpr bool lower_bits_nonzero(const Int & value, int bit_count)
 		{
-			if (bit_count <= 0) { return false; }
+			if (bit_count <= 0)
+			{
+				return false;
+			}
 			constexpr int DIGITS = std::numeric_limits<Int>::digits;
-			if (bit_count >= DIGITS) { return !int_is_zero(value); }
+			if (bit_count >= DIGITS)
+			{
+				return !int_is_zero(value);
+			}
 
 			if constexpr (std::is_integral_v<Int>)
 			{
 				const Int mask = (Int{ 1 } << bit_count) - Int{ 1 };
 				return (value & mask) != Int{ 0 };
-			}
-			else
+			} else
 			{
 				for (int bit = 0; bit < bit_count; ++bit)
 				{
-					if (value.get_bit(static_cast<std::size_t>(bit))) { return true; }
+					if (value.get_bit(static_cast<std::size_t>(bit)))
+					{
+						return true;
+					}
 				}
 				return false;
 			}
 		}
 
-		template <typename Int>
-		[[nodiscard]] constexpr bool shift_right_with_sticky(int shift_length, Int& value)
+		template <typename Int> [[nodiscard]] constexpr bool shift_right_with_sticky(int shift_length, Int & value)
 		{
-			if (shift_length <= 0 || int_is_zero(value)) { return false; }
+			if (shift_length <= 0 || int_is_zero(value))
+			{
+				return false;
+			}
 
 			constexpr int DIGITS = std::numeric_limits<Int>::digits;
 			if (shift_length >= DIGITS)
@@ -98,11 +114,9 @@ namespace ccm::support::fp
 			return sticky_bits;
 		}
 
-		template <typename T>
-		struct fixed_fma_traits;
+		template <typename T> struct fixed_fma_traits;
 
-		template <>
-		struct fixed_fma_traits<float>
+		template <> struct fixed_fma_traits<float>
 		{
 			using product_int					  = std::uint64_t;
 			using acc_int						  = types::UInt<128>;
@@ -110,8 +124,7 @@ namespace ccm::support::fp
 			static constexpr int accumulator_bits = 96;
 		};
 
-		template <>
-		struct fixed_fma_traits<double>
+		template <> struct fixed_fma_traits<double>
 		{
 			using product_int					  = types::UInt<128>;
 			using acc_int						  = types::UInt<256>;
@@ -119,11 +132,9 @@ namespace ccm::support::fp
 			static constexpr int accumulator_bits = 212;
 		};
 
-		template <typename T>
-		inline constexpr bool has_fixed_fma_kernel_v = std::is_same_v<T, float> || std::is_same_v<T, double>;
+		template <typename T> inline constexpr bool has_fixed_fma_kernel_v = std::is_same_v<T, float> || std::is_same_v<T, double>;
 
-		template <typename T>
-		struct decoded_operand
+		template <typename T> struct decoded_operand
 		{
 			using storage_type = typename FPBits<T>::storage_type;
 
@@ -134,8 +145,7 @@ namespace ccm::support::fp
 			int top_exponent	  = 0;
 		};
 
-		template <typename T>
-		[[nodiscard]] constexpr decoded_operand<T> decode_finite_nonzero(const FPBits<T>& bits)
+		template <typename T> [[nodiscard]] constexpr decoded_operand<T> decode_finite_nonzero(const FPBits<T> & bits)
 		{
 			decoded_operand<T> decoded{};
 			decoded.sign		 = bits.sign();
@@ -146,21 +156,24 @@ namespace ccm::support::fp
 			return decoded;
 		}
 
-		template <typename T, bool ShouldSignalExceptions>
-		[[nodiscard]] constexpr std::enable_if_t<std::is_floating_point_v<T>, T> wide_fma(T x, T y, T z);
+		template <typename T, bool ShouldSignalExceptions> [[nodiscard]] constexpr std::enable_if_t<std::is_floating_point_v<T>, T> wide_fma(T x, T y, T z);
 
-		template <typename T>
-		[[nodiscard]] constexpr T propagate_quiet_nan(const FPBits<T>& bits)
-		{ return FPBits<T>::quiet_nan(bits.sign(), bits.get_mantissa()).get_val(); }
+		template <typename T> [[nodiscard]] constexpr T propagate_quiet_nan(const FPBits<T> & bits)
+		{
+			return FPBits<T>::quiet_nan(bits.sign(), bits.get_mantissa()).get_val();
+		}
 
 		template <typename T, bool>
-		[[nodiscard]] constexpr bool special_case_fma(const FPBits<T>& x_bits, const FPBits<T>& y_bits, const FPBits<T>& z_bits, T& result)
+		[[nodiscard]] constexpr bool special_case_fma(const FPBits<T> & x_bits, const FPBits<T> & y_bits, const FPBits<T> & z_bits, T & result)
 		{
 			using Sign = types::Sign;
 
 			if (CCM_UNLIKELY(x_bits.is_nan() || y_bits.is_nan() || z_bits.is_nan()))
 			{
-				if (x_bits.is_signaling_nan() || y_bits.is_signaling_nan() || z_bits.is_signaling_nan()) { fenv::raise_except_if_required(FE_INVALID); }
+				if (x_bits.is_signaling_nan() || y_bits.is_signaling_nan() || z_bits.is_signaling_nan())
+				{
+					fenv::raise_except_if_required(FE_INVALID);
+				}
 
 				// When the addend is a quiet NaN, glibc std::fma does not raise FE_INVALID for an
 				// inf*0 product. Apple libm does. Match the platform libm observable behavior.
@@ -170,7 +183,10 @@ namespace ccm::support::fp
 				if (CCM_UNLIKELY(!z_bits.is_quiet_nan() && ((x_bits.is_zero() && y_bits.is_inf()) || (x_bits.is_inf() && y_bits.is_zero()))))
 #endif
 				{
-					if (!is_constant_evaluated()) { fenv::set_errno_if_required(EDOM); }
+					if (!is_constant_evaluated())
+					{
+						fenv::set_errno_if_required(EDOM);
+					}
 					fenv::raise_except_if_required(FE_INVALID);
 				}
 
@@ -198,7 +214,10 @@ namespace ccm::support::fp
 			{
 				if (x_bits.is_zero() || y_bits.is_zero())
 				{
-					if (!is_constant_evaluated()) { fenv::set_errno_if_required(EDOM); }
+					if (!is_constant_evaluated())
+					{
+						fenv::set_errno_if_required(EDOM);
+					}
 					fenv::raise_except_if_required(FE_INVALID);
 					result = FPBits<T>::quiet_nan().get_val();
 					return true;
@@ -207,7 +226,10 @@ namespace ccm::support::fp
 				const Sign product_sign = (x_bits.sign() == y_bits.sign()) ? Sign::POS : Sign::NEG;
 				if (z_bits.is_inf() && z_bits.sign() != product_sign)
 				{
-					if (!is_constant_evaluated()) { fenv::set_errno_if_required(EDOM); }
+					if (!is_constant_evaluated())
+					{
+						fenv::set_errno_if_required(EDOM);
+					}
 					fenv::raise_except_if_required(FE_INVALID);
 					result = FPBits<T>::quiet_nan().get_val();
 					return true;
@@ -229,10 +251,12 @@ namespace ccm::support::fp
 				if (z_bits.is_zero())
 				{
 					Sign zero_sign = product_sign;
-					if (product_sign != z_bits.sign()) { zero_sign = (fenv::get_rounding_mode() == FE_DOWNWARD) ? Sign::NEG : Sign::POS; }
+					if (product_sign != z_bits.sign())
+					{
+						zero_sign = (fenv::get_rounding_mode() == FE_DOWNWARD) ? Sign::NEG : Sign::POS;
+					}
 					result = FPBits<T>::zero(zero_sign).get_val();
-				}
-				else
+				} else
 				{
 					result = z_bits.get_val();
 				}
@@ -248,7 +272,10 @@ namespace ccm::support::fp
 			using OutFPBits	  = FPBits<T>;
 			using StorageType = typename OutFPBits::storage_type;
 
-			if (int_is_zero(mantissa)) { return OutFPBits::zero(sign).get_val(); }
+			if (int_is_zero(mantissa))
+			{
+				return OutFPBits::zero(sign).get_val();
+			}
 
 			constexpr int FRACTION_BITS	   = static_cast<int>(OutFPBits::fraction_length);
 			constexpr int PRECISION_BITS   = FRACTION_BITS + 1;
@@ -270,13 +297,19 @@ namespace ccm::support::fp
 
 				switch (fenv::get_rounding_mode())
 				{
-				case FE_TONEAREST: return OutFPBits::inf(sign).get_val();
+				case FE_TONEAREST : return OutFPBits::inf(sign).get_val();
 				case FE_TOWARDZERO: return OutFPBits::max_normal(sign).get_val();
 				case FE_DOWNWARD:
-					if (sign.is_pos()) { return OutFPBits::max_normal(types::Sign::POS).get_val(); }
+					if (sign.is_pos())
+					{
+						return OutFPBits::max_normal(types::Sign::POS).get_val();
+					}
 					return OutFPBits::inf(types::Sign::NEG).get_val();
 				case FE_UPWARD:
-					if (sign.is_neg()) { return OutFPBits::max_normal(types::Sign::NEG).get_val(); }
+					if (sign.is_neg())
+					{
+						return OutFPBits::max_normal(types::Sign::NEG).get_val();
+					}
 					return OutFPBits::inf(types::Sign::POS).get_val();
 				default: support::unreachable();
 				}
@@ -294,19 +327,19 @@ namespace ccm::support::fp
 				round_bit			= int_get_bit(mantissa, NORMAL_SHIFT - 1);
 				sticky_bit |= lower_bits_nonzero(mantissa, NORMAL_SHIFT - 1);
 				out_mantissa = static_cast<StorageType>(mantissa >> static_cast<std::size_t>(NORMAL_SHIFT));
-			}
-			else
+			} else
 			{
 				underflow				  = true;
 				const int subnormal_shift = MIN_SUBNORMAL_LS - base_exponent;
 
-				if (subnormal_shift > ActiveBits) { sticky_bit = true; }
-				else if (subnormal_shift == ActiveBits)
+				if (subnormal_shift > ActiveBits)
+				{
+					sticky_bit = true;
+				} else if (subnormal_shift == ActiveBits)
 				{
 					round_bit = int_get_bit(mantissa, ActiveBits - 1);
 					sticky_bit |= lower_bits_nonzero(mantissa, ActiveBits - 1);
-				}
-				else
+				} else
 				{
 					round_bit = int_get_bit(mantissa, subnormal_shift - 1);
 					sticky_bit |= lower_bits_nonzero(mantissa, subnormal_shift - 1);
@@ -320,13 +353,22 @@ namespace ccm::support::fp
 			switch (fenv::get_rounding_mode())
 			{
 			case FE_TONEAREST:
-				if (round_bit && (lsb || sticky_bit)) { ++result; }
+				if (round_bit && (lsb || sticky_bit))
+				{
+					++result;
+				}
 				break;
 			case FE_DOWNWARD:
-				if (sign.is_neg() && (round_bit || sticky_bit)) { ++result; }
+				if (sign.is_neg() && (round_bit || sticky_bit))
+				{
+					++result;
+				}
 				break;
 			case FE_UPWARD:
-				if (sign.is_pos() && (round_bit || sticky_bit)) { ++result; }
+				if (sign.is_pos() && (round_bit || sticky_bit))
+				{
+					++result;
+				}
 				break;
 			default: break;
 			}
@@ -338,12 +380,17 @@ namespace ccm::support::fp
 					int excepts = FE_INEXACT;
 					if (OutFPBits(result).is_inf())
 					{
-						if (!is_constant_evaluated()) { fenv::set_errno_if_required(ERANGE); }
+						if (!is_constant_evaluated())
+						{
+							fenv::set_errno_if_required(ERANGE);
+						}
 						excepts |= FE_OVERFLOW;
-					}
-					else if (underflow)
+					} else if (underflow)
 					{
-						if (!is_constant_evaluated()) { fenv::set_errno_if_required(ERANGE); }
+						if (!is_constant_evaluated())
+						{
+							fenv::set_errno_if_required(ERANGE);
+						}
 						excepts |= FE_UNDERFLOW;
 					}
 					fenv::raise_except_if_required(excepts);
@@ -353,8 +400,7 @@ namespace ccm::support::fp
 			return OutFPBits(result).get_val();
 		}
 
-		template <typename T, bool ShouldSignalExceptions>
-		[[nodiscard]] constexpr std::enable_if_t<has_fixed_fma_kernel_v<T>, T> fixed_fma(T x, T y, T z)
+		template <typename T, bool ShouldSignalExceptions> [[nodiscard]] constexpr std::enable_if_t<has_fixed_fma_kernel_v<T>, T> fixed_fma(T x, T y, T z)
 		{
 			using Traits	  = fixed_fma_traits<T>;
 			using FPBits	  = FPBits<T>;
@@ -368,7 +414,10 @@ namespace ccm::support::fp
 			FPBits const z_bits(z);
 
 			T special_result{};
-			if (special_case_fma<T, ShouldSignalExceptions>(x_bits, y_bits, z_bits, special_result)) { return special_result; }
+			if (special_case_fma<T, ShouldSignalExceptions>(x_bits, y_bits, z_bits, special_result))
+			{
+				return special_result;
+			}
 
 			const auto x_value = decode_finite_nonzero<T>(x_bits);
 			const auto y_value = decode_finite_nonzero<T>(y_bits);
@@ -397,8 +446,7 @@ namespace ccm::support::fp
 			{
 				z_sticky	  = shift_right_with_sticky(product_top_exponent - z_value.top_exponent, z_acc);
 				base_exponent = product_top_exponent - (Traits::accumulator_bits - 1);
-			}
-			else if (z_value.top_exponent > product_top_exponent)
+			} else if (z_value.top_exponent > product_top_exponent)
 			{
 				product_sticky = shift_right_with_sticky(z_value.top_exponent - product_top_exponent, product_acc);
 				base_exponent  = z_value.top_exponent - (Traits::accumulator_bits - 1);
@@ -419,13 +467,19 @@ namespace ccm::support::fp
 					result_mantissa >>= 1;
 					++base_exponent;
 				}
-			}
-			else
+			} else
 			{
 				int compare = 0;
-				if (product_acc > z_acc) { compare = 1; }
-				else if (product_acc < z_acc) { compare = -1; }
-				else if (product_sticky != z_sticky) { compare = product_sticky ? 1 : -1; }
+				if (product_acc > z_acc)
+				{
+					compare = 1;
+				} else if (product_acc < z_acc)
+				{
+					compare = -1;
+				} else if (product_sticky != z_sticky)
+				{
+					compare = product_sticky ? 1 : -1;
+				}
 
 				if (compare == 0)
 				{
@@ -440,22 +494,19 @@ namespace ccm::support::fp
 					{
 						result_mantissa = product_acc - z_acc - AccInt{ 1 };
 						sticky_tail		= true;
-					}
-					else
+					} else
 					{
 						result_mantissa = product_acc - z_acc;
 						sticky_tail		= product_sticky;
 					}
-				}
-				else
+				} else
 				{
 					result_sign = z_value.sign;
 					if (product_sticky)
 					{
 						result_mantissa = z_acc - product_acc - AccInt{ 1 };
 						sticky_tail		= true;
-					}
-					else
+					} else
 					{
 						result_mantissa = z_acc - product_acc;
 						sticky_tail		= z_sticky;
@@ -484,8 +535,7 @@ namespace ccm::support::fp
 		// Exact wide-integer FMA used for directed modes, constexpr policy modes, and every
 		// binary64 software fallback. The product is formed exactly, the addend is aligned with a
 		// sticky bit, and the result is rounded once through DyadicFloat::generic_as.
-		template <typename T, bool ShouldSignalExceptions>
-		[[nodiscard]] constexpr std::enable_if_t<std::is_floating_point_v<T>, T> wide_fma(T x, T y, T z)
+		template <typename T, bool ShouldSignalExceptions> [[nodiscard]] constexpr std::enable_if_t<std::is_floating_point_v<T>, T> wide_fma(T x, T y, T z)
 		{
 			using FPBits	  = FPBits<T>;
 			using StorageType = typename FPBits::storage_type;
@@ -503,14 +553,29 @@ namespace ccm::support::fp
 
 			if (CCM_UNLIKELY(x_bits.is_nan() || y_bits.is_nan() || z_bits.is_nan()))
 			{
-				if (x_bits.is_signaling_nan() || y_bits.is_signaling_nan() || z_bits.is_signaling_nan()) { fenv::raise_except_if_required(FE_INVALID); }
-				if (x_bits.is_quiet_nan()) { return FPBits::quiet_nan(x_bits.sign(), x_bits.get_mantissa()).get_val(); }
-				if (y_bits.is_quiet_nan()) { return FPBits::quiet_nan(y_bits.sign(), y_bits.get_mantissa()).get_val(); }
-				if (z_bits.is_quiet_nan()) { return FPBits::quiet_nan(z_bits.sign(), z_bits.get_mantissa()).get_val(); }
+				if (x_bits.is_signaling_nan() || y_bits.is_signaling_nan() || z_bits.is_signaling_nan())
+				{
+					fenv::raise_except_if_required(FE_INVALID);
+				}
+				if (x_bits.is_quiet_nan())
+				{
+					return FPBits::quiet_nan(x_bits.sign(), x_bits.get_mantissa()).get_val();
+				}
+				if (y_bits.is_quiet_nan())
+				{
+					return FPBits::quiet_nan(y_bits.sign(), y_bits.get_mantissa()).get_val();
+				}
+				if (z_bits.is_quiet_nan())
+				{
+					return FPBits::quiet_nan(z_bits.sign(), z_bits.get_mantissa()).get_val();
+				}
 				return FPBits::quiet_nan().get_val();
 			}
 
-			if (CCM_UNLIKELY(x == T(0) || y == T(0) || z == T(0))) { return (x * y) + z; }
+			if (CCM_UNLIKELY(x == T(0) || y == T(0) || z == T(0)))
+			{
+				return (x * y) + z;
+			}
 
 			int x_exp = 0;
 			int y_exp = 0;
@@ -548,7 +613,10 @@ namespace ccm::support::fp
 
 			if (CCM_UNLIKELY(x_exp == FPBits::max_biased_exponent || y_exp == FPBits::max_biased_exponent || z_exp == FPBits::max_biased_exponent))
 			{
-				if (CCM_UNLIKELY(x_exp != FPBits::max_biased_exponent && y_exp != FPBits::max_biased_exponent && z_bits.is_inf())) { return z; }
+				if (CCM_UNLIKELY(x_exp != FPBits::max_biased_exponent && y_exp != FPBits::max_biased_exponent && z_bits.is_inf()))
+				{
+					return z;
+				}
 				return (x * y) + z;
 			}
 
@@ -569,38 +637,49 @@ namespace ccm::support::fp
 			{
 				sticky_bits	 = shift_right_with_sticky(z_lsb_exp - prod_lsb_exp, prod_mant);
 				prod_lsb_exp = z_lsb_exp;
-			}
-			else if (z_lsb_exp < prod_lsb_exp)
+			} else if (z_lsb_exp < prod_lsb_exp)
 			{
 				z_shifted	= true;
 				sticky_bits = shift_right_with_sticky(prod_lsb_exp - z_lsb_exp, z_mant);
 			}
 
-			if (prod_sign == z_sign) { prod_mant += z_mant; }
-			else
+			if (prod_sign == z_sign)
+			{
+				prod_mant += z_mant;
+			} else
 			{
 				if (prod_mant >= z_mant)
 				{
-					if (z_shifted && sticky_bits) { ++z_mant; }
+					if (z_shifted && sticky_bits)
+					{
+						++z_mant;
+					}
 					prod_mant -= z_mant;
-				}
-				else
+				} else
 				{
-					if (!z_shifted && sticky_bits) { ++prod_mant; }
+					if (!z_shifted && sticky_bits)
+					{
+						++prod_mant;
+					}
 					prod_mant = z_mant - prod_mant;
 					prod_sign = z_sign;
 				}
 			}
 
-			if (prod_mant == TmpResultType(0)) { prod_sign = fenv::get_rounding_mode() == FE_DOWNWARD ? Sign::NEG : Sign::POS; }
+			if (prod_mant == TmpResultType(0))
+			{
+				prod_sign = fenv::get_rounding_mode() == FE_DOWNWARD ? Sign::NEG : Sign::POS;
+			}
 
 			WideFloat result(prod_sign, prod_lsb_exp - FPBits::exponent_bias, prod_mant);
-			if (sticky_bits) { result.mantissa |= TmpResultType(1); }
+			if (sticky_bits)
+			{
+				result.mantissa |= TmpResultType(1);
+			}
 			return result.template generic_as<T, ShouldSignalExceptions>();
 		}
 
-		template <bool ShouldSignalExceptions>
-		[[nodiscard]] constexpr float software_fmaf(float x, float y, float z)
+		template <bool ShouldSignalExceptions> [[nodiscard]] constexpr float software_fmaf(float x, float y, float z)
 		{
 			// The fixed binary32 kernel forms the product exactly in a wide accumulator and rounds
 			// once, so it is correctly rounded for every rounding mode. A "fast" double-precision
@@ -615,46 +694,58 @@ namespace ccm::support::fp
 	// libc's generic FMA (libc/src/__support/FPUtil/generic/FMA.h). This quiet variant is used by
 	// internal error-free transforms and deliberately suppresses public FE_INEXACT / range flag
 	// signaling while still producing the exact fused result under the active rounding mode.
-	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<std::is_floating_point_v<T>, T> generic_fma(T x, T y, T z)
+	template <typename T> [[nodiscard]] constexpr std::enable_if_t<std::is_floating_point_v<T>, T> generic_fma(T x, T y, T z)
 	{
-		if constexpr (std::is_same_v<T, float>) { return fma_internal::software_fmaf</*ShouldSignalExceptions=*/false>(x, y, z); }
-		else if constexpr (std::is_same_v<T, double>) { return fma_internal::fixed_fma<double, /*ShouldSignalExceptions=*/false>(x, y, z); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return fma_internal::software_fmaf</*ShouldSignalExceptions=*/false>(x, y, z);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return fma_internal::fixed_fma<double, /*ShouldSignalExceptions=*/false>(x, y, z);
+		} else
 		{
 			return fma_internal::wide_fma<T, /*ShouldSignalExceptions=*/false>(x, y, z);
 		}
 	}
 
-	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<std::is_floating_point_v<T>, T> public_fma(T x, T y, T z)
+	template <typename T> [[nodiscard]] constexpr std::enable_if_t<std::is_floating_point_v<T>, T> public_fma(T x, T y, T z)
 	{
-		if constexpr (std::is_same_v<T, float>) { return fma_internal::software_fmaf</*ShouldSignalExceptions=*/true>(x, y, z); }
-		else if constexpr (std::is_same_v<T, double>) { return fma_internal::fixed_fma<double, /*ShouldSignalExceptions=*/true>(x, y, z); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return fma_internal::software_fmaf</*ShouldSignalExceptions=*/true>(x, y, z);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return fma_internal::fixed_fma<double, /*ShouldSignalExceptions=*/true>(x, y, z);
+		} else
 		{
 			return fma_internal::wide_fma<T, /*ShouldSignalExceptions=*/true>(x, y, z);
 		}
 	}
 
-	template <typename T, bool HasConstexprBuiltinFma = ccm::builtin::has_constexpr_fma<T>>
-	struct dispatch_fma_constexpr_builtin
+	template <typename T, bool HasConstexprBuiltinFma = ccm::builtin::has_constexpr_fma<T>> struct dispatch_fma_constexpr_builtin
 	{
-		static constexpr T tonearest(T /*unused*/, T /*unused*/, T /*unused*/) { return T{}; }
+		static constexpr T tonearest(T /*unused*/, T /*unused*/, T /*unused*/)
+		{
+			return T{};
+		}
 	};
 
-	template <typename T>
-	struct dispatch_fma_constexpr_builtin<T, true>
+	template <typename T> struct dispatch_fma_constexpr_builtin<T, true>
 	{
-		static constexpr T tonearest(T x, T y, T z) { return ccm::builtin::fma_ct(x, y, z); }
+		static constexpr T tonearest(T x, T y, T z)
+		{
+			return ccm::builtin::fma_ct(x, y, z);
+		}
 	};
 
-	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<std::is_floating_point_v<T>, T> dispatch_fma(T x, T y, T z)
+	template <typename T> [[nodiscard]] constexpr std::enable_if_t<std::is_floating_point_v<T>, T> dispatch_fma(T x, T y, T z)
 	{
 		if constexpr (ccm::builtin::has_constexpr_fma<T>)
 		{
-			if (fenv::constant_eval_rounding_mode() == FE_TONEAREST) { return dispatch_fma_constexpr_builtin<T>::tonearest(x, y, z); }
+			if (fenv::constant_eval_rounding_mode() == FE_TONEAREST)
+			{
+				return dispatch_fma_constexpr_builtin<T>::tonearest(x, y, z);
+			}
 		}
 
 		if (!is_constant_evaluated())
@@ -665,20 +756,25 @@ namespace ccm::support::fp
 			// yielding wrong directed-mode results. Fall back to the correctly-rounded software path.
 			if constexpr (ccm::builtin::runtime_builtin_fma_trusted<T>)
 			{
-				if (fenv::get_rounding_mode() == FE_TONEAREST) { return builtin::fma_rt(x, y, z); }
+				if (fenv::get_rounding_mode() == FE_TONEAREST)
+				{
+					return builtin::fma_rt(x, y, z);
+				}
 			}
 		}
 
 		return public_fma(x, y, z);
 	}
 
-	template <typename T>
-	[[nodiscard]] std::enable_if_t<std::is_floating_point_v<T>, T> dispatch_runtime_fma(T x, T y, T z) noexcept
+	template <typename T> [[nodiscard]] std::enable_if_t<std::is_floating_point_v<T>, T> dispatch_runtime_fma(T x, T y, T z) noexcept
 	{
 		// See dispatch_fma: only trust the native FMA instruction under round-to-nearest.
 		if constexpr (ccm::builtin::runtime_builtin_fma_trusted<T>)
 		{
-			if (fenv::get_rounding_mode() == FE_TONEAREST) { return builtin::fma_rt(x, y, z); }
+			if (fenv::get_rounding_mode() == FE_TONEAREST)
+			{
+				return builtin::fma_rt(x, y, z);
+			}
 		}
 		return public_fma(x, y, z);
 	}

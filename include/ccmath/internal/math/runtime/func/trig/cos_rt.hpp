@@ -21,14 +21,15 @@
 
 namespace ccm::rt
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T cos_rt(T num) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T cos_rt(T num) noexcept
 	{
 #if defined(CCM_CONFIG_SYSTEM_MATH)
 		return detail::sys::cos_call(num);
 #else
-		if constexpr (ccm::builtin::has_runtime_cos<T>) { return ccm::builtin::cos_rt(num); }
-		else
+		if constexpr (ccm::builtin::has_runtime_cos<T>)
+		{
+			return ccm::builtin::cos_rt(num);
+		} else
 		{
 			const auto scalar = [](T value) { return gen::cos_gen(value); };
 	#if defined(CCMATH_HAS_SIMD) && defined(CCMATH_HAS_SIMD_SVML) && !defined(_MSC_VER)

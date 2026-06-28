@@ -31,17 +31,30 @@ namespace ccm
 	 * @param exp Integer value.
 	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T scalbn(T num, int exp) noexcept
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T scalbn(T num, int exp) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_scalbn<T>) { return ccm::builtin::scalbn_ct(num, exp); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_scalbn<T>)
 		{
-			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::scalbn_rt(num, exp); }
+			return ccm::builtin::scalbn_ct(num, exp);
+		} else
+		{
+			if (!ccm::support::is_constant_evaluated())
+			{
+				return ccm::rt::scalbn_rt(num, exp);
+			}
 
-			if constexpr (std::is_same_v<T, float>) { return internal::scalbn_float(num, exp); }
-			if constexpr (std::is_same_v<T, double>) { return internal::scalbn_double(num, exp); }
-			if constexpr (std::is_same_v<T, long double>) { return internal::scalbn_ldouble(num, exp); }
+			if constexpr (std::is_same_v<T, float>)
+			{
+				return internal::scalbn_float(num, exp);
+			}
+			if constexpr (std::is_same_v<T, double>)
+			{
+				return internal::scalbn_double(num, exp);
+			}
+			if constexpr (std::is_same_v<T, long double>)
+			{
+				return internal::scalbn_ldouble(num, exp);
+			}
 			return static_cast<T>(internal::scalbn_ldouble(num, exp));
 		}
 	}
@@ -53,17 +66,30 @@ namespace ccm
 	 * @param exp Integer value.
 	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T scalbn(T num, long exp) noexcept
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T scalbn(T num, long exp) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_scalbn<T>) { return ccm::builtin::scalbn_ct(num, exp); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_scalbn<T>)
 		{
-			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::scalbn_rt(num, static_cast<int>(exp)); }
+			return ccm::builtin::scalbn_ct(num, exp);
+		} else
+		{
+			if (!ccm::support::is_constant_evaluated())
+			{
+				return ccm::rt::scalbn_rt(num, static_cast<int>(exp));
+			}
 
-			if constexpr (std::is_same_v<T, float>) { return internal::scalbn_float(num, exp); }
-			if constexpr (std::is_same_v<T, double>) { return internal::scalbn_double(num, exp); }
-			if constexpr (std::is_same_v<T, long double>) { return internal::scalbn_ldouble(num, exp); }
+			if constexpr (std::is_same_v<T, float>)
+			{
+				return internal::scalbn_float(num, exp);
+			}
+			if constexpr (std::is_same_v<T, double>)
+			{
+				return internal::scalbn_double(num, exp);
+			}
+			if constexpr (std::is_same_v<T, long double>)
+			{
+				return internal::scalbn_ldouble(num, exp);
+			}
 			return static_cast<T>(internal::scalbn_ldouble(num, exp));
 		}
 	}
@@ -75,9 +101,10 @@ namespace ccm
 	 * @param exp Integer value.
 	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a double.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double scalbn(Integer num, int exp) noexcept
-	{ return ccm::scalbn<double>(static_cast<double>(num), exp); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double scalbn(Integer num, int exp) noexcept
+	{
+		return ccm::scalbn<double>(static_cast<double>(num), exp);
+	}
 
 	/**
 	 * @brief Multiplies a number by FLT_RADIX raised to a power
@@ -86,17 +113,20 @@ namespace ccm
 	 * @param exp Integer value.
 	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a double.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double scalbn(Integer num, long exp) noexcept
-	{ return ccm::scalbn<double>(static_cast<double>(num), exp); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double scalbn(Integer num, long exp) noexcept
+	{
+		return ccm::scalbn<double>(static_cast<double>(num), exp);
+	}
 
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T scalbln(T num, long int exp) noexcept
-	{ return ccm::scalbn(num, exp); }
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T scalbln(T num, long int exp) noexcept
+	{
+		return ccm::scalbn(num, exp);
+	}
 
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double scalbln(Integer num, long int exp) noexcept
-	{ return ccm::scalbn<double>(static_cast<double>(num), exp); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double scalbln(Integer num, long int exp) noexcept
+	{
+		return ccm::scalbn<double>(static_cast<double>(num), exp);
+	}
 
 	/**
 	 * @brief Multiplies a number by FLT_RADIX raised to a power
@@ -105,7 +135,9 @@ namespace ccm
 	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a float.
 	 */
 	constexpr float scalbnf(float num, int exp) noexcept
-	{ return ccm::scalbn<float>(num, exp); }
+	{
+		return ccm::scalbn<float>(num, exp);
+	}
 
 	/**
 	 * @brief Multiplies a number by FLT_RADIX raised to a power
@@ -114,7 +146,9 @@ namespace ccm
 	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a float.
 	 */
 	constexpr float scalbnf(float num, long exp) noexcept
-	{ return ccm::scalbn<float>(num, exp); }
+	{
+		return ccm::scalbn<float>(num, exp);
+	}
 
 	/**
 	 * @brief Multiplies a number by FLT_RADIX raised to a power
@@ -123,7 +157,9 @@ namespace ccm
 	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a long double.
 	 */
 	constexpr long double scalbnl(long double num, int exp) noexcept
-	{ return ccm::scalbn<long double>(num, exp); }
+	{
+		return ccm::scalbn<long double>(num, exp);
+	}
 
 	/**
 	 * @brief Multiplies a number by FLT_RADIX raised to a power
@@ -132,13 +168,19 @@ namespace ccm
 	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a long double.
 	 */
 	constexpr long double scalbnl(long double num, long exp) noexcept
-	{ return ccm::scalbn<long double>(num, exp); }
+	{
+		return ccm::scalbn<long double>(num, exp);
+	}
 
 	constexpr float scalblnf(float num, long int exp) noexcept
-	{ return ccm::scalbln<float>(num, exp); }
+	{
+		return ccm::scalbln<float>(num, exp);
+	}
 
 	constexpr long double scalblnl(long double num, long int exp) noexcept
-	{ return ccm::scalbln<long double>(num, exp); }
+	{
+		return ccm::scalbln<long double>(num, exp);
+	}
 } // namespace ccm
 
 #if defined(_MSC_VER) && !defined(__clang__)

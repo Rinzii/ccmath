@@ -185,6 +185,12 @@ TEST(CcmathMathConstexprSmokeTest, SincosInfinityAndNanPayload)
 	std::feclearexcept(FE_ALL_EXCEPT);
 	errno = 0;
 	EXPECT_TRUE(ccm::isnan(ccm::gen::sin_gen(inf)));
-	if ((handling & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0) { EXPECT_NE(std::fetestexcept(FE_INVALID), 0); }
-	if ((handling & get_mode(ccm_math_err_mode::eErrno)) != 0) { EXPECT_EQ(errno, EDOM); }
+	if ((handling & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0)
+	{
+		EXPECT_NE(std::fetestexcept(FE_INVALID), 0);
+	}
+	if ((handling & get_mode(ccm_math_err_mode::eErrno)) != 0)
+	{
+		EXPECT_EQ(errno, EDOM);
+	}
 }

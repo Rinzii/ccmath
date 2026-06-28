@@ -17,11 +17,13 @@
 
 namespace
 {
-	template <typename T>
-	void basic(uint8_t const * data, size_t size)
+	template <typename T> void basic(uint8_t const * data, size_t size)
 	{
 		ccm::fuzz::Inputs<T> in;
-		if (!in.load_xyz(data, size)) { return; }
+		if (!in.load_xyz(data, size))
+		{
+			return;
+		}
 
 		ccm::fuzz::fuzz_unary_vs_std(in.x, ccm::fabs<T>, [](T v) { return std::fabs(v); });
 		ccm::fuzz::fuzz_binary_vs_std(in.x, in.y, ccm::fdim<T>, [](T a, T b) { return std::fdim(a, b); });

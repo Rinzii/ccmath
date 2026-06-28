@@ -35,11 +35,17 @@ TEST(PowlPlatform, StdPowRegressionCorpus)
 			if (!ccm::config::reduced_precision_powl_fallback_enabled())
 			{
 				const auto path = ccm::test::oracle::classify_powl_gen_path(base, exponent);
-				if (!ccm::test::oracle::powl_path_is_native_phase1(path)) { continue; }
+				if (!ccm::test::oracle::powl_path_is_native_phase1(path))
+				{
+					continue;
+				}
 			}
 
 			const long double expected = std::pow(base, exponent);
-			if (std::isnan(expected)) { continue; }
+			if (std::isnan(expected))
+			{
+				continue;
+			}
 			EXPECT_EQ(ccm::powl(base, exponent), expected);
 		}
 	}

@@ -31,9 +31,10 @@ namespace ccm::ext
 		 * @param value The value to evaluate.
 		 * @return The interpolation parameter of value in the range [start, end].
 		 */
-		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-		constexpr T unlerp(T start, T end, T value) noexcept
-		{ return (value - start) / (end - start); }
+		template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T unlerp(T start, T end, T value) noexcept
+		{
+			return (value - start) / (end - start);
+		}
 	} // namespace unsafe
 
 	/**
@@ -52,12 +53,14 @@ namespace ccm::ext
 	 * @param value The value to evaluate.
 	 * @return The interpolation parameter of value in the range [start, end].
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T unlerp(T start, T end, T value) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T unlerp(T start, T end, T value) noexcept
 	{
 		const T length = end - start;
 
-		if (length == T(0)) { return T(0); }
+		if (length == T(0))
+		{
+			return T(0);
+		}
 
 		return ext::unsafe::unlerp(start, end, value);
 	}

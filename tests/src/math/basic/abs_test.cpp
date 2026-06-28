@@ -31,8 +31,7 @@ namespace
 	using testing::TestWithParam;
 	using testing::ValuesIn;
 
-	template <typename T>
-	struct AbsTestParams
+	template <typename T> struct AbsTestParams
 	{
 		T input{};
 		T expected{};
@@ -184,17 +183,13 @@ namespace
 } // namespace
 
 class CcmathAbsDoubleTests : public TestWithParam<AbsTestParams<double>>
-{
-};
+{};
 class CcmathAbsFloatTests : public TestWithParam<AbsTestParams<float>>
-{
-};
+{};
 class CcmathAbsLongDoubleTests : public TestWithParam<AbsTestParams<long double>>
-{
-};
+{};
 class CcmathAbsIntTests : public TestWithParam<AbsTestParams<int>>
-{
-};
+{};
 
 INSTANTIATE_TEST_SUITE_P(AbsDoubleTests, CcmathAbsDoubleTests, ValuesIn(kAbsDoubleTestParams));
 INSTANTIATE_TEST_SUITE_P(AbsFloatTests, CcmathAbsFloatTests, ValuesIn(kAbsFloatTestParams));
