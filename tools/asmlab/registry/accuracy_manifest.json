@@ -1,0 +1,90 @@
+{
+  "_comment": "Function-specific accuracy gate coverage. Keys match ulp_label in functions.json or registry function name. Each entry lists exact ctest targets or gtest filters to run.",
+  "sqrt": {
+    "simple": ["ccmath-simple-power"],
+    "rigorous": ["ccmath-rigorous-conformance"],
+    "rigorous_mpfr": [],
+    "rigorous_coremath": ["ccmath-rigorous-conformance"],
+    "mpfr_oracle": false,
+    "coremath_oracle": false,
+    "boundary_corpus": false,
+    "worst_case_replay": true,
+    "constexpr_tests": ["ccmath-simple-power"]
+  },
+  "sqrtf": {
+    "simple": ["ccmath-simple-power"],
+    "rigorous": ["ccmath-rigorous-conformance"],
+    "rigorous_mpfr": [],
+    "rigorous_coremath": ["ccmath-rigorous-conformance"],
+    "mpfr_oracle": false,
+    "coremath_oracle": false,
+    "boundary_corpus": false,
+    "worst_case_replay": true,
+    "constexpr_tests": ["ccmath-simple-power"]
+  },
+  "pow": {
+    "simple": ["ccmath-simple-power"],
+    "rigorous_mpfr": [
+      "ccmath-rigorous-mpfr-pow",
+      "ccmath-rigorous-power-boundaries",
+      "ccmath-rigorous-conformance"
+    ],
+    "rigorous_coremath": [
+      "ccmath-rigorous-coremath-pow",
+      "ccmath-rigorous-conformance"
+    ],
+    "rigorous": [
+      "ccmath-rigorous-mpfr-pow",
+      "ccmath-rigorous-coremath-pow",
+      "ccmath-rigorous-power-boundaries",
+      "ccmath-rigorous-conformance"
+    ],
+    "mpfr_oracle": true,
+    "coremath_oracle": true,
+    "boundary_corpus": true,
+    "worst_case_replay": true,
+    "constexpr_tests": ["ccmath-simple-power"]
+  },
+  "powf": {
+    "simple": ["ccmath-simple-power:CcmathPowerUlpTests.PowFloat"],
+    "rigorous_mpfr": [
+      "ccmath-rigorous-mpfr-powf",
+      "ccmath-rigorous-power-boundaries",
+      "ccmath-rigorous-conformance"
+    ],
+    "rigorous_coremath": [
+      "ccmath-rigorous-coremath-powf",
+      "ccmath-rigorous-conformance"
+    ],
+    "rigorous": [
+      "ccmath-rigorous-mpfr-powf",
+      "ccmath-rigorous-coremath-powf",
+      "ccmath-rigorous-power-boundaries",
+      "ccmath-rigorous-conformance"
+    ],
+    "mpfr_oracle": true,
+    "coremath_oracle": true,
+    "boundary_corpus": true,
+    "worst_case_replay": true,
+    "constexpr_tests": ["ccmath-simple-power"]
+  },
+  "powl": {
+    "simple": ["ccmath-simple-power"],
+    "rigorous_mpfr": [
+      "ccmath-rigorous-mpfr-powl",
+      "ccmath-rigorous-power-boundaries",
+      "ccmath-rigorous-powl-platform"
+    ],
+    "rigorous_coremath": [],
+    "rigorous": [
+      "ccmath-rigorous-mpfr-powl",
+      "ccmath-rigorous-power-boundaries",
+      "ccmath-rigorous-powl-platform"
+    ],
+    "mpfr_oracle": true,
+    "coremath_oracle": false,
+    "boundary_corpus": true,
+    "worst_case_replay": false,
+    "constexpr_tests": ["ccmath-simple-power"]
+  }
+}

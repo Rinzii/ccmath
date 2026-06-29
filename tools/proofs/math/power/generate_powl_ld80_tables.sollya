@@ -1,0 +1,51 @@
+// Generate ld80 powl table constants for powl_ld80_tables.hpp.
+// Run: sollya tools/proofs/math/power/generate_powl_ld80_tables.sollya
+
+display = hexadecimal;
+
+print("// POW_LOG2_COEFFS");
+Plog = fpminimax(log(1 + x)/log(2)/x, 6, [|double...|], [-2^(-8), 2^(-7)]);
+for i from 0 to 6 do print("{ ", Plog[i], "L },");
+
+print("");
+print("// POW_EXP2_COEFFS");
+Pexp = fpminimax(2^(x/64), 5, [|double...|], [-2^(-1), 2^(-1)]);
+for i from 0 to 5 do print("{ ", Pexp[i], "L },");
+
+print("");
+print("// RD[128]");
+for i from 0 to 127 do {
+  r = 2^(-8) * ceil(2^8 * (1 - 2^(-8)) / (1 + i * 2^(-7)));
+  print("{ ", r, "L },");
+};
+
+print("");
+print("// CD[128]");
+for i from 0 to 127 do {
+  r = 2^(-8) * ceil(2^8 * (1 - 2^(-8)) / (1 + i * 2^(-7)));
+  cd = r * (1 + i * 2^(-7)) - 1;
+  print("{ ", cd, "L },");
+};
+
+print("");
+print("// LOG2_R_TD[128]");
+for i from 0 to 127 do {
+  r = 2^(-8) * ceil(2^8 * (1 - 2^(-8)) / (1 + i * 2^(-7)));
+  a = -log2(r);
+  b = round(a, 64 - 24 - 8, RN);
+  c = round(a - b, double, RN);
+  d = round(a - b - c, double, RN);
+  if i == 0 then print("{ 0.0L, 0.0L, 0.0L },");
+  else print("{ ", d, "L, ", c, "L, ", b, "L },");
+};
+
+print("");
+print("// EXP2_MID1[64]");
+for i from 0 to 63 do {
+  t = 2^(i/64);
+  hi = round(t, 64 - 24 - 8, RN);
+  mid = round(t - hi, double, RN);
+  lo = round(t - hi - mid, double, RN);
+  if i == 0 then print("{ 0.0L, 0.0L, 0x1p0L },");
+  else print("{ ", lo, "L, ", mid, "L, ", hi, "L },");
+};

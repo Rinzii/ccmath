@@ -1,0 +1,121 @@
+{
+  "_comment": "Input corpora for isolated candidate accuracy probes. check: ulp (vs std::powf, max_ulp 4), special (bitwise special semantics), domain (domain-error NaN parity). Groups marked wired false in candidate_edge_cases.json are not executed.",
+  "powf_impl": {
+    "positive_finite_general": {
+      "wired": true,
+      "modes": ["simple"],
+      "cases": [
+        {"check": "ulp", "base": 2.0, "exp": 3.0},
+        {"check": "ulp", "base": 3.0, "exp": 0.5},
+        {"check": "ulp", "base": 0.5, "exp": 2.0},
+        {"check": "ulp", "base": 10.0, "exp": -1.0},
+        {"check": "ulp", "base": 0.25, "exp": 0.5},
+        {"check": "ulp", "base": 4.0, "exp": 3.0}
+      ]
+    },
+    "near_one": {
+      "wired": true,
+      "modes": ["simple"],
+      "cases": [
+        {"check": "ulp", "base": 1.0001, "exp": 1.5},
+        {"check": "ulp", "base": 0.9999, "exp": 2.0},
+        {"check": "ulp", "base": 1.0001, "exp": -0.5}
+      ]
+    },
+    "integer_exponent": {
+      "wired": true,
+      "modes": ["simple"],
+      "cases": [
+        {"check": "ulp", "base": 2.0, "exp": 4.0},
+        {"check": "ulp", "base": 1.5, "exp": 3.0},
+        {"check": "special", "base": 2.0, "exp": 2.0}
+      ]
+    },
+    "negative_base_integer_exponent": {
+      "wired": true,
+      "modes": ["simple"],
+      "cases": [
+        {"check": "ulp", "base": -1.0, "exp": 3.0},
+        {"check": "ulp", "base": -1.0, "exp": 4.0},
+        {"check": "ulp", "base": -4.0, "exp": 2.0},
+        {"check": "ulp", "base": -2.0, "exp": 5.0}
+      ]
+    },
+    "negative_base_noninteger_exponent": {
+      "wired": true,
+      "modes": ["simple"],
+      "cases": [
+        {"check": "domain", "base": -4.0, "exp": 0.5},
+        {"check": "domain", "base": -1.0, "exp": 1.5},
+        {"check": "domain", "base": -2.0, "exp": 0.25}
+      ]
+    },
+    "zero_signed_zero": {
+      "wired": true,
+      "modes": ["simple"],
+      "cases": [
+        {"check": "special", "base": 0.0, "exp": 2.0},
+        {"check": "special", "base": "-0", "exp": 3.0},
+        {"check": "special", "base": 0.0, "exp": 0.0},
+        {"check": "special", "base": 2.0, "exp": 0.0}
+      ]
+    },
+    "nan_inf": {
+      "wired": true,
+      "modes": ["simple"],
+      "cases": [
+        {"check": "special", "base": "nan", "exp": 2.0},
+        {"check": "special", "base": 2.0, "exp": "nan"},
+        {"check": "special", "base": "inf", "exp": 2.0},
+        {"check": "special", "base": 2.0, "exp": "inf"},
+        {"check": "special", "base": "-inf", "exp": 3.0}
+      ]
+    },
+    "subnormal": {
+      "wired": true,
+      "modes": ["simple"],
+      "cases": [
+        {"check": "ulp", "base": "denorm_min", "exp": 1.0},
+        {"check": "ulp", "base": "denorm_min", "exp": 2.0},
+        {"check": "ulp", "base": 1.5, "exp": "denorm_min"}
+      ]
+    },
+    "overflow_boundary": {
+      "wired": true,
+      "modes": ["simple"],
+      "cases": [
+        {"check": "ulp", "base": "max", "exp": 2.0},
+        {"check": "ulp", "base": 1.9, "exp": 100.0},
+        {"check": "special", "base": "max", "exp": "max"}
+      ]
+    },
+    "underflow_boundary": {
+      "wired": true,
+      "modes": ["simple"],
+      "cases": [
+        {"check": "ulp", "base": 2.0, "exp": -120.0},
+        {"check": "ulp", "base": 1.1, "exp": -90.0}
+      ]
+    },
+    "rounding_sensitive": {
+      "wired": false,
+      "modes": [],
+      "cases": []
+    },
+    "known_worst_ulp": {
+      "wired": true,
+      "modes": ["simple"],
+      "cases": [
+        {"check": "ulp", "base": 9.53674316e-07, "exp": 1048576.0},
+        {"check": "ulp", "base": -1.0, "exp": 3.0},
+        {"check": "ulp", "base": -1.0, "exp": 4.0},
+        {"check": "domain", "base": -1.0, "exp": 1.5}
+      ]
+    },
+    "ziv_retry_path": {
+      "wired": false,
+      "modes": [],
+      "cases": []
+    }
+  }
+}

@@ -1,0 +1,64 @@
+// Teaching log2 reduction table for B = 16.
+
+prec = 240!;
+display = decimal!;
+rationalmode = off!;
+
+data_path = "docs/approximating_functions/data/log2_core_table.dat";
+
+B = 16!;
+hi_bits = 32!;
+sample_n = 1024!;
+
+print("script:", "log2_core_table.sollya");
+version;
+print("B:", B);
+print("hi_bits:", hi_bits);
+print("r_i formula:", "c_i = 1 + (i + 1/2) / B", "r_i = round(1 / c_i, D, RN)");
+print("approximated value:", "a_i = -log2(r_i)");
+print("split rounding:", "a_hi = round(a_i, hi_bits, RN)", "a_lo = round(a_i - a_hi, D, RN)");
+print("split invariant:", "a_i is approximated by a_hi + a_lo for the teaching fast path");
+print("bucket sampling:", sample_n + 1, "points on each closed bucket interval");
+
+print("i", "r", "a_hi", "a_lo", "residual_center") > data_path;
+
+global_min_u = 1;
+global_max_u = -1;
+
+for i from 0 to B - 1 do {
+  c = round(1 + (i + 0.5) / B, prec, RN);
+  r = round(1 / c, D, RN);
+  a = evaluate(-log2(x), r);
+  a_hi = round(a, hi_bits, RN);
+  a_lo = round(a - a_hi, D, RN);
+  residual_center = round(c * r - 1, prec, RN);
+
+  bucket_lo = round(1 + i / B, prec, RN);
+  bucket_hi = round(1 + (i + 1) / B, prec, RN);
+  bucket_min_u = 1;
+  bucket_max_u = -1;
+
+  for j from 0 to sample_n do {
+    mj = round(bucket_lo + (bucket_hi - bucket_lo) * j / sample_n, prec, RN);
+    uj = round(mj * r - 1, prec, RN);
+
+    if (uj < bucket_min_u) then {
+      bucket_min_u = uj;
+    };
+    if (uj > bucket_max_u) then {
+      bucket_max_u = uj;
+    };
+    if (uj < global_min_u) then {
+      global_min_u = uj;
+    };
+    if (uj > global_max_u) then {
+      global_max_u = uj;
+    };
+  };
+
+  print(i, r, a_hi, a_lo, residual_center) >> data_path;
+  print("entry", i, "c_i", c, "r_i", r, "a_i", a, "a_hi", a_hi, "a_lo", a_lo,
+        "residual_center", residual_center, "bucket_min_u", bucket_min_u, "bucket_max_u", bucket_max_u);
+};
+
+print("observed residual interval from sampled reduction:", "[", global_min_u, ";", global_max_u, "]");

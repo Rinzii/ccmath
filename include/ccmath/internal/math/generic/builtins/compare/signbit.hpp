@@ -34,6 +34,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_SIGNBIT
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for signbit that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_SIGNBIT
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_SIGNBIT
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -49,6 +64,15 @@ namespace ccm::builtin
 #endif
 	// clang-format on
 
+	// TODO: determine actual compiler/version support for runtime __builtin_signbit.
+	template <typename T>
+	inline constexpr bool has_runtime_signbit =
+#ifdef CCMATH_HAS_BUILTIN_SIGNBIT
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_signbit functions.
@@ -56,8 +80,12 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_signbit functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto signbit(T x) -> std::enable_if_t<has_constexpr_signbit<T>, bool>
+	template <typename T> constexpr auto signbit_ct(T x) -> std::enable_if_t<has_constexpr_signbit<T>, bool>
+	{
+		return __builtin_signbit(x);
+	}
+
+	template <typename T> auto signbit_rt(T x) -> std::enable_if_t<has_runtime_signbit<T>, bool>
 	{
 		return __builtin_signbit(x);
 	}
@@ -65,3 +93,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_SIGNBIT
+#undef CCMATH_HAS_BUILTIN_SIGNBIT

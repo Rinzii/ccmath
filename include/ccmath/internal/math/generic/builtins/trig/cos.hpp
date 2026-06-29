@@ -28,17 +28,41 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_COS
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for cos that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_COS
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_COS
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
 	template <typename T>
 	inline constexpr bool has_constexpr_cos =
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_COS
-		is_valid_builtin_type<T>;
+		is_valid_transcendental_builtin_type<T>;
 	#else
 			false;
 	#endif
 	// clang-format on
+
+	// TODO: determine actual compiler/version support for runtime __builtin_cos.
+	template <typename T>
+	inline constexpr bool has_runtime_cos =
+#ifdef CCMATH_HAS_BUILTIN_COS
+		is_valid_transcendental_builtin_type<T>;
+#else
+		false;
+#endif
 
 	/**
 	 * Wrapper for constexpr __builtin_cos functions.
@@ -46,16 +70,40 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_cos functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto cos(T x) -> std::enable_if_t<has_constexpr_cos<T>, T>
+	template <typename T> constexpr auto cos_ct(T x) -> std::enable_if_t<has_constexpr_cos<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_cosf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_cos(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_cosl(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_cosf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_cos(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_cosl(x);
+		} else
 		{
 			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_cos");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for cos");
+			return T{};
+		}
+	}
+
+	template <typename T> auto cos_rt(T x) -> std::enable_if_t<has_runtime_cos<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_cosf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_cos(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_cosl(x);
+		} else
+		{
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for cos");
 			return T{};
 		}
 	}
@@ -63,3 +111,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_COS
+#undef CCMATH_HAS_BUILTIN_COS

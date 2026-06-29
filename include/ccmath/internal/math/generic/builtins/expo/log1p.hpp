@@ -28,6 +28,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_LOG1P
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for log1p that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_LOG1P
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_LOG1P
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -37,11 +52,20 @@ namespace ccm::builtin
 	template <typename T>
 	inline constexpr bool has_constexpr_log1p =
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_LOG1P
-		is_valid_builtin_type<T>;
+		is_valid_transcendental_builtin_type<T>;
 	#else
 			false;
 	#endif
 	// clang-format on
+
+	// TODO: determine actual compiler/version support for runtime __builtin_log1p.
+	template <typename T>
+	inline constexpr bool has_runtime_log1p =
+#ifdef CCMATH_HAS_BUILTIN_LOG1P
+		is_valid_transcendental_builtin_type<T>;
+#else
+		false;
+#endif
 
 	/**
 	 * @internal
@@ -50,16 +74,40 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_log1p functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto log1p(T x) -> std::enable_if_t<has_constexpr_log1p<T>, T>
+	template <typename T> constexpr auto log1p_ct(T x) -> std::enable_if_t<has_constexpr_log1p<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_log1pf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_log1p(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_log1pl(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_log1pf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_log1p(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_log1pl(x);
+		} else
 		{
 			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_log1p");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for log1p");
+			return T{};
+		}
+	}
+
+	template <typename T> auto log1p_rt(T x) -> std::enable_if_t<has_runtime_log1p<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_log1pf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_log1p(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_log1pl(x);
+		} else
+		{
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for log1p");
 			return T{};
 		}
 	}
@@ -67,3 +115,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_LOG1P
+#undef CCMATH_HAS_BUILTIN_LOG1P

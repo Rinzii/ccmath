@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "rules": [
+    "x86_stack_serial_fma",
+    "aarch64_stack_serial_fma",
+    "back_to_back_fma_dependency",
+    "call_boundary_thin_slice"
+  ]
+}

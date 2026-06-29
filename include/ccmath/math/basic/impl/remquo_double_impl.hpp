@@ -42,7 +42,10 @@ namespace ccm::internal
 			y_i64 &= 0x7fffffffffffffffULL;
 
 			// If y is zero.
-			if (CCM_UNLIKELY(y_i64 == 0)) { return (x * y) / (x * y); }
+			if (CCM_UNLIKELY(y_i64 == 0))
+			{
+				return (x * y) / (x * y);
+			}
 
 			// GCC and Clang do not like comparing signed and unsigned integers.
 			// The outcome of these comparisons is well-defined, so we can safely disable these warnings.
@@ -97,8 +100,7 @@ namespace ccm::internal
 						++computed_quotient;
 					}
 				}
-			}
-			else
+			} else
 			{
 				const double y_half = 0.5 * y;
 				if (x > y_half)
@@ -119,8 +121,14 @@ namespace ccm::internal
 			*quo = quotient_sign != 0U ? -computed_quotient : computed_quotient;
 
 			// Make sure that the correct sign of zero results in round down mode.
-			if (x == 0.0) { x = 0.0; }
-			if (x_sign != 0U) { x = -x; }
+			if (x == 0.0)
+			{
+				x = 0.0;
+			}
+			if (x_sign != 0U)
+			{
+				x = -x;
+			}
 
 			return x;
 		}

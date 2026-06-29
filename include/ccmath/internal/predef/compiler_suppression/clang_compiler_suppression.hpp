@@ -10,8 +10,8 @@
 
 #pragma once
 
-// TODO: This should work fine on clang based compilers, but I still need to validate this is fact.
-// TODO: I need to validate that clang-cl works with this as well on windows.
+// TODO(IanP): This should work fine on clang based compilers, but I still need to validate this is fact.
+// TODO(IanP): I need to validate that clang-cl works with this as well on windows.
 
 ///
 /// \def CCM_DISABLE_CLANG_WARNING(w)
@@ -27,7 +27,7 @@
 ///     CCM_RESTORE_CLANG_WARNING()
 ///
 #ifndef CCM_DISABLE_CLANG_WARNING
-	#if defined(__clang__)
+	#ifdef __clang__
 	// Disable clang format so it does not format "-Wunknown-warning-option" to "- Wunknown - Wwarning - Woption"
 	// clang-format off
 		#define CCM_CLANG_WHELP0(x) #x											 // Helper macros - do not use directly
@@ -60,7 +60,7 @@
 ///     CCM_RESTORE_CLANG_WARNING()
 ///
 #ifndef CCM_RESTORE_CLANG_WARNING
-	#if defined(__clang__)
+	#ifdef __clang__
 		// Restore a warning for Clang in a stack-based manner.
 		// Must be called after CCM_DISABLE_CLANG_WARNING(w).
 		#define CCM_RESTORE_CLANG_WARNING() _Pragma("clang diagnostic pop")
@@ -85,7 +85,7 @@
 ///     CCM_DISABLE_CLANG_WARNING_AS_ERROR()
 ///
 #ifndef CCM_ENABLE_CLANG_WARNING_AS_ERROR
-	#if defined(__clang__)
+	#ifdef __clang__
 		// Helper macros
 		#define CCM_CLANG_WERROR_HELP0(x) #x											   // Helper macros - do not use directly
 		#define CCM_CLANG_WERROR_HELP1(x) CCM_CLANG_WERROR_HELP0(clang diagnostic error x) // Helper macros - do not use directly
@@ -114,7 +114,7 @@
 ///     CCM_DISABLE_CLANG_WARNING_AS_ERROR()
 ///
 #ifndef CCM_DISABLE_CLANG_WARNING_AS_ERROR
-	#if defined(__clang__)
+	#ifdef __clang__
 		// This will disable a warning as an error for clang in a stack-based manner.
 		// Must be called after CCM_ENABLE_CLANG_WARNING_AS_ERROR(w).
 		#define CCM_DISABLE_CLANG_WARNING_AS_ERROR() _Pragma("clang diagnostic pop")

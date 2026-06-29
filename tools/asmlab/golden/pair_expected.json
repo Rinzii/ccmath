@@ -1,0 +1,30 @@
+{
+  "baseline": "golden_poly_horner",
+  "candidate": "golden_poly_estrin",
+  "description": "Horner vs Estrin calibration pair for asmlab analysis validation.",
+  "expected_top_findings": [
+    "dependency_chain_reduced",
+    "ILP_increased",
+    "throughput_improved",
+    "register_pressure_increased",
+    "FMA_contraction_present"
+  ],
+  "suppressed_low_value": [
+    "raw_instruction_count_only",
+    "generic_remark_spam"
+  ],
+  "expected_metric_direction": {
+    "llvm_mca_rthroughput": "estrin_lower_is_faster",
+    "benchmark_ns": "estrin_lower_or_equal",
+    "register_pressure": "estrin_higher"
+  },
+  "validation_thresholds": {
+    "ipc_improvement_ratio_min": 1.02,
+    "rthroughput_improvement_min": 0.01,
+    "register_pressure_delta_min": 0,
+    "instruction_count_delta_min": 2,
+    "stack_mem_delta_min": 1,
+    "register_insn_delta_min": 0,
+    "top_finding_rank_max": 3
+  }
+}

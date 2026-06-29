@@ -21,11 +21,12 @@ namespace ccm
 	 * @param num A floating-point or integer value
 	 * @return true if the number has a finite value, false otherwise.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr bool isfinite(T num)
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr bool isfinite(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_isfinite<T>) { return ccm::builtin::isfinite(num); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_isfinite<T>)
+		{
+			return ccm::builtin::isfinite_ct(num);
+		} else
 		{
 			using FPBits_t = typename ccm::support::fp::FPBits<T>;
 			const FPBits_t num_bits(num);
@@ -38,10 +39,9 @@ namespace ccm
 	 * @tparam Integer The type of the integer.
 	 * @return true if the number has a finite value, false otherwise.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr bool isfinite(Integer /* x */)
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr bool isfinite(Integer /* x */)
 	{
-		return false; // All integers are finite
+		return true; // All integers are finite
 	}
 
 } // namespace ccm

@@ -51,7 +51,10 @@ namespace ccm::support::fp::op
 		{
 			if (x_bits.is_nan() || y_bits.is_nan())
 			{
-				if (x_bits.is_signaling_nan() || y_bits.is_signaling_nan()) { fenv::raise_except_if_required(FE_INVALID); }
+				if (x_bits.is_signaling_nan() || y_bits.is_signaling_nan())
+				{
+					fenv::raise_except_if_required(FE_INVALID);
+				}
 
 				if (x_bits.is_quiet_nan())
 				{
@@ -86,7 +89,10 @@ namespace ccm::support::fp::op
 				return OutFPBits::inf(x_bits.sign()).get_val();
 			}
 
-			if (y_bits.is_inf()) { return OutFPBits::inf(y_bits.sign()).get_val(); }
+			if (y_bits.is_inf())
+			{
+				return OutFPBits::inf(y_bits.sign()).get_val();
+			}
 
 			if (x_bits.is_zero())
 			{
@@ -95,7 +101,7 @@ namespace ccm::support::fp::op
 					switch (fenv::get_rounding_mode())
 					{
 					case FE_DOWNWARD: return OutFPBits::zero(types::Sign::NEG).get_val();
-					default: return OutFPBits::zero(types::Sign::POS).get_val();
+					default			: return OutFPBits::zero(types::Sign::POS).get_val();
 					}
 				}
 
@@ -103,13 +109,19 @@ namespace ccm::support::fp::op
 				// immediately back to InType before negating it, resulting in double
 				// rounding.
 				volatile InType tmp = y;
-				if constexpr (IsSub) { tmp = -tmp; }
+				if constexpr (IsSub)
+				{
+					tmp = -tmp;
+				}
 				return static_cast<OutType>(tmp);
 			}
 			if (y_bits.is_zero())
 			{
 				volatile InType tmp = y;
-				if constexpr (IsSub) { tmp = -tmp; }
+				if constexpr (IsSub)
+				{
+					tmp = -tmp;
+				}
 				return static_cast<OutType>(tmp);
 			}
 		}
@@ -122,19 +134,29 @@ namespace ccm::support::fp::op
 			switch (fenv::get_rounding_mode())
 			{
 			case FE_DOWNWARD: return OutFPBits::zero(types::Sign::NEG).get_val();
-			default: return OutFPBits::zero(types::Sign::POS).get_val();
+			default			: return OutFPBits::zero(types::Sign::POS).get_val();
 			}
 		}
 
 		types::Sign result_sign = types::Sign::POS;
 
-		if (x_abs > y_abs) { result_sign = x_bits.sign(); } // NOLINT(bugprone-branch-clone)
+		if (x_abs > y_abs)
+		{
+			result_sign = x_bits.sign();
+		} // NOLINT(bugprone-branch-clone)
 		else if (x_abs < y_abs)
 		{
-			if (is_effectively_add) { result_sign = y_bits.sign(); }
-			else if (y_bits.is_pos()) { result_sign = types::Sign::NEG; }
+			if (is_effectively_add)
+			{
+				result_sign = y_bits.sign();
+			} else if (y_bits.is_pos())
+			{
+				result_sign = types::Sign::NEG;
+			}
+		} else if (is_effectively_add)
+		{
+			result_sign = x_bits.sign();
 		}
-		else if (is_effectively_add) { result_sign = x_bits.sign(); }
 
 		InFPBits max_bits(ccm::gen::max(x_abs, y_abs));
 		InFPBits min_bits(ccm::gen::min(x_abs, y_abs));
@@ -145,12 +167,16 @@ namespace ccm::support::fp::op
 		{
 			// min_bits must be subnormal too.
 
-			if (is_effectively_add) { result_mant = max_bits.get_mantissa() + min_bits.get_mantissa(); }
-			else { result_mant = max_bits.get_mantissa() - min_bits.get_mantissa(); }
+			if (is_effectively_add)
+			{
+				result_mant = max_bits.get_mantissa() + min_bits.get_mantissa();
+			} else
+			{
+				result_mant = max_bits.get_mantissa() - min_bits.get_mantissa();
+			}
 
 			result_mant <<= guard_bits_length;
-		}
-		else
+		} else
 		{
 			InStorageType max_mant = max_bits.get_explicit_mantissa() << guard_bits_length;
 			InStorageType min_mant = min_bits.get_explicit_mantissa() << guard_bits_length;
@@ -159,14 +185,26 @@ namespace ccm::support::fp::op
 			InStorageType aligned_min_mant = min_mant >> ccm::gen::min(alignment, result_mantissa_length);
 			bool aligned_min_mant_sticky   = false;
 
-			if (alignment <= 3) { aligned_min_mant_sticky = false; }
-			else if (alignment <= InFPBits::fraction_length + 3) { aligned_min_mant_sticky = (min_mant << (InFPBits::storage_length - alignment)) != 0; }
-			else { aligned_min_mant_sticky = true; }
+			if (alignment <= 3)
+			{
+				aligned_min_mant_sticky = false;
+			} else if (alignment <= InFPBits::fraction_length + 3)
+			{
+				aligned_min_mant_sticky = (min_mant << (InFPBits::storage_length - alignment)) != 0;
+			} else
+			{
+				aligned_min_mant_sticky = true;
+			}
 
 			InStorageType min_mant_sticky(static_cast<int>(aligned_min_mant_sticky));
 
-			if (is_effectively_add) { result_mant = max_mant + (aligned_min_mant | min_mant_sticky); }
-			else { result_mant = max_mant - (aligned_min_mant | min_mant_sticky); }
+			if (is_effectively_add)
+			{
+				result_mant = max_mant + (aligned_min_mant | min_mant_sticky);
+			} else
+			{
+				result_mant = max_mant - (aligned_min_mant | min_mant_sticky);
+			}
 		}
 
 		int result_exp = max_bits.get_exponent() - result_fraction_length;

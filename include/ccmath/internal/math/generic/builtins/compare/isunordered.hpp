@@ -27,6 +27,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_ISUNORDERED
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for isunordered that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_ISUNORDERED
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_ISUNORDERED
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -42,6 +57,15 @@ namespace ccm::builtin
 #endif
 	// clang-format on
 
+	// TODO: determine actual compiler/version support for runtime __builtin_isunordered.
+	template <typename T>
+	inline constexpr bool has_runtime_isunordered =
+#ifdef CCMATH_HAS_BUILTIN_ISUNORDERED
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_isunordered functions.
@@ -49,8 +73,12 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_isunordered functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto isunordered(T x, T y) -> std::enable_if_t<has_constexpr_isunordered<T>, bool>
+	template <typename T> constexpr auto isunordered_ct(T x, T y) -> std::enable_if_t<has_constexpr_isunordered<T>, bool>
+	{
+		return __builtin_isunordered(x, y);
+	}
+
+	template <typename T> auto isunordered_rt(T x, T y) -> std::enable_if_t<has_runtime_isunordered<T>, bool>
 	{
 		return __builtin_isunordered(x, y);
 	}
@@ -58,3 +86,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_ISUNORDERED
+#undef CCMATH_HAS_BUILTIN_ISUNORDERED

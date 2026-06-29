@@ -29,12 +29,13 @@ namespace ccm
 	 * @tparam T The type of the number.
 	 * @param num A floating-point value.
 	 * @return If no errors occur, the rounded floating point value. Otherwise, returns the input floating point value unmodified.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/nearbyint
 	 */
-	template <class T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T nearbyint(T num) noexcept
+	template <class T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T nearbyint(T num) noexcept
 	{
-		if (!ccm::support::is_constant_evaluated()) { return ccm::rt::nearbyint_rt(num); }
+		if (!ccm::support::is_constant_evaluated())
+		{
+			return ccm::rt::nearbyint_rt(num);
+		}
 
 		constexpr auto rounding_mode{ ccm::support::fenv::get_rounding_mode() };
 		return ccm::support::fp::directional_round(num, rounding_mode);
@@ -45,10 +46,8 @@ namespace ccm
 	 * @tparam Integer The type of the number.
 	 * @param num An integral value.
 	 * @return If no errors occur, the rounded floating point value. Otherwise, returns the input integer value unmodified.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/nearbyint
 	 */
-	template <class Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double nearbyint(Integer num) noexcept
+	template <class Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double nearbyint(Integer num) noexcept
 	{
 		return static_cast<double>(num);
 	}
@@ -57,7 +56,6 @@ namespace ccm
 	 * @brief The nearest integer value to num, according to the rounding mode FE_TONEAREST, is returned.
 	 * @param num A float value.
 	 * @return If no errors occur, the rounded floating point value. Otherwise, returns the input integer value unmodified.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/nearbyint
 	 */
 	constexpr float nearbyintf(float num) noexcept
 	{
@@ -68,7 +66,6 @@ namespace ccm
 	 * @brief The nearest integer value to num, according to the rounding mode FE_TONEAREST, is returned.
 	 * @param num A long double value.
 	 * @return If no errors occur, the rounded floating point value. Otherwise, returns the input integer value unmodified.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/nearbyint
 	 */
 	constexpr long double nearbyintl(long double num) noexcept
 	{

@@ -10,29 +10,34 @@
 
 #pragma once
 
-#include "ccmath/internal/math/runtime/func/detail/msvc_libm.hpp"
-#include "ccmath/internal/math/runtime/func/detail/trunc_scalar.hpp"
+#include "ccmath/internal/math/generic/builtins/basic/fmod.hpp"
+#include "ccmath/internal/math/runtime/func/detail/system_math.hpp"
 #include "ccmath/internal/math/runtime/func/rt_dispatch.hpp"
-#include "ccmath/internal/predef/has_builtin.hpp"
+#include "ccmath/math/basic/impl/fmod_impl.hpp"
 
 #include <type_traits>
 
 namespace ccm::rt
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T fmod_rt(T x, T y) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T fmod_rt(T x, T y) noexcept
 	{
-#if defined(_MSC_VER) && !defined(__clang__)
-		return detail::msvc_libm::fmod_call(x, y);
+#if defined(CCM_CONFIG_SYSTEM_MATH)
+		return detail::sys::fmod_call(x, y);
 #else
-	#if CCM_HAS_BUILTIN(__builtin_fmod) || defined(__builtin_fmod)
-		if constexpr (std::is_same_v<T, float>) { return __builtin_fmodf(x, y); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_fmod(x, y); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fmodl(x, y); }
-		else { return static_cast<T>(__builtin_fmodl(static_cast<long double>(x), static_cast<long double>(y))); }
-	#else
-		return static_cast<T>(x - (detail::trunc_scalar<T>(x / y) * y));
-	#endif
+		if constexpr (ccm::builtin::has_runtime_fmod<T>)
+		{
+			return ccm::builtin::fmod_rt(x, y);
+		} else
+		{
+			// No builtin and no system math, so use the exact FPBits reduction. It is exact for every magnitude.
+			if constexpr (std::is_same_v<T, long double>)
+			{
+				return static_cast<T>(ccm::internal::fmod(static_cast<double>(x), static_cast<double>(y)));
+			} else
+			{
+				return ccm::internal::fmod(x, y);
+			}
+		}
 #endif
 	}
 } // namespace ccm::rt

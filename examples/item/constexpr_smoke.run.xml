@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="examples / smoke / constexpr_smoke" type="CMakeRunConfiguration" factoryName="Application" folderName="examples" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ccmath" TARGET_NAME="ccmath-example-constexpr_smoke" CONFIG_NAME="clion-clang-debug-rigorous-dev - internal" RUN_TARGET_PROJECT_NAME="ccmath" RUN_TARGET_NAME="ccmath-example-constexpr_smoke">
+    <method v="2">
+      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -34,7 +34,6 @@ namespace ccm::internal
 
 		constexpr float log_float_impl(float x)
 		{
-			// Declare variables for intermediate calculations
 			ccm::double_t normVal{};
 			ccm::double_t rem{};
 			ccm::double_t remSqr{};
@@ -43,19 +42,20 @@ namespace ccm::internal
 			ccm::double_t inverseCoeff{};
 			ccm::double_t logarithmCoeff{};
 
-			// Declare variables for bitwise operations
 			std::uint32_t intX{};
 			std::uint32_t intNorm{};
 			std::uint32_t tmp{};
 
-			// Declare variables for exponent and loop iteration
 			int expo{};
 			int i{};
 
 			intX = ccm::support::float_to_uint32(x);
 
 			// Correct the sign of zero with downward rounding when x is equal to 1.0
-			if (CCM_UNLIKELY(intX == 0x3f800000)) { return 0; }
+			if (CCM_UNLIKELY(intX == 0x3f800000))
+			{
+				return 0;
+			}
 
 			if (CCM_UNLIKELY(intX - 0x00800000 >= 0x7f800000 - 0x00800000))
 			{
@@ -64,7 +64,7 @@ namespace ccm::internal
 				intX -= 23 << 23;
 			}
 
-			// x = 2^exp normVal; where normVal is in range [k_logTableOff_flt, 2 * k_logTableOff_flt] and exact
+			// x = 2^exp normVal. normVal is in range [k_logTableOff_flt, 2 * k_logTableOff_flt] and exact
 			tmp			   = intX - k_logTableOff_flt;
 			i			   = (tmp >> (23 - ccm::internal::k_logTableBitsFlt)) % k_logTableN_flt; // NOLINT
 			expo		   = static_cast<std::int32_t>(tmp) >> 23;
@@ -77,7 +77,6 @@ namespace ccm::internal
 			rem		= normVal * inverseCoeff - 1;
 			result0 = logarithmCoeff + static_cast<ccm::double_t>(expo) * log_ln2_value_flt;
 
-			// Polynomial approximation for log1p(rem)
 			remSqr = rem * rem;
 			result = log_poly_values_flt[1] * rem + log_poly_values_flt[2];
 			result = log_poly_values_flt[0] * remSqr + result;

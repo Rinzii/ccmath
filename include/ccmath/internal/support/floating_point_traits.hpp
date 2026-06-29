@@ -19,11 +19,9 @@
 
 namespace ccm::support
 {
-	template <class FloatingType>
-	struct floating_point_traits;
+	template <class FloatingType> struct floating_point_traits;
 
-	template <>
-	struct floating_point_traits<float>
+	template <> struct floating_point_traits<float>
 	{
 		using upgraded_floating_type = double;
 
@@ -53,10 +51,9 @@ namespace ccm::support
 		static constexpr float max_safe_integer = 0x1p+24F; // 16777216.0 (2^24)
 	};
 
-	template <>
-	struct floating_point_traits<double>
+	template <> struct floating_point_traits<double>
 	{
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT128)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT128
 		using upgraded_floating_type = long double;
 #elif defined(CCM_TYPES_HAS_FLOAT128)
 		using upgraded_floating_type = ccm::types::float128;
@@ -92,9 +89,8 @@ namespace ccm::support
 		static constexpr double max_safe_integer = 0x1p+53; // 9007199254740992.0 (2^53)
 	};
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT128)
-	template <>
-	struct floating_point_traits<long double>
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT128
+	template <> struct floating_point_traits<long double>
 	{
 		using upgraded_floating_type = ccm::types::DyadicFloat<256>;
 
@@ -110,20 +106,19 @@ namespace ccm::support
 
 		using uint_type = ccm::types::uint128_t;
 
-		static constexpr uint_type exponent_mask			 = 0x0000000000007FFFU; // (1ULL << exponent_bits) - 1
-		static constexpr uint_type normal_mantissa_mask		 = 0x0000FFFFFFFFFFFFU; // (1ULL << mantissa_bits) - 1
-		static constexpr uint_type denormal_mantissa_mask	 = 0x00007FFFFFFFFFFFU; // (1ULL << (mantissa_bits - 1)) - 1
-		static constexpr uint_type special_nan_mantissa_mask = 0x0000400000000000U; // 1ULL << (mantissa_bits - 2)
-		static constexpr uint_type shifted_sign_mask		 = 0x8000000000000000U; // 1ULL << sign_shift
-		static constexpr uint_type shifted_exponent_mask	 = 0x7FFF000000000000U; // exponent_mask << exponent_shift
+		static constexpr uint_type exponent_mask			 = 0x0000000000007FFFU;				 // (1ULL << exponent_bits) - 1
+		static constexpr uint_type normal_mantissa_mask		 = 0x0000FFFFFFFFFFFFU;				 // (1ULL << mantissa_bits) - 1
+		static constexpr uint_type denormal_mantissa_mask	 = 0x00007FFFFFFFFFFFU;				 // (1ULL << (mantissa_bits - 1)) - 1
+		static constexpr uint_type special_nan_mantissa_mask = 0x0000400000000000U;				 // 1ULL << (mantissa_bits - 2)
+		static constexpr uint_type shifted_sign_mask		 = static_cast<uint_type>(1) << 127; // sign bit of the 128-bit value
+		static constexpr uint_type shifted_exponent_mask	 = 0x7FFF000000000000U;				 // exponent_mask << exponent_shift
 
 		static constexpr long double normalize_factor = 340282366920938463463374607431768211456.0L; // 2^128
 
 		static constexpr long double max_safe_integer = 0x1p+112; // 5192296858534827628530496329220096.0L (2^112)
 	};
 #elif defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
-	template <>
-	struct floating_point_traits<long double>
+	template <> struct floating_point_traits<long double>
 	{
 		using upgraded_floating_type = ccm::types::DyadicFloat<256>;
 
@@ -139,22 +134,21 @@ namespace ccm::support
 
 		using uint_type = ccm::types::uint128_t;
 
-		static constexpr uint_type exponent_mask			 = 0x0000000000007FFFU; // (1ULL << exponent_bits) - 1
-		static constexpr uint_type normal_mantissa_mask		 = 0x0000FFFFFFFFFFFFU; // (1ULL << mantissa_bits) - 1
-		static constexpr uint_type denormal_mantissa_mask	 = 0x00007FFFFFFFFFFFU; // (1ULL << (mantissa_bits - 1)) - 1
-		static constexpr uint_type special_nan_mantissa_mask = 0x0000400000000000U; // 1ULL << (mantissa_bits - 2)
-		static constexpr uint_type shifted_sign_mask		 = 0x8000000000000000U; // 1ULL << sign_shift
-		static constexpr uint_type shifted_exponent_mask	 = 0x7FFF000000000000U; // exponent_mask << exponent_shift
+		static constexpr uint_type exponent_mask			 = 0x0000000000007FFFU;				// (1ULL << exponent_bits) - 1
+		static constexpr uint_type normal_mantissa_mask		 = 0x0000FFFFFFFFFFFFU;				// (1ULL << mantissa_bits) - 1
+		static constexpr uint_type denormal_mantissa_mask	 = 0x00007FFFFFFFFFFFU;				// (1ULL << (mantissa_bits - 1)) - 1
+		static constexpr uint_type special_nan_mantissa_mask = 0x0000400000000000U;				// 1ULL << (mantissa_bits - 2)
+		static constexpr uint_type shifted_sign_mask		 = static_cast<uint_type>(1) << 79; // sign bit of the 80-bit value bit_cast into 128 bits
+		static constexpr uint_type shifted_exponent_mask	 = 0x7FFF000000000000U;				// exponent_mask << exponent_shift
 
-		// TODO: Not 100% sure if the normalize factor should be 2^128 or 2^80. I think it should be 2^128, but I've not yet tested this.
+		// TODO(IanP): Not 100% sure if the normalize factor should be 2^128 or 2^80. I think it should be 2^128, but I've not yet tested this.
 		static constexpr long double normalize_factor = 340282366920938463463374607431768211456.0L; // 2^128
 
 		static constexpr long double max_safe_integer = 0x1p+64L; // 18446744073709551616.0L (2^64)
 	};
 
 #else // long double is the same as double
-	template <>
-	struct floating_point_traits<long double>
+	template <> struct floating_point_traits<long double>
 	{
 		using upgraded_floating_type = ccm::types::DyadicFloat<128>;
 
@@ -185,23 +179,18 @@ namespace ccm::support
 	};
 #endif
 
-	template <typename T>
-	using float_bits_t = typename floating_point_traits<T>::uint_type;
+	template <typename T> using float_bits_t = typename floating_point_traits<T>::uint_type;
 
-	template <typename T>
-	using float_signed_bits_t = typename floating_point_traits<T>::int_type;
+	template <typename T> using float_signed_bits_t = typename floating_point_traits<T>::int_type;
 
-	template <typename T>
-	using float_upgraded_t = typename floating_point_traits<T>::upgraded_floating_type;
+	template <typename T> using float_upgraded_t = typename floating_point_traits<T>::upgraded_floating_type;
 
-	template <typename T>
-	inline constexpr typename floating_point_traits<T>::uint_type sign_mask_v = floating_point_traits<T>::shifted_sign_mask;
+	template <typename T> inline constexpr typename floating_point_traits<T>::uint_type sign_mask_v = floating_point_traits<T>::shifted_sign_mask;
 
-	// TODO: Possible remove these func from floating_point_traits as they are more so there own things and not really traits.
+	// TODO(IanP): Possible remove these func from floating_point_traits as they are more so there own things and not really traits.
 	// All func below that use bit_cast have to use the __builtin_bit_cast as bit_cast itself includes floating_point_traits.hpp
 
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
-	[[nodiscard]] constexpr T floating_point_abs_bits(const T & x) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0> [[nodiscard]] constexpr T floating_point_abs_bits(const T & x) noexcept
 	{
 		using traits	= floating_point_traits<T>;
 		using uint_type = typename traits::uint_type;
@@ -209,8 +198,7 @@ namespace ccm::support
 		return bits & ~traits::shifted_sign_mask;
 	}
 
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr float_signed_bits_t<T> get_exponent_of_floating_point(T x) noexcept
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr float_signed_bits_t<T> get_exponent_of_floating_point(T x) noexcept
 	{
 		const auto bits = __builtin_bit_cast(ccm::support::float_bits_t<T>, x);
 
@@ -219,8 +207,7 @@ namespace ccm::support
 		return static_cast<float_signed_bits_t<T>>(masked_exponent) - floating_point_traits<T>::exponent_bias;
 	}
 
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T set_exponent_of_floating_point(T x, int exp) noexcept
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T set_exponent_of_floating_point(T x, int exp) noexcept
 	{
 		const auto bit_casted			  = __builtin_bit_cast(ccm::support::float_bits_t<T>, x);
 		const auto inverted_exponent_mask = ~floating_point_traits<T>::shifted_exponent_mask;

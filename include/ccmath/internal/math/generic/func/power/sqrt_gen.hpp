@@ -22,40 +22,34 @@ namespace ccm::gen
 {
 	namespace internal
 	{
-		template <typename T>
-		struct Is80BitLongDouble
+		template <typename T> struct Is80BitLongDouble
 		{
 			static constexpr bool value = false;
 		};
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
-		template <>
-		struct Is80BitLongDouble<long double>
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
+		template <> struct Is80BitLongDouble<long double>
 		{
 			static constexpr bool value = true;
 		};
 #endif
 
-		template <typename T>
-		constexpr bool Is80BitLongDouble_v = Is80BitLongDouble<T>::value;
+		template <typename T> constexpr bool Is80BitLongDouble_v = Is80BitLongDouble<T>::value;
 
-		template <typename T>
-		constexpr void normalize(int & exponent, typename support::fp::FPBits<T>::storage_type & mantissa)
+		template <typename T> constexpr void normalize(int & exponent, typename support::fp::FPBits<T>::storage_type & mantissa)
 		{
-			const int shift = support::countl_zero(mantissa) - (8 * static_cast<int>(sizeof(mantissa)) - 1 - support::fp::FPBits<T>::fraction_length);
+			const int shift = support::countl_zero(mantissa) - ((8 * static_cast<int>(sizeof(mantissa))) - 1 - support::fp::FPBits<T>::fraction_length);
 			exponent -= shift;
 			mantissa <<= shift;
 		}
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT64)
-		template <>
-		constexpr void normalize<long double>(int & exponent, std::uint64_t & mantissa)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT64
+		template <> constexpr void normalize<long double>(int & exponent, std::uint64_t & mantissa)
 		{
 			normalize<double>(exponent, mantissa);
 		}
 #elif defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
-		template <>
-		constexpr void normalize<long double>(int & exponent, support::fp::FPBits<long double>::storage_type & mantissa)
+		template <> constexpr void normalize<long double>(int & exponent, support::fp::FPBits<long double>::storage_type & mantissa)
 		{
 			const auto shift = static_cast<unsigned int>(static_cast<unsigned long>(support::countl_zero(static_cast<std::uint64_t>(mantissa))) -
 														 (8 * sizeof(std::uint64_t) - 1 - support::fp::FPBits<long double>::fraction_length));
@@ -72,7 +66,7 @@ namespace ccm::gen
 				// ReSharper disable once CppFunctionIsNotImplemented
 				static constexpr long double sqrt_calc_80bits(long double x);
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
 				static constexpr long double sqrt_calc_80bits(long double x)
 				{
 					using Bits				   = support::fp::FPBits<long double>;
@@ -81,17 +75,28 @@ namespace ccm::gen
 
 					const Bits bits(x);
 
-					if (bits == Bits::inf(types::Sign::POS) || bits.is_zero() || bits.is_nan()) { return x; }
+					if (bits == Bits::inf(types::Sign::POS) || bits.is_zero() || bits.is_nan())
+					{
+						return x;
+					}
 
 					constexpr auto nan_type = Bits::quiet_nan().get_val();
-					if (bits.is_neg()) { return nan_type; }
+					if (bits.is_neg())
+					{
+						return nan_type;
+					}
 
 					int x_exp			= bits.get_explicit_exponent();
 					storage_type x_mant = bits.get_mantissa();
 
 					// If we have denormal values, normalize it.
-					if (bits.get_implicit_bit()) { x_mant |= one; }
-					else if (bits.is_subnormal()) { normalize<long double>(x_exp, x_mant); }
+					if (bits.get_implicit_bit())
+					{
+						x_mant |= one;
+					} else if (bits.is_subnormal())
+					{
+						normalize<long double>(x_exp, x_mant);
+					}
 
 					// Ensure that the exponent is even.
 					if ((x_exp & 1) != 0)
@@ -114,8 +119,7 @@ namespace ccm::gen
 								y += current_bit;
 							}
 						}
-					}
-					else // If we are not in a constant evaluated context, we can vectorize the loop.
+					} else // If we are not in a constant evaluated context, we can vectorize the loop.
 					{
 						CCM_SIMD_VECTORIZE for (storage_type current_bit = one >> 1; current_bit != 0U; current_bit >>= 1)
 						{
@@ -147,10 +151,16 @@ namespace ccm::gen
 					{
 					case FE_TONEAREST:
 						// Round to nearest, ties to even
-						if (round_bit && (lsb || (r != 0))) { ++y; }
+						if (round_bit && (lsb || (r != 0)))
+						{
+							++y;
+						}
 						break;
 					case FE_UPWARD:
-						if (round_bit || (r != 0)) { ++y; }
+						if (round_bit || (r != 0))
+						{
+							++y;
+						}
 						break;
 					default: break;
 					}
@@ -166,8 +176,7 @@ namespace ccm::gen
 #endif
 			} // namespace bit80
 
-			template <typename T>
-			static constexpr std::enable_if_t<std::is_floating_point_v<T>, T> sqrt_calc_bits(const support::fp::FPBits<T> & bits)
+			template <typename T> static constexpr std::enable_if_t<std::is_floating_point_v<T>, T> sqrt_calc_bits(const support::fp::FPBits<T> & bits)
 			{
 				using FPBits_t			   = support::fp::FPBits<T>;
 				using storage_type		   = typename FPBits_t::storage_type;
@@ -181,8 +190,10 @@ namespace ccm::gen
 				{
 					++x_exp; // ensure that x_exp is the correct exponent of one bit.
 					internal::normalize<T>(x_exp, x_mant);
+				} else
+				{
+					x_mant |= one;
 				}
-				else { x_mant |= one; }
 
 				// Ensure that the exponent is even.
 				if (x_exp & 1)
@@ -226,10 +237,16 @@ namespace ccm::gen
 				{
 				case FE_TONEAREST:
 					// Round to nearest, ties to even
-					if (round_bit && (lsb || (r != 0))) { ++y; }
+					if (round_bit && (lsb || (r != 0)))
+					{
+						++y;
+					}
 					break;
 				case FE_UPWARD:
-					if (round_bit || (r != 0)) { ++y; }
+					if (round_bit || (r != 0))
+					{
+						++y;
+					}
 					break;
 				default: break;
 				}
@@ -239,11 +256,12 @@ namespace ccm::gen
 
 			// This calculates the square root of any IEEE-754 floating point number using the shift and add algorithm.
 			// The function accounts for all rounding modes and special cases.
-			template <typename T>
-			static constexpr std::enable_if_t<std::is_floating_point_v<T>, T> sqrt_impl(T x) // NOLINT
+			template <typename T> static constexpr std::enable_if_t<std::is_floating_point_v<T>, T> sqrt_impl(T x) // NOLINT
 			{
-				if constexpr (Is80BitLongDouble_v<T>) { return bit80::sqrt_calc_80bits(x); }
-				else
+				if constexpr (Is80BitLongDouble_v<T>)
+				{
+					return bit80::sqrt_calc_80bits(x);
+				} else
 				{
 					// IEEE floating points formats.
 					using FPBits_t = support::fp::FPBits<T>;
@@ -251,22 +269,27 @@ namespace ccm::gen
 
 					// lut_double_sqrt_first_256
 					//  Handle special cases where the bits are +Inf, ±0, or ±NaN
-					if (CCM_UNLIKELY(bits == FPBits_t::inf(types::Sign::POS) || bits.is_zero() || bits.is_nan())) { return x; }
+					if (CCM_UNLIKELY(bits == FPBits_t::inf(types::Sign::POS) || bits.is_zero() || bits.is_nan()))
+					{
+						return x;
+					}
 
 					constexpr auto flt_nan = FPBits_t::quiet_nan().get_val();
 
 					// Handle special cases where the bits are -Inf or -num
-					if (CCM_UNLIKELY(bits.is_neg())) { return -flt_nan; }
+					if (CCM_UNLIKELY(bits.is_neg()))
+					{
+						return -flt_nan;
+					}
 
 					// If we didn't encounter any special cases, we can calculate the square root normally.
 					return sqrt_calc_bits<T>(bits);
 				}
 			}
 		} // namespace impl
-	}	  // namespace internal
+	} // namespace internal
 
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T sqrt_gen(T num)
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T sqrt_gen(T num)
 	{
 		return internal::impl::sqrt_impl(num);
 	}

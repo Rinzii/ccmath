@@ -24,15 +24,18 @@ namespace ccm
 	 * @tparam T Floating-point type.
 	 * @param num Angle in radians.
 	 * @return Tangent of num.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/tan
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T tan(T num)
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T tan(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_tan<T>) { return ccm::builtin::tan(num); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_tan<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::gen::tan_gen(num); }
+			return ccm::builtin::tan_ct(num);
+		} else
+		{
+			if (ccm::support::is_constant_evaluated())
+			{
+				return ccm::gen::tan_gen(num);
+			}
 			return ccm::rt::tan_rt(num);
 		}
 	}
@@ -42,10 +45,8 @@ namespace ccm
 	 * @tparam Integer Integral type.
 	 * @param num Angle in radians.
 	 * @return Tangent of num as double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/tan
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double tan(Integer num)
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double tan(Integer num)
 	{
 		return ccm::tan<double>(static_cast<double>(num));
 	}
@@ -54,7 +55,6 @@ namespace ccm
 	 * @brief Computes the tangent of a float angle in radians.
 	 * @param num Angle in radians.
 	 * @return Tangent as float.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/tan
 	 */
 	constexpr float tanf(float num)
 	{
@@ -65,7 +65,6 @@ namespace ccm
 	 * @brief Computes the tangent of a long double angle in radians.
 	 * @param num Angle in radians.
 	 * @return Tangent as long double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/tan
 	 */
 	constexpr long double tanl(long double num)
 	{

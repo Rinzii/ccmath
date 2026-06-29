@@ -1,0 +1,33 @@
+// Production coefficients for the restricted sine kernel.  The guide's
+// teaching version uses Taylor coefficients, this run shows what
+// fpminimax produces for the same degree and interval.
+
+prec = 200!;
+display = decimal!;
+rationalmode = off!;
+
+// Fitting sin directly with an odd basis and relative error gives a
+// degenerate system.  Fit the transformed kernel sin(x)/x with even
+// monomials instead, then multiply by x in the implementation.  The
+// even basis is a proper Haar system on the half interval, and odd
+// symmetry extends the bound to the negative half exactly.
+I = [0; 1/16];
+Icheck = [-1/16; 1/16];
+
+q = fpminimax(sin(x)/x, [|0, 2, 4, 6, 8|], [|D, D, D, D, D|], I, relative);
+p = x * q;
+
+print("coefficients of q, so that sin(x) ~ x * q(x^2):");
+display = hexadecimal!;
+print("  q0 =", coeff(q, 0));
+print("  q2 =", coeff(q, 2));
+print("  q4 =", coeff(q, 4));
+print("  q6 =", coeff(q, 6));
+print("  q8 =", coeff(q, 8));
+display = decimal!;
+
+abs_err = supnorm(p, sin(x), Icheck, absolute, 1b-80);
+rel_err = supnorm(p, sin(x), Icheck, relative, 1b-80);
+
+print("certified absolute error:", abs_err);
+print("certified relative error:", rel_err);

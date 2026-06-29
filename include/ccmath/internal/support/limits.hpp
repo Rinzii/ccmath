@@ -28,16 +28,24 @@ namespace ccm::support
 		round_toward_neg_infinity = 3
 	};
 
-	template <class T, bool = std::is_arithmetic_v<T>>
-	class numeric_limits
+	template <class T, bool = std::is_arithmetic_v<T>> class numeric_limits
 	{
 	public:
 		using type = T;
 
 		static constexpr const bool is_specialized = std::numeric_limits<type>::is_specialized;
-		[[nodiscard]] static constexpr type min() noexcept { return std::numeric_limits<type>::min(); }
-		[[nodiscard]] static constexpr type max() noexcept { return std::numeric_limits<type>::max(); }
-		[[nodiscard]] static constexpr type lowest() noexcept { return std::numeric_limits<type>::lowest(); }
+		[[nodiscard]] static constexpr type min() noexcept
+		{
+			return std::numeric_limits<type>::min();
+		}
+		[[nodiscard]] static constexpr type max() noexcept
+		{
+			return std::numeric_limits<type>::max();
+		}
+		[[nodiscard]] static constexpr type lowest() noexcept
+		{
+			return std::numeric_limits<type>::lowest();
+		}
 
 		static constexpr const int digits		= std::numeric_limits<type>::digits;
 		static constexpr const int digits10		= std::numeric_limits<type>::digits10;
@@ -46,8 +54,14 @@ namespace ccm::support
 		static constexpr const bool is_integer	= std::numeric_limits<type>::is_integer;
 		static constexpr const bool is_exact	= std::numeric_limits<type>::is_exact;
 		static constexpr const int radix		= std::numeric_limits<type>::radix;
-		[[nodiscard]] static constexpr type epsilon() noexcept { return std::numeric_limits<type>::epsilon(); }
-		[[nodiscard]] static constexpr type round_error() noexcept { return std::numeric_limits<type>::round_error(); }
+		[[nodiscard]] static constexpr type epsilon() noexcept
+		{
+			return std::numeric_limits<type>::epsilon();
+		}
+		[[nodiscard]] static constexpr type round_error() noexcept
+		{
+			return std::numeric_limits<type>::round_error();
+		}
 
 		static constexpr const int min_exponent	  = std::numeric_limits<type>::min_exponent;
 		static constexpr const int min_exponent10 = std::numeric_limits<type>::min_exponent10;
@@ -57,10 +71,22 @@ namespace ccm::support
 		static constexpr const bool has_infinity	  = std::numeric_limits<type>::has_infinity;
 		static constexpr const bool has_quiet_NaN	  = std::numeric_limits<type>::has_quiet_NaN;
 		static constexpr const bool has_signaling_NaN = std::numeric_limits<type>::has_signaling_NaN;
-		[[nodiscard]] static constexpr type infinity() noexcept { return std::numeric_limits<type>::infinity(); }
-		[[nodiscard]] static constexpr type quiet_NaN() noexcept { return std::numeric_limits<type>::quiet_NaN(); }
-		[[nodiscard]] static constexpr type signaling_NaN() noexcept { return std::numeric_limits<type>::signaling_NaN(); }
-		[[nodiscard]] static constexpr type denorm_min() noexcept { return std::numeric_limits<type>::denorm_min(); }
+		[[nodiscard]] static constexpr type infinity() noexcept
+		{
+			return std::numeric_limits<type>::infinity();
+		}
+		[[nodiscard]] static constexpr type quiet_NaN() noexcept
+		{
+			return std::numeric_limits<type>::quiet_NaN();
+		}
+		[[nodiscard]] static constexpr type signaling_NaN() noexcept
+		{
+			return std::numeric_limits<type>::signaling_NaN();
+		}
+		[[nodiscard]] static constexpr type denorm_min() noexcept
+		{
+			return std::numeric_limits<type>::denorm_min();
+		}
 
 		static constexpr const bool is_iec559  = std::numeric_limits<type>::is_iec559;
 		static constexpr const bool is_bounded = std::numeric_limits<type>::is_bounded;

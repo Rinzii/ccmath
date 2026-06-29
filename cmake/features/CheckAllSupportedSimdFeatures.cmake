@@ -2,6 +2,10 @@ if (NOT DEFINED CCMATH_ROOT_DIR)
     message(FATAL_ERROR "CCMATH_ROOT_DIR is not defined. Did you forget to include the main CMakeLists.txt?")
 endif ()
 
+# Select the preferred instruction set first so the FMA / SVML probes below are
+# evaluated at the chosen level (via CMAKE_REQUIRED_FLAGS).
+include(${CCMATH_ROOT_DIR}/cmake/features/simd/SelectSimdInstructionSet.cmake)
+
 include(${CCMATH_ROOT_DIR}/cmake/features/simd/CheckFMASupport.cmake)
 
 if (NOT CCMATH_DISABLE_SVML_USAGE)

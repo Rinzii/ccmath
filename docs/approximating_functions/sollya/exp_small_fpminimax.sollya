@@ -1,0 +1,25 @@
+// Production coefficients for exp on the reduced interval, as printed in
+// the guide's first full Sollya example.
+
+prec = 200!;
+display = decimal!;
+rationalmode = off!;
+
+f = exp(x);
+I = [-log(2) / 2; log(2) / 2];
+
+print("suggested degree for 1b-53 relative:");
+guessdegree(f, I, 1b-53);
+
+p = fpminimax(f, 11, [|D, D, D, D, D, D, D, D, D, D, D, D|], I, relative);
+
+print("coefficients:");
+display = hexadecimal!;
+for i from 0 to 11 do coeff(p, i);
+display = decimal!;
+
+eps_fast = dirtyinfnorm(p / f - 1, I);
+print("quick relative error estimate:", eps_fast);
+
+eps_cert = supnorm(p, f, I, relative, 1b-40);
+print("certified relative error:", eps_cert);

@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/basic/fabs.hpp"
 #include "ccmath/internal/math/generic/func/basic/abs_gen.hpp"
 
 namespace ccm::func
@@ -21,7 +22,13 @@ namespace ccm::func
 	template <typename T>
 	constexpr auto fabs(T num) -> std::enable_if_t<std::is_arithmetic_v<T> && (std::is_floating_point_v<T> || std::is_signed_v<T> || std::is_unsigned_v<T>), T>
 	{
-		return gen::abs<T>(num);
+		if constexpr (ccm::builtin::has_constexpr_abs<T>)
+		{
+			return ccm::builtin::abs_ct(num);
+		} else
+		{
+			return gen::abs<T>(num);
+		}
 	}
 
 } // namespace ccm::func

@@ -28,6 +28,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_MODF
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for modf that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_MODF
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_MODF
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -43,6 +58,15 @@ namespace ccm::builtin
 #endif
 	// clang-format on
 
+	// TODO: determine actual compiler/version support for runtime __builtin_modf.
+	template <typename T>
+	inline constexpr bool has_runtime_modf =
+#ifdef CCMATH_HAS_BUILTIN_MODF
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_modf functions.
@@ -50,16 +74,40 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_modf functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto modf(T x, T * intpart) -> std::enable_if_t<has_constexpr_modf<T>, T>
+	template <typename T> constexpr auto modf_ct(T x, T * intpart) -> std::enable_if_t<has_constexpr_modf<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_modff(x, intpart); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_modf(x, intpart); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_modfl(x, intpart); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_modff(x, intpart);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_modf(x, intpart);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_modfl(x, intpart);
+		} else
 		{
 			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_modf");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for modf");
+			return T{};
+		}
+	}
+
+	template <typename T> auto modf_rt(T x, T * intpart) -> std::enable_if_t<has_runtime_modf<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_modff(x, intpart);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_modf(x, intpart);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_modfl(x, intpart);
+		} else
+		{
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for modf");
 			return T{};
 		}
 	}
@@ -67,3 +115,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_MODF
+#undef CCMATH_HAS_BUILTIN_MODF

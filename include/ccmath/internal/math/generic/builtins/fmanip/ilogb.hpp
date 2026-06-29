@@ -28,6 +28,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_ILOGB
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for ilogb that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_ILOGB
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_ILOGB
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -43,6 +58,15 @@ namespace ccm::builtin
 	#endif
 	// clang-format on
 
+	// TODO: determine actual compiler/version support for runtime __builtin_ilogb.
+	template <typename T>
+	inline constexpr bool has_runtime_ilogb =
+#ifdef CCMATH_HAS_BUILTIN_ILOGB
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_ilogb functions.
@@ -50,16 +74,40 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_ilogb functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto ilogb(T x) -> std::enable_if_t<has_constexpr_ilogb<T>, int>
+	template <typename T> constexpr auto ilogb_ct(T x) -> std::enable_if_t<has_constexpr_ilogb<T>, int>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_ilogbf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_ilogb(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_ilogbl(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_ilogbf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_ilogb(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_ilogbl(x);
+		} else
 		{
 			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_ilogb");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for ilogb");
+			return 0;
+		}
+	}
+
+	template <typename T> auto ilogb_rt(T x) -> std::enable_if_t<has_runtime_ilogb<T>, int>
+	{
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_ilogbf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_ilogb(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_ilogbl(x);
+		} else
+		{
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for ilogb");
 			return 0;
 		}
 	}
@@ -67,3 +115,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_ILOGB
+#undef CCMATH_HAS_BUILTIN_ILOGB

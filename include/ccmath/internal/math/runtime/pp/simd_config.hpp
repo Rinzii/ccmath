@@ -20,13 +20,15 @@
 	#define CCMATH_SIMD_HAVE_MMX 0
 #endif
 
-#if defined __SSE__ || defined __x86_64__
+// GNU/Clang/ICX/NVHPC spell these __SSE__ / __SSE2__ / __x86_64__. MSVC does not,
+// so also recognise its _M_X64 (x64 implies SSE2) and _M_IX86_FP levels.
+#if defined __SSE__ || defined __x86_64__ || defined _M_X64 || (defined(_M_IX86_FP) && _M_IX86_FP >= 1)
 	#define CCMATH_SIMD_HAVE_SSE 1
 #else
 	#define CCMATH_SIMD_HAVE_SSE 0
 #endif
 
-#if defined __SSE2__ || defined __x86_64__
+#if defined __SSE2__ || defined __x86_64__ || defined _M_X64 || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
 	#define CCMATH_SIMD_HAVE_SSE2 1
 #else
 	#define CCMATH_SIMD_HAVE_SSE2 0
@@ -238,7 +240,7 @@
 
 // Intel Short Vector Math Library (SVML)
 // As far as I am aware, there is no reliable way to detect SVML support at compile-time.
-#if defined(CCM_CONFIG_RT_SIMD_HAS_SVML)
+#ifdef CCM_CONFIG_RT_SIMD_HAS_SVML
 	#ifndef CCMATH_HAS_SIMD
 		#define CCMATH_HAS_SIMD 1
 	#endif
@@ -250,7 +252,7 @@
 #endif
 
 // ARM macros
-#if defined __ARM_NEON
+#ifdef __ARM_NEON
 	#define CCMATH_SIMD_HAVE_NEON 1
 #else
 	#define CCMATH_SIMD_HAVE_NEON 0
@@ -265,14 +267,14 @@
 #else
 	#define CCMATH_SIMD_HAVE_NEON_A64 0
 #endif
-#if (__ARM_FEATURE_SVE_BITS > 0 && __ARM_FEATURE_SVE_VECTOR_OPERATORS == 1)
+#if defined(__ARM_FEATURE_SVE_BITS) && (__ARM_FEATURE_SVE_BITS > 0) && defined(__ARM_FEATURE_SVE_VECTOR_OPERATORS) && (__ARM_FEATURE_SVE_VECTOR_OPERATORS == 1)
 	#define CCMATH_SIMD_HAVE_SVE 1
 #else
 	#define CCMATH_SIMD_HAVE_SVE 0
 #endif
 
 // CCM_SIMD_INTRINSIC
-#if defined(CCM_CONFIG_NO_SIMD_INLINE)
+#ifdef CCM_CONFIG_NO_SIMD_INLINE
 	#define CCM_SIMD_INTRINSIC
 #elif defined(CCM_CONFIG_NO_FORCED_SIMD_INLINE)
 	#define CCM_SIMD_INTRINSIC inline
@@ -310,7 +312,8 @@
 namespace ccm::pp::config::detail
 {
 	template <int... PACK, typename F>
-	CCM_SIMD_ENFORCED_ALWAYS_INLINE constexpr void simd_int_pack(std::integer_sequence<int, PACK...>, F && code)
+	CCM_SIMD_ENFORCED_ALWAYS_INLINE constexpr void simd_int_pack(std::integer_sequence<int, PACK...> /*unused*/,
+																 F && code) // NOLINT(cppcoreguidelines-missing-std-forward)
 	{
 		code(std::integer_sequence<int, PACK...>{});
 	}

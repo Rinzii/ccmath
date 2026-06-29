@@ -17,12 +17,16 @@
 
 namespace ccm
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T nextafter(T from, T to) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T nextafter(T from, T to) noexcept
 	{
 		// TODO: Better define how this interacts with the builtin.
-		if constexpr (ccm::builtin::has_constexpr_nextafter<T>) { return ccm::builtin::nextafter(from, to); }
-		else { return gen::nextafter_gen(from, to); }
+		if constexpr (ccm::builtin::has_constexpr_nextafter<T>)
+		{
+			return ccm::builtin::nextafter_ct(from, to);
+		} else
+		{
+			return gen::nextafter_gen(from, to);
+		}
 	}
 
 	template <typename Arithmetic1, typename Arithmetic2, std::enable_if_t<std::is_arithmetic_v<Arithmetic1> && std::is_arithmetic_v<Arithmetic2>, bool> = true>

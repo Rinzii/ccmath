@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "facts": [
+    {
+      "instruction": "fsqrt",
+      "isa": "aarch64",
+      "category": "sqrt",
+      "latency_cycles": {"value": null, "source": "unknown", "confidence": "unknown"},
+      "reciprocal_throughput_cycles": {"value": null, "source": "unknown", "confidence": "unknown"},
+      "notes": ["sqrt on Apple M1 often lowers to hardware sqrt in thin regions."],
+      "source_ids": ["apple_silicon_opt_guide", "asmlab_local_calibration"]
+    }
+  ]
+}

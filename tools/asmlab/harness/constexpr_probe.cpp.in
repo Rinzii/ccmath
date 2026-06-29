@@ -1,0 +1,20 @@
+/*
+ * Copyright (c) Ian Pike
+ * Copyright (c) CCMath contributors
+ *
+ * CCMath is provided under the Apache-2.0 License WITH LLVM-exception.
+ * See LICENSE for more information.
+ *
+ * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+ */
+
+// asmlab constexpr probe template. constexpr_check.py substitutes @@TOKENS@@ and
+// writes constexpr_probe.cpp under out/asmlab/. .cpp.in sources are not
+// clang-formatted, are never compiled as-is, and must not be checked in.
+
+@@INCLUDES@@
+
+@@STATIC_ASSERTS@@
+
+int main()
+{ return 0; }

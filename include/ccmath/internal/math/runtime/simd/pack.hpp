@@ -19,18 +19,19 @@ namespace ccm::intrin
 	namespace abi
 	{
 
-		template <int N>
-		struct pack;
+		template <int N> struct pack;
 	} // namespace abi
 
-	template <int N>
-	struct simd_mask<float, abi::pack<N>>
+	template <int N> struct simd_mask<float, abi::pack<N>>
 	{
 		using value_type			  = bool;
 		using simd_type				  = simd<float, abi::pack<N>>;
 		using abi_type				  = abi::pack<N>;
 		CCM_ALWAYS_INLINE simd_mask() = default;
-		[[nodiscard]] static constexpr int size() { return N; }
+		[[nodiscard]] static constexpr int size()
+		{
+			return N;
+		}
 		CCM_ALWAYS_INLINE explicit simd_mask(bool value)
 		{
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
@@ -38,8 +39,14 @@ namespace ccm::intrin
 				m_value[i] = value;
 			}
 		}
-		constexpr bool operator[](int i) const { return m_value[i]; }
-		CCM_ALWAYS_INLINE int & operator[](int i) { return m_value[i]; }
+		constexpr bool operator[](int i) const
+		{
+			return m_value[i];
+		}
+		CCM_ALWAYS_INLINE int & operator[](int i)
+		{
+			return m_value[i];
+		}
 		CCM_ALWAYS_INLINE simd_mask operator||(simd_mask const & other) const
 		{
 			simd_mask result;
@@ -69,17 +76,19 @@ namespace ccm::intrin
 		}
 
 	private:
-		std::array<int, N> m_value;
+		std::array<int, static_cast<std::size_t>(N)> m_value;
 	};
 
-	template <int N>
-	struct simd_mask<double, abi::pack<N>>
+	template <int N> struct simd_mask<double, abi::pack<N>>
 	{
 		using value_type			  = bool;
 		using simd_type				  = simd<double, abi::pack<N>>;
 		using abi_type				  = abi::pack<N>;
 		CCM_ALWAYS_INLINE simd_mask() = default;
-		[[nodiscard]] static constexpr int size() { return N; }
+		[[nodiscard]] static constexpr int size()
+		{
+			return N;
+		}
 		CCM_ALWAYS_INLINE explicit simd_mask(bool value)
 		{
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
@@ -87,8 +96,14 @@ namespace ccm::intrin
 				m_value[i] = value;
 			}
 		}
-		constexpr bool operator[](int i) const { return m_value[i]; }
-		CCM_ALWAYS_INLINE std::int64_t & operator[](int i) { return m_value[i]; }
+		constexpr bool operator[](int i) const
+		{
+			return m_value[i];
+		}
+		CCM_ALWAYS_INLINE std::int64_t & operator[](int i)
+		{
+			return m_value[i];
+		}
 		CCM_ALWAYS_INLINE simd_mask operator||(simd_mask const & other) const
 		{
 			simd_mask result;
@@ -118,11 +133,10 @@ namespace ccm::intrin
 		}
 
 	private:
-		std::array<std::int64_t, N> m_value;
+		std::array<std::int64_t, static_cast<std::size_t>(N)> m_value;
 	};
 
-	template <class T, int N>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE bool all_of(simd_mask<T, abi::pack<N>> const & a)
+	template <class T, int N> CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE bool all_of(simd_mask<T, abi::pack<N>> const & a)
 	{
 		bool result = true;
 		CCM_SIMD_VECTORIZE for (int i = 0; i < a.size(); ++i)
@@ -132,8 +146,7 @@ namespace ccm::intrin
 		return result;
 	}
 
-	template <class T, int N>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE bool any_of(simd_mask<T, abi::pack<N>> const & a)
+	template <class T, int N> CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE bool any_of(simd_mask<T, abi::pack<N>> const & a)
 	{
 		bool result = false;
 		CCM_SIMD_VECTORIZE for (int i = 0; i < a.size(); ++i)
@@ -143,8 +156,7 @@ namespace ccm::intrin
 		return result;
 	}
 
-	template <class T, int N>
-	struct simd<T, abi::pack<N>>
+	template <class T, int N> struct simd<T, abi::pack<N>>
 	{
 
 		using value_type		 = T;
@@ -152,7 +164,10 @@ namespace ccm::intrin
 		using mask_type			 = simd_mask<T, abi_type>;
 		using storage_type		 = simd_storage<T, abi_type>;
 		CCM_ALWAYS_INLINE simd() = default;
-		[[nodiscard]] static constexpr int size() { return N; }
+		[[nodiscard]] static constexpr int size()
+		{
+			return N;
+		}
 		CCM_ALWAYS_INLINE explicit simd(T value)
 		{
 			CCM_SIMD_VECTORIZE for (int i = 0; i < size(); ++i)
@@ -160,14 +175,16 @@ namespace ccm::intrin
 				m_value[i] = value;
 			}
 		}
-		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE explicit simd(storage_type const & value) { copy_from(value.data(), element_aligned_tag()); }
+		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE explicit simd(storage_type const & value)
+		{
+			copy_from(value.data(), element_aligned_tag());
+		}
 		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd & operator=(storage_type const & value)
 		{
 			copy_from(value.data(), element_aligned_tag());
 			return *this;
 		}
-		template <class Flags>
-		CCM_ALWAYS_INLINE simd(T const * ptr, Flags flags)
+		template <class Flags> CCM_ALWAYS_INLINE simd(T const * ptr, Flags flags)
 		{
 			copy_from(ptr, flags);
 		}
@@ -230,8 +247,14 @@ namespace ccm::intrin
 				ptr[i] = m_value[i]; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 			}
 		}
-		CCM_ALWAYS_INLINE constexpr T operator[](int i) const { return m_value[i]; }
-		CCM_ALWAYS_INLINE T & operator[](int i) { return m_value[i]; }
+		CCM_ALWAYS_INLINE constexpr T operator[](int i) const
+		{
+			return m_value[i];
+		}
+		CCM_ALWAYS_INLINE T & operator[](int i)
+		{
+			return m_value[i];
+		}
 		CCM_ALWAYS_INLINE simd_mask<T, abi::pack<N>> operator<(simd const & other) const
 		{
 			simd_mask<T, abi::pack<N>> result;
@@ -252,7 +275,7 @@ namespace ccm::intrin
 		}
 
 	private:
-		std::array<T, N> m_value;
+		std::array<T, static_cast<std::size_t>(N)> m_value;
 	};
 
 	template <class T, int N>

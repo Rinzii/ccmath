@@ -20,7 +20,10 @@ namespace ccm::internal::impl
 {
 	constexpr float nan_float_impl(const char * arg) noexcept
 	{
-		if constexpr (!std::numeric_limits<float>::is_iec559) { return 0.0F; }
+		if constexpr (!std::numeric_limits<float>::is_iec559)
+		{
+			return 0.0F;
+		}
 
 #if defined(_MSC_VER) && !defined(__clang__)
 		// Currently, MSVC always returns a Quiet NaN no matter if a payload is
@@ -57,37 +60,32 @@ namespace ccm::internal::impl
 
 		if (has_hex_been_detected)
 		{
-			// Calculate tag_value by handling wrapping for numbers larger than 8 digits
 			for (std::size_t i = 0; arg[i] != '\0'; ++i)
 			{
 				flt_bits *= 16;
-				flt_bits += static_cast<std::uint8_t>(ccm::support::helpers::digit_to_int(arg[i])); // Convert ASCII to numeric value
+				flt_bits += static_cast<std::uint8_t>(ccm::support::helpers::digit_to_int(arg[i]));
 				if (i >= 7)
 				{
-					flt_bits %= static_cast<std::uint32_t>(1e8); // Wrap around for numbers larger than 8 digits
+					flt_bits %= static_cast<std::uint32_t>(1e8);
 				}
 			}
-		}
-		else
+		} else
 		{
-			// Calculate tag_value by handling wrapping for numbers larger than 8 digits
 			for (std::size_t i = 0; arg[i] != '\0'; ++i)
 			{
 				flt_bits *= 10;
-				flt_bits += static_cast<std::uint8_t>(ccm::support::helpers::digit_to_int(arg[i])); // Convert ASCII to numeric value
+				flt_bits += static_cast<std::uint8_t>(ccm::support::helpers::digit_to_int(arg[i]));
 				if (i >= 7)
 				{
-					flt_bits %= static_cast<std::uint32_t>(1e8); // Wrap around for numbers larger than 8 digits
+					flt_bits %= static_cast<std::uint32_t>(1e8);
 				}
 			}
 		}
 
 		// NOLINTEND
 
-		// Set the tag bits for NaN
 		flt_bits |= ccm::support::bit_cast<std::uint32_t>(std::numeric_limits<float>::quiet_NaN());
 
-		// Convert the bits to a float
 		return ccm::support::bit_cast<float>(flt_bits);
 	}
 } // namespace ccm::internal::impl

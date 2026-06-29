@@ -10,7 +10,7 @@
 
 #pragma once
 
-#if defined(__clang__)
+#ifdef __clang__
 	#define CCM_SUPPRESS(x) [[gsl::suppress("x")]]
 #else
 	#if defined(_MSC_VER) && !defined(__INTEL_COMPILER)

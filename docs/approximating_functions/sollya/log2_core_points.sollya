@@ -1,0 +1,48 @@
+// Point table for the teaching log2 core.
+
+prec = 240!;
+display = decimal!;
+rationalmode = off!;
+
+data_path = "docs/approximating_functions/data/log2_core_points.dat";
+
+B = 16!;
+poly_degree = 5!;
+U = [-1 / 32; 1 / 32];
+g = log2(1 + x) / x;
+p = fpminimax(g, poly_degree, [|D...|], U, relative);
+
+print("script:", "log2_core_points.sollya");
+version;
+print("B:", B);
+print("point set:", "exactly 1", "just above 1", "near a table boundary", "near the upper end", "bucket midpoint");
+
+print("x", "reduced_u", "approx", "reference", "abs_error") > data_path;
+
+x0 = round(1, D, RN);
+x1 = round(1 + 2^(-52), D, RN);
+x2 = round(1 + 1 / 16 - 2^(-40), D, RN);
+x3 = round(2 - 2^(-20), D, RN);
+x4 = round(1 + (5 + 0.5) / 16, D, RN);
+
+for k from 0 to 4 do {
+  if (k == 0) then { xv = x0; };
+  if (k == 1) then { xv = x1; };
+  if (k == 2) then { xv = x2; };
+  if (k == 3) then { xv = x3; };
+  if (k == 4) then { xv = x4; };
+
+  i = floor((xv - 1) * B);
+  c = round(1 + (i + 0.5) / B, prec, RN);
+  r = round(1 / c, D, RN);
+  a = evaluate(-log2(x), r);
+  a_hi = round(a, 32, RN);
+  a_lo = round(a - a_hi, D, RN);
+  u = round(xv * r - 1, prec, RN);
+  approx = round(a_hi + a_lo + u * evaluate(p, u), prec, RN);
+  reference = sup(evaluate(log2(x), xv));
+  abs_err = sup(abs(approx - reference));
+
+  print(xv, u, approx, reference, abs_err) >> data_path;
+  print("point", k, "x", xv, "table_index", i, "reduced_u", u, "approx", approx, "reference", reference, "abs_error", abs_err);
+};

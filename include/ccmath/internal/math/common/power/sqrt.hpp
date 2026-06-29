@@ -26,13 +26,17 @@ namespace ccm
 	 * @param num Floating-point or integer number.
 	 * @return If no errors occur, square root of num (√num), is returned.
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T sqrt(T num)
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T sqrt(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_sqrt<T>) { return ccm::builtin::sqrt(num); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_sqrt<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::gen::sqrt_gen<T>(num); }
+			return ccm::builtin::sqrt_ct(num);
+		} else
+		{
+			if (ccm::support::is_constant_evaluated())
+			{
+				return ccm::gen::sqrt_gen<T>(num);
+			}
 			return ccm::rt::sqrt_rt<T>(num);
 		}
 	}
@@ -43,8 +47,7 @@ namespace ccm
 	 * @param num Integer number.
 	 * @return If no errors occur, square root of num (√num), is returned.
 	 */
-	template <typename Integer, std::enable_if_t<!std::is_floating_point_v<Integer>, bool> = true>
-	constexpr double sqrt(Integer num)
+	template <typename Integer, std::enable_if_t<!std::is_floating_point_v<Integer>, bool> = true> constexpr double sqrt(Integer num)
 	{
 		return ccm::sqrt<double>(static_cast<double>(num));
 	}

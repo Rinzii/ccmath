@@ -8,14 +8,17 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#include <gtest/gtest.h>
-
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "utils/fenv_fixture.hpp"
 
+#include <gtest/gtest.h>
+
 TEST(CcmathFenvProbeTests, StdFenvSupportsAllRoundingModes)
 {
-	if (!ccm::test::FenvIsSupported()) { GTEST_SKIP() << "platform does not support all IEEE rounding modes"; }
+	if (!ccm::test::FenvIsSupported())
+	{
+		GTEST_SKIP() << "platform does not support all IEEE rounding modes";
+	}
 
 	for (int mode : ccm::test::kStdRoundingModes)
 	{
@@ -28,7 +31,10 @@ TEST(CcmathFenvProbeTests, StdFenvSupportsAllRoundingModes)
 
 TEST(CcmathFenvProbeTests, CcmGetRoundingModeTracksStdFenv)
 {
-	if (!ccm::test::FenvIsSupported()) { GTEST_SKIP() << "platform does not support all IEEE rounding modes"; }
+	if (!ccm::test::FenvIsSupported())
+	{
+		GTEST_SKIP() << "platform does not support all IEEE rounding modes";
+	}
 
 	for (int mode : ccm::test::kStdRoundingModes)
 	{

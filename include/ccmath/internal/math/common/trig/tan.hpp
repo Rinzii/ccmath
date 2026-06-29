@@ -19,19 +19,22 @@
 
 namespace ccm
 {
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T tan(T num)
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T tan(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_tan<T>) { return ccm::builtin::tan(num); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_tan<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::gen::tan_gen(num); }
+			return ccm::builtin::tan_ct(num);
+		} else
+		{
+			if (ccm::support::is_constant_evaluated())
+			{
+				return ccm::gen::tan_gen(num);
+			}
 			return ccm::rt::tan_rt(num);
 		}
 	}
 
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double tan(Integer num)
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double tan(Integer num)
 	{
 		return ccm::tan<double>(static_cast<double>(num));
 	}

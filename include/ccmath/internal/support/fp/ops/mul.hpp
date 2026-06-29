@@ -32,12 +32,12 @@ namespace ccm::support::fp::op
 	mul(InType x, InType y)
 	{
 		using OutFPBits		 = FPBits<OutType>;
-		using OutStorageType = typename OutFPBits::StorageType;
+		using OutStorageType = typename OutFPBits::storage_type;
 		using InFPBits		 = FPBits<InType>;
-		using InStorageType	 = typename InFPBits::StorageType;
+		using InStorageType	 = typename InFPBits::storage_type;
 
 		// The product of two p-digit numbers is a 2p-digit number.
-		using DyadicFloat = types::DyadicFloat<ccm::support::bit_ceil(2 * static_cast<size_t>(InFPBits::SIG_LEN))>;
+		using DyadicFloat = types::DyadicFloat<ccm::support::bit_ceil(2 * static_cast<size_t>(InFPBits::significand_length))>;
 
 		InFPBits x_bits(x);
 		InFPBits y_bits(y);
@@ -48,7 +48,10 @@ namespace ccm::support::fp::op
 		{
 			if (x_bits.is_nan() || y_bits.is_nan())
 			{
-				if (x_bits.is_signaling_nan() || y_bits.is_signaling_nan()) { fenv::raise_except_if_required(FE_INVALID); }
+				if (x_bits.is_signaling_nan() || y_bits.is_signaling_nan())
+				{
+					fenv::raise_except_if_required(FE_INVALID);
+				}
 
 				if (x_bits.is_quiet_nan())
 				{
@@ -91,14 +94,14 @@ namespace ccm::support::fp::op
 				return OutFPBits::inf(result_sign).get_val();
 			}
 
-			// Now either x or y is zero, and the other one is finite.
+			// Either x or y is zero, and the other one is finite.
 			return OutFPBits::zero(result_sign).get_val();
 		}
 
 		DyadicFloat xd(x);
 		DyadicFloat yd(y);
 
-		DyadicFloat result = quick_mul(xd, yd);
+		types::DyadicFloat<ccm::support::bit_ceil(2 * static_cast<size_t>(InFPBits::significand_length))> result = types::quick_mul(xd, yd);
 		return result.template as<OutType, /*ShouldSignalExceptions=*/true>();
 	}
 } // namespace ccm::support::fp::op

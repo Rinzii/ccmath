@@ -13,7 +13,7 @@
 #include <cfloat>  // LDBL_MANT_DIG
 #include <cstdint> // UINT64_MAX, __SIZEOF_INT128__
 
-#if defined(UINT64_MAX)
+#ifdef UINT64_MAX
 	#define CCM_TYPES_HAS_INT64
 #endif // UINT64_MAX
 
@@ -38,7 +38,7 @@
 		// __CUDACC_VER__ is a full version number before CUDA 9, and is defined to a
 		// string explaining that it has been removed starting with CUDA 9. We use
 		// nested #ifs because there is no short-circuiting in the preprocessor.
-		// NOTE: `__CUDACC__` could be undefined while `__CUDACC_VER__` is defined.
+		// NOTE: __CUDACC__ could be undefined while __CUDACC_VER__ is defined.
 		#if __CUDACC_VER__ >= 70000
 			#define CCM_TYPES_HAS_INT128 1
 		#endif // __CUDACC_VER__ >= 70000

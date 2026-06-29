@@ -1,0 +1,73 @@
+// Sampled error curve for the teaching sin_small kernel.
+
+prec = 240!;
+display = decimal!;
+rationalmode = off!;
+
+data_path = "docs/approximating_functions/data/sin_small_error.dat";
+
+I = [-1 / 16; 1 / 16];
+n = 200!;
+
+p = x * (
+    0x1.0000000000000p+0
+  + x^2 * (
+      -0x1.5555555555555p-3
+    + x^2 * (
+        0x1.1111111111111p-7
+      + x^2 * (
+          -0x1.a01a01a01a01ap-13
+        + x^2 * 0x1.71de3a556c734p-19
+      )
+    )
+  )
+);
+
+print("script:", "sin_small_error.sollya");
+version;
+print("interval:", I);
+print("samples:", n + 1);
+
+print("x", "abs_error", "rel_error") > data_path;
+
+max_abs = 0;
+max_abs_x = 0;
+max_rel = 0;
+max_rel_x = 0;
+
+for i from 0 to n do {
+  xi = round(-1 / 16 + (1 / 8) * i / n, prec, RN);
+  abs_err = sup(evaluate(abs(p - sin(x)), xi));
+  if (i == n / 2) then {
+    rel_err = 0;
+  } else {
+    rel_err = sup(evaluate(abs(p / sin(x) - 1), xi));
+  };
+
+  if (abs_err > max_abs) then {
+    max_abs = abs_err;
+    max_abs_x = xi;
+  };
+
+  if (rel_err > max_rel) then {
+    max_rel = rel_err;
+    max_rel_x = xi;
+  };
+
+  print(xi, abs_err, rel_err) >> data_path;
+};
+
+print("sampled maximum absolute error:", max_abs);
+print("x at sampled maximum absolute error:", max_abs_x);
+print("sampled maximum relative error:", max_rel);
+print("x at sampled maximum relative error:", max_rel_x);
+
+dirty_abs = dirtyinfnorm(abs(p - sin(x)), I);
+dirty_rel = dirtyinfnorm(abs(p / sin(x) - 1), I);
+print("dirtyinfnorm absolute error:", dirty_abs);
+print("dirtyinfnorm relative error:", dirty_rel);
+
+sup_abs = supnorm(p, sin(x), I, absolute, 1b-80);
+sup_rel = supnorm(p, sin(x), I, relative, 1b-80);
+print("supnorm absolute error:", sup_abs);
+print("supnorm relative error:", sup_rel);

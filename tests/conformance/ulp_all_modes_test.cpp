@@ -46,6 +46,7 @@ TEST(CcmathAllModesUlpTests, CosDouble)
 	ccm::test::ExpectUlpUnaryOverAllRoundingModes(ccm::test::samples::kAllModesProbeDouble, ccm::cos<double>, static_cast<double (*)(double)>(std::cos));
 }
 
+// [c.math]/1: validates that the double overload preserves the standard C library behavior across active rounding modes.
 TEST(CcmathAllModesUlpTests, PowDouble)
 {
 	ccm::test::ExpectUlpBinaryOverAllRoundingModes(

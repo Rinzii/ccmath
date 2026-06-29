@@ -25,8 +25,7 @@ namespace ccm::ext
 	 * @param hi Maximum value.
 	 * @return The clamped value.
 	 */
-	template <typename T>
-	constexpr T clamp(T v, T lo = T{ 0 }, T hi = T{ 1 })
+	template <typename T> constexpr T clamp(T v, T lo = T{ 0 }, T hi = T{ 1 })
 	{
 		return ccm::min(ccm::max(v, lo), hi);
 	}

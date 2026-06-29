@@ -10,6 +10,9 @@
 
 #pragma once
 
+#include "ccmath/internal/predef/has_builtin.hpp"
+#include "ccmath/internal/support/fp/fma.hpp"
+#include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/multiply_add.hpp"
 #include "ccmath/internal/types/number_pair.hpp"
 
@@ -18,6 +21,22 @@ namespace ccm
 	namespace types
 	{
 		using DoubleDouble = NumberPair<double>;
+
+		// True fused multiply-add for the error-free transforms below. This path stays on the quiet
+		// software fallback when a builtin is unavailable so the residual remains exact without
+		// raising spurious public FE_INEXACT / range exceptions.
+		constexpr double exact_fma(double x, double y, double z) noexcept // NOLINT(bugprone-exception-escape)
+		{
+			if (support::is_constant_evaluated())
+			{
+				return support::fp::generic_fma(x, y, z);
+			}
+#if CCM_HAS_BUILTIN(__builtin_fma)
+			return __builtin_fma(x, y, z);
+#else
+			return support::fp::generic_fma(x, y, z);
+#endif
+		}
 
 		// The output of Dekker's FastTwoSum algorithm is correct, i.e.:
 		//   r.hi + r.lo = a + b exactly
@@ -63,37 +82,29 @@ namespace ccm
 		constexpr DoubleDouble exact_mult(double a, double b)
 		{
 			DoubleDouble r{ 0.0, 0.0 };
-
-// If we have builtin FMA, we can use it to get the exact product.
-#if defined(__GNUC__) && (__GNUC__ > 6 || (__GNUC__ == 6 && __GNUC_MINOR__ >= 1)) && !defined(__clang__)
-			r.hi = a * b;
-			r.lo = support::multiply_add(a, b, -r.hi);
-#else
 			// Dekker's Product.
 			const DoubleDouble as = split(a);
 			const DoubleDouble bs = split(b);
 			r.hi				  = a * b;
-			const double t1		  = as.hi * bs.hi - r.hi;
-			const double t2		  = as.hi * bs.lo + t1;
-			const double t3		  = as.lo * bs.hi + t2;
-			r.lo				  = as.lo * bs.lo + t3;
-#endif
-
+			const double t1		  = (as.hi * bs.hi) - r.hi;
+			const double t2		  = (as.hi * bs.lo) + t1;
+			const double t3		  = (as.lo * bs.hi) + t2;
+			r.lo				  = (as.lo * bs.lo) + t3;
 			return r;
 		}
 
 		constexpr DoubleDouble quick_mult(double a, const DoubleDouble & b)
 		{
 			DoubleDouble r = exact_mult(a, b.hi);
-			r.lo		   = support::multiply_add(a, b.lo, r.lo);
+			r.lo		   = exact_fma(a, b.lo, r.lo);
 			return r;
 		}
 
 		constexpr DoubleDouble quick_mult(const DoubleDouble & a, const DoubleDouble & b)
 		{
 			DoubleDouble r	= exact_mult(a.hi, b.hi);
-			const double t1 = support::multiply_add(a.hi, b.lo, r.lo);
-			const double t2 = support::multiply_add(a.lo, b.hi, t1);
+			const double t1 = exact_fma(a.hi, b.lo, r.lo);
+			const double t2 = exact_fma(a.lo, b.hi, t1);
 			r.lo			= t2;
 			return r;
 		}

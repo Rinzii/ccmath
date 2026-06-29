@@ -28,6 +28,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_ATAN2
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for atan2 that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_ATAN2
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_ATAN2
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -37,11 +52,20 @@ namespace ccm::builtin
 	template <typename T>
 	inline constexpr bool has_constexpr_atan2 =
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_ATAN2
-		is_valid_builtin_type<T>;
+		is_valid_transcendental_builtin_type<T>;
 	#else
 			false;
 	#endif
 	// clang-format on
+
+	// TODO: determine actual compiler/version support for runtime __builtin_atan2.
+	template <typename T>
+	inline constexpr bool has_runtime_atan2 =
+#ifdef CCMATH_HAS_BUILTIN_ATAN2
+		is_valid_transcendental_builtin_type<T>;
+#else
+		false;
+#endif
 
 	/**
 	 * @internal
@@ -50,13 +74,37 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_atan2 functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto atan2(T y, T x) -> std::enable_if_t<has_constexpr_atan2<T>, T>
+	template <typename T> constexpr auto atan2_ct(T y, T x) -> std::enable_if_t<has_constexpr_atan2<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_atan2f(y, x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_atan2(y, x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_atan2l(y, x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_atan2f(y, x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_atan2(y, x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_atan2l(y, x);
+		} else
+		{
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for atan2");
+			return T{};
+		}
+	}
+
+	template <typename T> auto atan2_rt(T y, T x) -> std::enable_if_t<has_runtime_atan2<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_atan2f(y, x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_atan2(y, x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_atan2l(y, x);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for atan2");
@@ -67,3 +115,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_ATAN2
+#undef CCMATH_HAS_BUILTIN_ATAN2

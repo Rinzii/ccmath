@@ -1,0 +1,1162 @@
+% Proof Notes for ccm::pow
+% Compile with: pdflatex POW_PROOF.tex
+
+\documentclass[11pt]{article}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+\renewcommand{\qedsymbol}{\ensuremath{\blacksquare}}
+\usepackage{amssymb}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{booktabs}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{longtable}
+
+\geometry{margin=1.1in}
+\hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue}
+
+\lstset{
+  basicstyle=\small\ttfamily,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  backgroundcolor=\color{gray!6},
+  rulecolor=\color{gray!40},
+  framesep=4pt,
+}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\newcommand{\ulp}{\operatorname{ulp}}
+\newcommand{\Pow}{\texttt{ccm::pow}}
+\newcommand{\Powf}{\texttt{ccm::powf}}
+\newcommand{\Powl}{\texttt{ccm::powl}}
+\newcommand{\Gdbl}{145805145804091023 \times 2^{-110}}
+\newcommand{\Gflt}{577595370471038973 \times 2^{-111}}
+
+\title{\textbf{Proof Notes for \texttt{ccm::pow}}}
+\author{Ian Pike}
+\date{}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{abstract}
+These notes record proved statements for \Pow, \Powf, and \Powl.  For binary64
+the input space has cardinality $2^{128}$, so the argument splits into separate
+obligations on their natural domains, in the same style as CRlibm and
+CORE-MATH~\cite{powr,coremath}: exceptional conformance, range-reduction
+identities in exact rational arithmetic, approximation bounds with Sollya, and
+rounded evaluation circuits with Gappa.  Where an end-to-end theorem needs a
+transfer lemma that is not yet shown, the gap is stated explicitly.  This note
+does not claim a complete binary64 $4$-ULP theorem on the whole non-exceptional
+path.
+
+Section~\ref{sec:powl80} covers the 80-bit \Powl{} kernel: Sollya sup-norm
+bounds on the 64-bit significand, a double-double bound on the integer path,
+and an explicit boundary on the reconstruction-circuit certificate.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section*{Notation}
+\addcontentsline{toc}{section}{Notation}
+
+For a floating-point format $F$, let $\mathbb{F}_F$ denote its representable
+values.  In particular, $\mathbb{F}_{64}$ denotes IEEE~754 binary64 and
+$\mathbb{F}_{32}$ denotes IEEE~754 binary32.
+
+If $v$ is a nonzero finite number representable in $F$, then $\ulp_F(v)$
+denotes the spacing of format $F$ at $v$.  In the normal range this is the
+usual
+\[
+  \ulp_F(v) = 2^{\lfloor \log_2 |v| \rfloor - p + 1},
+\]
+where $p$ is the precision in bits.  In the subnormal range $\ulp_F(v)$ is
+the constant minimum spacing.
+
+Gappa~\cite{gappa} writes exact rationals in the form $N\mathtt{b}E$, meaning
+$N \times 2^E$.
+
+\section{Method and Scope}
+\label{sec:scope}
+
+\subsection{Objects under proof}
+
+This note concerns the production sources listed below:
+\begin{enumerate}[label=(O\arabic*)]
+  \item \texttt{pow\_impl(double,double)} in \texttt{pow\_impl.hpp};
+  \item \texttt{powf\_impl(float,float)} in \texttt{powf\_impl.hpp};
+  \item the associated tables in \texttt{common\_math\_constants.hpp};
+  \item the \Powl{} dispatch \texttt{powl\_impl} / \texttt{powl\_bounded\_integer}
+    in \texttt{powl\_gen.hpp};
+  \item the 80-bit kernel \texttt{powl\_ld80\_general\_finite} in
+    \texttt{powl\_ld80\_kernel.hpp};
+  \item the 80-bit tables and minimax coefficients in
+    \texttt{powl\_ld80\_tables.hpp}.
+\end{enumerate}
+The supporting proof scripts read their constants directly from those files;
+they do not rely on hand-copied duplicates.
+
+The note separates exceptional semantics, range-reduction identities,
+approximation on the reals, and rounded circuit evaluation; see~\cite{powr,coremath}.
+
+\subsection{Standing assumptions}
+
+Every non-exceptional theorem in this note is proved under the following
+standing assumptions:
+\begin{enumerate}[label=(A\arabic*)]
+  \item IEEE~754 binary32 and binary64 semantics~\cite{ieee754};
+  \item round-to-nearest, ties-to-even for the modeled operations;
+  \item no flush-to-zero or denormals-are-zero mode;
+  \item no fast-math reassociation or other algebraic transformation that
+    changes the operation graph being certified;
+  \item when a Gappa theorem is cited, the executed circuit is the non-FMA
+    circuit encoded in the corresponding \texttt{.g} file;
+  \item the \Powl{} discussion concerns exactly two platform shapes, and no
+    others: the \emph{double-aliased} shape, with
+    \texttt{numeric\_limits<long double>::digits=53}, on which \Powl{} is the
+    binary64 kernel composed with the identity cast; and the
+    \emph{x87 extended} shape, with \texttt{digits=64} and the macro
+    \texttt{CCM\_TYPES\_LONG\_DOUBLE\_IS\_FLOAT80} defined, on which \Powl{} uses
+    its own kernel and tables.  The IEEE binary128 and unknown shapes are out of
+    scope here.
+\end{enumerate}
+
+\begin{remark}
+Assumption~(A5) is substantive.  The present certificates are for explicit
+non-FMA circuits.  They should not be read as blanket certificates for every
+possible FMA-contracted build.
+\end{remark}
+
+\subsection{Reference value and ULP policy}
+
+\begin{definition}[Reference value]
+\label{def:reference}
+For finite non-exceptional inputs $(x,y)$, the reference value is the real
+number $x^y$, interpreted in the usual way:
+\begin{enumerate}[label=(R\arabic*)]
+  \item if $x>0$, then $x^y = 2^{y\log_2(x)}$;
+  \item if $x<0$ and $y \in \mathbb{Z}$, then
+    $x^y = \operatorname{sgn}(x)^y |x|^y$;
+  \item exceptional cases are treated separately by the C/IEEE rules and do
+    not belong to this definition.
+\end{enumerate}
+\end{definition}
+
+\begin{definition}[4-ULP policy]
+\label{def:ulp-policy}
+Let $\widehat{r}$ be an output in format $F$, and let $r$ be the reference
+value from Definition~\ref{def:reference}.
+\begin{enumerate}[label=(U\arabic*)]
+  \item If $r$ is finite and nonzero, the ULP error is
+    $|\widehat{r} - r|/\ulp_F(r)$.
+  \item If $r=0$, the requirement is the correct signed zero.
+  \item If the C/IEEE rules require infinity, NaN, overflow, underflow, or a
+    specific floating-point exception, then that mandated behavior replaces
+    the finite ULP metric.
+\end{enumerate}
+\end{definition}
+
+\subsection{What is proved here}
+
+\begin{theorem}[Formal scope of this note]
+\label{thm:scope}
+Under the standing assumptions above, the present note establishes the
+following statements, and no others.
+\begin{enumerate}[label=(S\arabic*)]
+  \item The exceptional branches of the binary64 kernel satisfy the stated
+    C17/Annex~F cases.
+  \item The first-stage and second-stage range reductions satisfy their stated
+    interval bounds for every source-table entry and every representable input
+    in the corresponding bucket.
+  \item The source polynomials satisfy rigorous sup-norm bounds on their
+    declared domains.
+  \item The non-FMA floating-point evaluation circuits encoded in the Gappa
+    files satisfy the displayed rounding-error bounds.
+  \item Conditional on the residual variable $lo_6$ lying in
+    $[-\tfrac12,\tfrac12]$, the exp stage of the binary64 kernel contributes
+    at most $(G+S)2^{53} \le 1.025$ binary64 ULP, with $G=\Gdbl$ and $S$ the
+    Sollya bound of Section~\ref{sec:poly}.
+  \item For the binary32 primary path, the analogous exp-stage contribution is
+    negligible compared with the final cast to float; the logical correctness
+    of the Ziv acceptance test is proved separately in
+    Theorem~\ref{thm:ziv}.
+  \item On the x87 extended platform, the integer-exponent path of \Powl{}
+    returns a value whose distance from $b^{n}$ is governed by the
+    double-double error analysis of Theorem~\ref{thm:powl-int}.
+  \item On the same platform, the two minimax polynomials of the general-finite
+    \Powl{} kernel satisfy rigorous sup-norm bounds on the 64-bit significand
+    (Lemmas~\ref{lem:supnorm-log-ld}--\ref{lem:supnorm-exp-ld}), and the
+    kernel's range reduction inherits the interval bounds of
+    Section~\ref{sec:reduction} verbatim.
+  \item The two double-double polynomials of the accurate binary64
+    reconstruction path satisfy rigorous sup-norm bounds on their declared
+    intervals (Lemmas~\ref{lem:supnorm-log-dd}--\ref{lem:supnorm-exp-dd}), and
+    the FMA error-free transformation used by the integer and half-integer
+    algebraic path is exact in every IEEE rounding mode.
+\end{enumerate}
+No theorem stronger than \ref{thm:scope} is claimed in this document.  In
+particular, no Gappa certificate is yet asserted for the 80-bit reconstruction
+circuit or for the accurate binary64 double-double reconstruction circuit;
+Section~\ref{sec:powl80} and Remark~\ref{rem:pow-accurate-scope} mark those
+boundaries precisely.
+\end{theorem}
+
+\begin{remark}
+Two transfer steps needed for a genuine end-to-end binary64 accuracy theorem
+are still outside the present certificates.  First, the note does not yet
+propagate the binary64 log-phase error all the way through the
+\texttt{exact\_add}/\texttt{exact\_mult} reconstruction, the multiplication by
+$y$, the scaling branch, and the final reconstruction of $2^{hm/64}$.  Second,
+the note does not yet prove unconditionally that every non-exceptional binary64
+execution reaches the exp polynomial with $|lo_6| \le \tfrac12$.  For that
+reason Theorem~\ref{thm:exp-stage} is stated conditionally.
+\end{remark}
+
+\section{The Algorithm}
+
+Both kernels are organized around the standard identity
+\[
+  x^y = 2^{\,y\log_2(x)}.
+\]
+The work is divided into an exceptional-input dispatch, a log phase, and an
+exp phase.
+
+The log phase writes the positive base in the form $x = 2^{e_x}m_x$ with
+$m_x \in [1,2)$, chooses a range-reduction constant $r_i$ from the top seven
+mantissa bits, and forms
+\[
+  dx = r_i m_x - 1.
+\]
+The tables are chosen so that $|dx| < 2^{-7}$.  Thus
+\[
+  \log_2(x) = e_x - \log_2(r_i) + \log_2(1+dx),
+\]
+and the nonlinear part of the problem has been confined to a very small
+interval.
+
+The exp phase forms an approximation to $64y\log_2(x)$, rounds its principal
+part to an integer $hm$, reconstructs $2^{hm/64}$ from a table, and
+approximates $2^{lo_6/64}$ by a short polynomial in the residual variable
+$lo_6$.
+
+\begin{algorithm}
+\caption{Binary64 $\mathrm{pow}(x,y)$}
+\label{alg:pow64}
+\begin{algorithmic}[1]
+\Require $x,y \in \mathbb{F}_{64}$
+\Ensure The C/IEEE exceptional result, or a finite approximation to $x^y$
+
+\Statex \textbf{Exceptional dispatch}
+\If{$y=\pm 0$} \Return $1.0$ \EndIf
+\If{$x=1$} \Return $1.0$ \EndIf
+\If{$\mathrm{isnan}(x)$ or $\mathrm{isnan}(y)$} \Return qNaN \EndIf
+\If{$x=\pm 0$} \Return signed $\pm\infty$ or signed $\pm0$ as required \EndIf
+\If{$|x|=\infty$} \Return signed $\pm\infty$ or signed $\pm0$ as required \EndIf
+\If{$|y|=\infty$} \Return $0$, $1$, or $\infty$ according to $|x| \lessgtr 1$ \EndIf
+\If{$x<0$ and $y \notin \mathbb{Z}$} \Return qNaN and raise \texttt{FE\_INVALID} \EndIf
+\State Record the sign determined by odd-integer parity; replace $x$ by $|x|$
+
+\Statex \textbf{Algebraic exact routing}
+\If{$y \in \mathbb{Z}$ and $|y| \le 1024$} \Return the double-double square-and-multiply value of \S\ref{sec:pow-exact} \EndIf
+\If{$2y \in \mathbb{Z}$ and $|2y| \le 2048$} \Return $\sqrt{x}$ (for $y=\tfrac12$) or the double-double square-and-multiply of $\sqrt{x}$ raised to the odd integer $2y$ \EndIf
+
+\Statex \textbf{Log phase}
+\State Normalize subnormals if necessary
+\State Write $x = 2^{e_x}m_x$ with $m_x \in [1,2)$
+\State $i \gets \lfloor 128(m_x - 1) \rfloor$
+\State $dx \gets \mathrm{RD}[i]m_x - 1$ or the algebraically equivalent compensated form
+\State Reconstruct an approximation to $\log_2(x)$ from $e_x$, $\mathrm{LOG2\_R\_TD}[i]$, and a polynomial in $dx$
+
+\Statex \textbf{Exp phase}
+\State Form an approximation to $64y\log_2(x)$ as $T_{\mathrm{hi}} + T_{\mathrm{lo}}$
+\State $hm \gets \mathrm{round}(T_{\mathrm{hi}})$
+\State $lo_6 \gets T_{\mathrm{hi}} - hm + T_{\mathrm{lo}}$
+\State Reconstruct $2^{hm/64}$ from the table \texttt{EXP2\_MID1}
+\State Evaluate a polynomial approximation to $2^{lo_6/64}$
+\If{the result is not clamped to overflow or underflow}
+  \State Carry the log and exp phases in double-double and \Return one binary64 rounding of $r_{\mathrm{hi}} + r_{\mathrm{lo}}$ (\S\ref{sec:pow-accurate})
+\Else{}
+  \State \Return the saturating single-double product, with the recorded sign and scaling factor
+\EndIf
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Binary32 $\mathrm{powf}(x,y)$}
+\label{alg:powf}
+\begin{algorithmic}[1]
+\Require $x,y \in \mathbb{F}_{32}$
+\Ensure The C/IEEE exceptional result, or a float approximation to $x^y$
+
+\State Exceptional dispatch and short fast paths
+\State Perform the primary log/exp computation in binary64 working precision
+\State Apply the Ziv test
+\If{the $\pm64$-ULP-double neighborhood rounds to one float}
+  \Return that float
+\EndIf
+\State Otherwise enter the double-double fallback and round its result to float
+\end{algorithmic}
+\end{algorithm}
+
+\section{Exceptional Inputs}
+\label{sec:exceptions}
+
+\begin{theorem}[Exceptional branch correctness]
+\label{thm:exceptional}
+For binary64 inputs, the exceptional branches of
+\texttt{pow\_impl(double,double)} cover the cases required by
+C17 \S7.12.7.4 and Annex~F, \S F.10.4.4~\cite{c17}, subject to the standing
+assumptions of Section~\ref{sec:scope}.
+\end{theorem}
+
+\begin{proof}
+The guards are evaluated in a fixed order, and that order matters.  The two
+identities
+\[
+  \mathrm{pow}(\mathrm{NaN},0)=1,
+  \qquad
+  \mathrm{pow}(1,\mathrm{NaN})=1
+\]
+must be recognized before generic NaN propagation; the implementation does so.
+After those two special cases, the remaining branches are disjoint and cover
+the classical exceptional cases.
+
+\begin{center}
+\begin{tabular}{@{}p{0.28\linewidth}p{0.29\linewidth}p{0.30\linewidth}@{}}
+\toprule
+Guard family & Result & Reason \\
+\midrule
+\texttt{exp == 0}
+  & $1.0$
+  & $\mathrm{pow}(x,\pm0)=1$ for all $x$. \\[4pt]
+\texttt{base == 1}
+  & $1.0$
+  & $\mathrm{pow}(1,y)=1$ for all $y$. \\[4pt]
+\texttt{isnan(base)} or \texttt{isnan(exp)}
+  & qNaN
+  & NaN propagation after the two fixed points above. \\[4pt]
+\texttt{base == +-0}, \texttt{exp < 0}
+  & signed $\pm\infty$
+  & Pole case; \texttt{FE\_DIVBYZERO} is raised. \\[4pt]
+\texttt{base == +-0}, \texttt{exp > 0}
+  & signed $\pm0$
+  & Sign determined by odd-integer parity. \\[4pt]
+\texttt{base == -inf}, non-integer \texttt{exp}
+  & qNaN
+  & Domain error; \texttt{FE\_INVALID} is raised. \\[4pt]
+\texttt{base == +-inf}, integer \texttt{exp}
+  & signed $\pm\infty$ or signed $\pm0$
+  & Determined by sign, parity, and the sign of the exponent. \\[4pt]
+\texttt{exp == +-inf}
+  & $0$, $1$, or $\infty$
+  & Determined by comparing $|x|$ with $1$. \\[4pt]
+finite \texttt{base < 0}, non-integer \texttt{exp}
+  & qNaN
+  & Domain error; \texttt{FE\_INVALID} is raised. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The auxiliary predicates \texttt{is\_integer} and \texttt{is\_odd\_integer}
+operate directly on the binary64 exponent and significand structure.  For
+magnitudes at least $2^{53}$ every finite binary64 value is already an integer,
+so the parity question is reduced to the least significant stored unit bit.
+Thus the large-exponent cases do not require a separate argument.
+\end{proof}
+
+\section{Range Reduction}
+\label{sec:reduction}
+
+\begin{lemma}[First-stage range reduction]
+\label{lem:stage1}
+Let $x$ be a finite positive binary64 number with mantissa $m_x \in [1,2)$,
+and let
+\[
+  i = \lfloor 128(m_x-1) \rfloor.
+\]
+Then $i \in \{0,\dots,127\}$, and the following two facts hold.
+\begin{enumerate}[label=(\roman*)]
+  \item The source-table identity
+    \[
+      \mathrm{RD}[i]\!\left(1 + \frac{i}{128}\right) - 1 = \mathrm{CD}[i]
+    \]
+    holds exactly.
+  \item For every representable $m_x$ in bucket $i$,
+    \[
+      dx = \mathrm{RD}[i]m_x - 1 \in [-2^{-8},\,2^{-7}).
+    \]
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+The proof script \texttt{pow\_double\_proof.py} parses the arrays
+\texttt{RD} and \texttt{CD} directly from the production header and checks
+every bucket in exact rational arithmetic using Python's \texttt{Fraction}.
+
+Part~(i) is a direct equality test.  For part~(ii), the script evaluates the
+two bucket endpoints
+\[
+  1 + \frac{i}{128},
+  \qquad
+  1 + \frac{i+1}{128} - 2^{-52},
+\]
+passes them through the affine map $t \mapsto \mathrm{RD}[i]t - 1$, and notes
+that a positive-slope affine map carries the whole interval between the images
+of its endpoints.  Since the 128 buckets cover the entire mantissa range
+$[1,2)$, the result follows for every finite positive binary64 input.
+\end{proof}
+
+\begin{remark}
+The analogous binary32 statement is verified by
+\texttt{pow\_float\_proof.py}; in addition, that script checks the exact
+identity \texttt{R[k] == RD[k]} after promotion from float to double.
+\end{remark}
+
+\begin{lemma}[Second-stage range reduction]
+\label{lem:stage2}
+In the \Powf{} double-double fallback, once the first stage has produced
+$dx \in [-2^{-8},2^{-7})$, the second reduction satisfies
+\[
+  dx_2 = (1+dx)\mathrm{R2}[i] - 1
+  \in [-\mathtt{0x1.3ffcp-15},\,\mathtt{0x1.3e3dp-15}].
+\]
+\end{lemma}
+
+\begin{proof}
+The proof is again exhaustive over the source table.  For each entry of
+\texttt{R2}, the script intersects the admissible first-stage interval with
+the bucket corresponding to that entry, and then maps the resulting interval
+through the affine function $u \mapsto (1+u)\mathrm{R2}[i]-1$.  Everything is
+done in exact rational arithmetic, so the displayed bound is exact as stated.
+\end{proof}
+
+\section{Polynomial Approximation}
+\label{sec:poly}
+
+Once the range reduction has been established, the approximation problem is
+small enough to be treated by short source polynomials on fixed intervals.
+
+\begin{lemma}[Log polynomial bound]
+\label{lem:supnorm-log}
+Let $P_{\!\log}$ be the binary64 polynomial with coefficients
+\texttt{POW\_LOG2\_COEFFS}.  Then
+\[
+  \sup_{dx \in [-2^{-8},\,2^{-7}]}
+  \left|
+    P_{\!\log}(dx) - \frac{\log_2(1+dx)}{dx}
+  \right|
+  \leq S_{\log},
+\]
+where $S_{\log}$ is the hexadecimal upper bound emitted by Sollya.
+\end{lemma}
+
+\begin{proof}
+The proof script feeds the source polynomial directly to Sollya and evaluates
+\[
+  \texttt{dirtyinfnorm(log2(1 + x)/x - Plog, [-2\string^-8; 2\string^-7])}.
+\]
+Sollya computes a rigorous interval-arithmetic upper bound for the sup norm,
+not a sampled estimate.
+\end{proof}
+
+\begin{lemma}[Exp polynomial bound]
+\label{lem:supnorm-exp}
+Let $P_{\!\exp}$ be the binary64 polynomial with coefficients
+\texttt{POW\_EXP2\_COEFFS}.  Then
+\[
+  \sup_{z \in [-1/2,\,1/2]}
+  |P_{\!\exp}(z) - 2^{z/64}|
+  \leq S_{\exp},
+\]
+where $S_{\exp}$ is the hexadecimal upper bound emitted by Sollya.
+\end{lemma}
+
+\begin{proof}
+This is the same argument, applied to
+\[
+  \texttt{dirtyinfnorm(2\string^(x/64) - Pexp, [-2\string^-1; 2\string^-1])}.
+\]
+\end{proof}
+
+\section{Floating-Point Evaluation Certificates}
+\label{sec:gappa}
+
+The preceding section concerns the exact real polynomials.  The implementation
+evaluates them in floating-point arithmetic; the certificates below are Gappa
+bounds on the encoded non-FMA circuits.
+
+\subsection{Mapping from source code to proof model}
+
+The Gappa files do not certify an abstract polynomial; they certify explicit
+rounded circuits.  The relevant correspondences are listed below.  In every
+row, \texttt{rnd()} denotes one round-to-nearest-even binary64 operation.
+
+\begin{longtable}{@{}p{0.29\linewidth}p{0.41\linewidth}p{0.12\linewidth}p{0.11\linewidth}@{}}
+\toprule
+Source step & Gappa model & Mode & File \\
+\midrule
+\endhead
+\texttt{dx2 = dx * dx}
+  & \texttt{x2 = rnd(x * x)}
+  & RN & \texttt{pow\_double\_log\_eval.g} \\[4pt]
+\texttt{c0 = muladd(dx, C2, C1)}
+  & \texttt{m0 = rnd(x * C2);} \texttt{ c0 = rnd(m0 + C1)}
+  & RN & same \\[4pt]
+\texttt{c1 = muladd(dx, C4, C3)}
+  & \texttt{m1 = rnd(x * C4);} \texttt{ c1 = rnd(m1 + C3)}
+  & RN & same \\[4pt]
+\texttt{c2 = muladd(dx, C6, C5)}
+  & \texttt{m2 = rnd(x * C6);} \texttt{ c2 = rnd(m2 + C5)}
+  & RN & same \\[4pt]
+\texttt{p = polyeval(dx2, c0, c1, c2)}
+  & \texttt{h0,h1,h2,h3,h4}
+  & RN & same \\[4pt]
+\texttt{log polynomial output}
+  & \texttt{log\_eval = rnd(h4 + x * C0)}
+  & RN & same \\[8pt]
+
+\texttt{lo6\_sqr = lo6 * lo6}
+  & \texttt{x2 = rnd(x * x)}
+  & RN & \texttt{pow\_double\_exp\_eval.g} \\[4pt]
+\texttt{d0 = muladd(lo6, C2, C1)}
+  & \texttt{m0 = rnd(x * C2);} \texttt{ d0 = rnd(m0 + C1)}
+  & RN & same \\[4pt]
+\texttt{d1 = muladd(lo6, C4, C3)}
+  & \texttt{m1 = rnd(x * C4);} \texttt{ d1 = rnd(m1 + C3)}
+  & RN & same \\[4pt]
+\texttt{pp = polyeval(lo6\_sqr, d0, d1, C5)}
+  & \texttt{h0,h1,h2,h3,h4}
+  & RN & same \\[4pt]
+\texttt{exp polynomial output}
+  & \texttt{exp\_eval = rnd(h4 + 0x1p0)}
+  & RN & same \\[8pt]
+
+\texttt{powf} primary log circuit
+  & \texttt{m0/c0, m1/c1, m2/c2, h0,h1,h2}
+  & RN & \texttt{pow\_float\_log\_eval.g} \\[4pt]
+\texttt{powf} primary exp circuit
+  & \texttt{m0/d0, m1/d1, m2/d2, h0,h1,h2}
+  & RN & \texttt{pow\_float\_exp\_eval.g} \\
+\bottomrule
+\end{longtable}
+
+\begin{remark}
+This table is the precise boundary of the Gappa argument.  If a build changes
+the circuit, the proof file must change with it.
+\end{remark}
+
+\subsection{Certified rounding-error bounds}
+
+\begin{lemma}[Binary64 log evaluation certificate]
+\label{lem:gappa-dbl-log}
+For the non-FMA binary64 log circuit,
+\[
+  |\mathrm{log\_eval} - P| \leq 584853814232881131 \times 2^{-119}.
+\]
+\end{lemma}
+
+\begin{lemma}[Binary64 exp evaluation certificate]
+\label{lem:gappa-dbl-exp}
+For the non-FMA binary64 exp circuit,
+\[
+  |\mathrm{exp\_eval} - \mathrm{exp\_stagee}| \leq \Gdbl.
+\]
+\end{lemma}
+
+\begin{lemma}[Binary32 log evaluation certificate]
+\label{lem:gappa-flt-log}
+For the non-FMA binary64 working-precision log circuit used in the primary
+path of \Powf,
+\[
+  |\mathrm{log\_eval} - P| \leq 577604123977524393 \times 2^{-111}.
+\]
+\end{lemma}
+
+\begin{lemma}[Binary32 exp evaluation certificate]
+\label{lem:gappa-flt-exp}
+For the corresponding exp circuit,
+\[
+  |\mathrm{exp\_eval} - P| \leq \Gflt.
+\]
+\end{lemma}
+
+\begin{proof}[Proof of Lemmas \ref{lem:gappa-dbl-log}--\ref{lem:gappa-flt-exp}]
+Each \texttt{.g} file introduces the rounded circuit and its exact real
+counterpart side by side, then asks Gappa to prove a symmetric interval bound
+for the difference.  The proof scripts treat failure as fatal and can archive
+the command line, source hashes, and tool output in a JSON report.  Since the
+reported intervals are the very intervals used by Gappa, the lemmas are simply
+restatements of those certificates.
+\end{proof}
+
+\section{Consequences for the Exp Stage}
+\label{sec:exp}
+
+The exp polynomial is certified on the interval $[-\tfrac12,\tfrac12]$, and
+the theorem below says exactly what follows when the implementation reaches the
+polynomial inside that interval.
+
+\begin{theorem}[Conditional binary64 exp-stage bound]
+\label{thm:exp-stage}
+Assume a finite non-exceptional binary64 input pair, and assume further that
+the residual variable supplied to the exp polynomial satisfies
+$|lo_6| \le \tfrac12$.  Then the exp stage contributes at most
+\[
+  (G+S)\,2^{53}
+\]
+binary64 ULP, where $G=\Gdbl$ is the Gappa bound of
+Lemma~\ref{lem:gappa-dbl-exp} and $S$ is the Sollya bound of
+Lemma~\ref{lem:supnorm-exp}.  Numerically this is at most $1.025$ binary64
+ULP.
+\end{theorem}
+
+\begin{proof}
+Lemma~\ref{lem:gappa-dbl-exp} gives
+\[
+  |\mathrm{exp\_eval} - P_{\!\exp}(lo_6)| \le G,
+\]
+while Lemma~\ref{lem:supnorm-exp} gives
+\[
+  |P_{\!\exp}(lo_6) - 2^{lo_6/64}| \le S.
+\]
+The triangle inequality yields
+\[
+  |\mathrm{exp\_eval} - 2^{lo_6/64}| \le G+S.
+\]
+Multiplying by the reconstructed factor $2^{hm/64}$ produces an absolute
+output error bounded by $2^{hm/64}(G+S)$.  When this is measured in ULP at the
+true result, the worst case occurs when $hm$ is a multiple of $64$ and
+$lo_6<0$, which introduces one extra factor of $2$.  Hence the contribution is
+bounded by $(G+S)2^{53}$ binary64 ULP.
+\end{proof}
+
+\begin{corollary}[Binary32 exp-stage contribution]
+\label{cor:float-exp}
+For the primary path of \Powf, the analogous argument yields
+\[
+  (G_f + S_f)\,2^{24} \approx 3.76 \times 10^{-9}
+  \quad\text{float ULP},
+\]
+which is negligible in comparison with the final cast to float.
+\end{corollary}
+
+\section{Accurate Binary64 Reconstruction}
+\label{sec:pow-accurate}
+
+For finite non-exceptional inputs that do not clamp to overflow or underflow,
+the binary64 kernel reconstructs $x^y$ in double-double working precision and
+returns one binary64 rounding of $r_{\mathrm{hi}} + r_{\mathrm{lo}}$ for a normal
+final value.  The
+single-double circuit of Sections~\ref{sec:poly}--\ref{sec:gappa} is retained
+only on the clamped over/underflow tail, where the result saturates to a signed
+infinity or zero.
+
+The accurate path repeats the second-stage range reduction of
+Lemma~\ref{lem:stage2} in double-double, evaluates a degree-5 double-double
+minimax for $\log_2(1+\cdot)$ and a degree-9 double-double minimax for
+$2^{\cdot/64}$, and collapses the final pair with one binary64 addition for a
+normal result.  The
+two minimax polynomials are the new numeric artifacts; their approximation
+error is certified below.
+
+Two reconstruction details are required for correct rounding in every mode and
+are worth recording, since neither is captured by the polynomial certificates.
+First, the high term $e_x + \log_2(r_1)$ is formed as an \texttt{exact\_add} so
+that its rounding residual survives in the low limb: for a base far from $1$ the
+integer $e_x$ is large and a bare single-double sum drops up to half an ulp of
+$e_x$, which the subsequent multiplication by $y$ amplifies past a full result
+ulp.  Second, when the over/underflow scale $2^{-512}$ is in force and the final
+value is subnormal, collapsing the pair to a normal double and then applying the
+scale rounds twice; a round-to-odd intermediate cannot repair this, because a
+$53$-bit double leaves only one guard bit over a $52$-bit subnormal while
+round-to-odd needs two.  The kernel therefore rounds the double-double directly
+onto the shared subnormal grid (lsb $2^{-1074}$) in a single active-mode
+rounding, after which the power-of-two reattachment is exact.
+
+\begin{lemma}[Accurate log2 double-double polynomial bound]
+\label{lem:supnorm-log-dd}
+Let $P_{\!\log}^{\mathrm{dd}}$ be the degree-5 polynomial whose coefficients are
+the double-double array \texttt{COEFFS} in \texttt{pow\_impl.hpp}, each summed as
+$\mathit{hi}+\mathit{lo}$.  Then
+\[
+  \sup_{x \in [-\mathtt{0x1.3ffcp-15},\,\mathtt{0x1.3e3dp-15}]}
+  \left| P_{\!\log}^{\mathrm{dd}}(x) - \frac{\log_2(1+x)}{x} \right|
+  \;\le\; S_{\log}^{\mathrm{dd}},
+\]
+where $S_{\log}^{\mathrm{dd}} \approx 2^{-96}$ is the rigorous sup-norm bound
+emitted by Sollya.
+\end{lemma}
+
+\begin{lemma}[Accurate exp2 double-double polynomial bound]
+\label{lem:supnorm-exp-dd}
+Let $P_{\!\exp}^{\mathrm{dd}}$ be the degree-9 polynomial whose coefficients are
+the double-double array \texttt{EXP2\_COEFFS} in \texttt{pow\_impl.hpp}, each
+summed as $\mathit{hi}+\mathit{lo}$.  Then
+\[
+  \sup_{z \in [-1/2,\,1/2]}
+  \left| P_{\!\exp}^{\mathrm{dd}}(z) - 2^{z/64} \right|
+  \;\le\; S_{\exp}^{\mathrm{dd}},
+\]
+where $S_{\exp}^{\mathrm{dd}} \approx 2^{-106}$ is the rigorous sup-norm bound
+emitted by Sollya.
+\end{lemma}
+
+\begin{proof}[Proof of Lemmas \ref{lem:supnorm-log-dd} and \ref{lem:supnorm-exp-dd}]
+The script \texttt{pow\_double\_proof.py} parses the double-double arrays from
+\texttt{pow\_impl.hpp}, reconstructs each coefficient as the exact sum of its two
+limbs, and asks Sollya for \texttt{dirtyinfnorm} of each residual on its declared
+interval.  As in Section~\ref{sec:poly} the returned magnitude is a rigorous
+interval bound, not a sample.  The script fails unless the bounds stay below
+$2^{-90}$ and $2^{-95}$ respectively, well under the $2^{-52}$ needed for a
+single binary64 rounding to be faithful.
+\end{proof}
+
+\subsection{Exact integer and half-integer exponents}
+\label{sec:pow-exact}
+
+Integer-exponent results sit within roughly $2^{-106}$ of a representable double
+and half-integer results land on exact midpoints, so the log/exp round-trip
+cannot resolve their rounding from the active mode alone.  These exponents are
+routed to an algebraic path before the kernel.
+
+For integer $y$ with $|y| \le 1024$ the kernel computes $x^{|y|}$ by
+double-double square-and-multiply.  Each product uses the FMA error-free
+transformation
+\[
+  \mathit{hi} = \mathrm{fl}(ab),
+  \qquad
+  \mathit{lo} = \mathrm{fma}(a,b,-\mathit{hi}),
+\]
+which is exact in every IEEE rounding mode, and a \textsc{FastTwoSum}
+renormalization.  The squaring carries a separate binary exponent: after each
+product the mantissa pair is rescaled so its high limb lies in $[1,2)$ and the
+shift is accumulated, so neither limb leaves the normal range however small or
+large $x^{|y|}$ becomes (a naive accumulation loses the low limb once an
+intermediate nears the subnormal floor, for instance a small base raised to a
+large power or its reciprocal, which is exactly where these near-power-of-two
+integer results carry a sub-ULP tail that decides the directed rounding).  A
+negative result's sign is folded into the pair before the final rounding rather
+than negated afterward: negating a magnitude that was already rounded in the
+active mode flips directed rounding, since
+$-\,\mathrm{RU}(|v|) = \mathrm{RD}(-|v|)$.  For a positive exponent the binary
+weight is then reattached in a single active-mode rounding: a power-of-two scale
+when the result is normal (exact), and a direct rounding onto the subnormal grid
+(lsb $2^{-1074}$) when it falls below the normal floor, so a tiny result does not
+double-round.  For a negative exponent the pair is reciprocated and scaled, and a
+result that is not finite, non-zero, and normal is handed back to the kernel for
+the standard saturation and signaling.
+
+For half-integer $y$ with $|2y| \le 2048$ (and $y$ not an integer, which the
+integer path above already owns) the identity $x^{y} = (\sqrt{x})^{2y}$ is used.
+The endpoints are handled directly: $y = \tfrac12$ returns the correctly-rounded
+\texttt{sqrt\_gen}, and $y = -\tfrac12$ returns a correctly-rounded $1/\sqrt{x}$
+obtained by pinning a faithful candidate $r$ with the \emph{exact} sign of
+$r^2 x - 1$.  That residual is exact in every mode: $r$ and $x$ are doubles, so
+$r^2$ is exact in two doubles via the FMA transform, each term times $x$ is exact
+in two more, and the nine-term sum minus one is signed by an integer
+fixed-point accumulation (a floating-point compensated sum would be exact only to
+nearest).  The candidate is bracketed by walking with that sign and the active
+mode selects the neighbor, with an exact midpoint test for round to nearest, so a
+double-double $1/\sqrt{x}$ that would fall a directed-mode ULP short just past a
+power of two is corrected.  Other half-integers raise a double-double $\sqrt{x}$
+to the odd integer $2y$ by the same exponent-tracked square-and-multiply and
+reattach the weight as above.  Any non-normal algebraic result is handed back to
+the kernel so that the overflow, underflow, and subnormal semantics of the
+standard are preserved.
+
+\begin{remark}
+\label{rem:pow-accurate-scope}
+The certificates of this section cover the approximation error of the two
+double-double polynomials (Lemmas~\ref{lem:supnorm-log-dd}
+and~\ref{lem:supnorm-exp-dd}) and the mode-independent exactness of the FMA
+error-free transformation used by the algebraic path.  They do not constitute a
+Gappa certificate for the full rounded double-double reconstruction circuit, and
+no bit-exact correct-rounding theorem is asserted here.  End-to-end
+correct-rounding in all four IEEE modes, including the subnormal scale branch and
+the negative-base integer path discussed above, is validated empirically by the
+MPFR and CORE-MATH all-mode campaigns over the generic runtime path; those
+measurements are engineering evidence and are not part of the formal
+certificates.
+\end{remark}
+
+\section{The Ziv Test for \Powf}
+\label{sec:ziv}
+
+\begin{theorem}[Correctness of the Ziv acceptance predicate]
+\label{thm:ziv}
+Let $r$ be a binary64 number, and let
+\[
+  \rho_+ = \mathrm{fl}_{32}(r + 64\,\ulp_{64}(r)),
+  \qquad
+  \rho_- = \mathrm{fl}_{32}(r - 64\,\ulp_{64}(r)).
+\]
+If $\rho_+ = \rho_-$, then every real number in the interval
+\[
+  [\,r - 64\,\ulp_{64}(r),\; r + 64\,\ulp_{64}(r)\,]
+\]
+rounds to that same float under round-to-nearest, ties-to-even.
+\end{theorem}
+
+\begin{proof}
+The rounding map $\mathrm{fl}_{32}$ is monotone on the real line.  Therefore,
+if the two endpoints of a closed interval round to the same float, then every
+point between them must round to that same float.  This is exactly the test
+performed by the primary path of \Powf.
+\end{proof}
+
+\begin{corollary}
+If the true real result of the primary path lies within
+$\pm 64\,\ulp_{64}(r)$ of the computed binary64 value $r$, and if the Ziv
+predicate accepts, then the returned float is correctly rounded.
+\end{corollary}
+
+\section{The 80-bit \texttt{powl} Kernel}
+\label{sec:powl80}
+
+When \texttt{long double} is the x87 extended type with a 64-bit significand,
+\Powl{} uses a dedicated kernel.
+
+\subsection{Dispatch}
+
+Exceptional cases match Theorem~\ref{thm:exceptional}, except that a negative
+infinite base follows glibc's parity convention rather than the textbook one.
+For a finite positive base and finite exponent $y$, when
+\texttt{try\_extract\_int64} recovers an integer with $|y| \le 2^{62}-1$, the
+kernel uses \S\ref{sec:powl-int}; otherwise it uses \S\ref{sec:powl-gen}.
+
+\subsection{Integer exponents by compensated squaring}
+\label{sec:powl-int}
+
+The integer path is square-and-multiply with double-double accumulators for the
+running product and square.
+
+\begin{algorithm}
+\caption{80-bit integer power $b^{n}$}
+\label{alg:powl-int}
+\begin{algorithmic}[1]
+\Require finite nonzero $b$; integer $n$ with $1 \le |n| \le 2^{62}-1$
+\State $P \gets (1,0)$; \quad $F \gets (b,0)$; \quad $e \gets |n|$
+\While{$e > 0$}
+  \If{$e$ is odd} $P \gets P \otimes F$ \EndIf
+  \State $e \gets \lfloor e/2 \rfloor$
+  \If{$e > 0$} $F \gets F \otimes F$ \EndIf
+\EndWhile
+\If{$n < 0$} \Return one Newton reciprocal of the pair $P$
+\Else{} \Return $\mathrm{round}_{80}(P_{\mathrm{hi}} + P_{\mathrm{lo}})$
+\EndIf
+\end{algorithmic}
+\end{algorithm}
+
+The operator $\otimes$ is a guarded double-double product.  It multiplies the
+high limbs with an exact \textsc{TwoProduct}, folds in the cross terms, and
+renormalizes with a \textsc{FastTwoSum}.  The one exception is that when either operand is near \texttt{LDBL\_MAX} it
+forms the plain product and sets the residual to zero, as noted below.
+
+\begin{theorem}[Compensated integer power]
+\label{thm:powl-int}
+Let $b$ be a finite nonzero long double and $n$ an integer with
+$1 \le |n| \le 2^{62}-1$, and suppose every partial product $b^{2^{j}}$ and every
+running partial result encountered by Algorithm~\ref{alg:powl-int} is a normal
+long double of magnitude below the split-safety threshold $2^{16300}$.  Then the
+pair $(P_{\mathrm{hi}}, P_{\mathrm{lo}})$ produced by the loop satisfies
+\[
+  \bigl| (P_{\mathrm{hi}} + P_{\mathrm{lo}}) - b^{|n|} \bigr|
+  \;\le\; \eta\,\bigl| b^{|n|} \bigr|,
+  \qquad \eta \le 2^{-110}.
+\]
+Consequently $\mathrm{round}_{80}(P_{\mathrm{hi}} + P_{\mathrm{lo}})$ differs from
+$b^{|n|}$ by at most $\tfrac12 + 2^{-45}$ ULP.  For $n < 0$ the value returned is
+one compensated reciprocal of the pair, which adds at most one further ULP.  In
+every case the integer path meets the 4-ULP policy of
+Definition~\ref{def:ulp-policy}.
+\end{theorem}
+
+\begin{proof}
+The loop runs at most $2\lfloor \log_2 |n| \rfloor \le 124$ double-double
+multiplications, one square for each bit of $|n|$ and one product for each bit
+that is set.  Every one of them is the standard double-double multiplication: an
+exact \textsc{TwoProduct} (the Veltkamp split \texttt{exact\_mult}, exact so long
+as its operand stays below $2^{16383-33}$), then a normalizing
+\textsc{FastTwoSum}.  Its relative error is at most $c\,u^{2}$, where
+$u = 2^{-64}$ and $c$ is the small constant of the textbook
+analysis~\cite{handbook}.  Treat each step as multiplication by $1 + \delta_k$
+with $|\delta_k| \le c\,u^{2}$; composing $k \le 124$ of them gives
+\[
+  \prod_{k}(1 + \delta_k) - 1
+  \;\le\; (1 + c\,u^{2})^{124} - 1
+  \;\le\; 2^{-110},
+\]
+the $\eta$ that was claimed.  Now $\eta$ falls short of $2^{-64}$ by more than
+forty binary orders, so $P_{\mathrm{lo}}$ carries the residual well below the
+64th bit, and the only error of any size in the returned scalar is the final
+rounding of $P_{\mathrm{hi}} + P_{\mathrm{lo}}$, which costs half an ULP.  When
+$n$ is negative the kernel inverts the pair with one Newton step; starting from a
+pair this good, a single step lands inside one ULP.  The hypotheses on normal
+range and split safety are just the conditions under which the guard in
+\texttt{powl\_dd::mul} keeps the Veltkamp constant from overflowing.  Outside
+them the kernel stops compensating and returns a saturating infinity or zero,
+the overflow or underflow result required by the standard.
+\end{proof}
+
+\begin{remark}
+The threshold $2^{16300}$ is required because the Veltkamp split scales its
+argument by $2^{33}$.  Near \texttt{LDBL\_MAX} that scaled value is already
+infinite, so the following subtraction $\infty - \infty$ would yield NaN in the
+residual.  The guard returns a clean infinity instead.  The hypothesis is the
+range where \texttt{powl\_dd::mul} keeps the split exact.
+\end{remark}
+
+\subsection{The general-finite kernel}
+\label{sec:powl-gen}
+
+The general-finite path follows Algorithm~\ref{alg:pow64} with double-double
+intermediates.  Range reduction matches the binary64 case: the same seven
+mantissa bits choose a bucket, the same \texttt{RD} and \texttt{CD} entries form
+$dx = \mathrm{RD}[i] m_x - 1$, and those entries are the binary64 constants
+promoted to long double without rounding error.
+
+\begin{corollary}[80-bit range reduction]
+\label{cor:ld-reduction}
+For every finite positive long double $x$ the reduced argument satisfies
+$dx \in [-2^{-8}, 2^{-7})$.
+\end{corollary}
+
+\begin{proof}
+Lemma~\ref{lem:stage1} goes through word for word.  The table and the bucket map
+are identical, and a positive-slope affine map sends an interval to the interval
+between the images of its endpoints.  The only thing that moves is the right end
+of each bucket, from $1 + (i+1)/128 - 2^{-52}$ to $1 + (i+1)/128 - 2^{-63}$, and
+the new endpoint sits inside the old one, hence inside the same image.
+\end{proof}
+
+The logarithm is built from $e_x$, the binary64 triple-double table
+\texttt{LOG2\_R\_TD} (read back as long double, again exactly), and the log
+polynomial of \S\ref{sec:powl-poly}.  The exponential stage forms
+$64\,y\log_2 x$ as a pair $(T_{\mathrm{hi}}, T_{\mathrm{lo}})$, takes
+$hm = \mathrm{round}(T_{\mathrm{hi}})$ and
+$lo_6 = (T_{\mathrm{hi}} - hm) + T_{\mathrm{lo}}$, rebuilds $2^{hm/64}$ from the
+\texttt{EXP2} table as a pair $(e_{\mathrm{hi}}, e_{\mathrm{lo}})$, and evaluates
+the exp polynomial at $lo_6$.
+
+Two reconstruction steps matter at 64-bit precision:
+\begin{enumerate}[label=(\roman*)]
+  \item \emph{Take the integer part from the high limb alone.}  With
+    $hm = \mathrm{round}(T_{\mathrm{hi}})$ the difference $T_{\mathrm{hi}} - hm$
+    is exact, by Sterbenz's lemma, so $lo_6 = (T_{\mathrm{hi}} - hm) +
+    T_{\mathrm{lo}}$ keeps full precision.  Had one instead added
+    $T_{\mathrm{hi}}$ and $T_{\mathrm{lo}}$ into a single long double first, the
+    sum would round at the magnitude of $hm$ and throw away about $\log_2|hm|$
+    low bits of $lo_6$.  At binary64 the loss hides beneath the result; at 64
+    bits it does not.
+  \item \emph{Scale the low limb as well.}  The pair
+    $e_{\mathrm{hi}} + e_{\mathrm{lo}}$ holds $2^{hm/64}$ to nearly twice the
+    significand width, so its product with
+    $2^{lo_6/64} = 1 + lo_6\,P_{\!\exp}^{80}(lo_6)$ owes a term
+    $e_{\mathrm{lo}}\,(2^{lo_6/64} - 1)$.  Omit it, as a binary64 kernel may with
+    impunity, and about $2^{-60}$ of relative error escapes; that is nothing at
+    binary64, and several long double ULP once the mid-table entry is nonzero and
+    $lo_6$ approaches $\tfrac12$.
+\end{enumerate}
+
+When $|T_{\mathrm{hi}}|$ runs past $512 \cdot 64$ the kernel peels off multiples
+of $512 \cdot 64$ before rounding and puts the matching power of two back at the
+end.  This is the $2^{\pm 512}$ trick of the binary64 kernel, repeated as often
+as the exponent demands, so that every finite power within range is reached.
+
+\subsection{The 80-bit minimax certificates}
+\label{sec:powl-poly}
+
+The 80-bit kernel uses higher-degree minimax polynomials than binary64.  On the
+intervals here the best errors at the binary64 degrees are about $2^{-56}$ for
+the logarithm and $2^{-60}$ for the exponential, under one binary64 ULP but
+several ULP at 64 bits.  The refit adds one term to each polynomial.
+
+\begin{lemma}[80-bit log polynomial bound]
+\label{lem:supnorm-log-ld}
+Let $P_{\!\log}^{80}$ be the degree-7 polynomial with coefficients
+\texttt{POW\_LOG2\_COEFFS} of \texttt{powl\_ld80\_tables.hpp}.  Then
+\[
+  \sup_{dx \in [-2^{-8},\,2^{-7}]}
+  \left| P_{\!\log}^{80}(dx) - \frac{\log_2(1 + dx)}{dx} \right|
+  \;\le\; S_{\log}^{80},
+\]
+where $S_{\log}^{80} \approx 2^{-65}$ is the rigorous sup-norm bound emitted by
+Sollya.
+\end{lemma}
+
+\begin{lemma}[80-bit exp polynomial bound]
+\label{lem:supnorm-exp-ld}
+Let $P_{\!\exp}^{80}$ be the degree-6 polynomial with coefficients
+\texttt{POW\_EXP2\_COEFFS} of \texttt{powl\_ld80\_tables.hpp}.  Then
+\[
+  \sup_{z \in [-1/2,\,1/2]}
+  \left| P_{\!\exp}^{80}(z) - 2^{z/64} \right|
+  \;\le\; S_{\exp}^{80},
+\]
+where $S_{\exp}^{80} \approx 2^{-71}$ is the rigorous sup-norm bound emitted by
+Sollya.
+\end{lemma}
+
+\begin{proof}[Proof of Lemmas \ref{lem:supnorm-log-ld} and \ref{lem:supnorm-exp-ld}]
+The script \texttt{validate\_powl\_ld80\_kernel.sollya} carries the production
+coefficients and asks Sollya for \texttt{dirtyinfnorm} of each residual on its
+interval.  As in Section~\ref{sec:poly}, what comes back is a rigorous interval
+bound on the sup norm rather than a sample; the magnitudes shown are those
+bounds, rounded up.
+\end{proof}
+
+\subsection{What is proved, and what is not}
+
+Proved for the general-finite \Powl{} path: exceptional dispatch
+(Theorem~\ref{thm:exceptional}), range reduction (Corollary~\ref{cor:ld-reduction}),
+polynomial bounds (Lemmas~\ref{lem:supnorm-log-ld} and~\ref{lem:supnorm-exp-ld}),
+and the integer path (Theorem~\ref{thm:powl-int}).  Not yet proved: a Gappa
+certificate for the reconstruction circuit (\texttt{exact\_mult},
+\texttt{exact\_add}, multiplication by $y$, scaling branch, and the two
+corrections above).  Until that certificate exists, the general-finite path is
+conditional in the same sense as Theorem~\ref{thm:exp-stage}.
+
+\begin{remark}
+MPFR probes over the integer, general-finite, and special-value corpora found at
+most one ULP error.  That measurement is engineering evidence only and is not
+part of the certificates above.
+\end{remark}
+
+\section{Source Traceability and Reproducibility}
+\label{sec:traceability}
+
+Proof scripts parse constants from the production headers.  A certificate for
+duplicated constants would certify the copy, not the implementation.
+
+\begin{enumerate}
+  \item \texttt{pow\_double\_proof.py} parses the source arrays from
+    \texttt{common\_math\_constants.hpp} and
+    \texttt{pow\_impl.hpp}.
+  \item \texttt{pow\_float\_proof.py} parses the corresponding arrays from
+    \texttt{common\_math\_constants.hpp} and
+    \texttt{powf\_impl.hpp}.
+  \item Both scripts accept an optional \texttt{--report} flag, which writes a
+    JSON record containing tool versions, command lines, source hashes, proof
+    inputs, and the certified bounds that were obtained.
+  \item For the 80-bit kernel,
+    \texttt{tools/proofs/math/power/generate\_powl\_ld80\_tables.py} emits
+    \texttt{powl\_ld80\_tables.hpp} from the refit minimax polynomials and the
+    binary64 reduction tables, and
+    \texttt{validate\_powl\_ld80\_kernel.sollya} certifies the two sup-norm
+    bounds of \S\ref{sec:powl-poly} against those same coefficients.  A
+    certificate for duplicated constants is a certificate for the duplicate, so
+    the two files must agree by construction; the generator and the validator
+    carry one and the same coefficient list.
+\end{enumerate}
+
+From the repository root, the relevant commands are:
+
+\begin{lstlisting}[language=bash]
+python3 tests/proofs/math/power/pow_double_proof.py \
+    --report /tmp/pow-double-proof-report.json
+
+python3 tests/proofs/math/power/pow_float_proof.py \
+    --report /tmp/pow-float-proof-report.json
+\end{lstlisting}
+
+Gappa certificates:
+
+\begin{lstlisting}[language=bash]
+gappa tests/proofs/math/power/pow_double_log_eval.g
+gappa tests/proofs/math/power/pow_double_exp_eval.g
+gappa tests/proofs/math/power/pow_float_log_eval.g
+gappa tests/proofs/math/power/pow_float_exp_eval.g
+\end{lstlisting}
+
+The 80-bit minimax certificates of \S\ref{sec:powl-poly} are reproduced with:
+
+\begin{lstlisting}[language=bash]
+sollya tools/proofs/math/power/validate_powl_ld80_kernel.sollya
+\end{lstlisting}
+
+\begin{remark}
+Empirical probes may still be useful as engineering diagnostics, but they are
+not part of this proof.  The present note is analytic from beginning to end.
+\end{remark}
+
+\begin{thebibliography}{9}
+
+\bibitem{ieee754}
+IEEE Computer Society,
+\textit{IEEE Standard for Floating-Point Arithmetic},
+IEEE Std~754-2019, Jul.~2019.
+\url{https://doi.org/10.1109/IEEESTD.2019.8766229}
+
+\bibitem{c17}
+ISO/IEC,
+\textit{Information technology: Programming languages: C},
+ISO/IEC~9899:2018 (C17), Jun.~2018.
+
+\bibitem{handbook}
+J.-M. Muller, N. Brunie, F. de~Dinechin, C.-P. Jeannerod, M. Joldes,
+V. Lef\`evre, G. Melquiond, N. Revol, and S. Torres,
+\textit{Handbook of Floating-Point Arithmetic}, 2nd~ed.
+Cham: Birkh\"auser/Springer, 2018.
+\url{https://doi.org/10.1007/978-3-319-76526-6}
+
+\bibitem{gappa}
+M. Daumas and G. Melquiond,
+``Certification of bounds on expressions involving rounded operators,''
+\textit{ACM Transactions on Mathematical Software},
+vol.~37, no.~1, pp.~2:1--2:20, Jan.~2010.
+\url{https://doi.org/10.1145/1644001.1644003}
+
+\bibitem{sollya}
+S. Chevillard, M. Jolde\c{s}, and C. Lauter,
+``Sollya: An environment for the development of numerical codes,''
+in \textit{Mathematical Software: ICMS~2010}, ser.~LNCS, vol.~6327.
+Berlin: Springer, 2010, pp.~28--31.
+\url{https://doi.org/10.1007/978-3-642-15582-6_5}
+
+\bibitem{ziv}
+A. Ziv,
+``Fast evaluation and rounding of elementary functions,''
+\textit{IEEE Transactions on Computers},
+vol.~40, no.~7, pp.~843--851, Jul.~1991.
+\url{https://doi.org/10.1109/12.83617}
+
+\bibitem{powr}
+C. Q. Lauter and V. Lef\`evre,
+``An efficient rounding boundary test for \texttt{pow}(x,y) in double
+precision,''
+\textit{IEEE Transactions on Computers},
+vol.~58, no.~2, pp.~197--207, Feb.~2009.
+\url{https://doi.org/10.1109/TC.2008.202}
+\newline
+\url{https://www.vinc17.net/research/papers/ieeetc2009-powr.pdf}
+
+\bibitem{coremath}
+A. Sibidanov, P. Zimmermann, and S. Glondu,
+``The CORE-MATH Project,''
+in \textit{Proceedings of the 29th IEEE Symposium on Computer Arithmetic},
+2022.
+\url{https://doi.org/10.1109/ARITH54963.2022.00014}
+
+\end{thebibliography}
+
+\end{document}

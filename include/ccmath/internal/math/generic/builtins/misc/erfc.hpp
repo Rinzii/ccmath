@@ -28,6 +28,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_ERFC
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for erfc that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_ERFC
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_ERFC
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -43,6 +58,15 @@ namespace ccm::builtin
 	#endif
 	// clang-format on
 
+	// TODO: determine actual compiler/version support for runtime __builtin_erfc.
+	template <typename T>
+	inline constexpr bool has_runtime_erfc =
+#ifdef CCMATH_HAS_BUILTIN_ERFC
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_erfc functions.
@@ -50,16 +74,40 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_erfc without triggering a compiler error
 	 * when the compiler does not support it.
 	 */
-	template <typename T>
-	constexpr auto erfc(T x) -> std::enable_if_t<has_constexpr_erfc<T>, T>
+	template <typename T> constexpr auto erfc_ct(T x) -> std::enable_if_t<has_constexpr_erfc<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_erfcf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_erfc(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_erfcl(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_erfcf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_erfc(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_erfcl(x);
+		} else
 		{
 			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_erfc");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for erfc");
+			return T{};
+		}
+	}
+
+	template <typename T> auto erfc_rt(T x) -> std::enable_if_t<has_runtime_erfc<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_erfcf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_erfc(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_erfcl(x);
+		} else
+		{
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for erfc");
 			return T{};
 		}
 	}
@@ -67,3 +115,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_ERFC
+#undef CCMATH_HAS_BUILTIN_ERFC

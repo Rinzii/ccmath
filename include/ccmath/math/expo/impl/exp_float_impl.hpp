@@ -51,9 +51,15 @@ namespace ccm::internal::impl
 		if (CCM_UNLIKELY(abs_top >= ccm::support::top12_bits_of_float(88.0F)))
 		{
 			// |x| >= 88 or x is nan.
-			if (support::float_to_uint32(x) == support::float_to_uint32(-std::numeric_limits<float>::infinity())) { return 0.0F; }
+			if (support::float_to_uint32(x) == support::float_to_uint32(-std::numeric_limits<float>::infinity()))
+			{
+				return 0.0F;
+			}
 
-			if (abs_top >= support::top12_bits_of_float(std::numeric_limits<float>::infinity())) { return x + x; }
+			if (abs_top >= support::top12_bits_of_float(std::numeric_limits<float>::infinity()))
+			{
+				return x + x;
+			}
 
 			// Handle overflow
 			if (x > 0x1.62e42ep6F) // x > log(0x1p128) ~= 88.72
@@ -117,13 +123,25 @@ namespace ccm::internal::impl
 
 		if (CCM_UNLIKELY(abs_top >= ccm::support::top12_bits_of_float(88.0F)))
 		{
-			if (support::float_to_uint32(x) == support::float_to_uint32(-std::numeric_limits<float>::infinity())) { return -1.0F; }
+			if (support::float_to_uint32(x) == support::float_to_uint32(-std::numeric_limits<float>::infinity()))
+			{
+				return -1.0F;
+			}
 
-			if (abs_top >= support::top12_bits_of_float(std::numeric_limits<float>::infinity())) { return x + x; }
+			if (abs_top >= support::top12_bits_of_float(std::numeric_limits<float>::infinity()))
+			{
+				return x + x;
+			}
 
-			if (x > 0x1.62e42ep6F) { return 0x1p97F * 0x1p97F; }
+			if (x > 0x1.62e42ep6F)
+			{
+				return 0x1p97F * 0x1p97F;
+			}
 
-			if (x < -0x1.9fe368p6F) { return -1.0F; }
+			if (x < -0x1.9fe368p6F)
+			{
+				return -1.0F;
+			}
 		}
 
 		scaled_input = exp_inv_ln2_N_flt * x_dbl_t;
@@ -145,15 +163,30 @@ namespace ccm::internal::impl
 
 	constexpr float expm1_float_impl(float x)
 	{
-		if (x == 0.0F) { return x; }
+		if (x == 0.0F)
+		{
+			return x;
+		}
 
-		if (CCM_UNLIKELY(ccm::isnan(x))) { return std::numeric_limits<float>::quiet_NaN(); }
+		if (CCM_UNLIKELY(ccm::isnan(x)))
+		{
+			return std::numeric_limits<float>::quiet_NaN();
+		}
 
-		if (x == std::numeric_limits<float>::infinity()) { return std::numeric_limits<float>::infinity(); }
+		if (x == std::numeric_limits<float>::infinity())
+		{
+			return std::numeric_limits<float>::infinity();
+		}
 
-		if (x == -std::numeric_limits<float>::infinity()) { return -1.0F; }
+		if (x == -std::numeric_limits<float>::infinity())
+		{
+			return -1.0F;
+		}
 
-		if (x >= 0.25F || x <= -0.25F) { return expm1_kernel(x); }
+		if (x >= 0.25F || x <= -0.25F)
+		{
+			return expm1_kernel(x);
+		}
 
 		if (x > 0.0625F || x < -0.0625F)
 		{

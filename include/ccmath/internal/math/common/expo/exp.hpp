@@ -11,8 +11,7 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/expo/exp.hpp"
-#include "ccmath/math/expo/impl/exp_double_impl.hpp"
-#include "ccmath/math/expo/impl/exp_float_impl.hpp"
+#include "ccmath/internal/math/generic/func/expo/exp_gen.hpp"
 
 #if defined(_MSC_VER) && !defined(__clang__)
 	#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
@@ -27,16 +26,14 @@ namespace ccm
 	 * @param num floating-point or integer value
 	 * @return If no errors occur, the base-e exponential of num (e^num) is returned.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T exp(T num)
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T exp(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_exp<T>) { return ccm::builtin::exp(num); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_exp<T>)
 		{
-			if constexpr (std::is_same_v<T, float>) { return internal::impl::exp_float_impl(num); }
-			if constexpr (std::is_same_v<T, double>) { return internal::impl::exp_double_impl(num); }
-			if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::impl::exp_double_impl(static_cast<double>(num))); }
-			return static_cast<T>(internal::impl::exp_double_impl(static_cast<double>(num)));
+			return ccm::builtin::exp_ct(num);
+		} else
+		{
+			return gen::exp_gen(num);
 		}
 	}
 
@@ -46,8 +43,7 @@ namespace ccm
 	 * @param num integer value
 	 * @return If no errors occur, the base-e exponential of num (e^num) is returned as double.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double exp(Integer num)
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double exp(Integer num)
 	{
 		return ccm::exp<double>(static_cast<double>(num));
 	}

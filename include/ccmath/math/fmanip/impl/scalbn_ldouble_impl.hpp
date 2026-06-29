@@ -32,21 +32,32 @@ namespace ccm::internal
 			// May be much slower than the double and float version.
 			// Need to benchmark it.
 			// TODO: Possibly implement a bit manipulation version of this function in the future if possible.
-			if (arg == static_cast<long double>(0)) { return arg; }
+			if (arg == static_cast<long double>(0))
+			{
+				return arg;
+			}
 
-			if (ccm::isinf(arg)) { return arg; }
+			if (ccm::isinf(arg))
+			{
+				return arg;
+			}
 
-			if (exp == static_cast<long double>(0)) { return arg; }
+			if (exp == static_cast<long double>(0))
+			{
+				return arg;
+			}
 
-			if (ccm::isnan(arg)) { return std::numeric_limits<long double>::quiet_NaN(); }
+			if (ccm::isnan(arg))
+			{
+				return std::numeric_limits<long double>::quiet_NaN();
+			}
 
 			long double mult(1);
 			if (exp > 0)
 			{
 				mult = std::numeric_limits<long double>::radix;
 				--exp;
-			}
-			else
+			} else
 			{
 				++exp;
 				exp = -exp;
@@ -59,8 +70,7 @@ namespace ccm::internal
 				{
 					mult *= mult;
 					exp >>= 1;
-				}
-				else
+				} else
 				{
 					arg *= mult;
 					--exp;

@@ -24,11 +24,15 @@ namespace ccm
 	 * @param y A floating-point or integer value.
 	 * @return true if the first argument is less than the second or greater than the second, false otherwise.
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr bool islessgreater(T x, T y) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr bool islessgreater(T x, T y) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_islessgreater<T>) { return ccm::builtin::islessgreater(x, y); }
-		else { return !ccm::isunordered(x, y) && (x < y || x > y); }
+		if constexpr (ccm::builtin::has_constexpr_islessgreater<T>)
+		{
+			return ccm::builtin::islessgreater_ct(x, y);
+		} else
+		{
+			return !ccm::isunordered(x, y) && (x < y || x > y);
+		}
 	}
 
 	/**

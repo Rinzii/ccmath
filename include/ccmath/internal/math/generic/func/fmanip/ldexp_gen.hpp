@@ -10,12 +10,13 @@
 
 #pragma once
 
+// TODO(IanP): Wire ldexp.hpp constexpr dispatch through ldexp_gen like pow_gen.
 #include "ccmath/internal/config/builtin/bit_cast_support.hpp"
 #include "ccmath/internal/config/builtin/ldexp_support.hpp"
 #include "ccmath/internal/predef/has_const_builtin.hpp"
 #include "ccmath/internal/support/helpers/internal_ldexp.hpp"
 
-/* TODO: Move, remove, or change this to not use bit_cast.
+/* TODO(IanP): Move, remove, or change this to not use bit_cast.
 	#include "ccmath/internal/support/bits.hpp"
 	#include "ccmath/internal/support/fenv/fenv_support.hpp"
 	#include "ccmath/internal/support/floating_point_traits.hpp"
@@ -35,18 +36,26 @@ namespace ccm
 	 * @return If no errors occur, num multiplied by 2 to the power of exp (num×2exp) is returned.\nIf a range error due to overflow occurs, ±HUGE_VAL,
 	 * ±HUGE_VALF, or ±HUGE_VALL is returned.\nIf a range error due to underflow occurs, the correct result (after rounding) is returned.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T ldexp(T num, int exp) noexcept
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T ldexp(T num, int exp) noexcept
 	{
 		// NOLINTNEXTLINE
 #if defined(CCMATH_HAS_CONSTEXPR_BUILTIN_LDEXP) || CCM_HAS_CONST_BUILTIN(__builtin_ldexp)
-		if constexpr (std::is_same_v<T, float>) { return __builtin_ldexpf(num, exp); }
-		if constexpr (std::is_same_v<T, double>) { return __builtin_ldexp(num, exp); }
-		if constexpr (std::is_same_v<T, long double>) { return __builtin_ldexpl(num, exp); }
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_ldexpf(num, exp);
+		}
+		if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_ldexp(num, exp);
+		}
+		if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_ldexpl(num, exp);
+		}
 		return static_cast<T>(__builtin_ldexpl(num, exp));
 #else
 		return support::helpers::internal_ldexp(num, exp);
-		/* TODO: Move, remove, or change this to not use bit_cast.
+		/* TODO(IanP): Move, remove, or change this to not use bit_cast.
 		// Fallback option. Does not give perfect results, but generally good enough.
 		int old_exp = static_cast<int>(support::get_exponent_of_floating_point<T>(num));
 
@@ -116,8 +125,7 @@ namespace ccm
 	 * @return If no errors occur, num multiplied by 2 to the power of exp (num×2exp) is returned.\nIf a range error due to overflow occurs, ±HUGE_VAL,
 	 * ±HUGE_VALF, or ±HUGE_VALL is returned.\nIf a range error due to underflow occurs, the correct result (after rounding) is returned.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double ldexp(Integer num, int exp) noexcept
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double ldexp(Integer num, int exp) noexcept
 	{
 		return ccm::ldexp<double>(static_cast<double>(num), exp);
 	}

@@ -17,11 +17,10 @@
 
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/math/misc/impl/gamma_double_impl.hpp"
 #include "ccmath/math/nearest/floor.hpp"
-
-#include <cfenv>
 
 namespace ccm::internal::impl
 {
@@ -62,7 +61,10 @@ namespace ccm::internal::impl
 
 		const double result = gamma_double_impl(static_cast<double>(x));
 
-		if (CCM_UNLIKELY(!xbits.is_neg() && ccm::support::fp::FPBits<double>(result).is_inf())) { return fp_bits::max_normal().get_val(); }
+		if (CCM_UNLIKELY(!xbits.is_neg() && ccm::support::fp::FPBits<double>(result).is_inf()))
+		{
+			return fp_bits::max_normal().get_val();
+		}
 
 		if (CCM_UNLIKELY(xbits.is_neg() && result != 0.0 && fp_bits(static_cast<float>(result)).is_zero()))
 		{

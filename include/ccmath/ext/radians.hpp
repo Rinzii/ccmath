@@ -22,8 +22,7 @@ namespace ccm::ext
 	 * @param degrees Angle in degrees.
 	 * @return The angle in radians.
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T radians(T degrees) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T radians(T degrees) noexcept
 	{
 		return (ccm::numbers::pi_v<T> * degrees) / static_cast<T>(180);
 	}

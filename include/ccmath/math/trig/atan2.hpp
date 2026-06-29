@@ -25,19 +25,28 @@ namespace ccm
 	 * @param y Numerator component.
 	 * @param x Denominator component.
 	 * @return Angle in radians in the correct quadrant.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/atan2
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T atan2(T y, T x)
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T atan2(T y, T x)
 	{
-		if constexpr (ccm::builtin::has_constexpr_atan2<T>) { return ccm::builtin::atan2(y, x); }
-		else if (ccm::support::is_constant_evaluated())
+		if constexpr (ccm::builtin::has_constexpr_atan2<T>)
 		{
-			if constexpr (std::is_same_v<T, float>) { return internal::impl::atan2_float(y, x); }
-			else if constexpr (std::is_same_v<T, double>) { return internal::impl::atan2_double(y, x); }
-			else { return static_cast<long double>(internal::impl::atan2_double(static_cast<double>(y), static_cast<double>(x))); }
+			return ccm::builtin::atan2_ct(y, x);
+		} else if (ccm::support::is_constant_evaluated())
+		{
+			if constexpr (std::is_same_v<T, float>)
+			{
+				return internal::impl::atan2_float(y, x);
+			} else if constexpr (std::is_same_v<T, double>)
+			{
+				return internal::impl::atan2_double(y, x);
+			} else
+			{
+				return static_cast<long double>(internal::impl::atan2_double(static_cast<double>(y), static_cast<double>(x)));
+			}
+		} else
+		{
+			return ccm::rt::atan2_rt(y, x);
 		}
-		else { return ccm::rt::atan2_rt(y, x); }
 	}
 
 	/**
@@ -45,7 +54,6 @@ namespace ccm
 	 * @param y Numerator component.
 	 * @param x Denominator component.
 	 * @return Angle in radians as float.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/atan2
 	 */
 	constexpr float atan2f(float y, float x)
 	{
@@ -57,7 +65,6 @@ namespace ccm
 	 * @param y Numerator component.
 	 * @param x Denominator component.
 	 * @return Angle in radians as long double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/atan2
 	 */
 	constexpr long double atan2l(long double y, long double x)
 	{

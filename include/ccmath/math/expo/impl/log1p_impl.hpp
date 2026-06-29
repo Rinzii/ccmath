@@ -49,7 +49,10 @@ namespace ccm::internal::impl
 		if (x > 0.414284F || x < -0.292893F)
 		{
 			const float u = 1.0F + x;
-			if (u == 1.0F) { return x; }
+			if (u == 1.0F)
+			{
+				return x;
+			}
 
 			return log_float_impl(u);
 		}
@@ -71,12 +74,18 @@ namespace ccm::internal::impl
 		{
 			if (ix >= 0xbf800000U)
 			{
-				if (x == -1.0F) { return -std::numeric_limits<float>::infinity(); }
+				if (x == -1.0F)
+				{
+					return -std::numeric_limits<float>::infinity();
+				}
 
 				return -std::numeric_limits<float>::quiet_NaN();
 			}
 
-			if ((ix << 1U) < (0x33800000U << 1U)) { return x; }
+			if ((ix << 1U) < (0x33800000U << 1U))
+			{
+				return x;
+			}
 
 			if (ix <= 0xbe95f619U)
 			{
@@ -84,8 +93,10 @@ namespace ccm::internal::impl
 				c = 0.0;
 				f = x;
 			}
+		} else if (ix >= 0x7f800000U)
+		{
+			return x;
 		}
-		else if (ix >= 0x7f800000U) { return x; }
 
 		if (k != 0)
 		{
@@ -97,8 +108,10 @@ namespace ccm::internal::impl
 			{
 				c = k >= 2 ? static_cast<ccm::double_t>(1.0F - (u - x)) : static_cast<ccm::double_t>(x - (u - 1.0F));
 				c /= u;
+			} else
+			{
+				c = 0.0;
 			}
-			else { c = 0.0; }
 
 			iu = (iu & 0x007fffffU) + 0x3f3504f3U;
 			f  = ccm::support::uint32_to_float(iu) - 1.0F;
@@ -121,7 +134,10 @@ namespace ccm::internal::impl
 		if (x > 0.414284 || x < -0.292893)
 		{
 			const double u = 1.0 + x;
-			if (u == 1.0) { return x; }
+			if (u == 1.0)
+			{
+				return x;
+			}
 
 			return log_double_impl(u);
 		}
@@ -144,12 +160,18 @@ namespace ccm::internal::impl
 		{
 			if (hx >= 0xbff00000U)
 			{
-				if (x == -1.0) { return -std::numeric_limits<double>::infinity(); }
+				if (x == -1.0)
+				{
+					return -std::numeric_limits<double>::infinity();
+				}
 
 				return -std::numeric_limits<double>::quiet_NaN();
 			}
 
-			if ((hx << 1U) < (0x3ca00000U << 1U)) { return x; }
+			if ((hx << 1U) < (0x3ca00000U << 1U))
+			{
+				return x;
+			}
 
 			if (hx <= 0xbfd2bec4U)
 			{
@@ -157,8 +179,10 @@ namespace ccm::internal::impl
 				c = 0.0;
 				f = x;
 			}
+		} else if (hx >= 0x7ff00000U)
+		{
+			return x;
 		}
-		else if (hx >= 0x7ff00000U) { return x; }
 
 		if (k != 0)
 		{
@@ -171,8 +195,10 @@ namespace ccm::internal::impl
 			{
 				c = k >= 2 ? 1.0 - (u - x) : x - (u - 1.0);
 				c /= u;
+			} else
+			{
+				c = 0.0;
 			}
-			else { c = 0.0; }
 
 			hu = (hu & 0x000fffffU) + 0x3fe6a09eU;
 			iu = (static_cast<std::uint64_t>(hu) << 32) | (iu & 0xffffffffULL);
@@ -194,19 +220,27 @@ namespace ccm::internal::impl
 
 namespace ccm::internal
 {
-	template <typename T>
-	constexpr T log1p_zero_result(T num) noexcept
+	template <typename T> constexpr T log1p_zero_result(T num) noexcept
 	{
 		return num;
 	}
 
 	constexpr float log1p_float(float num) noexcept
 	{
-		if (num == 0.0F) { return log1p_zero_result(num); }
+		if (num == 0.0F)
+		{
+			return log1p_zero_result(num);
+		}
 
-		if (CCM_UNLIKELY(ccm::isnan(num))) { return std::numeric_limits<float>::quiet_NaN(); }
+		if (CCM_UNLIKELY(ccm::isnan(num)))
+		{
+			return std::numeric_limits<float>::quiet_NaN();
+		}
 
-		if (num == std::numeric_limits<float>::infinity()) { return std::numeric_limits<float>::infinity(); }
+		if (num == std::numeric_limits<float>::infinity())
+		{
+			return std::numeric_limits<float>::infinity();
+		}
 		if (num == -1.0F)
 		{
 			ccm::support::fenv::set_errno_if_required(ERANGE);
@@ -225,11 +259,20 @@ namespace ccm::internal
 
 	constexpr double log1p_double(double num) noexcept
 	{
-		if (num == 0.0) { return log1p_zero_result(num); }
+		if (num == 0.0)
+		{
+			return log1p_zero_result(num);
+		}
 
-		if (CCM_UNLIKELY(ccm::isnan(num))) { return std::numeric_limits<double>::quiet_NaN(); }
+		if (CCM_UNLIKELY(ccm::isnan(num)))
+		{
+			return std::numeric_limits<double>::quiet_NaN();
+		}
 
-		if (num == std::numeric_limits<double>::infinity()) { return std::numeric_limits<double>::infinity(); }
+		if (num == std::numeric_limits<double>::infinity())
+		{
+			return std::numeric_limits<double>::infinity();
+		}
 		if (num == -1.0)
 		{
 			ccm::support::fenv::set_errno_if_required(ERANGE);

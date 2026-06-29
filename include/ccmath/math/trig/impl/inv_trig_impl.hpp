@@ -14,6 +14,7 @@
 
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/multiply_add.hpp"
 #include "ccmath/internal/support/poly_eval.hpp"
@@ -25,15 +26,15 @@
 #include "ccmath/math/trig/impl/inv_trig_data.hpp"
 
 #include <cerrno>
-#include <cfenv>
 #include <type_traits>
 
 namespace ccm::internal::impl
 {
 	namespace inv_trig_detail
 	{
-		template <typename T>
-		constexpr T asin_eval(T xsq) noexcept
+		// Evaluates the asin(x)/x approximation polynomial from inv_trig_data (argument x^2) in
+		// parallel Estrin form, for |x| <= 1/2.
+		template <typename T> constexpr T asin_eval(T xsq) noexcept
 		{
 			using namespace inv_trig_data;
 
@@ -51,8 +52,9 @@ namespace ccm::internal::impl
 			return ccm::support::polyeval(x8, d0, d1, d2);
 		}
 
-		template <typename T>
-		constexpr T acos_kernel(T x) noexcept
+		// Two regions. For |x| <= 1/2, acos(x) = pi/2 - asin(x) via the asin polynomial. For
+		// |x| > 1/2, acos(|x|) = 2 asin(sqrt((1-|x|)/2)), reflected to pi - r when x < 0.
+		template <typename T> constexpr T acos_kernel(T x) noexcept
 		{
 			using namespace inv_trig_data;
 			using fp_bits_t = ccm::support::fp::FPBits<T>;
@@ -80,41 +82,50 @@ namespace ccm::internal::impl
 			const T r  = ccm::support::multiply_add(cv * u, r3, cv);
 			return x < static_cast<T>(0) ? static_cast<T>(k_pi) - r : r;
 		}
-		template <typename T>
-		constexpr T asin_small_impl(T x) noexcept
+		template <typename T> constexpr T asin_small_impl(T x) noexcept
 		{
 			const T ax = ccm::fabs(x);
 
-			if (ax < static_cast<T>(0x1.0p-14)) { return x + x * x * x * static_cast<T>(-0x1.5555555555555p-3); }
+			// asin(x) = x + x^3/6 + O(x^5). The cubic coefficient is +1/6 (this fast path previously
+			// used -1/6, which underran by ~x^3/3 over the tiny-|x| band).
+			if (ax < static_cast<T>(0x1.0p-14))
+			{
+				return x + x * x * x * static_cast<T>(0x1.5555555555555p-3);
+			}
 
+			// Float evaluates in double then rounds once. The same-type path is in the else so it is
+			// discarded rather than left unreachable for the float instantiation (MSVC C4702).
 			if constexpr (sizeof(T) == sizeof(float))
 			{
 				const double dx	 = static_cast<double>(x);
 				const double xsq = dx * dx;
 				const double r	 = asin_eval<double>(xsq);
 				return static_cast<T>(dx + dx * xsq * r);
+			} else
+			{
+				const T xsq = x * x;
+				const T r	= asin_eval<T>(xsq);
+				return x + x * xsq * r;
 			}
-
-			const T xsq = x * x;
-			const T r	= asin_eval<T>(xsq);
-			return x + x * xsq * r;
 		}
 	} // namespace inv_trig_detail
 
-	template <typename T>
-	constexpr T acos_impl(T x) noexcept
+	template <typename T> constexpr T acos_impl(T x) noexcept
 	{
 		using fp_bits_t = ccm::support::fp::FPBits<T>;
 
 		fp_bits_t bits(x);
 
-		if (CCM_UNLIKELY(bits.is_nan())) { return x; }
+		if (CCM_UNLIKELY(bits.is_nan()))
+		{
+			return x;
+		}
 
 		if (CCM_UNLIKELY(bits.is_inf()))
 		{
 			ccm::support::fenv::set_errno_if_required(EDOM);
 			ccm::support::fenv::raise_except_if_required(FE_INVALID);
-			return x + fp_bits_t::quiet_nan().get_val();
+			return fp_bits_t::quiet_nan().get_val();
 		}
 
 		const T ax = ccm::fabs(x);
@@ -122,72 +133,103 @@ namespace ccm::internal::impl
 		{
 			ccm::support::fenv::set_errno_if_required(EDOM);
 			ccm::support::fenv::raise_except_if_required(FE_INVALID);
-			return x + fp_bits_t::quiet_nan().get_val();
+			return fp_bits_t::quiet_nan().get_val();
 		}
 
-		if (ax == static_cast<T>(1)) { return x < static_cast<T>(0) ? static_cast<T>(ccm::numbers::pi_v<T>) : static_cast<T>(0); }
+		if (ax == static_cast<T>(1))
+		{
+			return x < static_cast<T>(0) ? static_cast<T>(ccm::numbers::pi_v<T>) : static_cast<T>(0);
+		}
 
 		return inv_trig_detail::acos_kernel(x);
 	}
 
-	template <typename T>
-	constexpr T asin_impl(T x) noexcept
+	template <typename T> constexpr T asin_impl(T x) noexcept
 	{
-		if (x == static_cast<T>(0)) { return x; }
+		if (x == static_cast<T>(0))
+		{
+			return x;
+		}
 
-		if (ccm::fabs(x) <= static_cast<T>(0.5)) { return inv_trig_detail::asin_small_impl(x); }
+		if (ccm::fabs(x) <= static_cast<T>(0.5))
+		{
+			return inv_trig_detail::asin_small_impl(x);
+		}
 
 		return static_cast<T>(ccm::numbers::pi_v<T>) / static_cast<T>(2) - acos_impl(x);
 	}
 
-	template <typename T>
-	constexpr T atan_impl(T x) noexcept
+	template <typename T> constexpr T atan_impl(T x) noexcept
 	{
-		if (CCM_UNLIKELY(ccm::isnan(x))) { return x; }
-
-		if (x == static_cast<T>(0)) { return x; }
-
-		const bool neg = x < static_cast<T>(0);
-		const T ax	   = ccm::fabs(x);
-
-		if (CCM_UNLIKELY(ccm::isinf(ax)))
+		// The |x|<=1 path composes sqrt, a division, and asin. In float those roundings compound to
+		// ~5 ULP. Evaluate float atan through the double kernel and round once (double atan is within
+		// a couple of double ULP, so the float result is effectively correctly rounded). The double
+		// path lives in the else so it is discarded for float rather than left as unreachable code,
+		// which MSVC rejects under /W4 (C4702).
+		if constexpr (std::is_same_v<T, float>)
 		{
-			return neg ? -static_cast<T>(ccm::numbers::pi_v<T>) / static_cast<T>(2) : static_cast<T>(ccm::numbers::pi_v<T>) / static_cast<T>(2);
-		}
-
-		if (ax > static_cast<T>(1))
+			return static_cast<float>(atan_impl<double>(static_cast<double>(x)));
+		} else
 		{
-			const T pi_over_2 = static_cast<T>(ccm::numbers::pi_v<T>) / static_cast<T>(2);
-			const T recip	  = static_cast<T>(1) / ax;
-
-			T small{};
-			if (recip < static_cast<T>(0x1.0p-14))
+			if (CCM_UNLIKELY(ccm::isnan(x)))
 			{
-				const T recip_sq = recip * recip;
-				small			 = recip + recip_sq * recip * static_cast<T>(-0x1.5555555555555p-2);
+				return x;
 			}
-			else { small = atan_impl(recip); }
 
-			return neg ? -pi_over_2 + small : pi_over_2 - small;
+			if (x == static_cast<T>(0))
+			{
+				return x;
+			}
+
+			const bool neg = x < static_cast<T>(0);
+			const T ax	   = ccm::fabs(x);
+
+			if (CCM_UNLIKELY(ccm::isinf(ax)))
+			{
+				return neg ? -static_cast<T>(ccm::numbers::pi_v<T>) / static_cast<T>(2) : static_cast<T>(ccm::numbers::pi_v<T>) / static_cast<T>(2);
+			}
+
+			if (ax > static_cast<T>(1))
+			{
+				const T pi_over_2 = static_cast<T>(ccm::numbers::pi_v<T>) / static_cast<T>(2);
+				const T recip	  = static_cast<T>(1) / ax;
+
+				T small{};
+				if (recip < static_cast<T>(0x1.0p-14))
+				{
+					const T recip_sq = recip * recip;
+					small			 = recip + recip_sq * recip * static_cast<T>(-0x1.5555555555555p-2);
+				} else
+				{
+					small = atan_impl(recip);
+				}
+
+				return neg ? -pi_over_2 + small : pi_over_2 - small;
+			}
+
+			if (ax < static_cast<T>(0x1.0p-14))
+			{
+				const T ax_sq = ax * ax;
+				const T val	  = ax + ax_sq * ax * static_cast<T>(-0x1.5555555555555p-2);
+				return neg ? -val : val;
+			}
+
+			const T root = ccm::sqrt(static_cast<T>(1) + ax * ax);
+			return asin_impl(neg ? -ax / root : ax / root);
 		}
-
-		if (ax < static_cast<T>(0x1.0p-14))
-		{
-			const T ax_sq = ax * ax;
-			const T val	  = ax + ax_sq * ax * static_cast<T>(-0x1.5555555555555p-2);
-			return neg ? -val : val;
-		}
-
-		const T root = ccm::sqrt(static_cast<T>(1) + ax * ax);
-		return asin_impl(neg ? -ax / root : ax / root);
 	}
 
-	template <typename T>
-	constexpr T atan2_impl(T y, T x) noexcept
+	// Resolves the atan2 special values (NaN, infinite, or zero operands, including signed zero)
+	// first, then reduces the general case to atan(y/x) with a quadrant correction by the sign
+	// of x.
+	template <typename T> constexpr T atan2_impl(T y, T x) noexcept
 	{
 		using fp_bits_t = ccm::support::fp::FPBits<T>;
 
-		if (CCM_UNLIKELY(ccm::isnan(y) || ccm::isnan(x))) { return y + x; }
+		if (CCM_UNLIKELY(ccm::isnan(y) || ccm::isnan(x)))
+		{
+			return y + x;
+		}
 
 		if (CCM_UNLIKELY(ccm::isinf(x)))
 		{
@@ -197,25 +239,49 @@ namespace ccm::internal::impl
 			{
 				if (CCM_UNLIKELY(ccm::isinf(y)))
 				{
-					if (y > static_cast<T>(0)) { return pi / static_cast<T>(4); }
-					if (y < static_cast<T>(0)) { return -pi / static_cast<T>(4); }
+					if (y > static_cast<T>(0))
+					{
+						return pi / static_cast<T>(4);
+					}
+					if (y < static_cast<T>(0))
+					{
+						return -pi / static_cast<T>(4);
+					}
 					return y;
 				}
 
-				if (y > static_cast<T>(0)) { return static_cast<T>(0); }
-				if (y < static_cast<T>(0)) { return static_cast<T>(-0.0); }
+				if (y > static_cast<T>(0))
+				{
+					return static_cast<T>(0);
+				}
+				if (y < static_cast<T>(0))
+				{
+					return static_cast<T>(-0.0);
+				}
 				return y;
 			}
 
 			if (CCM_UNLIKELY(ccm::isinf(y)))
 			{
-				if (y > static_cast<T>(0)) { return static_cast<T>(3) * pi / static_cast<T>(4); }
-				if (y < static_cast<T>(0)) { return -static_cast<T>(3) * pi / static_cast<T>(4); }
+				if (y > static_cast<T>(0))
+				{
+					return static_cast<T>(3) * pi / static_cast<T>(4);
+				}
+				if (y < static_cast<T>(0))
+				{
+					return -static_cast<T>(3) * pi / static_cast<T>(4);
+				}
 				return fp_bits_t(y).is_neg() ? -pi : pi;
 			}
 
-			if (y > static_cast<T>(0)) { return pi; }
-			if (y < static_cast<T>(0)) { return -pi; }
+			if (y > static_cast<T>(0))
+			{
+				return pi;
+			}
+			if (y < static_cast<T>(0))
+			{
+				return -pi;
+			}
 			return fp_bits_t(y).is_neg() ? -pi : pi;
 		}
 
@@ -229,8 +295,14 @@ namespace ccm::internal::impl
 		{
 			const T pi_over_2 = static_cast<T>(ccm::numbers::pi_v<T>) / static_cast<T>(2);
 
-			if (y > static_cast<T>(0)) { return pi_over_2; }
-			if (y < static_cast<T>(0)) { return -pi_over_2; }
+			if (y > static_cast<T>(0))
+			{
+				return pi_over_2;
+			}
+			if (y < static_cast<T>(0))
+			{
+				return -pi_over_2;
+			}
 			if (fp_bits_t(x).is_neg())
 			{
 				const T pi = static_cast<T>(ccm::numbers::pi_v<T>);
@@ -245,7 +317,10 @@ namespace ccm::internal::impl
 
 		if (x < static_cast<T>(0))
 		{
-			if (y >= static_cast<T>(0)) { return angle + static_cast<T>(ccm::numbers::pi_v<T>); }
+			if (y >= static_cast<T>(0))
+			{
+				return angle + static_cast<T>(ccm::numbers::pi_v<T>);
+			}
 			return angle - static_cast<T>(ccm::numbers::pi_v<T>);
 		}
 		return angle;

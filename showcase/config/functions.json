@@ -1,0 +1,44 @@
+{
+  "sqrt": {
+    "arity": "unary",
+    "type": "double",
+    "mpfr": "sqrt",
+    "ccmath_paths": [
+      "public_default",
+      "generic_gen",
+      "runtime_rt",
+      "runtime_simd",
+      "runtime_builtin"
+    ],
+    "compile_probe_inputs": [0.5, 2.0, 1e-10, 1e10],
+    "ccmath": {
+      "include": "ccmath/math/power/sqrt.hpp",
+      "expr": "ccm::sqrt(x)"
+    },
+    "gcem": {
+      "include": "gcem.hpp",
+      "expr": "gcem::sqrt(x)"
+    }
+  },
+  "sin": {
+    "arity": "unary",
+    "type": "double",
+    "mpfr": "sin",
+    "ccmath_paths": [
+      "public_default",
+      "generic_gen",
+      "runtime_rt",
+      "runtime_simd",
+      "runtime_builtin"
+    ],
+    "compile_probe_inputs": [0.0, 0.5, 1.0, 3.141592653589793 / 6.0],
+    "ccmath": {
+      "include": "ccmath/math/trig/sin.hpp",
+      "expr": "ccm::sin(x)"
+    },
+    "gcem": {
+      "include": "gcem.hpp",
+      "expr": "gcem::sin(x)"
+    }
+  }
+}

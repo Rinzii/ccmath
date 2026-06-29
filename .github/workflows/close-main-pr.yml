@@ -1,0 +1,30 @@
+# Close PRs that were opened from a main development branch instead of a topic branch.
+
+name: Close PRs from main branches
+
+on:
+    pull_request_target:
+        types:
+            - opened
+            - ready_for_review
+
+permissions:
+    contents: read
+    pull-requests: write
+    issues: write
+
+jobs:
+    run:
+        if: ${{ (github.head_ref == 'main' || github.head_ref == 'master' || github.head_ref == 'develop') && github.event.pull_request.head.repo.fork }}
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Close PR opened from a main development branch
+              uses: superbrothers/close-pull-request@9c18513d320d7b2c7185fb93396d0c664d5d8448 # v3
+              with:
+                  comment: |
+                      Thank you for your contribution.
+
+                      It looks like this pull request was opened from a main development branch. That is something you should generally avoid, so this pull request has been automatically closed.
+
+                      Please move your work to a separate branch, then reopen the pull request from that branch.

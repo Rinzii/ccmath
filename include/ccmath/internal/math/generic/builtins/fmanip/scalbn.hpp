@@ -28,6 +28,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_SCALBN
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for scalbn that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_SCALBN
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_SCALBN
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -43,6 +58,15 @@ namespace ccm::builtin
 #endif
 	// clang-format on
 
+	// TODO: determine actual compiler/version support for runtime __builtin_scalbn.
+	template <typename T>
+	inline constexpr bool has_runtime_scalbn =
+#ifdef CCMATH_HAS_BUILTIN_SCALBN
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_scalbn functions.
@@ -50,13 +74,37 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_scalbn functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto scalbn(T x, int exp) -> std::enable_if_t<has_constexpr_scalbn<T>, T>
+	template <typename T> constexpr auto scalbn_ct(T x, int exp) -> std::enable_if_t<has_constexpr_scalbn<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_scalbnf(x, exp); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_scalbn(x, exp); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_scalbnl(x, exp); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_scalbnf(x, exp);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_scalbn(x, exp);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_scalbnl(x, exp);
+		} else
+		{
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for scalbn");
+			return T{};
+		}
+	}
+
+	template <typename T> auto scalbn_rt(T x, int exp) -> std::enable_if_t<has_runtime_scalbn<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_scalbnf(x, exp);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_scalbn(x, exp);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_scalbnl(x, exp);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for scalbn");
@@ -71,13 +119,18 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_scalbn functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto scalbn(T x, long exp) -> std::enable_if_t<has_constexpr_scalbn<T>, T>
+	template <typename T> constexpr auto scalbn_ct(T x, long exp) -> std::enable_if_t<has_constexpr_scalbn<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_scalblnf(x, exp); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_scalbln(x, exp); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_scalblnl(x, exp); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_scalblnf(x, exp);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_scalbln(x, exp);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_scalblnl(x, exp);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for scalbn");
@@ -88,3 +141,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_SCALBN
+#undef CCMATH_HAS_BUILTIN_SCALBN

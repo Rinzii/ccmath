@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "description": "Documented enums for asmlab CPU knowledge JSON files.",
+  "enums": {
+    "confidence": [
+      "high",
+      "medium",
+      "low",
+      "unknown",
+      "partially_trusted",
+      "high_for_documented_runs"
+    ],
+    "source_kind": [
+      "measured_instruction_database",
+      "measured_instruction_tables",
+      "vendor_manual",
+      "static_model",
+      "local_calibration",
+      "unofficial_microarchitecture_notes",
+      "research_paper",
+      "tool_documentation"
+    ],
+    "trust": [
+      "high_for_supported_x86",
+      "high_for_x86_when_table_matches_uarch",
+      "high_for_official_intel_semantics",
+      "high_for_official_amd_semantics",
+      "high_when_locally_run",
+      "high_for_cortex_specific_facts",
+      "high_for_official_apple_guidance",
+      "high_for_documented_host_runs",
+      "medium_advisory",
+      "medium_for_recent_intel",
+      "medium_unofficial"
+    ],
+    "calibration_golden_status": ["trusted", "partially_trusted", "untrusted", "unknown"],
+    "calibration_overall_status": ["trusted", "partially_trusted", "noisy", "unsupported", "failed", "unknown"],
+    "microarch_confidence": ["trusted", "partially_trusted", "noisy", "unsupported", "failed", "unknown"],
+    "pattern_meaning": [
+      "stack_serial_fma_candidate",
+      "dependency_chain_candidate",
+      "dependency_chain_or_ilp_candidate",
+      "static_claim_scope_limited"
+    ],
+    "match_kind": ["heuristic", "measured", "proven"]
+  },
+  "timing_fields": [
+    "latency_cycles",
+    "reciprocal_throughput_cycles"
+  ],
+  "required_calibration_fields": [
+    "id",
+    "arch",
+    "source",
+    "confidence",
+    "golden_status",
+    "overall_status",
+    "known_limitations"
+  ]
+}

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or design discussion
+    url: https://discord.gg/p3mVxAbdmc
+    about: Usage questions, design discussion, and general help belong on Discord.
+  - name: Security vulnerability
+    url: https://github.com/Rinzii/ccmath/security/policy
+    about: Report security issues privately as described in SECURITY.md. Do not open a public issue.

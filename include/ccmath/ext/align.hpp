@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "ccmath/internal/support/bits.hpp"
+
 #include <cstddef>
 #include <type_traits>
 
@@ -33,12 +35,11 @@ namespace ccm::ext
 	 * @tparam mode Alignment direction (eUP or eDOWN).
 	 * @param value Value to align.
 	 * @return value rounded to the nearest aligned multiple according to mode.
-	 * @see https://en.cppreference.com/w/cpp/memory/align
 	 */
-	template <typename T, std::size_t alignment, AR::Direction mode, std::enable_if_t<std::is_integral_v<T>, bool> = true>
-	constexpr T align(T value) noexcept
+	template <typename T, std::size_t alignment, AR::Direction mode, std::enable_if_t<std::is_integral_v<T>, bool> = true> constexpr T align(T value) noexcept
 	{
 		static_assert(alignment != 0, "Alignment must be non-zero");
+		static_assert(support::has_single_bit(alignment), "Alignment must be a power of two");
 
 		if constexpr (mode == AR::Direction::eUP)
 		{
@@ -59,9 +60,9 @@ namespace ccm::ext
 			 *   	This operation zeroes out the lower bits that fall within the alignment range, effectively rounding
 			 *   	value up to the nearest multiple of alignment.
 			 */
-			return (value + (alignment - 1)) & ~(alignment - 1);
-		}
-		else
+			const T align_mask = static_cast<T>(alignment - 1);
+			return (value + align_mask) & ~align_mask;
+		} else
 		{
 			/*
 			 * What is happening here:
@@ -77,7 +78,8 @@ namespace ccm::ext
 			 *   - This operation zeroes out the lower bits that fall within the alignment range, effectively rounding
 			 *     value down to the nearest multiple of alignment.
 			 */
-			return value & ~(alignment - 1);
+			const T align_mask = static_cast<T>(alignment - 1);
+			return value & ~align_mask;
 		}
 	}
 
@@ -87,10 +89,8 @@ namespace ccm::ext
 	 * @tparam alignment Alignment boundary as a compile-time constant.
 	 * @param value Value to align.
 	 * @return value rounded up to the alignment boundary.
-	 * @see https://en.cppreference.com/w/cpp/memory/align
 	 */
-	template <typename T, std::size_t alignment, std::enable_if_t<std::is_integral_v<T>, bool> = true>
-	constexpr T align_up(T value) noexcept
+	template <typename T, std::size_t alignment, std::enable_if_t<std::is_integral_v<T>, bool> = true> constexpr T align_up(T value) noexcept
 	{
 		return align<T, alignment, AR::Direction::eUP>(value);
 	}
@@ -101,10 +101,8 @@ namespace ccm::ext
 	 * @tparam alignment Alignment boundary as a compile-time constant.
 	 * @param value Value to align.
 	 * @return value rounded down to the alignment boundary.
-	 * @see https://en.cppreference.com/w/cpp/memory/align
 	 */
-	template <typename T, std::size_t alignment, std::enable_if_t<std::is_integral_v<T>, bool> = true>
-	constexpr T align_down(T value) noexcept
+	template <typename T, std::size_t alignment, std::enable_if_t<std::is_integral_v<T>, bool> = true> constexpr T align_down(T value) noexcept
 	{
 		return align<T, alignment, AR::Direction::eDOWN>(value);
 	}

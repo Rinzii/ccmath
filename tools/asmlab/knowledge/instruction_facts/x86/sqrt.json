@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "facts": [
+    {
+      "instruction": "sqrtsd",
+      "isa": "x86_64",
+      "category": "sqrt",
+      "latency_cycles": {"value": null, "source": "unknown", "confidence": "unknown"},
+      "reciprocal_throughput_cycles": {"value": null, "source": "unknown", "confidence": "unknown"},
+      "notes": ["Often bound on FP divider unit in llvm-mca."],
+      "source_ids": ["uops_info", "intel_opt_manual"]
+    },
+    {
+      "instruction": "sqrtss",
+      "isa": "x86_64",
+      "category": "sqrt",
+      "latency_cycles": {"value": null, "source": "unknown", "confidence": "unknown"},
+      "reciprocal_throughput_cycles": {"value": null, "source": "unknown", "confidence": "unknown"},
+      "notes": ["Scalar sqrt lowering for sqrtf."],
+      "source_ids": ["uops_info", "intel_opt_manual"]
+    }
+  ]
+}

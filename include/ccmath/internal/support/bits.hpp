@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include "ccmath/internal/config/builtin/bit_cast_support.hpp"
 #include "ccmath/internal/config/type_support.hpp"
 // ReSharper disable once CppUnusedIncludeDirective
 #include "ccmath/internal/math/runtime/simd/simd_vectorize.hpp"
@@ -20,14 +21,63 @@
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
 
+#include <array>
+#include <climits>
+#include <cstddef>
 #include <cstdint>
+#include <type_traits>
 
 #if defined(_MSC_VER) && !defined(__clang__)
 	#include <cstdlib>
 #endif
 
+#ifndef CCMATH_HAS_BUILTIN_BIT_CAST
+	#error                                                                                                                                                     \
+		"CCMath requires compiler support for __builtin_bit_cast. Use the CMake, Meson, or Premake consumer wiring to validate the toolchain before building."
+#endif
+
 namespace ccm::support
 {
+	namespace detail
+	{
+		template <typename To, typename From> constexpr To bit_cast_float80_constexpr(const From & from) noexcept
+		{
+			// Rebuilding a long double from its integer storage is safe in a constant expression: every
+			// bit of the result is sourced from the determinate integer, so the intrinsic handles it.
+			if constexpr (std::is_same_v<To, long double>)
+			{
+				return __builtin_bit_cast(To, from);
+			} // NOLINT(bugprone-branch-clone)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
+			else
+			{
+				// The other direction cannot go through a single __builtin_bit_cast. An x87 80-bit long
+				// double carries indeterminate padding bytes, and those bytes may not initialize an
+				// integer in a constant expression. To inspect the underlying bits we bit-cast the value
+				// into a byte array matching its exact memory layout, then assemble the storage integer
+				// from just the 80 bits the format actually uses, never touching the padding.
+				struct byte_buffer
+				{
+					std::array<unsigned char, sizeof(From)> bytes;
+				};
+				const byte_buffer buffer = __builtin_bit_cast(byte_buffer, from);
+
+				constexpr std::size_t used_bytes = 10; // 1 sign + 15 exponent + 64 significand bits, low end first
+				To to{};
+				for (std::size_t i = 0; i < used_bytes; ++i)
+				{
+					to |= static_cast<To>(buffer.bytes[i]) << (i * CHAR_BIT);
+				}
+				return to;
+			}
+#else
+			else
+			{
+				return __builtin_bit_cast(To, from);
+			}
+#endif
+		}
+	} // namespace detail
 
 	template <typename To, typename From>
 	constexpr std::enable_if_t<sizeof(To) == sizeof(From) && std::is_trivially_constructible_v<To> && std::is_trivially_copyable_v<To> &&
@@ -35,6 +85,18 @@ namespace ccm::support
 							   To>
 	bit_cast(const From & from)
 	{
+#ifdef __clang__
+		if constexpr (sizeof(long double) != sizeof(double))
+		{
+			if constexpr ((std::is_same_v<From, long double> || std::is_same_v<To, long double>) && sizeof(To) == sizeof(From))
+			{
+				if (is_constant_evaluated())
+				{
+					return detail::bit_cast_float80_constexpr<To>(from);
+				}
+			}
+		}
+#endif
 		return __builtin_bit_cast(To, from);
 	}
 
@@ -45,8 +107,7 @@ namespace ccm::support
 		return x && !(x & (x - 1));
 	}
 
-	// TODO: Have the below function replace all other top_bits func.
-	// TODO: Remove all usages of bit grabbing functions
+	// TODO: Consolidate top_bits helpers and retire duplicate bit-grab paths.
 
 	template <typename T, std::size_t TopBitsToTake, std::enable_if_t<std::is_floating_point_v<T> && !std::is_same_v<T, long double>, bool> = true>
 	constexpr std::uint32_t top_bits(T x) noexcept
@@ -55,8 +116,10 @@ namespace ccm::support
 		if constexpr (std::is_same_v<T, double>)
 		{
 			return static_cast<std::uint32_t>(bit_cast<std::uint64_t>(x) >> (std::numeric_limits<std::uint64_t>::digits - TopBitsToTake));
+		} else
+		{
+			return bit_cast<std::uint32_t>(x) >> (std::numeric_limits<std::uint32_t>::digits - TopBitsToTake);
 		}
-		else { return bit_cast<std::uint32_t>(x) >> (std::numeric_limits<std::uint32_t>::digits - TopBitsToTake); }
 	}
 
 	/**
@@ -123,21 +186,28 @@ namespace ccm::support
 	 * @brief Rotates unsigned integer bits to the right.
 	 * https://en.cppreference.com/w/cpp/numeric/rotr
 	 */
-	template <class T, std::enable_if_t<traits::ccm_is_unsigned_v<T>, bool> = true>
-	constexpr T rotr(T t, int cnt) noexcept
+	template <class T, std::enable_if_t<traits::ccm_is_unsigned_v<T>, bool> = true> constexpr T rotr(T t, int cnt) noexcept
 	{
 #if defined(_MSC_VER) && !defined(__clang__)
 		// Allow for the use of compiler intrinsics if we are not being evaluated at compile time in msvc.
 		if (!is_constant_evaluated())
 		{
 			// These func are not constexpr in msvc.
-			if constexpr (std::is_same_v<T, unsigned int>) { return _rotr(t, cnt); }
-			else if constexpr (std::is_same_v<T, std::uint64_t>) { return _rotr64(t, cnt); }
+			if constexpr (std::is_same_v<T, unsigned int>)
+			{
+				return _rotr(t, cnt);
+			} else if constexpr (std::is_same_v<T, std::uint64_t>)
+			{
+				return _rotr64(t, cnt);
+			}
 		}
 #endif
 		const unsigned int dig = std::numeric_limits<T>::digits;
 
-		if ((static_cast<unsigned int>(cnt) % dig) == 0) { return t; }
+		if ((static_cast<unsigned int>(cnt) % dig) == 0)
+		{
+			return t;
+		}
 
 		if (cnt < 0)
 		{
@@ -153,16 +223,20 @@ namespace ccm::support
 	 * @brief Rotates unsigned integer bits to the left.
 	 * https://en.cppreference.com/w/cpp/numeric/rotl
 	 */
-	template <class T, std::enable_if_t<traits::ccm_is_unsigned_v<T>, bool> = true>
-	constexpr T rotl(T t, int cnt) noexcept
+	template <class T, std::enable_if_t<traits::ccm_is_unsigned_v<T>, bool> = true> constexpr T rotl(T t, int cnt) noexcept
 	{
 #if defined(_MSC_VER) && !defined(__clang__)
 		// Allow for the use of compiler intrinsics if we are not being evaluated at compile time in msvc.
 		if (!is_constant_evaluated())
 		{
 			// These func are not constexpr in msvc.
-			if constexpr (std::is_same_v<T, unsigned int>) { return _rotl(t, cnt); }
-			else if constexpr (std::is_same_v<T, std::uint64_t>) { return _rotl64(t, cnt); }
+			if constexpr (std::is_same_v<T, unsigned int>)
+			{
+				return _rotl(t, cnt);
+			} else if constexpr (std::is_same_v<T, std::uint64_t>)
+			{
+				return _rotl64(t, cnt);
+			}
 		}
 #endif
 		return rotr(t, -cnt);
@@ -171,8 +245,7 @@ namespace ccm::support
 // Macro to allow simplified creation of specializations
 // NOLINTBEGIN(bugprone-macro-parentheses)
 #define INTERNAL_CCM_ADD_CTZ_SPECIALIZATION(FUNC, TYPE, BUILTIN)                                                                                               \
-	template <>                                                                                                                                                \
-	[[nodiscard]] constexpr int FUNC<TYPE>(TYPE value)                                                                                                         \
+	template <> [[nodiscard]] constexpr int FUNC<TYPE>(TYPE value)                                                                                             \
 	{                                                                                                                                                          \
 		static_assert(ccm::support::traits::ccm_is_unsigned_v<TYPE>);                                                                                          \
 		return value == 0 ? std::numeric_limits<TYPE>::digits : BUILTIN(value);                                                                                \
@@ -184,8 +257,7 @@ namespace ccm::support
 	 * @brief Returns the number of consecutive 0 bits in the value of x, starting from the least significant bit ("right").
 	 * https://en.cppreference.com/w/cpp/numeric/countr_zero
 	 */
-	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<ccm::support::traits::ccm_is_unsigned_v<T>, int> countr_zero(T value)
+	template <typename T> [[nodiscard]] constexpr std::enable_if_t<ccm::support::traits::ccm_is_unsigned_v<T>, int> countr_zero(T value)
 	{
 		return __builtin_ctzg(value, std::numeric_limits<T>::digits); // NOLINT
 	}
@@ -194,11 +266,16 @@ namespace ccm::support
 	 * @brief Returns the number of consecutive 0 bits in the value of x, starting from the least significant bit ("right").
 	 * https://en.cppreference.com/w/cpp/numeric/countr_zero
 	 */
-	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countr_zero(T value)
+	template <typename T> [[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countr_zero(T value)
 	{
-		if (value == 0) { return std::numeric_limits<T>::digits; }
-		if (value & 0x1) { return 0; }
+		if (value == 0)
+		{
+			return std::numeric_limits<T>::digits;
+		}
+		if (value & 0x1)
+		{
+			return 0;
+		}
 		// Bisection method
 		unsigned zero_bits = 0;
 		unsigned shift	   = std::numeric_limits<T>::digits >> 1;
@@ -213,7 +290,7 @@ namespace ccm::support
 			shift >>= 1;
 			mask >>= shift;
 		}
-		return zero_bits;
+		return static_cast<int>(zero_bits);
 	}
 #endif // CCM_HAS_BUILTIN(__builtin_ctzg)
 
@@ -231,16 +308,17 @@ namespace ccm::support
 #endif // CCM_HAS_BUILTIN(__builtin_ctzll)
 
 #if CCM_HAS_BUILTIN(__builtin_clzg)
-	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countl_zero(T value)
+	template <typename T> [[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countl_zero(T value)
 	{
 		return __builtin_clzg(value, std::numeric_limits<T>::digits); // NOLINT
 	}
 #else  // !CCM_HAS_BUILTIN(__builtin_clzg)
-	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countl_zero(T value)
+	template <typename T> [[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countl_zero(T value)
 	{
-		if (value == 0) { return std::numeric_limits<T>::digits; }
+		if (value == 0)
+		{
+			return std::numeric_limits<T>::digits;
+		}
 		// Bisection method
 		unsigned zero_bits = 0;
 		if (is_constant_evaluated())
@@ -248,17 +326,26 @@ namespace ccm::support
 			for (unsigned shift = std::numeric_limits<T>::digits >> 1; shift; shift >>= 1)
 			{
 				T tmp = value >> shift;
-				if (tmp) { value = tmp; }
-				else { zero_bits |= shift; }
+				if (tmp)
+				{
+					value = tmp;
+				} else
+				{
+					zero_bits |= shift;
+				}
 			}
-		}
-		else
+		} else
 		{
 			CCM_SIMD_VECTORIZE for (unsigned shift = std::numeric_limits<T>::digits >> 1; shift; shift >>= 1)
 			{
 				T tmp = value >> shift;
-				if (tmp) { value = tmp; }
-				else { zero_bits |= shift; }
+				if (tmp)
+				{
+					value = tmp;
+				} else
+				{
+					zero_bits |= shift;
+				}
 			}
 		}
 		return zero_bits;
@@ -280,8 +367,7 @@ namespace ccm::support
 
 #undef INTERNAL_CCM_ADD_CTZ_SPECIALIZATION
 
-	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countr_one(T value)
+	template <typename T> [[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countr_one(T value)
 	{
 		return support::countr_zero<T>(~value);
 	}
@@ -292,8 +378,7 @@ namespace ccm::support
 		return value != std::numeric_limits<T>::max() ? countl_zero(static_cast<T>(~value)) : std::numeric_limits<T>::digits;
 	}
 
-	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> bit_width(T value)
+	template <typename T> [[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> bit_width(T value)
 	{
 		return std::numeric_limits<T>::digits - countl_zero(value);
 	}
@@ -307,13 +392,18 @@ namespace ccm::support
 							   T>
 	bit_ceil(T x) noexcept
 	{
-		if (x < 2) { return 1; }
+		if (x < 2)
+		{
+			return 1;
+		}
 
 		// Assume we got a good input
 		const unsigned n = static_cast<unsigned>(std::numeric_limits<T>::digits - countl_zero(static_cast<T>(x - 1U)));
 
-		if constexpr (sizeof(T) >= sizeof(unsigned)) { return T{ 1 } << n; }
-		else
+		if constexpr (sizeof(T) >= sizeof(unsigned))
+		{
+			return T{ 1 } << n;
+		} else
 		{
 			const unsigned extra  = std::numeric_limits<unsigned>::digits - std::numeric_limits<T>::digits;
 			const unsigned retVal = 1U << (n + extra);
@@ -322,28 +412,31 @@ namespace ccm::support
 	}
 
 #if CCM_HAS_BUILTIN(__builtin_popcountg)
-	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> popcount(T value)
+	template <typename T> [[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<T>, int> popcount(T value)
 	{
 		return __builtin_popcountg(value); // NOLINT
 	}
 #else // !CCM_HAS_BUILTIN(__builtin_popcountg)
-	template <typename T>
-	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> popcount(T value)
+	template <typename T> [[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> popcount(T value)
 	{
 		int count = 0;
 		if (is_constant_evaluated())
 		{
 			for (int i = 0; i != std::numeric_limits<T>::digits; ++i)
 			{
-				if ((value >> i) & 0x1) { ++count; }
+				if ((value >> i) & 0x1)
+				{
+					++count;
+				}
 			}
-		}
-		else
+		} else
 		{
 			CCM_SIMD_VECTORIZE for (int i = 0; i != std::numeric_limits<T>::digits; ++i)
 			{
-				if ((value >> i) & 0x1) { ++count; }
+				if ((value >> i) & 0x1)
+				{
+					++count;
+				}
 			}
 		}
 		return count;
@@ -370,8 +463,7 @@ namespace ccm::support
 // Macro to allow simplified creation of specializations
 // NOLINTBEGIN(bugprone-macro-parentheses)
 #define INTERNAL_CCM_ADD_POPCOUNT_SPECIALIZATION(FUNC, TYPE, BUILTIN)                                                                                          \
-	template <>                                                                                                                                                \
-	[[nodiscard]] constexpr int FUNC<TYPE>(TYPE value)                                                                                                         \
+	template <> [[nodiscard]] constexpr int FUNC<TYPE>(TYPE value)                                                                                             \
 	{                                                                                                                                                          \
 		static_assert(ccm::support::traits::ccm_is_unsigned_v<TYPE>);                                                                                          \
 		return BUILTIN(value);                                                                                                                                 \
@@ -412,8 +504,7 @@ namespace ccm::support
 			n = (n & 0x33333333) + (n >> 2) & 0x33333333;
 			n = (n + (n >> 4)) & 0x0F0F0F0F;
 			return (n * 0x01010101) >> 24;
-		}
-		else // 16 bit int
+		} else // 16 bit int
 		{
 			n = n - (n >> 1) & 0x5555;
 			n = (n & 0x3333) + (n >> 2) & 0x3333;
@@ -435,8 +526,7 @@ namespace ccm::support
 			n = (n & 0x33333333) + (n >> 2) & 0x33333333;
 			n = (n + (n >> 4)) & 0x0F0F0F0F;
 			return (n * 0x01010101) >> 24;
-		}
-		else // 64-bit long
+		} else // 64-bit long
 		{
 			n = n - ((n >> 1) & 0x5555555555555555);
 			n = (n & 0x3333333333333333) + ((n >> 2) & 0x3333333333333333);

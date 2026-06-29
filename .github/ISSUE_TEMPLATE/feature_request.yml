@@ -1,0 +1,51 @@
+name: Feature Request
+description: Propose a new function, behavior, or capability for ccmath
+title: '[FEATURE]: '
+labels: ['T: New Feature', 'S: Untriaged']
+body:
+  - type: checkboxes
+    attributes:
+      label: Due diligence
+      options:
+        - label: I searched existing issues and did not find a duplicate
+          required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What should ccmath do that it does not do today.
+    validations:
+      required: true
+
+  - type: input
+    id: function
+    attributes:
+      label: Function or area
+      description: The function or family this concerns, if applicable.
+      placeholder: ccm::lgamma, or trig
+    validations:
+      required: false
+
+  - type: textarea
+    id: standard
+    attributes:
+      label: Standard reference
+      description: The relevant C++ standard clause or cppreference page, if this maps to a standard function.
+    validations:
+      required: false
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: The problem this solves and why it belongs in ccmath.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false

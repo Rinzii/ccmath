@@ -15,27 +15,26 @@
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/fp/nearest_integer.hpp"
 #include "ccmath/internal/support/multiply_add.hpp"
-#include "ccmath/internal/types/double_double.hpp"
 #include "ccmath/math/trig/impl/sincos_double_data.hpp"
+#include "ccmath/math/trig/impl/sincos_payne_hanek.hpp"
 
 #include <cerrno>
-#include <cfenv>
 #include <cstdint>
 
 namespace ccm::internal::impl
 {
 	namespace sincos_double_detail
 	{
-		using FPBits	   = support::fp::FPBits<double>;
-		using DoubleDouble = types::DoubleDouble;
-		namespace data	   = sincos_double_data;
+		using FPBits   = support::fp::FPBits<double>;
+		namespace data = sincos_double_data;
 
 		constexpr unsigned sincos_range_reduction_small(double x, double & u)
 		{
-			const double prod_hi = x * data::ONE_OVER_PI;
+			const double prod_hi = x * data::EIGHT_OVER_PI;
 			const double k		 = support::fp::nearest_integer(prod_hi);
 
 			const double y_hi = support::multiply_add(k, data::MPI[0], x);
@@ -44,49 +43,25 @@ namespace ccm::internal::impl
 			return static_cast<unsigned>(static_cast<int>(k));
 		}
 
-		constexpr unsigned sincos_range_reduction_large(double x, double & u)
-		{
-			FPBits xbits(x);
-
-			const int x_e_m32 = xbits.get_biased_exponent() - (FPBits::exponent_bias + 32);
-			unsigned idx	  = static_cast<unsigned>((x_e_m32 >> 3) + 2);
-			if (idx >= data::EIGHT_OVER_PI.size()) { idx = static_cast<unsigned>(data::EIGHT_OVER_PI.size() - 1); }
-
-			xbits.set_biased_exponent((x_e_m32 & 7) + FPBits::exponent_bias + 32);
-			const double x_reduced = xbits.get_val();
-
-			const DoubleDouble ph = types::exact_mult(x_reduced, data::EIGHT_OVER_PI[idx][0]);
-			const DoubleDouble pm = types::exact_mult(x_reduced, data::EIGHT_OVER_PI[idx][1]);
-			const DoubleDouble pl = types::exact_mult(x_reduced, data::EIGHT_OVER_PI[idx][2]);
-
-			const double sum_hi = ph.lo + pm.hi;
-			const double k		= support::fp::nearest_integer(sum_hi);
-
-			const double y_hi		 = (ph.lo - k) + pm.hi;
-			const DoubleDouble y_mid = types::exact_add(pm.lo, pl.hi);
-			const double y_lo		 = pl.lo;
-
-			const double y_l	 = support::multiply_add(x_reduced, data::EIGHT_OVER_PI[idx][3], y_lo);
-			const DoubleDouble y = types::exact_add(y_hi, y_mid.hi);
-			DoubleDouble y_total = y;
-			y_total.lo += (y_mid.lo + y_l);
-
-			u = support::multiply_add(y_total.hi, data::PI_OVER_8.hi, y_total.lo * data::PI_OVER_8.hi);
-
-			return static_cast<unsigned>(static_cast<int>(k));
-		}
-
-		template <bool IsSin>
-		constexpr double sincos_eval(double x)
+		template <bool IsSin> constexpr double sincos_eval(double x)
 		{
 			FPBits xbits(x);
 			const std::uint64_t x_abs = ccm::support::bit_cast<std::uint64_t>(x) & 0x7fff'ffff'ffff'ffffULL;
 
+			// sin(+/-0) = +/-0, cos(+/-0) = 1. Returning x preserves the sign of a signed zero,
+			// which the reconstruction below would otherwise flush to +0.
+			if (x_abs == 0)
+			{
+				return IsSin ? x : 1.0;
+			}
+
 			double y{};
 			unsigned k = 0;
 
-			if (x_abs < 0x4130'0000'0000'0000ULL) { k = sincos_range_reduction_small(x, y); }
-			else
+			if (x_abs < 0x4130'0000'0000'0000ULL)
+			{
+				k = sincos_range_reduction_small(x, y);
+			} else
 			{
 				if (CCM_UNLIKELY(x_abs >= 0x7ff0'0000'0000'0000ULL))
 				{
@@ -100,25 +75,50 @@ namespace ccm::internal::impl
 					{
 						support::fenv::set_errno_if_required(EDOM);
 						support::fenv::raise_except_if_required(FE_INVALID);
+						// sin/cos of an infinity is a domain error, so return a canonical quiet NaN.
+						// Forming it as x + quiet_nan is ill-formed in a constant expression, which
+						// rejects floating-point arithmetic that produces a NaN.
+						return FPBits::quiet_nan().get_val();
 					}
-					return x + FPBits::quiet_nan().get_val();
+
+					// x is a quiet NaN here. Return it unchanged so its sign and payload survive.
+					return x;
 				}
 
-				k = sincos_range_reduction_large(x, y);
+				k = sincos_ph::payne_hanek_reduce(x, y);
 			}
 
 			const double sin_k = data::SIN_K_PI_OVER_8[k & 15];
 			const double cos_k = data::SIN_K_PI_OVER_8[(k + 4) & 15];
 
 			const double y_sq = y * y;
-			const double p1	  = support::multiply_add(y_sq, 0x1.111111111111p-7, -0x1.555555555555p-3);
-			const double q1	  = support::multiply_add(y_sq, 0x1.54b8b8b8b8b8p-5, -0x1.fffffffffffp-2);
-			const double y3	  = y_sq * y;
-			const double c1	  = support::multiply_add(y_sq, q1, 1.0);
-			const double s1	  = support::multiply_add(y3, p1, y);
 
-			if constexpr (IsSin) { return support::multiply_add(cos_k, s1, sin_k * c1); }
-			return support::multiply_add(cos_k, c1, -sin_k * s1);
+			// sin(y) = y * (1 + y^2 (SIN_POLY[1] + y^2 (...))) and cos(y) = 1 + y^2 (COS_POLY[1] + ...),
+			// evaluated by Horner. The double-precision coefficients keep |y| < pi/16 to ~2^-63
+			// (sin) and ~2^-68 (cos), versus the float-grade two-term tails this replaced.
+			double sp = support::multiply_add(y_sq, data::SIN_POLY[5], data::SIN_POLY[4]);
+			sp		  = support::multiply_add(y_sq, sp, data::SIN_POLY[3]);
+			sp		  = support::multiply_add(y_sq, sp, data::SIN_POLY[2]);
+			sp		  = support::multiply_add(y_sq, sp, data::SIN_POLY[1]);
+
+			double cp = support::multiply_add(y_sq, data::COS_POLY[5], data::COS_POLY[4]);
+			cp		  = support::multiply_add(y_sq, cp, data::COS_POLY[3]);
+			cp		  = support::multiply_add(y_sq, cp, data::COS_POLY[2]);
+			cp		  = support::multiply_add(y_sq, cp, data::COS_POLY[1]);
+
+			const double y3 = y_sq * y;
+			const double c1 = support::multiply_add(y_sq, cp, 1.0);
+			const double s1 = support::multiply_add(y3, sp, y);
+
+			// The cos tail is in the else so it is discarded for the sin instantiation rather than
+			// left as unreachable code, which MSVC rejects under /W4 (C4702).
+			if constexpr (IsSin)
+			{
+				return support::multiply_add(cos_k, s1, sin_k * c1);
+			} else
+			{
+				return support::multiply_add(cos_k, c1, -sin_k * s1);
+			}
 		}
 
 	} // namespace sincos_double_detail

@@ -10,8 +10,8 @@
 
 #pragma once
 
+#include "ccmath/internal/math/generic/builtins/nearest/nearbyint.hpp"
 #include "ccmath/internal/math/runtime/func/rt_dispatch.hpp"
-#include "ccmath/internal/predef/has_builtin.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/fp/directional_rounding_utils.hpp"
 
@@ -19,16 +19,14 @@
 
 namespace ccm::rt
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T nearbyint_rt(T num) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T nearbyint_rt(T num) noexcept
 	{
-#if CCM_HAS_BUILTIN(__builtin_nearbyint) || defined(__builtin_nearbyint)
-		if constexpr (std::is_same_v<T, float>) { return __builtin_nearbyintf(num); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_nearbyint(num); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_nearbyintl(num); }
-		else { return static_cast<T>(__builtin_nearbyintl(static_cast<long double>(num))); }
-#else
-		return ccm::support::fp::directional_round(num, ccm::support::fenv::get_rounding_mode());
-#endif
+		if constexpr (ccm::builtin::has_runtime_nearbyint<T>)
+		{
+			return ccm::builtin::nearbyint_rt(num);
+		} else
+		{
+			return ccm::support::fp::directional_round(num, ccm::support::fenv::get_rounding_mode());
+		}
 	}
 } // namespace ccm::rt

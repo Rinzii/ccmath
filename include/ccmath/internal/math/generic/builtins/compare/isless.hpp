@@ -27,6 +27,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_ISLESS
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for isless that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_ISLESS
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_ISLESS
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -42,6 +57,15 @@ namespace ccm::builtin
 	#endif
 	// clang-format on
 
+	// TODO: determine actual compiler/version support for runtime __builtin_isless.
+	template <typename T>
+	inline constexpr bool has_runtime_isless =
+#ifdef CCMATH_HAS_BUILTIN_ISLESS
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_isless.
@@ -49,8 +73,12 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_isless without triggering a compiler error
 	 * when the compiler does not support it.
 	 */
-	template <typename T>
-	constexpr auto isless(T x, T y) -> std::enable_if_t<has_constexpr_isless<T>, bool>
+	template <typename T> constexpr auto isless_ct(T x, T y) -> std::enable_if_t<has_constexpr_isless<T>, bool>
+	{
+		return __builtin_isless(x, y);
+	}
+
+	template <typename T> auto isless_rt(T x, T y) -> std::enable_if_t<has_runtime_isless<T>, bool>
 	{
 		return __builtin_isless(x, y);
 	}
@@ -58,3 +86,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_ISLESS
+#undef CCMATH_HAS_BUILTIN_ISLESS

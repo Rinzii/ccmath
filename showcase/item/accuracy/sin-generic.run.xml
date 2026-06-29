@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="showcase / accuracy / sin generic" type="CMakeRunConfiguration" factoryName="Application" folderName="showcase/accuracy" PROGRAM_PARAMS="--function=sin --backend=ccmath --path=generic_gen" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ccmath" TARGET_NAME="showcase_accuracy" RUN_TARGET_PROJECT_NAME="ccmath" RUN_TARGET_NAME="showcase_accuracy">
+    <option name="workingDir" value="$PROJECT_DIR$" />
+    <method v="2">
+      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+    </method>
+  </configuration>
+</component>

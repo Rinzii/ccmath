@@ -11,9 +11,8 @@
 #pragma once
 
 #include "ccmath/internal/math/generic/builtins/expo/log.hpp"
+#include "ccmath/internal/math/generic/func/expo/log_gen.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
-#include "ccmath/math/expo/impl/log_double_impl.hpp"
-#include "ccmath/math/expo/impl/log_float_impl.hpp"
 
 #if defined(_MSC_VER) && !defined(__clang__)
 	#include "ccmath/internal/predef/compiler_suppression/msvc_compiler_suppression.hpp"
@@ -28,14 +27,18 @@ namespace ccm
 	 * @param num A floating-point or integer value to find the natural logarithm of.
 	 * @return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T log(const T num) noexcept
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T log(const T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_log<T>) { return ccm::builtin::log(num); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_log<T>)
+		{
+			return ccm::builtin::log_ct(num);
+		} else
 		{
 			// If the number is 1, return +0.
-			if (num == static_cast<T>(1)) { return static_cast<T>(0); }
+			if (num == static_cast<T>(1))
+			{
+				return static_cast<T>(0);
+			}
 
 			// If the argument is ±0, -∞ is returned.
 			if (num == static_cast<T>(0))
@@ -54,15 +57,18 @@ namespace ccm
 			}
 
 			// If the argument is +∞, +∞ is returned.
-			if (CCM_UNLIKELY(num == std::numeric_limits<T>::infinity())) { return std::numeric_limits<T>::infinity(); }
+			if (CCM_UNLIKELY(num == std::numeric_limits<T>::infinity()))
+			{
+				return std::numeric_limits<T>::infinity();
+			}
 
 			// If the argument is NaN, NaN is returned.
-			if (CCM_UNLIKELY(ccm::isnan(num))) { return std::numeric_limits<T>::quiet_NaN(); }
+			if (CCM_UNLIKELY(ccm::isnan(num)))
+			{
+				return std::numeric_limits<T>::quiet_NaN();
+			}
 
-			if constexpr (std::is_same_v<T, float>) { return internal::log_float(num); }
-			if constexpr (std::is_same_v<T, double>) { return internal::log_double(num); }
-			if constexpr (std::is_same_v<T, long double>) { return static_cast<long double>(internal::log_double(static_cast<double>(num))); }
-			return static_cast<T>(internal::log_double(static_cast<double>(num)));
+			return gen::log_gen(num);
 		}
 	}
 
@@ -72,8 +78,7 @@ namespace ccm
 	 * @param num An integer value to find the natural logarithm of.
 	 * @return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double log(const Integer num) noexcept
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double log(const Integer num) noexcept
 	{
 		return ccm::log<double>(static_cast<double>(num));
 	}

@@ -28,6 +28,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_CBRT
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for cbrt that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_CBRT
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_CBRT
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -37,11 +52,20 @@ namespace ccm::builtin
 	template <typename T>
 	inline constexpr bool has_constexpr_cbrt =
 #ifdef CCMATH_HAS_CONSTEXPR_BUILTIN_CBRT
-		is_valid_builtin_type<T>;
+		is_valid_transcendental_builtin_type<T>;
 	#else
 			false;
 	#endif
 	// clang-format on
+
+	// TODO: determine actual compiler/version support for runtime __builtin_cbrt.
+	template <typename T>
+	inline constexpr bool has_runtime_cbrt =
+#ifdef CCMATH_HAS_BUILTIN_CBRT
+		is_valid_transcendental_builtin_type<T>;
+#else
+		false;
+#endif
 
 	/**
 	 * @internal
@@ -50,16 +74,39 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_cbrt functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto cbrt(T x) -> std::enable_if_t<has_constexpr_cbrt<T>, T>
+	template <typename T> constexpr auto cbrt_ct(T x) -> std::enable_if_t<has_constexpr_cbrt<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_cbrtf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_cbrt(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_cbrtl(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_cbrtf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_cbrt(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_cbrtl(x);
+		} else
 		{
 			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_cbrt");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for cbrt");
+			return T{};
+		}
+	}
+
+	template <typename T> auto cbrt_rt(T x) -> std::enable_if_t<has_runtime_cbrt<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_cbrtf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_cbrt(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_cbrtl(x);
+		} else
+		{
+			static_assert(ccm::support::always_false<T>, "Unsupported type for cbrt");
 			return T{};
 		}
 	}
@@ -67,3 +114,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_CBRT
+#undef CCMATH_HAS_BUILTIN_CBRT

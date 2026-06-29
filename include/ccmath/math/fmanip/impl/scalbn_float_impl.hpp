@@ -37,8 +37,7 @@ namespace ccm::internal
 					exp -= 127;
 					exp = ccm::min(exp, 127);
 				}
-			}
-			else if (exp < -126)
+			} else if (exp < -126)
 			{
 				tmp *= 0x1p-126F * 0x1p24F;
 				exp += 126 - 24;

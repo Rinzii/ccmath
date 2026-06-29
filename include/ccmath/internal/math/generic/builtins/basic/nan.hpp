@@ -28,6 +28,21 @@
 	#endif
 #endif
 
+/// CCMATH_HAS_BUILTIN_NAN
+/// This is a macro that is defined if the compiler has constexpr __builtin functions for nan that allow static_assert
+///
+/// Compilers with Support:
+/// - GCC
+/// - Clang
+
+// TODO(IanP): Determine the lowest runtime compiler versions at some point.
+
+#ifndef CCMATH_HAS_BUILTIN_NAN
+	#if defined(__GNUC__) || defined(__clang__)
+		#define CCMATH_HAS_BUILTIN_NAN
+	#endif
+#endif
+
 namespace ccm::builtin
 {
 	// clang-format off
@@ -43,6 +58,15 @@ namespace ccm::builtin
 	#endif
 	// clang-format on
 
+	// TODO: determine actual compiler/version support for runtime __builtin_nan.
+	template <typename T>
+	inline constexpr bool has_runtime_nan =
+#ifdef CCMATH_HAS_BUILTIN_NAN
+		is_valid_builtin_type<T>;
+#else
+		false;
+#endif
+
 	/**
 	 * @internal
 	 * Wrapper for constexpr __builtin_nan functions.
@@ -50,16 +74,40 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_nan functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto nan(const char * tag) -> std::enable_if_t<has_constexpr_nan<T>, T>
+	template <typename T> constexpr auto nan_ct(const char * tag) -> std::enable_if_t<has_constexpr_nan<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_nanf(tag); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_nan(tag); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_nanl(tag); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_nanf(tag);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_nan(tag);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_nanl(tag);
+		} else
 		{
 			// This should never be reached
-			static_assert(ccm::support::always_false<T>, "Unsupported type for __builtin_nan");
+			static_assert(ccm::support::always_false<T>, "Unsupported type for nan");
+			return T{};
+		}
+	}
+
+	template <typename T> auto nan_rt(const char * tag) -> std::enable_if_t<has_runtime_nan<T>, T>
+	{
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_nanf(tag);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_nan(tag);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_nanl(tag);
+		} else
+		{
+			// This should never be reached
+			static_assert(ccm::support::always_false<T>, "Unsupported type for nan");
 			return T{};
 		}
 	}
@@ -67,3 +115,4 @@ namespace ccm::builtin
 
 // Cleanup the global namespace
 #undef CCMATH_HAS_CONSTEXPR_BUILTIN_NAN
+#undef CCMATH_HAS_BUILTIN_NAN

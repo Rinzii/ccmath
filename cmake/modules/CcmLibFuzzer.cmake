@@ -6,7 +6,7 @@
 #   CCMATH_FUZZ_LINK_FLAGS     - link options for fuzz executables
 #
 # Optional environment:
-#   LIB_FUZZING_ENGINE - OSS-Fuzz / external engine path (link-only; compile uses fuzzer-no-link)
+#   LIB_FUZZING_ENGINE - OSS-Fuzz / external engine path (link-only, compile uses fuzzer-no-link)
 
 include(CheckCXXSourceCompiles)
 
@@ -15,12 +15,22 @@ set(CCMATH_FUZZ_SANITIZERS "fuzzer,address,undefined")
 function(ccmath_probe_libfuzzer compile_flags link_flags result_var)
 	set(CMAKE_REQUIRED_FLAGS ${compile_flags})
 	set(CMAKE_REQUIRED_LINK_OPTIONS ${link_flags})
-	check_cxx_source_compiles("
+	# With -fsanitize=fuzzer the runtime supplies main(). With fuzzer-no-link, the probe needs its own.
+	if (compile_flags MATCHES "fuzzer-no-link")
+		set(_probe_source "
 #include <cstddef>
 #include <cstdint>
 extern \"C\" int LLVMFuzzerTestOneInput(uint8_t const*, size_t) { return 0; }
 int main() { return 0; }
-" ${result_var})
+")
+	else ()
+		set(_probe_source "
+#include <cstddef>
+#include <cstdint>
+extern \"C\" int LLVMFuzzerTestOneInput(uint8_t const*, size_t) { return 0; }
+")
+	endif ()
+	check_cxx_source_compiles("${_probe_source}" ${result_var})
 endfunction()
 
 function(ccmath_append_compiler_libcxx_flags compile_flags_var link_flags_var)
@@ -47,7 +57,7 @@ function(ccmath_append_compiler_libcxx_flags compile_flags_var link_flags_var)
 endfunction()
 
 function(ccmath_detect_libfuzzer)
-	set(_compile_base "-fno-omit-frame-pointer" "-O1")
+	set(_compile_base "-fno-omit-frame-pointer" "-O1" "-fno-sanitize-recover=all")
 	set(_available FALSE)
 
 	if (DEFINED ENV{LIB_FUZZING_ENGINE})

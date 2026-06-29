@@ -19,21 +19,24 @@
 
 namespace ccm
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T pow(T base, T exp)
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T pow(T base, T exp)
 	{
-		if constexpr (ccm::builtin::has_constexpr_pow<T>) { return ccm::builtin::pow(base, exp); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_pow<T>)
+		{
+			return ccm::builtin::pow_ct(base, exp);
+		} else
 		{
 			// TODO: Add in usage of builtins that meet ccmath standards.
 
-			if (support::is_constant_evaluated()) { return gen::pow_gen(base, exp); }
+			if (support::is_constant_evaluated())
+			{
+				return gen::pow_gen(base, exp);
+			}
 			return rt::pow_rt(base, exp);
 		}
 	}
 
-	template <typename Integer, std::enable_if_t<!std::is_floating_point_v<Integer>, bool> = true>
-	constexpr double pow(Integer base, Integer exp)
+	template <typename Integer, std::enable_if_t<!std::is_floating_point_v<Integer>, bool> = true> constexpr double pow(Integer base, Integer exp)
 	{
 		// TODO: Add integer specific optimization with exponentiation of a square
 		return ccm::pow<double>(static_cast<double>(base), static_cast<double>(exp));

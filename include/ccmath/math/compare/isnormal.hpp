@@ -23,11 +23,15 @@ namespace ccm
 	 * @param num A floating-point or integer value
 	 * @return true if the number has a normal value, false otherwise.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr bool isnormal(T num) noexcept
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr bool isnormal(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_isnormal<T>) { return ccm::builtin::isnormal(num); }
-		else { return num != static_cast<T>(0) && !ccm::isnan(num) && !ccm::isinf(num) && ccm::abs(num) >= std::numeric_limits<T>::min(); }
+		if constexpr (ccm::builtin::has_constexpr_isnormal<T>)
+		{
+			return ccm::builtin::isnormal_ct(num);
+		} else
+		{
+			return num != static_cast<T>(0) && !ccm::isnan(num) && !ccm::isinf(num) && ccm::abs(num) >= std::numeric_limits<T>::min();
+		}
 	}
 
 	/**
@@ -36,8 +40,7 @@ namespace ccm
 	 * @param num A integer value to check.
 	 * @return true if the number has a normal value, false otherwise.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr bool isnormal(Integer num) noexcept
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr bool isnormal(Integer num) noexcept
 	{
 		return num != static_cast<Integer>(0);
 	}

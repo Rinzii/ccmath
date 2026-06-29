@@ -10,12 +10,9 @@
 
 #pragma once
 
-#include "ccmath/internal/math/generic/builtins/basic/remainder.hpp"
 #include "ccmath/internal/math/runtime/func/basic/remainder_rt.hpp"
-#include "ccmath/internal/predef/unlikely.hpp"
-#include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
-#include "ccmath/math/nearest/trunc.hpp"
+#include "ccmath/math/basic/remquo.hpp"
 
 namespace ccm
 {
@@ -25,30 +22,22 @@ namespace ccm
 	 * @param x Dividend.
 	 * @param y Divisor.
 	 * @return The remainder of the division of x by y.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/remainder
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T remainder(T x, T y)
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T remainder(T x, T y)
 	{
-		if (!ccm::support::is_constant_evaluated()) { return ccm::rt::remainder_rt(x, y); }
-
-		using FPBits_t = typename ccm::support::fp::FPBits<T>;
-		const FPBits_t x_bits(x);
-		const FPBits_t y_bits(y);
-
-		const bool x_is_nan = x_bits.is_nan();
-		const bool y_is_nan = y_bits.is_nan();
-
-		// If x is ±∞ and y is not NaN, NaN is returned.
-		// If y is ±0 and x is not NaN, NaN is returned.
-		// If either argument is NaN, NaN is returned.
-		if (CCM_UNLIKELY((x_bits.is_inf() && !y_is_nan) || (y_bits.is_zero() && !x_is_nan) || (x_is_nan || y_is_nan)))
+		if (!ccm::support::is_constant_evaluated())
 		{
-			// All major compilers return -NaN.
-			return -std::numeric_limits<T>::quiet_NaN();
+			return ccm::rt::remainder_rt(x, y);
 		}
 
-		return static_cast<T>(x - (ccm::trunc<T>(x / y) * y));
+		// remainder is the remainder component of remquo, so reuse the exact iterative reduction
+		// already implemented there. The quotient rounds to nearest, ties-to-even, which keeps the
+		// result in the closed interval from -abs(y) / 2 to +abs(y) / 2. The result is an exact
+		// subtraction, so it does not depend on the active rounding mode, and the remquo kernel also
+		// covers the special cases (remainder of a finite value by an infinity is that finite value,
+		// and NaN is returned for an infinite dividend, a zero divisor, or a NaN argument).
+		int quotient = 0;
+		return ccm::remquo<T>(x, y, &quotient);
 	}
 
 	/**
@@ -57,10 +46,8 @@ namespace ccm
 	 * @param x Dividend.
 	 * @param y Divisor.
 	 * @return The remainder of the division of x by y as a double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/remainder
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double remainder(Integer x, Integer y)
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double remainder(Integer x, Integer y)
 	{
 		return ccm::remainder<double>(static_cast<double>(x), static_cast<double>(y));
 	}
@@ -70,7 +57,6 @@ namespace ccm
 	 * @param x Dividend.
 	 * @param y Divisor.
 	 * @return The remainder of the division of x by y.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/remainder
 	 */
 	constexpr float remainderf(float x, float y)
 	{
@@ -82,7 +68,6 @@ namespace ccm
 	 * @param x Dividend.
 	 * @param y Divisor.
 	 * @return The remainder of the division of x by y.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/remainder
 	 */
 	constexpr long double remainderl(long double x, long double y)
 	{

@@ -50,7 +50,10 @@ namespace ccm::internal
 			if (CCM_UNLIKELY(intX - low < high - low))
 			{
 				// Handle the case where x is exactly 1.0
-				if (CCM_UNLIKELY(intX == ccm::support::double_to_uint64(1.0))) { return 0.0; }
+				if (CCM_UNLIKELY(intX == ccm::support::double_to_uint64(1.0)))
+				{
+					return 0.0;
+				}
 
 				const ccm::double_t rem		 = x - 1.0;
 				const ccm::double_t remHi	 = support::uint64_to_double(support::double_to_uint64(rem) & -1ULL << 32);
@@ -82,7 +85,7 @@ namespace ccm::internal
 				intX -= 52ULL << 52;
 			}
 
-			// x = 2^expo normVal; where normVal is in range [k_logTableOff_dbl, 2 * k_logTableOff_dbl) and exact.
+			// x = 2^expo normVal. normVal is in range [k_logTableOff_dbl, 2 * k_logTableOff_dbl) and exact.
 			//  The range is split into N sub-intervals.
 			// The ith sub-interval contains normVal and c is near its center.
 			const std::uint64_t tmp = intX - k_log2TableOff_dbl;
@@ -120,7 +123,7 @@ namespace ccm::internal
 			const ccm::double_t polynomialTerm = log2_poly_values_dbl[0] + rem * log2_poly_values_dbl[1] +
 												 remSqr * (log2_poly_values_dbl[2] + rem * log2_poly_values_dbl[3]) +
 												 remQuad * (log2_poly_values_dbl[4] + rem * log2_poly_values_dbl[5]);
-			result = lowPart + remSqr * polynomialTerm + highPart;
+			result							   = lowPart + remSqr * polynomialTerm + highPart;
 
 			return result;
 		}
