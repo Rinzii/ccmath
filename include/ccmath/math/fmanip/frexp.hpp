@@ -25,46 +25,56 @@ namespace ccm
 	 * @param x Floating-point value to decompose.
 	 * @param exp Pointer that receives the extracted exponent.
 	 * @return Normalized fraction in the range [-1, -0.5) or [0.5, 1), or zero when x is zero.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/frexp
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T frexp(T x, int * exp)
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T frexp(T x, int * exp)
 	{
-		if constexpr (ccm::builtin::has_constexpr_frexp<T>) { return ccm::builtin::frexp_ct(x, exp); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_frexp<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::gen::frexp_gen(x, *exp); }
+			return ccm::builtin::frexp_ct(x, exp);
+		} else
+		{
+			if (ccm::support::is_constant_evaluated())
+			{
+				return ccm::gen::frexp_gen(x, *exp);
+			}
 			return ccm::rt::frexp_rt(x, *exp);
 		}
 	}
 
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T frexp(T x, int & exp)
-	{ return ccm::frexp(x, &exp); }
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T frexp(T x, int & exp)
+	{
+		return ccm::frexp(x, &exp);
+	}
 
 	/**
 	 * @brief Decomposes a float into a normalized fraction and a base-2 exponent.
 	 * @param x Floating-point value to decompose.
 	 * @param exp Pointer that receives the extracted exponent.
 	 * @return Normalized fraction for x.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/frexp
 	 */
 	constexpr float frexpf(float x, int * exp)
-	{ return ccm::frexp(x, exp); }
+	{
+		return ccm::frexp(x, exp);
+	}
 
 	constexpr float frexpf(float x, int & exp)
-	{ return ccm::frexpf(x, &exp); }
+	{
+		return ccm::frexpf(x, &exp);
+	}
 
 	/**
 	 * @brief Decomposes a long double into a normalized fraction and a base-2 exponent.
 	 * @param x Floating-point value to decompose.
 	 * @param exp Pointer that receives the extracted exponent.
 	 * @return Normalized fraction for x.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/frexp
 	 */
 	constexpr long double frexpl(long double x, int * exp)
-	{ return ccm::frexp(x, exp); }
+	{
+		return ccm::frexp(x, exp);
+	}
 
 	constexpr long double frexpl(long double x, int & exp)
-	{ return ccm::frexpl(x, &exp); }
+	{
+		return ccm::frexpl(x, &exp);
+	}
 } // namespace ccm

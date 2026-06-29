@@ -20,9 +20,9 @@ namespace
 {
 	using FPBits = ccm::support::fp::FPBits<float>;
 
-	constexpr ccm::support::fp::ExceptValues<float, 1> kFloatExcepts{ {
+	constexpr ccm::support::fp::ExceptValues<float, 1> kFloatExcepts{ { {
 		{ 0x3f800000U, 0x3f000000U, 0U, 0U, 0U },
-	} };
+	} } };
 } // namespace
 
 TEST(CcmathInternalTypesTests, NormalizedFloatMul2MatchesLdexp)
@@ -46,7 +46,9 @@ TEST(CcmathInternalSupportTests, ExceptValuesLookupTowardZero)
 }
 
 TEST(CcmathInternalSupportTests, ExceptValuesLookupMissReturnsNullopt)
-{ EXPECT_FALSE(kFloatExcepts.lookup(0x40000000U).has_value()); }
+{
+	EXPECT_FALSE(kFloatExcepts.lookup(0x40000000U).has_value());
+}
 
 TEST(CcmathInternalTypesTests, DyadicFloatRoundedDivNearOne)
 {

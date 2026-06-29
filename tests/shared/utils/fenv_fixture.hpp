@@ -28,15 +28,15 @@ namespace ccm::test
 
 	inline constexpr std::array<int, 4> kStdRoundingModes = { FE_TONEAREST, FE_UPWARD, FE_DOWNWARD, FE_TOWARDZERO };
 
-	inline constexpr const char *RoundingModeName(int rounding_mode)
+	inline constexpr const char * RoundingModeName(int rounding_mode)
 	{
 		switch (rounding_mode)
 		{
-		case FE_TONEAREST: return "FE_TONEAREST";
-		case FE_UPWARD: return "FE_UPWARD";
-		case FE_DOWNWARD: return "FE_DOWNWARD";
+		case FE_TONEAREST : return "FE_TONEAREST";
+		case FE_UPWARD	  : return "FE_UPWARD";
+		case FE_DOWNWARD  : return "FE_DOWNWARD";
 		case FE_TOWARDZERO: return "FE_TOWARDZERO";
-		default: return "unknown";
+		default			  : return "unknown";
 		}
 	}
 
@@ -44,16 +44,19 @@ namespace ccm::test
 	{
 		switch (rounding_mode)
 		{
-		case FE_UPWARD: return RoundingModeKind::Upward;
-		case FE_DOWNWARD: return RoundingModeKind::Downward;
+		case FE_UPWARD	  : return RoundingModeKind::Upward;
+		case FE_DOWNWARD  : return RoundingModeKind::Downward;
 		case FE_TOWARDZERO: return RoundingModeKind::TowardZero;
-		default: return RoundingModeKind::Nearest;
+		default			  : return RoundingModeKind::Nearest;
 		}
 	}
 
 	inline bool TrySetRoundingMode(int rounding_mode)
 	{
-		if (std::fesetround(rounding_mode) != 0) { return false; }
+		if (std::fesetround(rounding_mode) != 0)
+		{
+			return false;
+		}
 		return std::fegetround() == rounding_mode;
 	}
 
@@ -77,15 +80,21 @@ namespace ccm::test
 	public:
 		explicit ScopedRoundingMode(int rounding_mode) : saved_(std::fegetround()), active_(TrySetRoundingMode(rounding_mode)) {}
 
-		ScopedRoundingMode(const ScopedRoundingMode &)			  = delete;
-		ScopedRoundingMode &operator=(const ScopedRoundingMode &) = delete;
+		ScopedRoundingMode(const ScopedRoundingMode &)			   = delete;
+		ScopedRoundingMode & operator=(const ScopedRoundingMode &) = delete;
 
 		~ScopedRoundingMode()
 		{
-			if (active_) { std::fesetround(saved_); }
+			if (active_)
+			{
+				std::fesetround(saved_);
+			}
 		}
 
-		[[nodiscard]] bool active() const { return active_; }
+		[[nodiscard]] bool active() const
+		{
+			return active_;
+		}
 
 	private:
 		int saved_;
@@ -97,15 +106,21 @@ namespace ccm::test
 	public:
 		ScopedFenvEnvironment() : active_(std::fegetenv(&saved_) == 0) {}
 
-		ScopedFenvEnvironment(const ScopedFenvEnvironment &)			= delete;
-		ScopedFenvEnvironment &operator=(const ScopedFenvEnvironment &) = delete;
+		ScopedFenvEnvironment(const ScopedFenvEnvironment &)			 = delete;
+		ScopedFenvEnvironment & operator=(const ScopedFenvEnvironment &) = delete;
 
 		~ScopedFenvEnvironment()
 		{
-			if (active_) { std::fesetenv(&saved_); }
+			if (active_)
+			{
+				std::fesetenv(&saved_);
+			}
 		}
 
-		[[nodiscard]] bool active() const { return active_; }
+		[[nodiscard]] bool active() const
+		{
+			return active_;
+		}
 
 	private:
 		std::fenv_t saved_{};
@@ -113,10 +128,14 @@ namespace ccm::test
 	};
 
 	inline bool ClearFenvExceptions()
-	{ return std::feclearexcept(FE_ALL_EXCEPT) == 0; }
+	{
+		return std::feclearexcept(FE_ALL_EXCEPT) == 0;
+	}
 
 	inline int CurrentFenvExceptions()
-	{ return std::fetestexcept(FE_ALL_EXCEPT); }
+	{
+		return std::fetestexcept(FE_ALL_EXCEPT);
+	}
 
 	/// LLVM-libc-style RAII wrapper. Restores the previous mode on destruction.
 	class ForceRoundingMode
@@ -124,16 +143,21 @@ namespace ccm::test
 	public:
 		explicit ForceRoundingMode(int rounding_mode) : scope_(rounding_mode) {}
 
-		[[nodiscard]] bool succeeded() const { return scope_.active(); }
+		[[nodiscard]] bool succeeded() const
+		{
+			return scope_.active();
+		}
 
-		explicit operator bool() const { return scope_.active(); }
+		explicit operator bool() const
+		{
+			return scope_.active();
+		}
 
 	private:
 		ScopedRoundingMode scope_;
 	};
 
-	template <typename Fn>
-	void ForEachRoundingMode(Fn &&fn)
+	template <typename Fn> void ForEachRoundingMode(Fn && fn)
 	{
 		for (int mode : kStdRoundingModes)
 		{
@@ -148,10 +172,12 @@ namespace ccm::test
 		}
 	}
 
-	template <typename Fn>
-	void ForEachRoundingModeOrSkip(Fn &&fn)
+	template <typename Fn> void ForEachRoundingModeOrSkip(Fn && fn)
 	{
-		if (!FenvIsSupported()) { GTEST_SKIP() << "floating-point rounding modes are not supported on this platform"; }
+		if (!FenvIsSupported())
+		{
+			GTEST_SKIP() << "floating-point rounding modes are not supported on this platform";
+		}
 		ForEachRoundingMode(std::forward<Fn>(fn));
 	}
 

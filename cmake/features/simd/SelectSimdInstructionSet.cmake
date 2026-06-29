@@ -31,7 +31,7 @@ endif ()
 include(CheckCXXSourceCompiles)
 
 # Probe whether the compiler accepts ${_flag} and can compile ${_src}. A flag of
-# NONE means "no extra flag" (used for baseline rungs; an empty string cannot be
+# NONE means "no extra flag" (used for baseline rungs, an empty string cannot be
 # carried as a list element).
 function(_ccmath_probe_isa _flag _src _resultvar)
     set(_saved "${CMAKE_REQUIRED_FLAGS}")
@@ -66,7 +66,7 @@ int main() { float32x4_t v = vdupq_n_f32(1.0f); v = vaddq_f32(v, v); return (int
 ]=])
 
 # Build the rung ladder (low -> high) for this architecture and compiler. Only
-# the rung names and flags are kept as lists; the source snippets contain
+# the rung names and flags are kept as lists. The source snippets contain
 # semicolons and must never be stored as list elements (they are looked up by
 # name as _src_<name> instead).
 set(_names "")
@@ -74,7 +74,7 @@ set(_flags "")
 
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64|i[3-6]86|x86)$")
     if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-        # MSVC: SSE2 is the x64 baseline (no flag); no SSE4 arch switch exists.
+        # MSVC: SSE2 is the x64 baseline (no flag), and no SSE4 arch switch exists.
         set(_names SSE2 AVX AVX2)
         set(_flags NONE "/arch:AVX" "/arch:AVX2")
     else ()
@@ -86,7 +86,7 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64|i[3-6]86|x86)$")
         set(_flags "-march=x86-64" "-march=x86-64-v2" "-march=x86-64-v3")
     endif ()
 elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|ARM64)$")
-    # NEON is the mandatory AArch64 baseline; SVE is intentionally out of scope.
+    # NEON is the mandatory AArch64 baseline. SVE is intentionally out of scope.
     set(_names NEON)
     set(_flags NONE)
 else ()

@@ -7,7 +7,7 @@ Publish-quality comparisons of CCMath against other constexpr math libraries. Ph
 ```bash
 ./showcase/run build    # configure + build (CLion preset when available)
 ./showcase/run doctor   # verify binaries
-./showcase/run all      # full suite → showcase/reports/
+./showcase/run all      # full suite, reports in showcase/reports/
 ```
 
 Run `./showcase/run help` for every command.
@@ -28,13 +28,13 @@ See `showcase/item/README.md` for the full configuration list.
 
 ## CCMath paths under test
 
-| Path | What it measures |
-|------|------------------|
-| `ccmath/public_default` | Production entry point (`ccm::sqrt`, `ccm::sin`) |
-| `ccmath/generic_gen` | Generic kernel (`ccm::gen::sqrt_gen`, `ccm::gen::sin_gen`) |
-| `ccmath/runtime_rt` | Runtime dispatcher (`ccm::rt::sqrt_rt`, `ccm::rt::sin_rt`) |
-| `ccmath/runtime_simd` | SIMD fast path when compiled in |
-| `ccmath/runtime_builtin` | Direct compiler builtin when available |
+| Path                     | What it measures                                           |
+|--------------------------|------------------------------------------------------------|
+| `ccmath/public_default`  | Production entry point (`ccm::sqrt`, `ccm::sin`)           |
+| `ccmath/generic_gen`     | Generic kernel (`ccm::gen::sqrt_gen`, `ccm::gen::sin_gen`) |
+| `ccmath/runtime_rt`      | Runtime dispatcher (`ccm::rt::sqrt_rt`, `ccm::rt::sin_rt`) |
+| `ccmath/runtime_simd`    | SIMD fast path when compiled in                            |
+| `ccmath/runtime_builtin` | Direct compiler builtin when available                     |
 
 External backends in Phase 1: **GCEM** (accuracy + perf + compile), **std** (perf only).
 
@@ -48,10 +48,10 @@ The generic_gen path calls the raw generic kernel directly. For sin this bypasse
 
 ## CMake presets
 
-| Preset | Use |
-|--------|-----|
+| Preset                         | Use                                         |
+|--------------------------------|---------------------------------------------|
 | `clion-clang-release-showcase` | CLion (single-config, `out/clang-showcase`) |
-| `ninja-clang-release-showcase` | Terminal / CI-style (multi-config Release) |
+| `ninja-clang-release-showcase` | Terminal / CI-style (multi-config Release)  |
 
 ```bash
 cmake --preset clion-clang-release-showcase
@@ -64,10 +64,10 @@ Or use `./showcase/run build`, which picks the CLion preset when present.
 
 Output lands under `showcase/reports/` (gitignored):
 
-- `perf/` — Google Benchmark JSON
-- `accuracy/` — per-path failure logs
-- `compile/` — probe timings and object sizes
-- `summary.json` — merged suite output
+- `perf/`: Google Benchmark JSON
+- `accuracy/`: per-path failure logs
+- `compile/`: probe timings and object sizes
+- `summary.json`: merged suite output
 
 ## Fairness notes
 

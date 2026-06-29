@@ -21,7 +21,9 @@ namespace
 	constexpr bool kNoFpExceptions = false;
 
 	double to_double(const Float128 & value)
-	{ return value.template as<double, kNoFpExceptions>(); }
+	{
+		return value.template as<double, kNoFpExceptions>();
+	}
 } // namespace
 
 TEST(CcmathInternalTypesTests, DyadicFloatQuickSubAndNegation)

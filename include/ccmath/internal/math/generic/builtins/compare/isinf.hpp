@@ -31,7 +31,7 @@
 #endif
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_ISINF
-	#if defined(__clang__) && (__clang_major__ > 5 || (__clang_major__ == 5 && __clang_minor__ >= 0)) && !defined(__MSC_VER) && !defined(__INTEL_LLVM_COMPILER)
+	#if defined(__clang__) && (__clang_major__ > 5 || (__clang_major__ == 5 && __clang_minor__ >= 0)) && !defined(_MSC_VER) && !defined(__INTEL_LLVM_COMPILER)
 		#define CCMATH_HAS_CONSTEXPR_BUILTIN_ISINF
 	#endif
 #endif
@@ -94,13 +94,15 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_isinf functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto isinf_ct(T x) -> std::enable_if_t<has_constexpr_isinf<T>, bool>
-	{ return __builtin_isinf(x); }
+	template <typename T> constexpr auto isinf_ct(T x) -> std::enable_if_t<has_constexpr_isinf<T>, bool>
+	{
+		return __builtin_isinf(x);
+	}
 
-	template <typename T>
-	auto isinf_rt(T x) -> std::enable_if_t<has_runtime_isinf<T>, bool>
-	{ return __builtin_isinf(x); }
+	template <typename T> auto isinf_rt(T x) -> std::enable_if_t<has_runtime_isinf<T>, bool>
+	{
+		return __builtin_isinf(x);
+	}
 } // namespace ccm::builtin
 
 // Cleanup the global namespace

@@ -17,24 +17,30 @@
 
 namespace ccm
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T nexttoward(T from, long double to) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T nexttoward(T from, long double to) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_nexttoward<T>) { return ccm::builtin::nexttoward_ct(from, to); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_nexttoward<T>)
+		{
+			return ccm::builtin::nexttoward_ct(from, to);
+		} else
 		{
 			return gen::nextafter_gen(from, to);
 		}
 	}
 
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double nexttoward(Integer from, long double to) noexcept
-	{ return gen::nextafter_gen(from, to); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double nexttoward(Integer from, long double to) noexcept
+	{
+		return gen::nextafter_gen(from, to);
+	}
 
 	constexpr float nexttowardf(float from, long double to) noexcept
-	{ return gen::nextafter_gen(from, to); }
+	{
+		return gen::nextafter_gen(from, to);
+	}
 
 	constexpr long double nexttowardl(long double from, long double to) noexcept
-	{ return gen::nextafter_gen(from, to); }
+	{
+		return gen::nextafter_gen(from, to);
+	}
 
 } // namespace ccm

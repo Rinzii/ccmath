@@ -25,21 +25,27 @@ namespace ccm
 	 * @param mag A floating-point or integer value
 	 * @param sgn A floating-point or integer value
 	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/copysign
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T copysign(T mag, T sgn)
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T copysign(T mag, T sgn)
 	{
-		if constexpr (ccm::builtin::has_constexpr_copysign<T>) { return ccm::builtin::copysign_ct(mag, sgn); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_copysign<T>)
+		{
+			return ccm::builtin::copysign_ct(mag, sgn);
+		} else
 		{
 			if (ccm::isnan(mag) || ccm::isnan(sgn))
 			{
-				if (ccm::signbit(sgn)) { return -std::numeric_limits<T>::quiet_NaN(); }
+				if (ccm::signbit(sgn))
+				{
+					return -std::numeric_limits<T>::quiet_NaN();
+				}
 				return std::numeric_limits<T>::quiet_NaN();
 			}
 
-			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::copysign_rt(mag, sgn); }
+			if (!ccm::support::is_constant_evaluated())
+			{
+				return ccm::rt::copysign_rt(mag, sgn);
+			}
 
 			T sign_bit = ccm::signbit(sgn) ? T(-1) : T(1);
 			return ccm::abs(mag) * sign_bit;
@@ -52,29 +58,31 @@ namespace ccm
 	 * @param mag A integer value
 	 * @param sgn A integer value
 	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/copysign
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double copysign(Integer mag, Integer sgn)
-	{ return ccm::copysign<double>(static_cast<double>(mag), static_cast<double>(sgn)); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double copysign(Integer mag, Integer sgn)
+	{
+		return ccm::copysign<double>(static_cast<double>(mag), static_cast<double>(sgn));
+	}
 
 	/**
 	 * @brief Copies the sign of a floating point value.
 	 * @param mag A floating-point.
 	 * @param sgn A floating-point.
 	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/copysign
 	 */
 	constexpr float copysignf(float mag, float sgn)
-	{ return ccm::copysign<float>(mag, sgn); }
+	{
+		return ccm::copysign<float>(mag, sgn);
+	}
 
 	/**
 	 * @brief Copies the sign of a floating point value.
 	 * @param mag A floating-point.
 	 * @param sgn A floating-point.
 	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/copysign
 	 */
 	constexpr long double copysignl(long double mag, long double sgn)
-	{ return ccm::copysign<long double>(mag, sgn); }
+	{
+		return ccm::copysign<long double>(mag, sgn);
+	}
 } // namespace ccm

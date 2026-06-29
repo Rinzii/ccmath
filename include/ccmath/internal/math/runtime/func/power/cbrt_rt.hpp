@@ -18,11 +18,12 @@
 
 namespace ccm::rt
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T cbrt_rt(T num) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T cbrt_rt(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_runtime_cbrt<T>) { return ccm::builtin::cbrt_rt(num); }
-		else
+		if constexpr (ccm::builtin::has_runtime_cbrt<T>)
+		{
+			return ccm::builtin::cbrt_rt(num);
+		} else
 		{
 			const auto scalar = [](T value) { return gen::cbrt_gen(value); };
 			return simd_impl::unary_via_scalar_abi(num, scalar);

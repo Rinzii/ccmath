@@ -16,8 +16,12 @@
 namespace ccm::internal
 {
 	constexpr float expm1_float(float num) noexcept
-	{ return impl::expm1_float_impl(num); }
+	{
+		return impl::expm1_float_impl(num);
+	}
 
 	constexpr double expm1_double(double num) noexcept
-	{ return impl::expm1_double_impl(num); }
+	{
+		return impl::expm1_double_impl(num);
+	}
 } // namespace ccm::internal

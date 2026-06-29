@@ -41,10 +41,16 @@ namespace ccm::internal
 			y_i32 &= 0x7fffffff;
 
 			// If y is zero.
-			if (CCM_UNLIKELY(y_i32 == 0)) { return (x * y) / (x * y); }
+			if (CCM_UNLIKELY(y_i32 == 0))
+			{
+				return (x * y) / (x * y);
+			}
 
 			// If x is not finite or y is NaN.
-			if (CCM_UNLIKELY(x_i32 >= 0x7f800000 || y_i32 > 0x7f800000)) { return (x * y) / (x * y); } // NOLINT(readability-simplify-boolean-expr)
+			if (CCM_UNLIKELY(x_i32 >= 0x7f800000 || y_i32 > 0x7f800000))
+			{
+				return (x * y) / (x * y);
+			} // NOLINT(readability-simplify-boolean-expr)
 
 			if (y_i32 <= 0x7dffffff)
 			{
@@ -83,8 +89,7 @@ namespace ccm::internal
 						++computed_quotient;
 					}
 				}
-			}
-			else
+			} else
 			{
 				const float y_half = 0.5F * y;
 				if (x > y_half)
@@ -101,13 +106,21 @@ namespace ccm::internal
 			*quo = quotient_sign != 0 ? -computed_quotient : computed_quotient;
 
 			// Make sure that the correct sign of zero results in round down mode.
-			if (x == 0.0F) { x = 0.0F; }
-			if (x_sign != 0U) { x = -x; }
+			if (x == 0.0F)
+			{
+				x = 0.0F;
+			}
+			if (x_sign != 0U)
+			{
+				x = -x;
+			}
 
 			return x;
 		}
 	} // namespace impl
 
 	constexpr float remquo_float(float x, float y, int * quo) noexcept
-	{ return impl::remquo_float_impl(x, y, quo); }
+	{
+		return impl::remquo_float_impl(x, y, quo);
+	}
 } // namespace ccm::internal

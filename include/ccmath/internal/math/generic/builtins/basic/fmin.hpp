@@ -29,8 +29,7 @@
 #endif
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_FMIN
-	#if defined(__clang__) && (__clang_major__ > 16 || (__clang_major__ == 16 && __clang_minor__ >= 0)) && !defined(__MSC_VER) &&                              \
-		!defined(__INTEL_LLVM_COMPILER)
+	#if defined(__clang__) && (__clang_major__ > 16 || (__clang_major__ == 16 && __clang_minor__ >= 0)) && !defined(_MSC_VER) && !defined(__INTEL_LLVM_COMPILER)
 		#define CCMATH_HAS_CONSTEXPR_BUILTIN_FMIN
 	#endif
 #endif
@@ -87,13 +86,18 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_fmin functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto fmin_ct(T x, T y) -> std::enable_if_t<has_constexpr_fmin<T>, T>
+	template <typename T> constexpr auto fmin_ct(T x, T y) -> std::enable_if_t<has_constexpr_fmin<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_fminf(x, y); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_fmin(x, y); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fminl(x, y); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_fminf(x, y);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_fmin(x, y);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_fminl(x, y);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for fmin");
@@ -101,13 +105,18 @@ namespace ccm::builtin
 		}
 	}
 
-	template <typename T>
-	auto fmin_rt(T x, T y) -> std::enable_if_t<has_runtime_fmin<T>, T>
+	template <typename T> auto fmin_rt(T x, T y) -> std::enable_if_t<has_runtime_fmin<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_fminf(x, y); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_fmin(x, y); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_fminl(x, y); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_fminf(x, y);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_fmin(x, y);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_fminl(x, y);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for fmin");

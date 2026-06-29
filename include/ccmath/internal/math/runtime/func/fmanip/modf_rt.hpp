@@ -16,7 +16,8 @@
 
 namespace ccm::rt
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T modf_rt(T num, T & iptr) noexcept
-	{ return internal::impl::modf_impl(num, &iptr); }
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T modf_rt(T num, T & iptr) noexcept
+	{
+		return internal::impl::modf_impl(num, &iptr);
+	}
 } // namespace ccm::rt

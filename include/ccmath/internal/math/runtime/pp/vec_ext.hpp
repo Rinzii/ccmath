@@ -29,7 +29,7 @@
 // Compilers that support the GNU/Clang vector extensions: GCC, Clang, Intel's
 // modern oneAPI compiler (ICX, defines __clang__), and the NVIDIA HPC compiler
 // (nvc++, defines __GNUC__). They are listed explicitly for clarity even though
-// ICX/nvc++ already imply __clang__/__GNUC__. Anything else (notably MSVC cl.exe)
+// ICX/nvc++ already imply __clang__/__GNUC__. Anything else (in particular MSVC cl.exe)
 // takes the intrinsic backend or the scalar array fallback.
 #if !defined(CCM_PP_FORCE_ARRAY_BACKEND) && !defined(CCM_PP_FORCE_PORTABLE) && !defined(CCM_PP_FORCE_MSVC_INTRIN) &&                                           \
 	(defined(__clang__) || defined(__GNUC__) || defined(__INTEL_LLVM_COMPILER) || defined(__NVCOMPILER))
@@ -67,17 +67,14 @@ namespace ccm::pp
 	namespace detail
 	{
 		// A native vector of M elements of type U.
-		template <typename U, int M>
-		struct vec_builtin
+		template <typename U, int M> struct vec_builtin
 		{
 			typedef U type __attribute__((__vector_size__(sizeof(U) * M)));
 		};
-		template <typename U, int M>
-		using vec_builtin_t = typename vec_builtin<U, M>::type;
+		template <typename U, int M> using vec_builtin_t = typename vec_builtin<U, M>::type;
 	} // namespace detail
 
-	template <typename T, detail::SimdSizeType N>
-	struct SimdTraits<T, VecAbi<N>>
+	template <typename T, detail::SimdSizeType N> struct SimdTraits<T, VecAbi<N>>
 	{
 		using value_type						   = T;
 		using MaskInt							   = detail::mask_integer_from<sizeof(T)>;
@@ -93,8 +90,14 @@ namespace ccm::pp
 			detail::unroll<N>([&](auto i) { r[i] = v; });
 			return r;
 		}
-		CCM_ALWAYS_INLINE static T get(SimdMember const & m, detail::SimdSizeType i) { return m[i]; }
-		CCM_ALWAYS_INLINE static void set(SimdMember & m, detail::SimdSizeType i, T v) { m[i] = v; }
+		CCM_ALWAYS_INLINE static T get(SimdMember const & m, detail::SimdSizeType i)
+		{
+			return m[i];
+		}
+		CCM_ALWAYS_INLINE static void set(SimdMember & m, detail::SimdSizeType i, T v)
+		{
+			m[i] = v;
+		}
 		// A single (unaligned) vector move rather than a per-lane loop.
 		CCM_ALWAYS_INLINE static SimdMember load(T const * p)
 		{
@@ -102,23 +105,59 @@ namespace ccm::pp
 			std::memcpy(&r, p, sizeof(r));
 			return r;
 		}
-		CCM_ALWAYS_INLINE static void store(SimdMember const & m, T * p) { std::memcpy(p, &m, sizeof(m)); }
+		CCM_ALWAYS_INLINE static void store(SimdMember const & m, T * p)
+		{
+			std::memcpy(p, &m, sizeof(m));
+		}
 
-		CCM_ALWAYS_INLINE static SimdMember add(SimdMember a, SimdMember b) { return a + b; }
-		CCM_ALWAYS_INLINE static SimdMember sub(SimdMember a, SimdMember b) { return a - b; }
-		CCM_ALWAYS_INLINE static SimdMember mul(SimdMember a, SimdMember b) { return a * b; }
-		CCM_ALWAYS_INLINE static SimdMember div(SimdMember a, SimdMember b) { return a / b; }
-		CCM_ALWAYS_INLINE static SimdMember negate(SimdMember a) { return -a; }
+		CCM_ALWAYS_INLINE static SimdMember add(SimdMember a, SimdMember b)
+		{
+			return a + b;
+		}
+		CCM_ALWAYS_INLINE static SimdMember sub(SimdMember a, SimdMember b)
+		{
+			return a - b;
+		}
+		CCM_ALWAYS_INLINE static SimdMember mul(SimdMember a, SimdMember b)
+		{
+			return a * b;
+		}
+		CCM_ALWAYS_INLINE static SimdMember div(SimdMember a, SimdMember b)
+		{
+			return a / b;
+		}
+		CCM_ALWAYS_INLINE static SimdMember negate(SimdMember a)
+		{
+			return -a;
+		}
 
 		// A same-size vector comparison yields a vector of the matching signed
-		// integer with all-ones / zero lanes; the cast reinterprets it as our
+		// integer with all-ones / zero lanes. The cast reinterprets it as our
 		// canonical MaskMember type.
-		CCM_ALWAYS_INLINE static MaskMember eq(SimdMember a, SimdMember b) { return reinterpret_mask(a == b); }
-		CCM_ALWAYS_INLINE static MaskMember ne(SimdMember a, SimdMember b) { return reinterpret_mask(a != b); }
-		CCM_ALWAYS_INLINE static MaskMember lt(SimdMember a, SimdMember b) { return reinterpret_mask(a < b); }
-		CCM_ALWAYS_INLINE static MaskMember le(SimdMember a, SimdMember b) { return reinterpret_mask(a <= b); }
-		CCM_ALWAYS_INLINE static MaskMember gt(SimdMember a, SimdMember b) { return reinterpret_mask(a > b); }
-		CCM_ALWAYS_INLINE static MaskMember ge(SimdMember a, SimdMember b) { return reinterpret_mask(a >= b); }
+		CCM_ALWAYS_INLINE static MaskMember eq(SimdMember a, SimdMember b)
+		{
+			return reinterpret_mask(a == b);
+		}
+		CCM_ALWAYS_INLINE static MaskMember ne(SimdMember a, SimdMember b)
+		{
+			return reinterpret_mask(a != b);
+		}
+		CCM_ALWAYS_INLINE static MaskMember lt(SimdMember a, SimdMember b)
+		{
+			return reinterpret_mask(a < b);
+		}
+		CCM_ALWAYS_INLINE static MaskMember le(SimdMember a, SimdMember b)
+		{
+			return reinterpret_mask(a <= b);
+		}
+		CCM_ALWAYS_INLINE static MaskMember gt(SimdMember a, SimdMember b)
+		{
+			return reinterpret_mask(a > b);
+		}
+		CCM_ALWAYS_INLINE static MaskMember ge(SimdMember a, SimdMember b)
+		{
+			return reinterpret_mask(a >= b);
+		}
 
 		CCM_ALWAYS_INLINE static MaskMember mbroadcast(bool b)
 		{
@@ -127,12 +166,30 @@ namespace ccm::pp
 			detail::unroll<N>([&](auto i) { r[i] = v; });
 			return r;
 		}
-		CCM_ALWAYS_INLINE static bool mget(MaskMember const & m, detail::SimdSizeType i) { return m[i] != 0; }
-		CCM_ALWAYS_INLINE static void mset(MaskMember & m, detail::SimdSizeType i, bool b) { m[i] = b ? static_cast<MaskInt>(-1) : MaskInt{ 0 }; }
-		CCM_ALWAYS_INLINE static MaskMember mand(MaskMember a, MaskMember b) { return a & b; }
-		CCM_ALWAYS_INLINE static MaskMember mor(MaskMember a, MaskMember b) { return a | b; }
-		CCM_ALWAYS_INLINE static MaskMember mxor(MaskMember a, MaskMember b) { return a ^ b; }
-		CCM_ALWAYS_INLINE static MaskMember mnot(MaskMember a) { return ~a; }
+		CCM_ALWAYS_INLINE static bool mget(MaskMember const & m, detail::SimdSizeType i)
+		{
+			return m[i] != 0;
+		}
+		CCM_ALWAYS_INLINE static void mset(MaskMember & m, detail::SimdSizeType i, bool b)
+		{
+			m[i] = b ? static_cast<MaskInt>(-1) : MaskInt{ 0 };
+		}
+		CCM_ALWAYS_INLINE static MaskMember mand(MaskMember a, MaskMember b)
+		{
+			return a & b;
+		}
+		CCM_ALWAYS_INLINE static MaskMember mor(MaskMember a, MaskMember b)
+		{
+			return a | b;
+		}
+		CCM_ALWAYS_INLINE static MaskMember mxor(MaskMember a, MaskMember b)
+		{
+			return a ^ b;
+		}
+		CCM_ALWAYS_INLINE static MaskMember mnot(MaskMember a)
+		{
+			return ~a;
+		}
 
 		// All lanes are 0 or -1, so a horizontal AND/OR collapses to a movemask test
 		// rather than a per-lane scalar chain.
@@ -175,17 +232,37 @@ namespace ccm::pp
 		}
 
 		// Integer-only operations (instantiated only when used, i.e. for integral T).
-		CCM_ALWAYS_INLINE static SimdMember mod(SimdMember a, SimdMember b) { return a % b; }
-		CCM_ALWAYS_INLINE static SimdMember band(SimdMember a, SimdMember b) { return a & b; }
-		CCM_ALWAYS_INLINE static SimdMember bor(SimdMember a, SimdMember b) { return a | b; }
-		CCM_ALWAYS_INLINE static SimdMember bxor(SimdMember a, SimdMember b) { return a ^ b; }
-		CCM_ALWAYS_INLINE static SimdMember bnot(SimdMember a) { return ~a; }
-		CCM_ALWAYS_INLINE static SimdMember shl(SimdMember a, SimdMember b) { return a << b; }
-		CCM_ALWAYS_INLINE static SimdMember shr(SimdMember a, SimdMember b) { return a >> b; }
+		CCM_ALWAYS_INLINE static SimdMember mod(SimdMember a, SimdMember b)
+		{
+			return a % b;
+		}
+		CCM_ALWAYS_INLINE static SimdMember band(SimdMember a, SimdMember b)
+		{
+			return a & b;
+		}
+		CCM_ALWAYS_INLINE static SimdMember bor(SimdMember a, SimdMember b)
+		{
+			return a | b;
+		}
+		CCM_ALWAYS_INLINE static SimdMember bxor(SimdMember a, SimdMember b)
+		{
+			return a ^ b;
+		}
+		CCM_ALWAYS_INLINE static SimdMember bnot(SimdMember a)
+		{
+			return ~a;
+		}
+		CCM_ALWAYS_INLINE static SimdMember shl(SimdMember a, SimdMember b)
+		{
+			return a << b;
+		}
+		CCM_ALWAYS_INLINE static SimdMember shr(SimdMember a, SimdMember b)
+		{
+			return a >> b;
+		}
 
 		// Lane-type conversion (value) and bit reinterpret (same total size).
-		template <typename U>
-		CCM_ALWAYS_INLINE static detail::vec_builtin_t<U, N> convert(SimdMember v)
+		template <typename U> CCM_ALWAYS_INLINE static detail::vec_builtin_t<U, N> convert(SimdMember v)
 		{
 	#if defined(__has_builtin) && __has_builtin(__builtin_convertvector)
 			return __builtin_convertvector(v, detail::vec_builtin_t<U, N>);
@@ -195,11 +272,12 @@ namespace ccm::pp
 			return r;
 	#endif
 		}
-		template <typename U>
-		CCM_ALWAYS_INLINE static detail::vec_builtin_t<U, N> bitcast(SimdMember v)
-		{ return reinterpret_cast<detail::vec_builtin_t<U, N>>(v); }
+		template <typename U> CCM_ALWAYS_INLINE static detail::vec_builtin_t<U, N> bitcast(SimdMember v)
+		{
+			return reinterpret_cast<detail::vec_builtin_t<U, N>>(v);
+		}
 
-		// Math primitives. Clang lowers these to packed instructions; GCC takes the
+		// Math primitives. Clang lowers these to packed instructions. GCC takes the
 		// per-lane fallback.
 		CCM_ALWAYS_INLINE static SimdMember op_sqrt(SimdMember v)
 		{
@@ -271,8 +349,14 @@ namespace ccm::pp
 			return r;
 	#endif
 		}
-		CCM_ALWAYS_INLINE static SimdMember op_min(SimdMember a, SimdMember b) { return select(lt(a, b), a, b); }
-		CCM_ALWAYS_INLINE static SimdMember op_max(SimdMember a, SimdMember b) { return select(lt(b, a), a, b); }
+		CCM_ALWAYS_INLINE static SimdMember op_min(SimdMember a, SimdMember b)
+		{
+			return select(lt(a, b), a, b);
+		}
+		CCM_ALWAYS_INLINE static SimdMember op_max(SimdMember a, SimdMember b)
+		{
+			return select(lt(b, a), a, b);
+		}
 
 		// Horizontal reductions.
 		CCM_ALWAYS_INLINE static T hadd(SimdMember v)
@@ -280,8 +364,10 @@ namespace ccm::pp
 			// __builtin_reduce_add is integer-only (float add is not associative);
 			// floats use the per-lane fold.
 	#if CCM_PP_HAS_RED(add)
-			if constexpr (std::is_integral<T>::value) { return __builtin_reduce_add(v); }
-			else
+			if constexpr (std::is_integral<T>::value)
+			{
+				return __builtin_reduce_add(v);
+			} else
 	#endif
 			{
 				T s = T(0);
@@ -312,13 +398,13 @@ namespace ccm::pp
 
 	private:
 		// Reinterpret an arbitrary same-size integer comparison vector as MaskMember.
-		template <typename Cmp>
-		CCM_ALWAYS_INLINE static MaskMember reinterpret_mask(Cmp c)
-		{ return reinterpret_cast<MaskMember>(c); }
+		template <typename Cmp> CCM_ALWAYS_INLINE static MaskMember reinterpret_mask(Cmp c)
+		{
+			return reinterpret_cast<MaskMember>(c);
+		}
 	};
 #else // CCM_PP_HAS_VECTOR_EXT == 0 : portable array fallback
-	template <typename T, detail::SimdSizeType N>
-	struct SimdTraits<T, VecAbi<N>>
+	template <typename T, detail::SimdSizeType N> struct SimdTraits<T, VecAbi<N>>
 	{
 		using value_type						   = T;
 		using MaskInt							   = detail::mask_integer_from<sizeof(T)>;
@@ -334,15 +420,24 @@ namespace ccm::pp
 			detail::unroll<N>([&](auto i) { r[i] = v; });
 			return r;
 		}
-		CCM_ALWAYS_INLINE static T get(SimdMember const & m, detail::SimdSizeType i) { return m[i]; }
-		CCM_ALWAYS_INLINE static void set(SimdMember & m, detail::SimdSizeType i, T v) { m[i] = v; }
+		CCM_ALWAYS_INLINE static T get(SimdMember const & m, detail::SimdSizeType i)
+		{
+			return m[i];
+		}
+		CCM_ALWAYS_INLINE static void set(SimdMember & m, detail::SimdSizeType i, T v)
+		{
+			m[i] = v;
+		}
 		CCM_ALWAYS_INLINE static SimdMember load(T const * p)
 		{
 			SimdMember r;
 			std::memcpy(r.data(), p, sizeof(r));
 			return r;
 		}
-		CCM_ALWAYS_INLINE static void store(SimdMember const & m, T * p) { std::memcpy(p, m.data(), sizeof(m)); }
+		CCM_ALWAYS_INLINE static void store(SimdMember const & m, T * p)
+		{
+			std::memcpy(p, m.data(), sizeof(m));
+		}
 
 	#define CCM_PP_ARRAY_BINOP(NAME, OP)                                                                                                                       \
 		CCM_ALWAYS_INLINE static SimdMember NAME(SimdMember a, SimdMember b)                                                                                   \
@@ -385,8 +480,14 @@ namespace ccm::pp
 			detail::unroll<N>([&](auto i) { r[i] = v; });
 			return r;
 		}
-		CCM_ALWAYS_INLINE static bool mget(MaskMember const & m, detail::SimdSizeType i) { return m[i] != 0; }
-		CCM_ALWAYS_INLINE static void mset(MaskMember & m, detail::SimdSizeType i, bool b) { m[i] = b ? static_cast<MaskInt>(-1) : MaskInt{ 0 }; }
+		CCM_ALWAYS_INLINE static bool mget(MaskMember const & m, detail::SimdSizeType i)
+		{
+			return m[i] != 0;
+		}
+		CCM_ALWAYS_INLINE static void mset(MaskMember & m, detail::SimdSizeType i, bool b)
+		{
+			m[i] = b ? static_cast<MaskInt>(-1) : MaskInt{ 0 };
+		}
 		CCM_ALWAYS_INLINE static MaskMember mand(MaskMember a, MaskMember b)
 		{
 			MaskMember r;
@@ -459,15 +560,13 @@ namespace ccm::pp
 			return r;
 		}
 
-		template <typename U>
-		CCM_ALWAYS_INLINE static std::array<U, static_cast<std::size_t>(N)> convert(SimdMember v)
+		template <typename U> CCM_ALWAYS_INLINE static std::array<U, static_cast<std::size_t>(N)> convert(SimdMember v)
 		{
 			std::array<U, static_cast<std::size_t>(N)> r;
 			detail::unroll<N>([&](auto i) { r[i] = static_cast<U>(v[i]); });
 			return r;
 		}
-		template <typename U>
-		CCM_ALWAYS_INLINE static std::array<U, static_cast<std::size_t>(N)> bitcast(SimdMember v)
+		template <typename U> CCM_ALWAYS_INLINE static std::array<U, static_cast<std::size_t>(N)> bitcast(SimdMember v)
 		{
 			std::array<U, static_cast<std::size_t>(N)> r;
 			std::memcpy(r.data(), v.data(), sizeof(r));

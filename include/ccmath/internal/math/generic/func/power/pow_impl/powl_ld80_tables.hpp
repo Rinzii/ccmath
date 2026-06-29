@@ -17,7 +17,7 @@
 
 #pragma once
 
-#if defined(CCM_TYPES_LONG_DOUBLE_IS_FLOAT80)
+#ifdef CCM_TYPES_LONG_DOUBLE_IS_FLOAT80
 
 	#include <array>
 

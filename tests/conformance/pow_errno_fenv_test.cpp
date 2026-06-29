@@ -26,18 +26,20 @@ namespace
 {
 	using ccm::test::runtime_value;
 
-	template <typename T>
-	void consume(T value)
+	template <typename T> void consume(T value)
 	{
-		volatile T sink = value;
-		(void)sink;
+		[[maybe_unused]] volatile T sink = value;
 	}
 
 	CCM_NEVER_INLINE double invoke_pow_gen(double base, double exp)
-	{ return ccm::gen::pow_gen(base, exp); }
+	{
+		return ccm::gen::pow_gen(base, exp);
+	}
 
 	CCM_NEVER_INLINE float invoke_powf_gen(float base, float exp)
-	{ return ccm::gen::pow_gen(base, exp); }
+	{
+		return ccm::gen::pow_gen(base, exp);
+	}
 } // namespace
 
 TEST(CcmathPowErrnoTests, GenericPowSetsErrnoWhenRuntimeErrnoIsEnabled)
@@ -118,7 +120,7 @@ TEST(CcmathPowFenvTests, GenericPowfBaseTwoCorrectlyRoundedAtRangeThresholdsAllM
 	constexpr float kMax	= std::numeric_limits<float>::max();
 	constexpr float kMinSub = std::numeric_limits<float>::denorm_min();
 
-	// 2^128 and 2^129 overflow; 2^-150 and below sit beneath the smallest subnormal 2^-149.
+	// 2^128 and 2^129 overflow. 2^-150 and below sit beneath the smallest subnormal 2^-149.
 	constexpr std::array<ThresholdCase, 5> kCases = { {
 		{ 128.0F, kInf, kInf, kMax, kMax },
 		{ 129.0F, kInf, kInf, kMax, kMax },
@@ -127,29 +129,27 @@ TEST(CcmathPowFenvTests, GenericPowfBaseTwoCorrectlyRoundedAtRangeThresholdsAllM
 		{ -152.0F, 0.0F, kMinSub, 0.0F, 0.0F },
 	} };
 
-	ccm::test::ForEachRoundingModeOrSkip(
-		[&](int mode)
+	ccm::test::ForEachRoundingModeOrSkip([&](int mode) {
+		for (const ThresholdCase & threshold : kCases)
 		{
-			for (const ThresholdCase& threshold : kCases)
+			SCOPED_TRACE(threshold.exponent);
+
+			const float base	 = runtime_value(2.0F);
+			const float exponent = runtime_value(threshold.exponent);
+			const float actual	 = invoke_powf_gen(base, exponent);
+
+			float expected = threshold.expected_nearest;
+			switch (ccm::test::ToRoundingModeKind(mode))
 			{
-				SCOPED_TRACE(threshold.exponent);
-
-				const float base	 = runtime_value(2.0F);
-				const float exponent = runtime_value(threshold.exponent);
-				const float actual	 = invoke_powf_gen(base, exponent);
-
-				float expected = threshold.expected_nearest;
-				switch (ccm::test::ToRoundingModeKind(mode))
-				{
-				case ccm::test::RoundingModeKind::Upward: expected = threshold.expected_upward; break;
-				case ccm::test::RoundingModeKind::Downward: expected = threshold.expected_downward; break;
-				case ccm::test::RoundingModeKind::TowardZero: expected = threshold.expected_toward_zero; break;
-				case ccm::test::RoundingModeKind::Nearest: break;
-				}
-
-				ccm::test::ExpectFpEq(actual, expected);
+			case ccm::test::RoundingModeKind::Upward	: expected = threshold.expected_upward; break;
+			case ccm::test::RoundingModeKind::Downward	: expected = threshold.expected_downward; break;
+			case ccm::test::RoundingModeKind::TowardZero: expected = threshold.expected_toward_zero; break;
+			case ccm::test::RoundingModeKind::Nearest	: break;
 			}
-		});
+
+			ccm::test::ExpectFpEq(actual, expected);
+		}
+	});
 }
 
 TEST(CcmathPowFenvTests, SignalingNaNsRaiseInvalidLikeStdWhenObservable)

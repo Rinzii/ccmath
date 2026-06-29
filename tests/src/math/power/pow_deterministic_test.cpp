@@ -23,8 +23,7 @@
 
 namespace
 {
-	template <typename T>
-	bool same_bits(T a, T b) noexcept
+	template <typename T> bool same_bits(T a, T b) noexcept
 	{
 		using U = std::conditional_t<sizeof(T) == 4, std::uint32_t, std::uint64_t>;
 		return ccm::support::bit_cast<U>(a) == ccm::support::bit_cast<U>(b);
@@ -72,10 +71,10 @@ TEST(PowDeterministic, LongDoubleDelegatesToDouble)
 	{
 		for (double exp : kExponents)
 		{
-			const auto b			= static_cast<long double>(base);
-			const auto e			= static_cast<long double>(exp);
-			const long double got	= ccm::pow(b, e);
-			const long double want	= static_cast<long double>(ccm::pow(static_cast<double>(b), static_cast<double>(e)));
+			const auto b		   = static_cast<long double>(base);
+			const auto e		   = static_cast<long double>(exp);
+			const long double got  = ccm::pow(b, e);
+			const long double want = static_cast<long double>(ccm::pow(static_cast<double>(b), static_cast<double>(e)));
 			EXPECT_TRUE(same_bits(got, want)) << "base=" << base << " exp=" << exp;
 		}
 	}
@@ -93,6 +92,8 @@ TEST(PowDeterministic, CompileTimeUsesGenericKernel)
 #else
 
 TEST(PowDeterministic, DisabledWithoutFlag)
-{ GTEST_SKIP() << "CCMATH_ENABLE_DETERMINISTIC is OFF; deterministic guarantees are not in effect."; }
+{
+	GTEST_SKIP() << "CCMATH_ENABLE_DETERMINISTIC is OFF; deterministic guarantees are not in effect.";
+}
 
 #endif // CCM_CONFIG_DETERMINISTIC

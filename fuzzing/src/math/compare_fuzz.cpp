@@ -17,11 +17,13 @@
 
 namespace
 {
-	template <typename T>
-	void compare(uint8_t const * data, size_t size)
+	template <typename T> void compare(uint8_t const * data, size_t size)
 	{
 		ccm::fuzz::Inputs<T> in;
-		if (!in.load_xy(data, size)) { return; }
+		if (!in.load_xy(data, size))
+		{
+			return;
+		}
 
 		FUZZ_CHECK(ccm::fpclassify(in.x) == std::fpclassify(in.x));
 		FUZZ_CHECK(static_cast<bool>(ccm::isfinite(in.x)) == static_cast<bool>(std::isfinite(in.x)));

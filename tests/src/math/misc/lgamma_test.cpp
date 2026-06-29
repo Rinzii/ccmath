@@ -20,12 +20,14 @@
 
 namespace
 {
-	template <typename T, typename CcmFn, typename StdFn>
-	void ExpectRelativeNearStd(T input, CcmFn ccm_fn, StdFn std_fn, T rel_tol)
+	template <typename T, typename CcmFn, typename StdFn> void ExpectRelativeNearStd(T input, CcmFn ccm_fn, StdFn std_fn, T rel_tol)
 	{
 		const T actual	 = ccm_fn(input);
 		const T expected = std_fn(input);
-		if (actual == expected) { return; }
+		if (actual == expected)
+		{
+			return;
+		}
 		const T scale = std::fabs(expected) > T(1) ? std::fabs(expected) : T(1);
 		EXPECT_NEAR(actual, expected, rel_tol * scale);
 	}

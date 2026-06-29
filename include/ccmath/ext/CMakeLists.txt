@@ -3,7 +3,6 @@ ccm_add_headers(
         align.hpp
         approximately.hpp
         ceil_div.hpp
-        chgsign.hpp
         clamp.hpp
         cubic.hpp
         degrees.hpp
@@ -13,7 +12,6 @@ ccm_add_headers(
         is_power_of_two.hpp
         lerp_angle.hpp
         lerp_smooth.hpp
-        mix.hpp
         move_towards.hpp
         move_towards_angle.hpp
         normalize.hpp

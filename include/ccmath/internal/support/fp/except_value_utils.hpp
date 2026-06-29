@@ -16,18 +16,18 @@
 #pragma once
 
 #include "ccmath/internal/predef/unlikely.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/is_constant_evaluated.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
 
-#include <cfenv>
+#include <array>
 #include <optional>
 
 namespace ccm::support::fp
 {
-	template <typename T, std::size_t N>
-	struct ExceptValues
+	template <typename T, std::size_t N> struct ExceptValues
 	{
 		static_assert(traits::ccm_is_floating_point_v<T>, "ExceptValues requires a floating-point type.");
 
@@ -42,7 +42,7 @@ namespace ccm::support::fp
 			StorageType rnd_tonearest_offset;
 		};
 
-		Mapping values[N];
+		std::array<Mapping, N> values;
 
 		[[nodiscard]] constexpr std::optional<T> lookup(StorageType x_bits) const
 		{
@@ -53,10 +53,10 @@ namespace ccm::support::fp
 					StorageType out_bits = values[i].rnd_towardzero_result;
 					switch (fenv::get_rounding_mode())
 					{
-					case FE_UPWARD: out_bits += values[i].rnd_upward_offset; break;
-					case FE_DOWNWARD: out_bits += values[i].rnd_downward_offset; break;
+					case FE_UPWARD	 : out_bits += values[i].rnd_upward_offset; break;
+					case FE_DOWNWARD : out_bits += values[i].rnd_downward_offset; break;
 					case FE_TONEAREST: out_bits += values[i].rnd_tonearest_offset; break;
-					default: break;
+					default			 : break;
 					}
 					return FPBits<T>(out_bits).get_val();
 				}
@@ -74,25 +74,32 @@ namespace ccm::support::fp
 					switch (fenv::get_rounding_mode())
 					{
 					case FE_UPWARD:
-						if (sign) { out_bits += values[i].rnd_downward_offset; }
-						else
+						if (sign)
+						{
+							out_bits += values[i].rnd_downward_offset;
+						} else
 						{
 							out_bits += values[i].rnd_upward_offset;
 						}
 						break;
 					case FE_DOWNWARD:
-						if (sign) { out_bits += values[i].rnd_upward_offset; }
-						else
+						if (sign)
+						{
+							out_bits += values[i].rnd_upward_offset;
+						} else
 						{
 							out_bits += values[i].rnd_downward_offset;
 						}
 						break;
 					case FE_TONEAREST: out_bits += values[i].rnd_tonearest_offset; break;
-					default: break;
+					default			 : break;
 					}
 
 					T result = FPBits<T>(out_bits).get_val();
-					if (sign) { result = -result; }
+					if (sign)
+					{
+						result = -result;
+					}
 					return result;
 				}
 			}
@@ -100,20 +107,24 @@ namespace ccm::support::fp
 		}
 	};
 
-	template <typename T>
-	[[nodiscard]] constexpr T round_result_slightly_down(T value_rn)
+	template <typename T> [[nodiscard]] constexpr T round_result_slightly_down(T value_rn)
 	{
-		if (support::is_constant_evaluated()) { return value_rn; }
+		if (support::is_constant_evaluated())
+		{
+			return value_rn;
+		}
 
 		volatile T tmp = value_rn;
 		tmp -= FPBits<T>::min_normal().get_val();
 		return tmp;
 	}
 
-	template <typename T>
-	[[nodiscard]] constexpr T round_result_slightly_up(T value_rn)
+	template <typename T> [[nodiscard]] constexpr T round_result_slightly_up(T value_rn)
 	{
-		if (support::is_constant_evaluated()) { return value_rn; }
+		if (support::is_constant_evaluated())
+		{
+			return value_rn;
+		}
 
 		volatile T tmp = value_rn;
 		tmp += FPBits<T>::min_normal().get_val();

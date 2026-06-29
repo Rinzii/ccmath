@@ -15,6 +15,7 @@
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/fp/nearest_integer.hpp"
 #include "ccmath/internal/support/multiply_add.hpp"
@@ -22,7 +23,6 @@
 #include "ccmath/math/trig/impl/sincos_payne_hanek.hpp"
 
 #include <cerrno>
-#include <cfenv>
 #include <cstdint>
 
 namespace ccm::internal::impl
@@ -34,7 +34,7 @@ namespace ccm::internal::impl
 
 		constexpr unsigned sincosf_range_reduction_small(float x, float & u)
 		{
-			const float prod_hi = x * data::ONE_OVER_PI;
+			const float prod_hi = x * data::EIGHT_OVER_PI;
 			const float k		= support::fp::nearest_integer(prod_hi);
 
 			const float y_hi = support::multiply_add(k, data::MPI[0], x);
@@ -43,20 +43,24 @@ namespace ccm::internal::impl
 			return static_cast<unsigned>(static_cast<int>(k));
 		}
 
-		template <bool IsSin>
-		constexpr float sincosf_eval(float x)
+		template <bool IsSin> constexpr float sincosf_eval(float x)
 		{
 			FPBits xbits(x);
 			const std::uint32_t x_abs = ccm::support::bit_cast<std::uint32_t>(x) & 0x7fff'ffffU;
 
 			// sin(+/-0) = +/-0, cos(+/-0) = 1. Returning x preserves the sign of a signed zero.
-			if (x_abs == 0) { return IsSin ? x : 1.0f; }
+			if (x_abs == 0)
+			{
+				return IsSin ? x : 1.0f;
+			}
 
 			float y{};
 			unsigned k = 0;
 
-			if (x_abs < 0x4880'0000U) { k = sincosf_range_reduction_small(x, y); }
-			else
+			if (x_abs < 0x4880'0000U)
+			{
+				k = sincosf_range_reduction_small(x, y);
+			} else
 			{
 				if (CCM_UNLIKELY(x_abs >= 0x7f80'0000U))
 				{
@@ -70,8 +74,14 @@ namespace ccm::internal::impl
 					{
 						support::fenv::set_errno_if_required(EDOM);
 						support::fenv::raise_except_if_required(FE_INVALID);
+						// sin/cos of an infinity is a domain error, so return a canonical quiet NaN.
+						// Forming it as x + quiet_nan is ill-formed in a constant expression, which
+						// rejects floating-point arithmetic that produces a NaN.
+						return FPBits::quiet_nan().get_val();
 					}
-					return x + FPBits::quiet_nan().get_val();
+
+					// x is a quiet NaN here. Return it unchanged so its sign and payload survive.
+					return x;
 				}
 
 				double yd = 0.0;
@@ -82,6 +92,8 @@ namespace ccm::internal::impl
 			const float sin_k = data::SIN_K_PI_OVER_8[k & 15];
 			const float cos_k = data::SIN_K_PI_OVER_8[(k + 4) & 15];
 
+			// sin(y) = y + y^3 p1(y^2) and cos(y) = 1 + y^2 q1(y^2) on |y| < pi/16, with float-grade
+			// two-term tails (the double kernel uses higher-order polynomials).
 			const float y_sq = y * y;
 			const float p1	 = support::multiply_add(y_sq, 0x1.111112p-7f, -0x1.555556p-3f);
 			const float q1	 = support::multiply_add(y_sq, 0x1.54b8bep-5f, -0x1.ffffc4p-2f);
@@ -91,8 +103,10 @@ namespace ccm::internal::impl
 
 			// The cos tail is in the else so it is discarded for the sin instantiation rather than
 			// left as unreachable code, which MSVC rejects under /W4 (C4702).
-			if constexpr (IsSin) { return support::multiply_add(cos_k, s1, sin_k * c1); }
-			else
+			if constexpr (IsSin)
+			{
+				return support::multiply_add(cos_k, s1, sin_k * c1);
+			} else
 			{
 				return support::multiply_add(cos_k, c1, -sin_k * s1);
 			}
@@ -101,18 +115,26 @@ namespace ccm::internal::impl
 	} // namespace sincos_float_detail
 
 	constexpr float sin_float_impl(float x)
-	{ return sincos_float_detail::sincosf_eval<true>(x); }
+	{
+		return sincos_float_detail::sincosf_eval<true>(x);
+	}
 
 	constexpr float cos_float_impl(float x)
-	{ return sincos_float_detail::sincosf_eval<false>(x); }
+	{
+		return sincos_float_detail::sincosf_eval<false>(x);
+	}
 
 } // namespace ccm::internal::impl
 
 namespace ccm::internal
 {
 	constexpr float sin_float(float num) noexcept
-	{ return impl::sin_float_impl(num); }
+	{
+		return impl::sin_float_impl(num);
+	}
 
 	constexpr float cos_float(float num) noexcept
-	{ return impl::cos_float_impl(num); }
+	{
+		return impl::cos_float_impl(num);
+	}
 } // namespace ccm::internal

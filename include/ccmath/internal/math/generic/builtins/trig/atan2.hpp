@@ -74,13 +74,18 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_atan2 functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto atan2_ct(T y, T x) -> std::enable_if_t<has_constexpr_atan2<T>, T>
+	template <typename T> constexpr auto atan2_ct(T y, T x) -> std::enable_if_t<has_constexpr_atan2<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_atan2f(y, x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_atan2(y, x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_atan2l(y, x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_atan2f(y, x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_atan2(y, x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_atan2l(y, x);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for atan2");
@@ -88,13 +93,18 @@ namespace ccm::builtin
 		}
 	}
 
-	template <typename T>
-	auto atan2_rt(T y, T x) -> std::enable_if_t<has_runtime_atan2<T>, T>
+	template <typename T> auto atan2_rt(T y, T x) -> std::enable_if_t<has_runtime_atan2<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_atan2f(y, x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_atan2(y, x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_atan2l(y, x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_atan2f(y, x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_atan2(y, x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_atan2l(y, x);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for atan2");

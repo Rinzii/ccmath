@@ -10,11 +10,12 @@
 
 #pragma once
 
+#include <cstdint>
 #include <limits>
 
 namespace ccm::config
 {
-	enum class LongDoubleFormat
+	enum class LongDoubleFormat : std::uint8_t
 	{
 		Double,
 		X87Extended,
@@ -27,10 +28,16 @@ namespace ccm::config
 		constexpr int digits	   = std::numeric_limits<long double>::digits;
 		constexpr int max_exponent = std::numeric_limits<long double>::max_exponent;
 
-		if constexpr (digits == 53 && max_exponent == 1024) { return LongDoubleFormat::Double; }
-		else if constexpr (digits == 64 && max_exponent == 16384) { return LongDoubleFormat::X87Extended; }
-		else if constexpr (digits == 113 && max_exponent == 16384) { return LongDoubleFormat::IEEEBinary128; }
-		else
+		if constexpr (digits == 53 && max_exponent == 1024)
+		{
+			return LongDoubleFormat::Double;
+		} else if constexpr (digits == 64 && max_exponent == 16384)
+		{
+			return LongDoubleFormat::X87Extended;
+		} else if constexpr (digits == 113 && max_exponent == 16384)
+		{
+			return LongDoubleFormat::IEEEBinary128;
+		} else
 		{
 			return LongDoubleFormat::Unknown;
 		}
@@ -40,10 +47,10 @@ namespace ccm::config
 	{
 		switch (format)
 		{
-		case LongDoubleFormat::Double: return "double_shaped";
-		case LongDoubleFormat::X87Extended: return "x87_float80";
+		case LongDoubleFormat::Double		: return "double_shaped";
+		case LongDoubleFormat::X87Extended	: return "x87_float80";
 		case LongDoubleFormat::IEEEBinary128: return "ieee_binary128";
-		case LongDoubleFormat::Unknown: return "unknown";
+		case LongDoubleFormat::Unknown		: return "unknown";
 		}
 		return "unknown";
 	}

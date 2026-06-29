@@ -18,11 +18,12 @@
 
 namespace ccm::rt
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T logb_rt(T num) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T logb_rt(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_runtime_logb<T>) { return ccm::builtin::logb_rt(num); }
-		else
+		if constexpr (ccm::builtin::has_runtime_logb<T>)
+		{
+			return ccm::builtin::logb_rt(num);
+		} else
 		{
 			return ccm::internal::impl::logb_impl(num);
 		}

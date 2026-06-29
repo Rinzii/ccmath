@@ -28,20 +28,22 @@ namespace ccm::pp
 	namespace detail
 	{
 		// Neutral element for a masked min reduction (so masked-off lanes never win).
-		template <typename T>
-		CCM_ALWAYS_INLINE T reduce_min_identity()
+		template <typename T> CCM_ALWAYS_INLINE T reduce_min_identity()
 		{
-			if constexpr (std::is_floating_point<T>::value) { return std::numeric_limits<T>::infinity(); }
-			else
+			if constexpr (std::is_floating_point_v<T>)
+			{
+				return std::numeric_limits<T>::infinity();
+			} else
 			{
 				return std::numeric_limits<T>::max();
 			}
 		}
-		template <typename T>
-		CCM_ALWAYS_INLINE T reduce_max_identity()
+		template <typename T> CCM_ALWAYS_INLINE T reduce_max_identity()
 		{
-			if constexpr (std::is_floating_point<T>::value) { return -std::numeric_limits<T>::infinity(); }
-			else
+			if constexpr (std::is_floating_point_v<T>)
+			{
+				return -std::numeric_limits<T>::infinity();
+			} else
 			{
 				return std::numeric_limits<T>::lowest();
 			}
@@ -49,25 +51,30 @@ namespace ccm::pp
 	} // namespace detail
 
 	// Sum of all lanes.
-	template <typename T, typename Abi>
-	CCM_ALWAYS_INLINE T reduce(basic_simd<T, Abi> const & v)
-	{ return SimdTraits<T, Abi>::hadd(v.get()); }
+	template <typename T, typename Abi> CCM_ALWAYS_INLINE T reduce(basic_simd<T, Abi> const & v)
+	{
+		return SimdTraits<T, Abi>::hadd(v.get());
+	}
 
 	// Reduction with an arbitrary associative binary operation.
-	template <typename T, typename Abi, typename BinaryOp>
-	CCM_ALWAYS_INLINE T reduce(basic_simd<T, Abi> const & v, BinaryOp op)
+	template <typename T, typename Abi, typename BinaryOp> CCM_ALWAYS_INLINE T reduce(basic_simd<T, Abi> const & v, BinaryOp op)
 	{
 		T acc = v[0];
-		for (detail::SimdSizeType i = 1; i < v.size(); ++i) { acc = op(acc, v[i]); }
+		for (detail::SimdSizeType i = 1; i < v.size(); ++i)
+		{
+			acc = op(acc, v[i]);
+		}
 		return acc;
 	}
 
-	template <typename T, typename Abi>
-	CCM_ALWAYS_INLINE T reduce_min(basic_simd<T, Abi> const & v)
-	{ return SimdTraits<T, Abi>::hmin(v.get()); }
-	template <typename T, typename Abi>
-	CCM_ALWAYS_INLINE T reduce_max(basic_simd<T, Abi> const & v)
-	{ return SimdTraits<T, Abi>::hmax(v.get()); }
+	template <typename T, typename Abi> CCM_ALWAYS_INLINE T reduce_min(basic_simd<T, Abi> const & v)
+	{
+		return SimdTraits<T, Abi>::hmin(v.get());
+	}
+	template <typename T, typename Abi> CCM_ALWAYS_INLINE T reduce_max(basic_simd<T, Abi> const & v)
+	{
+		return SimdTraits<T, Abi>::hmax(v.get());
+	}
 
 	// Masked reductions: masked-off lanes contribute the identity element.
 	template <typename T, typename Abi, typename BinaryOp = std::plus<>>
@@ -75,13 +82,18 @@ namespace ccm::pp
 	{
 		basic_simd<T, Abi> const sel = simd_select(m, v, basic_simd<T, Abi>(identity));
 		T acc						 = sel[0];
-		for (detail::SimdSizeType i = 1; i < sel.size(); ++i) { acc = op(acc, sel[i]); }
+		for (detail::SimdSizeType i = 1; i < sel.size(); ++i)
+		{
+			acc = op(acc, sel[i]);
+		}
 		return acc;
 	}
-	template <typename T, typename Abi>
-	CCM_ALWAYS_INLINE T reduce_min(basic_simd<T, Abi> const & v, basic_simd_mask<sizeof(T), Abi> const & m)
-	{ return reduce_min(simd_select(m, v, basic_simd<T, Abi>(detail::reduce_min_identity<T>()))); }
-	template <typename T, typename Abi>
-	CCM_ALWAYS_INLINE T reduce_max(basic_simd<T, Abi> const & v, basic_simd_mask<sizeof(T), Abi> const & m)
-	{ return reduce_max(simd_select(m, v, basic_simd<T, Abi>(detail::reduce_max_identity<T>()))); }
+	template <typename T, typename Abi> CCM_ALWAYS_INLINE T reduce_min(basic_simd<T, Abi> const & v, basic_simd_mask<sizeof(T), Abi> const & m)
+	{
+		return reduce_min(simd_select(m, v, basic_simd<T, Abi>(detail::reduce_min_identity<T>())));
+	}
+	template <typename T, typename Abi> CCM_ALWAYS_INLINE T reduce_max(basic_simd<T, Abi> const & v, basic_simd_mask<sizeof(T), Abi> const & m)
+	{
+		return reduce_max(simd_select(m, v, basic_simd<T, Abi>(detail::reduce_max_identity<T>())));
+	}
 } // namespace ccm::pp

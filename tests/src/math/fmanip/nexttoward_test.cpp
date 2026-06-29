@@ -16,4 +16,6 @@
 #include <limits>
 
 TEST(CcmathFmanipTests, Nexttoward)
-{ EXPECT_EQ(ccm::nexttoward(1.0, 2.0), std::nexttoward(1.0, 2.0)); }
+{
+	EXPECT_EQ(ccm::nexttoward(1.0, 2.0), std::nexttoward(1.0, 2.0));
+}

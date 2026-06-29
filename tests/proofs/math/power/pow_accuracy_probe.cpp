@@ -44,7 +44,7 @@ namespace
 #endif
 	}
 
-	const char* target_arch()
+	const char * target_arch()
 	{
 #if defined(__aarch64__) || defined(_M_ARM64)
 		return "aarch64";
@@ -59,19 +59,19 @@ namespace
 #endif
 	}
 
-	const char* rounding_mode_name(int mode)
+	const char * rounding_mode_name(int mode)
 	{
 		switch (mode)
 		{
-		case FE_TONEAREST: return "FE_TONEAREST";
-		case FE_DOWNWARD: return "FE_DOWNWARD";
-		case FE_UPWARD: return "FE_UPWARD";
+		case FE_TONEAREST : return "FE_TONEAREST";
+		case FE_DOWNWARD  : return "FE_DOWNWARD";
+		case FE_UPWARD	  : return "FE_UPWARD";
 		case FE_TOWARDZERO: return "FE_TOWARDZERO";
-		default: return "unknown";
+		default			  : return "unknown";
 		}
 	}
 
-	const char* fast_math_status()
+	const char * fast_math_status()
 	{
 #if defined(__FAST_MATH__)
 		return "on";
@@ -81,8 +81,7 @@ namespace
 	}
 } // namespace
 
-template <typename T>
-int64_t ulp_difference_local(T a, T b)
+template <typename T> int64_t ulp_difference_local(T a, T b)
 {
 	const std::uint64_t distance = ccm::test::ulp::distance_or_max(a, b);
 	return (distance > static_cast<std::uint64_t>(std::numeric_limits<int64_t>::max())) ? std::numeric_limits<int64_t>::max() : static_cast<int64_t>(distance);
@@ -97,30 +96,41 @@ struct Stats
 
 	void add(int64_t ulp)
 	{
-		if (ulp < min) { min = ulp; }
-		if (ulp > max) { max = ulp; }
+		if (ulp < min)
+		{
+			min = ulp;
+		}
+		if (ulp > max)
+		{
+			max = ulp;
+		}
 		sum += static_cast<long double>(ulp);
 		++count;
 	}
 
-	long double avg() const { return count == 0 ? 0.0L : (sum / static_cast<long double>(count)); }
+	long double avg() const
+	{
+		return count == 0 ? 0.0L : (sum / static_cast<long double>(count));
+	}
 };
 
-template <typename T, typename Fn, typename RefFn>
-Stats measure_suite(const std::array<T, 6>& bases, const std::array<T, 6>& exponents, Fn fn, RefFn ref)
+template <typename T, typename Fn, typename RefFn> Stats measure_suite(const std::array<T, 6> & bases, const std::array<T, 6> & exponents, Fn fn, RefFn ref)
 {
 	Stats stats;
 	for (std::size_t i = 0; i < bases.size(); ++i)
 	{
 		const T expected = ref(bases[i], exponents[i]);
-		if (std::isnan(expected)) { continue; }
+		if (std::isnan(expected))
+		{
+			continue;
+		}
 		stats.add(ulp_difference_local(fn(bases[i], exponents[i]), expected));
 	}
 	return stats;
 }
 
 template <typename T, std::size_t NB, std::size_t NE, typename Fn, typename RefFn>
-Stats measure_grid(const std::array<T, NB>& bases, const std::array<T, NE>& exponents, Fn fn, RefFn ref)
+Stats measure_grid(const std::array<T, NB> & bases, const std::array<T, NE> & exponents, Fn fn, RefFn ref)
 {
 	Stats stats;
 	for (T base : bases)
@@ -128,15 +138,17 @@ Stats measure_grid(const std::array<T, NB>& bases, const std::array<T, NE>& expo
 		for (T exponent : exponents)
 		{
 			const T expected = ref(base, exponent);
-			if (std::isnan(expected)) { continue; }
+			if (std::isnan(expected))
+			{
+				continue;
+			}
 			stats.add(ulp_difference_local(fn(base, exponent), expected));
 		}
 	}
 	return stats;
 }
 
-template <typename T, typename Fn, typename RefFn>
-Stats measure_random(Fn fn, RefFn ref)
+template <typename T, typename Fn, typename RefFn> Stats measure_random(Fn fn, RefFn ref)
 {
 	Stats stats;
 	std::mt19937_64 rng(0xCCBEEF1234ULL);
@@ -148,15 +160,17 @@ Stats measure_random(Fn fn, RefFn ref)
 		const T base	 = static_cast<T>(base_dist(rng));
 		const T exponent = static_cast<T>(exponent_dist(rng));
 		const T expected = ref(base, exponent);
-		if (std::isnan(expected)) { continue; }
+		if (std::isnan(expected))
+		{
+			continue;
+		}
 		stats.add(ulp_difference_local(fn(base, exponent), expected));
 	}
 
 	return stats;
 }
 
-template <typename T>
-void print_stats(const char* label, const Stats& stats)
+template <typename T> void print_stats(const char * label, const Stats & stats)
 {
 	std::cout << label << ": count=" << stats.count << " min=" << (stats.count == 0 ? 0 : stats.min) << " max=" << stats.max << " avg=" << std::fixed
 			  << std::setprecision(9) << static_cast<double>(stats.avg()) << '\n';

@@ -9,24 +9,25 @@
 
 namespace ccm::test::oracle
 {
-	template <typename T>
-	inline bool has_unary_hard_failure(const std::vector<unary_failure_record<T>>& events)
+	template <typename T> inline bool has_unary_hard_failure(const std::vector<unary_failure_record<T>> & events)
 	{
-		for (const auto& event : events)
+		for (const auto & event : events)
 		{
-			if (event.event_kind == "mpfr_hard_failure") { return true; }
+			if (event.event_kind == "mpfr_hard_failure")
+			{
+				return true;
+			}
 		}
 		return false;
 	}
 
-	template <typename T>
-	inline void write_unary_failure_json(const std::string& output_path, const std::vector<unary_failure_record<T>>& events)
+	template <typename T> inline void write_unary_failure_json(const std::string & output_path, const std::vector<unary_failure_record<T>> & events)
 	{
 		std::ofstream out(output_path, std::ios::trunc);
 		out << "[\n";
 		for (std::size_t i = 0; i < events.size(); ++i)
 		{
-			const auto& event = events[i];
+			const auto & event = events[i];
 			out << "  {\n";
 			out << "    \"function_name\": \"" << json_escape(event.function_name) << "\",\n";
 			out << "    \"input_type\": \"" << json_escape(event.input_type) << "\",\n";
@@ -52,12 +53,14 @@ namespace ccm::test::oracle
 		out << "]\n";
 	}
 
-	template <typename T>
-	inline void print_unary_hard_failures(const std::vector<unary_failure_record<T>>& events)
+	template <typename T> inline void print_unary_hard_failures(const std::vector<unary_failure_record<T>> & events)
 	{
-		for (const auto& event : events)
+		for (const auto & event : events)
 		{
-			if (event.event_kind != "mpfr_hard_failure") { continue; }
+			if (event.event_kind != "mpfr_hard_failure")
+			{
+				continue;
+			}
 			std::cout << "HARD FAILURE " << event.event_kind << " fn=" << event.function_name << " path=" << event.path << " rounding=" << event.rounding_mode
 					  << " input=" << event.input_bits << " actual=" << event.actual_bits << " expected=" << event.expected_bits
 					  << " ulp=" << event.ulp_distance << " provenance=\"" << event.provenance << "\" notes=\"" << event.notes << "\"\n";

@@ -14,12 +14,12 @@
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/types/fp_types.hpp"
 #include "ccmath/math/expo/impl/exp2_data.hpp"
 
 #include <cerrno>
-#include <cfenv>
 #include <cstdint>
 #include <limits>
 
@@ -44,9 +44,9 @@ namespace ccm::internal
 			{
 			case FE_DOWNWARD:
 			case FE_TOWARDZERO: return FloatBits::max_normal().get_val();
-			case FE_UPWARD:
-			case FE_TONEAREST: [[fallthrough]];
-			default: return FloatBits::inf().get_val();
+			case FE_UPWARD	  :
+			case FE_TONEAREST : [[fallthrough]];
+			default			  : return FloatBits::inf().get_val();
 			}
 		}
 
@@ -84,20 +84,35 @@ namespace ccm::internal
 			// If |x| >= 128 or x is NaN, then we need to handle the special case.
 			if (const std::uint32_t abs_top = sp::top12_bits_of_float(x) & 0x7ff; CCM_UNLIKELY(abs_top >= sp::top12_bits_of_float(128.0F)))
 			{
-				if (x_bits.is_inf()) { return x_bits.is_neg() ? 0.0F : x; }
+				if (x_bits.is_inf())
+				{
+					return x_bits.is_neg() ? 0.0F : x;
+				}
 
 				// Use floating-point classification instead of raw unsigned bit comparisons so
 				// large negative finite inputs do not alias the NaN/Inf branch.
-				if (x_bits.is_nan()) { return x + x; }
+				if (x_bits.is_nan())
+				{
+					return x + x;
+				}
 
 				// Handle overflow
-				if (x > 0.0F) { return exp2_float_overflow_result(); }
+				if (x > 0.0F)
+				{
+					return exp2_float_overflow_result();
+				}
 
 				// Handle underflow
-				if (x <= -150.0F) { return exp2_float_underflow_result(); }
+				if (x <= -150.0F)
+				{
+					return exp2_float_underflow_result();
+				}
 
 				// Handle errno underflow. We assume we want errno behavior for underflow.
-				if (x < -149.0F) { return exp2_float_underflow_result(); }
+				if (x < -149.0F)
+				{
+					return exp2_float_underflow_result();
+				}
 			}
 
 			// x = k/N + r with r in [-1/(2N), 1/(2N)] and int k.
@@ -121,6 +136,8 @@ namespace ccm::internal
 	} // namespace impl
 
 	constexpr float exp2_float(float x)
-	{ return impl::exp2_float_impl(x); }
+	{
+		return impl::exp2_float_impl(x);
+	}
 } // namespace ccm::internal
 CCM_RESTORE_MSVC_WARNING()

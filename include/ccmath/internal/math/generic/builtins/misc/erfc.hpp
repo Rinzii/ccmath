@@ -74,13 +74,18 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_erfc without triggering a compiler error
 	 * when the compiler does not support it.
 	 */
-	template <typename T>
-	constexpr auto erfc_ct(T x) -> std::enable_if_t<has_constexpr_erfc<T>, T>
+	template <typename T> constexpr auto erfc_ct(T x) -> std::enable_if_t<has_constexpr_erfc<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_erfcf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_erfc(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_erfcl(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_erfcf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_erfc(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_erfcl(x);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for erfc");
@@ -88,13 +93,18 @@ namespace ccm::builtin
 		}
 	}
 
-	template <typename T>
-	auto erfc_rt(T x) -> std::enable_if_t<has_runtime_erfc<T>, T>
+	template <typename T> auto erfc_rt(T x) -> std::enable_if_t<has_runtime_erfc<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_erfcf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_erfc(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_erfcl(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_erfcf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_erfc(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_erfcl(x);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for erfc");

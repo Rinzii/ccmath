@@ -27,11 +27,9 @@ namespace ccm::internal
 	constexpr std::size_t k_exp_table_bits_dbl = 7;
 	constexpr std::size_t k_exp_poly_order_dbl = 5;
 
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	struct exp_data;
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> struct exp_data;
 
-	template <>
-	struct exp_data<float>
+	template <> struct exp_data<float>
 	{
 		double invln2_scaled{ 0x1.71547652b82fep0 * (1 << k_exp_table_bits_flt) };
 		double shift{ 0x1.8p+52 };
@@ -50,8 +48,7 @@ namespace ccm::internal
 		};
 	};
 
-	template <>
-	struct exp_data<double>
+	template <> struct exp_data<double>
 	{
 		double invln2N{ 0x1.71547652b82fep0 * (1 << k_exp_table_bits_dbl) }; // N/ln2
 		double shift{ 0x1.8p52 };
@@ -333,8 +330,6 @@ namespace ccm::internal
 		};
 	};
 
-	template <>
-	struct exp_data<long double> : exp_data<double>
-	{
-	};
+	template <> struct exp_data<long double> : exp_data<double>
+	{};
 } // namespace ccm::internal

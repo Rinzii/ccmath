@@ -10,7 +10,7 @@
 
 #pragma once
 
-#if defined(CCM_VERSION_ENCODE)
+#ifdef CCM_VERSION_ENCODE
 	#undef CCM_VERSION_ENCODE
 #endif
 #define CCM_VERSION_ENCODE(major, minor, revision) (((major) * 1000000) + ((minor) * 1000) + (revision))

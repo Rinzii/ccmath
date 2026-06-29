@@ -23,12 +23,14 @@ namespace ccm::rt
 {
 	namespace detail
 	{
-		template <typename T>
-		[[nodiscard]] inline T copysign_scalar(T mag, T sgn) noexcept
+		template <typename T> [[nodiscard]] inline T copysign_scalar(T mag, T sgn) noexcept
 		{
 			if (ccm::isnan(mag) || ccm::isnan(sgn))
 			{
-				if (ccm::signbit(sgn)) { return -std::numeric_limits<T>::quiet_NaN(); }
+				if (ccm::signbit(sgn))
+				{
+					return -std::numeric_limits<T>::quiet_NaN();
+				}
 				return std::numeric_limits<T>::quiet_NaN();
 			}
 
@@ -37,11 +39,12 @@ namespace ccm::rt
 		}
 	} // namespace detail
 
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T copysign_rt(T x, T y) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T copysign_rt(T x, T y) noexcept
 	{
-		if constexpr (ccm::builtin::has_runtime_copysign<T>) { return ccm::builtin::copysign_rt(x, y); }
-		else
+		if constexpr (ccm::builtin::has_runtime_copysign<T>)
+		{
+			return ccm::builtin::copysign_rt(x, y);
+		} else
 		{
 			return detail::copysign_scalar(x, y);
 		}

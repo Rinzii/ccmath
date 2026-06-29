@@ -24,8 +24,7 @@ namespace ccm::ext
 	 * @param x Value to interpolate.
 	 * @return The interpolated value.
 	 */
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T smoothstep(T edge0, T edge1, T x)
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T smoothstep(T edge0, T edge1, T x)
 	{
 		// Scale, bias and saturate x to 0..1 range
 		x = ccm::ext::clamp((x - edge0) / (edge1 - edge0));

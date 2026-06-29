@@ -63,7 +63,10 @@ namespace ccm::internal::impl
 			lo	   = 1.0 - hi + result + lo;
 			result = support::helpers::narrow_eval(hi + lo) - 1.0;
 			// Prevent -0.0 with downward rounding.
-			if (result == 0.0) { result = 0.0; }
+			if (result == 0.0)
+			{
+				result = 0.0;
+			}
 		}
 
 		result = 0x1p-1022 * result;
@@ -92,16 +95,28 @@ namespace ccm::internal::impl
 						 ccm::support::top12_bits_of_double(512.0) - ccm::support::top12_bits_of_double(0x1p-54)))
 		{
 			// Avoid raising underflow for tiny x. 0 is a common input.
-			if (abs_top - support::top12_bits_of_double(0x1p-54) >= 0x80000000) { return 1.0 + x; }
+			if (abs_top - support::top12_bits_of_double(0x1p-54) >= 0x80000000)
+			{
+				return 1.0 + x;
+			}
 
 			if (abs_top >= support::top12_bits_of_double(1024.0))
 			{
-				if (support::double_to_uint64(x) == support::double_to_uint64(-std::numeric_limits<double>::infinity())) { return 0.0; }
+				if (support::double_to_uint64(x) == support::double_to_uint64(-std::numeric_limits<double>::infinity()))
+				{
+					return 0.0;
+				}
 
-				if (abs_top >= support::top12_bits_of_double(std::numeric_limits<double>::infinity())) { return 1.0 + x; }
+				if (abs_top >= support::top12_bits_of_double(std::numeric_limits<double>::infinity()))
+				{
+					return 1.0 + x;
+				}
 
 				// Handle underflow
-				if ((support::double_to_uint64(x) >> 63) != 0U) { return 0x1p-767 * 0x1p-767; }
+				if ((support::double_to_uint64(x) >> 63) != 0U)
+				{
+					return 0x1p-767 * 0x1p-767;
+				}
 
 				// Handle Overflow
 				return 0x1p769 * 0x1p769;
@@ -136,7 +151,10 @@ namespace ccm::internal::impl
 		// Worst case error is less than (0.5+1.11/N+(abs poly error * 2^53))+0.25/N ulp.
 		tmp = tail + rem + remSqr * (exp_poly_coeff_one_dbl + rem * exp_poly_coeff_two_dbl) +
 			  remSqr * remSqr * (exp_poly_coeff_three_dbl + rem * exp_poly_coeff_four_dbl);
-		if (CCM_UNLIKELY(abs_top == 0.0)) { return handle_special_case(tmp, sign_bits, expo_int64); }
+		if (CCM_UNLIKELY(abs_top == 0.0))
+		{
+			return handle_special_case(tmp, sign_bits, expo_int64);
+		}
 
 		scale = support::uint64_to_double(sign_bits);
 
@@ -170,15 +188,27 @@ namespace ccm::internal::impl
 		if (CCM_UNLIKELY(abs_top - ccm::support::top12_bits_of_double(0x1p-54) >=
 						 ccm::support::top12_bits_of_double(512.0) - ccm::support::top12_bits_of_double(0x1p-54)))
 		{
-			if (abs_top - support::top12_bits_of_double(0x1p-54) >= 0x80000000) { return x; }
+			if (abs_top - support::top12_bits_of_double(0x1p-54) >= 0x80000000)
+			{
+				return x;
+			}
 
 			if (abs_top >= support::top12_bits_of_double(1024.0))
 			{
-				if (support::double_to_uint64(x) == support::double_to_uint64(-std::numeric_limits<double>::infinity())) { return -1.0; }
+				if (support::double_to_uint64(x) == support::double_to_uint64(-std::numeric_limits<double>::infinity()))
+				{
+					return -1.0;
+				}
 
-				if (abs_top >= support::top12_bits_of_double(std::numeric_limits<double>::infinity())) { return x + x; }
+				if (abs_top >= support::top12_bits_of_double(std::numeric_limits<double>::infinity()))
+				{
+					return x + x;
+				}
 
-				if ((support::double_to_uint64(x) >> 63) != 0U) { return -1.0; }
+				if ((support::double_to_uint64(x) >> 63) != 0U)
+				{
+					return -1.0;
+				}
 
 				return 0x1p769 * 0x1p769;
 			}
@@ -203,7 +233,10 @@ namespace ccm::internal::impl
 
 		tmp = tail + rem + remSqr * (exp_poly_coeff_one_dbl + rem * exp_poly_coeff_two_dbl) +
 			  remSqr * remSqr * (exp_poly_coeff_three_dbl + rem * exp_poly_coeff_four_dbl);
-		if (CCM_UNLIKELY(abs_top == 0.0)) { return handle_special_case(tmp, sign_bits, expo_int64); }
+		if (CCM_UNLIKELY(abs_top == 0.0))
+		{
+			return handle_special_case(tmp, sign_bits, expo_int64);
+		}
 
 		scale = support::uint64_to_double(sign_bits);
 
@@ -212,15 +245,30 @@ namespace ccm::internal::impl
 
 	constexpr double expm1_double_impl(double x)
 	{
-		if (x == 0.0) { return x; }
+		if (x == 0.0)
+		{
+			return x;
+		}
 
-		if (CCM_UNLIKELY(ccm::isnan(x))) { return std::numeric_limits<double>::quiet_NaN(); }
+		if (CCM_UNLIKELY(ccm::isnan(x)))
+		{
+			return std::numeric_limits<double>::quiet_NaN();
+		}
 
-		if (x == std::numeric_limits<double>::infinity()) { return std::numeric_limits<double>::infinity(); }
+		if (x == std::numeric_limits<double>::infinity())
+		{
+			return std::numeric_limits<double>::infinity();
+		}
 
-		if (x == -std::numeric_limits<double>::infinity()) { return -1.0; }
+		if (x == -std::numeric_limits<double>::infinity())
+		{
+			return -1.0;
+		}
 
-		if (x >= 0.25 || x <= -0.25) { return expm1_kernel(x); }
+		if (x >= 0.25 || x <= -0.25)
+		{
+			return expm1_kernel(x);
+		}
 
 		if (x > 0.0625 || x < -0.0625)
 		{

@@ -12,6 +12,7 @@ Parses clang/gcc assembly with debug line tables (-gline-tables-only -fverbose-a
 and maps instructions to source locations. Writes source_map.json and source_map.md.
 """
 
+import contextlib
 import json
 import re
 import sys
@@ -212,13 +213,11 @@ def _read_snippet(path, line, cache):
     candidates.append(Path(path))
     for p in candidates:
         if p.exists():
-            try:
+            with contextlib.suppress(OSError):
                 lines = p.read_text().splitlines()
                 if 1 <= line <= len(lines):
                     cache[key] = lines[line - 1].strip()
                     return cache[key]
-            except OSError:
-                pass
     cache[key] = ""
     return ""
 

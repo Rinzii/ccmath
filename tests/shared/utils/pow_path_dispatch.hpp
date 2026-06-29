@@ -31,24 +31,42 @@ namespace ccm::test::pow_path
 	{
 		switch (path)
 		{
-		case validation_path::public_default: return "public_default";
-		case validation_path::generic_runtime: return "generic_runtime";
+		case validation_path::public_default		: return "public_default";
+		case validation_path::generic_runtime		: return "generic_runtime";
 		case validation_path::generic_modeled_domain: return "generic_modeled_domain";
-		case validation_path::runtime_no_builtin: return "runtime_no_builtin";
-		case validation_path::runtime_simd: return "runtime_simd";
-		case validation_path::runtime_builtin: return "runtime_builtin";
+		case validation_path::runtime_no_builtin	: return "runtime_no_builtin";
+		case validation_path::runtime_simd			: return "runtime_simd";
+		case validation_path::runtime_builtin		: return "runtime_builtin";
 		}
 		return "unknown";
 	}
 
 	inline std::optional<validation_path> parse_path(std::string_view raw)
 	{
-		if (raw == "public" || raw == "public_default" || raw == "public_api_runtime") { return validation_path::public_default; }
-		if (raw == "generic" || raw == "generic_runtime" || raw == "generic_pow_gen") { return validation_path::generic_runtime; }
-		if (raw == "generic_modeled_domain" || raw == "generic_pow_gen_modeled_domain") { return validation_path::generic_modeled_domain; }
-		if (raw == "runtime_no_builtin") { return validation_path::runtime_no_builtin; }
-		if (raw == "runtime_simd") { return validation_path::runtime_simd; }
-		if (raw == "runtime_builtin") { return validation_path::runtime_builtin; }
+		if (raw == "public" || raw == "public_default" || raw == "public_api_runtime")
+		{
+			return validation_path::public_default;
+		}
+		if (raw == "generic" || raw == "generic_runtime" || raw == "generic_pow_gen")
+		{
+			return validation_path::generic_runtime;
+		}
+		if (raw == "generic_modeled_domain" || raw == "generic_pow_gen_modeled_domain")
+		{
+			return validation_path::generic_modeled_domain;
+		}
+		if (raw == "runtime_no_builtin")
+		{
+			return validation_path::runtime_no_builtin;
+		}
+		if (raw == "runtime_simd")
+		{
+			return validation_path::runtime_simd;
+		}
+		if (raw == "runtime_builtin")
+		{
+			return validation_path::runtime_builtin;
+		}
 		return std::nullopt;
 	}
 
@@ -58,8 +76,7 @@ namespace ccm::test::pow_path
 		std::string skip_reason;
 	};
 
-	template <typename T>
-	inline path_support path_is_supported(validation_path path)
+	template <typename T> inline path_support path_is_supported(validation_path path)
 	{
 		switch (path)
 		{
@@ -74,33 +91,42 @@ namespace ccm::test::pow_path
 #endif
 		case validation_path::runtime_simd:
 #if defined(CCMATH_HAS_SIMD)
-			if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>) { return { true, {} }; }
+			if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>)
+			{
+				return { true, {} };
+			}
 			return { false, "runtime_simd is only supported for float and double" };
 #else
 			return { false, "runtime_simd requires runtime SIMD to be compiled in" };
 #endif
 		case validation_path::runtime_builtin:
-			if constexpr (ccm::builtin::has_runtime_pow<T>) { return { true, {} }; }
+			if constexpr (ccm::builtin::has_runtime_pow<T>)
+			{
+				return { true, {} };
+			}
 			return { false, "runtime_builtin is unavailable on this toolchain" };
 		}
 		return { false, "unknown path" };
 	}
 
-	template <typename T>
-	inline T invoke(validation_path path, T base, T exponent)
+	template <typename T> inline T invoke(validation_path path, T base, T exponent)
 	{
 		switch (path)
 		{
 		case validation_path::public_default:
-			if constexpr (std::is_same_v<T, float>) { return ccm::powf(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent)); }
-			else if constexpr (std::is_same_v<T, double>) { return ccm::pow(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent)); }
-			else
+			if constexpr (std::is_same_v<T, float>)
+			{
+				return ccm::powf(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
+			} else if constexpr (std::is_same_v<T, double>)
+			{
+				return ccm::pow(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
+			} else
 			{
 				return ccm::powl(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
 			}
 		case validation_path::generic_runtime:
 		case validation_path::generic_modeled_domain: return ccm::gen::pow_gen(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
-		case validation_path::runtime_no_builtin: return ccm::rt::pow_rt(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
+		case validation_path::runtime_no_builtin	: return ccm::rt::pow_rt(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
 		case validation_path::runtime_simd:
 #if defined(CCMATH_HAS_SIMD)
 			return ccm::rt::simd_impl::pow_simd_impl(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
@@ -111,8 +137,10 @@ namespace ccm::test::pow_path
 			// pow_rt is only defined where has_runtime_pow<T> holds (GCC/Clang). On other
 			// toolchains this path reports unsupported via path_is_supported, but the switch must
 			// still compile, so fall back to the generic kernel in the discarded branch.
-			if constexpr (ccm::builtin::has_runtime_pow<T>) { return ccm::builtin::pow_rt(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent)); }
-			else
+			if constexpr (ccm::builtin::has_runtime_pow<T>)
+			{
+				return ccm::builtin::pow_rt(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
+			} else
 			{
 				return ccm::gen::pow_gen(ccm::test::runtime_value(base), ccm::test::runtime_value(exponent));
 			}
@@ -132,8 +160,7 @@ namespace ccm::test::pow_path
 		std::string simd_available;
 	};
 
-	template <typename T>
-	inline configuration_report make_configuration_report(validation_path path)
+	template <typename T> inline configuration_report make_configuration_report(validation_path path)
 	{
 		return configuration_report{
 			ccm::test::pow_configuration_name(), path_name(path),		  ccm::test::compiler_id(),			  ccm::test::platform_id(),
@@ -158,6 +185,8 @@ namespace ccm::test::pow_path
 	}
 
 	inline void print_configuration_banner(const configuration_report & report)
-	{ std::cout << "pow validation configuration: " << configuration_report_json(report) << '\n'; }
+	{
+		std::cout << "pow validation configuration: " << configuration_report_json(report) << '\n';
+	}
 
 } // namespace ccm::test::pow_path

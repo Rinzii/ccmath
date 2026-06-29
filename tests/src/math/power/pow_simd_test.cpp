@@ -45,7 +45,10 @@ namespace
 	// NaN payloads are not part of the contract, so any NaN matches any NaN.
 	bool bit_equal(double a, double b)
 	{
-		if (std::isnan(a) && std::isnan(b)) { return true; }
+		if (std::isnan(a) && std::isnan(b))
+		{
+			return true;
+		}
 		return double_bits(a) == double_bits(b);
 	}
 
@@ -53,8 +56,7 @@ namespace
 	{
 		std::vector<double> xs;
 		std::vector<double> ys;
-		const auto add = [&](double x, double y)
-		{
+		const auto add = [&](double x, double y) {
 			xs.push_back(x);
 			ys.push_back(y);
 		};
@@ -66,32 +68,45 @@ namespace
 		const double maxd	= std::numeric_limits<double>::max();
 
 		// Exceptional grid: zeros, ones, infinities, NaN, denormals, extremes, negative bases.
-		const double special_bases[] = { 0.0,  -0.0, 1.0,	  -1.0,	   2.0,	 -2.0, 10.0, 0.5,
-										 inf,  -inf, qnan,	  denorm,  -denorm, minn, maxd, -maxd,
-										 1.0000000000000002, 0.9999999999999999, 1.5, -1.5 };
-		const double special_exps[]	 = { 0.0,	 -0.0,	 1.0,  -1.0, 2.0,	 3.0,	-3.0,  0.5,	 -0.5, 2.5,
-										 1023.0, -1074.0, 1025.0, inf, -inf, qnan, 1e300, -1e300, 0.3333333333333333, 5.5e18 };
+		const double special_bases[] = {
+			0.0, -0.0, 1.0, -1.0, 2.0, -2.0, 10.0, 0.5, inf, -inf, qnan, denorm, -denorm, minn, maxd, -maxd, 1.0000000000000002, 0.9999999999999999, 1.5, -1.5
+		};
+		const double special_exps[] = {
+			0.0, -0.0, 1.0, -1.0, 2.0, 3.0, -3.0, 0.5, -0.5, 2.5, 1023.0, -1074.0, 1025.0, inf, -inf, qnan, 1e300, -1e300, 0.3333333333333333, 5.5e18
+		};
 		for (double b : special_bases)
 		{
-			for (double e : special_exps) { add(b, e); }
+			for (double e : special_exps)
+			{
+				add(b, e);
+			}
 		}
 
 		// Normal range grid through the vector fast path.
 		for (double b = 0.001; b <= 1000.0; b *= 1.7)
 		{
-			for (double e = -150.0; e <= 150.0; e += 1.7) { add(b, e + 0.123456789); }
+			for (double e = -150.0; e <= 150.0; e += 1.7)
+			{
+				add(b, e + 0.123456789);
+			}
 		}
 
 		// Hard near-one region with large exponents (stresses the double-double pipeline).
 		for (double b = 0.95; b <= 1.05; b += 0.00037)
 		{
-			for (double e : { -4000.1, -750.3, -13.7, 13.7, 750.3, 4000.1 }) { add(b, e); }
+			for (double e : { -4000.1, -750.3, -13.7, 13.7, 750.3, 4000.1 })
+			{
+				add(b, e);
+			}
 		}
 
 		// Integer exponents (exact ipow path) including negative bases.
 		for (double b = -10.0; b <= 10.0; b += 0.375)
 		{
-			for (int e = -24; e <= 24; ++e) { add(b, static_cast<double>(e)); }
+			for (int e = -24; e <= 24; ++e)
+			{
+				add(b, static_cast<double>(e));
+			}
 		}
 
 		// Half-integer exponents (exact sqrt path) and just-off neighbors (vector path).
@@ -120,7 +135,10 @@ namespace
 		// Subnormal bases.
 		for (int e2 = -1074; e2 <= -1000; e2 += 7)
 		{
-			for (double e : { -2.5, -1.1, 0.7, 1.3, 2.9 }) { add(std::ldexp(1.2345, e2), e); }
+			for (double e : { -2.5, -1.1, 0.7, 1.3, 2.9 })
+			{
+				add(std::ldexp(1.2345, e2), e);
+			}
 		}
 
 		// Huge exponents straddling the clamp threshold 0x43d74910d52d3052.
@@ -137,13 +155,15 @@ namespace
 		std::mt19937_64 rng(20260612ULL);
 		std::uniform_real_distribution<double> base_dist(1.0e-12, 1.0e12);
 		std::uniform_real_distribution<double> exp_dist(-600.0, 600.0);
-		for (int i = 0; i < 40000; ++i) { add(base_dist(rng), exp_dist(rng)); }
+		for (int i = 0; i < 40000; ++i)
+		{
+			add(base_dist(rng), exp_dist(rng));
+		}
 
 		return { std::move(xs), std::move(ys) };
 	}
 
-	template <typename V>
-	void expect_matches_scalar(const std::vector<double> & xs, const std::vector<double> & ys, const char * tag)
+	template <typename V> void expect_matches_scalar(const std::vector<double> & xs, const std::vector<double> & ys, const char * tag)
 	{
 		constexpr int width = static_cast<int>(V::size());
 		ASSERT_EQ(xs.size(), ys.size());
@@ -168,14 +188,13 @@ namespace
 			{
 				const double got = rv[i];
 				const double ref = ccm::gen::impl::pow_impl(xb[i], yb[i]);
-				EXPECT_TRUE(bit_equal(got, ref)) << tag << " pow(" << xb[i] << ", " << yb[i] << ") got=0x" << std::hex << double_bits(got)
-												 << " ref=0x" << double_bits(ref);
+				EXPECT_TRUE(bit_equal(got, ref)) << tag << " pow(" << xb[i] << ", " << yb[i] << ") got=0x" << std::hex << double_bits(got) << " ref=0x"
+												 << double_bits(ref);
 			}
 		}
 	}
 
-	template <typename V>
-	double scalar_lane(double x, double y)
+	template <typename V> double scalar_lane(double x, double y)
 	{
 		return ccm::gen::impl::pow_simd(V(x), V(y))[0];
 	}
@@ -189,14 +208,16 @@ namespace
 		int err;
 	};
 
-	template <typename F>
-	FenvObservation observe_fenv(F && run)
+	template <typename F> FenvObservation observe_fenv(F && run)
 	{
 		std::feclearexcept(FE_ALL_EXCEPT);
 		errno = 0;
 		run();
-		return { std::fetestexcept(FE_OVERFLOW) != 0, std::fetestexcept(FE_UNDERFLOW) != 0, std::fetestexcept(FE_INVALID) != 0,
-				 std::fetestexcept(FE_DIVBYZERO) != 0, errno };
+		return { std::fetestexcept(FE_OVERFLOW) != 0,
+				 std::fetestexcept(FE_UNDERFLOW) != 0,
+				 std::fetestexcept(FE_INVALID) != 0,
+				 std::fetestexcept(FE_DIVBYZERO) != 0,
+				 errno };
 	}
 } // namespace
 
@@ -224,8 +245,7 @@ TEST(CcmathPowSimd, BitIdenticalToScalarKernelWidth8)
 	{
 		const auto [xs, ys] = build_inputs();
 		expect_matches_scalar<simd<double, 8>>(xs, ys, "w8");
-	}
-	else
+	} else
 	{
 		GTEST_SKIP() << "8-wide double simd not available on this target";
 	}
@@ -292,8 +312,8 @@ TEST(CcmathPowSimd, FenvAndErrnoParityWithScalarKernel)
 
 	for (const auto & c : cases)
 	{
-		volatile double simd_out = 0.0;
-		volatile double scal_out = 0.0;
+		volatile double simd_out	   = 0.0;
+		volatile double scal_out	   = 0.0;
 		const FenvObservation simd_obs = observe_fenv([&] { simd_out = ccm::gen::impl::pow_simd(V(c[0]), V(c[1]))[0]; });
 		const FenvObservation scal_obs = observe_fenv([&] { scal_out = ccm::gen::impl::pow_impl(c[0], c[1]); });
 

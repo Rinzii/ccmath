@@ -15,7 +15,10 @@
 
 TEST(CcmathFenvProbeTests, StdFenvSupportsAllRoundingModes)
 {
-	if (!ccm::test::FenvIsSupported()) { GTEST_SKIP() << "platform does not support all IEEE rounding modes"; }
+	if (!ccm::test::FenvIsSupported())
+	{
+		GTEST_SKIP() << "platform does not support all IEEE rounding modes";
+	}
 
 	for (int mode : ccm::test::kStdRoundingModes)
 	{
@@ -28,7 +31,10 @@ TEST(CcmathFenvProbeTests, StdFenvSupportsAllRoundingModes)
 
 TEST(CcmathFenvProbeTests, CcmGetRoundingModeTracksStdFenv)
 {
-	if (!ccm::test::FenvIsSupported()) { GTEST_SKIP() << "platform does not support all IEEE rounding modes"; }
+	if (!ccm::test::FenvIsSupported())
+	{
+		GTEST_SKIP() << "platform does not support all IEEE rounding modes";
+	}
 
 	for (int mode : ccm::test::kStdRoundingModes)
 	{

@@ -18,13 +18,13 @@
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/fp/nearest_integer.hpp"
 #include "ccmath/internal/support/multiply_add.hpp"
 #include "ccmath/math/misc/impl/gamma_data.hpp"
 #include "ccmath/math/nearest/floor.hpp"
 
-#include <cfenv>
 #include <cstdint>
 
 namespace ccm::internal::impl
@@ -55,7 +55,7 @@ namespace ccm::internal::impl
 			return ccm::support::multiply_add(d4, p47, p03);
 		}
 
-		constexpr double gamma_reduce(double xd, double &w_out) noexcept
+		constexpr double gamma_reduce(double xd, double & w_out) noexcept
 		{
 			const double m	  = xd - data::k_gamma_base;
 			const double i	  = ccm::support::fp::nearest_integer(m);
@@ -76,7 +76,10 @@ namespace ccm::internal::impl
 					w *= z;
 				}
 			}
-			if (i <= -0.5) { w = 1.0 / w; }
+			if (i <= -0.5)
+			{
+				w = 1.0 / w;
+			}
 
 			w_out = w;
 			return f;
@@ -85,7 +88,10 @@ namespace ccm::internal::impl
 		constexpr double positive_factorial(std::int32_t k) noexcept
 		{
 			double result = 1.0;
-			for (std::int32_t i = 2; i < k; ++i) { result *= static_cast<double>(i); }
+			for (std::int32_t i = 2; i < k; ++i)
+			{
+				result *= static_cast<double>(i);
+			}
 			return result;
 		}
 
@@ -127,8 +133,7 @@ namespace ccm::internal::impl
 			{
 				ccm::support::fenv::raise_except_if_required(FE_OVERFLOW | FE_INEXACT);
 				ccm::support::fenv::set_errno_if_required(ERANGE);
-			}
-			else
+			} else
 			{
 				ccm::support::fenv::raise_except_if_required(FE_INEXACT);
 			}
@@ -151,7 +156,10 @@ namespace ccm::internal::impl
 				ccm::support::fenv::set_errno_if_required(EDOM);
 				return fp_bits::quiet_nan().get_val();
 			}
-			if (k >= 1 && k <= 170) { return detail::positive_factorial(k); }
+			if (k >= 1 && k <= 170)
+			{
+				return detail::positive_factorial(k);
+			}
 		}
 
 		double w{};
@@ -161,8 +169,10 @@ namespace ccm::internal::impl
 		{
 			ccm::support::fenv::raise_except_if_required(FE_OVERFLOW | FE_INEXACT);
 			ccm::support::fenv::set_errno_if_required(ERANGE);
+		} else if (CCM_UNLIKELY(result == 0.0 && !xbits.is_neg()))
+		{
+			ccm::support::fenv::set_errno_if_required(ERANGE);
 		}
-		else if (CCM_UNLIKELY(result == 0.0 && !xbits.is_neg())) { ccm::support::fenv::set_errno_if_required(ERANGE); }
 		return result;
 	}
 } // namespace ccm::internal::impl

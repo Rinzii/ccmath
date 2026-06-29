@@ -61,13 +61,24 @@ namespace ccm::test::oracle::cross_libm
 		return backends;
 	}
 
-	template <typename T>
-	inline disagreement_kind classify(T lhs, T rhs)
+	template <typename T> inline disagreement_kind classify(T lhs, T rhs)
 	{
-		if (lhs == rhs) { return disagreement_kind::exact_match; }
-		if (std::isnan(lhs) && std::isnan(rhs)) { return disagreement_kind::exceptional_policy; }
-		if (std::isinf(lhs) && std::isinf(rhs) && std::signbit(lhs) == std::signbit(rhs)) { return disagreement_kind::exact_match; }
-		if (lhs == T{} && rhs == T{}) { return disagreement_kind::signed_zero; }
+		if (lhs == rhs)
+		{
+			return disagreement_kind::exact_match;
+		}
+		if (std::isnan(lhs) && std::isnan(rhs))
+		{
+			return disagreement_kind::exceptional_policy;
+		}
+		if (std::isinf(lhs) && std::isinf(rhs) && std::signbit(lhs) == std::signbit(rhs))
+		{
+			return disagreement_kind::exact_match;
+		}
+		if (lhs == T{} && rhs == T{})
+		{
+			return disagreement_kind::signed_zero;
+		}
 		return disagreement_kind::ulp_ordinary;
 	}
 
@@ -75,11 +86,11 @@ namespace ccm::test::oracle::cross_libm
 	{
 		switch (kind)
 		{
-		case disagreement_kind::ulp_ordinary: return "ulp_ordinary";
+		case disagreement_kind::ulp_ordinary	  : return "ulp_ordinary";
 		case disagreement_kind::exceptional_policy: return "exceptional_policy";
-		case disagreement_kind::nan_sign: return "nan_sign";
-		case disagreement_kind::signed_zero: return "signed_zero";
-		case disagreement_kind::exact_match: return "exact_match";
+		case disagreement_kind::nan_sign		  : return "nan_sign";
+		case disagreement_kind::signed_zero		  : return "signed_zero";
+		case disagreement_kind::exact_match		  : return "exact_match";
 		}
 		return "unknown";
 	}

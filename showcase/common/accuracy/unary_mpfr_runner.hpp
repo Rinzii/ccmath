@@ -29,7 +29,7 @@ namespace ccm::showcase::accuracy
 		switch (fn)
 		{
 		case unary_function::sqrt_fn: return "sqrt";
-		case unary_function::sin_fn: return "sin";
+		case unary_function::sin_fn : return "sin";
 		}
 		return "unknown";
 	}
@@ -39,7 +39,7 @@ namespace ccm::showcase::accuracy
 		switch (fn)
 		{
 		case unary_function::sqrt_fn: return sqrt_corpus();
-		case unary_function::sin_fn: return sin_corpus();
+		case unary_function::sin_fn : return sin_corpus();
 		}
 		return {};
 	}
@@ -49,7 +49,7 @@ namespace ccm::showcase::accuracy
 		switch (fn)
 		{
 		case unary_function::sqrt_fn: return std::sqrt(x);
-		case unary_function::sin_fn: return std::sin(x);
+		case unary_function::sin_fn : return std::sin(x);
 		}
 		return 0.0;
 	}
@@ -64,7 +64,7 @@ namespace ccm::showcase::accuracy
 		switch (fn)
 		{
 		case unary_function::sqrt_fn: mpfr_sqrt(result, value, rounding); break;
-		case unary_function::sin_fn: mpfr_sin(result, value, rounding); break;
+		case unary_function::sin_fn : mpfr_sin(result, value, rounding); break;
 		}
 		const double out = mpfr_get_d(result, rounding);
 		mpfr_clear(value);
@@ -77,7 +77,7 @@ namespace ccm::showcase::accuracy
 		switch (fn)
 		{
 		case unary_function::sqrt_fn: return ccm::showcase::ccmath_path::sqrt_is_supported(path);
-		case unary_function::sin_fn: return ccm::showcase::ccmath_path::sin_is_supported(path);
+		case unary_function::sin_fn : return ccm::showcase::ccmath_path::sin_is_supported(path);
 		}
 		return { false, "unknown function" };
 	}
@@ -87,7 +87,7 @@ namespace ccm::showcase::accuracy
 		switch (fn)
 		{
 		case unary_function::sqrt_fn: return ccm::showcase::ccmath_path::invoke_sqrt(path, x);
-		case unary_function::sin_fn: return ccm::showcase::ccmath_path::invoke_sin(path, x);
+		case unary_function::sin_fn : return ccm::showcase::ccmath_path::invoke_sin(path, x);
 		}
 		return 0.0;
 	}
@@ -101,7 +101,7 @@ namespace ccm::showcase::accuracy
 	};
 
 	inline int run_ccmath_path_campaign(
-		unary_function fn, ccm::showcase::ccmath_path::path path, mpfr_prec_t precision, std::uint64_t max_ulp, const std::optional<std::string>& output_path)
+		unary_function fn, ccm::showcase::ccmath_path::path path, mpfr_prec_t precision, std::uint64_t max_ulp, const std::optional<std::string> & output_path)
 	{
 		const auto support = path_is_supported(fn, path);
 		if (!support.supported)
@@ -143,7 +143,7 @@ namespace ccm::showcase::accuracy
 			out << "[\n";
 			for (std::size_t i = 0; i < events.size(); ++i)
 			{
-				const auto& event = events[i];
+				const auto & event = events[i];
 				out << "  {\"path\":\"" << event.path << "\",\"input_bits\":\"" << event.input_bits << "\",\"actual_bits\":\"" << event.actual_bits
 					<< "\",\"expected_bits\":\"" << event.expected_bits << "\",\"ulp_distance\":" << event.ulp_distance << ",\"event_kind\":\""
 					<< event.event_kind << "\"}" << (i + 1 < events.size() ? "," : "") << '\n';
@@ -154,7 +154,7 @@ namespace ccm::showcase::accuracy
 		return summary.failure_count > 0 ? 1 : 0;
 	}
 
-	inline int run_gcem_campaign(unary_function fn, mpfr_prec_t precision, std::uint64_t max_ulp, const std::optional<std::string>& output_path)
+	inline int run_gcem_campaign(unary_function fn, mpfr_prec_t precision, std::uint64_t max_ulp, const std::optional<std::string> & output_path)
 	{
 #if !defined(CCMATH_SHOWCASE_HAS_GCEM)
 		std::cout << "skip gcem accuracy: GCEM backend disabled\n";
@@ -172,13 +172,12 @@ namespace ccm::showcase::accuracy
 				test_case,
 				fn_label,
 				"gcem",
-				[fn](double value)
-				{
+				[fn](double value) {
 					volatile double x = value;
 					switch (fn)
 					{
 					case unary_function::sqrt_fn: return gcem::sqrt(x);
-					case unary_function::sin_fn: return gcem::sin(x);
+					case unary_function::sin_fn : return gcem::sin(x);
 					}
 					return 0.0;
 				},
@@ -202,7 +201,7 @@ namespace ccm::showcase::accuracy
 			out << "[\n";
 			for (std::size_t i = 0; i < events.size(); ++i)
 			{
-				const auto& event = events[i];
+				const auto & event = events[i];
 				out << "  {\"path\":\"gcem\",\"input_bits\":\"" << event.input_bits << "\",\"actual_bits\":\"" << event.actual_bits << "\",\"expected_bits\":\""
 					<< event.expected_bits << "\",\"ulp_distance\":" << event.ulp_distance << ",\"event_kind\":\"" << event.event_kind << "\"}"
 					<< (i + 1 < events.size() ? "," : "") << '\n';

@@ -8,11 +8,19 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+// clang-format off
+// <cmath> must come before pp.hpp. It pulls in the UCRT math declarations first,
+// so the ccm::pp MSVC scalar fallback, which forward declares the same C runtime
+// entry points, redeclares them rather than declaring them ahead of the UCRT.
+// Including pp.hpp first makes MSVC reject the later UCRT declarations (C2375
+// redefinition, C2733 cannot overload an extern "C" function).
+#include <cmath>
+
 #include "ccmath/internal/math/runtime/pp/pp.hpp"
+// clang-format on
 
 #include <gtest/gtest.h>
 
-#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -24,19 +32,22 @@ namespace
 	using namespace ccm::pp;
 
 	// Fill a buffer with a deterministic, non-degenerate pattern.
-	template <typename T>
-	void fill_a(T * p, int n)
+	template <typename T> void fill_a(T * p, int n)
 	{
-		for (int i = 0; i < n; ++i) { p[i] = static_cast<T>(i + 1); }
+		for (int i = 0; i < n; ++i)
+		{
+			p[i] = static_cast<T>(i + 1);
+		}
 	}
-	template <typename T>
-	void fill_b(T * p, int n)
+	template <typename T> void fill_b(T * p, int n)
 	{
-		for (int i = 0; i < n; ++i) { p[i] = static_cast<T>((i % 3) + 1); }
+		for (int i = 0; i < n; ++i)
+		{
+			p[i] = static_cast<T>((i % 3) + 1);
+		}
 	}
 
-	template <typename V>
-	void check_construction()
+	template <typename V> void check_construction()
 	{
 		using T				  = typename V::value_type;
 		constexpr int N		  = V::size();
@@ -47,15 +58,24 @@ namespace
 		// load constructor (vector aligned) + store roundtrip (element aligned)
 		V va(a, vector_aligned);
 		va.copy_to(out, element_aligned);
-		for (int i = 0; i < N; ++i) { EXPECT_EQ(out[i], a[i]); }
+		for (int i = 0; i < N; ++i)
+		{
+			EXPECT_EQ(out[i], a[i]);
+		}
 
 		// broadcast
 		V vb(static_cast<T>(7));
-		for (int i = 0; i < N; ++i) { EXPECT_EQ(vb[i], static_cast<T>(7)); }
+		for (int i = 0; i < N; ++i)
+		{
+			EXPECT_EQ(vb[i], static_cast<T>(7));
+		}
 
 		// generator
 		V vg([](auto i) { return static_cast<T>(static_cast<int>(i) * 2); });
-		for (int i = 0; i < N; ++i) { EXPECT_EQ(vg[i], static_cast<T>(i * 2)); }
+		for (int i = 0; i < N; ++i)
+		{
+			EXPECT_EQ(vg[i], static_cast<T>(i * 2));
+		}
 
 		// mutable lane proxy
 		va[0] = static_cast<T>(42);
@@ -64,11 +84,13 @@ namespace
 		// copy_from
 		V vc;
 		vc.copy_from(a, element_aligned);
-		for (int i = 0; i < N; ++i) { EXPECT_EQ(vc[i], a[i]); }
+		for (int i = 0; i < N; ++i)
+		{
+			EXPECT_EQ(vc[i], a[i]);
+		}
 	}
 
-	template <typename V>
-	void check_arithmetic()
+	template <typename V> void check_arithmetic()
 	{
 		using T			= typename V::value_type;
 		constexpr int N = V::size();
@@ -97,11 +119,13 @@ namespace
 		vc -= vb;
 		vc *= vb;
 		vc /= vb;
-		for (int i = 0; i < N; ++i) { EXPECT_EQ(vc[i], static_cast<T>(static_cast<T>(a[i] * b[i]) / b[i])); }
+		for (int i = 0; i < N; ++i)
+		{
+			EXPECT_EQ(vc[i], static_cast<T>(static_cast<T>(a[i] * b[i]) / b[i]));
+		}
 	}
 
-	template <typename V>
-	void check_masks()
+	template <typename V> void check_masks()
 	{
 		using T			= typename V::value_type;
 		constexpr int N = V::size();
@@ -143,8 +167,7 @@ namespace
 		EXPECT_TRUE(all_of(either));
 	}
 
-	template <typename V>
-	void check_where()
+	template <typename V> void check_where()
 	{
 		using T			= typename V::value_type;
 		constexpr int N = V::size();
@@ -156,7 +179,10 @@ namespace
 
 		auto m	  = va < vb;
 		V blended = simd_select(m, va, vb); // where m: va else vb
-		for (int i = 0; i < N; ++i) { EXPECT_EQ(blended[i], (a[i] < b[i]) ? a[i] : b[i]); }
+		for (int i = 0; i < N; ++i)
+		{
+			EXPECT_EQ(blended[i], (a[i] < b[i]) ? a[i] : b[i]);
+		}
 
 		V w			= vb;
 		where(m, w) = static_cast<T>(0);
@@ -168,8 +194,7 @@ namespace
 		}
 	}
 
-	template <typename V>
-	void check_all()
+	template <typename V> void check_all()
 	{
 		check_construction<V>();
 		check_arithmetic<V>();
@@ -178,12 +203,15 @@ namespace
 	}
 
 	inline void expect_close(float got, float ref)
-	{ EXPECT_FLOAT_EQ(got, ref); }
+	{
+		EXPECT_FLOAT_EQ(got, ref);
+	}
 	inline void expect_close(double got, double ref)
-	{ EXPECT_DOUBLE_EQ(got, ref); }
+	{
+		EXPECT_DOUBLE_EQ(got, ref);
+	}
 
-	template <typename Abi>
-	void check_integer_ops()
+	template <typename Abi> void check_integer_ops()
 	{
 		using V			= basic_simd<std::int32_t, Abi>;
 		constexpr int N = V::size();
@@ -229,18 +257,23 @@ namespace
 		}
 	}
 
-	template <typename V>
-	void check_conversions()
+	template <typename V> void check_conversions()
 	{
 		using T			= typename V::value_type;
 		using I			= std::conditional_t<sizeof(T) == 4, std::int32_t, std::int64_t>;
 		constexpr int N = V::size();
 		alignas(64) T x[16];
-		for (int i = 0; i < N; ++i) { x[i] = static_cast<T>(i - N / 2) + static_cast<T>(0.5); }
+		for (int i = 0; i < N; ++i)
+		{
+			x[i] = static_cast<T>(i - N / 2) + static_cast<T>(0.5);
+		}
 		V vx(x, element_aligned);
 
 		auto vi = static_simd_cast<I>(vx); // truncation toward zero
-		for (int i = 0; i < N; ++i) { EXPECT_EQ(vi[i], static_cast<I>(x[i])); }
+		for (int i = 0; i < N; ++i)
+		{
+			EXPECT_EQ(vi[i], static_cast<I>(x[i]));
+		}
 
 		auto vb = simd_bit_cast<I>(vx); // bit reinterpret
 		for (int i = 0; i < N; ++i)
@@ -251,11 +284,13 @@ namespace
 		}
 
 		auto back = static_simd_cast<T>(vi);
-		for (int i = 0; i < N; ++i) { expect_close(back[i], static_cast<T>(static_cast<I>(x[i]))); }
+		for (int i = 0; i < N; ++i)
+		{
+			expect_close(back[i], static_cast<T>(static_cast<I>(x[i])));
+		}
 	}
 
-	template <typename V>
-	void check_math()
+	template <typename V> void check_math()
 	{
 		using T			= typename V::value_type;
 		constexpr int N = V::size();
@@ -299,14 +334,16 @@ namespace
 		}
 	}
 
-	template <typename V>
-	void check_reduce()
+	template <typename V> void check_reduce()
 	{
 		using T			= typename V::value_type;
 		using M			= typename V::mask_type;
 		constexpr int N = V::size();
 		alignas(64) T a[16];
-		for (int i = 0; i < N; ++i) { a[i] = static_cast<T>((i * 7 % 13) + 1); }
+		for (int i = 0; i < N; ++i)
+		{
+			a[i] = static_cast<T>((i * 7 % 13) + 1);
+		}
 		V v(a, element_aligned);
 
 		T sum = 0, prod = 1, mn = a[0], mx = a[0];
@@ -335,8 +372,7 @@ namespace
 				{
 					mmn = mmx = a[i];
 					any		  = true;
-				}
-				else
+				} else
 				{
 					mmn = a[i] < mmn ? a[i] : mmn;
 					mmx = a[i] > mmx ? a[i] : mmx;
@@ -348,8 +384,7 @@ namespace
 		expect_close(reduce_max(v, m), mmx);
 	}
 
-	template <typename V>
-	void check_masked_memory()
+	template <typename V> void check_masked_memory()
 	{
 		using T			= typename V::value_type;
 		using M			= typename V::mask_type;
@@ -360,44 +395,80 @@ namespace
 		M m = M::from_bits(0x5555555555555555ull); // even lanes
 
 		alignas(64) T dst[16];
-		for (int i = 0; i < N; ++i) { dst[i] = static_cast<T>(-1); }
+		for (int i = 0; i < N; ++i)
+		{
+			dst[i] = static_cast<T>(-1);
+		}
 		where(m, v).copy_to(dst);
-		for (int i = 0; i < N; ++i) { EXPECT_EQ(dst[i], (i % 2 == 0) ? a[i] : static_cast<T>(-1)); }
+		for (int i = 0; i < N; ++i)
+		{
+			EXPECT_EQ(dst[i], (i % 2 == 0) ? a[i] : static_cast<T>(-1));
+		}
 
 		alignas(64) T src[16];
-		for (int i = 0; i < N; ++i) { src[i] = static_cast<T>(100 + i); }
+		for (int i = 0; i < N; ++i)
+		{
+			src[i] = static_cast<T>(100 + i);
+		}
 		V w(static_cast<T>(0));
 		where(m, w).copy_from(src);
-		for (int i = 0; i < N; ++i) { EXPECT_EQ(w[i], (i % 2 == 0) ? src[i] : static_cast<T>(0)); }
+		for (int i = 0; i < N; ++i)
+		{
+			EXPECT_EQ(w[i], (i % 2 == 0) ? src[i] : static_cast<T>(0));
+		}
 
 		alignas(64) T dst2[16];
-		for (int i = 0; i < N; ++i) { dst2[i] = static_cast<T>(-1); }
+		for (int i = 0; i < N; ++i)
+		{
+			dst2[i] = static_cast<T>(-1);
+		}
 		V const cw = v;
 		where(m, cw).copy_to(dst2); // const_where_expression
-		for (int i = 0; i < N; ++i) { EXPECT_EQ(dst2[i], (i % 2 == 0) ? a[i] : static_cast<T>(-1)); }
+		for (int i = 0; i < N; ++i)
+		{
+			EXPECT_EQ(dst2[i], (i % 2 == 0) ? a[i] : static_cast<T>(-1));
+		}
 	}
 } // namespace
 
 TEST(PpSimdTest, ScalarAbiFloat)
-{ check_all<basic_simd<float, ScalarAbi>>(); }
+{
+	check_all<basic_simd<float, ScalarAbi>>();
+}
 TEST(PpSimdTest, ScalarAbiDouble)
-{ check_all<basic_simd<double, ScalarAbi>>(); }
+{
+	check_all<basic_simd<double, ScalarAbi>>();
+}
 TEST(PpSimdTest, ScalarAbiInt32)
-{ check_all<basic_simd<std::int32_t, ScalarAbi>>(); }
+{
+	check_all<basic_simd<std::int32_t, ScalarAbi>>();
+}
 
 TEST(PpSimdTest, VecAbiFloat4)
-{ check_all<basic_simd<float, VecAbi<4>>>(); }
+{
+	check_all<basic_simd<float, VecAbi<4>>>();
+}
 TEST(PpSimdTest, VecAbiFloat8)
-{ check_all<basic_simd<float, VecAbi<8>>>(); }
+{
+	check_all<basic_simd<float, VecAbi<8>>>();
+}
 TEST(PpSimdTest, VecAbiDouble2)
-{ check_all<basic_simd<double, VecAbi<2>>>(); }
+{
+	check_all<basic_simd<double, VecAbi<2>>>();
+}
 TEST(PpSimdTest, VecAbiInt32x4)
-{ check_all<basic_simd<std::int32_t, VecAbi<4>>>(); }
+{
+	check_all<basic_simd<std::int32_t, VecAbi<4>>>();
+}
 
 TEST(PpSimdTest, NativeFloat)
-{ check_all<native_simd<float>>(); }
+{
+	check_all<native_simd<float>>();
+}
 TEST(PpSimdTest, NativeDouble)
-{ check_all<native_simd<double>>(); }
+{
+	check_all<native_simd<double>>();
+}
 
 TEST(PpSimdTest, AliasesAndTraits)
 {
@@ -422,11 +493,17 @@ TEST(PpSimdTest, AliasesAndTraits)
 }
 
 TEST(PpSimdTest, IntegerOpsScalar)
-{ check_integer_ops<ScalarAbi>(); }
+{
+	check_integer_ops<ScalarAbi>();
+}
 TEST(PpSimdTest, IntegerOpsVec4)
-{ check_integer_ops<VecAbi<4>>(); }
+{
+	check_integer_ops<VecAbi<4>>();
+}
 TEST(PpSimdTest, IntegerOpsVec8)
-{ check_integer_ops<VecAbi<8>>(); }
+{
+	check_integer_ops<VecAbi<8>>();
+}
 
 TEST(PpSimdTest, ConversionsFloat)
 {
@@ -497,7 +574,10 @@ TEST(PpSimdTest, CatSplit)
 
 	auto cat = simd_cat(lo, hi);
 	static_assert(decltype(cat)::size() == 8, "");
-	for (int i = 0; i < 8; ++i) { EXPECT_EQ(cat[i], a[i]); }
+	for (int i = 0; i < 8; ++i)
+	{
+		EXPECT_EQ(cat[i], a[i]);
+	}
 
 	auto parts = simd_split<V4>(cat);
 	EXPECT_EQ(parts.size(), 2u);

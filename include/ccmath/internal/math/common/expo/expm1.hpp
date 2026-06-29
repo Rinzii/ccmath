@@ -17,23 +17,29 @@
 
 namespace ccm
 {
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T expm1(T num)
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T expm1(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_expm1<T>) { return ccm::builtin::expm1_ct(num); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_expm1<T>)
+		{
+			return ccm::builtin::expm1_ct(num);
+		} else
 		{
 			return gen::expm1_gen(num);
 		}
 	}
 
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double expm1(Integer num)
-	{ return ccm::expm1<double>(static_cast<double>(num)); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double expm1(Integer num)
+	{
+		return ccm::expm1<double>(static_cast<double>(num));
+	}
 
 	constexpr float expm1f(float num)
-	{ return ccm::expm1<float>(num); }
+	{
+		return ccm::expm1<float>(num);
+	}
 
 	constexpr long double expm1l(long double num)
-	{ return ccm::expm1<long double>(num); }
+	{
+		return ccm::expm1<long double>(num);
+	}
 } // namespace ccm

@@ -20,16 +20,13 @@ namespace ccm::support::helpers
 {
 #if FLT_EVAL_METHOD == 1
 	// check if the type is the same as float
-	template <typename T>
-	inline constexpr bool check_excess_precision = std::is_same_v<T, float>;
+	template <typename T> inline constexpr bool check_excess_precision = std::is_same_v<T, float>;
 #else
 	// check if the type is the same as float or double
-	template <typename T>
-	inline constexpr bool check_excess_precision = ccm::support::or_v<std::is_same<T, float>, std::is_same<T, double>>;
+	template <typename T> inline constexpr bool check_excess_precision = ccm::support::or_v<std::is_same<T, float>, std::is_same<T, double>>;
 #endif
 
-	template <typename T>
-	constexpr T narrow_eval(T x)
+	template <typename T> constexpr T narrow_eval(T x)
 	{
 #if FLT_EVAL_METHOD == 0
 		return x;

@@ -7,10 +7,9 @@
 
 #include "io.hpp"
 
-#include <cmath>
-
 #include <ccmath/ccmath.hpp>
 
+#include <cmath>
 #include <limits>
 #include <string_view>
 
@@ -20,12 +19,12 @@ namespace
 	{
 		switch (ccm::fpclassify(x))
 		{
-		case FP_INFINITE: return "infinite";
-		case FP_NAN: return "nan";
-		case FP_NORMAL: return "normal";
+		case FP_INFINITE : return "infinite";
+		case FP_NAN		 : return "nan";
+		case FP_NORMAL	 : return "normal";
 		case FP_SUBNORMAL: return "subnormal";
-		case FP_ZERO: return "zero";
-		default: return "unknown";
+		case FP_ZERO	 : return "zero";
+		default			 : return "unknown";
 		}
 	}
 

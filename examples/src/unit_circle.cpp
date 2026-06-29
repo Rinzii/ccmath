@@ -20,11 +20,7 @@ namespace
 	};
 
 	constexpr AngleCase kAngles[] = {
-		{0.0, 0.0},
-		{30.0, kPi / 6.0},
-		{45.0, kPi / 4.0},
-		{60.0, kPi / 3.0},
-		{90.0, kPi / 2.0},
+		{ 0.0, 0.0 }, { 30.0, kPi / 6.0 }, { 45.0, kPi / 4.0 }, { 60.0, kPi / 3.0 }, { 90.0, kPi / 2.0 },
 	};
 } // namespace
 
@@ -34,7 +30,7 @@ int main()
 
 	ccm::examples::table_header("deg", "sin", "cos");
 
-	for (auto const& angle : kAngles)
+	for (auto const & angle : kAngles)
 	{
 		double const s = ccm::sin(angle.radians);
 		double const c = ccm::cos(angle.radians);
@@ -42,7 +38,7 @@ int main()
 	}
 
 	ccm::examples::section("identity check");
-	double const x = kPi / 5.0;
+	double const x	 = kPi / 5.0;
 	double const lhs = ccm::sin(x) * ccm::sin(x) + ccm::cos(x) * ccm::cos(x);
 	ccm::examples::print_row("sin^2(x) + cos^2(x)", lhs);
 

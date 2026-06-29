@@ -50,7 +50,10 @@ namespace ccm::internal
 			if (CCM_UNLIKELY(intX - low < high - low))
 			{
 				// Handle the case where x is exactly 1.0
-				if (CCM_UNLIKELY(intX == ccm::support::double_to_uint64(1.0))) { return 0.0; }
+				if (CCM_UNLIKELY(intX == ccm::support::double_to_uint64(1.0)))
+				{
+					return 0.0;
+				}
 
 				const ccm::double_t rem		 = x - 1.0;
 				const ccm::double_t remHi	 = support::uint64_to_double(support::double_to_uint64(rem) & -1ULL << 32);
@@ -127,7 +130,9 @@ namespace ccm::internal
 	} // namespace impl
 
 	constexpr double log2_double(double num) noexcept
-	{ return impl::log2_double_impl(num); }
+	{
+		return impl::log2_double_impl(num);
+	}
 } // namespace ccm::internal
 
 CCM_RESTORE_MSVC_WARNING()

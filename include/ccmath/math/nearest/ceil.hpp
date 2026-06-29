@@ -27,24 +27,34 @@ namespace ccm
 	 * @tparam T The type of the number.
 	 * @param num A floating-point or integer value.
 	 * @return The smallest integer value not less than num.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/ceil
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T ceil(T num) noexcept
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T ceil(T num) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_ceil<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::ceil_ct(num); }
+			if (ccm::support::is_constant_evaluated())
+			{
+				return ccm::builtin::ceil_ct(num);
+			}
 		}
 		{
 			// If num is NaN, NaN is returned.
 			// If num is ±∞ or ±0, num is returned, unmodified.
-			if (ccm::isinf(num) || num == static_cast<T>(0) || ccm::isnan(num)) { return num; }
+			if (ccm::isinf(num) || num == static_cast<T>(0) || ccm::isnan(num))
+			{
+				return num;
+			}
 
-			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::ceil_rt(num); }
+			if (!ccm::support::is_constant_evaluated())
+			{
+				return ccm::rt::ceil_rt(num);
+			}
 
 			const T truncated = ccm::trunc(num);
-			if (truncated == num || num < static_cast<T>(0)) { return truncated; }
+			if (truncated == num || num < static_cast<T>(0))
+			{
+				return truncated;
+			}
 			return truncated + static_cast<T>(1);
 		}
 	}
@@ -54,29 +64,31 @@ namespace ccm
 	 * @tparam Integer Integral type.
 	 * @param num Integer value.
 	 * @return num converted to double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/ceil
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double ceil(Integer num) noexcept
-	{ return static_cast<double>(num); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double ceil(Integer num) noexcept
+	{
+		return static_cast<double>(num);
+	}
 
 	/**
 	 * @brief Computes the ceiling of a float value.
 	 * @param num Floating-point value.
 	 * @return Smallest integer value not less than num, as float.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/ceil
 	 */
 	constexpr float ceilf(float num) noexcept
-	{ return ccm::ceil<float>(num); }
+	{
+		return ccm::ceil<float>(num);
+	}
 
 	/**
 	 * @brief Computes the ceiling of a double value.
 	 * @param num Floating-point value.
 	 * @return Smallest integer value not less than num, as double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/ceil
 	 */
 	constexpr long double ceill(long double num) noexcept
-	{ return ccm::ceil<long double>(num); }
+	{
+		return ccm::ceil<long double>(num);
+	}
 } // namespace ccm
 
 /// @ingroup nearest

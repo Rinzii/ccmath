@@ -81,13 +81,18 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_ceil functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto ceil_ct(T x) -> std::enable_if_t<has_constexpr_ceil<T>, T>
+	template <typename T> constexpr auto ceil_ct(T x) -> std::enable_if_t<has_constexpr_ceil<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_ceilf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_ceil(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_ceill(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_ceilf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_ceil(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_ceill(x);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for ceil");
@@ -95,13 +100,18 @@ namespace ccm::builtin
 		}
 	}
 
-	template <typename T>
-	auto ceil_rt(T x) -> std::enable_if_t<has_runtime_ceil<T>, T>
+	template <typename T> auto ceil_rt(T x) -> std::enable_if_t<has_runtime_ceil<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_ceilf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_ceil(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_ceill(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_ceilf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_ceil(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_ceill(x);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for ceil");

@@ -32,7 +32,7 @@
 #endif
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_ISNORMAL
-	#if defined(__clang__) && (__clang_major__ > 5 || (__clang_major__ == 5 && __clang_minor__ >= 0)) && !defined(__MSC_VER) && !defined(__INTEL_LLVM_COMPILER)
+	#if defined(__clang__) && (__clang_major__ > 5 || (__clang_major__ == 5 && __clang_minor__ >= 0)) && !defined(_MSC_VER) && !defined(__INTEL_LLVM_COMPILER)
 		#define CCMATH_HAS_CONSTEXPR_BUILTIN_ISNORMAL
 	#endif
 #endif
@@ -95,13 +95,15 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_isnormal functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto isnormal_ct(T x) -> std::enable_if_t<has_constexpr_isnormal<T>, bool>
-	{ return __builtin_isnormal(x); }
+	template <typename T> constexpr auto isnormal_ct(T x) -> std::enable_if_t<has_constexpr_isnormal<T>, bool>
+	{
+		return __builtin_isnormal(x);
+	}
 
-	template <typename T>
-	auto isnormal_rt(T x) -> std::enable_if_t<has_runtime_isnormal<T>, bool>
-	{ return __builtin_isnormal(x); }
+	template <typename T> auto isnormal_rt(T x) -> std::enable_if_t<has_runtime_isnormal<T>, bool>
+	{
+		return __builtin_isnormal(x);
+	}
 } // namespace ccm::builtin
 
 // Cleanup the global namespace

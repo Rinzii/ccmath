@@ -61,7 +61,10 @@ namespace ccm::internal
 				result = (hi + lo) - 1.0;
 
 				// Avoid -0.0 with downward rounding.
-				if (result == 0.0) { result = 0.0; }
+				if (result == 0.0)
+				{
+					result = 0.0;
+				}
 			}
 			result = 0x1p-1022 * result;
 			return result;
@@ -90,19 +93,34 @@ namespace ccm::internal
 			{
 				// Avoid pointless underflow for tiny x.
 				// 0 Is a common input.
-				if (abs_top - sp::top12_bits_of_double(0x1p-54) >= sp::bitmask_traits<float>::neg_zero) { return x + 1.0; }
+				if (abs_top - sp::top12_bits_of_double(0x1p-54) >= sp::bitmask_traits<float>::neg_zero)
+				{
+					return x + 1.0;
+				}
 
 				if (abs_top >= sp::top12_bits_of_double(1024.0))
 				{
-					if (sp::double_to_uint64(x) == sp::double_to_uint64(-std::numeric_limits<double>::infinity())) { return 0.0; }
+					if (sp::double_to_uint64(x) == sp::double_to_uint64(-std::numeric_limits<double>::infinity()))
+					{
+						return 0.0;
+					}
 
-					if (abs_top >= sp::top12_bits_of_double(std::numeric_limits<double>::infinity())) { return x + 1.0; }
+					if (abs_top >= sp::top12_bits_of_double(std::numeric_limits<double>::infinity()))
+					{
+						return x + 1.0;
+					}
 
 					// Handle overflow
-					if ((sp::double_to_uint64(x) >> 63) == 0U) { return 0x1p769 * 0x1p769; }
+					if ((sp::double_to_uint64(x) >> 63) == 0U)
+					{
+						return 0x1p769 * 0x1p769;
+					}
 
 					// Handle underflow
-					if (sp::double_to_uint64(x) >= sp::double_to_uint64(-1075.0)) { return 0x1p-767 * 0x1p-767; }
+					if (sp::double_to_uint64(x) >= sp::double_to_uint64(-1075.0))
+					{
+						return 0x1p-767 * 0x1p-767;
+					}
 				}
 
 				if (2 * sp::double_to_uint64(x) > 2 * sp::double_to_uint64(928.0))
@@ -131,7 +149,10 @@ namespace ccm::internal
 			const ccm::double_t tmp = tail + rem * first_polynomial_coefficient +
 									  remSqr * (second_polynomial_coefficient + rem * third_polynomial_coefficient) +
 									  remSqr * remSqr * (fourth_polynomial_coefficient + rem * fifth_polynomial_coefficient);
-			if (CCM_UNLIKELY(abs_top == 0.0)) { return handle_special_cases(tmp, sign_bits, expo_int64); }
+			if (CCM_UNLIKELY(abs_top == 0.0))
+			{
+				return handle_special_cases(tmp, sign_bits, expo_int64);
+			}
 
 			const ccm::double_t scale = sp::uint64_to_double(sign_bits);
 
@@ -140,6 +161,8 @@ namespace ccm::internal
 	} // namespace impl
 
 	constexpr double exp2_double(double num)
-	{ return impl::exp2_double_impl(num); }
+	{
+		return impl::exp2_double_impl(num);
+	}
 
 } // namespace ccm::internal

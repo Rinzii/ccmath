@@ -23,7 +23,10 @@ namespace
 #define REQUIRE_POWL_LD80()                                                                                                                                    \
 	do                                                                                                                                                         \
 	{                                                                                                                                                          \
-		if (ccm::config::detect_long_double_format() != ccm::config::LongDoubleFormat::X87Extended) { GTEST_SKIP() << "x87 80-bit long double required"; }     \
+		if (ccm::config::detect_long_double_format() != ccm::config::LongDoubleFormat::X87Extended)                                                            \
+		{                                                                                                                                                      \
+			GTEST_SKIP() << "x87 80-bit long double required";                                                                                                 \
+		}                                                                                                                                                      \
 	} while (false)
 
 	void ExpectPowlMatchesStd(long double base, long double exponent)
