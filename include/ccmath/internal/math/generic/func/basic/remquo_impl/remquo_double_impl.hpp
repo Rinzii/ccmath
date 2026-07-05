@@ -42,6 +42,10 @@ namespace ccm::internal
 			y_i64 &= 0x7fffffffffffffffULL;
 
 			// If y is zero.
+			// This is a common libm trick to produce a NaN and raise FE_INVALID at the same time
+			// without hard coding a NaN or pulling in feraiseexception. The idea is that for y == 0
+			// it computes x * 0 then 0 / 0, which gives the NaN and sets the invalid flag. It also
+			// handles the case where x is infinite. The same idiom is reused below for the non-finite case.
 			if (CCM_UNLIKELY(y_i64 == 0))
 			{
 				return (x * y) / (x * y);
