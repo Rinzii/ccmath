@@ -8,6 +8,7 @@
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 """Record git, compiler, and tool versions for an asmlab run."""
 
+import contextlib
 import datetime
 from datetime import timezone
 import json
@@ -50,13 +51,11 @@ def _host_cpu():
         if res.returncode == 0:
             return res.stdout.strip()
     if sysname == "Linux":
-        try:
-            with open("/proc/cpuinfo") as fh:
-                for line in fh:
-                    if line.startswith("model name"):
-                        return line.split(":", 1)[1].strip()
-        except OSError:
-            pass
+        # Fall back to platform.processor() if /proc/cpuinfo cannot be read.
+        with contextlib.suppress(OSError), open("/proc/cpuinfo") as fh:
+            for line in fh:
+                if line.startswith("model name"):
+                    return line.split(":", 1)[1].strip()
     return platform.processor() or "unknown"
 
 

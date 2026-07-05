@@ -39,7 +39,7 @@ namespace ccm::gen::impl
 		{
 			inline double fma_dx(double x, double y, double z) noexcept
 			{
-#if defined(CCMATH_TARGET_CPU_HAS_FMA)
+#ifdef CCMATH_TARGET_CPU_HAS_FMA
 				return support::multiply_add(x, y, z);
 #elif CCM_HAS_BUILTIN(__builtin_fma)
 				return __builtin_fma(x, y, z);
@@ -143,15 +143,23 @@ namespace ccm::gen::impl
 				DoubleDouble result{ 1.0, 0.0 };
 				while (e > 0U)
 				{
-					if ((e & 1U) != 0U) { result = mul(result, factor); }
+					if ((e & 1U) != 0U)
+					{
+						result = mul(result, factor);
+					}
 					e >>= 1U;
-					if (e > 0U) { factor = mul(factor, factor); }
+					if (e > 0U)
+					{
+						factor = mul(factor, factor);
+					}
 				}
 				return result;
 			}
 
 			constexpr DoubleDouble ipow(double base, std::uint64_t e) noexcept
-			{ return ipow(DoubleDouble{ base, 0.0 }, e); }
+			{
+				return ipow(DoubleDouble{ base, 0.0 }, e);
+			}
 
 			// sqrt(x) refined to a double-double via one Newton correction on a correctly
 			// rounded seed: x^(k + 1/2) = sqrt(x)^(2k + 1) is then exact integer exponentiation.
@@ -179,17 +187,22 @@ namespace ccm::gen::impl
 				const DoubleDouble divisor = ccm::types::exact_add(p.hi, p.lo);
 				const double r0			   = 1.0 / divisor.hi;
 				const FPBits_t r0_bits(r0);
-				if (r0 == 0.0 || !r0_bits.is_finite()) { return r0; }
+				if (r0 == 0.0 || !r0_bits.is_finite())
+				{
+					return r0;
+				}
 				// An exact single-double divisor (e.g. x^-1) is reciprocated correctly by IEEE
 				// division in every rounding mode. The Newton refinement below targets a genuine
 				// double-double divisor and would re-round r0 to the wrong neighbor here.
-				if (divisor.lo == 0.0) { return r0; }
+				if (divisor.lo == 0.0)
+				{
+					return r0;
+				}
 
 				// Keep both Newton steps fused so software-FMA backends such as MSVC preserve the
 				// full double-double correction instead of bleeding precision through intermediate
 				// rounding in the residual and update terms.
-				auto refine = [&divisor](double r) constexpr noexcept
-				{
+				auto refine = [&divisor](double r) constexpr noexcept {
 					const DoubleDouble pr = two_prod(divisor.hi, r);
 					const double err_hi	  = (1.0 - pr.hi) - pr.lo;
 					const double err	  = ccm::types::exact_fma(-divisor.lo, r, err_hi);
@@ -261,10 +274,14 @@ namespace ccm::gen::impl
 			}
 
 			constexpr ScaledPow ipow_scaled(double base, std::uint64_t e) noexcept
-			{ return ipow_scaled(load_scaled(DoubleDouble{ base, 0.0 }), e); }
+			{
+				return ipow_scaled(load_scaled(DoubleDouble{ base, 0.0 }), e);
+			}
 
 			constexpr ScaledPow ipow_scaled(const DoubleDouble & base, std::uint64_t e) noexcept
-			{ return ipow_scaled(load_scaled(base), e); }
+			{
+				return ipow_scaled(load_scaled(base), e);
+			}
 
 			// Round (mant.hi + mant.lo) * 2^exp2 to a correctly rounded double in the active mode,
 			// with mant.hi in [1, 2) (or its negation). A normal result is a single power-of-two
@@ -297,13 +314,16 @@ namespace ccm::gen::impl
 				bool round_up_mag  = false;
 				switch (mode)
 				{
-				case FE_TONEAREST: round_up_mag = frac > 0.5 || (frac == 0.5 && (units & 1) != 0); break;
-				case FE_UPWARD: round_up_mag = !neg && inexact; break;
-				case FE_DOWNWARD: round_up_mag = neg && inexact; break;
+				case FE_TONEAREST : round_up_mag = frac > 0.5 || (frac == 0.5 && (units & 1) != 0); break;
+				case FE_UPWARD	  : round_up_mag = !neg && inexact; break;
+				case FE_DOWNWARD  : round_up_mag = neg && inexact; break;
 				case FE_TOWARDZERO:
-				default: break;
+				default			  : break;
 				}
-				if (round_up_mag) { units += 1; }
+				if (round_up_mag)
+				{
+					units += 1;
+				}
 				const double magnitude = static_cast<double>(units) * 0x1.0p-1074;
 				return neg ? -magnitude : magnitude;
 			}
@@ -324,19 +344,33 @@ namespace ccm::gen::impl
 				for (int i = 0; i < n; ++i)
 				{
 					const FPBits_t b(terms[i]);
-					if (b.is_zero()) { continue; }
+					if (b.is_zero())
+					{
+						continue;
+					}
 					const std::uint64_t significand = static_cast<std::uint64_t>(b.get_explicit_mantissa());
 					const int shift					= (b.get_explicit_exponent() - static_cast<int>(FPBits_t::fraction_length)) + kSumScale;
-					if (shift < 0) { continue; } // below the accumulator resolution; never reached for the fed terms
+					if (shift < 0)
+					{
+						continue;
+					} // below the accumulator resolution, never reached for the fed terms
 					const Wide term = Wide(significand) << static_cast<std::size_t>(shift);
-					if (b.sign().is_neg()) { neg += term; }
-					else
+					if (b.sign().is_neg())
+					{
+						neg += term;
+					} else
 					{
 						pos += term;
 					}
 				}
-				if (pos > neg) { return 1; }
-				if (pos < neg) { return -1; }
+				if (pos > neg)
+				{
+					return 1;
+				}
+				if (pos < neg)
+				{
+					return -1;
+				}
 				return 0;
 			}
 
@@ -348,22 +382,22 @@ namespace ccm::gen::impl
 			constexpr int rsqrt_residual_sign(double ch, double cl, double x) noexcept
 			{
 				// sign(c^2*x - 1) is invariant under ch -> ch*2^-k, cl -> cl*2^-k, x -> x*2^2k. Scale so
-				// ch lands in [1,2); then c^2 and c^2*x stay in range (a raw 1/sqrt(x) for tiny x is
+				// ch lands in [1,2). Then c^2 and c^2*x stay in range (a raw 1/sqrt(x) for tiny x is
 				// huge and c^2 would overflow to infinity, breaking the sign and the caller's walk).
 				const int k = static_cast<int>(support::fp::FPBits<double>(ch).get_biased_exponent()) - support::fp::FPBits<double>::exponent_bias;
 				ch			= support::helpers::internal_ldexp(ch, -k);
 				cl			= support::helpers::internal_ldexp(cl, -k);
 				x			= support::helpers::internal_ldexp(x, 2 * k);
 
-				const DoubleDouble chh = two_prod(ch, ch);
-				const double cross	   = 2.0 * (ch * cl);
-				const double clsq	   = cl * cl;
-				const DoubleDouble t0  = two_prod(chh.hi, x);
-				const DoubleDouble t1  = two_prod(chh.lo, x);
-				const DoubleDouble t2  = two_prod(cross, x);
-				const DoubleDouble t3  = two_prod(clsq, x);
-				const double terms[9]  = { t0.hi, t0.lo, t1.hi, t1.lo, t2.hi, t2.lo, t3.hi, t3.lo, -1.0 };
-				return exact_sign_of_sum(terms, 9);
+				const DoubleDouble chh			  = two_prod(ch, ch);
+				const double cross				  = 2.0 * (ch * cl);
+				const double clsq				  = cl * cl;
+				const DoubleDouble t0			  = two_prod(chh.hi, x);
+				const DoubleDouble t1			  = two_prod(chh.lo, x);
+				const DoubleDouble t2			  = two_prod(cross, x);
+				const DoubleDouble t3			  = two_prod(clsq, x);
+				const std::array<double, 9> terms = { t0.hi, t0.lo, t1.hi, t1.lo, t2.hi, t2.lo, t3.hi, t3.lo, -1.0 };
+				return exact_sign_of_sum(terms.data(), static_cast<int>(terms.size()));
 			}
 
 			// Correctly rounded 1/sqrt(x) for finite x > 0, in every rounding mode. The exact residual
@@ -375,33 +409,56 @@ namespace ccm::gen::impl
 			{
 				using FPBits_t = support::fp::FPBits<double>;
 				double r	   = 1.0 / ccm::gen::sqrt_gen<double>(x);
-				if (const FPBits_t rb(r); !rb.is_finite() || rb.is_zero() || rb.is_subnormal()) { return r; }
+				if (const FPBits_t rb(r); !rb.is_finite() || rb.is_zero() || rb.is_subnormal())
+				{
+					return r;
+				}
 
 				const auto next_up	 = [](double v) { return FPBits_t(FPBits_t(v).uintval() + 1U).get_val(); };
 				const auto next_down = [](double v) { return FPBits_t(FPBits_t(v).uintval() - 1U).get_val(); };
 
 				// Walk to the floor: the largest double r with r^2*x <= 1, i.e. r <= 1/sqrt(x). The
 				// faithful seed is at most a few ulps away, so this is a short loop.
-				int s = rsqrt_residual_sign(r, 0.0, x);
+				int const s = rsqrt_residual_sign(r, 0.0, x);
 				if (s > 0)
 				{
-					do { r = next_down(r); } while (rsqrt_residual_sign(r, 0.0, x) > 0);
-				}
-				else if (s < 0)
+					do
+					{
+						r = next_down(r);
+					} while (rsqrt_residual_sign(r, 0.0, x) > 0); // NOLINT(cppcoreguidelines-avoid-do-while)
+				} else if (s < 0)
 				{
-					while (rsqrt_residual_sign(next_up(r), 0.0, x) <= 0) { r = next_up(r); }
+					while (rsqrt_residual_sign(next_up(r), 0.0, x) <= 0)
+					{
+						r = next_up(r);
+					}
 				}
 
-				if (rsqrt_residual_sign(r, 0.0, x) == 0) { return r; } // exact
+				if (rsqrt_residual_sign(r, 0.0, x) == 0)
+				{
+					return r;
+				} // exact
 
 				const double rp = next_up(r); // r < 1/sqrt(x) < rp
-				if (mode == FE_UPWARD) { return rp; }
-				if (mode != FE_TONEAREST) { return r; } // toward zero / downward
+				if (mode == FE_UPWARD)
+				{
+					return rp;
+				}
+				if (mode != FE_TONEAREST)
+				{
+					return r;
+				} // toward zero / downward
 
 				const double half = 0.5 * (rp - r); // half ulp, a power of two
 				const int sm	  = rsqrt_residual_sign(r, half, x);
-				if (sm > 0) { return r; }							// midpoint above the true value -> nearest is r
-				if (sm < 0) { return rp; }							// midpoint below -> nearest is rp
+				if (sm > 0)
+				{
+					return r;
+				} // midpoint above the true value -> nearest is r
+				if (sm < 0)
+				{
+					return rp;
+				} // midpoint below -> nearest is rp
 				return (FPBits_t(r).uintval() & 1U) == 0U ? r : rp; // exact midpoint -> ties to even
 			}
 		} // namespace pow_int_detail
@@ -412,9 +469,10 @@ namespace ccm::gen::impl
 		// path mirrors powf_double_double but keeps a full double-double log2(x) (binary64
 		// allows |y| up to ~2^53, so the powf lo6_hi single-double shortcut is unsafe). A
 		// normal final value collapses with a single binary64 addition, correctly rounded in
-		// every mode; a subnormal value (only reachable through the 2^-512 underflow scale) is
+		// every mode. A subnormal value (only reachable through the 2^-512 underflow scale) is
 		// instead rounded straight onto the subnormal grid to avoid a double rounding.
-		constexpr double pow_double_double(unsigned idx_x, double dx, double e_x, double y6, std::uint64_t sign, double scale) noexcept
+		constexpr double
+		pow_double_double(unsigned idx_x, double dx, double e_x, double y6, std::uint64_t sign, double scale) noexcept // NOLINT(bugprone-exception-escape)
 		{
 			using FPBits_t = support::fp::FPBits<double>;
 
@@ -470,7 +528,10 @@ namespace ccm::gen::impl
 			// the binary exponent so the power-of-two reconstruction below stays representable.
 			// The result is reassembled by multiplying the (normal) reconstruction by scale,
 			// which is exact for a normal final value, so it stays correctly rounded.
-			if (scale != 1.0) { y6_log2_x.hi += (scale > 1.0) ? -512.0 * 0x1.0p6 : 512.0 * 0x1.0p6; }
+			if (scale != 1.0)
+			{
+				y6_log2_x.hi += (scale > 1.0) ? -512.0 * 0x1.0p6 : 512.0 * 0x1.0p6;
+			}
 
 			const double hm		   = support::fp::nearest_integer(y6_log2_x.hi);
 			const double lo6_hi	   = y6_log2_x.hi - hm; // Exact, |lo6_hi| <= 0.5
@@ -507,7 +568,7 @@ namespace ccm::gen::impl
 			// A single binary64 addition of a faithful double-double rounds once in the
 			// active mode, yielding the correctly-rounded result for a normal final value. When
 			// scale != 1 the reconstruction is built at normal magnitude and shifted by a
-			// power-of-two scale; that shift is exact while the result stays normal, so the lone
+			// power-of-two scale. That shift is exact while the result stays normal, so the lone
 			// addition is still correctly rounded there.
 			const double collapsed = rr.hi + rr.lo;
 			double result		   = collapsed * scale;
@@ -516,14 +577,14 @@ namespace ccm::gen::impl
 			// time, so the collapse above double-rounds (off by one ULP under FE_TONEAREST). A
 			// round-to-odd intermediate cannot rescue it: a 53-bit double leaves only one guard
 			// bit over a 52-bit subnormal, while round-to-odd needs two. Instead round the
-			// double-double straight onto the subnormal grid in one active-mode rounding; the
+			// double-double straight onto the subnormal grid in one active-mode rounding. The
 			// following power-of-two shift is then exact. Normal results keep the fast path
 			// untouched (a normal reconstruction times a power-of-two scale is already exact).
 			if (scale < 1.0)
 			{
 				if (const FPBits_t rb(result); rb.is_subnormal() || rb.is_zero())
 				{
-					// Every subnormal shares the lsb 2^-1074; with scale = 2^-512 the pre-scale grid
+					// Every subnormal shares the lsb 2^-1074. With scale = 2^-512 the pre-scale grid
 					// is 2^-562, so scaling the pair up by 2^562 makes that grid the unit and the
 					// magnitude at most 2^51 (exact, no overflow). Round the integer count of grid
 					// units in the active mode, then reattach the 2^-1074 weight exactly.
@@ -547,13 +608,16 @@ namespace ccm::gen::impl
 					bool round_up_mag  = false;
 					switch (support::fenv::get_rounding_mode())
 					{
-					case FE_TONEAREST: round_up_mag = frac > 0.5 || (frac == 0.5 && (units & 1) != 0); break;
-					case FE_UPWARD: round_up_mag = !neg && inexact; break;
-					case FE_DOWNWARD: round_up_mag = neg && inexact; break;
+					case FE_TONEAREST : round_up_mag = frac > 0.5 || (frac == 0.5 && (units & 1) != 0); break;
+					case FE_UPWARD	  : round_up_mag = !neg && inexact; break;
+					case FE_DOWNWARD  : round_up_mag = neg && inexact; break;
 					case FE_TOWARDZERO:
-					default: break;
+					default			  : break;
 					}
-					if (round_up_mag) { units += 1; }
+					if (round_up_mag)
+					{
+						units += 1;
+					}
 
 					const double magnitude = static_cast<double>(units) * kUnitToResult; // exact, units <= 2^52
 					result				   = neg ? -magnitude : magnitude;
@@ -563,7 +627,7 @@ namespace ccm::gen::impl
 			return result;
 		}
 
-		constexpr double pow_kernel(double base, double exp, std::uint64_t sign) noexcept
+		constexpr double pow_kernel(double base, double exp, std::uint64_t sign) noexcept // NOLINT(bugprone-exception-escape)
 		{
 			using FPBits_t = support::fp::FPBits<double>;
 
@@ -587,24 +651,22 @@ namespace ccm::gen::impl
 
 			if (support::is_constant_evaluated())
 			{
-				const typename FPBits_t::storage_type masked_mantissa = static_cast<typename FPBits_t::storage_type>(
-					FPBits_t(m_x).uintval() & static_cast<typename FPBits_t::storage_type>(0x3fff'e000'0000'0000ULL));
+				const typename FPBits_t::storage_type masked_mantissa =
+					static_cast<FPBits_t::storage_type>(FPBits_t(m_x).uintval() & static_cast<FPBits_t::storage_type>(0x3fff'e000'0000'0000ULL));
 				const double c = FPBits_t(masked_mantissa).get_val();
 				dx			   = support::multiply_add(
 					support::constants::RD.at(static_cast<std::size_t>(idx_x)), m_x - c, support::constants::CD.at(static_cast<std::size_t>(idx_x)));
 				dx_c0 = ccm::types::exact_mult(POW_LOG2_COEFFS[0], dx);
-			}
-			else
+			} else
 			{
 				if constexpr (ccm::builtin::target_cpu_has_fma)
 				{
 					dx	  = pow_kernel_detail::fma_dx(support::constants::RD.at(static_cast<std::size_t>(idx_x)), m_x, -1.0);
 					dx_c0 = ccm::types::exact_mult(POW_LOG2_COEFFS[0], dx);
-				}
-				else
+				} else
 				{
-					const typename FPBits_t::storage_type masked_mantissa = static_cast<typename FPBits_t::storage_type>(
-						FPBits_t(m_x).uintval() & static_cast<typename FPBits_t::storage_type>(0x3fff'e000'0000'0000ULL));
+					const typename FPBits_t::storage_type masked_mantissa =
+						static_cast<FPBits_t::storage_type>(FPBits_t(m_x).uintval() & static_cast<FPBits_t::storage_type>(0x3fff'e000'0000'0000ULL));
 					const double c = FPBits_t(masked_mantissa).get_val();
 					dx			   = support::multiply_add(
 						support::constants::RD.at(static_cast<std::size_t>(idx_x)), m_x - c, support::constants::CD.at(static_cast<std::size_t>(idx_x)));
@@ -649,8 +711,7 @@ namespace ccm::gen::impl
 						y6_log2_x.lo = 0.0;
 						clamped		 = true;
 					}
-				}
-				else
+				} else
 				{
 					scale = 0x1.0p-512;
 					y6_log2_x.hi += 512.0 * 64.0;
@@ -681,8 +742,7 @@ namespace ccm::gen::impl
 					{
 						support::fenv::set_errno_if_required(ERANGE);
 						support::fenv::raise_except_if_required(FE_OVERFLOW);
-					}
-					else if (dd_bits.is_zero() || dd_bits.abs().uintval() < FPBits_t::min_normal().uintval())
+					} else if (dd_bits.is_zero() || dd_bits.abs().uintval() < FPBits_t::min_normal().uintval())
 					{
 						support::fenv::set_errno_if_required(ERANGE);
 						support::fenv::raise_except_if_required(FE_UNDERFLOW);
@@ -722,7 +782,7 @@ namespace ccm::gen::impl
 			double final = result * scale;
 			if (sign == 0)
 			{
-				FPBits_t final_bits(final);
+				FPBits_t const final_bits(final);
 				if (final_bits.sign().is_neg())
 				{
 					if (final_bits.is_inf())
@@ -730,16 +790,14 @@ namespace ccm::gen::impl
 						support::fenv::set_errno_if_required(ERANGE);
 						support::fenv::raise_except_if_required(FE_OVERFLOW);
 						final = FPBits_t::inf(types::Sign::POS).get_val();
-					}
-					else
+					} else
 					{
 						support::fenv::set_errno_if_required(ERANGE);
 						support::fenv::raise_except_if_required(FE_UNDERFLOW);
 						final = 0.0;
 					}
-				}
-				else if (scale == 0x1.0p-512 && final_bits.is_finite() && !final_bits.is_zero() &&
-						 final_bits.abs().uintval() < FPBits_t::min_subnormal().uintval())
+				} else if (scale == 0x1.0p-512 && final_bits.is_finite() && !final_bits.is_zero() &&
+						   final_bits.abs().uintval() < FPBits_t::min_subnormal().uintval())
 				{
 					support::fenv::set_errno_if_required(ERANGE);
 					support::fenv::raise_except_if_required(FE_UNDERFLOW);
@@ -755,20 +813,32 @@ namespace ccm::gen::impl
 			using FPBits_t = support::fp::FPBits<double>;
 			using Sign	   = types::Sign;
 
-			FPBits_t base_bits(base);
-			FPBits_t exp_bits(exp);
+			FPBits_t const base_bits(base);
+			FPBits_t const exp_bits(exp);
 
 			// Screen the operands by bit inspection so no floating point compare touches a
 			// signaling NaN. UCRT's pow returns quietly for sNaN operands while glibc and
 			// Apple libm signal invalid, so the raise is explicit and platform scoped.
-#if !defined(_WIN32)
-			if (base_bits.is_signaling_nan() || exp_bits.is_signaling_nan()) { support::fenv::raise_except_if_required(FE_INVALID); }
+#ifndef _WIN32
+			if (base_bits.is_signaling_nan() || exp_bits.is_signaling_nan())
+			{
+				support::fenv::raise_except_if_required(FE_INVALID);
+			}
 #endif
 
-			if (exp_bits.is_zero()) { return 1.0; }								// pow(x, +/-0) = 1, including NaN x
-			if (base_bits.uintval() == FPBits_t(1.0).uintval()) { return 1.0; } // pow(1, y) = 1, including NaN y
+			if (exp_bits.is_zero())
+			{
+				return 1.0;
+			} // pow(x, +/-0) = 1, including NaN x
+			if (base_bits.uintval() == FPBits_t(1.0).uintval())
+			{
+				return 1.0;
+			} // pow(1, y) = 1, including NaN y
 
-			if (base_bits.is_nan() || exp_bits.is_nan()) { return std::numeric_limits<double>::quiet_NaN(); }
+			if (base_bits.is_nan() || exp_bits.is_nan())
+			{
+				return std::numeric_limits<double>::quiet_NaN();
+			}
 
 			if (base_bits.is_zero())
 			{
@@ -790,7 +860,10 @@ namespace ccm::gen::impl
 				// result sign when the exponent is an odd integer, otherwise the magnitude rule for
 				// +inf applies (including non-integer exponents, e.g. pow(-inf, 0.5) = +inf).
 				const bool out_is_neg = base_bits.sign().is_neg() && is_odd_integer(exp);
-				if (exp < 0.0) { return out_is_neg ? -0.0 : 0.0; }
+				if (exp < 0.0)
+				{
+					return out_is_neg ? -0.0 : 0.0;
+				}
 				return FPBits_t::inf(out_is_neg ? Sign::NEG : Sign::POS).get_val();
 			}
 
@@ -799,9 +872,15 @@ namespace ccm::gen::impl
 				const std::uint64_t base_abs = base_bits.abs().uintval();
 				const std::uint64_t one_bits = FPBits_t(1.0).uintval();
 
-				if (base_abs == one_bits) { return 1.0; }
+				if (base_abs == one_bits)
+				{
+					return 1.0;
+				}
 
-				if (exp_bits.sign().is_neg()) { return base_abs < one_bits ? std::numeric_limits<double>::infinity() : 0.0; }
+				if (exp_bits.sign().is_neg())
+				{
+					return base_abs < one_bits ? std::numeric_limits<double>::infinity() : 0.0;
+				}
 
 				return base_abs < one_bits ? 0.0 : std::numeric_limits<double>::infinity();
 			}
@@ -816,7 +895,10 @@ namespace ccm::gen::impl
 			std::uint64_t sign = 0;
 			if (base < 0.0)
 			{
-				if (is_odd_integer(exp)) { sign = FPBits_t::sign_mask; }
+				if (is_odd_integer(exp))
+				{
+					sign = FPBits_t::sign_mask;
+				}
 				base = base_bits.abs().get_val();
 			}
 
@@ -835,7 +917,7 @@ namespace ccm::gen::impl
 					pow_int_detail::ScaledPow sp = pow_int_detail::ipow_scaled(base, mag);
 					// Fold a negative result's sign into the pair before the final rounding. Negating
 					// a magnitude that was already rounded in the active mode flips directed rounding
-					// (-round_up(|v|) is round_down(-|v|)); rounding the signed value is correct.
+					// (-round_up(|v|) is round_down(-|v|)). Rounding the signed value is correct.
 					if (sign != 0)
 					{
 						sp.mantissa.hi = -sp.mantissa.hi;
@@ -848,9 +930,11 @@ namespace ccm::gen::impl
 						// the reciprocal, or a subnormal that the single reciprocal cannot grid-round
 						// without double rounding) fall through to the kernel.
 						const double r = support::helpers::internal_ldexp(pow_int_detail::reciprocal(sp.mantissa), static_cast<int>(-sp.exp2));
-						if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal()) { return r; }
-					}
-					else
+						if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal())
+						{
+							return r;
+						}
+					} else
 					{
 						// Positive exponent: reconstruct_scaled rounds once in the active mode, using the
 						// subnormal grid below the normal floor so a tiny result does not double-round.
@@ -874,29 +958,37 @@ namespace ccm::gen::impl
 			// the same exponent-tracked accumulator as the integer path so the smallest and largest
 			// reachable magnitudes keep full precision (a bare double-double drops its lo limb for a
 			// small base under a large odd power, e.g. 1/sqrt(x) for x just above a tiny power of two).
-			// Genuine half-integers only; integer exponents are fully owned by the integer path above
+			// Genuine half-integers only. Integer exponents are fully owned by the integer path above
 			// (which also carries the result sign for a negative base).
 			const double two_exp = exp * 2.0;
 			if (is_integer(two_exp) && !is_integer(exp) && FPBits_t(two_exp).abs().get_val() <= 2048.0)
 			{
-				// pow(x, +/-1/2) are sqrt and 1/sqrt. sqrt is the correctly rounded sqrt_gen; 1/sqrt
+				// pow(x, +/-1/2) are sqrt and 1/sqrt. sqrt is the correctly rounded sqrt_gen. 1/sqrt
 				// is correctly rounded by an exact residual test (a bare double-double 1/sqrt sits a
 				// directed-mode ULP short for x just past a power of two). The double-double squaring
 				// below cannot resolve those two, so they are intercepted first.
-				if (exp == 0.5) { return ccm::gen::sqrt_gen<double>(base); }
-				if (exp == -0.5) { return pow_int_detail::cr_rsqrt(base, support::fenv::get_rounding_mode()); }
+				if (exp == 0.5)
+				{
+					return ccm::gen::sqrt_gen<double>(base);
+				}
+				if (exp == -0.5)
+				{
+					return pow_int_detail::cr_rsqrt(base, support::fenv::get_rounding_mode());
+				}
 
 				const auto m					   = static_cast<std::int64_t>(two_exp);
 				const std::uint64_t mag			   = m < 0 ? static_cast<std::uint64_t>(-(m + 1)) + 1U : static_cast<std::uint64_t>(m);
 				const pow_int_detail::ScaledPow sp = pow_int_detail::ipow_scaled(pow_int_detail::dd_sqrt(base), mag);
 				if (m < 0)
 				{
-					// Negative half-integer: reciprocal of the odd power then an exact scale; a
+					// Negative half-integer: reciprocal of the odd power then an exact scale. A
 					// non-normal result falls through to the kernel.
 					const double r = support::helpers::internal_ldexp(pow_int_detail::reciprocal(sp.mantissa), static_cast<int>(-sp.exp2));
-					if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal()) { return r; }
-				}
-				else
+					if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero() && !r_bits.is_subnormal())
+					{
+						return r;
+					}
+				} else
 				{
 					const double r = pow_int_detail::reconstruct_scaled(sp.mantissa, sp.exp2, support::fenv::get_rounding_mode());
 					if (const FPBits_t r_bits(r); r_bits.is_finite() && !r_bits.is_zero())
@@ -915,13 +1007,18 @@ namespace ccm::gen::impl
 			const FPBits_t exp_abs_bits(exp);
 			const std::uint64_t exp_a					   = exp_abs_bits.abs().uintval();
 			constexpr std::uint64_t kHugeExponentThreshold = 0x43d7'4910'd52d'3052ULL;
-			if (exp_a > kHugeExponentThreshold) { exp = exp_abs_bits.sign().is_neg() ? -0x1.0p100 : 0x1.0p100; }
+			if (exp_a > kHugeExponentThreshold)
+			{
+				exp = exp_abs_bits.sign().is_neg() ? -0x1.0p100 : 0x1.0p100;
+			}
 
 			return pow_kernel(base, exp, sign);
 		}
 	} // namespace internal::impl
 
 	constexpr double pow_impl(double base, double exp) noexcept
-	{ return internal::impl::pow_impl(base, exp); }
+	{
+		return internal::impl::pow_impl(base, exp);
+	}
 
 } // namespace ccm::gen::impl

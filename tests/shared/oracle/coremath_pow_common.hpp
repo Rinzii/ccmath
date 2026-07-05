@@ -12,12 +12,15 @@
 
 namespace ccm::test::oracle
 {
-	template <typename T>
-	inline T coremath_pow_reference(T base, T exponent)
+	template <typename T> inline T coremath_pow_reference(T base, T exponent)
 	{
-		if constexpr (std::is_same_v<T, float>) { return cr_powf(base, exponent); }
-		else if constexpr (std::is_same_v<T, double>) { return cr_pow(base, exponent); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return cr_powf(base, exponent);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return cr_pow(base, exponent);
+		} else
 		{
 			return static_cast<T>(cr_pow(static_cast<double>(base), static_cast<double>(exponent)));
 		}
@@ -26,7 +29,7 @@ namespace ccm::test::oracle
 	// Higher-precision correctly-rounded float reference, used only to cross-check
 	// disagreements with the primary float oracle (cr_powf). cr_powf has a fast path
 	// that flushes results extremely close to 1.0 to exactly 1.0 in every rounding
-	// mode (ignoring directed rounding) and mishandles (-1)^(large even); the double
+	// mode (ignoring directed rounding) and mishandles (-1)^(large even). The double
 	// oracle cr_pow does not. We evaluate cr_pow under round-up and round-down, take
 	// the round-to-odd double, and cast it to float in the active rounding mode, which
 	// yields the correctly rounded float without double rounding.
@@ -61,59 +64,65 @@ namespace ccm::test::oracle
 	// sign of x^y - 1 = sign(y) * sign(|x| - 1). Outside this region cr_pow is reliable.
 	inline std::optional<double> coremath_double_near_one_truth(double base, double exponent)
 	{
-		if (!(base > 0.0) || !std::isfinite(base) || !std::isfinite(exponent) || base == 1.0) { return std::nullopt; }
+		if (!(base > 0.0) || !std::isfinite(base) || !std::isfinite(exponent) || base == 1.0)
+		{
+			return std::nullopt;
+		}
 
 		int e_x = 0;
 		std::frexp(base, &e_x); // base in [0.5, 1) * 2^e_x, so |log2(base)| <= |e_x| + 1
 		const double log2_bound = std::fabs(static_cast<double>(e_x)) + 1.0;
-		if (!(std::fabs(exponent) * log2_bound < 0x1.0p-54)) { return std::nullopt; }
+		if (!(std::fabs(exponent) * log2_bound < 0x1.0p-54))
+		{
+			return std::nullopt;
+		}
 
 		const int sign_y	 = (exponent > 0.0) ? 1 : (exponent < 0.0) ? -1 : 0;
 		const int sign_log	 = (base > 1.0) ? 1 : (base < 1.0) ? -1 : 0;
 		const int sign_delta = sign_y * sign_log; // sign of x^y - 1
 		const int mode		 = std::fegetround();
 
-		if (sign_delta > 0) { return mode == FE_UPWARD ? std::nextafter(1.0, 2.0) : 1.0; }
-		if (sign_delta < 0) { return (mode == FE_DOWNWARD || mode == FE_TOWARDZERO) ? std::nextafter(1.0, 0.0) : 1.0; }
+		if (sign_delta > 0)
+		{
+			return mode == FE_UPWARD ? std::nextafter(1.0, 2.0) : 1.0;
+		}
+		if (sign_delta < 0)
+		{
+			return (mode == FE_DOWNWARD || mode == FE_TOWARDZERO) ? std::nextafter(1.0, 0.0) : 1.0;
+		}
 		return 1.0;
 	}
 
 	// True when the function output disagrees with the primary oracle but is in fact
 	// correctly rounded (confirmed by a higher-precision cross-check), i.e. the oracle
-	// is wrong for this case. float cross-checks against the round-to-odd double oracle;
+	// is wrong for this case. float cross-checks against the round-to-odd double oracle,
 	// double resolves the near-1 region where cr_pow ignores directed rounding.
-	template <typename T>
-	inline bool function_matches_high_precision_truth(T base, T exponent, T actual)
+	template <typename T> inline bool function_matches_high_precision_truth([[maybe_unused]] T base, [[maybe_unused]] T exponent, [[maybe_unused]] T actual)
 	{
 		if constexpr (std::is_same_v<T, float>)
 		{
 			const float truth = coremath_float_truth(base, exponent);
 			return oracle_fp_bits_match(actual, truth);
-		}
-		else if constexpr (std::is_same_v<T, double>)
+		} else if constexpr (std::is_same_v<T, double>)
 		{
 			const std::optional<double> truth = coremath_double_near_one_truth(base, exponent);
 			return truth.has_value() && oracle_fp_bits_match(actual, *truth);
-		}
-		else
+		} else
 		{
-			(void)base;
-			(void)exponent;
-			(void)actual;
 			return false;
 		}
 	}
 
 	template <typename T, typename Fn>
-	inline std::optional<failure_record<T>> evaluate_case_in_mode(const pow_case<T>& test_case,
+	inline std::optional<failure_record<T>> evaluate_case_in_mode(const pow_case<T> & test_case,
 																  std::string_view function_name,
 																  std::string_view path_name,
 																  int rounding_mode,
 																  Fn fn,
-																  run_summary<T>& summary,
-																  std::uint64_t seed						= 0,
-																  std::string_view search_mode				= {},
-																  std::vector<failure_record<T>>* event_log = nullptr)
+																  run_summary<T> & summary,
+																  std::uint64_t seed						 = 0,
+																  std::string_view search_mode				 = {},
+																  std::vector<failure_record<T>> * event_log = nullptr)
 	{
 		return evaluate_binary_coremath_case_in_mode(
 			test_case,
@@ -132,16 +141,16 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T, typename Fn>
-	inline void evaluate_case_all_modes(const pow_case<T>& test_case,
+	inline void evaluate_case_all_modes(const pow_case<T> & test_case,
 										std::string_view function_name,
 										std::string_view path_name,
-										const std::vector<int>& rounding_modes,
+										const std::vector<int> & rounding_modes,
 										Fn fn,
-										run_summary<T>& summary,
-										std::vector<failure_record<T>>& failures,
-										std::uint64_t seed						  = 0,
-										std::string_view search_mode			  = {},
-										std::vector<failure_record<T>>* event_log = nullptr)
+										run_summary<T> & summary,
+										std::vector<failure_record<T>> & failures,
+										std::uint64_t seed						   = 0,
+										std::string_view search_mode			   = {},
+										std::vector<failure_record<T>> * event_log = nullptr)
 	{
 		evaluate_binary_coremath_case_all_modes(
 			test_case,

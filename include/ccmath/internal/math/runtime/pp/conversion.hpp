@@ -22,14 +22,14 @@ namespace ccm::pp
 {
 	// Value conversion of every lane to U, preserving lane count (and thus ABI).
 	// e.g. static_simd_cast<int>(basic_simd<float>) truncates toward zero per lane.
-	template <typename U, typename T, typename Abi>
-	CCM_ALWAYS_INLINE basic_simd<U, Abi> static_simd_cast(basic_simd<T, Abi> const & v)
-	{ return basic_simd<U, Abi>::from_member(SimdTraits<T, Abi>::template convert<U>(v.get())); }
+	template <typename U, typename T, typename Abi> CCM_ALWAYS_INLINE basic_simd<U, Abi> static_simd_cast(basic_simd<T, Abi> const & v)
+	{
+		return basic_simd<U, Abi>::from_member(SimdTraits<T, Abi>::template convert<U>(v.get()));
+	}
 
 	// Bit-preserving reinterpret of each lane to a same-sized type U
 	// (e.g. float <-> int32, double <-> int64). The bit pattern is unchanged.
-	template <typename U, typename T, typename Abi>
-	CCM_ALWAYS_INLINE basic_simd<U, Abi> simd_bit_cast(basic_simd<T, Abi> const & v)
+	template <typename U, typename T, typename Abi> CCM_ALWAYS_INLINE basic_simd<U, Abi> simd_bit_cast(basic_simd<T, Abi> const & v)
 	{
 		static_assert(sizeof(U) == sizeof(T), "simd_bit_cast requires equal element size");
 		return basic_simd<U, Abi>::from_member(SimdTraits<T, Abi>::template bitcast<U>(v.get()));

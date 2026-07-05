@@ -11,12 +11,16 @@
 #include <gtest/gtest.h>
 
 #include <ccmath/ext/delta_angle.hpp>
+#include <ccmath/math/numbers.hpp>
 
 TEST(CcmathExtDeltaAngleTest, Smoke)
 {
-	static_assert(ccm::ext::delta_angle(0.0, 90.0) == 90.0);
-	static_assert(ccm::ext::delta_angle(350.0, 10.0) == 20.0);
-	static_assert(ccm::ext::safe::delta_angle(350.0, 10.0) == 20.0);
+	constexpr double pi = ccm::numbers::pi_v<double>;
 
-	EXPECT_DOUBLE_EQ(ccm::ext::delta_angle(0.0, 180.0), 180.0);
+	static_assert(ccm::ext::delta_angle(0.0, pi / 2) == pi / 2);
+	static_assert(ccm::ext::delta_angle(0.0, 2.0 * pi) == 0.0);
+	static_assert(ccm::ext::delta_angle(0.0, pi) == pi);
+
+	EXPECT_DOUBLE_EQ(ccm::ext::delta_angle(0.0, pi), pi);
+	EXPECT_DOUBLE_EQ(ccm::ext::delta_angle(0.0, 1.5 * pi), -0.5 * pi);
 }

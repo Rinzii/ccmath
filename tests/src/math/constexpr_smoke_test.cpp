@@ -8,11 +8,19 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
+#include "ccmath/internal/math/generic/func/trig/cos_gen.hpp"
+#include "ccmath/internal/math/generic/func/trig/sin_gen.hpp"
+#include "ccmath/internal/support/bits.hpp"
+#include "ccmath/internal/support/fenv/fenv_support.hpp"
+
 #include <gtest/gtest.h>
 
 #include <ccmath/ccmath.hpp>
 
+#include <cerrno>
+#include <cfenv>
 #include <cmath>
+#include <cstdint>
 #include <limits>
 
 namespace
@@ -115,4 +123,74 @@ TEST(CcmathMathConstexprSmokeTest, AllImplementedFunctions)
 	static_assert(ccm::gamma(5.0) == 24.0);
 	static_assert(ccm::lgamma(1.0) == 0.0);
 	static_assert(ccm::lerp(0.0, 10.0, 0.5) == 5.0);
+}
+
+TEST(CcmathMathConstexprSmokeTest, DomainAndSpecialInputs)
+{
+	// Regression for issue 135. Domain and special inputs must be usable in a constant
+	// expression and return the correct special value, raising no errno at compile time.
+	// GCC-proper evaluates these through the __builtin_ family, which refuses domain
+	// inputs at compile time (a separate limitation), so guard that path out here.
+#if !(defined(__GNUC__) && !defined(__clang__))
+	static_assert(ccm::log(0.0) == -std::numeric_limits<double>::infinity());
+	static_assert(ccm::isnan(ccm::log(-1.0)));
+	static_assert(ccm::isnan(ccm::acos(2.0)));
+	static_assert(ccm::isnan(ccm::pow(-1.0, 0.5)));
+	static_assert(ccm::tgamma(0.0) == std::numeric_limits<double>::infinity());
+	static_assert(ccm::ilogb(0.0) == FP_ILOGB0);
+
+	// sin/cos of an infinity is a domain error. The generic kernel must yield a NaN that is
+	// usable in a constant expression. The old code built it as x + quiet_nan, which constant
+	// evaluation rejects because the addition produces a NaN.
+	static_assert(ccm::isnan(ccm::sin(std::numeric_limits<double>::infinity())));
+	static_assert(ccm::isnan(ccm::cos(std::numeric_limits<double>::infinity())));
+	static_assert(ccm::isnan(ccm::sin(std::numeric_limits<float>::infinity())));
+	static_assert(ccm::isnan(ccm::cos(std::numeric_limits<float>::infinity())));
+#endif
+	SUCCEED();
+}
+
+TEST(CcmathMathConstexprSmokeTest, SincosInfinityAndNanPayload)
+{
+	// Runtime companion to the sin/cos infinity static_asserts above, exercising the generic
+	// kernel directly (the runtime dispatch otherwise routes through __builtin sin/cos). An
+	// infinity is a domain error: the result is a NaN, FE_INVALID is raised, and errno is EDOM.
+	// A quiet-NaN input must pass through unchanged so its sign and payload survive.
+	const double inf  = std::numeric_limits<double>::infinity();
+	const float inf_f = std::numeric_limits<float>::infinity();
+
+	EXPECT_TRUE(ccm::isnan(ccm::gen::sin_gen(inf)));
+	EXPECT_TRUE(ccm::isnan(ccm::gen::cos_gen(inf)));
+	EXPECT_TRUE(ccm::isnan(ccm::gen::sin_gen(inf_f)));
+	EXPECT_TRUE(ccm::isnan(ccm::gen::cos_gen(inf_f)));
+
+	// A quiet NaN with the sign bit set and a distinctive payload must come back bit for bit.
+	const std::uint64_t qnan_bits = 0xfff8'0000'1234'5678ULL;
+	const double qnan_in		  = ccm::support::bit_cast<double>(qnan_bits);
+	EXPECT_EQ(ccm::support::bit_cast<std::uint64_t>(ccm::gen::sin_gen(qnan_in)), qnan_bits);
+	EXPECT_EQ(ccm::support::bit_cast<std::uint64_t>(ccm::gen::cos_gen(qnan_in)), qnan_bits);
+
+	const std::uint32_t qnan_bits_f = 0xffc0'abcdU;
+	const float qnan_in_f			= ccm::support::bit_cast<float>(qnan_bits_f);
+	EXPECT_EQ(ccm::support::bit_cast<std::uint32_t>(ccm::gen::sin_gen(qnan_in_f)), qnan_bits_f);
+	EXPECT_EQ(ccm::support::bit_cast<std::uint32_t>(ccm::gen::cos_gen(qnan_in_f)), qnan_bits_f);
+
+	// FE_INVALID and errno are each reported only when the build's error-handling mode asks for
+	// them. -fno-math-errno (the default on some toolchains) keeps the fp exception but drops the
+	// errno write, so gate each check on the mode it belongs to rather than on a single flag.
+	using ccm::support::fenv::ccm_math_err_mode;
+	using ccm::support::fenv::get_mode;
+	const int handling = ccm::support::fenv::ccm_math_err_handling();
+
+	std::feclearexcept(FE_ALL_EXCEPT);
+	errno = 0;
+	EXPECT_TRUE(ccm::isnan(ccm::gen::sin_gen(inf)));
+	if ((handling & get_mode(ccm_math_err_mode::eErrnoExcept)) != 0)
+	{
+		EXPECT_NE(std::fetestexcept(FE_INVALID), 0);
+	}
+	if ((handling & get_mode(ccm_math_err_mode::eErrno)) != 0)
+	{
+		EXPECT_EQ(errno, EDOM);
+	}
 }

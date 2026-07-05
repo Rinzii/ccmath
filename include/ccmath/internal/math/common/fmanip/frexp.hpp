@@ -17,19 +17,24 @@
 
 namespace ccm
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	constexpr T frexp(T x, int & exp)
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T frexp(T x, int & exp)
 	{
-		if constexpr (ccm::builtin::has_constexpr_frexp<T>) { return ccm::builtin::frexp_ct(x, &exp); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_frexp<T>)
+		{
+			return ccm::builtin::frexp_ct(x, &exp);
+		} else
 		{
 			return gen::frexp_gen(x, exp);
 		}
 	}
 
 	constexpr float frexpf(float x, int & exp)
-	{ return ccm::frexp(x, exp); }
+	{
+		return ccm::frexp(x, exp);
+	}
 
 	constexpr long double frexpl(long double x, int & exp)
-	{ return ccm::frexp(x, exp); }
+	{
+		return ccm::frexp(x, exp);
+	}
 } // namespace ccm

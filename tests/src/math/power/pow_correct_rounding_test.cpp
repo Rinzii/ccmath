@@ -24,6 +24,7 @@
 
 #include <gtest/gtest.h>
 
+#include <array>
 #include <cfenv>
 #include <cstdint>
 #include <cstring>
@@ -48,7 +49,7 @@ namespace
 	{
 		std::uint64_t base_bits;
 		std::uint64_t exp_bits;
-		std::uint64_t expected[4]; // FE_TONEAREST, FE_TOWARDZERO, FE_UPWARD, FE_DOWNWARD
+		std::array<std::uint64_t, 4> expected; // FE_TONEAREST, FE_TOWARDZERO, FE_UPWARD, FE_DOWNWARD
 	};
 
 	// Goldens generated with MPFR mpfr_pow at 53-bit target precision plus mpfr_subnormalize.
@@ -80,18 +81,18 @@ namespace
 		{ 0x3b5fffffffffffffULL, 0x402c000000000000ULL, { 0x000ffffffffffff9ULL, 0x000ffffffffffff9ULL, 0x000ffffffffffffaULL, 0x000ffffffffffff9ULL } },
 	};
 
-	constexpr int kModes[4]			= { FE_TONEAREST, FE_TOWARDZERO, FE_UPWARD, FE_DOWNWARD };
-	constexpr const char* kNames[4] = { "FE_TONEAREST", "FE_TOWARDZERO", "FE_UPWARD", "FE_DOWNWARD" };
+	constexpr std::array<int, 4> kModes			 = { FE_TONEAREST, FE_TOWARDZERO, FE_UPWARD, FE_DOWNWARD };
+	constexpr std::array<const char *, 4> kNames = { "FE_TONEAREST", "FE_TOWARDZERO", "FE_UPWARD", "FE_DOWNWARD" };
 } // namespace
 
 TEST(CcmathPowCorrectRounding, BinaryDoubleAllModes)
 {
 	const int saved = std::fegetround();
-	for (const auto& c : kCases)
+	for (const auto & c : kCases)
 	{
 		const double base = from_bits(c.base_bits);
 		const double exp  = from_bits(c.exp_bits);
-		for (int m = 0; m < 4; ++m)
+		for (std::size_t m = 0; m < kModes.size(); ++m)
 		{
 			std::fesetround(kModes[m]);
 			const double got = ccm::gen::pow_gen<double>(base, exp);

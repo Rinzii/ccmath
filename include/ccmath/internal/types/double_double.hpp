@@ -25,9 +25,12 @@ namespace ccm
 		// True fused multiply-add for the error-free transforms below. This path stays on the quiet
 		// software fallback when a builtin is unavailable so the residual remains exact without
 		// raising spurious public FE_INEXACT / range exceptions.
-		constexpr double exact_fma(double x, double y, double z) noexcept
+		constexpr double exact_fma(double x, double y, double z) noexcept // NOLINT(bugprone-exception-escape)
 		{
-			if (support::is_constant_evaluated()) { return support::fp::generic_fma(x, y, z); }
+			if (support::is_constant_evaluated())
+			{
+				return support::fp::generic_fma(x, y, z);
+			}
 #if CCM_HAS_BUILTIN(__builtin_fma)
 			return __builtin_fma(x, y, z);
 #else
@@ -83,10 +86,10 @@ namespace ccm
 			const DoubleDouble as = split(a);
 			const DoubleDouble bs = split(b);
 			r.hi				  = a * b;
-			const double t1		  = as.hi * bs.hi - r.hi;
-			const double t2		  = as.hi * bs.lo + t1;
-			const double t3		  = as.lo * bs.hi + t2;
-			r.lo				  = as.lo * bs.lo + t3;
+			const double t1		  = (as.hi * bs.hi) - r.hi;
+			const double t2		  = (as.hi * bs.lo) + t1;
+			const double t3		  = (as.lo * bs.hi) + t2;
+			r.lo				  = (as.lo * bs.lo) + t3;
 			return r;
 		}
 
@@ -115,6 +118,8 @@ namespace ccm
 		template <>
 		constexpr types::DoubleDouble
 		multiply_add<types::DoubleDouble>(const types::DoubleDouble & x, const types::DoubleDouble & y, const types::DoubleDouble & z)
-		{ return add(z, quick_mult(x, y)); }
+		{
+			return add(z, quick_mult(x, y));
+		}
 	} // namespace support
 } // namespace ccm

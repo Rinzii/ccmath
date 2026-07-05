@@ -1,0 +1,65 @@
+name: "Labels: Approved"
+
+on:
+    pull_request_review:
+        types:
+            - submitted
+
+permissions:
+    contents: read
+    pull-requests: write
+    issues: write
+
+jobs:
+    add-approved-label:
+        if: github.event.review.state == 'approved'
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Add Approved label for trusted reviewers
+              uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const review = context.payload.review;
+                      const pr = context.payload.pull_request;
+                      if (!review?.user?.login || pr?.number == null) {
+                        core.info('Missing review user or pull request, skipping.');
+                        return;
+                      }
+
+                      const reviewUser = review.user.login;
+                      const issue_number = pr.number;
+
+                      const permission = await github.rest.repos.getCollaboratorPermissionLevel({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        username: reviewUser
+                      });
+
+                      const allowed = new Set(['admin', 'maintain', 'write']);
+
+                      if (!allowed.has(permission.data.permission)) {
+                        core.info(`${reviewUser} does not have sufficient repo permissions`);
+                        return;
+                      }
+
+                      await github.rest.issues.addLabels({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number,
+                        labels: ['S: Approved']
+                      });
+
+                      try {
+                        await github.rest.issues.removeLabel({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number,
+                          name: 'S: Needs Review'
+                        });
+                      } catch (error) {
+                        if (error.status !== 404) {
+                          throw error;
+                        }
+                      }

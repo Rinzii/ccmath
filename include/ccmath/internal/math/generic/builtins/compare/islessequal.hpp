@@ -73,13 +73,15 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_islessequal without triggering a compiler error
 	 * when the compiler does not support it.
 	 */
-	template <typename T>
-	constexpr auto islessequal_ct(T x, T y) -> std::enable_if_t<has_constexpr_islessequal<T>, bool>
-	{ return __builtin_islessequal(x, y); }
+	template <typename T> constexpr auto islessequal_ct(T x, T y) -> std::enable_if_t<has_constexpr_islessequal<T>, bool>
+	{
+		return __builtin_islessequal(x, y);
+	}
 
-	template <typename T>
-	auto islessequal_rt(T x, T y) -> std::enable_if_t<has_runtime_islessequal<T>, bool>
-	{ return __builtin_islessequal(x, y); }
+	template <typename T> auto islessequal_rt(T x, T y) -> std::enable_if_t<has_runtime_islessequal<T>, bool>
+	{
+		return __builtin_islessequal(x, y);
+	}
 } // namespace ccm::builtin
 
 // Cleanup the global namespace

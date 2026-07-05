@@ -23,10 +23,11 @@ namespace ccm::internal::sincos_float_data
 		0.0f, -0x1.87de2ap-2f, -0x1.6a09e6p-1f, -0x1.d906bcp-1f, -1.0f, -0x1.d906bcp-1f, -0x1.6a09e6p-1f, -0x1.87de2ap-2f,
 	};
 
-	// Multi-part pi/8 for small range reduction.
+	// Cody-Waite three-part -pi/8 for the small-range reduction.
 	constexpr std::array<float, 3> MPI = { -0x1.921f8p-2f, -0x1.aa22p-21f, -0x1.68c234p-41f };
 
-	constexpr float ONE_OVER_PI = 0x1.45f306p+1f;
+	// Reciprocal of pi/8. The reduction computes k = round(x * 8/pi) from it.
+	constexpr float EIGHT_OVER_PI = 0x1.45f306p+1f;
 
 	// Large-|x| reduction is handled by the shared Payne-Hanek path in sincos_payne_hanek.hpp.
 

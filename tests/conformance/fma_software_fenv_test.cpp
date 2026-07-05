@@ -29,11 +29,9 @@ namespace
 {
 	using ccm::test::runtime_value;
 
-	template <typename T>
-	void consume(T value)
+	template <typename T> void consume(T value)
 	{
-		volatile T sink = value;
-		(void)sink;
+		[[maybe_unused]] volatile T sink = value;
 	}
 } // namespace
 
@@ -76,64 +74,48 @@ TEST(CcmathSoftwareFmaFenvTests, RangeFlagsMatchStdAllModes)
 {
 	CCMATH_SKIP_MSVC_FENV_EXCEPTIONS();
 
-	ccm::test::ForEachRoundingModeOrSkip(
-		[&](int mode)
-		{
-			ccm::test::ForceRoundingMode force(mode);
-			ASSERT_TRUE(force);
+	ccm::test::ForEachRoundingModeOrSkip([&](int mode) {
+		ccm::test::ForceRoundingMode force(mode);
+		ASSERT_TRUE(force);
 
-			ccm::test::ExpectFenvFlagsMatchStd(
-				[]
-				{
-					consume(ccm::fmaf(runtime_value(std::numeric_limits<float>::max()), runtime_value(2.0F), runtime_value(std::numeric_limits<float>::max())));
-				},
-				[]
-				{
-					consume(std::fmaf(runtime_value(std::numeric_limits<float>::max()), runtime_value(2.0F), runtime_value(std::numeric_limits<float>::max())));
-				},
-				FE_OVERFLOW | FE_INEXACT);
+		ccm::test::ExpectFenvFlagsMatchStd(
+			[] { consume(ccm::fmaf(runtime_value(std::numeric_limits<float>::max()), runtime_value(2.0F), runtime_value(std::numeric_limits<float>::max()))); },
+			[] { consume(std::fmaf(runtime_value(std::numeric_limits<float>::max()), runtime_value(2.0F), runtime_value(std::numeric_limits<float>::max()))); },
+			FE_OVERFLOW | FE_INEXACT);
 
-			ccm::test::ExpectFenvFlagsMatchStd(
-				[] { consume(ccm::fmaf(runtime_value(std::numeric_limits<float>::denorm_min()), runtime_value(0.5F), runtime_value(0.0F))); },
-				[] { consume(std::fmaf(runtime_value(std::numeric_limits<float>::denorm_min()), runtime_value(0.5F), runtime_value(0.0F))); },
-				FE_UNDERFLOW | FE_INEXACT);
+		ccm::test::ExpectFenvFlagsMatchStd(
+			[] { consume(ccm::fmaf(runtime_value(std::numeric_limits<float>::denorm_min()), runtime_value(0.5F), runtime_value(0.0F))); },
+			[] { consume(std::fmaf(runtime_value(std::numeric_limits<float>::denorm_min()), runtime_value(0.5F), runtime_value(0.0F))); },
+			FE_UNDERFLOW | FE_INEXACT);
 
-			ccm::test::ExpectFenvFlagsMatchStd(
-				[]
-				{
-					consume(ccm::fma(runtime_value(std::numeric_limits<double>::max()), runtime_value(2.0), runtime_value(std::numeric_limits<double>::max())));
-				},
-				[]
-				{
-					consume(std::fma(runtime_value(std::numeric_limits<double>::max()), runtime_value(2.0), runtime_value(std::numeric_limits<double>::max())));
-				},
-				FE_OVERFLOW | FE_INEXACT);
+		ccm::test::ExpectFenvFlagsMatchStd(
+			[] { consume(ccm::fma(runtime_value(std::numeric_limits<double>::max()), runtime_value(2.0), runtime_value(std::numeric_limits<double>::max()))); },
+			[] { consume(std::fma(runtime_value(std::numeric_limits<double>::max()), runtime_value(2.0), runtime_value(std::numeric_limits<double>::max()))); },
+			FE_OVERFLOW | FE_INEXACT);
 
-			ccm::test::ExpectFenvFlagsMatchStd(
-				[] { consume(ccm::fma(runtime_value(std::numeric_limits<double>::denorm_min()), runtime_value(0.5), runtime_value(0.0))); },
-				[] { consume(std::fma(runtime_value(std::numeric_limits<double>::denorm_min()), runtime_value(0.5), runtime_value(0.0))); },
-				FE_UNDERFLOW | FE_INEXACT);
-		});
+		ccm::test::ExpectFenvFlagsMatchStd(
+			[] { consume(ccm::fma(runtime_value(std::numeric_limits<double>::denorm_min()), runtime_value(0.5), runtime_value(0.0))); },
+			[] { consume(std::fma(runtime_value(std::numeric_limits<double>::denorm_min()), runtime_value(0.5), runtime_value(0.0))); },
+			FE_UNDERFLOW | FE_INEXACT);
+	});
 }
 
 TEST(CcmathSoftwareFmaFenvTests, InexactFlagsMatchStdAllModes)
 {
 	CCMATH_SKIP_MSVC_FENV_EXCEPTIONS();
 
-	ccm::test::ForEachRoundingModeOrSkip(
-		[&](int mode)
-		{
-			ccm::test::ForceRoundingMode force(mode);
-			ASSERT_TRUE(force);
+	ccm::test::ForEachRoundingModeOrSkip([&](int mode) {
+		ccm::test::ForceRoundingMode force(mode);
+		ASSERT_TRUE(force);
 
-			ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::fmaf(runtime_value(0.1F), runtime_value(0.1F), runtime_value(0.0F))); },
-											   [] { consume(std::fmaf(runtime_value(0.1F), runtime_value(0.1F), runtime_value(0.0F))); },
-											   FE_INEXACT);
+		ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::fmaf(runtime_value(0.1F), runtime_value(0.1F), runtime_value(0.0F))); },
+										   [] { consume(std::fmaf(runtime_value(0.1F), runtime_value(0.1F), runtime_value(0.0F))); },
+										   FE_INEXACT);
 
-			ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::fma(runtime_value(0.1), runtime_value(0.1), runtime_value(0.0))); },
-											   [] { consume(std::fma(runtime_value(0.1), runtime_value(0.1), runtime_value(0.0))); },
-											   FE_INEXACT);
-		});
+		ccm::test::ExpectFenvFlagsMatchStd([] { consume(ccm::fma(runtime_value(0.1), runtime_value(0.1), runtime_value(0.0))); },
+										   [] { consume(std::fma(runtime_value(0.1), runtime_value(0.1), runtime_value(0.0))); },
+										   FE_INEXACT);
+	});
 }
 
 #undef CCMATH_SKIP_MSVC_FENV_EXCEPTIONS

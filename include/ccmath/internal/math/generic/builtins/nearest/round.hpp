@@ -121,13 +121,18 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_round functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto round_ct(T x) -> std::enable_if_t<has_constexpr_round<T>, T>
+	template <typename T> constexpr auto round_ct(T x) -> std::enable_if_t<has_constexpr_round<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_roundf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_round(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_roundl(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_roundf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_round(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_roundl(x);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for round");
@@ -142,13 +147,18 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_lround functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto lround_ct(T x) -> std::enable_if_t<has_constexpr_lround<T>, T>
+	template <typename T> constexpr auto lround_ct(T x) -> std::enable_if_t<has_constexpr_lround<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_lroundf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_lround(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_lroundl(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_lroundf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_lround(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_lroundl(x);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for lround");
@@ -156,26 +166,36 @@ namespace ccm::builtin
 		}
 	}
 
-	template <typename T>
-	auto round_rt(T x) -> std::enable_if_t<has_runtime_round<T>, T>
+	template <typename T> auto round_rt(T x) -> std::enable_if_t<has_runtime_round<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_roundf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_round(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_roundl(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_roundf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_round(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_roundl(x);
+		} else
 		{
 			static_assert(ccm::support::always_false<T>, "Unsupported type for round");
 			return T{};
 		}
 	}
 
-	template <typename T>
-	auto lround_rt(T x) -> std::enable_if_t<has_runtime_lround<T>, T>
+	template <typename T> auto lround_rt(T x) -> std::enable_if_t<has_runtime_lround<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_lroundf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_lround(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_lroundl(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_lroundf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_lround(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_lroundl(x);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for lround");

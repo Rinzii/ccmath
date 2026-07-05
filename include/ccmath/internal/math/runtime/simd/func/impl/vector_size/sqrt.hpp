@@ -19,8 +19,7 @@
 
 namespace ccm::intrin
 {
-	template <class T, int N>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, abi::vector_size<N>> sqrt(simd<T, abi::vector_size<N>> const & a)
+	template <class T, int N> CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, abi::vector_size<N>> sqrt(simd<T, abi::vector_size<N>> const & a)
 	{
 		return map_scalar(a, [](T value) { return ccm::gen::sqrt_gen(value); });
 	}

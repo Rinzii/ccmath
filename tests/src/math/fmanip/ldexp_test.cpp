@@ -18,16 +18,13 @@
 
 // NOLINTBEGIN
 
-template <typename T>
-class CcmathFmanipTests : public ::testing::Test
-{
-};
+template <typename T> class CcmathFmanipTests : public ::testing::Test
+{};
 
 class FPNameGenerator
 {
 public:
-	template <typename T>
-	static std::string GetName(float)
+	template <typename T> static std::string GetName(float)
 	{
 		if constexpr (std::is_same_v<T, float>) return "float";
 		if constexpr (std::is_same_v<T, double>) return "double";

@@ -30,7 +30,7 @@ namespace ccm::support
 {
 	constexpr bool is_constant_evaluated() noexcept
 	{
-#if defined(CCMATH_HAS_BUILTIN_IS_CONSTANT_EVALUATED)
+#ifdef CCMATH_HAS_BUILTIN_IS_CONSTANT_EVALUATED
 		return __builtin_is_constant_evaluated();
 #else
 		return false;

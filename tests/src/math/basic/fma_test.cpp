@@ -26,12 +26,15 @@
 
 namespace
 {
-	template <typename T>
-	constexpr bool same_bits(T lhs, T rhs)
+	template <typename T> constexpr bool same_bits(T lhs, T rhs)
 	{
-		if constexpr (std::is_same_v<T, float>) { return ccm::support::bit_cast<std::uint32_t>(lhs) == ccm::support::bit_cast<std::uint32_t>(rhs); }
-		else if constexpr (std::is_same_v<T, double>) { return ccm::support::bit_cast<std::uint64_t>(lhs) == ccm::support::bit_cast<std::uint64_t>(rhs); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return ccm::support::bit_cast<std::uint32_t>(lhs) == ccm::support::bit_cast<std::uint32_t>(rhs);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return ccm::support::bit_cast<std::uint64_t>(lhs) == ccm::support::bit_cast<std::uint64_t>(rhs);
+		} else
 		{
 			return lhs == rhs;
 		}
@@ -72,7 +75,9 @@ namespace
 
 #if !CCMATH_SUPPORTS_DEEP_CONSTEXPR
 TEST(CcmathBasicTests, FmaDoubleFusedResidualRuntime)
-{ EXPECT_TRUE(same_bits(ccm::fma(0x1.ffffffffffep-1, 0x1.ffffffffffep-1, -(0x1.ffffffffffep-1 * 0x1.ffffffffffep-1)), 0x1p-88)); }
+{
+	EXPECT_TRUE(same_bits(ccm::fma(0x1.ffffffffffep-1, 0x1.ffffffffffep-1, -(0x1.ffffffffffep-1 * 0x1.ffffffffffep-1)), 0x1p-88));
+}
 #endif
 
 TEST(CcmathBasicTests, FmaMatchesStdStructuredFloatCases)

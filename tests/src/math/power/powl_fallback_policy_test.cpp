@@ -27,7 +27,9 @@ namespace
 	using ccm::test::oracle::PowlImplementationPath;
 
 	void ExpectPath(long double base, long double exponent, PowlImplementationPath expected)
-	{ EXPECT_EQ(classify_powl_gen_path(base, exponent), expected) << "base=" << base << " exponent=" << exponent; }
+	{
+		EXPECT_EQ(classify_powl_gen_path(base, exponent), expected) << "base=" << base << " exponent=" << exponent;
+	}
 } // namespace
 
 TEST(PowlFallbackPolicy, ReportsFallbackPolicyState)
@@ -38,7 +40,10 @@ TEST(PowlFallbackPolicy, ReportsFallbackPolicyState)
 
 TEST(PowlFallbackPolicy, Ld64AliasIsNotReducedPrecision)
 {
-	if (ccm::config::detect_long_double_format() != ccm::config::LongDoubleFormat::Double) { GTEST_SKIP() << "double-shaped long double required"; }
+	if (ccm::config::detect_long_double_format() != ccm::config::LongDoubleFormat::Double)
+	{
+		GTEST_SKIP() << "double-shaped long double required";
+	}
 
 	ExpectPath(2.0L, 0.5L, PowlImplementationPath::Ld64DoubleAlias);
 	EXPECT_FALSE(powl_path_is_reduced_precision(PowlImplementationPath::Ld64DoubleAlias));
@@ -87,8 +92,7 @@ TEST(PowlFallbackPolicy, UnsupportedTierPolicy)
 		const auto path = classify_powl_gen_path(base, exponent);
 		EXPECT_TRUE(path == PowlImplementationPath::Ld128ReducedPrecisionFallback || path == PowlImplementationPath::UnknownReducedPrecisionFallback);
 		EXPECT_TRUE(powl_path_is_reduced_precision(path));
-	}
-	else
+	} else
 	{
 		const auto path = classify_powl_gen_path(base, exponent);
 		EXPECT_TRUE(path == PowlImplementationPath::Ld128Unsupported || path == PowlImplementationPath::UnknownUnsupported);

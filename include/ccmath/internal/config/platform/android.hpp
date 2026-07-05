@@ -10,7 +10,7 @@
 
 #pragma once
 
-#if defined(__ANDROID__)
+#ifdef __ANDROID__
 
 	// Check that what we plan to define is not already defined
 	#ifdef CCM_TARGET_PLATFORM_ANDROID

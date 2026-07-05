@@ -26,11 +26,12 @@ namespace ccm
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the smaller of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename T>
-	constexpr T min(const T x, const T y) noexcept
+	template <typename T> constexpr T min(const T x, const T y) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_fmin<T>) { return ccm::builtin::fmin_ct(x, y); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_fmin<T>)
+		{
+			return ccm::builtin::fmin_ct(x, y);
+		} else
 		{
 			return ccm::gen::min(x, y);
 		}
@@ -44,8 +45,7 @@ namespace ccm
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the smaller of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename T, typename U>
-	constexpr T min(const T x, const U y) noexcept
+	template <typename T, typename U> constexpr T min(const T x, const U y) noexcept
 	{
 		// Find the common type of the two arguments
 		using shared_type = std::common_type_t<T, U>;
@@ -61,9 +61,10 @@ namespace ccm
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the smaller of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename Real, std::enable_if_t<!std::is_integral_v<Real>, bool> = true>
-	constexpr Real fmin(const Real x, const Real y) noexcept
-	{ return min<Real>(x, y); }
+	template <typename Real, std::enable_if_t<!std::is_integral_v<Real>, bool> = true> constexpr Real fmin(const Real x, const Real y) noexcept
+	{
+		return min<Real>(x, y);
+	}
 
 	/**
 	 * @brief Computes the smaller of the two values.
@@ -73,8 +74,7 @@ namespace ccm
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the smaller of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename T, typename U>
-	constexpr auto fmin(const T x, const U y) noexcept
+	template <typename T, typename U> constexpr auto fmin(const T x, const U y) noexcept
 	{
 		// Find the common type of the two arguments
 		using shared_type = std::common_type_t<T, U>;
@@ -90,9 +90,10 @@ namespace ccm
 	 * @param y Left-hand side of the comparison.
 	 * @return If successful, returns the smaller of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr Integer fmin(const Integer x, const Integer y) noexcept
-	{ return min<Integer>(x, y); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr Integer fmin(const Integer x, const Integer y) noexcept
+	{
+		return min<Integer>(x, y);
+	}
 } // namespace ccm
 
 /// @ingroup basic

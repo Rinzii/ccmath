@@ -171,18 +171,22 @@ TEST(CcmathBasicTests, Nan_LDouble64bit)
  * Because this is where the information to determine NaN stops and
  * the remainder afterward is padding that can't be determined or tested.
  */
-template <std::size_t N>
-void removePaddingBits(std::array<std::byte, N>& byteArray)
+template <std::size_t N> void removePaddingBits(std::array<std::byte, N> & byteArray)
 {
 	// If the array has 10 or fewer elements, there's nothing to zero out
-	if (N <= 10) { return; }
+	if (N <= 10)
+	{
+		return;
+	}
 
 	// Zero out everything after the 10th element
-	for (std::size_t i = 10; i < N; ++i) { byteArray.at(i) = std::byte{ 0 }; }
+	for (std::size_t i = 10; i < N; ++i)
+	{
+		byteArray.at(i) = std::byte{ 0 };
+	}
 }
 
-template <std::size_t N>
-std::array<std::byte, N> ldoubleToByteArray(long double value)
+template <std::size_t N> std::array<std::byte, N> ldoubleToByteArray(long double value)
 {
 	std::array<std::byte, N> byteArray{};
 	std::memcpy(byteArray.data(), &value, sizeof(long double));
@@ -246,8 +250,7 @@ TEST(CcmathBasicTests, Nan_LDouble80bit)
 	#elif LDBL_MANT_DIG == 113
 
 // Does not strip padding as there shouldn't be any if ldouble is 128 bits
-template <std::size_t N>
-std::array<std::byte, N> ldoubleToByteArray(ccm::types::float128 value)
+template <std::size_t N> std::array<std::byte, N> ldoubleToByteArray(ccm::types::float128 value)
 {
 	std::array<std::byte, N> byteArray{};
 	std::memcpy(byteArray.data(), &value, sizeof(ccm::types::float128));
@@ -309,6 +312,8 @@ TEST(CcmathBasicTests, Nan_LDouble128bit)
 	#else
 
 TEST(CcmathBasicTests, Nan_LDoubleUnknownBits)
-{ FAIL() << "We do not know how to handle long doubles with an unknown number of bits. Please report this if you see this failure."; }
+{
+	FAIL() << "We do not know how to handle long doubles with an unknown number of bits. Please report this if you see this failure.";
+}
 	#endif
 #endif // !(defined(SYCL_LANGUAGE_VERSION) || defined(__INTEL_LLVM_COMPILER))

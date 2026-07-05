@@ -132,7 +132,7 @@ namespace ccm::support::traits
 
 	template <typename T>
 struct ccm_is_unsigned : std::bool_constant<(ccm_is_arithmetic_v<T> && (T(-1) > T(0)))> {
-		constexpr operator bool() const { return ccm_is_unsigned::value; }
+		constexpr operator bool() const { return ccm_is_unsigned::value; } // NOLINT(google-explicit-constructor)
 		constexpr bool operator()() const { return ccm_is_unsigned::value; }
 	};
 	template <typename T>

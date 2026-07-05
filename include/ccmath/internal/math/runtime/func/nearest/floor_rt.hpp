@@ -19,12 +19,13 @@
 
 namespace ccm::rt
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T floor_rt(T num) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T floor_rt(T num) noexcept
 	{
-#if !defined(CCMATH_COMPILER_GCC)
-		if constexpr (ccm::builtin::has_runtime_floor<T>) { return ccm::builtin::floor_rt(num); }
-		else
+#ifndef CCMATH_COMPILER_GCC
+		if constexpr (ccm::builtin::has_runtime_floor<T>)
+		{
+			return ccm::builtin::floor_rt(num);
+		} else
 #endif
 		{
 			return detail::floor_scalar(num);

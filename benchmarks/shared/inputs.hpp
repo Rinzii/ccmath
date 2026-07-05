@@ -18,7 +18,10 @@ namespace ccm::bench
 			std::vector<int> out;
 			out.reserve(static_cast<std::size_t>(count));
 			std::uniform_int_distribution dist(min, max);
-			for (std::int64_t i = 0; i < count; ++i) { out.push_back(dist(m_gen)); }
+			for (std::int64_t i = 0; i < count; ++i)
+			{
+				out.push_back(dist(m_gen));
+			}
 			return out;
 		}
 
@@ -28,7 +31,10 @@ namespace ccm::bench
 			std::vector<double> out;
 			out.reserve(static_cast<std::size_t>(count));
 			std::uniform_real_distribution dist(min, max);
-			for (std::int64_t i = 0; i < count; ++i) { out.push_back(dist(m_gen)); }
+			for (std::int64_t i = 0; i < count; ++i)
+			{
+				out.push_back(dist(m_gen));
+			}
 			return out;
 		}
 
@@ -36,16 +42,20 @@ namespace ccm::bench
 		std::mt19937 m_gen;
 	};
 
-	inline Randomizer& thread_rng()
+	inline Randomizer & thread_rng()
 	{
 		static thread_local Randomizer rng;
 		return rng;
 	}
 
 	inline std::vector<int> random_integers(std::int64_t count)
-	{ return thread_rng().integers(count); }
+	{
+		return thread_rng().integers(count);
+	}
 
 	inline std::vector<double> random_doubles(std::int64_t count)
-	{ return thread_rng().doubles(count); }
+	{
+		return thread_rng().doubles(count);
+	}
 
 } // namespace ccm::bench

@@ -30,7 +30,7 @@
 #endif
 
 #ifndef CCMATH_HAS_CONSTEXPR_BUILTIN_ISFINITE
-	#if defined(__clang__) && (__clang_major__ > 5 || (__clang_major__ == 5 && __clang_minor__ >= 0)) && !defined(__MSC_VER) && !defined(__INTEL_LLVM_COMPILER)
+	#if defined(__clang__) && (__clang_major__ > 5 || (__clang_major__ == 5 && __clang_minor__ >= 0)) && !defined(_MSC_VER) && !defined(__INTEL_LLVM_COMPILER)
 		#define CCMATH_HAS_CONSTEXPR_BUILTIN_ISFINITE
 	#endif
 #endif
@@ -87,13 +87,15 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_isfinite functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto isfinite_ct(T x) -> std::enable_if_t<has_constexpr_isfinite<T>, bool>
-	{ return __builtin_isfinite(x); }
+	template <typename T> constexpr auto isfinite_ct(T x) -> std::enable_if_t<has_constexpr_isfinite<T>, bool>
+	{
+		return __builtin_isfinite(x);
+	}
 
-	template <typename T>
-	auto isfinite_rt(T x) -> std::enable_if_t<has_runtime_isfinite<T>, bool>
-	{ return __builtin_isfinite(x); }
+	template <typename T> auto isfinite_rt(T x) -> std::enable_if_t<has_runtime_isfinite<T>, bool>
+	{
+		return __builtin_isfinite(x);
+	}
 } // namespace ccm::builtin
 
 // Cleanup the global namespace

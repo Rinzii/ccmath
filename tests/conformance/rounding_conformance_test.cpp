@@ -35,7 +35,7 @@ namespace
 	// the host libm is most likely to disagree with the correctly rounded result under a directed
 	// mode. Valid inputs for log, log2 and log10.
 	constexpr std::array<double, 9> kLogDirectedProbes = {
-		0x1.5fdffffffff32p-1, 0x1.921fb54442d18p+0, 0x1.5bf0a8b145769p+1, 0x1.62e42fefa39efp+2, 0x1.b7e151628aed3p+4,
+		0x1.5fdffffffff32p-1, 0x1.921fb54442d18p+0, 0x1.5bf0a8b145769p+1, 0x1.62e42fefa39efp+2,	 0x1.b7e151628aed3p+4,
 		0x1.0000000000001p+0, 0x1.fffffffffffffp+9, 0x1.199999999999ap-7, 0x1.5fdffffffff32p+40,
 	};
 
@@ -53,7 +53,7 @@ namespace
 	// result is a full-precision normal value rather than a saturated edge.
 	constexpr std::array<double, 10> kExpDirectedProbes = {
 		-0x1.62e42fefa39efp+5, -0x1.5fdffffffff32p+4, -0x1.921fb54442d18p+0, -0x1.199999999999ap-7, 0x1.199999999999ap-7,
-		0x1.5bf0a8b145769p+1,  0x1.921fb54442d18p+0,  0x1.5fdffffffff32p+4,	0x1.b7e151628aed3p+2,  0x1.62e42fefa39efp+5,
+		0x1.5bf0a8b145769p+1,  0x1.921fb54442d18p+0,  0x1.5fdffffffff32p+4,	 0x1.b7e151628aed3p+2,	0x1.62e42fefa39efp+5,
 	};
 
 	// The expo runtime headers route to the generic kernel outside FE_TONEAREST, because the libm
@@ -65,17 +65,18 @@ namespace
 	template <typename CcmFn, typename GenFn, std::size_t N>
 	void ExpectRuntimeMatchesGenericInDirectedModes(const std::array<double, N> & inputs, CcmFn ccm_fn, GenFn gen_fn)
 	{
-		ccm::test::ForEachRoundingModeOrSkip(
-			[&](int mode)
+		ccm::test::ForEachRoundingModeOrSkip([&](int mode) {
+			if (mode == FE_TONEAREST)
 			{
-				if (mode == FE_TONEAREST) { return; } // round to nearest keeps the builtin, nothing to pin here
-				for (double input : inputs)
-				{
-					SCOPED_TRACE(input);
-					const double x = runtime_value(input);
-					ccm::test::ExpectFpEq(ccm_fn(x), gen_fn(x));
-				}
-			});
+				return;
+			} // round to nearest keeps the builtin, nothing to pin here
+			for (double input : inputs)
+			{
+				SCOPED_TRACE(input);
+				const double x = runtime_value(input);
+				ccm::test::ExpectFpEq(ccm_fn(x), gen_fn(x));
+			}
+		});
 	}
 } // namespace
 
@@ -93,41 +94,35 @@ TEST(CcmathRoundingConformanceTests, NearbyIntMatchesStdAllModesFloat)
 
 TEST(CcmathRoundingConformanceTests, LogOneMatchesStdAllModes)
 {
-	ccm::test::ForEachRoundingModeOrSkip(
-		[&](int mode)
-		{
-			ccm::test::ScopedRoundingMode scope(mode);
-			ASSERT_TRUE(scope.active());
+	ccm::test::ForEachRoundingModeOrSkip([&](int mode) {
+		ccm::test::ScopedRoundingMode scope(mode);
+		ASSERT_TRUE(scope.active());
 
-			const double one = runtime_value(1.0);
-			ccm::test::ExpectFpEq(ccm::log(one), std::log(one));
-		});
+		const double one = runtime_value(1.0);
+		ccm::test::ExpectFpEq(ccm::log(one), std::log(one));
+	});
 }
 
 TEST(CcmathRoundingConformanceTests, Log10OneMatchesStdAllModes)
 {
-	ccm::test::ForEachRoundingModeOrSkip(
-		[&](int mode)
-		{
-			ccm::test::ScopedRoundingMode scope(mode);
-			ASSERT_TRUE(scope.active());
+	ccm::test::ForEachRoundingModeOrSkip([&](int mode) {
+		ccm::test::ScopedRoundingMode scope(mode);
+		ASSERT_TRUE(scope.active());
 
-			const double one = runtime_value(1.0);
-			ccm::test::ExpectFpEq(ccm::log10(one), std::log10(one));
-		});
+		const double one = runtime_value(1.0);
+		ccm::test::ExpectFpEq(ccm::log10(one), std::log10(one));
+	});
 }
 
 TEST(CcmathRoundingConformanceTests, Log2OneMatchesStdAllModes)
 {
-	ccm::test::ForEachRoundingModeOrSkip(
-		[&](int mode)
-		{
-			ccm::test::ScopedRoundingMode scope(mode);
-			ASSERT_TRUE(scope.active());
+	ccm::test::ForEachRoundingModeOrSkip([&](int mode) {
+		ccm::test::ScopedRoundingMode scope(mode);
+		ASSERT_TRUE(scope.active());
 
-			const double one = runtime_value(1.0);
-			ccm::test::ExpectFpEq(ccm::log2(one), std::log2(one));
-		});
+		const double one = runtime_value(1.0);
+		ccm::test::ExpectFpEq(ccm::log2(one), std::log2(one));
+	});
 }
 
 TEST(CcmathRoundingConformanceTests, Log1pZeroMatchesStdAllModes)
@@ -155,10 +150,14 @@ TEST(CcmathRoundingConformanceTests, SqrtMatchesStdAllModes)
 }
 
 TEST(CcmathRoundingConformanceTests, RintMatchesStdAllModesDouble)
-{ ccm::test::ExpectFpUnaryOverMatchesStdAllModes(ccm::test::samples::kNearbyIntProbeDouble, ccm::rint<double>, static_cast<double (*)(double)>(std::rint)); }
+{
+	ccm::test::ExpectFpUnaryOverMatchesStdAllModes(ccm::test::samples::kNearbyIntProbeDouble, ccm::rint<double>, static_cast<double (*)(double)>(std::rint));
+}
 
 TEST(CcmathRoundingConformanceTests, RintMatchesStdAllModesFloat)
-{ ccm::test::ExpectFpUnaryOverMatchesStdAllModes(ccm::test::samples::kNearbyIntProbeFloat, ccm::rint<float>, static_cast<float (*)(float)>(std::rint)); }
+{
+	ccm::test::ExpectFpUnaryOverMatchesStdAllModes(ccm::test::samples::kNearbyIntProbeFloat, ccm::rint<float>, static_cast<float (*)(float)>(std::rint));
+}
 
 TEST(CcmathRoundingConformanceTests, CeilTruncRoundFloorIndependentOfMode)
 {
@@ -166,6 +165,25 @@ TEST(CcmathRoundingConformanceTests, CeilTruncRoundFloorIndependentOfMode)
 	ccm::test::ExpectFpUnaryOverMatchesStdAllModes(ccm::test::samples::kNearbyIntProbeDouble, ccm::trunc<double>, static_cast<double (*)(double)>(std::trunc));
 	ccm::test::ExpectFpUnaryOverMatchesStdAllModes(ccm::test::samples::kNearestHalfwayDouble, ccm::round<double>, static_cast<double (*)(double)>(std::round));
 	ccm::test::ExpectFpUnaryOverMatchesStdAllModes(ccm::test::samples::kNearbyIntProbeDouble, ccm::floor<double>, static_cast<double (*)(double)>(std::floor));
+}
+
+TEST(CcmathRoundingConformanceTests, FmodRemainderIndependentOfRoundingMode)
+{
+	// fmod and remainder are exact operations, so the result must not vary with the active rounding
+	// mode. Both operands go through runtime_value so the kernels read the dynamic mode at run time.
+	ccm::test::ForEachRoundingModeOrSkip([&](int mode) {
+		ccm::test::ScopedRoundingMode scope(mode);
+		ASSERT_TRUE(scope.active());
+
+		ccm::test::ExpectFpEq(ccm::fmod(runtime_value(10.0), runtime_value(3.0)), 1.0);
+		ccm::test::ExpectFpEq(ccm::fmod(runtime_value(7.5), runtime_value(2.0)), 1.5);
+		ccm::test::ExpectFpEq(ccm::fmod(runtime_value(-10.0), runtime_value(3.0)), -1.0);
+		ccm::test::ExpectFpEq(ccm::fmod(runtime_value(1e30), runtime_value(3.0)), 1.0);
+		ccm::test::ExpectFpEq(ccm::internal::fmod(runtime_value(1e300), runtime_value(7.0)), 1.0);
+
+		ccm::test::ExpectFpEq(ccm::remainder(runtime_value(5.0), runtime_value(3.0)), -1.0);
+		ccm::test::ExpectFpEq(ccm::remainder(runtime_value(7.5), runtime_value(2.0)), -0.5);
+	});
 }
 
 // The following pin the FE_TONEAREST guard in the expo runtime headers: outside round to nearest

@@ -74,13 +74,18 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_modf functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto modf_ct(T x, T * intpart) -> std::enable_if_t<has_constexpr_modf<T>, T>
+	template <typename T> constexpr auto modf_ct(T x, T * intpart) -> std::enable_if_t<has_constexpr_modf<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_modff(x, intpart); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_modf(x, intpart); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_modfl(x, intpart); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_modff(x, intpart);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_modf(x, intpart);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_modfl(x, intpart);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for modf");
@@ -88,13 +93,18 @@ namespace ccm::builtin
 		}
 	}
 
-	template <typename T>
-	auto modf_rt(T x, T * intpart) -> std::enable_if_t<has_runtime_modf<T>, T>
+	template <typename T> auto modf_rt(T x, T * intpart) -> std::enable_if_t<has_runtime_modf<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_modff(x, intpart); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_modf(x, intpart); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_modfl(x, intpart); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_modff(x, intpart);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_modf(x, intpart);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_modfl(x, intpart);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for modf");

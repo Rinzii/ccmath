@@ -11,7 +11,7 @@
 #pragma once
 
 #ifndef CCM_SIMD_VECTORIZE
-	#if defined(_OPENMP)
+	#ifdef _OPENMP
 		#define CCM_SIMD_VECTORIZE _Pragma("omp simd")
 	// msvc
 	#elif defined(_MSC_VER) && !defined(__clang__)

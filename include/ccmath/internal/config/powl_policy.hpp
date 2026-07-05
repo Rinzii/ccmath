@@ -18,7 +18,7 @@ namespace ccm::config
 	// Set CCMATH_DISABLE_REDUCED_PRECISION_POWL=ON to return quiet NaN on incomplete tiers.
 	constexpr bool reduced_precision_powl_fallback_enabled() noexcept
 	{
-#if defined(CCM_CONFIG_DISABLE_REDUCED_PRECISION_POWL)
+#ifdef CCM_CONFIG_DISABLE_REDUCED_PRECISION_POWL
 		return false;
 #else
 		return true;

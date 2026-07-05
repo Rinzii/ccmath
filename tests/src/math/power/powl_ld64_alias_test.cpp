@@ -51,6 +51,9 @@ TEST(PowlLd64Alias, PublicPowlMatchesGenPath)
 	const std::array<long double, 4> exponents = { -2.0L, 0.5L, 2.0L, 3.0L };
 	for (long double base : bases)
 	{
-		for (long double exponent : exponents) { EXPECT_EQ(ccm::powl(base, exponent), ccm::gen::pow_gen(base, exponent)); }
+		for (long double exponent : exponents)
+		{
+			EXPECT_EQ(ccm::powl(base, exponent), ccm::gen::pow_gen(base, exponent));
+		}
 	}
 }

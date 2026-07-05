@@ -18,11 +18,12 @@
 
 namespace ccm::rt
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T nexttoward_rt(T x, long double y) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T nexttoward_rt(T x, long double y) noexcept
 	{
-		if constexpr (ccm::builtin::has_runtime_nexttoward<T>) { return ccm::builtin::nexttoward_rt(x, y); }
-		else
+		if constexpr (ccm::builtin::has_runtime_nexttoward<T>)
+		{
+			return ccm::builtin::nexttoward_rt(x, y);
+		} else
 		{
 			return gen::nextafter_gen(x, y);
 		}

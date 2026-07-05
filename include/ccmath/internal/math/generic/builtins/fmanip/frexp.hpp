@@ -74,13 +74,18 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_frexp functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto frexp_ct(T x, int * exp) -> std::enable_if_t<has_constexpr_frexp<T>, T>
+	template <typename T> constexpr auto frexp_ct(T x, int * exp) -> std::enable_if_t<has_constexpr_frexp<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_frexpf(x, exp); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_frexp(x, exp); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_frexpl(x, exp); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_frexpf(x, exp);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_frexp(x, exp);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_frexpl(x, exp);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for frexp");
@@ -88,13 +93,18 @@ namespace ccm::builtin
 		}
 	}
 
-	template <typename T>
-	auto frexp_rt(T x, int * exp) -> std::enable_if_t<has_runtime_frexp<T>, T>
+	template <typename T> auto frexp_rt(T x, int * exp) -> std::enable_if_t<has_runtime_frexp<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_frexpf(x, exp); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_frexp(x, exp); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_frexpl(x, exp); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_frexpf(x, exp);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_frexp(x, exp);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_frexpl(x, exp);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for frexp");

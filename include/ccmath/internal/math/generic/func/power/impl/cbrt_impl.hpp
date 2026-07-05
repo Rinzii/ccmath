@@ -23,25 +23,33 @@
 
 namespace ccm::internal::impl
 {
-	template <typename T>
-	constexpr T cbrt_impl(T x) noexcept
+	template <typename T> constexpr T cbrt_impl(T x) noexcept
 	{
 		using fp_bits_t = ccm::support::fp::FPBits<T>;
 
-		fp_bits_t bits(x);
+		fp_bits_t const bits(x);
 
-		if (CCM_UNLIKELY(bits.is_nan())) { return x; }
+		if (CCM_UNLIKELY(bits.is_nan()))
+		{
+			return x;
+		}
 
-		if (CCM_UNLIKELY(bits.is_inf())) { return x; }
+		if (CCM_UNLIKELY(bits.is_inf()))
+		{
+			return x;
+		}
 
-		if (CCM_UNLIKELY(bits.is_zero())) { return x; }
+		if (CCM_UNLIKELY(bits.is_zero()))
+		{
+			return x;
+		}
 
 		const bool negative = bits.is_neg();
 		const T ax			= ccm::fabs(x);
 
 		T y			 = ccm::exp(ccm::log(ax) / static_cast<T>(3));
 		const T y_sq = y * y;
-		y			 = (static_cast<T>(2) * y + ax / y_sq) / static_cast<T>(3);
+		y			 = ((static_cast<T>(2) * y) + (ax / y_sq)) / static_cast<T>(3);
 
 		return negative ? -y : y;
 	}

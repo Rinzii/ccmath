@@ -17,11 +17,11 @@
 
 #include "ccmath/internal/support/bits.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 #include "ccmath/internal/support/type_traits.hpp"
 #include "ccmath/internal/types/dyadic_float.hpp"
 
-#include <cfenv>
 #include <type_traits>
 
 namespace ccm::support::fp
@@ -29,9 +29,13 @@ namespace ccm::support::fp
 	template <typename OutType, typename InType>
 	[[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_floating_point_v<OutType> && traits::ccm_is_floating_point_v<InType>, OutType> cast(InType x)
 	{
-		if constexpr (std::is_same_v<InType, OutType>) { return x; }
-		else if constexpr (sizeof(OutType) >= sizeof(InType)) { return static_cast<OutType>(x); }
-		else
+		if constexpr (std::is_same_v<InType, OutType>)
+		{
+			return x;
+		} else if constexpr (sizeof(OutType) >= sizeof(InType))
+		{
+			return static_cast<OutType>(x);
+		} else
 		{
 			using InFPBits	 = FPBits<InType>;
 			using InStorage	 = typename InFPBits::storage_type;
@@ -48,11 +52,17 @@ namespace ccm::support::fp
 				}
 
 				InStorage x_mant = x_bits.get_mantissa();
-				if (InFPBits::fraction_length > OutFPBits::fraction_length) { x_mant >>= InFPBits::fraction_length - OutFPBits::fraction_length; }
+				if (InFPBits::fraction_length > OutFPBits::fraction_length)
+				{
+					x_mant >>= InFPBits::fraction_length - OutFPBits::fraction_length;
+				}
 				return OutFPBits::quiet_nan(x_bits.sign(), static_cast<OutStorage>(x_mant)).get_val();
 			}
 
-			if (x_bits.is_inf()) { return OutFPBits::inf(x_bits.sign()).get_val(); }
+			if (x_bits.is_inf())
+			{
+				return OutFPBits::inf(x_bits.sign()).get_val();
+			}
 
 			constexpr std::size_t max_fraction_len =
 				InFPBits::fraction_length > OutFPBits::fraction_length ? InFPBits::fraction_length : OutFPBits::fraction_length;

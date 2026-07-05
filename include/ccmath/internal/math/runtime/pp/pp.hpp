@@ -11,7 +11,7 @@
 #pragma once
 
 // Umbrella for the C++17 port of the C++26 std::simd surface (ccm::pp). This is
-// a standalone library; it does not replace the live ccm::intrin SIMD system
+// a standalone library. It does not replace the live ccm::intrin SIMD system
 // until the project decides to switch over.
 
 #include "ccmath/internal/math/runtime/pp/conversion.hpp"
@@ -34,16 +34,12 @@
 namespace ccm::pp
 {
 	// [simd.alias] Width-parametrized aliases over the deduced ABI.
-	template <typename T, detail::SimdSizeType N = basic_simd<T>::size()>
-	using simd = basic_simd<T, detail::deduce_t<T, N>>;
+	template <typename T, detail::SimdSizeType N = basic_simd<T>::size()> using simd = basic_simd<T, detail::deduce_t<T, N>>;
 
-	template <typename T, detail::SimdSizeType N = basic_simd<T>::size()>
-	using simd_mask = basic_simd_mask<sizeof(T), detail::deduce_t<T, N>>;
+	template <typename T, detail::SimdSizeType N = basic_simd<T>::size()> using simd_mask = basic_simd_mask<sizeof(T), detail::deduce_t<T, N>>;
 
 	// Widest native register width for T.
-	template <typename T>
-	using native_simd = basic_simd<T, detail::NativeAbi<T>>;
+	template <typename T> using native_simd = basic_simd<T, detail::NativeAbi<T>>;
 
-	template <typename T>
-	using native_simd_mask = basic_simd_mask<sizeof(T), detail::NativeAbi<T>>;
+	template <typename T> using native_simd_mask = basic_simd_mask<sizeof(T), detail::NativeAbi<T>>;
 } // namespace ccm::pp

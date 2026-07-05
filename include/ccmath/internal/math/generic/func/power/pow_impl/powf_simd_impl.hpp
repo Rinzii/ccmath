@@ -42,8 +42,7 @@ namespace ccm::gen::impl
 			0x1p0, 0x1.62e42fefa39efp-7, 0x1.ebfbdff82a23ap-15, 0x1.c6b08d7076268p-23, 0x1.3b2ad33f8b48bp-31, 0x1.5d870c4d84445p-40
 		};
 
-		template <typename Abi>
-		[[nodiscard]] CCM_ALWAYS_INLINE pp::basic_simd<double, Abi> v_nearest_integer(pp::basic_simd<double, Abi> const & x) noexcept
+		template <typename Abi> [[nodiscard]] CCM_ALWAYS_INLINE pp::basic_simd<double, Abi> v_nearest_integer(pp::basic_simd<double, Abi> const & x) noexcept
 		{
 			using DVec = pp::basic_simd<double, Abi>;
 			const DVec off(0x1.0p52);
@@ -56,8 +55,7 @@ namespace ccm::gen::impl
 	} // namespace simd_detail
 
 	// x^y for a vector of single precision lanes.
-	template <typename Abi>
-	[[nodiscard]] inline pp::basic_simd<float, Abi> powf_simd(pp::basic_simd<float, Abi> x, pp::basic_simd<float, Abi> y) noexcept
+	template <typename Abi> [[nodiscard]] inline pp::basic_simd<float, Abi> powf_simd(pp::basic_simd<float, Abi> x, pp::basic_simd<float, Abi> y) noexcept
 	{
 		using FVec = pp::basic_simd<float, Abi>;
 		using DVec = pp::basic_simd<double, Abi>;
@@ -72,10 +70,12 @@ namespace ccm::gen::impl
 		if constexpr (!ccm::builtin::target_cpu_has_fma)
 		{
 			FVec out{};
-			for (int i = 0; i < N; ++i) { out[i] = ccm::gen::impl::powf_impl(x[i], y[i]); }
+			for (int i = 0; i < N; ++i)
+			{
+				out[i] = ccm::gen::impl::powf_impl(x[i], y[i]);
+			}
 			return out;
-		}
-		else
+		} else
 		{
 			namespace cst = ccm::support::constants;
 
@@ -92,8 +92,8 @@ namespace ccm::gen::impl
 			// Replace exceptional lanes with a benign value so the unconditional vector main path cannot
 			// raise spurious floating point exceptions on them. The originals are kept for the scalar
 			// fallback, which is what actually computes those lanes.
-			const FVec xs = pp::simd_select(special, FVec(1.0f), x);
-			const FVec ys = pp::simd_select(special, FVec(1.0f), y);
+			const FVec xs = pp::simd_select(special, FVec(1.0F), x);
+			const FVec ys = pp::simd_select(special, FVec(1.0F), y);
 
 			const U32 xu = pp::simd_bit_cast<std::uint32_t>(xs);
 
@@ -111,7 +111,7 @@ namespace ccm::gen::impl
 			const DVec lr_mid([&](auto i) { return internal::impl::LOG2_R_TD[static_cast<std::size_t>(idx_x_u[i])].mid; });
 
 			// dx = m_x * R[idx] - 1, computed in float then widened (exact).
-			const DVec dx  = DVec(pp::fma(m_x, r_tab, FVec(-1.0f)));
+			const DVec dx  = DVec(pp::fma(m_x, r_tab, FVec(-1.0F)));
 			const DVec dx2 = dx * dx;
 			const DVec c0  = pp::fma(dx, DVec(simd_detail::kLog2Coeffs[1]), DVec(simd_detail::kLog2Coeffs[0]));
 			const DVec c1  = pp::fma(dx, DVec(simd_detail::kLog2Coeffs[3]), DVec(simd_detail::kLog2Coeffs[2]));
@@ -119,12 +119,12 @@ namespace ccm::gen::impl
 			const DVec p   = pp::fma(dx2, pp::fma(dx2, c2, c1), c0); // polyeval(dx2, c0, c1, c2)
 			const DVec s   = pp::fma(dx, p, log2r + e_x);
 
-			const DVec y6	  = DVec(ys * FVec(0x1.0p6f));
+			const DVec y6	  = DVec(ys * FVec(0x1.0p6F));
 			const DVec hm	  = simd_detail::v_nearest_integer(s * y6);
 			const DVec lo6_hi = pp::fma(y6, e_x + lr_hi, -hm);
 			const DVec lo6	  = pp::fma(y6, pp::fma(dx, p, lr_mid), lo6_hi);
 
-			// Clamp 2^(hi+mid) exponent into double range; out of range lanes round at the cast.
+			// Clamp 2^(hi+mid) exponent into double range. Out of range lanes round at the cast.
 			I64 hm_i(hm);
 			hm_i = pp::simd_select(hm_i > I64(1 << 15), I64(1 << 15), hm_i);
 			hm_i = pp::simd_select(hm_i < I64(-(1 << 15)), I64(-(1 << 15)), hm_i);
@@ -161,7 +161,10 @@ namespace ccm::gen::impl
 			{
 				for (int i = 0; i < N; ++i)
 				{
-					if (needs_scalar[i]) { result[i] = ccm::gen::impl::powf_impl(x[i], y[i]); }
+					if (needs_scalar[i])
+					{
+						result[i] = ccm::gen::impl::powf_impl(x[i], y[i]);
+					}
 				}
 			}
 
@@ -175,7 +178,7 @@ namespace ccm::gen::impl
 				ccm::support::fenv::set_errno_if_required(ERANGE);
 				ccm::support::fenv::raise_except_if_required(FE_OVERFLOW);
 			}
-			if (pp::any_of(fast_lane & (r_upper == FVec(0.0f))))
+			if (pp::any_of(fast_lane & (r_upper == FVec(0.0F))))
 			{
 				ccm::support::fenv::set_errno_if_required(ERANGE);
 				ccm::support::fenv::raise_except_if_required(FE_UNDERFLOW);

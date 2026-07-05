@@ -31,16 +31,14 @@ namespace ccm::gen::impl
 	{
 		// Vector double-double pair. Each helper below replays the matching ccm::types
 		// primitive lane for lane, so results are bit identical to the scalar kernel.
-		template <typename Abi>
-		struct VDD
+		template <typename Abi> struct VDD
 		{
 			pp::basic_simd<double, Abi> hi;
 			pp::basic_simd<double, Abi> lo;
 		};
 
 		// Dekker's FastTwoSum. Same assumption as types::exact_add: |a| >= |b| or a == 0.
-		template <typename Abi>
-		CCM_ALWAYS_INLINE VDD<Abi> v_exact_add(pp::basic_simd<double, Abi> const & a, pp::basic_simd<double, Abi> const & b) noexcept
+		template <typename Abi> CCM_ALWAYS_INLINE VDD<Abi> v_exact_add(pp::basic_simd<double, Abi> const & a, pp::basic_simd<double, Abi> const & b) noexcept
 		{
 			using DVec	  = pp::basic_simd<double, Abi>;
 			const DVec hi = a + b;
@@ -49,16 +47,14 @@ namespace ccm::gen::impl
 		}
 
 		// types::add(DoubleDouble, DoubleDouble). Assumption: |a.hi| >= |b.hi|.
-		template <typename Abi>
-		CCM_ALWAYS_INLINE VDD<Abi> v_add(VDD<Abi> const & a, VDD<Abi> const & b) noexcept
+		template <typename Abi> CCM_ALWAYS_INLINE VDD<Abi> v_add(VDD<Abi> const & a, VDD<Abi> const & b) noexcept
 		{
 			const VDD<Abi> r = v_exact_add(a.hi, b.hi);
 			return v_exact_add(r.hi, r.lo + (a.lo + b.lo));
 		}
 
 		// Veltkamp's splitting.
-		template <typename Abi>
-		CCM_ALWAYS_INLINE VDD<Abi> v_split(pp::basic_simd<double, Abi> const & a) noexcept
+		template <typename Abi> CCM_ALWAYS_INLINE VDD<Abi> v_split(pp::basic_simd<double, Abi> const & a) noexcept
 		{
 			using DVec = pp::basic_simd<double, Abi>;
 			const DVec c(0x1.0p27 + 1.0);
@@ -69,22 +65,20 @@ namespace ccm::gen::impl
 		}
 
 		// Dekker's product, mirroring types::exact_mult.
-		template <typename Abi>
-		CCM_ALWAYS_INLINE VDD<Abi> v_exact_mult(pp::basic_simd<double, Abi> const & a, pp::basic_simd<double, Abi> const & b) noexcept
+		template <typename Abi> CCM_ALWAYS_INLINE VDD<Abi> v_exact_mult(pp::basic_simd<double, Abi> const & a, pp::basic_simd<double, Abi> const & b) noexcept
 		{
 			using DVec		  = pp::basic_simd<double, Abi>;
 			const VDD<Abi> as = v_split(a);
 			const VDD<Abi> bs = v_split(b);
 			const DVec hi	  = a * b;
-			const DVec t1	  = as.hi * bs.hi - hi;
-			const DVec t2	  = as.hi * bs.lo + t1;
-			const DVec t3	  = as.lo * bs.hi + t2;
-			return { hi, as.lo * bs.lo + t3 };
+			const DVec t1	  = (as.hi * bs.hi) - hi;
+			const DVec t2	  = (as.hi * bs.lo) + t1;
+			const DVec t3	  = (as.lo * bs.hi) + t2;
+			return { hi, (as.lo * bs.lo) + t3 };
 		}
 
 		// types::quick_mult(double, DoubleDouble).
-		template <typename Abi>
-		CCM_ALWAYS_INLINE VDD<Abi> v_quick_mult(pp::basic_simd<double, Abi> const & a, VDD<Abi> const & b) noexcept
+		template <typename Abi> CCM_ALWAYS_INLINE VDD<Abi> v_quick_mult(pp::basic_simd<double, Abi> const & a, VDD<Abi> const & b) noexcept
 		{
 			VDD<Abi> r = v_exact_mult(a, b.hi);
 			r.lo	   = pp::fma(a, b.lo, r.lo);
@@ -92,8 +86,7 @@ namespace ccm::gen::impl
 		}
 
 		// types::quick_mult(DoubleDouble, DoubleDouble).
-		template <typename Abi>
-		CCM_ALWAYS_INLINE VDD<Abi> v_quick_mult(VDD<Abi> const & a, VDD<Abi> const & b) noexcept
+		template <typename Abi> CCM_ALWAYS_INLINE VDD<Abi> v_quick_mult(VDD<Abi> const & a, VDD<Abi> const & b) noexcept
 		{
 			using DVec	  = pp::basic_simd<double, Abi>;
 			VDD<Abi> r	  = v_exact_mult(a.hi, b.hi);
@@ -103,23 +96,23 @@ namespace ccm::gen::impl
 		}
 
 		// support::multiply_add<DoubleDouble>, the polyeval step: add(z, quick_mult(x, y)).
-		template <typename Abi>
-		CCM_ALWAYS_INLINE VDD<Abi> v_multiply_add(VDD<Abi> const & x, VDD<Abi> const & y, VDD<Abi> const & z) noexcept
-		{ return v_add(z, v_quick_mult(x, y)); }
+		template <typename Abi> CCM_ALWAYS_INLINE VDD<Abi> v_multiply_add(VDD<Abi> const & x, VDD<Abi> const & y, VDD<Abi> const & z) noexcept
+		{
+			return v_add(z, v_quick_mult(x, y));
+		}
 
-		template <typename Abi>
-		CCM_ALWAYS_INLINE pp::basic_simd<std::uint64_t, Abi> v_biased_exponent(pp::basic_simd<double, Abi> const & a) noexcept
+		template <typename Abi> CCM_ALWAYS_INLINE pp::basic_simd<std::uint64_t, Abi> v_biased_exponent(pp::basic_simd<double, Abi> const & a) noexcept
 		{
 			using U64 = pp::basic_simd<std::uint64_t, Abi>;
 			return (pp::simd_bit_cast<std::uint64_t>(a) >> U64(52)) & U64(0x7ff);
 		}
 
-		template <typename Abi>
-		CCM_ALWAYS_INLINE VDD<Abi> v_select(pp::basic_simd_mask<8, Abi> const & mask, VDD<Abi> const & a, VDD<Abi> const & b) noexcept
-		{ return { pp::simd_select(mask, a.hi, b.hi), pp::simd_select(mask, a.lo, b.lo) }; }
+		template <typename Abi> CCM_ALWAYS_INLINE VDD<Abi> v_select(pp::basic_simd_mask<8, Abi> const & mask, VDD<Abi> const & a, VDD<Abi> const & b) noexcept
+		{
+			return { pp::simd_select(mask, a.hi, b.hi), pp::simd_select(mask, a.lo, b.lo) };
+		}
 
-		template <typename Abi>
-		CCM_ALWAYS_INLINE VDD<Abi> v_broadcast(types::DoubleDouble const & c) noexcept
+		template <typename Abi> CCM_ALWAYS_INLINE VDD<Abi> v_broadcast(types::DoubleDouble const & c) noexcept
 		{
 			using DVec = pp::basic_simd<double, Abi>;
 			return { DVec(c.hi), DVec(c.lo) };
@@ -127,8 +120,7 @@ namespace ccm::gen::impl
 	} // namespace simd_detail
 
 	// x^y for a vector of double precision lanes.
-	template <typename Abi>
-	[[nodiscard]] inline pp::basic_simd<double, Abi> pow_simd(pp::basic_simd<double, Abi> x, pp::basic_simd<double, Abi> y) noexcept
+	template <typename Abi> [[nodiscard]] inline pp::basic_simd<double, Abi> pow_simd(pp::basic_simd<double, Abi> x, pp::basic_simd<double, Abi> y) noexcept
 	{
 		using DVec = pp::basic_simd<double, Abi>;
 		using U64  = pp::basic_simd<std::uint64_t, Abi>;
@@ -142,10 +134,12 @@ namespace ccm::gen::impl
 		if constexpr (!ccm::builtin::target_cpu_has_fma)
 		{
 			DVec out{};
-			for (int i = 0; i < N; ++i) { out[i] = ccm::gen::impl::pow_impl(x[i], y[i]); }
+			for (int i = 0; i < N; ++i)
+			{
+				out[i] = ccm::gen::impl::pow_impl(x[i], y[i]);
+			}
 			return out;
-		}
-		else
+		} else
 		{
 			namespace cst = ccm::support::constants;
 			namespace sd  = simd_detail;
@@ -290,7 +284,10 @@ namespace ccm::gen::impl
 			{
 				for (int i = 0; i < N; ++i)
 				{
-					if (needs_scalar[i]) { result[i] = ccm::gen::impl::pow_impl(x[i], y[i]); }
+					if (needs_scalar[i])
+					{
+						result[i] = ccm::gen::impl::pow_impl(x[i], y[i]);
+					}
 				}
 			}
 			return result;

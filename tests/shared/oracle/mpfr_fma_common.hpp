@@ -30,22 +30,31 @@ namespace ccm::test::oracle::fma_oracle
 	{
 		switch (path)
 		{
-		case validation_path::public_default: return "public_default";
+		case validation_path::public_default   : return "public_default";
 		case validation_path::software_fallback: return "software_fallback";
-		case validation_path::quiet_generic: return "quiet_generic";
+		case validation_path::quiet_generic	   : return "quiet_generic";
 		}
 		return "unknown";
 	}
 
 	inline std::optional<validation_path> parse_path(std::string_view raw)
 	{
-		if (raw == "public" || raw == "public_default") { return validation_path::public_default; }
-		if (raw == "software" || raw == "software_fallback") { return validation_path::software_fallback; }
-		if (raw == "quiet" || raw == "quiet_generic") { return validation_path::quiet_generic; }
+		if (raw == "public" || raw == "public_default")
+		{
+			return validation_path::public_default;
+		}
+		if (raw == "software" || raw == "software_fallback")
+		{
+			return validation_path::software_fallback;
+		}
+		if (raw == "quiet" || raw == "quiet_generic")
+		{
+			return validation_path::quiet_generic;
+		}
 		return std::nullopt;
 	}
 
-	inline std::vector<validation_path> parse_paths(int argc, char** argv)
+	inline std::vector<validation_path> parse_paths(int argc, char ** argv)
 	{
 		std::vector<validation_path> paths;
 		const auto raw = option_value(argc, argv, "--path=");
@@ -56,23 +65,33 @@ namespace ccm::test::oracle::fma_oracle
 			{
 				const std::size_t comma		 = view.find(',');
 				const std::string_view token = view.substr(0, comma);
-				if (auto parsed = parse_path(token)) { paths.push_back(*parsed); }
-				if (comma == std::string_view::npos) { break; }
+				if (auto parsed = parse_path(token))
+				{
+					paths.push_back(*parsed);
+				}
+				if (comma == std::string_view::npos)
+				{
+					break;
+				}
 				view.remove_prefix(comma + 1);
 			}
 		}
-		if (paths.empty()) { paths.push_back(validation_path::public_default); }
+		if (paths.empty())
+		{
+			paths.push_back(validation_path::public_default);
+		}
 		return paths;
 	}
 
-	template <typename T>
-	inline T invoke(validation_path path, T x, T y, T z)
+	template <typename T> inline T invoke(validation_path path, T x, T y, T z)
 	{
 		switch (path)
 		{
 		case validation_path::public_default:
-			if constexpr (std::is_same_v<T, float>) { return ccm::fmaf(ccm::test::runtime_value(x), ccm::test::runtime_value(y), ccm::test::runtime_value(z)); }
-			else
+			if constexpr (std::is_same_v<T, float>)
+			{
+				return ccm::fmaf(ccm::test::runtime_value(x), ccm::test::runtime_value(y), ccm::test::runtime_value(z));
+			} else
 			{
 				return ccm::fma(ccm::test::runtime_value(x), ccm::test::runtime_value(y), ccm::test::runtime_value(z));
 			}
@@ -84,18 +103,18 @@ namespace ccm::test::oracle::fma_oracle
 		return ccm::support::fp::public_fma(ccm::test::runtime_value(x), ccm::test::runtime_value(y), ccm::test::runtime_value(z));
 	}
 
-	template <typename T>
-	inline T std_fma_reference(T x, T y, T z)
+	template <typename T> inline T std_fma_reference(T x, T y, T z)
 	{
-		if constexpr (std::is_same_v<T, float>) { return std::fmaf(x, y, z); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return std::fmaf(x, y, z);
+		} else
 		{
 			return std::fma(x, y, z);
 		}
 	}
 
-	template <typename T>
-	inline T mpfr_fma_reference(T x, T y, T z, mpfr_prec_t precision, mpfr_rnd_t rounding)
+	template <typename T> inline T mpfr_fma_reference(T x, T y, T z, mpfr_prec_t precision, mpfr_rnd_t rounding)
 	{
 		mpfr_t x_mpfr;
 		mpfr_t y_mpfr;
@@ -119,16 +138,20 @@ namespace ccm::test::oracle::fma_oracle
 		return result;
 	}
 
-	template <typename T>
-	inline void append_structured_cases(std::vector<ternary_case<T>>& cases)
+	template <typename T> inline void append_structured_cases(std::vector<ternary_case<T>> & cases)
 	{
 		if constexpr (std::is_same_v<T, float>)
 		{
-			for (const auto& input : ccm::test::samples::kFmaFloatCases) { cases.push_back({ input.x, input.y, input.z, "structured regression corpus" }); }
-		}
-		else
+			for (const auto & input : ccm::test::samples::kFmaFloatCases)
+			{
+				cases.push_back({ input.x, input.y, input.z, "structured regression corpus" });
+			}
+		} else
 		{
-			for (const auto& input : ccm::test::samples::kFmaDoubleCases) { cases.push_back({ input.x, input.y, input.z, "structured regression corpus" }); }
+			for (const auto & input : ccm::test::samples::kFmaDoubleCases)
+			{
+				cases.push_back({ input.x, input.y, input.z, "structured regression corpus" });
+			}
 		}
 
 		const T one		  = static_cast<T>(1);
@@ -144,16 +167,14 @@ namespace ccm::test::oracle::fma_oracle
 		{
 			cases.push_back({ min_normal, 0x1.0p-23F, -min_subnormal, "float exact subnormal cancellation" });
 			cases.push_back({ min_normal, 0x1.0p-24F, -min_subnormal, "float sticky-bit underflow boundary" });
-		}
-		else
+		} else
 		{
 			cases.push_back({ min_normal, 0x1.0p-52, -min_subnormal, "double exact subnormal cancellation" });
 			cases.push_back({ min_normal, 0x1.0p-53, -min_subnormal, "double sticky-bit underflow boundary" });
 		}
 	}
 
-	template <typename T>
-	inline void append_special_matrix(std::vector<ternary_case<T>>& cases)
+	template <typename T> inline void append_special_matrix(std::vector<ternary_case<T>> & cases)
 	{
 		const std::array<T, 10> values = {
 			-std::numeric_limits<T>::infinity(),
@@ -172,7 +193,10 @@ namespace ccm::test::oracle::fma_oracle
 		{
 			for (T y : values)
 			{
-				for (T z : values) { cases.push_back({ x, y, z, "special-value matrix" }); }
+				for (T z : values)
+				{
+					cases.push_back({ x, y, z, "special-value matrix" });
+				}
 			}
 		}
 
@@ -181,8 +205,7 @@ namespace ccm::test::oracle::fma_oracle
 		cases.push_back({ static_cast<T>(1), static_cast<T>(1), std::numeric_limits<T>::quiet_NaN(), "quiet NaN addend" });
 	}
 
-	template <typename T>
-	inline void append_random_cases(std::vector<ternary_case<T>>& cases, campaign_mode mode, std::uint64_t seed)
+	template <typename T> inline void append_random_cases(std::vector<ternary_case<T>> & cases, campaign_mode mode, std::uint64_t seed)
 	{
 		const std::size_t count = mode == campaign_mode::quick ? (std::is_same_v<T, float> ? 1024U : 512U)
 															   : (mode == campaign_mode::extended ? (std::is_same_v<T, float> ? 8192U : 4096U)
@@ -198,8 +221,7 @@ namespace ccm::test::oracle::fma_oracle
 					ccm::support::bit_cast<float>(static_cast<std::uint32_t>(rng())),
 					"deterministic random bit-pattern campaign",
 				});
-			}
-			else
+			} else
 			{
 				cases.push_back({
 					ccm::support::bit_cast<double>(rng()),
@@ -211,8 +233,7 @@ namespace ccm::test::oracle::fma_oracle
 		}
 	}
 
-	template <typename T>
-	inline std::vector<ternary_case<T>> build_cases(campaign_mode mode, std::uint64_t seed)
+	template <typename T> inline std::vector<ternary_case<T>> build_cases(campaign_mode mode, std::uint64_t seed)
 	{
 		std::vector<ternary_case<T>> cases;
 		append_structured_cases(cases);
@@ -221,18 +242,17 @@ namespace ccm::test::oracle::fma_oracle
 		return cases;
 	}
 
-	template <typename T>
-	inline int run_campaign(int argc, char** argv, std::string_view function_name, mpfr_prec_t default_precision)
+	template <typename T> inline int run_campaign(int argc, char ** argv, std::string_view function_name, mpfr_prec_t default_precision)
 	{
 		const auto mode		   = parse_mode(option_value(argc, argv, "--mode="));
 		const auto output_path = resolve_event_log_path(argc, argv);
 		const std::uint64_t seed =
-			parse_option_or<std::uint64_t>(option_value(argc, argv, "--seed="), [](const std::string& value) { return std::stoull(value); }, 0xF6A600D5EEDULL);
+			parse_option_or<std::uint64_t>(option_value(argc, argv, "--seed="), [](const std::string & value) { return std::stoull(value); }, 0xF6A600D5EEDULL);
 		const std::uint64_t max_ulp = parse_option_or<std::uint64_t>(
-			option_value(argc, argv, "--max-ulp="), [](const std::string& value) { return static_cast<std::uint64_t>(std::stoull(value)); }, 0);
+			option_value(argc, argv, "--max-ulp="), [](const std::string & value) { return static_cast<std::uint64_t>(std::stoull(value)); }, 0);
 		const mpfr_prec_t precision = parse_option_or<mpfr_prec_t>(
 			option_value(argc, argv, "--oracle-precision="),
-			[](const std::string& value) { return static_cast<mpfr_prec_t>(std::stoul(value)); },
+			[](const std::string & value) { return static_cast<mpfr_prec_t>(std::stoul(value)); },
 			default_precision);
 
 		const auto paths		  = parse_paths(argc, argv);
@@ -251,16 +271,20 @@ namespace ccm::test::oracle::fma_oracle
 			for (const int rounding_mode : rounding_modes)
 			{
 				ScopedMpfrRoundingMode scope(rounding_mode);
-				if (!scope) { continue; }
-				for (const auto& test_case : cases)
+				if (!scope)
+				{
+					continue;
+				}
+				for (const auto & test_case : cases)
 				{
 					if (auto failure = evaluate_ternary_mpfr_case(
 							test_case,
 							function_name,
 							path_name(path),
 							[path](T x, T y, T z) { return invoke(path, x, y, z); },
-							[](T x, T y, T z, mpfr_prec_t oracle_precision, mpfr_rnd_t rounding)
-							{ return mpfr_fma_reference(x, y, z, oracle_precision, rounding); },
+							[](T x, T y, T z, mpfr_prec_t oracle_precision, mpfr_rnd_t rounding) {
+								return mpfr_fma_reference(x, y, z, oracle_precision, rounding);
+							},
 							[](T x, T y, T z) { return std_fma_reference(x, y, z); },
 							precision,
 							max_ulp,

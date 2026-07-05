@@ -18,11 +18,12 @@
 
 namespace ccm::rt
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T fdim_rt(T x, T y) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T fdim_rt(T x, T y) noexcept
 	{
-		if constexpr (ccm::builtin::has_runtime_fdim<T>) { return ccm::builtin::fdim_rt(x, y); }
-		else
+		if constexpr (ccm::builtin::has_runtime_fdim<T>)
+		{
+			return ccm::builtin::fdim_rt(x, y);
+		} else
 		{
 			return gen::fdim(x, y);
 		}

@@ -18,11 +18,12 @@
 
 namespace ccm::rt
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T fmin_rt(T x, T y) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T fmin_rt(T x, T y) noexcept
 	{
-		if constexpr (ccm::builtin::has_runtime_fmin<T>) { return ccm::builtin::fmin_rt(x, y); }
-		else
+		if constexpr (ccm::builtin::has_runtime_fmin<T>)
+		{
+			return ccm::builtin::fmin_rt(x, y);
+		} else
 		{
 			return gen::min(x, y);
 		}

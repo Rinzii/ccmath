@@ -19,14 +19,16 @@
 
 namespace
 {
-	template <typename T>
-	void expo(uint8_t const * data, size_t size)
+	template <typename T> void expo(uint8_t const * data, size_t size)
 	{
 		ccm::fuzz::Inputs<T> in;
-		if (!in.load_x(data, size)) { return; }
+		if (!in.load_x(data, size))
+		{
+			return;
+		}
 
 		// fuzz_calls routes to the generic kernels in the generic build and to the public
-		// dispatch otherwise; the exp and log kernels meet the contract for both float and
+		// dispatch otherwise. The exp and log kernels meet the contract for both float and
 		// double, so the same call set covers both build flavors.
 		ccm::fuzz::fuzz_unary_vs_std(in.x, ccm::fuzz::calls::exp<T>, [](T v) { return std::exp(v); });
 		ccm::fuzz::fuzz_unary_vs_std(in.x, ccm::fuzz::calls::exp2<T>, [](T v) { return std::exp2(v); });

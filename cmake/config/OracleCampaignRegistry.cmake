@@ -11,6 +11,7 @@ set(CCMATH_ORACLE_MPFR_EXECUTABLE_IDS
         powl_characterization
         pow_search
         cross_libm_pow
+        mpfr_unary
 )
 
 set(CCMATH_ORACLE_MPFR_mpfr_pow_double_TARGET ccmath-rigorous-mpfr-pow)
@@ -123,6 +124,38 @@ set(CCMATH_ORACLE_MPFR_TEST_cross_libm_pow_smoke_REQUIRES CCMATH_ENABLE_CROSS_LI
 set(CCMATH_ORACLE_MPFR_TEST_cross_libm_pow_smoke_TIMEOUT 60)
 set(CCMATH_ORACLE_MPFR_TEST_cross_libm_pow_smoke_LABELS rigorous mpfr)
 set(CCMATH_ORACLE_MPFR_TEST_cross_libm_pow_smoke_ARGS --corpus=quick --format=json --output=cross-libm-pow-quick.json)
+
+set(CCMATH_ORACLE_MPFR_mpfr_unary_TARGET ccmath-rigorous-mpfr-unary)
+set(CCMATH_ORACLE_MPFR_mpfr_unary_SOURCE ../shared/oracle/mpfr_unary.cpp)
+
+# Sampled, CI-friendly smoke per unary function. The doc-quality numbers (large sampled binary64
+# and exhaustive binary32) come from tools/measure_ulp.sh, not from these ctests, so these stay
+# bounded and do not write the canonical summary JSON the doc generator consumes.
+set(CCMATH_ORACLE_MPFR_UNARY_DOUBLE_FUNCTIONS
+        exp exp2 expm1 log log1p log2 log10 sin cos tan asin acos atan cbrt sqrt tgamma lgamma)
+set(CCMATH_ORACLE_MPFR_UNARY_FLOAT_FUNCTIONS exp log sin sqrt tgamma)
+
+set(CCMATH_ORACLE_MPFR_mpfr_unary_CTESTS "")
+foreach (_ccm_unary_fn IN LISTS CCMATH_ORACLE_MPFR_UNARY_DOUBLE_FUNCTIONS)
+    set(_ccm_unary_id unary_${_ccm_unary_fn}_double)
+    list(APPEND CCMATH_ORACLE_MPFR_mpfr_unary_CTESTS ${_ccm_unary_id})
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_NAME ccmath-rigorous-mpfr-unary-${_ccm_unary_fn}-double)
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_TARGET ccmath-rigorous-mpfr-unary)
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_TIMEOUT 300)
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_LABELS rigorous mpfr)
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_ARGS
+            --function=${_ccm_unary_fn} --type=double --mode=quick --count=20000 --rounding-modes=all)
+endforeach ()
+foreach (_ccm_unary_fn IN LISTS CCMATH_ORACLE_MPFR_UNARY_FLOAT_FUNCTIONS)
+    set(_ccm_unary_id unary_${_ccm_unary_fn}_float)
+    list(APPEND CCMATH_ORACLE_MPFR_mpfr_unary_CTESTS ${_ccm_unary_id})
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_NAME ccmath-rigorous-mpfr-unary-${_ccm_unary_fn}-float)
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_TARGET ccmath-rigorous-mpfr-unary)
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_TIMEOUT 300)
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_LABELS rigorous mpfr)
+    set(CCMATH_ORACLE_MPFR_TEST_${_ccm_unary_id}_ARGS
+            --function=${_ccm_unary_fn} --type=float --mode=quick --count=20000 --rounding-modes=all)
+endforeach ()
 
 set(CCMATH_ORACLE_COREMATH_EXECUTABLE_IDS
         coremath_pow_double

@@ -22,7 +22,10 @@ namespace
 		auto current = std::filesystem::path(__FILE__).parent_path();
 		while (!current.empty())
 		{
-			if (std::filesystem::exists(current / "include" / "ccmath")) { return current; }
+			if (std::filesystem::exists(current / "include" / "ccmath"))
+			{
+				return current;
+			}
 			current = current.parent_path();
 		}
 		return std::filesystem::path(__FILE__).parent_path();
@@ -44,8 +47,14 @@ TEST(CcmathImplementationPolicyTests, LibraryHeadersDoNotIncludeCmath)
 
 	for (const auto & entry : std::filesystem::recursive_directory_iterator(include_root))
 	{
-		if (!entry.is_regular_file()) { continue; }
-		if (!is_library_source_file(entry.path())) { continue; }
+		if (!entry.is_regular_file())
+		{
+			continue;
+		}
+		if (!is_library_source_file(entry.path()))
+		{
+			continue;
+		}
 
 		std::ifstream input(entry.path());
 		ASSERT_TRUE(input.is_open()) << "failed to open " << entry.path().string();
@@ -65,6 +74,9 @@ TEST(CcmathImplementationPolicyTests, LibraryHeadersDoNotIncludeCmath)
 	EXPECT_TRUE(violations.empty());
 	if (!violations.empty())
 	{
-		for (const std::string & violation : violations) { ADD_FAILURE() << "forbidden <cmath> include in library header: " << violation; }
+		for (const std::string & violation : violations)
+		{
+			ADD_FAILURE() << "forbidden <cmath> include in library header: " << violation;
+		}
 	}
 }

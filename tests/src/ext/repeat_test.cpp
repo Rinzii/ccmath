@@ -16,8 +16,10 @@ TEST(CcmathExtRepeatTest, Smoke)
 {
 	static_assert(ccm::ext::repeat(370.0, 360.0) == 10.0);
 	static_assert(ccm::ext::repeat(-10.0, 360.0) == 350.0);
-	static_assert(ccm::ext::safe::repeat(5.0, 0.0) == 0.0);
+	static_assert(ccm::ext::repeat(5.0, 0.0) == 0.0);
+	static_assert(ccm::ext::unsafe::repeat(370.0, 360.0) == 10.0);
 
 	EXPECT_DOUBLE_EQ(ccm::ext::repeat(7.5, 3.0), 1.5);
-	EXPECT_DOUBLE_EQ(ccm::ext::safe::repeat(7.5, 0.0), 0.0);
+	EXPECT_DOUBLE_EQ(ccm::ext::repeat(7.5, 0.0), 0.0);
+	EXPECT_DOUBLE_EQ(ccm::ext::unsafe::repeat(7.5, 3.0), 1.5);
 }

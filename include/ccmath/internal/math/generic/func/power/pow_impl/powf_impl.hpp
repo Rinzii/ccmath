@@ -68,7 +68,7 @@ namespace ccm::gen::impl
 			return DoubleBits(a).get_biased_exponent() >= DoubleBits(b).get_biased_exponent();
 		}
 
-		constexpr double powf_double_double(int idx_x, double dx, double y6, double lo6_hi, const DoubleDouble& exp2_hi_mid)
+		constexpr double powf_double_double(int idx_x, double dx, double y6, double lo6_hi, const DoubleDouble & exp2_hi_mid)
 		{
 			using DoubleBits = support::fp::FPBits<double>;
 
@@ -117,7 +117,7 @@ namespace ccm::gen::impl
 			const DoubleDouble prod = quick_mult(y6, log2_x);
 
 			// 2^6 * (y * log2(x) - (hi + mid)) = 2^6 * lo
-			DoubleDouble lo6								   = larger_exponent(prod.hi, lo6_hi) ? add(prod, lo6_hi_dd) : add(lo6_hi_dd, prod);
+			DoubleDouble const lo6							   = larger_exponent(prod.hi, lo6_hi) ? add(prod, lo6_hi_dd) : add(lo6_hi_dd, prod);
 			constexpr std::array<DoubleDouble, 10> EXP2_COEFFS = {
 				DoubleDouble{ 0x1p0, 0 },
 				DoubleDouble{ 0x1.62e42fefa39efp-7, 0x1.abc9e3b398024p-62 },
@@ -131,7 +131,7 @@ namespace ccm::gen::impl
 				DoubleDouble{ 0x1.b5251ff97bee1p-78, -0x1.8483eabd9642dp-132 },
 			};
 
-			DoubleDouble pp		  = ::ccm::support::polyeval(lo6,
+			DoubleDouble const pp = ::ccm::support::polyeval(lo6,
 															 EXP2_COEFFS[0],
 															 EXP2_COEFFS[1],
 															 EXP2_COEFFS[2],
@@ -152,20 +152,25 @@ namespace ccm::gen::impl
 			if (CCM_UNLIKELY(((r_bits & 0xfff'ffff) == 0) && (r.lo != 0.0)))
 			{
 				const types::Sign hi_sign = DoubleBits(r.hi).sign();
-				if (const types::Sign lo_sign = DoubleBits(r.lo).sign(); hi_sign == lo_sign) { ++r_bits; }
-				else if ((r_bits & DoubleBits::fraction_mask) > 0) { --r_bits; }
+				if (const types::Sign lo_sign = DoubleBits(r.lo).sign(); hi_sign == lo_sign)
+				{
+					++r_bits;
+				} else if ((r_bits & DoubleBits::fraction_mask) > 0)
+				{
+					--r_bits;
+				}
 			}
 
 			return ccm::support::bit_cast<double>(r_bits);
 		}
 
-		constexpr std::optional<float> handle_exceptional_cases(float& x,
-																float& y,
-																support::fp::FPBits<float>& xbits,
-																support::fp::FPBits<float>& ybits,
-																const std::uint32_t& x_u,
-																int& exponent,
-																std::uint64_t& sign)
+		constexpr std::optional<float> handle_exceptional_cases(float & x,
+																float & y,
+																support::fp::FPBits<float> & xbits,
+																support::fp::FPBits<float> & ybits,
+																const std::uint32_t & x_u,
+																int & exponent,
+																std::uint64_t & sign)
 		{
 			using FloatBits = support::fp::FPBits<float>;
 
@@ -176,9 +181,12 @@ namespace ccm::gen::impl
 			// The single precision number that is closest to 1 is (1 - 2^-24)
 			if (CCM_UNLIKELY((y_abs & 0x0007'ffff) == 0 || y_abs > 0x4f170000))
 			{
-				if (y == 0.0F) { return 1.0F; }
+				if (y == 0.0F)
+				{
+					return 1.0F;
+				}
 
-				switch (y_abs)
+				switch (y_abs) // NOLINT(hicpp-multiway-paths-covered)
 				{
 				case 0x7f800000:
 				{ // y is +/-infinity
@@ -203,7 +211,10 @@ namespace ccm::gen::impl
 					switch (y_u)
 					{
 					case 0x3f00'0000: // y = 0.5f
-						if (CCM_UNLIKELY(x == 0.0F || x_u == 0xff80'0000)) { return x * x; }
+						if (CCM_UNLIKELY(x == 0.0F || x_u == 0xff80'0000))
+						{
+							return x * x;
+						}
 						if (x < 0.0F)
 						{
 							support::fenv::set_errno_if_required(EDOM);
@@ -228,7 +239,10 @@ namespace ccm::gen::impl
 							{
 								const auto x_d = static_cast<double>(x);
 								double result  = x_d;
-								for (int i = 1; i < iter; ++i) { result *= x_d; }
+								for (int i = 1; i < iter; ++i)
+								{
+									result *= x_d;
+								}
 								return static_cast<float>(result);
 							}
 						}
@@ -236,7 +250,10 @@ namespace ccm::gen::impl
 						{
 							if (y_abs > 0x7f80'0000)
 							{
-								if (x_u == 0x3f80'0000) { return 1.0F; }
+								if (x_u == 0x3f80'0000)
+								{
+									return 1.0F;
+								}
 								return y;
 							}
 							y = support::bit_cast<float>((y_u & FloatBits::sign_mask) + 0x4f80'0000U);
@@ -275,7 +292,10 @@ namespace ccm::gen::impl
 				if (x_abs == 0x7f80'0000) // x is +/-inf
 				{
 					const bool out_is_neg = x_is_neg && is_odd_integer(FloatBits(y_u).get_val());
-					if (y_u >= FloatBits::sign_mask) { return out_is_neg ? -0.0F : 0.0F; }
+					if (y_u >= FloatBits::sign_mask)
+					{
+						return out_is_neg ? -0.0F : 0.0F;
+					}
 					return FloatBits::inf(out_is_neg ? types::Sign::NEG : types::Sign::POS).get_val();
 				}
 
@@ -297,9 +317,11 @@ namespace ccm::gen::impl
 					if (is_integer(y))
 					{
 						x = -x;
-						if (is_odd_integer(y)) { sign = 0x8000'0000'0000'0000ULL; } // sign = -1.0
-					}
-					else
+						if (is_odd_integer(y))
+						{
+							sign = 0x8000'0000'0000'0000ULL;
+						} // sign = -1.0
+					} else
 					{
 						support::fenv::set_errno_if_required(EDOM);
 						support::fenv::raise_except_if_required(FE_INVALID);
@@ -326,7 +348,7 @@ namespace ccm::gen::impl
 			// Check for exceptional cases
 			if (auto exceptional_case = handle_exceptional_cases(x, y, xbits, ybits, x_u, ex, sign); CCM_UNLIKELY(exceptional_case.has_value()))
 			{
-				return *exceptional_case;
+				return *exceptional_case; // NOLINT(bugprone-unchecked-optional-access) guarded by has_value() above
 			}
 
 			if (x < 0.0F && !is_integer(y))
@@ -357,13 +379,11 @@ namespace ccm::gen::impl
 			// Then m_x = (1 + dx) / r, and
 			//   log2(m_x) = log2( (1 + dx) / r )
 			//             = log2(1 + dx) - log2(r).
-			const double dx = [&]()
-			{
+			const double dx = [&]() {
 				if constexpr (ccm::builtin::target_cpu_has_fma)
 				{
 					return static_cast<double>(support::multiply_add(m_x, support::constants::R.at(static_cast<std::size_t>(idx_x)), -1.0F));
-				}
-				else
+				} else
 				{
 					return support::multiply_add(static_cast<double>(m_x), support::constants::RD.at(static_cast<std::size_t>(idx_x)), -1.0);
 				}
@@ -427,9 +447,9 @@ namespace ccm::gen::impl
 			// For those exponents that are out of range, the final conversion will round
 			// them correctly to inf/max float or 0/min float accordingly.
 			auto hm_i = static_cast<std::int64_t>(hm);
-			hm_i	  = (hm_i > (1 << 15)) ? (1 << 15) : (hm_i < (-(1 << 15)) ? -(1 << 15) : hm_i);
+			hm_i	  = (hm_i > (1 << 15)) ? (1 << 15) : (hm_i < (-(1 << 15)) ? -(1 << 15) : hm_i); // NOLINT(readability-avoid-nested-conditional-operator)
 
-			int idx_y = hm_i & 0x3f;
+			int const idx_y = static_cast<int>(hm_i & 0x3f);
 
 			// 2^hi
 			// The shift goes through uint64 because left-shifting a negative value is undefined
@@ -476,8 +496,7 @@ namespace ccm::gen::impl
 					{
 						support::fenv::set_errno_if_required(ERANGE);
 						support::fenv::raise_except_if_required(FE_OVERFLOW);
-					}
-					else if (r_upper == 0.0F)
+					} else if (r_upper == 0.0F)
 					{
 						support::fenv::set_errno_if_required(ERANGE);
 						support::fenv::raise_except_if_required(FE_UNDERFLOW);
@@ -500,7 +519,7 @@ namespace ccm::gen::impl
 		}
 	} // namespace internal::impl
 
-	constexpr float powf_impl(float base, float exp) noexcept
+	constexpr float powf_impl(float base, float exp) noexcept // NOLINT(bugprone-exception-escape)
 	{
 		return internal::impl::powf_impl(base, exp);
 		// return internal::impl::powf_impl(base, exp);

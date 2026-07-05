@@ -13,16 +13,16 @@
 #include "ccmath/internal/math/generic/func/fmanip/impl/frexp_impl.hpp"
 #include "ccmath/internal/predef/unlikely.hpp"
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fp/fp_bits.hpp"
 
 #include <cerrno>
-#include <cfenv>
 #include <climits>
 #include <cstdint>
 
 namespace ccm::internal::impl
 {
-	inline constexpr int fp_ilogb0() noexcept
+	constexpr int fp_ilogb0() noexcept
 	{
 #ifdef FP_ILOGB0
 		return FP_ILOGB0;
@@ -31,7 +31,7 @@ namespace ccm::internal::impl
 #endif
 	}
 
-	inline constexpr int fp_ilogbnan() noexcept
+	constexpr int fp_ilogbnan() noexcept
 	{
 #ifdef FP_ILOGBNAN
 		return FP_ILOGBNAN;
@@ -40,12 +40,11 @@ namespace ccm::internal::impl
 #endif
 	}
 
-	template <typename T>
-	constexpr int ilogb_impl(T x) noexcept
+	template <typename T> constexpr int ilogb_impl(T x) noexcept
 	{
 		using fp_bits_t = ccm::support::fp::FPBits<T>;
 
-		fp_bits_t bits(x);
+		fp_bits_t const bits(x);
 
 		if (CCM_UNLIKELY(bits.is_nan()))
 		{

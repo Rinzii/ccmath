@@ -16,8 +16,7 @@
 
 namespace ccm::test::worst_case
 {
-	template <typename T>
-	struct PowCase
+	template <typename T> struct PowCase
 	{
 		T base;
 		T exponent;

@@ -48,11 +48,11 @@
 /// \return True if the compiler has the attribute, false otherwise.
 ///
 #ifndef CCM_HAS_DECLSPEC_ATTR
-	#if defined(_MSC_VER)
+	#ifdef _MSC_VER
 		// MSVC will always return true for this macro.
 		#define CCM_HAS_DECLSPEC_ATTR(x) 1
 	#elif defined(__clang__)
-		#if defined(__has_declspec_attribute)
+		#ifdef __has_declspec_attribute
 		// This will check if the compiler has access to a specific declspec attribute. Only works for Clang based compilers.
 			#define CCM_HAS_DECLSPEC_ATTR(x) __has_declspec_attribute(x)
 		#else

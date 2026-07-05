@@ -30,9 +30,15 @@ namespace
 	std::string detect_powl_path()
 	{
 #if defined(CCMATH_HAS_CONSTEXPR_BUILTIN_POW)
-		if (ccm::builtin::has_constexpr_pow<long double>) { return "constexpr_builtin"; }
+		if (ccm::builtin::has_constexpr_pow<long double>)
+		{
+			return "constexpr_builtin";
+		}
 #endif
-		if (ccm::builtin::has_runtime_pow<long double>) { return "runtime_builtin"; }
+		if (ccm::builtin::has_runtime_pow<long double>)
+		{
+			return "runtime_builtin";
+		}
 #if defined(CCMATH_HAS_SIMD)
 		return "runtime_simd_or_generic";
 #else
@@ -78,7 +84,10 @@ namespace
 					summary.worst_actual	 = actual;
 					summary.worst_expected	 = expected_ld;
 				}
-				if (!pass) { ++summary.failure_count; }
+				if (!pass)
+				{
+					++summary.failure_count;
+				}
 			}
 		}
 
@@ -132,7 +141,10 @@ int main(int argc, char ** argv)
 			  << " powl_path=" << report.powl_path << '\n';
 	// ReSharper disable once CppDFAConstantConditions
 	std::cout << "  mpfr_oracle_supported=" << (report.mpfr_oracle_supported ? "yes" : "no");
-	if (!report.mpfr_skip_reason.empty()) { std::cout << " reason=" << report.mpfr_skip_reason; }
+	if (!report.mpfr_skip_reason.empty())
+	{
+		std::cout << " reason=" << report.mpfr_skip_reason;
+	}
 	std::cout << '\n';
 	// ReSharper disable once CppDFAConstantConditions
 	if (report.mpfr_oracle_supported)

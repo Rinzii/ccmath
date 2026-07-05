@@ -24,8 +24,7 @@ namespace ccm::gen
 	 * @param y Right-hand side of the comparison.
 	 * @return If successful, returns the smaller of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename T>
-	constexpr T min(const T x, const T y) noexcept
+	template <typename T> constexpr T min(const T x, const T y) noexcept
 	{
 		// If we are comparing floating point numbers, we need to check for NaN
 		if constexpr (std::is_floating_point_v<T>)
@@ -37,12 +36,21 @@ namespace ccm::gen
 			const bool x_is_nan = x_bits.is_nan();
 			const bool y_is_nan = y_bits.is_nan();
 
-			if (CCM_UNLIKELY(x_is_nan)) { return y; }
-			if (CCM_UNLIKELY(y_is_nan)) { return x; }
+			if (CCM_UNLIKELY(x_is_nan))
+			{
+				return y;
+			}
+			if (CCM_UNLIKELY(y_is_nan))
+			{
+				return x;
+			}
 
 			// Preserve IEC 60559 signed-zero behavior for fmin: if both are zero,
 			// return -0 when either argument is -0.
-			if (CCM_UNLIKELY(x_bits.is_zero() && y_bits.is_zero())) { return x_bits.is_neg() ? x : y; }
+			if (CCM_UNLIKELY(x_bits.is_zero() && y_bits.is_zero()))
+			{
+				return x_bits.is_neg() ? x : y;
+			}
 		}
 
 		return (x < y) ? x : y;

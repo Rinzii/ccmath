@@ -16,8 +16,7 @@
 
 namespace ccm::test::samples
 {
-	template <typename T>
-	struct ternary_input
+	template <typename T> struct ternary_input
 	{
 		T x;
 		T y;
@@ -135,7 +134,7 @@ namespace ccm::test::samples
 		ternary_input<float>{ std::numeric_limits<float>::quiet_NaN(), 1.0F, 1.0F },
 		ternary_input<float>{ 1.0F, 1.0F, std::numeric_limits<float>::quiet_NaN() },
 		// Double-rounding killers: double(x)*double(y) + double(z) cast back to float rounds twice
-		// and is off by 1 ulp; only a correctly-rounded fused kernel matches. See fma.hpp.
+		// and is off by 1 ulp. Only a correctly-rounded fused kernel matches. See fma.hpp.
 		ternary_input<float>{ 0x1.001p+0F, 0x1.001p+0F, 0x1.0p-53F },	 // 1+2^-12 squared + 2^-53 -> 0x3f801001
 		ternary_input<float>{ 0x1.001p+0F, 0x1.001p+0F, -0x1.0p-53F },	 // 1+2^-12 squared - 2^-53 -> 0x3f801000
 		ternary_input<float>{ 0x1.8p+1F, 0x1.000002p+0F, -0x1.0p-149F }, // 3*(1+2^-23) - 2^-149

@@ -74,13 +74,18 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_expm1 functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto expm1_ct(T x) -> std::enable_if_t<has_constexpr_expm1<T>, T>
+	template <typename T> constexpr auto expm1_ct(T x) -> std::enable_if_t<has_constexpr_expm1<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_expm1f(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_expm1(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_expm1l(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_expm1f(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_expm1(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_expm1l(x);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for expm1");
@@ -88,13 +93,18 @@ namespace ccm::builtin
 		}
 	}
 
-	template <typename T>
-	auto expm1_rt(T x) -> std::enable_if_t<has_runtime_expm1<T>, T>
+	template <typename T> auto expm1_rt(T x) -> std::enable_if_t<has_runtime_expm1<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_expm1f(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_expm1(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_expm1l(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_expm1f(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_expm1(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_expm1l(x);
+		} else
 		{
 			static_assert(ccm::support::always_false<T>, "Unsupported type for expm1");
 			return T{};

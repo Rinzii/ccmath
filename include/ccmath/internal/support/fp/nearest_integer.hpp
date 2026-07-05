@@ -36,8 +36,14 @@ namespace ccm::support::fp
 				constexpr float round_threshold = 0.5F; // Threshold for correcting rounding modes at runtime
 				const float diff				= x - r;
 				// Correct for non-default rounding modes at runtime
-				if (CCM_UNLIKELY(diff > round_threshold)) { return r + round_increment; }
-				if (CCM_UNLIKELY(diff < -round_threshold)) { return r - round_increment; }
+				if (CCM_UNLIKELY(diff > round_threshold))
+				{
+					return r + round_increment;
+				}
+				if (CCM_UNLIKELY(diff < -round_threshold))
+				{
+					return r - round_increment;
+				}
 			}
 			return r;
 		}
@@ -60,8 +66,14 @@ namespace ccm::support::fp
 				constexpr double round_threshold = 0.5F; // Threshold for correcting rounding modes at runtime
 				const double diff				 = x - r;
 				// Correct for non-default rounding modes at runtime
-				if (CCM_UNLIKELY(diff > round_threshold)) { return r + round_increment; }
-				if (CCM_UNLIKELY(diff < -round_threshold)) { return r - round_increment; }
+				if (CCM_UNLIKELY(diff > round_threshold))
+				{
+					return r + round_increment;
+				}
+				if (CCM_UNLIKELY(diff < -round_threshold))
+				{
+					return r - round_increment;
+				}
 			}
 			return r;
 		}

@@ -9,18 +9,18 @@
 
 namespace ccm::test::oracle
 {
-	template <typename T>
-	inline bool has_ternary_hard_failure(const std::vector<ternary_failure_record<T>>& events)
-	{ return !events.empty(); }
+	template <typename T> inline bool has_ternary_hard_failure(const std::vector<ternary_failure_record<T>> & events)
+	{
+		return !events.empty();
+	}
 
-	template <typename T>
-	inline void write_ternary_failure_json(const std::string& output_path, const std::vector<ternary_failure_record<T>>& events)
+	template <typename T> inline void write_ternary_failure_json(const std::string & output_path, const std::vector<ternary_failure_record<T>> & events)
 	{
 		std::ofstream out(output_path, std::ios::trunc);
 		out << "[\n";
 		for (std::size_t i = 0; i < events.size(); ++i)
 		{
-			const auto& event = events[i];
+			const auto & event = events[i];
 			out << "  {\n";
 			out << "    \"function_name\": \"" << json_escape(event.function_name) << "\",\n";
 			out << "    \"input_type\": \"" << json_escape(event.input_type) << "\",\n";
@@ -49,10 +49,9 @@ namespace ccm::test::oracle
 		out << "]\n";
 	}
 
-	template <typename T>
-	inline void print_ternary_hard_failures(const std::vector<ternary_failure_record<T>>& events)
+	template <typename T> inline void print_ternary_hard_failures(const std::vector<ternary_failure_record<T>> & events)
 	{
-		for (const auto& event : events)
+		for (const auto & event : events)
 		{
 			std::cout << "HARD FAILURE " << event.event_kind << " fn=" << event.function_name << " path=" << event.path << " rounding=" << event.rounding_mode
 					  << " x=" << event.x_bits << " y=" << event.y_bits << " z=" << event.z_bits << " actual=" << event.actual_bits

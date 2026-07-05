@@ -23,8 +23,7 @@ namespace ccm::ext
 	 * @param h Half-life, time until halfway, in seconds.
 	 * @return The smoothed value.
 	 */
-	template <typename T>
-	constexpr T lerp_smooth(T a, T b, T t, T h)
+	template <typename T> constexpr T lerp_smooth(T a, T b, T t, T h)
 	{
 		// ReSharper disable once CppRedundantParentheses
 		return b + ((a - b) * ccm::exp2<T>(-t / h));

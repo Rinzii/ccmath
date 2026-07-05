@@ -18,8 +18,7 @@
 
 namespace ccm::internal::impl
 {
-	template <typename T>
-	constexpr T modf_impl(T x, T * iptr) noexcept
+	template <typename T> constexpr T modf_impl(T x, T * iptr) noexcept
 	{
 		using fp_bits_t = ccm::support::fp::FPBits<T>;
 
@@ -44,7 +43,10 @@ namespace ccm::internal::impl
 		*iptr		 = ccm::trunc(x);
 		T fractional = x - *iptr;
 
-		if (fractional == T{}) { fractional = fp_bits_t::zero(fp_bits_t(x).sign()).get_val(); }
+		if (fractional == T{})
+		{
+			fractional = fp_bits_t::zero(fp_bits_t(x).sign()).get_val();
+		}
 
 		return fractional;
 	}

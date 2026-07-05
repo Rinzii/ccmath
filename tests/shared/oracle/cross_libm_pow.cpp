@@ -24,12 +24,18 @@ namespace
 	std::vector<case_record> build_corpus(const std::string & corpus)
 	{
 		std::vector<case_record> cases;
-		for (const auto & hard : ccm::test::worst_case::kPowDoubleHard) { cases.push_back({ hard.base, hard.exponent, {} }); }
+		for (const auto & hard : ccm::test::worst_case::kPowDoubleHard)
+		{
+			cases.push_back({ hard.base, hard.exponent, {} });
+		}
 		if (corpus == "extended")
 		{
 			for (double base : { 0.5, 1.0, 2.0, -2.0, 1e-300, 1e300 })
 			{
-				for (double exponent : { -3.0, -0.5, 0.0, 0.5, 2.0, 10.0 }) { cases.push_back({ base, exponent, {} }); }
+				for (double exponent : { -3.0, -0.5, 0.0, 0.5, 2.0, 10.0 })
+				{
+					cases.push_back({ base, exponent, {} });
+				}
 			}
 		}
 		return cases;
@@ -37,7 +43,10 @@ namespace
 
 	double eval_backend(const backend_info & backend, double base, double exponent)
 	{
-		if (backend.id == "std_pow" || backend.id == "platform_libm") { return std::pow(base, exponent); }
+		if (backend.id == "std_pow" || backend.id == "platform_libm")
+		{
+			return std::pow(base, exponent);
+		}
 		return std::pow(base, exponent);
 	}
 } // namespace
@@ -53,15 +62,20 @@ int main(int argc, char ** argv)
 	std::vector<backend_info> active;
 	for (const auto & backend : backends)
 	{
-		if (backend.available) { active.push_back(backend); }
+		if (backend.available)
+		{
+			active.push_back(backend);
+		}
 	}
 
 	auto cases					   = build_corpus(corpus);
 	std::size_t disagreement_count = 0;
 
 	std::ofstream out(output, std::ios::trunc);
-	if (format == "csv") { out << "base,exponent,backend_a,backend_b,kind,result_a,result_b\n"; }
-	else
+	if (format == "csv")
+	{
+		out << "base,exponent,backend_a,backend_b,kind,result_a,result_b\n";
+	} else
 	{
 		out << "[\n";
 	}
@@ -69,7 +83,10 @@ int main(int argc, char ** argv)
 	bool first_json = true;
 	for (auto & test_case : cases)
 	{
-		for (const auto & backend : active) { test_case.results[backend.id] = eval_backend(backend, test_case.base, test_case.exponent); }
+		for (const auto & backend : active)
+		{
+			test_case.results[backend.id] = eval_backend(backend, test_case.base, test_case.exponent);
+		}
 
 		const double mpfr_ref = ccm::test::oracle::mpfr_pow_reference(test_case.base, test_case.exponent, 256, ccm::test::oracle::current_mpfr_rounding_mode());
 
@@ -78,17 +95,22 @@ int main(int argc, char ** argv)
 			for (std::size_t j = i + 1; j < active.size(); ++j)
 			{
 				const auto kind = ccm::test::oracle::cross_libm::classify(test_case.results[active[i].id], test_case.results[active[j].id]);
-				if (kind == disagreement_kind::exact_match) { continue; }
+				if (kind == disagreement_kind::exact_match)
+				{
+					continue;
+				}
 				++disagreement_count;
 				if (format == "csv")
 				{
 					out << test_case.base << ',' << test_case.exponent << ',' << active[i].id << ',' << active[j].id << ','
 						<< ccm::test::oracle::cross_libm::disagreement_name(kind) << ',' << test_case.results[active[i].id] << ','
 						<< test_case.results[active[j].id] << '\n';
-				}
-				else
+				} else
 				{
-					if (!first_json) { out << ",\n"; }
+					if (!first_json)
+					{
+						out << ",\n";
+					}
 					first_json = false;
 					out << "  {\n";
 					out << "    \"base_bits\": \"" << ccm::test::oracle::bits_hex(test_case.base) << "\",\n";
@@ -105,7 +127,10 @@ int main(int argc, char ** argv)
 		}
 	}
 
-	if (format != "csv") { out << "\n]\n"; }
+	if (format != "csv")
+	{
+		out << "\n]\n";
+	}
 
 	std::cout << "cross-libm pow corpus=" << corpus << " active_backends=" << active.size() << " disagreements=" << disagreement_count << " output=" << output
 			  << '\n';
@@ -114,6 +139,9 @@ int main(int argc, char ** argv)
 		std::cout << "  backend " << backend.id << " available=" << (backend.available ? "yes" : "no") << " label=" << backend.label << '\n';
 	}
 
-	if (fail_on_disagreement && disagreement_count > 0) { return 1; }
+	if (fail_on_disagreement && disagreement_count > 0)
+	{
+		return 1;
+	}
 	return 0;
 }

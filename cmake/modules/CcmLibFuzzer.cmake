@@ -6,7 +6,7 @@
 #   CCMATH_FUZZ_LINK_FLAGS     - link options for fuzz executables
 #
 # Optional environment:
-#   LIB_FUZZING_ENGINE - OSS-Fuzz / external engine path (link-only; compile uses fuzzer-no-link)
+#   LIB_FUZZING_ENGINE - OSS-Fuzz / external engine path (link-only, compile uses fuzzer-no-link)
 
 include(CheckCXXSourceCompiles)
 

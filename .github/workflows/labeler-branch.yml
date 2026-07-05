@@ -1,0 +1,38 @@
+name: "Labels: Branch target"
+
+on:
+    pull_request_target:
+        types:
+            - opened
+
+permissions:
+    contents: read
+    pull-requests: write
+    issues: write
+
+jobs:
+    add-branch-label:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Label by base branch
+              uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const base = context.payload.pull_request.base.ref;
+                      const label = base.startsWith('release/')
+                        ? 'Branch: release'
+                        : (base === 'main' ? 'Branch: main' : null);
+
+                      if (!label) {
+                        core.info(`No branch label for base ${base}`);
+                        return;
+                      }
+
+                      await github.rest.issues.addLabels({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: context.payload.pull_request.number,
+                        labels: [label]
+                      });

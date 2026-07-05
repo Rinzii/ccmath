@@ -46,6 +46,10 @@ ccmath_add_gtest_suite(ccmath-simple-ext-constexpr
         SOURCES ../src/ext/constexpr_smoke_test.cpp
         LABELS simple)
 
+ccmath_add_gtest_suite(ccmath-simple-system-math-coexistence
+        SOURCES ../src/math/system_math_header_coexistence_test.cpp
+        LABELS simple)
+
 if (CMAKE_CXX_STANDARD GREATER_EQUAL 20)
     set(_lerp_source ../src/math/misc/lerp_test_std.cpp)
 else ()

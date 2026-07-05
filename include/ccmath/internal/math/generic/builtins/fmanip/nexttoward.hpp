@@ -78,10 +78,16 @@ namespace ccm::builtin
 	constexpr auto nexttoward_ct(T x, long double y)
 		-> std::enable_if_t<std::is_same_v<T, float> || std::is_same_v<T, double> || std::is_same_v<T, long double>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_nexttowardf(x, y); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_nexttoward(x, y); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_nexttowardl(x, y); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_nexttowardf(x, y);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_nexttoward(x, y);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_nexttowardl(x, y);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for nexttoward");
@@ -89,13 +95,18 @@ namespace ccm::builtin
 		}
 	}
 
-	template <typename T>
-	auto nexttoward_rt(T x, long double y) -> std::enable_if_t<has_runtime_nexttoward<T>, T>
+	template <typename T> auto nexttoward_rt(T x, long double y) -> std::enable_if_t<has_runtime_nexttoward<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_nexttowardf(x, y); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_nexttoward(x, y); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_nexttowardl(x, y); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_nexttowardf(x, y);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_nexttoward(x, y);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_nexttowardl(x, y);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for nexttoward");

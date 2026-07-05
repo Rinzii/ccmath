@@ -17,11 +17,13 @@
 
 namespace
 {
-	template <typename T>
-	void nearest(uint8_t const * data, size_t size)
+	template <typename T> void nearest(uint8_t const * data, size_t size)
 	{
 		ccm::fuzz::Inputs<T> in;
-		if (!in.load_x(data, size)) { return; }
+		if (!in.load_x(data, size))
+		{
+			return;
+		}
 
 		ccm::fuzz::fuzz_unary_vs_std(in.x, ccm::floor<T>, [](T v) { return std::floor(v); });
 		ccm::fuzz::fuzz_unary_vs_std(in.x, ccm::trunc<T>, [](T v) { return std::trunc(v); });

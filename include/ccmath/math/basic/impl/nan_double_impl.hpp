@@ -24,7 +24,10 @@ namespace ccm::internal::impl
 
 	constexpr double nan_double_impl(const char * arg) noexcept
 	{
-		if constexpr (!std::numeric_limits<double>::is_iec559) { return 0.0; }
+		if constexpr (!std::numeric_limits<double>::is_iec559)
+		{
+			return 0.0;
+		}
 
 #if (defined(_MSC_VER))
 		// MSVC and clang-cl both return a quiet NaN without honoring a payload.
@@ -71,16 +74,21 @@ namespace ccm::internal::impl
 			{
 				dbl_bits *= 16;
 				dbl_bits += static_cast<std::uint8_t>(ccm::support::helpers::digit_to_int(arg[i]));
-				if (i >= 15) { dbl_bits %= static_cast<std::uint64_t>(1e18); }
+				if (i >= 15)
+				{
+					dbl_bits %= static_cast<std::uint64_t>(1e18);
+				}
 			}
-		}
-		else
+		} else
 		{
 			for (std::size_t i = 0; arg[i] != '\0'; ++i)
 			{
 				dbl_bits *= 10;
 				dbl_bits += static_cast<std::uint8_t>(arg[i] - '0');
-				if (i >= 15) { dbl_bits %= static_cast<std::uint64_t>(1e18); }
+				if (i >= 15)
+				{
+					dbl_bits %= static_cast<std::uint64_t>(1e18);
+				}
 			}
 		}
 		// NOLINTEND

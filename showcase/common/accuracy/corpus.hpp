@@ -10,7 +10,10 @@ namespace ccm::showcase::accuracy
 	{
 		std::vector<double> values;
 		values.reserve(ccm::test::samples::kSqrtDouble.size() + 8);
-		for (double v : ccm::test::samples::kSqrtDouble) { values.push_back(v); }
+		for (double v : ccm::test::samples::kSqrtDouble)
+		{
+			values.push_back(v);
+		}
 		values.push_back(1e-200);
 		values.push_back(1e200);
 		values.push_back(0x1.fffffffffffffp-1022);
@@ -22,7 +25,10 @@ namespace ccm::showcase::accuracy
 	{
 		std::vector<double> values;
 		values.reserve(ccm::test::samples::kTrigDouble.size() + 4);
-		for (double v : ccm::test::samples::kTrigDouble) { values.push_back(v); }
+		for (double v : ccm::test::samples::kTrigDouble)
+		{
+			values.push_back(v);
+		}
 		values.push_back(100.0);
 		values.push_back(-100.0);
 		values.push_back(1e-8);

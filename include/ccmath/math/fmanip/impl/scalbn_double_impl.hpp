@@ -35,8 +35,7 @@ namespace ccm::internal
 					exp -= 1023;
 					exp = ccm::min(exp, 1023);
 				}
-			}
-			else if (exp < -1022)
+			} else if (exp < -1022)
 			{
 				tmp *= 0x1p-1022 * 0x1p53;
 				exp += 1022 - 53;
@@ -56,8 +55,12 @@ namespace ccm::internal
 	} // namespace impl
 
 	constexpr double scalbn_double(double arg, int exp) noexcept
-	{ return impl::scalbn_double_impl(arg, exp); }
+	{
+		return impl::scalbn_double_impl(arg, exp);
+	}
 
 	constexpr double scalbn_double(double arg, long exp) noexcept
-	{ return impl::scalbn_double_impl(arg, static_cast<int>(exp)); }
+	{
+		return impl::scalbn_double_impl(arg, static_cast<int>(exp));
+	}
 } // namespace ccm::internal

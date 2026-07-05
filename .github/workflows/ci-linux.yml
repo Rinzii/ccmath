@@ -340,7 +340,10 @@ jobs:
           key: ${{ runner.os }}-coremath-prefix-v1-${{ hashFiles('cmake/coremath/**', 'tools/coremath/**') }}
 
       - name: Install dependencies
-        run: sudo apt-get update -qq && sudo apt-get install -yqq --no-install-recommends ninja-build pkg-config libmpfr-dev libgmp-dev sollya gappa git || sudo apt-get install -yqq --no-install-recommends ninja-build pkg-config libmpfr-dev libgmp-dev git
+        run: |
+          if ! sudo apt-get update -qq || ! sudo apt-get install -yqq --no-install-recommends ninja-build pkg-config libmpfr-dev libgmp-dev sollya gappa git; then
+            sudo apt-get install -yqq --no-install-recommends ninja-build pkg-config libmpfr-dev libgmp-dev git
+          fi
 
       - name: Build CORE-MATH oracle prefix
         run: |

@@ -11,6 +11,4 @@
 #pragma once
 
 namespace ccm
-{
-
-} // namespace ccm
+{} // namespace ccm

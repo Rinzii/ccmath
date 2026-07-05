@@ -18,14 +18,14 @@
 
 namespace ccm::rt
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	[[nodiscard]] inline T atan2_rt(T y, T x) noexcept
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] inline T atan2_rt(T y, T x) noexcept
 	{
-		if constexpr (ccm::builtin::has_runtime_atan2<T>) { return ccm::builtin::atan2_rt(y, x); }
-		else
+		if constexpr (ccm::builtin::has_runtime_atan2<T>)
 		{
-			const auto scalar = [](T yv, T xv)
-			{
+			return ccm::builtin::atan2_rt(y, x);
+		} else
+		{
+			const auto scalar = [](T yv, T xv) {
 				return detail::dispatch_float_double(
 					yv,
 					[&](float yf) { return internal::impl::atan2_float(yf, static_cast<float>(xv)); },

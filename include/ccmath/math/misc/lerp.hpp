@@ -22,19 +22,29 @@ namespace ccm
 	 * @param b End value.
 	 * @param t Interpolation factor.
 	 * @return Interpolated value equivalent to a + t * (b - a) with stability handling for edge cases.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/lerp
 	 */
-	template <typename T>
-	constexpr T lerp(T a, T b, T t) noexcept
+	template <typename T> constexpr T lerp(T a, T b, T t) noexcept
 	{
-		if (ccm::isnan(a) || ccm::isnan(b) || ccm::isnan(t)) { return a + b + t; }
+		if (ccm::isnan(a) || ccm::isnan(b) || ccm::isnan(t))
+		{
+			return a + b + t;
+		}
 
-		if ((a <= 0 && b >= 0) || (a >= 0 && b <= 0)) { return t * b + (1 - t) * a; }
+		if ((a <= 0 && b >= 0) || (a >= 0 && b <= 0))
+		{
+			return t * b + (1 - t) * a;
+		}
 
-		if (t == 1) { return b; }
+		if (t == 1)
+		{
+			return b;
+		}
 
 		const T x = a + t * (b - a);
-		if ((t > 1) == (b > a)) { return b < x ? x : b; }
+		if ((t > 1) == (b > a))
+		{
+			return b < x ? x : b;
+		}
 
 		return x < b ? x : b;
 	}
@@ -48,7 +58,6 @@ namespace ccm
 	 * @param b End value.
 	 * @param t Interpolation factor.
 	 * @return Interpolated value in the common type of T, U, and V.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/lerp
 	 */
 	template <typename T, typename U, typename V>
 	constexpr std::enable_if_t<std::is_arithmetic_v<T> && std::is_arithmetic_v<U> && std::is_arithmetic_v<V>, std::common_type_t<T, U, V>>
@@ -73,12 +82,21 @@ namespace ccm
 		"Do not use ccm::lerp_old it is only being kept as a fallback until ccm::lerp has been validated as conforming to std::lerp")]] constexpr T
 	old_lerp(T a, T b, T t) noexcept
 	{
-		if ((a <= 0 && b >= 0) || (a >= 0 && b <= 0)) { return t * b + (1 - t) * a; }
+		if ((a <= 0 && b >= 0) || (a >= 0 && b <= 0))
+		{
+			return t * b + (1 - t) * a;
+		}
 
-		if (t == 1) { return b; }
+		if (t == 1)
+		{
+			return b;
+		}
 
 		const T x = a + t * (b - a);
-		if ((t > 1) == (b > a)) { return b < x ? x : b; }
+		if ((t > 1) == (b > a))
+		{
+			return b < x ? x : b;
+		}
 
 		return x < b ? x : b;
 	}

@@ -29,8 +29,7 @@ namespace
 	using testing::TestWithParam;
 	using testing::ValuesIn;
 
-	template <typename T>
-	struct TruncTestParams
+	template <typename T> struct TruncTestParams
 	{
 		T input{};
 		T expected{};
@@ -130,14 +129,11 @@ namespace
 // TODO(IanP): Add coverage for compiler-specific trunc dispatch paths when they diverge.
 
 class CcmathTruncDoubleTests : public TestWithParam<TruncTestParams<double>>
-{
-};
+{};
 class CcmathTruncFloatTests : public TestWithParam<TruncTestParams<float>>
-{
-};
+{};
 class CcmathTruncLongDoubleTests : public TestWithParam<TruncTestParams<long double>>
-{
-};
+{};
 
 INSTANTIATE_TEST_SUITE_P(TruncDoubleTests, CcmathTruncDoubleTests, ValuesIn(kTruncDoubleTestsParams));
 INSTANTIATE_TEST_SUITE_P(TruncFloatTests, CcmathTruncFloatTests, ValuesIn(kTruncFloatTestParams));

@@ -30,26 +30,33 @@ namespace ccm::pp
 {
 	namespace detail
 	{
-		template <typename T, typename Abi, typename F>
-		CCM_ALWAYS_INLINE basic_simd<T, Abi> map1(basic_simd<T, Abi> const & v, F f)
+		template <typename T, typename Abi, typename F> CCM_ALWAYS_INLINE basic_simd<T, Abi> map1(basic_simd<T, Abi> const & v, F f)
 		{
 			basic_simd<T, Abi> r;
-			for (SimdSizeType i = 0; i < v.size(); ++i) { r[i] = f(v[i]); }
+			for (SimdSizeType i = 0; i < v.size(); ++i)
+			{
+				r[i] = f(v[i]);
+			}
 			return r;
 		}
 		template <typename T, typename Abi, typename F>
 		CCM_ALWAYS_INLINE basic_simd<T, Abi> map2(basic_simd<T, Abi> const & a, basic_simd<T, Abi> const & b, F f)
 		{
 			basic_simd<T, Abi> r;
-			for (SimdSizeType i = 0; i < a.size(); ++i) { r[i] = f(a[i], b[i]); }
+			for (SimdSizeType i = 0; i < a.size(); ++i)
+			{
+				r[i] = f(a[i], b[i]);
+			}
 			return r;
 		}
 	} // namespace detail
 
 #define CCM_PP_MATH1(NAME, OP)                                                                                                                                 \
-	template <typename T, typename Abi, std::enable_if_t<std::is_floating_point<T>::value, int> = 0>                                                           \
+	template <typename T, typename Abi, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>                                                                \
 	CCM_ALWAYS_INLINE basic_simd<T, Abi> NAME(basic_simd<T, Abi> const & v)                                                                                    \
-	{ return basic_simd<T, Abi>::from_member(SimdTraits<T, Abi>::OP(v.get())); }
+	{                                                                                                                                                          \
+		return basic_simd<T, Abi>::from_member(SimdTraits<T, Abi>::OP(v.get()));                                                                               \
+	}
 	CCM_PP_MATH1(sqrt, op_sqrt)
 	CCM_PP_MATH1(floor, op_floor)
 	CCM_PP_MATH1(ceil, op_ceil)
@@ -58,39 +65,45 @@ namespace ccm::pp
 	CCM_PP_MATH1(fabs, op_fabs)
 #undef CCM_PP_MATH1
 
-	template <typename T, typename Abi, std::enable_if_t<std::is_floating_point<T>::value, int> = 0>
+	template <typename T, typename Abi, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 	CCM_ALWAYS_INLINE basic_simd<T, Abi> fma(basic_simd<T, Abi> const & a, basic_simd<T, Abi> const & b, basic_simd<T, Abi> const & c)
-	{ return basic_simd<T, Abi>::from_member(SimdTraits<T, Abi>::op_fma(a.get(), b.get(), c.get())); }
+	{
+		return basic_simd<T, Abi>::from_member(SimdTraits<T, Abi>::op_fma(a.get(), b.get(), c.get()));
+	}
 
-	template <typename T, typename Abi>
-	CCM_ALWAYS_INLINE basic_simd<T, Abi> min(basic_simd<T, Abi> const & a, basic_simd<T, Abi> const & b)
-	{ return basic_simd<T, Abi>::from_member(SimdTraits<T, Abi>::op_min(a.get(), b.get())); }
-	template <typename T, typename Abi>
-	CCM_ALWAYS_INLINE basic_simd<T, Abi> max(basic_simd<T, Abi> const & a, basic_simd<T, Abi> const & b)
-	{ return basic_simd<T, Abi>::from_member(SimdTraits<T, Abi>::op_max(a.get(), b.get())); }
+	template <typename T, typename Abi> CCM_ALWAYS_INLINE basic_simd<T, Abi> min(basic_simd<T, Abi> const & a, basic_simd<T, Abi> const & b)
+	{
+		return basic_simd<T, Abi>::from_member(SimdTraits<T, Abi>::op_min(a.get(), b.get()));
+	}
+	template <typename T, typename Abi> CCM_ALWAYS_INLINE basic_simd<T, Abi> max(basic_simd<T, Abi> const & a, basic_simd<T, Abi> const & b)
+	{
+		return basic_simd<T, Abi>::from_member(SimdTraits<T, Abi>::op_max(a.get(), b.get()));
+	}
 
-	// abs: floating point reuses the fabs primitive; integral negates negatives.
-	template <typename T, typename Abi, std::enable_if_t<std::is_floating_point<T>::value, int> = 0>
+	// abs: floating point reuses the fabs primitive. Integral negates negatives.
+	template <typename T, typename Abi, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 	CCM_ALWAYS_INLINE basic_simd<T, Abi> abs(basic_simd<T, Abi> const & v)
-	{ return basic_simd<T, Abi>::from_member(SimdTraits<T, Abi>::op_fabs(v.get())); }
-	template <typename T, typename Abi, std::enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value, int> = 0>
+	{
+		return basic_simd<T, Abi>::from_member(SimdTraits<T, Abi>::op_fabs(v.get()));
+	}
+	template <typename T, typename Abi, std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>, int> = 0>
 	CCM_ALWAYS_INLINE basic_simd<T, Abi> abs(basic_simd<T, Abi> const & v)
 	{
 		return detail::map1(v, [](T x) { return x < T(0) ? static_cast<T>(-x) : x; });
 	}
 
 	// Per-lane transcendental baseline.
-	template <typename T, typename Abi, std::enable_if_t<std::is_floating_point<T>::value, int> = 0>
+	template <typename T, typename Abi, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 	CCM_ALWAYS_INLINE basic_simd<T, Abi> exp(basic_simd<T, Abi> const & v)
 	{
 		return detail::map1(v, [](T x) { return detail::s_exp<T>(x); });
 	}
-	template <typename T, typename Abi, std::enable_if_t<std::is_floating_point<T>::value, int> = 0>
+	template <typename T, typename Abi, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 	CCM_ALWAYS_INLINE basic_simd<T, Abi> log(basic_simd<T, Abi> const & v)
 	{
 		return detail::map1(v, [](T x) { return detail::s_log<T>(x); });
 	}
-	template <typename T, typename Abi, std::enable_if_t<std::is_floating_point<T>::value, int> = 0>
+	template <typename T, typename Abi, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 	CCM_ALWAYS_INLINE basic_simd<T, Abi> pow(basic_simd<T, Abi> const & a, basic_simd<T, Abi> const & b)
 	{
 		return detail::map2(a, b, [](T x, T y) { return detail::s_pow<T>(x, y); });

@@ -26,8 +26,7 @@
 
 namespace
 {
-	template <std::size_t Bits>
-	struct RefUint
+	template <std::size_t Bits> struct RefUint
 	{
 		static_assert(Bits > 0 && Bits % 32 == 0, "RefUint requires a 32-bit limb width");
 
@@ -36,7 +35,10 @@ namespace
 
 		std::array<std::uint32_t, limb_count> limbs{};
 
-		[[nodiscard]] static RefUint zero() { return {}; }
+		[[nodiscard]] static RefUint zero()
+		{
+			return {};
+		}
 
 		[[nodiscard]] static RefUint one()
 		{
@@ -55,20 +57,31 @@ namespace
 		[[nodiscard]] static RefUint from_u64(std::uint64_t value)
 		{
 			RefUint out;
-			if constexpr (limb_count > 0) { out.limbs[0] = static_cast<std::uint32_t>(value); }
-			if constexpr (limb_count > 1) { out.limbs[1] = static_cast<std::uint32_t>(value >> 32U); }
+			if constexpr (limb_count > 0)
+			{
+				out.limbs[0] = static_cast<std::uint32_t>(value);
+			}
+			if constexpr (limb_count > 1)
+			{
+				out.limbs[1] = static_cast<std::uint32_t>(value >> 32U);
+			}
 			return out;
 		}
 
-		template <std::size_t WordCount>
-		[[nodiscard]] static RefUint from_words64(const std::array<std::uint64_t, WordCount>& words)
+		template <std::size_t WordCount> [[nodiscard]] static RefUint from_words64(const std::array<std::uint64_t, WordCount> & words)
 		{
 			RefUint out;
 			for (std::size_t i = 0; i < WordCount; ++i)
 			{
 				const std::size_t lo_index = i * 2;
-				if (lo_index < limb_count) { out.limbs[lo_index] = static_cast<std::uint32_t>(words[i]); }
-				if (lo_index + 1 < limb_count) { out.limbs[lo_index + 1] = static_cast<std::uint32_t>(words[i] >> 32U); }
+				if (lo_index < limb_count)
+				{
+					out.limbs[lo_index] = static_cast<std::uint32_t>(words[i]);
+				}
+				if (lo_index + 1 < limb_count)
+				{
+					out.limbs[lo_index + 1] = static_cast<std::uint32_t>(words[i] >> 32U);
+				}
 			}
 			return out;
 		}
@@ -77,14 +90,20 @@ namespace
 		{
 			for (std::uint32_t limb : limbs)
 			{
-				if (limb != 0U) { return false; }
+				if (limb != 0U)
+				{
+					return false;
+				}
 			}
 			return true;
 		}
 
 		[[nodiscard]] bool get_bit(std::size_t bit) const
 		{
-			if (bit >= Bits) { return false; }
+			if (bit >= Bits)
+			{
+				return false;
+			}
 			const std::size_t limb_index = bit / limb_bits;
 			const std::size_t bit_index	 = bit % limb_bits;
 			return ((limbs[limb_index] >> bit_index) & 1U) != 0U;
@@ -104,27 +123,42 @@ namespace
 			limbs[limb_index] &= ~(1U << bit_index);
 		}
 
-		[[nodiscard]] int compare(const RefUint& other) const
+		[[nodiscard]] int compare(const RefUint & other) const
 		{
 			for (std::size_t i = limb_count; i-- > 0;)
 			{
-				if (limbs[i] < other.limbs[i]) { return -1; }
-				if (limbs[i] > other.limbs[i]) { return 1; }
+				if (limbs[i] < other.limbs[i])
+				{
+					return -1;
+				}
+				if (limbs[i] > other.limbs[i])
+				{
+					return 1;
+				}
 			}
 			return 0;
 		}
 
-		[[nodiscard]] bool operator==(const RefUint& other) const { return limbs == other.limbs; }
-		[[nodiscard]] bool operator!=(const RefUint& other) const { return !(*this == other); }
+		[[nodiscard]] bool operator==(const RefUint & other) const
+		{
+			return limbs == other.limbs;
+		}
+		[[nodiscard]] bool operator!=(const RefUint & other) const
+		{
+			return !(*this == other);
+		}
 
 		[[nodiscard]] RefUint bitwise_not() const
 		{
 			RefUint out;
-			for (std::size_t i = 0; i < limb_count; ++i) { out.limbs[i] = ~limbs[i]; }
+			for (std::size_t i = 0; i < limb_count; ++i)
+			{
+				out.limbs[i] = ~limbs[i];
+			}
 			return out;
 		}
 
-		[[nodiscard]] std::pair<RefUint, bool> add(const RefUint& other) const
+		[[nodiscard]] std::pair<RefUint, bool> add(const RefUint & other) const
 		{
 			RefUint out;
 			std::uint64_t carry = 0;
@@ -137,7 +171,7 @@ namespace
 			return { out, carry != 0 };
 		}
 
-		[[nodiscard]] std::pair<RefUint, bool> sub(const RefUint& other) const
+		[[nodiscard]] std::pair<RefUint, bool> sub(const RefUint & other) const
 		{
 			RefUint out;
 			std::uint64_t borrow = 0;
@@ -151,8 +185,7 @@ namespace
 			return { out, borrow != 0 };
 		}
 
-		template <std::size_t OtherBits>
-		[[nodiscard]] RefUint<Bits + OtherBits> full_mul(const RefUint<OtherBits>& other) const
+		template <std::size_t OtherBits> [[nodiscard]] RefUint<Bits + OtherBits> full_mul(const RefUint<OtherBits> & other) const
 		{
 			RefUint<Bits + OtherBits> out;
 			for (std::size_t i = 0; i < limb_count; ++i)
@@ -162,9 +195,9 @@ namespace
 				{
 					const std::size_t out_index = i + j;
 					const std::uint64_t accum	= static_cast<std::uint64_t>(out.limbs[out_index]) +
-												static_cast<std::uint64_t>(limbs[i]) * static_cast<std::uint64_t>(other.limbs[j]) + carry;
-					out.limbs[out_index] = static_cast<std::uint32_t>(accum);
-					carry				 = accum >> limb_bits;
+												  static_cast<std::uint64_t>(limbs[i]) * static_cast<std::uint64_t>(other.limbs[j]) + carry;
+					out.limbs[out_index]		= static_cast<std::uint32_t>(accum);
+					carry						= accum >> limb_bits;
 				}
 				for (std::size_t out_index = i + RefUint<OtherBits>::limb_count; carry != 0 && out_index < RefUint<Bits + OtherBits>::limb_count; ++out_index)
 				{
@@ -178,7 +211,10 @@ namespace
 
 		[[nodiscard]] RefUint shift_left(std::size_t shift) const
 		{
-			if (shift >= Bits) { return {}; }
+			if (shift >= Bits)
+			{
+				return {};
+			}
 
 			RefUint out;
 			const std::size_t limb_shift = shift / limb_bits;
@@ -186,20 +222,32 @@ namespace
 
 			for (std::size_t i = 0; i < limb_count; ++i)
 			{
-				if (limbs[i] == 0U) { continue; }
+				if (limbs[i] == 0U)
+				{
+					continue;
+				}
 				const std::size_t out_index = i + limb_shift;
-				if (out_index >= limb_count) { continue; }
+				if (out_index >= limb_count)
+				{
+					continue;
+				}
 
 				const std::uint64_t wide = static_cast<std::uint64_t>(limbs[i]) << bit_shift;
 				out.limbs[out_index] |= static_cast<std::uint32_t>(wide);
-				if (bit_shift != 0 && out_index + 1 < limb_count) { out.limbs[out_index + 1] |= static_cast<std::uint32_t>(wide >> limb_bits); }
+				if (bit_shift != 0 && out_index + 1 < limb_count)
+				{
+					out.limbs[out_index + 1] |= static_cast<std::uint32_t>(wide >> limb_bits);
+				}
 			}
 			return out;
 		}
 
 		[[nodiscard]] RefUint shift_right(std::size_t shift) const
 		{
-			if (shift >= Bits) { return {}; }
+			if (shift >= Bits)
+			{
+				return {};
+			}
 
 			RefUint out;
 			const std::size_t limb_shift = shift / limb_bits;
@@ -228,16 +276,22 @@ namespace
 			}
 		}
 
-		[[nodiscard]] std::pair<RefUint, RefUint> divmod(const RefUint& divider) const
+		[[nodiscard]] std::pair<RefUint, RefUint> divmod(const RefUint & divider) const
 		{
 			RefUint quotient;
 			RefUint remainder;
-			if (divider.is_zero()) { return { quotient, remainder }; }
+			if (divider.is_zero())
+			{
+				return { quotient, remainder };
+			}
 
 			for (std::size_t bit = Bits; bit-- > 0;)
 			{
 				remainder.shift_left_one_in_place();
-				if (get_bit(bit)) { remainder.limbs[0] |= 1U; }
+				if (get_bit(bit))
+				{
+					remainder.limbs[0] |= 1U;
+				}
 				if (remainder.compare(divider) >= 0)
 				{
 					remainder = remainder.sub(divider).first;
@@ -247,22 +301,26 @@ namespace
 			return { quotient, remainder };
 		}
 
-		template <std::size_t NewBits>
-		[[nodiscard]] RefUint<NewBits> truncate_low() const
+		template <std::size_t NewBits> [[nodiscard]] RefUint<NewBits> truncate_low() const
 		{
 			RefUint<NewBits> out;
 			const std::size_t max_limbs = std::min<std::size_t>(limb_count, RefUint<NewBits>::limb_count);
-			for (std::size_t i = 0; i < max_limbs; ++i) { out.limbs[i] = limbs[i]; }
+			for (std::size_t i = 0; i < max_limbs; ++i)
+			{
+				out.limbs[i] = limbs[i];
+			}
 			return out;
 		}
 
-		template <std::size_t NewBits>
-		[[nodiscard]] RefUint<NewBits> slice(std::size_t bit_offset) const
+		template <std::size_t NewBits> [[nodiscard]] RefUint<NewBits> slice(std::size_t bit_offset) const
 		{
 			RefUint<NewBits> out;
 			for (std::size_t bit = 0; bit < NewBits; ++bit)
 			{
-				if (get_bit(bit_offset + bit)) { out.set_bit(bit); }
+				if (get_bit(bit_offset + bit))
+				{
+					out.set_bit(bit);
+				}
 			}
 			return out;
 		}
@@ -271,7 +329,10 @@ namespace
 		{
 			for (std::size_t i = 2; i < limb_count; ++i)
 			{
-				if (limbs[i] != 0U) { return false; }
+				if (limbs[i] != 0U)
+				{
+					return false;
+				}
 			}
 			return true;
 		}
@@ -279,8 +340,14 @@ namespace
 		[[nodiscard]] std::uint64_t to_u64() const
 		{
 			std::uint64_t out = 0;
-			if constexpr (limb_count > 0) { out |= limbs[0]; }
-			if constexpr (limb_count > 1) { out |= static_cast<std::uint64_t>(limbs[1]) << 32U; }
+			if constexpr (limb_count > 0)
+			{
+				out |= limbs[0];
+			}
+			if constexpr (limb_count > 1)
+			{
+				out |= static_cast<std::uint64_t>(limbs[1]) << 32U;
+			}
 			return out;
 		}
 
@@ -293,26 +360,33 @@ namespace
 			{
 				if (!started)
 				{
-					if (limbs[i] == 0U && i != 0) { continue; }
+					if (limbs[i] == 0U && i != 0)
+					{
+						continue;
+					}
 					out << std::hex << std::uppercase << limbs[i];
 					started = true;
-				}
-				else
+				} else
 				{
 					out << std::hex << std::uppercase << std::setfill('0') << std::setw(8) << limbs[i];
 				}
 			}
-			if (!started) { out << '0'; }
+			if (!started)
+			{
+				out << '0';
+			}
 			return out.str();
 		}
 	};
 
-	template <std::size_t Bits>
-	struct RefInt
+	template <std::size_t Bits> struct RefInt
 	{
 		RefUint<Bits> raw{};
 
-		[[nodiscard]] static RefInt zero() { return {}; }
+		[[nodiscard]] static RefInt zero()
+		{
+			return {};
+		}
 
 		[[nodiscard]] static RefInt one()
 		{
@@ -349,24 +423,39 @@ namespace
 			const std::uint64_t raw_bits = static_cast<std::uint64_t>(value);
 			for (std::size_t bit = 0; bit < std::min<std::size_t>(Bits, 64); ++bit)
 			{
-				if (((raw_bits >> bit) & 1ULL) != 0ULL) { out.raw.set_bit(bit); }
+				if (((raw_bits >> bit) & 1ULL) != 0ULL)
+				{
+					out.raw.set_bit(bit);
+				}
 			}
 			if (value < 0)
 			{
-				for (std::size_t bit = 64; bit < Bits; ++bit) { out.raw.set_bit(bit); }
+				for (std::size_t bit = 64; bit < Bits; ++bit)
+				{
+					out.raw.set_bit(bit);
+				}
 			}
 			return out;
 		}
 
-		[[nodiscard]] bool is_negative() const { return raw.get_bit(Bits - 1); }
-
-		[[nodiscard]] int compare(const RefInt& other) const
+		[[nodiscard]] bool is_negative() const
 		{
-			if (is_negative() != other.is_negative()) { return is_negative() ? -1 : 1; }
+			return raw.get_bit(Bits - 1);
+		}
+
+		[[nodiscard]] int compare(const RefInt & other) const
+		{
+			if (is_negative() != other.is_negative())
+			{
+				return is_negative() ? -1 : 1;
+			}
 			return raw.compare(other.raw);
 		}
 
-		[[nodiscard]] bool operator==(const RefInt& other) const { return raw == other.raw; }
+		[[nodiscard]] bool operator==(const RefInt & other) const
+		{
+			return raw == other.raw;
+		}
 
 		[[nodiscard]] RefInt negated() const
 		{
@@ -375,30 +464,51 @@ namespace
 			return out;
 		}
 
-		[[nodiscard]] RefInt add(const RefInt& other) const { return RefInt{ raw.add(other.raw).first }; }
-		[[nodiscard]] RefInt sub(const RefInt& other) const { return RefInt{ raw.sub(other.raw).first }; }
-		[[nodiscard]] RefInt mul(const RefInt& other) const { return RefInt{ raw.full_mul(other.raw).template truncate_low<Bits>() }; }
+		[[nodiscard]] RefInt add(const RefInt & other) const
+		{
+			return RefInt{ raw.add(other.raw).first };
+		}
+		[[nodiscard]] RefInt sub(const RefInt & other) const
+		{
+			return RefInt{ raw.sub(other.raw).first };
+		}
+		[[nodiscard]] RefInt mul(const RefInt & other) const
+		{
+			return RefInt{ raw.full_mul(other.raw).template truncate_low<Bits>() };
+		}
 
-		[[nodiscard]] RefUint<Bits> abs_unsigned() const { return is_negative() ? negated().raw : raw; }
+		[[nodiscard]] RefUint<Bits> abs_unsigned() const
+		{
+			return is_negative() ? negated().raw : raw;
+		}
 
 		[[nodiscard]] RefInt arithmetic_shift_right(std::size_t shift) const
 		{
-			if (shift >= Bits) { return is_negative() ? minus_one() : zero(); }
+			if (shift >= Bits)
+			{
+				return is_negative() ? minus_one() : zero();
+			}
 
 			RefInt out;
 			out.raw = raw.shift_right(shift);
 			if (is_negative())
 			{
-				for (std::size_t bit = Bits - shift; bit < Bits; ++bit) { out.raw.set_bit(bit); }
+				for (std::size_t bit = Bits - shift; bit < Bits; ++bit)
+				{
+					out.raw.set_bit(bit);
+				}
 			}
 			return out;
 		}
 
-		[[nodiscard]] std::pair<RefInt, RefInt> divmod(const RefInt& divider) const
+		[[nodiscard]] std::pair<RefInt, RefInt> divmod(const RefInt & divider) const
 		{
 			RefInt quotient;
 			RefInt remainder;
-			if (divider.raw.is_zero()) { return { quotient, remainder }; }
+			if (divider.raw.is_zero())
+			{
+				return { quotient, remainder };
+			}
 
 			const RefUint<Bits> lhs_mag = abs_unsigned();
 			const RefUint<Bits> rhs_mag = divider.abs_unsigned();
@@ -407,62 +517,75 @@ namespace
 			quotient.raw  = uq;
 			remainder.raw = ur;
 
-			if (is_negative() != divider.is_negative()) { quotient = quotient.negated(); }
-			if (is_negative()) { remainder = remainder.negated(); }
+			if (is_negative() != divider.is_negative())
+			{
+				quotient = quotient.negated();
+			}
+			if (is_negative())
+			{
+				remainder = remainder.negated();
+			}
 			return { quotient, remainder };
 		}
 
-		[[nodiscard]] std::string hex_string() const { return raw.hex_string(); }
+		[[nodiscard]] std::string hex_string() const
+		{
+			return raw.hex_string();
+		}
 	};
 
-	template <typename Big, std::size_t Bits>
-	[[nodiscard]] Big to_bigint(const RefUint<Bits>& ref)
+	template <typename Big, std::size_t Bits> [[nodiscard]] Big to_bigint(const RefUint<Bits> & ref)
 	{
 		Big out{};
 		for (std::size_t bit = 0; bit < Bits; ++bit)
 		{
-			if (ref.get_bit(bit)) { out.set_bit(bit); }
+			if (ref.get_bit(bit))
+			{
+				out.set_bit(bit);
+			}
 		}
 		return out;
 	}
 
-	template <typename Big, std::size_t Bits>
-	[[nodiscard]] Big to_bigint(const RefInt<Bits>& ref)
-	{ return to_bigint<Big>(ref.raw); }
+	template <typename Big, std::size_t Bits> [[nodiscard]] Big to_bigint(const RefInt<Bits> & ref)
+	{
+		return to_bigint<Big>(ref.raw);
+	}
 
 	template <std::size_t Bits, bool Signed, typename WordType>
-	[[nodiscard]] RefUint<Bits> to_ref_unsigned(const ccm::types::BigInt<Bits, Signed, WordType>& value)
+	[[nodiscard]] RefUint<Bits> to_ref_unsigned(const ccm::types::BigInt<Bits, Signed, WordType> & value)
 	{
 		RefUint<Bits> out;
 		for (std::size_t bit = 0; bit < Bits; ++bit)
 		{
-			if (value.get_bit(bit)) { out.set_bit(bit); }
+			if (value.get_bit(bit))
+			{
+				out.set_bit(bit);
+			}
 		}
 		return out;
 	}
 
-	template <std::size_t Bits, typename WordType>
-	[[nodiscard]] RefInt<Bits> to_ref_signed(const ccm::types::BigInt<Bits, true, WordType>& value)
-	{ return RefInt<Bits>{ to_ref_unsigned(value) }; }
+	template <std::size_t Bits, typename WordType> [[nodiscard]] RefInt<Bits> to_ref_signed(const ccm::types::BigInt<Bits, true, WordType> & value)
+	{
+		return RefInt<Bits>{ to_ref_unsigned(value) };
+	}
 
-	template <std::size_t Bits>
-	[[nodiscard]] RefUint<Bits> repeat_limb(std::uint32_t value)
+	template <std::size_t Bits> [[nodiscard]] RefUint<Bits> repeat_limb(std::uint32_t value)
 	{
 		RefUint<Bits> out;
 		out.limbs.fill(value);
 		return out;
 	}
 
-	template <std::size_t Bits>
-	[[nodiscard]] RefUint<Bits> single_bit(std::size_t bit)
+	template <std::size_t Bits> [[nodiscard]] RefUint<Bits> single_bit(std::size_t bit)
 	{
 		RefUint<Bits> out;
 		out.set_bit(bit);
 		return out;
 	}
 
-	template <std::size_t Bits>
-	[[nodiscard]] RefUint<Bits> generated_case(std::uint64_t seed)
+	template <std::size_t Bits> [[nodiscard]] RefUint<Bits> generated_case(std::uint64_t seed)
 	{
 		RefUint<Bits> out;
 		std::uint64_t state = seed;
@@ -477,8 +600,7 @@ namespace
 		return out;
 	}
 
-	template <std::size_t Bits>
-	[[nodiscard]] std::vector<RefUint<Bits>> build_unsigned_cases()
+	template <std::size_t Bits> [[nodiscard]] std::vector<RefUint<Bits>> build_unsigned_cases()
 	{
 		std::vector<RefUint<Bits>> out;
 		out.push_back(RefUint<Bits>::zero());
@@ -498,7 +620,14 @@ namespace
 		out.push_back(carry_chain);
 
 		RefUint<Bits> sparse = RefUint<Bits>::zero();
-		for (std::size_t bit : { std::size_t(0), std::size_t(1), std::size_t(31), std::size_t(32), Bits / 2 - 1, Bits / 2, Bits - 2, Bits - 1 })
+		for (std::size_t bit : { static_cast<std::size_t>(0),
+								 static_cast<std::size_t>(1),
+								 static_cast<std::size_t>(31),
+								 static_cast<std::size_t>(32),
+								 Bits / 2 - 1,
+								 Bits / 2,
+								 Bits - 2,
+								 Bits - 1 })
 		{
 			sparse.set_bit(bit);
 		}
@@ -520,8 +649,7 @@ namespace
 		return out;
 	}
 
-	template <std::size_t Bits>
-	[[nodiscard]] std::vector<RefInt<Bits>> build_signed_cases()
+	template <std::size_t Bits> [[nodiscard]] std::vector<RefInt<Bits>> build_signed_cases()
 	{
 		std::vector<RefInt<Bits>> out = {
 			RefInt<Bits>::zero(),
@@ -545,67 +673,74 @@ namespace
 		return out;
 	}
 
-	template <std::size_t Bits>
-	[[nodiscard]] int countl_zero_ref(const RefUint<Bits>& value)
+	template <std::size_t Bits> [[nodiscard]] int countl_zero_ref(const RefUint<Bits> & value)
 	{
 		int count = 0;
 		for (std::size_t bit = Bits; bit-- > 0;)
 		{
-			if (value.get_bit(bit)) { break; }
+			if (value.get_bit(bit))
+			{
+				break;
+			}
 			++count;
 		}
 		return count;
 	}
 
-	template <std::size_t Bits>
-	[[nodiscard]] int countr_zero_ref(const RefUint<Bits>& value)
+	template <std::size_t Bits> [[nodiscard]] int countr_zero_ref(const RefUint<Bits> & value)
 	{
 		int count = 0;
 		for (std::size_t bit = 0; bit < Bits; ++bit)
 		{
-			if (value.get_bit(bit)) { break; }
+			if (value.get_bit(bit))
+			{
+				break;
+			}
 			++count;
 		}
 		return count;
 	}
 
-	template <std::size_t Bits>
-	[[nodiscard]] int countl_one_ref(const RefUint<Bits>& value)
+	template <std::size_t Bits> [[nodiscard]] int countl_one_ref(const RefUint<Bits> & value)
 	{
 		int count = 0;
 		for (std::size_t bit = Bits; bit-- > 0;)
 		{
-			if (!value.get_bit(bit)) { break; }
+			if (!value.get_bit(bit))
+			{
+				break;
+			}
 			++count;
 		}
 		return count;
 	}
 
-	template <std::size_t Bits>
-	[[nodiscard]] int countr_one_ref(const RefUint<Bits>& value)
+	template <std::size_t Bits> [[nodiscard]] int countr_one_ref(const RefUint<Bits> & value)
 	{
 		int count = 0;
 		for (std::size_t bit = 0; bit < Bits; ++bit)
 		{
-			if (!value.get_bit(bit)) { break; }
+			if (!value.get_bit(bit))
+			{
+				break;
+			}
 			++count;
 		}
 		return count;
 	}
 
-	template <std::size_t Bits>
-	[[nodiscard]] int bit_width_ref(const RefUint<Bits>& value)
-	{ return value.is_zero() ? 0 : static_cast<int>(Bits) - countl_zero_ref(value); }
+	template <std::size_t Bits> [[nodiscard]] int bit_width_ref(const RefUint<Bits> & value)
+	{
+		return value.is_zero() ? 0 : static_cast<int>(Bits) - countl_zero_ref(value);
+	}
 
-	template <typename Big, typename Ref>
-	void expect_bigint_equals_ref(const Big& actual, const Ref& expected)
+	template <typename Big, typename Ref> void expect_bigint_equals_ref(const Big & actual, const Ref & expected)
 	{
 		const auto actual_ref = to_ref_unsigned(actual);
 		EXPECT_TRUE(actual_ref == expected) << "actual=" << actual_ref.hex_string() << " expected=" << expected.hex_string();
 	}
 
-	template <typename Big, std::size_t Bits>
-	void expect_signed_bigint_equals_ref(const Big& actual, const RefInt<Bits>& expected)
+	template <typename Big, std::size_t Bits> void expect_signed_bigint_equals_ref(const Big & actual, const RefInt<Bits> & expected)
 	{
 		const auto actual_ref = to_ref_signed(actual);
 		EXPECT_TRUE(actual_ref == expected) << "actual=" << actual_ref.hex_string() << " expected=" << expected.hex_string();
@@ -680,7 +815,7 @@ TEST(CcmathInternalTypesTests, BigIntMultiwordMul2MatchesReference)
 		{ 0xFEDCBA9876543210ULL, 0x0123456789ABCDEFULL },
 	} };
 
-	for (const auto& [lhs, rhs] : cases)
+	for (const auto & [lhs, rhs] : cases)
 	{
 		SCOPED_TRACE(lhs);
 		SCOPED_TRACE(rhs);
@@ -700,7 +835,7 @@ TEST(CcmathInternalTypesTests, BigIntUnsignedShiftsAndCountHelpersMatchReference
 	const auto cases						 = build_unsigned_cases<256>();
 	const std::array<std::size_t, 15> shifts = { 0, 1, 7, 31, 32, 33, 63, 64, 65, 95, 127, 128, 129, 191, 255 };
 
-	for (const auto& value : cases)
+	for (const auto & value : cases)
 	{
 		const Big big = to_bigint<Big>(value);
 		SCOPED_TRACE(value.hex_string());
@@ -725,9 +860,9 @@ TEST(CcmathInternalTypesTests, BigIntUnsignedArithmeticMatchesReference)
 	using Big = ccm::types::BigInt<256, false, std::uint64_t>;
 
 	const auto cases = build_unsigned_cases<256>();
-	for (const auto& lhs_ref : cases)
+	for (const auto & lhs_ref : cases)
 	{
-		for (const auto& rhs_ref : cases)
+		for (const auto & rhs_ref : cases)
 		{
 			const Big lhs = to_bigint<Big>(lhs_ref);
 			const Big rhs = to_bigint<Big>(rhs_ref);
@@ -757,9 +892,9 @@ TEST(CcmathInternalTypesTests, BigIntQuickMulHiRespectsReferenceErrorBound)
 	using Big = ccm::types::BigInt<256, false, std::uint64_t>;
 
 	const auto cases = build_unsigned_cases<256>();
-	for (const auto& lhs_ref : cases)
+	for (const auto & lhs_ref : cases)
 	{
-		for (const auto& rhs_ref : cases)
+		for (const auto & rhs_ref : cases)
 		{
 			const Big lhs = to_bigint<Big>(lhs_ref);
 			const Big rhs = to_bigint<Big>(rhs_ref);
@@ -795,7 +930,10 @@ TEST(CcmathInternalTypesTests, BigIntPowNMatchesReference)
 			std::uint64_t exp = exponent;
 			while (exp > 0)
 			{
-				if ((exp & 1ULL) != 0ULL) { expected = expected.full_mul(power).template truncate_low<128>(); }
+				if ((exp & 1ULL) != 0ULL)
+				{
+					expected = expected.full_mul(power).template truncate_low<128>();
+				}
 				exp >>= 1U;
 				power = power.full_mul(power).template truncate_low<128>();
 			}
@@ -819,7 +957,7 @@ TEST(CcmathInternalTypesTests, BigIntDivHalfWordTimesPowerOfTwoMatchesReference)
 	const std::array<HalfWord, 6> divisors	 = { 1U, 3U, 5U, 0x7FFFFFFFU, 0x80000001U, 0xFFFFFFFFU };
 	const std::array<std::size_t, 12> shifts = { 0, 1, 7, 31, 32, 33, 63, 64, 95, 127, 191, 320 };
 
-	for (const auto& numerator_ref : cases)
+	for (const auto & numerator_ref : cases)
 	{
 		for (HalfWord divisor : divisors)
 		{
@@ -853,7 +991,7 @@ TEST(CcmathInternalTypesTests, BigIntSignedArithmeticAndDivisionMatchReference)
 	const auto cases						 = build_signed_cases<128>();
 	const std::array<std::size_t, 10> shifts = { 0, 1, 2, 31, 32, 33, 63, 64, 65, 127 };
 
-	for (const auto& lhs_ref : cases)
+	for (const auto & lhs_ref : cases)
 	{
 		const Big lhs = to_bigint<Big>(lhs_ref);
 		SCOPED_TRACE(lhs_ref.hex_string());
@@ -865,7 +1003,7 @@ TEST(CcmathInternalTypesTests, BigIntSignedArithmeticAndDivisionMatchReference)
 			expect_signed_bigint_equals_ref(lhs << shift, RefInt<128>{ lhs_ref.raw.shift_left(shift) });
 		}
 
-		for (const auto& rhs_ref : cases)
+		for (const auto & rhs_ref : cases)
 		{
 			const Big rhs = to_bigint<Big>(rhs_ref);
 
@@ -883,7 +1021,10 @@ TEST(CcmathInternalTypesTests, BigIntSignedArithmeticAndDivisionMatchReference)
 				expect_signed_bigint_equals_ref(lhs * rhs, lhs_ref.mul(rhs_ref));
 			}
 
-			if (rhs_ref.raw.is_zero()) { continue; }
+			if (rhs_ref.raw.is_zero())
+			{
+				continue;
+			}
 
 			const auto [expected_q, expected_r] = lhs_ref.divmod(rhs_ref);
 			{
@@ -941,7 +1082,10 @@ TEST(CcmathInternalTypesTests, BigIntCrossWordSignedAndUnsignedConversionsPreser
 	RefInt<192> wide_signed_expected{ signed_ref.raw.template slice<192>(0) };
 	if (signed_ref.is_negative())
 	{
-		for (std::size_t bit = 96; bit < 192; ++bit) { wide_signed_expected.raw.set_bit(bit); }
+		for (std::size_t bit = 96; bit < 192; ++bit)
+		{
+			wide_signed_expected.raw.set_bit(bit);
+		}
 	}
 
 	const SmallSigned small_s = to_bigint<SmallSigned>(signed_ref);
@@ -956,17 +1100,21 @@ TEST(CcmathInternalSupportTests, BigIntMaskHelpersMatchReference)
 {
 	using Big = ccm::types::BigInt<256, false, std::uint64_t>;
 
-	const auto expect_trailing = [](const auto& actual, std::size_t count)
-	{
+	const auto expect_trailing = [](const auto & actual, std::size_t count) {
 		RefUint<256> expected;
-		for (std::size_t bit = 0; bit < count; ++bit) { expected.set_bit(bit); }
+		for (std::size_t bit = 0; bit < count; ++bit)
+		{
+			expected.set_bit(bit);
+		}
 		expect_bigint_equals_ref(actual, expected);
 	};
 
-	const auto expect_leading = [](const auto& actual, std::size_t count)
-	{
+	const auto expect_leading = [](const auto & actual, std::size_t count) {
 		RefUint<256> expected;
-		for (std::size_t bit = 256 - count; bit < 256; ++bit) { expected.set_bit(bit); }
+		for (std::size_t bit = 256 - count; bit < 256; ++bit)
+		{
+			expected.set_bit(bit);
+		}
 		expect_bigint_equals_ref(actual, expected);
 	};
 

@@ -22,17 +22,29 @@ if ! "${CLANG_FORMAT}" --version | grep -Fq "${expected_version}"; then
     exit 1
 fi
 
-if ! find include -name '*.hpp' -print -quit | grep -q .; then
-    echo "No header files found under include/."
-    exit 0
+cd "${repo_root}"
+
+if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+    echo "Not inside a git work tree, cannot enumerate sources." >&2
+    exit 1
 fi
 
+# Every tracked C++ source, excluding build glue, vendored code, and docs demos.
+source_pathspec=('*.hpp' '*.cpp' '*.h' ':!:docs/**' ':!:thirdparty/**' ':!:cmake/**')
+
+checked=0
 while IFS= read -r -d '' file; do
+    checked=1
     if ! "${CLANG_FORMAT}" --dry-run --Werror "${STYLE_ARGS[@]}" "${file}"; then
         echo "Formatting check failed: ${file}"
-        echo "Run tools/apply_format.sh locally or fix headers manually."
+        echo "Run tools/apply_format.sh locally or fix the file manually."
         exit 1
     fi
-done < <(find include -name '*.hpp' -print0)
+done < <(git ls-files -z -- "${source_pathspec[@]}")
+
+if [ "${checked}" -eq 0 ]; then
+    echo "No source files found."
+    exit 0
+fi
 
 echo "Formatting is up to date."

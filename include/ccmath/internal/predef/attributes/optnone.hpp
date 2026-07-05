@@ -17,7 +17,7 @@
 	#undef CCM_ATTR_OPTNONE
 #endif // CCM_ATTR_OPTNONE
 
-#if defined(__has_attribute)
+#ifdef __has_attribute
 	#if __has_attribute(optnone)
 		#define CCM_ATTR_OPTNONE __attribute__((optnone))
 	#else

@@ -29,8 +29,7 @@ namespace
 	using testing::TestWithParam;
 	using testing::ValuesIn;
 
-	template <typename InputType, typename OutputType = InputType>
-	struct NearbyIntTestParams
+	template <typename InputType, typename OutputType = InputType> struct NearbyIntTestParams
 	{
 		InputType input{};
 		OutputType expected{};
@@ -167,20 +166,16 @@ namespace
 } // namespace
 
 class CcmathNearbyIntIntegerTests : public TestWithParam<NearbyIntTestParams<int, double>>
-{
-};
+{};
 
 class CcmathNearbyIntDoubleTests : public TestWithParam<NearbyIntTestParams<double>>
-{
-};
+{};
 
 class CcmathNearbyIntFloatTests : public TestWithParam<NearbyIntTestParams<float>>
-{
-};
+{};
 
 class CcmathNearbyIntLongDoubleTests : public TestWithParam<NearbyIntTestParams<long double>>
-{
-};
+{};
 
 INSTANTIATE_TEST_SUITE_P(NearestIntIntegerTests, CcmathNearbyIntIntegerTests, ValuesIn(kNearbyIntIntegerTestParams));
 INSTANTIATE_TEST_SUITE_P(NearestIntDoubleTests, CcmathNearbyIntDoubleTests, ValuesIn(kNearbyIntDoubleTestParams));

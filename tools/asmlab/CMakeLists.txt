@@ -10,7 +10,7 @@ endif ()
 
 find_package(Python3 COMPONENTS Interpreter QUIET)
 if (NOT Python3_FOUND)
-    message(WARNING "asmlab: Python3 not found; convenience targets will be skipped")
+    message(WARNING "asmlab: Python3 not found, convenience targets will be skipped")
     return()
 endif ()
 

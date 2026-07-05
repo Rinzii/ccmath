@@ -80,13 +80,15 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_signbit functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto signbit_ct(T x) -> std::enable_if_t<has_constexpr_signbit<T>, bool>
-	{ return __builtin_signbit(x); }
+	template <typename T> constexpr auto signbit_ct(T x) -> std::enable_if_t<has_constexpr_signbit<T>, bool>
+	{
+		return __builtin_signbit(x);
+	}
 
-	template <typename T>
-	auto signbit_rt(T x) -> std::enable_if_t<has_runtime_signbit<T>, bool>
-	{ return __builtin_signbit(x); }
+	template <typename T> auto signbit_rt(T x) -> std::enable_if_t<has_runtime_signbit<T>, bool>
+	{
+		return __builtin_signbit(x);
+	}
 } // namespace ccm::builtin
 
 // Cleanup the global namespace

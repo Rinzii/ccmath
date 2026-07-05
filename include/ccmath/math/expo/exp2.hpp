@@ -30,15 +30,18 @@ namespace ccm
 	 * @tparam T Floating-point or integer type
 	 * @param num Floating-point or integer value
 	 * @return If no errors occur, the base-2 exponential of num (2^num) is returned.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp2
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T exp2(T num)
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T exp2(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_exp2<T>) { return ccm::builtin::exp2_ct(num); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_exp2<T>)
 		{
-			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::exp2_rt(num); }
+			return ccm::builtin::exp2_ct(num);
+		} else
+		{
+			if (!ccm::support::is_constant_evaluated())
+			{
+				return ccm::rt::exp2_rt(num);
+			}
 
 			return gen::exp2_gen(num);
 		}
@@ -49,29 +52,31 @@ namespace ccm
 	 * @tparam Integer Integer type
 	 * @param num Integer value
 	 * @return If no errors occur, the base-2 exponential of num (2^num) is returned as a double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp2
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double exp2(Integer num)
-	{ return ccm::exp2<double>(static_cast<double>(num)); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double exp2(Integer num)
+	{
+		return ccm::exp2<double>(static_cast<double>(num));
+	}
 
 	/**
 	 * @brief Returns 2 raised to the given power (2^x)
 	 * @param num Floating-point value
 	 * @return If no errors occur, the base-2 exponential of num (2^num) is returned as a float.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp2
 	 */
 	constexpr float exp2f(float num)
-	{ return ccm::exp2<float>(num); }
+	{
+		return ccm::exp2<float>(num);
+	}
 
 	/**
 	 * @brief Returns 2 raised to the given power (2^x)
 	 * @param num Floating-point value
 	 * @return If no errors occur, the base-2 exponential of num (2^num) is returned as a double.
-	 * @see https://en.cppreference.com/w/cpp/numeric/math/exp2
 	 */
 	constexpr long double exp2l(long double num)
-	{ return ccm::exp2<long double>(num); }
+	{
+		return ccm::exp2<long double>(num);
+	}
 } // namespace ccm
 
 #if defined(_MSC_VER) && !defined(__clang__)

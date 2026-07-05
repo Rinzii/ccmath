@@ -26,23 +26,30 @@ namespace ccm::support
 {
 
 	constexpr std::uint8_t operator""_u8(unsigned long long value)
-	{ return static_cast<std::uint8_t>(value); }
+	{
+		return static_cast<std::uint8_t>(value);
+	}
 
 	constexpr std::uint16_t operator""_u16(unsigned long long value)
-	{ return static_cast<std::uint16_t>(value); }
+	{
+		return static_cast<std::uint16_t>(value);
+	}
 
 	constexpr std::uint32_t operator""_u32(unsigned long long value)
-	{ return static_cast<std::uint32_t>(value); }
+	{
+		return static_cast<std::uint32_t>(value);
+	}
 
 	constexpr std::uint64_t operator""_u64(unsigned long long value)
-	{ return static_cast<std::uint64_t>(value); }
+	{
+		return static_cast<std::uint64_t>(value);
+	}
 
 	namespace internal
 	{
 
 		// Creates a T by reading digits from an array.
-		template <typename T>
-		constexpr T accumulate(int base, const uint8_t * digits, size_t size)
+		template <typename T> constexpr T accumulate(int base, const uint8_t * digits, size_t size)
 		{
 			T value{};
 			for (size_t i = 0; i < size; ++i)
@@ -54,8 +61,7 @@ namespace ccm::support
 		}
 
 		// A static buffer to hold the digits for a T.
-		template <typename T, int base>
-		struct DigitBuffer
+		template <typename T, int base> struct DigitBuffer
 		{
 			static_assert(base == 2 || base == 10 || base == 16);
 			// One character provides log2(base) bits.
@@ -64,9 +70,18 @@ namespace ccm::support
 			// for buffer allocation.
 			static constexpr std::size_t calculate_bits_per_digit()
 			{
-				if constexpr (base == 2) { return 1; }
-				if constexpr (base == 10) { return 3; }
-				if constexpr (base == 16) { return 4; }
+				if constexpr (base == 2)
+				{
+					return 1;
+				}
+				if constexpr (base == 10)
+				{
+					return 3;
+				}
+				if constexpr (base == 16)
+				{
+					return 4;
+				}
 				return 0;
 			}
 
@@ -79,7 +94,10 @@ namespace ccm::support
 
 			constexpr explicit DigitBuffer(std::string_view str)
 			{
-				for (char const ch : str) { push(ch); }
+				for (char const ch : str)
+				{
+					push(ch);
+				}
 			}
 
 			CCM_DISABLE_MSVC_WARNING(4127) // MSVC treats is_alpha as a constant expression. It is not.
@@ -90,9 +108,15 @@ namespace ccm::support
 				const auto to_lower = [](char ch) { return static_cast<char>(std::byte(ch) | std::byte(32)); };
 				const auto is_digit = [](char ch) { return ch >= '0' && ch <= '9'; };
 				const auto is_alpha = [](char ch) { return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z'); };
-				if (is_digit(c)) { return static_cast<std::uint8_t>(c - '0'); }
+				if (is_digit(c))
+				{
+					return static_cast<std::uint8_t>(c - '0');
+				}
 
-				if (base > 10 && is_alpha(c)) { return static_cast<std::uint8_t>(to_lower(c) - 'a' + 10); }
+				if (base > 10 && is_alpha(c))
+				{
+					return static_cast<std::uint8_t>(to_lower(c) - 'a' + 10);
+				}
 				return INVALID_DIGIT;
 			}
 			CCM_RESTORE_MSVC_WARNING()
@@ -120,11 +144,9 @@ namespace ccm::support
 
 		// Generic implementation for native types (including __uint128_t or ExtInt
 		// where available).
-		template <typename T>
-		struct Parser
+		template <typename T> struct Parser
 		{
-			template <int base>
-			static constexpr T parse(std::string_view str)
+			template <int base> static constexpr T parse(std::string_view str)
 			{
 				const DigitBuffer<T, base> buffer(str);
 				return accumulate<T>(base, buffer.digits.data(), buffer.size);
@@ -136,21 +158,18 @@ namespace ccm::support
 		// binary and hexadecimal formats, we read digits by chunks of 64 bits and
 		// produce the Big Int internal representation directly. For decimal numbers, we
 		// go the slow path and use slower Big Int arithmetic.
-		template <size_t N>
-		struct Parser<ccm::types::UInt<N>>
+		template <size_t N> struct Parser<ccm::types::UInt<N>>
 		{
 			using UIntT = ccm::types::UInt<N>;
 
-			template <int base>
-			static constexpr UIntT parse(std::string_view str)
+			template <int base> static constexpr UIntT parse(std::string_view str)
 			{
 				const DigitBuffer<UIntT, base> buffer(str);
 				if constexpr (base == 10)
 				{
 					// Slow path, we sum and multiply BigInt for each digit.
 					return accumulate<UIntT>(base, buffer.digits.data(), buffer.size);
-				}
-				else
+				} else
 				{
 					// Fast path, we consume blocks of WordType and create the BigInt's
 					// internal representation directly.
@@ -174,21 +193,28 @@ namespace ccm::support
 		};
 
 		// Detects the base of the number and dispatches to the right implementation.
-		template <typename T>
-		constexpr T parse_with_prefix_internal(std::string_view view)
+		template <typename T> constexpr T parse_with_prefix_internal(std::string_view view)
 		{
 			using P = Parser<T>;
 
-			if (view.size() >= 2 && view[0] == '0' && view[1] == 'b') { return P::template parse<2>(view.substr(2).data()); }
-			if (view.size() >= 2 && view[0] == '0' && view[1] == 'x') { return P::template parse<16>(view.substr(2).data()); }
+			if (view.size() >= 2 && view[0] == '0' && view[1] == 'b')
+			{
+				return P::template parse<2>(view.substr(2).data()); // NOLINT(bugprone-suspicious-stringview-data-usage)
+			}
+			if (view.size() >= 2 && view[0] == '0' && view[1] == 'x')
+			{
+				return P::template parse<16>(view.substr(2).data()); // NOLINT(bugprone-suspicious-stringview-data-usage)
+			}
 
-			return P::template parse<10>(view.data());
+			return P::template parse<10>(view.data()); // NOLINT(bugprone-suspicious-stringview-data-usage)
 		}
 
-		template <typename T>
-		constexpr T parse_with_prefix(const char * ptr)
+		template <typename T> constexpr T parse_with_prefix(const char * ptr)
 		{
-			if (ptr == nullptr) { return T(); }
+			if (ptr == nullptr)
+			{
+				return T();
+			}
 
 			return parse_with_prefix_internal<T>(std::string_view(ptr));
 		}
@@ -196,16 +222,21 @@ namespace ccm::support
 	} // namespace internal
 
 	constexpr ccm::types::UInt<96> operator""_u96(const char * x)
-	{ return internal::parse_with_prefix<ccm::types::UInt<96>>(x); }
+	{
+		return internal::parse_with_prefix<ccm::types::UInt<96>>(x);
+	}
 
 	constexpr ccm::types::uint128_t operator""_u128(const char * x)
-	{ return internal::parse_with_prefix<ccm::types::uint128_t>(x); }
+	{
+		return internal::parse_with_prefix<ccm::types::uint128_t>(x);
+	}
 
 	constexpr auto operator""_u256(const char * x)
-	{ return internal::parse_with_prefix<ccm::types::UInt<256>>(x); }
+	{
+		return internal::parse_with_prefix<ccm::types::UInt<256>>(x);
+	}
 
-	template <typename T>
-	constexpr T parse_bigint_internal(std::string_view view)
+	template <typename T> constexpr T parse_bigint_internal(std::string_view view)
 	{
 		if (view[0] == '-' || view[0] == '+')
 		{
@@ -215,10 +246,12 @@ namespace ccm::support
 		return internal::parse_with_prefix<T>(view);
 	}
 
-	template <typename T>
-	constexpr T parse_bigint(const char * ptr)
+	template <typename T> constexpr T parse_bigint(const char * ptr)
 	{
-		if (ptr == nullptr) { return T(); }
+		if (ptr == nullptr)
+		{
+			return T();
+		}
 
 		return parse_bigint_internal<T>(std::string_view(ptr));
 	}

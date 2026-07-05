@@ -1,1 +1,1 @@
-ccm_add_headers(msvc_libm.hpp trunc_scalar.hpp)
+ccm_add_headers(trunc_scalar.hpp)

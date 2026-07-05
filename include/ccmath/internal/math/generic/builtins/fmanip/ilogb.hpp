@@ -74,13 +74,18 @@ namespace ccm::builtin
 	 * It exists only to allow for usage of __builtin_ilogb functions without triggering a compiler error
 	 * when the compiler does not support them.
 	 */
-	template <typename T>
-	constexpr auto ilogb_ct(T x) -> std::enable_if_t<has_constexpr_ilogb<T>, int>
+	template <typename T> constexpr auto ilogb_ct(T x) -> std::enable_if_t<has_constexpr_ilogb<T>, int>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_ilogbf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_ilogb(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_ilogbl(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_ilogbf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_ilogb(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_ilogbl(x);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for ilogb");
@@ -88,13 +93,18 @@ namespace ccm::builtin
 		}
 	}
 
-	template <typename T>
-	auto ilogb_rt(T x) -> std::enable_if_t<has_runtime_ilogb<T>, int>
+	template <typename T> auto ilogb_rt(T x) -> std::enable_if_t<has_runtime_ilogb<T>, int>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_ilogbf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_ilogb(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_ilogbl(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_ilogbf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_ilogb(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_ilogbl(x);
+		} else
 		{
 			// This should never be reached
 			static_assert(ccm::support::always_false<T>, "Unsupported type for ilogb");

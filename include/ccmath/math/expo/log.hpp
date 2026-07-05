@@ -31,18 +31,23 @@ namespace ccm
 	 * @param num A floating-point or integer value to find the natural logarithm of.
 	 * @return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T log(const T num) noexcept
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T log(const T num) noexcept
 	{
 		if constexpr (ccm::builtin::has_constexpr_log<T>)
 		{
-			if (ccm::support::is_constant_evaluated()) { return ccm::builtin::log_ct(num); }
+			if (ccm::support::is_constant_evaluated())
+			{
+				return ccm::builtin::log_ct(num);
+			}
 		}
 		{
 			// If the argument is 1, exact zero is returned.
 			if (num == static_cast<T>(1))
 			{
-				if (ccm::support::is_constant_evaluated()) { return static_cast<T>(0); }
+				if (ccm::support::is_constant_evaluated())
+				{
+					return static_cast<T>(0);
+				}
 #if defined(CCMATH_COMPILER_APPLE_CLANG) || (defined(_MSC_VER) && !defined(__clang__))
 				return ccm::support::fp::signed_zero_for_current_mode<T>();
 #else
@@ -67,12 +72,21 @@ namespace ccm
 			}
 
 			// If the argument is +∞, +∞ is returned.
-			if (CCM_UNLIKELY(num == std::numeric_limits<T>::infinity())) { return std::numeric_limits<T>::infinity(); }
+			if (CCM_UNLIKELY(num == std::numeric_limits<T>::infinity()))
+			{
+				return std::numeric_limits<T>::infinity();
+			}
 
 			// If the argument is NaN, NaN is returned.
-			if (CCM_UNLIKELY(ccm::isnan(num))) { return std::numeric_limits<T>::quiet_NaN(); }
+			if (CCM_UNLIKELY(ccm::isnan(num)))
+			{
+				return std::numeric_limits<T>::quiet_NaN();
+			}
 
-			if (!ccm::support::is_constant_evaluated()) { return ccm::rt::log_rt(num); }
+			if (!ccm::support::is_constant_evaluated())
+			{
+				return ccm::rt::log_rt(num);
+			}
 
 			return gen::log_gen(num);
 		}
@@ -84,9 +98,10 @@ namespace ccm
 	 * @param num An integer value to find the natural logarithm of.
 	 * @return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double log(const Integer num) noexcept
-	{ return ccm::log<double>(static_cast<double>(num)); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double log(const Integer num) noexcept
+	{
+		return ccm::log<double>(static_cast<double>(num));
+	}
 
 	/**
 	 * @brief Computes the natural (base e) logarithm (lnx) of a number.
@@ -94,7 +109,9 @@ namespace ccm
 	 * @return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
 	 */
 	constexpr float logf(const float num) noexcept
-	{ return ccm::log<float>(num); }
+	{
+		return ccm::log<float>(num);
+	}
 
 	/**
 	 * @brief Computes the natural (base e) logarithm (lnx) of a number.
@@ -102,7 +119,9 @@ namespace ccm
 	 * @return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
 	 */
 	constexpr long double logl(long double num) noexcept
-	{ return ccm::log<long double>(num); }
+	{
+		return ccm::log<long double>(num);
+	}
 } // namespace ccm
 
 #if defined(_MSC_VER) && !defined(__clang__)

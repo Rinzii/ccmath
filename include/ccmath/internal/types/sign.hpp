@@ -15,12 +15,24 @@ namespace ccm::types
 	// A type to interact with signed arithmetic types.
 	struct Sign
 	{
-		[[nodiscard]] constexpr bool is_pos() const { return !m_is_negative_val; }
-		[[nodiscard]] constexpr bool is_neg() const { return m_is_negative_val; }
+		[[nodiscard]] constexpr bool is_pos() const
+		{
+			return !m_is_negative_val;
+		}
+		[[nodiscard]] constexpr bool is_neg() const
+		{
+			return m_is_negative_val;
+		}
 
-		friend constexpr bool operator==(Sign a, Sign b) { return a.m_is_negative_val == b.m_is_negative_val; }
+		friend constexpr bool operator==(Sign a, Sign b)
+		{
+			return a.m_is_negative_val == b.m_is_negative_val;
+		}
 
-		friend constexpr bool operator!=(Sign a, Sign b) { return !(a == b); }
+		friend constexpr bool operator!=(Sign a, Sign b)
+		{
+			return !(a == b);
+		}
 
 		static const Sign POS;
 		static const Sign NEG;

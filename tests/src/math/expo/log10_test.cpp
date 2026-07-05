@@ -37,8 +37,8 @@ TEST(CcmathExponentialTests, Log10DoubleLastTableBucket)
 	static_assert(ccm::log10(0x1.5fdffffffff32p+0) == 0x1.1aed92aadd55p-3, "log10 must use the final log table entry in the last bucket");
 
 	constexpr double inputs[] = {
-		0x1.5fdffffffff32p-1011, 0x1.5fdffffffff32p-1, 0x1.5fdffffffff32p+0, 0x1.5fdffffffff32p+1,
-		0x1.5ep+0,				 0x1.5ffffffffffffp+0, 0x1.5ep-512,			 0x1.5ffffffffffffp+512,
+		0x1.5fdffffffff32p-1011, 0x1.5fdffffffff32p-1, 0x1.5fdffffffff32p+0,   0x1.5fdffffffff32p+1, 0x1.5ep+0,
+		0x1.5ffffffffffffp+0,	 0x1.5ep-512,		   0x1.5ffffffffffffp+512,
 	};
 	for (double input : inputs)
 	{

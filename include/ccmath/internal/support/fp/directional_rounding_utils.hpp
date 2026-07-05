@@ -10,20 +10,22 @@
 
 #pragma once
 
+#include "ccmath/internal/support/fenv/host_fenv.hpp"
 #include "ccmath/internal/support/fenv/rounding_mode.hpp"
 #include "fp_bits.hpp"
 
-#include <cfenv>
 #include <cstdint>
 #include <type_traits>
 
 namespace ccm::support::fp
 {
 	/// Exact zero with sign per the current rounding mode (downward yields −0).
-	template <typename T>
-	constexpr std::enable_if_t<std::is_floating_point_v<T>, T> signed_zero_for_current_mode() noexcept
+	template <typename T> constexpr std::enable_if_t<std::is_floating_point_v<T>, T> signed_zero_for_current_mode() noexcept
 	{
-		if (ccm::support::fenv::get_rounding_mode() == FE_DOWNWARD) { return T(-0.0); }
+		if (ccm::support::fenv::get_rounding_mode() == FE_DOWNWARD)
+		{
+			return T(-0.0);
+		}
 		return T(0.0);
 	}
 
@@ -44,15 +46,21 @@ namespace ccm::support::fp
 		using FPBits_t	= ccm::support::fp::FPBits<T>;
 		using Storage_t = typename FPBits_t::storage_type;
 
-		FPBits_t bits(val);
+		FPBits_t const bits(val);
 
-		if (bits.is_inf_or_nan() || bits.is_zero()) { return val; }
+		if (bits.is_inf_or_nan() || bits.is_zero())
+		{
+			return val;
+		}
 
-		bool is_neg	 = bits.is_neg();
-		int exponent = bits.get_exponent();
+		bool const is_neg  = bits.is_neg();
+		int const exponent = bits.get_exponent();
 
 		// If our exponent is greater than the most negative possible mantissa, then x is in fact already an integral.
-		if (exponent >= static_cast<int>(FPBits_t::fraction_length)) { return val; }
+		if (exponent >= static_cast<int>(FPBits_t::fraction_length))
+		{
+			return val;
+		}
 
 		auto provided_round_mode = static_cast<rounding_mode>(desired_rounding_mode);
 
@@ -60,8 +68,8 @@ namespace ccm::support::fp
 		{
 			switch (provided_round_mode)
 			{
-			case rounding_mode::eFE_DOWNWARD: return is_neg ? T(-1.0) : T(0.0);
-			case rounding_mode::eFE_UPWARD: return is_neg ? T(-0.0) : T(1.0);
+			case rounding_mode::eFE_DOWNWARD  : return is_neg ? T(-1.0) : T(0.0);
+			case rounding_mode::eFE_UPWARD	  : return is_neg ? T(-0.0) : T(1.0);
 			case rounding_mode::eFE_TOWARDZERO: return is_neg ? T(-0.0) : T(0.0);
 			case rounding_mode::eFE_TONEARESTFROMZERO:
 				if (exponent < -1)
@@ -87,34 +95,47 @@ namespace ccm::support::fp
 		T truncated_value = new_bits.get_val();
 
 		// If the truncated value is the same as the original value, then the value is already integral.
-		if (truncated_value == val) { return val; }
+		if (truncated_value == val)
+		{
+			return val;
+		}
 
 		// Bits below the rounding point and the half-way bit for tie handling.
-		Storage_t trimmed_value = bits.get_mantissa() & ((Storage_t(1) << trimming_length) - 1);
-		Storage_t half_value	= Storage_t(1) << (trimming_length - 1);
+		Storage_t const trimmed_value = bits.get_mantissa() & ((Storage_t(1) << trimming_length) - 1);
+		Storage_t const half_value	  = Storage_t(1) << (trimming_length - 1);
 
 		// If the event that the exponent is 0, the trimmed_length variable will be equal to the width of the mantissa and truncated_value_is_odd
 		// will not be the correct value. In such instances, we handle this special case below inside the switch statement.
-		Storage_t truncated_value_is_odd = new_bits.get_mantissa() & (Storage_t(1) << trimming_length);
+		Storage_t const truncated_value_is_odd = new_bits.get_mantissa() & (Storage_t(1) << trimming_length);
 
 		switch (provided_round_mode)
 		{
-		case rounding_mode::eFE_DOWNWARD: return is_neg ? truncated_value - T(1.0) : truncated_value;
-		case rounding_mode::eFE_UPWARD: return is_neg ? truncated_value : truncated_value + T(1.0);
+		case rounding_mode::eFE_DOWNWARD  : return is_neg ? truncated_value - T(1.0) : truncated_value;
+		case rounding_mode::eFE_UPWARD	  : return is_neg ? truncated_value : truncated_value + T(1.0);
 		case rounding_mode::eFE_TOWARDZERO: return truncated_value;
 		case rounding_mode::eFE_TONEARESTFROMZERO:
-			if (trimmed_value >= half_value) { return is_neg ? truncated_value - T(1.0) : truncated_value + T(1.0); }
+			if (trimmed_value >= half_value)
+			{
+				return is_neg ? truncated_value - T(1.0) : truncated_value + T(1.0);
+			}
 			return truncated_value;
 		case rounding_mode::eFE_TONEAREST: [[fallthrough]]; // The Default case is round to the nearest
 		default:
-			if (trimmed_value > half_value) { return is_neg ? truncated_value - T(1.0) : truncated_value + T(1.0); }
-			else if (trimmed_value == half_value)
+			if (trimmed_value > half_value)
 			{
-				if (exponent == 0) { return is_neg ? T(-2.0) : T(2.0); }
-				if (truncated_value_is_odd) { return is_neg ? truncated_value - T(1.0) : truncated_value + T(1.0); }
+				return is_neg ? truncated_value - T(1.0) : truncated_value + T(1.0);
+			} else if (trimmed_value == half_value)
+			{
+				if (exponent == 0)
+				{
+					return is_neg ? T(-2.0) : T(2.0);
+				}
+				if (truncated_value_is_odd)
+				{
+					return is_neg ? truncated_value - T(1.0) : truncated_value + T(1.0);
+				}
 				return truncated_value;
-			}
-			else
+			} else
 			{
 				return truncated_value;
 			}
@@ -122,16 +143,14 @@ namespace ccm::support::fp
 	}
 
 	// Helper func to set results for exceptional cases.
-	template <typename T>
-	constexpr T round_result_slightly_down(T value_rn)
+	template <typename T> constexpr T round_result_slightly_down(T value_rn)
 	{
 		volatile T tmp = value_rn;
 		tmp -= FPBits<T>::min_normal().get_val();
 		return tmp;
 	}
 
-	template <typename T>
-	constexpr T round_result_slightly_up(T value_rn)
+	template <typename T> constexpr T round_result_slightly_up(T value_rn)
 	{
 		volatile T tmp = value_rn;
 		tmp += FPBits<T>::min_normal().get_val();

@@ -19,11 +19,9 @@
 
 namespace ccm::internal
 {
-	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	struct exp2_data;
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> struct exp2_data;
 
-	template <>
-	struct exp2_data<float> // NOLINT
+	template <> struct exp2_data<float> // NOLINT
 	{
 		static constexpr std::size_t table_bits			  = 5;
 		static constexpr std::size_t poly_order			  = 3;
@@ -45,8 +43,7 @@ namespace ccm::internal
 		};
 	};
 
-	template <>
-	struct exp2_data<double>
+	template <> struct exp2_data<double>
 	{
 		static constexpr std::size_t table_bits			= 7;
 		static constexpr std::size_t poly_order			= 5;
@@ -327,8 +324,6 @@ namespace ccm::internal
 		};
 	};
 
-	template <>
-	struct exp2_data<long double> : exp2_data<double>
-	{
-	};
+	template <> struct exp2_data<long double> : exp2_data<double>
+	{};
 } // namespace ccm::internal

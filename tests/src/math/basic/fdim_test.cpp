@@ -23,8 +23,7 @@ namespace
 	using testing::TestWithParam;
 	using testing::ValuesIn;
 
-	template <typename T>
-	struct FDimTestParams
+	template <typename T> struct FDimTestParams
 	{
 		T x{};
 		T y{};
@@ -49,9 +48,8 @@ namespace
 		// Edge cases
 		{ std::numeric_limits<double>::infinity(), 1.0, std::fdim(std::numeric_limits<double>::infinity(), 1.0) },
 		{ 1.0, std::numeric_limits<double>::infinity(), std::fdim(1.0, std::numeric_limits<double>::infinity()) },
-		{ std::numeric_limits<double>::infinity(),
-		  std::numeric_limits<double>::infinity(),
-		  std::fdim(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()) },
+		// fdim(inf, inf) is +0 by the standard, the host libm oracle is non-conformant on some platforms
+		{ std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), +0.0 },
 		{ std::numeric_limits<double>::quiet_NaN(), 1.0, std::fdim(std::numeric_limits<double>::quiet_NaN(), 1.0) },
 		{ 1.0, std::numeric_limits<double>::quiet_NaN(), std::fdim(1.0, std::numeric_limits<double>::quiet_NaN()) },
 		{ std::numeric_limits<double>::max(),
@@ -80,9 +78,8 @@ namespace
 		// Edge cases
 		{ std::numeric_limits<float>::infinity(), 1.0F, std::fdim(std::numeric_limits<float>::infinity(), 1.0F) },
 		{ 1.0F, std::numeric_limits<float>::infinity(), std::fdim(1.0F, std::numeric_limits<float>::infinity()) },
-		{ std::numeric_limits<float>::infinity(),
-		  std::numeric_limits<float>::infinity(),
-		  std::fdim(std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity()) },
+		// fdim(inf, inf) is +0 by the standard, the host libm oracle is non-conformant on some platforms
+		{ std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), +0.0F },
 		{ std::numeric_limits<float>::quiet_NaN(), 1.0F, std::fdim(std::numeric_limits<float>::quiet_NaN(), 1.0F) },
 		{ 1.0F, std::numeric_limits<float>::quiet_NaN(), std::fdim(1.0F, std::numeric_limits<float>::quiet_NaN()) },
 		{ std::numeric_limits<float>::max(),
@@ -111,9 +108,8 @@ namespace
 		// Edge cases
 		{ std::numeric_limits<long double>::infinity(), 1.0L, std::fdim(std::numeric_limits<long double>::infinity(), 1.0L) },
 		{ 1.0L, std::numeric_limits<long double>::infinity(), std::fdim(1.0L, std::numeric_limits<long double>::infinity()) },
-		{ std::numeric_limits<long double>::infinity(),
-		  std::numeric_limits<long double>::infinity(),
-		  std::fdim(std::numeric_limits<long double>::infinity(), std::numeric_limits<long double>::infinity()) },
+		// fdim(inf, inf) is +0 by the standard, the host libm oracle is non-conformant on some platforms
+		{ std::numeric_limits<long double>::infinity(), std::numeric_limits<long double>::infinity(), +0.0L },
 		{ std::numeric_limits<long double>::quiet_NaN(), 1.0L, std::fdim(std::numeric_limits<long double>::quiet_NaN(), 1.0L) },
 		{ 1.0L, std::numeric_limits<long double>::quiet_NaN(), std::fdim(1.0L, std::numeric_limits<long double>::quiet_NaN()) },
 		{ std::numeric_limits<long double>::max(),
@@ -127,14 +123,11 @@ namespace
 } // namespace
 
 class CcmathFDimDoubleTests : public TestWithParam<FDimTestParams<double>>
-{
-};
+{};
 class CcmathFDimFloatTests : public TestWithParam<FDimTestParams<float>>
-{
-};
+{};
 class CcmathFDimLongDoubleTests : public TestWithParam<FDimTestParams<long double>>
-{
-};
+{};
 
 INSTANTIATE_TEST_SUITE_P(FDimDoubleTests, CcmathFDimDoubleTests, ValuesIn(kFDimDoubleTestParams));
 INSTANTIATE_TEST_SUITE_P(FDimFloatTests, CcmathFDimFloatTests, ValuesIn(kFDimFloatTestParams));

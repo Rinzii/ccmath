@@ -22,11 +22,12 @@ namespace ccm
 	 * @param num The value to truncate.
 	 * @return Returns a truncated value.
 	 */
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T trunc(T num) noexcept
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T trunc(T num) noexcept
 	{
-		if constexpr (ccm::builtin::has_constexpr_trunc<T>) { return ccm::builtin::trunc_ct(num); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_trunc<T>)
+		{
+			return ccm::builtin::trunc_ct(num);
+		} else
 		{
 			using FPBits_t	= ccm::support::fp::FPBits<T>;
 			using Storage_t = typename FPBits_t::storage_type;
@@ -35,18 +36,30 @@ namespace ccm
 
 			// If x == ±∞ then return num
 			// If x == ±NaN then return num
-			if (CCM_UNLIKELY(bits.is_inf_or_nan())) { return num; }
+			if (CCM_UNLIKELY(bits.is_inf_or_nan()))
+			{
+				return num;
+			}
 
 			// If x == ±0 then return num
-			if (CCM_UNLIKELY(num == 0.0)) { return num; }
+			if (CCM_UNLIKELY(num == 0.0))
+			{
+				return num;
+			}
 
 			const int exponent = bits.get_exponent();
 
 			// If the exponent is greater than or equal to the fraction length, then we will return the number as is since it is already an integer.
-			if (exponent >= FPBits_t::fraction_length) { return num; }
+			if (exponent >= FPBits_t::fraction_length)
+			{
+				return num;
+			}
 
 			// If our exponent is set up such that the abs(x) is less than 1 we will instead return 0.
-			if (exponent <= -1) { return FPBits_t::zero(bits.sign()).get_val(); }
+			if (exponent <= -1)
+			{
+				return FPBits_t::zero(bits.sign()).get_val();
+			}
 
 			// Perform the truncation
 			const int trimming_size		  = FPBits_t::fraction_length - exponent;
@@ -62,9 +75,10 @@ namespace ccm
 	 * @param num The value to truncate.
 	 * @return Returns a truncated value.
 	 */
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double trunc(Integer num) noexcept
-	{ return static_cast<double>(num); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double trunc(Integer num) noexcept
+	{
+		return static_cast<double>(num);
+	}
 
 	/**
 	 * @brief Specialization for float that returns the integral value nearest to x with the magnitude of the integral value always less than or equal to x.
@@ -72,7 +86,9 @@ namespace ccm
 	 * @return Returns a truncated float.
 	 */
 	constexpr float truncf(float num) noexcept
-	{ return ccm::trunc<float>(num); }
+	{
+		return ccm::trunc<float>(num);
+	}
 
 	/**
 	 * @brief Specialization for long double that returns the integral value nearest to x with the magnitude of the integral value always less than or equal to
@@ -81,5 +97,7 @@ namespace ccm
 	 * @return Returns a truncated long double.
 	 */
 	constexpr long double truncl(long double num) noexcept
-	{ return ccm::trunc<long double>(num); }
+	{
+		return ccm::trunc<long double>(num);
+	}
 } // namespace ccm

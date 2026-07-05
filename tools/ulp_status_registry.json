@@ -1,0 +1,452 @@
+{
+  "_comment": "Single source of truth for docs/ULP_STATUS.md. Each function has a status class and, when measured, an id the generator uses to find tests/rigorous/oracle_logs/mpfr-unary-<id>-<type>-summary.json, plus a symbol naming the exact ccmath kernel measured (the float symbol; the generator derives the double and long double symbols from it). A family with by_type true breaks each function out into its float, double, and long double variant rows (expf, exp, expl). no_suffix true marks a function with no C f or l variant, such as lerp. Classes: exact, correctly_rounded, bounded, not_rounding, not_implemented. Regenerate the doc with tools/ulp_status.py after a sweep (tools/measure_ulp.sh).",
+  "summary_glob": "mpfr-unary-{id}-{type}-summary.json",
+  "families": [
+    {
+      "name": "Basic",
+      "functions": [
+        {
+          "name": "fabs",
+          "class": "exact"
+        },
+        {
+          "name": "fdim",
+          "class": "exact"
+        },
+        {
+          "name": "fma",
+          "class": "correctly_rounded",
+          "note": "Native FMA where trusted, exact software fallback otherwise. Validated by the MPFR fma all-mode campaign."
+        },
+        {
+          "name": "fmax",
+          "class": "exact"
+        },
+        {
+          "name": "fmin",
+          "class": "exact"
+        },
+        {
+          "name": "fmod",
+          "class": "exact",
+          "note": "Exact remainder by construction."
+        },
+        {
+          "name": "remainder",
+          "class": "exact"
+        },
+        {
+          "name": "remquo",
+          "class": "exact"
+        },
+        {
+          "name": "nan",
+          "class": "not_rounding",
+          "note": "Constructs a NaN payload. No rounded result."
+        }
+      ]
+    },
+    {
+      "name": "Comparison",
+      "functions": [
+        {
+          "name": "fpclassify",
+          "class": "not_rounding"
+        },
+        {
+          "name": "isfinite",
+          "class": "not_rounding"
+        },
+        {
+          "name": "isgreater",
+          "class": "not_rounding"
+        },
+        {
+          "name": "isgreaterequal",
+          "class": "not_rounding"
+        },
+        {
+          "name": "isinf",
+          "class": "not_rounding"
+        },
+        {
+          "name": "isless",
+          "class": "not_rounding"
+        },
+        {
+          "name": "islessequal",
+          "class": "not_rounding"
+        },
+        {
+          "name": "islessgreater",
+          "class": "not_rounding"
+        },
+        {
+          "name": "isnan",
+          "class": "not_rounding"
+        },
+        {
+          "name": "isnormal",
+          "class": "not_rounding"
+        },
+        {
+          "name": "isunordered",
+          "class": "not_rounding"
+        },
+        {
+          "name": "signbit",
+          "class": "not_rounding"
+        }
+      ]
+    },
+    {
+      "name": "Exponential",
+      "by_type": true,
+      "functions": [
+        {
+          "name": "exp",
+          "class": "bounded",
+          "id": "exp",
+          "symbol": "ccm::gen::exp_gen"
+        },
+        {
+          "name": "exp2",
+          "class": "bounded",
+          "id": "exp2",
+          "symbol": "ccm::gen::exp2_gen"
+        },
+        {
+          "name": "expm1",
+          "class": "bounded",
+          "id": "expm1",
+          "symbol": "ccm::gen::expm1_gen"
+        },
+        {
+          "name": "log",
+          "class": "bounded",
+          "id": "log",
+          "symbol": "ccm::gen::log_gen"
+        },
+        {
+          "name": "log1p",
+          "class": "bounded",
+          "id": "log1p",
+          "symbol": "ccm::gen::log1p_gen"
+        },
+        {
+          "name": "log2",
+          "class": "bounded",
+          "id": "log2",
+          "symbol": "ccm::gen::log2_gen"
+        },
+        {
+          "name": "log10",
+          "class": "bounded",
+          "id": "log10",
+          "symbol": "ccm::gen::log10_gen"
+        }
+      ]
+    },
+    {
+      "name": "Float manipulation",
+      "functions": [
+        {
+          "name": "copysign",
+          "class": "exact"
+        },
+        {
+          "name": "frexp",
+          "class": "exact"
+        },
+        {
+          "name": "ilogb",
+          "class": "not_rounding",
+          "note": "Returns an integer exponent."
+        },
+        {
+          "name": "ldexp",
+          "class": "exact"
+        },
+        {
+          "name": "logb",
+          "class": "exact"
+        },
+        {
+          "name": "modf",
+          "class": "exact"
+        },
+        {
+          "name": "nextafter",
+          "class": "exact"
+        },
+        {
+          "name": "nexttoward",
+          "class": "exact"
+        },
+        {
+          "name": "nextup",
+          "class": "exact"
+        },
+        {
+          "name": "nextdown",
+          "class": "exact"
+        },
+        {
+          "name": "scalbn",
+          "class": "exact",
+          "note": "long double is slow but exact."
+        }
+      ]
+    },
+    {
+      "name": "Hyperbolic",
+      "functions": [
+        {
+          "name": "acosh",
+          "class": "not_implemented"
+        },
+        {
+          "name": "asinh",
+          "class": "not_implemented"
+        },
+        {
+          "name": "atanh",
+          "class": "not_implemented"
+        },
+        {
+          "name": "cosh",
+          "class": "not_implemented"
+        },
+        {
+          "name": "sinh",
+          "class": "not_implemented"
+        },
+        {
+          "name": "tanh",
+          "class": "not_implemented"
+        }
+      ]
+    },
+    {
+      "name": "Nearest integer",
+      "functions": [
+        {
+          "name": "ceil",
+          "class": "exact"
+        },
+        {
+          "name": "floor",
+          "class": "exact"
+        },
+        {
+          "name": "nearbyint",
+          "class": "exact"
+        },
+        {
+          "name": "rint",
+          "class": "exact"
+        },
+        {
+          "name": "round",
+          "class": "exact"
+        },
+        {
+          "name": "trunc",
+          "class": "exact"
+        }
+      ]
+    },
+    {
+      "name": "Power",
+      "by_type": true,
+      "functions": [
+        {
+          "name": "cbrt",
+          "class": "bounded",
+          "id": "cbrt",
+          "symbol": "ccm::gen::cbrt_gen"
+        },
+        {
+          "name": "hypot",
+          "class": "bounded",
+          "note": "Binary argument. Measurement is pending a binary sweep harness."
+        },
+        {
+          "name": "pow",
+          "class": "bounded",
+          "id": "pow",
+          "symbol": "ccm::gen::pow_gen",
+          "note": "Binary, so sampled over the finite-result band and broad bit patterns rather than exhaustive. See the pow campaign appendix below."
+        },
+        {
+          "name": "sqrt",
+          "class": "correctly_rounded",
+          "id": "sqrt",
+          "symbol": "ccm::gen::sqrt_gen",
+          "note": "Correctly rounded by IEEE 754."
+        }
+      ]
+    },
+    {
+      "name": "Special functions",
+      "functions": [
+        {
+          "name": "assoc_laguerre",
+          "class": "not_implemented"
+        },
+        {
+          "name": "assoc_legendre",
+          "class": "not_implemented"
+        },
+        {
+          "name": "beta",
+          "class": "not_implemented"
+        },
+        {
+          "name": "comp_ellint_1",
+          "class": "not_implemented"
+        },
+        {
+          "name": "comp_ellint_2",
+          "class": "not_implemented"
+        },
+        {
+          "name": "comp_ellint_3",
+          "class": "not_implemented"
+        },
+        {
+          "name": "cyl_bessel_i",
+          "class": "not_implemented"
+        },
+        {
+          "name": "cyl_bessel_j",
+          "class": "not_implemented"
+        },
+        {
+          "name": "cyl_bessel_k",
+          "class": "not_implemented"
+        },
+        {
+          "name": "cyl_neumann",
+          "class": "not_implemented"
+        },
+        {
+          "name": "ellint_1",
+          "class": "not_implemented"
+        },
+        {
+          "name": "ellint_2",
+          "class": "not_implemented"
+        },
+        {
+          "name": "ellint_3",
+          "class": "not_implemented"
+        },
+        {
+          "name": "expint",
+          "class": "not_implemented"
+        },
+        {
+          "name": "hermite",
+          "class": "not_implemented"
+        },
+        {
+          "name": "laguerre",
+          "class": "not_implemented"
+        },
+        {
+          "name": "legendre",
+          "class": "not_implemented"
+        },
+        {
+          "name": "riemann_zeta",
+          "class": "not_implemented"
+        },
+        {
+          "name": "sph_bessel",
+          "class": "not_implemented"
+        },
+        {
+          "name": "sph_legendre",
+          "class": "not_implemented"
+        },
+        {
+          "name": "sph_neumann",
+          "class": "not_implemented"
+        }
+      ]
+    },
+    {
+      "name": "Trigonometric",
+      "by_type": true,
+      "functions": [
+        {
+          "name": "acos",
+          "class": "bounded",
+          "id": "acos",
+          "symbol": "ccm::internal::impl::acos_float"
+        },
+        {
+          "name": "asin",
+          "class": "bounded",
+          "id": "asin",
+          "symbol": "ccm::internal::impl::asin_float"
+        },
+        {
+          "name": "atan",
+          "class": "bounded",
+          "id": "atan",
+          "symbol": "ccm::internal::impl::atan_float"
+        },
+        {
+          "name": "atan2",
+          "class": "bounded",
+          "note": "Binary argument. Measurement is pending a binary sweep harness."
+        },
+        {
+          "name": "cos",
+          "class": "bounded",
+          "id": "cos",
+          "symbol": "ccm::gen::cos_gen"
+        },
+        {
+          "name": "sin",
+          "class": "bounded",
+          "id": "sin",
+          "symbol": "ccm::gen::sin_gen"
+        },
+        {
+          "name": "tan",
+          "class": "bounded",
+          "id": "tan",
+          "symbol": "ccm::gen::tan_gen"
+        }
+      ]
+    },
+    {
+      "name": "Miscellaneous",
+      "by_type": true,
+      "functions": [
+        {
+          "name": "tgamma",
+          "class": "bounded",
+          "id": "tgamma",
+          "symbol": "ccm::internal::gamma_float",
+          "note": "Listed as gamma in earlier status docs."
+        },
+        {
+          "name": "lerp",
+          "class": "bounded",
+          "no_suffix": true,
+          "note": "Ternary argument, and a C++ template with no f or l suffix variant. Measurement is pending a ternary sweep harness."
+        },
+        {
+          "name": "lgamma",
+          "class": "bounded",
+          "id": "lgamma",
+          "symbol": "ccm::internal::lgamma_float"
+        }
+      ]
+    }
+  ]
+}

@@ -41,13 +41,18 @@ namespace ccm::builtin
 		false;
 #endif
 
-	template <typename T>
-	auto lgamma_rt(T x) -> std::enable_if_t<has_runtime_lgamma<T>, T>
+	template <typename T> auto lgamma_rt(T x) -> std::enable_if_t<has_runtime_lgamma<T>, T>
 	{
-		if constexpr (std::is_same_v<T, float>) { return __builtin_lgammaf(x); }
-		else if constexpr (std::is_same_v<T, double>) { return __builtin_lgamma(x); }
-		else if constexpr (std::is_same_v<T, long double>) { return __builtin_lgammal(x); }
-		else
+		if constexpr (std::is_same_v<T, float>)
+		{
+			return __builtin_lgammaf(x);
+		} else if constexpr (std::is_same_v<T, double>)
+		{
+			return __builtin_lgamma(x);
+		} else if constexpr (std::is_same_v<T, long double>)
+		{
+			return __builtin_lgammal(x);
+		} else
 		{
 			static_assert(ccm::support::always_false<T>, "Unsupported type for lgamma");
 			return T{};

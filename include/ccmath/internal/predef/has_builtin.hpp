@@ -14,7 +14,7 @@
 	#undef CCM_HAS_BUILTIN
 #endif // CCM_HAS_BUILTIN
 
-#if defined(__has_builtin)
+#ifdef __has_builtin
 	#define CCM_HAS_BUILTIN(builtin) __has_builtin(builtin)
 #else
 	#define CCM_HAS_BUILTIN(builtin) (0)

@@ -126,42 +126,30 @@ namespace ccm::internal::platform
 		eNvidiaHPC
 	};
 
-	template <compiler>
-	struct native_compiler : std::false_type
-	{
-	};
+	template <compiler> struct native_compiler : std::false_type
+	{};
 
-	template <>
-	struct native_compiler<compiler::eUnknown> : std::false_type
-	{
-	};
+	template <> struct native_compiler<compiler::eUnknown> : std::false_type
+	{};
 
 #ifdef CCMATH_COMPILER_GCC
-	template <>
-	struct native_compiler<compiler::eGCC> : std::true_type
-	{
-	};
+	template <> struct native_compiler<compiler::eGCC> : std::true_type
+	{};
 #endif
 
 #ifdef CCMATH_COMPILER_CLANG
-	template <>
-	struct native_compiler<compiler::eClang> : std::true_type
-	{
-	};
+	template <> struct native_compiler<compiler::eClang> : std::true_type
+	{};
 #endif
 
 #ifdef CCMATH_COMPILER_MSVC
-	template <>
-	struct native_compiler<compiler::eMSVC> : std::true_type
-	{
-	};
+	template <> struct native_compiler<compiler::eMSVC> : std::true_type
+	{};
 #endif
 
 #ifdef CCMATH_COMPILER_CLANG_CL
-	template <>
-	struct native_compiler<compiler::eClangCL> : std::true_type
-	{
-	};
+	template <> struct native_compiler<compiler::eClangCL> : std::true_type
+	{};
 #endif
 
 } // namespace ccm::internal::platform

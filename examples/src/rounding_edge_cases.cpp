@@ -16,7 +16,7 @@ namespace
 		double x;
 	};
 
-	constexpr Sample kSamples[] = {{2.5}, {3.5}, {-2.5}, {1e8 + 0.5}};
+	constexpr Sample kSamples[] = { { 2.5 }, { 3.5 }, { -2.5 }, { 1e8 + 0.5 } };
 } // namespace
 
 int main()
@@ -25,10 +25,9 @@ int main()
 
 	ccm::examples::table_header("x", "nearbyint", "round");
 
-	for (auto const& s : kSamples)
+	for (auto const & s : kSamples)
 	{
-		std::cout << std::left << std::setw(14) << s.x << std::setw(18) << ccm::nearbyint(s.x) << std::setw(18) << ccm::round(s.x)
-				  << '\n';
+		std::cout << std::left << std::setw(14) << s.x << std::setw(18) << ccm::nearbyint(s.x) << std::setw(18) << ccm::round(s.x) << '\n';
 	}
 
 	ccm::examples::section("floor / ceil / trunc at pi");

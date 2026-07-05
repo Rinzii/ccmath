@@ -25,17 +25,22 @@ namespace ccm::gen
 	 * @param num Floating-point or integer value.
 	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
-	template <typename T>
-	constexpr auto abs(T num) -> std::enable_if_t<std::is_floating_point_v<T> && std::is_signed_v<T>, T>
+	template <typename T> constexpr auto abs(T num) -> std::enable_if_t<std::is_floating_point_v<T> && std::is_signed_v<T>, T>
 	{
 		using FPBits_t = support::fp::FPBits<T>;
 		const FPBits_t num_bits(num);
 
 		// If num is NaN, return a quiet NaN.
-		if (CCM_UNLIKELY(num_bits.is_nan())) { return std::numeric_limits<T>::quiet_NaN(); }
+		if (CCM_UNLIKELY(num_bits.is_nan()))
+		{
+			return std::numeric_limits<T>::quiet_NaN();
+		}
 
 		// If num is equal to ±zero, return +zero.
-		if (num_bits.is_zero()) { return static_cast<T>(0); }
+		if (num_bits.is_zero())
+		{
+			return static_cast<T>(0);
+		}
 
 		// If num is less than zero, return -num, otherwise return num.
 		return num < 0 ? -num : num;

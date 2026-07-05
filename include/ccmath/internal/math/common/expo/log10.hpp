@@ -21,13 +21,17 @@
 
 namespace ccm
 {
-	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true>
-	constexpr T log10(T num)
+	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T log10(T num)
 	{
-		if constexpr (ccm::builtin::has_constexpr_log10<T>) { return ccm::builtin::log10_ct(num); }
-		else
+		if constexpr (ccm::builtin::has_constexpr_log10<T>)
 		{
-			if (num == static_cast<T>(1)) { return static_cast<T>(0); }
+			return ccm::builtin::log10_ct(num);
+		} else
+		{
+			if (num == static_cast<T>(1))
+			{
+				return static_cast<T>(0);
+			}
 			if (num == static_cast<T>(0))
 			{
 				ccm::support::fenv::set_errno_if_required(ERANGE);
@@ -40,20 +44,31 @@ namespace ccm
 				ccm::support::fenv::raise_except_if_required(FE_INVALID);
 				return -std::numeric_limits<T>::quiet_NaN();
 			}
-			if (CCM_UNLIKELY(num == std::numeric_limits<T>::infinity())) { return std::numeric_limits<T>::infinity(); }
-			if (CCM_UNLIKELY(ccm::isnan(num))) { return std::numeric_limits<T>::quiet_NaN(); }
+			if (CCM_UNLIKELY(num == std::numeric_limits<T>::infinity()))
+			{
+				return std::numeric_limits<T>::infinity();
+			}
+			if (CCM_UNLIKELY(ccm::isnan(num)))
+			{
+				return std::numeric_limits<T>::quiet_NaN();
+			}
 
 			return gen::log10_gen(num);
 		}
 	}
 
-	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-	constexpr double log10(Integer num)
-	{ return ccm::log10<double>(static_cast<double>(num)); }
+	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double log10(Integer num)
+	{
+		return ccm::log10<double>(static_cast<double>(num));
+	}
 
 	constexpr float log10f(float num)
-	{ return ccm::log10<float>(num); }
+	{
+		return ccm::log10<float>(num);
+	}
 
 	constexpr long double log10l(long double num)
-	{ return ccm::log10<long double>(num); }
+	{
+		return ccm::log10<long double>(num);
+	}
 } // namespace ccm
