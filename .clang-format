@@ -21,7 +21,6 @@ AlwaysBreakBeforeMultilineStrings: true
 AlwaysBreakTemplateDeclarations: MultiLine
 BasedOnStyle: LLVM
 BinPackArguments: false
-BinPackParameters: false
 BraceWrapping:
   AfterCaseLabel: true
   AfterClass: true
@@ -45,7 +44,6 @@ BreakAfterAttributes: Never
 BreakBeforeBraces: Custom
 ColumnLimit: 160
 CompactNamespaces: false
-Cpp11BracedListStyle: false
 DerivePointerAlignment: false
 FixNamespaceComments: true
 IncludeBlocks: Regroup
