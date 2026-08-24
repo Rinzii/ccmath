@@ -159,7 +159,7 @@ Everything builds clean under `-Werror` with aggressive warnings.
 
 ## Comments
 
-Public entry points get Doxygen: `@brief`, `@param` or `@tparam`, and `@return`.
+Public entry points get Doxygen: `\brief`, `\param` or `\tparam`, and `\return`.
 Implementation comments are for the why, not the what: the constraint, the tradeoff,
 the reason a builtin is or is not trusted. `pow.hpp` is a good model.
 
