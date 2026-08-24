@@ -20,10 +20,10 @@
 namespace ccm
 {
 	/**
-	 * @brief Computes the principal value of the inverse cosine in radians.
-	 * @tparam T Floating-point type.
-	 * @param num Floating-point value, typically in [-1, 1].
-	 * @return Inverse cosine of num in radians.
+	 * \brief Computes the principal value of the inverse cosine in radians.
+	 * \tparam T Floating-point type.
+	 * \param num Floating-point value, typically in [-1, 1].
+	 * \return Inverse cosine of num in radians.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T acos(T num)
 	{
@@ -49,10 +49,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes inverse cosine of an integer input after promotion to double.
-	 * @tparam Integer Integral type.
-	 * @param num Input value.
-	 * @return Inverse cosine in radians as double.
+	 * \brief Computes inverse cosine of an integer input after promotion to double.
+	 * \tparam Integer Integral type.
+	 * \param num Input value.
+	 * \return Inverse cosine in radians as double.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double acos(Integer num)
 	{
@@ -60,9 +60,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes inverse cosine for float.
-	 * @param num Input value.
-	 * @return Inverse cosine in radians as float.
+	 * \brief Computes inverse cosine for float.
+	 * \param num Input value.
+	 * \return Inverse cosine in radians as float.
 	 */
 	constexpr float acosf(float num)
 	{
@@ -70,9 +70,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes inverse cosine for long double.
-	 * @param num Input value.
-	 * @return Inverse cosine in radians as long double.
+	 * \brief Computes inverse cosine for long double.
+	 * \param num Input value.
+	 * \return Inverse cosine in radians as long double.
 	 */
 	constexpr long double acosl(long double num)
 	{
@@ -80,4 +80,4 @@ namespace ccm
 	}
 } // namespace ccm
 
-/// @ingroup trig
+/// \ingroup trig

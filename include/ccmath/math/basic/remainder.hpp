@@ -17,11 +17,11 @@
 namespace ccm
 {
 	/**
-	 * @brief Returns the remainder of the division of x by y.
-	 * @tparam T Type of the values to compare.
-	 * @param x Dividend.
-	 * @param y Divisor.
-	 * @return The remainder of the division of x by y.
+	 * \brief Returns the remainder of the division of x by y.
+	 * \tparam T Type of the values to compare.
+	 * \param x Dividend.
+	 * \param y Divisor.
+	 * \return The remainder of the division of x by y.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T remainder(T x, T y)
 	{
@@ -41,11 +41,11 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Returns the remainder of the division of x by y.
-	 * @tparam Integer Type of the values to compare.
-	 * @param x Dividend.
-	 * @param y Divisor.
-	 * @return The remainder of the division of x by y as a double.
+	 * \brief Returns the remainder of the division of x by y.
+	 * \tparam Integer Type of the values to compare.
+	 * \param x Dividend.
+	 * \param y Divisor.
+	 * \return The remainder of the division of x by y as a double.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double remainder(Integer x, Integer y)
 	{
@@ -53,10 +53,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Returns the remainder of the division of x by y.
-	 * @param x Dividend.
-	 * @param y Divisor.
-	 * @return The remainder of the division of x by y.
+	 * \brief Returns the remainder of the division of x by y.
+	 * \param x Dividend.
+	 * \param y Divisor.
+	 * \return The remainder of the division of x by y.
 	 */
 	constexpr float remainderf(float x, float y)
 	{
@@ -64,10 +64,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Returns the remainder of the division of x by y.
-	 * @param x Dividend.
-	 * @param y Divisor.
-	 * @return The remainder of the division of x by y.
+	 * \brief Returns the remainder of the division of x by y.
+	 * \param x Dividend.
+	 * \param y Divisor.
+	 * \return The remainder of the division of x by y.
 	 */
 	constexpr long double remainderl(long double x, long double y)
 	{
@@ -75,4 +75,4 @@ namespace ccm
 	}
 } // namespace ccm
 
-/// @ingroup basic
+/// \ingroup basic

@@ -17,10 +17,10 @@
 namespace ccm::ext
 {
 	/**
-	 * @brief Saturate a floating-point value to the range [0, 1].
-	 * @tparam T Type of the input and output.
-	 * @param value The value to saturate.
-	 * @return The value clamped to the range [0, 1].
+	 * \brief Saturate a floating-point value to the range [0, 1].
+	 * \tparam T Type of the input and output.
+	 * \param value The value to saturate.
+	 * \return The value clamped to the range [0, 1].
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T saturate(T value) noexcept
 	{

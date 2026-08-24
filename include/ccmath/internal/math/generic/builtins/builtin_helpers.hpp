@@ -5,14 +5,14 @@
 namespace ccm::builtin
 {
 	/**
-	 * @internal
-	 * @brief Helper to check that a valid builtin type is used
+	 * \internal
+	 * \brief Helper to check that a valid builtin type is used
 	 */
 	template <typename T> inline constexpr bool is_valid_builtin_type = std::is_same_v<T, float> || std::is_same_v<T, double> || std::is_same_v<T, long double>;
 
 	/**
-	 * @internal
-	 * @brief Like is_valid_builtin_type, but false in deterministic builds.
+	 * \internal
+	 * \brief Like is_valid_builtin_type, but false in deterministic builds.
 	 *
 	 * Transcendental builtins lower to system libm, which is not correctly rounded and differs
 	 * across platforms. Deterministic mode routes those functions through the generic kernels by

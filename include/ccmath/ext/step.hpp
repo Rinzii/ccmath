@@ -15,11 +15,11 @@
 namespace ccm::ext
 {
 	/**
-	 * @brief Return 0 if value is less than edge, otherwise return 1.
-	 * @tparam T Type of the input and output.
-	 * @param edge The comparison edge.
-	 * @param value The value to compare against edge.
-	 * @return 0 if value is less than edge, otherwise 1.
+	 * \brief Return 0 if value is less than edge, otherwise return 1.
+	 * \tparam T Type of the input and output.
+	 * \param edge The comparison edge.
+	 * \param value The value to compare against edge.
+	 * \return 0 if value is less than edge, otherwise 1.
 	 */
 	template <typename T, std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>, bool> = true> constexpr T step(T edge, T value) noexcept
 	{

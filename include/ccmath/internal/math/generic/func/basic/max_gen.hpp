@@ -19,11 +19,11 @@
 namespace ccm::gen
 {
 	/**
-	 * @brief Computes the larger of the two values.
-	 * @tparam T Type of the values to compare.
-	 * @param x Left-hand side of the comparison.
-	 * @param y Right-hand side of the comparison.
-	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
+	 * \brief Computes the larger of the two values.
+	 * \tparam T Type of the values to compare.
+	 * \param x Left-hand side of the comparison.
+	 * \param y Right-hand side of the comparison.
+	 * \return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename T> constexpr T max(T x, T y) noexcept
 	{

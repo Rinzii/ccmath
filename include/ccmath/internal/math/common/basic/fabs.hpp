@@ -16,7 +16,7 @@
 namespace ccm::func
 {
 	/**
-	 * @internal
+	 * \internal
 	 * Internal implementation that switches between compile time and runtime implementations.
 	 */
 	template <typename T>

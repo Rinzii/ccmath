@@ -17,12 +17,12 @@
 namespace ccm::ext
 {
 	/**
-	 * @brief Smooth hermite interpolation.
-	 * @tparam T Type of the input and output.
-	 * @param edge0 Lower edge.
-	 * @param edge1 Upper edge.
-	 * @param x Value to interpolate.
-	 * @return The interpolated value.
+	 * \brief Smooth hermite interpolation.
+	 * \tparam T Type of the input and output.
+	 * \param edge0 Lower edge.
+	 * \param edge1 Upper edge.
+	 * \param x Value to interpolate.
+	 * \return The interpolated value.
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T smoothstep(T edge0, T edge1, T x)
 	{

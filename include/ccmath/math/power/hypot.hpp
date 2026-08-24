@@ -20,11 +20,11 @@
 namespace ccm
 {
 	/**
-	 * @brief Computes the length of the hypotenuse from two coordinates.
-	 * @tparam T Floating-point type.
-	 * @param x First value.
-	 * @param y Second value.
-	 * @return sqrt(x*x + y*y) computed with scaling behavior suitable for floating-point range.
+	 * \brief Computes the length of the hypotenuse from two coordinates.
+	 * \tparam T Floating-point type.
+	 * \param x First value.
+	 * \param y Second value.
+	 * \return sqrt(x*x + y*y) computed with scaling behavior suitable for floating-point range.
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T hypot(T x, T y) noexcept
 	{
@@ -42,12 +42,12 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the length of the three-dimensional hypotenuse.
-	 * @tparam T Floating-point type.
-	 * @param x First value.
-	 * @param y Second value.
-	 * @param z Third value.
-	 * @return sqrt(x*x + y*y + z*z) computed with the same scaling behavior as the 2-argument overload.
+	 * \brief Computes the length of the three-dimensional hypotenuse.
+	 * \tparam T Floating-point type.
+	 * \param x First value.
+	 * \param y Second value.
+	 * \param z Third value.
+	 * \return sqrt(x*x + y*y + z*z) computed with the same scaling behavior as the 2-argument overload.
 	 */
 	constexpr float hypot(float x, float y, float z) noexcept
 	{
@@ -75,10 +75,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the hypotenuse for float values.
-	 * @param x First value.
-	 * @param y Second value.
-	 * @return Hypotenuse length as float.
+	 * \brief Computes the hypotenuse for float values.
+	 * \param x First value.
+	 * \param y Second value.
+	 * \return Hypotenuse length as float.
 	 */
 	constexpr float hypotf(float x, float y) noexcept
 	{
@@ -86,10 +86,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the hypotenuse for long double values.
-	 * @param x First value.
-	 * @param y Second value.
-	 * @return Hypotenuse length as long double.
+	 * \brief Computes the hypotenuse for long double values.
+	 * \param x First value.
+	 * \param y Second value.
+	 * \return Hypotenuse length as long double.
 	 */
 	constexpr long double hypotl(long double x, long double y) noexcept
 	{
@@ -97,4 +97,4 @@ namespace ccm
 	}
 } // namespace ccm
 
-/// @ingroup power
+/// \ingroup power

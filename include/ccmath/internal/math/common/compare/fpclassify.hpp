@@ -18,11 +18,11 @@
 namespace ccm
 {
 	/**
-	 * @brief Classify the floating point number
-	 * @attention This function is heavily implementation defined and may not work as expected on unknown compilers
-	 * @tparam T The type of the floating point number
-	 * @param num The number to classify
-	 * @return The classification of the number as an integer
+	 * \brief Classify the floating point number
+	 * \attention This function is heavily implementation defined and may not work as expected on unknown compilers
+	 * \tparam T The type of the floating point number
+	 * \param num The number to classify
+	 * \return The classification of the number as an integer
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr int fpclassify(T num)
 	{

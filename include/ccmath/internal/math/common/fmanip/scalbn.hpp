@@ -23,11 +23,11 @@ CCM_DISABLE_MSVC_WARNING(4702) // 4702: unreachable code
 namespace ccm
 {
 	/**
-	 * @brief Multiplies a number by FLT_RADIX raised to a power
-	 * @tparam T Floating-point or integer type.
-	 * @param num Floating-point or integer value.
-	 * @param exp Integer value.
-	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned.
+	 * \brief Multiplies a number by FLT_RADIX raised to a power
+	 * \tparam T Floating-point or integer type.
+	 * \param num Floating-point or integer value.
+	 * \param exp Integer value.
+	 * \return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T scalbn(T num, int exp) noexcept
 	{
@@ -53,11 +53,11 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Multiplies a number by FLT_RADIX raised to a power
-	 * @tparam T Floating-point or integer type.
-	 * @param num Floating-point or integer value.
-	 * @param exp Integer value.
-	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned.
+	 * \brief Multiplies a number by FLT_RADIX raised to a power
+	 * \tparam T Floating-point or integer type.
+	 * \param num Floating-point or integer value.
+	 * \param exp Integer value.
+	 * \return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T scalbn(T num, long exp) noexcept
 	{
@@ -83,11 +83,11 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Multiplies a number by FLT_RADIX raised to a power
-	 * @tparam Integer Integer type.
-	 * @param num Integer value.
-	 * @param exp Integer value.
-	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a double.
+	 * \brief Multiplies a number by FLT_RADIX raised to a power
+	 * \tparam Integer Integer type.
+	 * \param num Integer value.
+	 * \param exp Integer value.
+	 * \return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a double.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double scalbn(Integer num, int exp) noexcept
 	{
@@ -95,11 +95,11 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Multiplies a number by FLT_RADIX raised to a power
-	 * @tparam Integer Integer type.
-	 * @param num Integer value.
-	 * @param exp Integer value.
-	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a double.
+	 * \brief Multiplies a number by FLT_RADIX raised to a power
+	 * \tparam Integer Integer type.
+	 * \param num Integer value.
+	 * \param exp Integer value.
+	 * \return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a double.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double scalbn(Integer num, long exp) noexcept
 	{
@@ -107,10 +107,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Multiplies a number by FLT_RADIX raised to a power
-	 * @param num Floating-point value.
-	 * @param exp Integer value.
-	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a float.
+	 * \brief Multiplies a number by FLT_RADIX raised to a power
+	 * \param num Floating-point value.
+	 * \param exp Integer value.
+	 * \return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a float.
 	 */
 	constexpr float scalbnf(float num, int exp) noexcept
 	{
@@ -118,10 +118,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Multiplies a number by FLT_RADIX raised to a power
-	 * @param num Floating-point value.
-	 * @param exp Integer value.
-	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a float.
+	 * \brief Multiplies a number by FLT_RADIX raised to a power
+	 * \param num Floating-point value.
+	 * \param exp Integer value.
+	 * \return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a float.
 	 */
 	constexpr float scalbnf(float num, long exp) noexcept
 	{
@@ -129,10 +129,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Multiplies a number by FLT_RADIX raised to a power
-	 * @param num Floating-point value.
-	 * @param exp Integer value.
-	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a long double.
+	 * \brief Multiplies a number by FLT_RADIX raised to a power
+	 * \param num Floating-point value.
+	 * \param exp Integer value.
+	 * \return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a long double.
 	 */
 	constexpr long double scalbnl(long double num, int exp) noexcept
 	{
@@ -140,10 +140,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Multiplies a number by FLT_RADIX raised to a power
-	 * @param num Floating-point value.
-	 * @param exp Integer value.
-	 * @return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a long double.
+	 * \brief Multiplies a number by FLT_RADIX raised to a power
+	 * \param num Floating-point value.
+	 * \param exp Integer value.
+	 * \return If no errors occur, num multiplied by FLT_RADIX to the power of exp (num×FLT_RADIX^exp) is returned as a long double.
 	 */
 	constexpr long double scalbnl(long double num, long exp) noexcept
 	{

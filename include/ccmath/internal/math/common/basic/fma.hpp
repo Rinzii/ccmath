@@ -18,12 +18,12 @@
 namespace ccm
 {
 	/**
-	 * @brief Fused multiply-add operation.
-	 * @tparam T Numeric type.
-	 * @param x Floating-point or integer value.
-	 * @param y Floating-point or integer value.
-	 * @param z Floating-point or integer value.
-	 * @return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
+	 * \brief Fused multiply-add operation.
+	 * \tparam T Numeric type.
+	 * \param x Floating-point or integer value.
+	 * \param y Floating-point or integer value.
+	 * \param z Floating-point or integer value.
+	 * \return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
 	 * calculated as a single ternary floating-point operation).
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T fma(T x, T y, T z) noexcept // NOLINT(bugprone-exception-escape)
@@ -37,14 +37,14 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Fused multiply-add operation.
-	 * @tparam T Floating-point or integer type converted to a common type.
-	 * @tparam U Floating-point or integer type converted to a common type.
-	 * @tparam V Floating-point or integer type converted to a common type.
-	 * @param x Floating-point or integer value converted to a common type.
-	 * @param y Floating-point or integer value converted to a common type.
-	 * @param z Floating-point or integer value converted to a common type.
-	 * @return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
+	 * \brief Fused multiply-add operation.
+	 * \tparam T Floating-point or integer type converted to a common type.
+	 * \tparam U Floating-point or integer type converted to a common type.
+	 * \tparam V Floating-point or integer type converted to a common type.
+	 * \param x Floating-point or integer value converted to a common type.
+	 * \param y Floating-point or integer value converted to a common type.
+	 * \param z Floating-point or integer value converted to a common type.
+	 * \return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
 	 * calculated as a single ternary floating-point operation).
 	 */
 	template <typename T, typename U, typename V> constexpr auto fma(T x, U y, V z) noexcept
@@ -66,14 +66,14 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Fused multiply-add operation.
-	 * @tparam T Integer type converted to a common type.
-	 * @tparam U Integer type converted to a common type.
-	 * @tparam V Integer type converted to a common type.
-	 * @param x Integer value converted to a common type.
-	 * @param y Integer value converted to a common type.
-	 * @param z Integer value converted to a common type.
-	 * @return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
+	 * \brief Fused multiply-add operation.
+	 * \tparam T Integer type converted to a common type.
+	 * \tparam U Integer type converted to a common type.
+	 * \tparam V Integer type converted to a common type.
+	 * \param x Integer value converted to a common type.
+	 * \param y Integer value converted to a common type.
+	 * \param z Integer value converted to a common type.
+	 * \return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
 	 * calculated as a single ternary floating-point operation).
 	 */
 	template <typename T, typename U, typename V, std::enable_if_t<std::is_integral_v<T> && std::is_integral_v<U> && std::is_integral_v<V>, bool> = true>
@@ -84,11 +84,11 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Fused multiply-add operation.
-	 * @param x Floating-point value.
-	 * @param y Floating-point value.
-	 * @param z Floating-point value.
-	 * @return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
+	 * \brief Fused multiply-add operation.
+	 * \param x Floating-point value.
+	 * \param y Floating-point value.
+	 * \param z Floating-point value.
+	 * \return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
 	 * calculated as a single ternary floating-point operation).
 	 */
 	constexpr double fma(double x, double y, double z) noexcept
@@ -97,11 +97,11 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Fused multiply-add operation.
-	 * @param x Floating-point value.
-	 * @param y Floating-point value.
-	 * @param z Floating-point value.
-	 * @return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
+	 * \brief Fused multiply-add operation.
+	 * \param x Floating-point value.
+	 * \param y Floating-point value.
+	 * \param z Floating-point value.
+	 * \return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
 	 * calculated as a single ternary floating-point operation).
 	 */
 	constexpr float fmaf(float x, float y, float z) noexcept
@@ -110,11 +110,11 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Fused multiply-add operation.
-	 * @param x Floating-point value.
-	 * @param y Floating-point value.
-	 * @param z Floating-point value.
-	 * @return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
+	 * \brief Fused multiply-add operation.
+	 * \param x Floating-point value.
+	 * \param y Floating-point value.
+	 * \param z Floating-point value.
+	 * \return If successful, returns the value of x * y + z as if calculated to infinite precision and rounded once to fit the result type (or, alternatively,
 	 * calculated as a single ternary floating-point operation).
 	 */
 	constexpr long double fmal(long double x, long double y, long double z) noexcept
@@ -123,4 +123,4 @@ namespace ccm
 	}
 } // namespace ccm
 
-/// @ingroup basic
+/// \ingroup basic

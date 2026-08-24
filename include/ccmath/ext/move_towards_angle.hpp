@@ -18,12 +18,12 @@
 namespace ccm::ext
 {
 	/**
-	 * @brief Move an angle toward a target angle without overshooting.
-	 * @tparam T Type of the input and output.
-	 * @param current The current angle, in radians.
-	 * @param target The target angle, in radians.
-	 * @param max_delta The maximum angular change to apply, in radians.
-	 * @return The moved angle, in radians.
+	 * \brief Move an angle toward a target angle without overshooting.
+	 * \tparam T Type of the input and output.
+	 * \param current The current angle, in radians.
+	 * \param target The target angle, in radians.
+	 * \param max_delta The maximum angular change to apply, in radians.
+	 * \return The moved angle, in radians.
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T move_towards_angle(T current, T target, T max_delta) noexcept
 	{

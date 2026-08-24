@@ -30,10 +30,10 @@ CCM_DISABLE_MSVC_WARNING(4702)
 namespace ccm
 {
 	/**
-	 * @brief Computes log(1 + num) with improved accuracy near zero.
-	 * @tparam T Floating-point type.
-	 * @param num Floating-point value.
-	 * @return Natural logarithm of 1 + num. Returns -inf for num == -1 and NaN for num < -1.
+	 * \brief Computes log(1 + num) with improved accuracy near zero.
+	 * \tparam T Floating-point type.
+	 * \param num Floating-point value.
+	 * \return Natural logarithm of 1 + num. Returns -inf for num == -1 and NaN for num < -1.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T log1p(T num)
 	{
@@ -85,10 +85,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes log(1 + num) after promoting an integer input to double.
-	 * @tparam Integer Integral type.
-	 * @param num Integer value.
-	 * @return Natural logarithm of 1 + num as double.
+	 * \brief Computes log(1 + num) after promoting an integer input to double.
+	 * \tparam Integer Integral type.
+	 * \param num Integer value.
+	 * \return Natural logarithm of 1 + num as double.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double log1p(Integer num)
 	{
@@ -96,9 +96,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes log(1 + num) for float.
-	 * @param num Floating-point value.
-	 * @return Natural logarithm of 1 + num as float.
+	 * \brief Computes log(1 + num) for float.
+	 * \param num Floating-point value.
+	 * \return Natural logarithm of 1 + num as float.
 	 */
 	constexpr float log1pf(float num)
 	{
@@ -106,9 +106,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes log(1 + num) for long double.
-	 * @param num Floating-point value.
-	 * @return Natural logarithm of 1 + num as long double.
+	 * \brief Computes log(1 + num) for long double.
+	 * \param num Floating-point value.
+	 * \return Natural logarithm of 1 + num as long double.
 	 */
 	constexpr long double log1pl(long double num)
 	{

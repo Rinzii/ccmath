@@ -41,7 +41,7 @@ namespace ccm::support::fp
 	namespace internal
 	{
 		/**
-		 * @brief Defines the layout of a floating point in memory and all of its parts along with the associated storage type.
+		 * \brief Defines the layout of a floating point in memory and all of its parts along with the associated storage type.
 		 */
 		template <FPType> struct FPLayout
 		{};
@@ -92,75 +92,75 @@ namespace ccm::support::fp
 			using BASE = FPLayout<fp_type>;
 
 			/**
-			 * @brief The number of bits in the exponent part.
+			 * \brief The number of bits in the exponent part.
 			 */
 			using BASE::exponent_length;
 
 			/**
-			 * @brief The number of bits in the significand part.
+			 * \brief The number of bits in the significand part.
 			 */
 			using BASE::significand_length;
 
 			/**
-			 * @brief The number of bits in the sign part.
+			 * \brief The number of bits in the sign part.
 			 */
 			using BASE::sign_length;
 
 			/**
-			 * @brief The total number of bits in the floating point number. Provided as a convenience.
+			 * \brief The total number of bits in the floating point number. Provided as a convenience.
 			 */
 			static constexpr int total_length = sign_length + exponent_length + significand_length;
 
 			/**
-			 * @brief The number of bits after the decimal dot when the number is in normal form.
+			 * \brief The number of bits after the decimal dot when the number is in normal form.
 			 */
 			using BASE::fraction_length;
 
 			/**
-			 * @brief The storage type for the floating point number represented as an unsigned integer wide enough to contain all of the floating point bits.
+			 * \brief The storage type for the floating point number represented as an unsigned integer wide enough to contain all of the floating point bits.
 			 */
 			using storage_type = typename BASE::storage_type;
 
 			/**
-			 * @brief The number of bits in the storage type.
+			 * \brief The number of bits in the storage type.
 			 */
 			static constexpr int storage_length = sizeof(storage_type) * CHAR_BIT;
 			static_assert(storage_length >= total_length,
 						  "ccmath - FPBits: Some how the storage is not able to hold the entire floating point number. This should never happen!");
 
 			/**
-			 * @brief The exponent bias for the floating point type that should always be positive.
+			 * \brief The exponent bias for the floating point type that should always be positive.
 			 */
 			static constexpr std::int32_t exponent_bias = (1U << (exponent_length - 1U)) - 1U;
 			static_assert(exponent_bias > 0, "ccmath - FPBits: The exponent bias should always be positive. This should never happen!");
 
 			/**
-			 * @brief The bit mask that keeps only the significand part.
+			 * \brief The bit mask that keeps only the significand part.
 			 */
 			static constexpr storage_type significand_mask = support::mask_trailing_ones<storage_type, significand_length>();
 
 			/**
-			 * @brief The bit mask that keeps only the exponent part.
+			 * \brief The bit mask that keeps only the exponent part.
 			 */
 			static constexpr storage_type exponent_mask = support::mask_trailing_ones<storage_type, exponent_length>() << significand_length;
 
 			/**
-			 * @brief The bit mask that keeps only the sign part.
+			 * \brief The bit mask that keeps only the sign part.
 			 */
 			static constexpr storage_type sign_mask = support::mask_trailing_ones<storage_type, sign_length>() << (exponent_length + significand_length);
 
 			/**
-			 * @brief The bit mask that keeps only the exponent and significand parts.
+			 * \brief The bit mask that keeps only the exponent and significand parts.
 			 */
 			static constexpr storage_type exponent_significand_mask = support::mask_trailing_ones<storage_type, exponent_length + significand_length>();
 
 			/**
-			 * @brief The bit mask that keeps the entire bit pattern. (sign + exponent + significand)
+			 * \brief The bit mask that keeps the entire bit pattern. (sign + exponent + significand)
 			 */
 			static constexpr storage_type fp_bits_mask = support::mask_trailing_ones<storage_type, total_length>();
 
 			/**
-			 * @brief The bit mask that keeps only the fraction part. (i.e., the significand without the leading one)
+			 * \brief The bit mask that keeps only the fraction part. (i.e., the significand without the leading one)
 			 */
 			static constexpr storage_type fraction_mask = support::mask_trailing_ones<storage_type, fraction_length>();
 
@@ -170,11 +170,11 @@ namespace ccm::support::fp
 
 		protected:
 			/**
-			 * @brief Merges the bits from 'a' and 'b' values according to 'mask'.
-			 * @param a Value to merge in non-masked bits
-			 * @param b Value to merge in masked bits
-			 * @param mask Mask that uses 'a' bits when corresponding 'mask' bits are zeroes and 'b' bits when corresponding bits are ones.
-			 * @return Merged bits from 'a' and 'b' according to 'mask'.
+			 * \brief Merges the bits from 'a' and 'b' values according to 'mask'.
+			 * \param a Value to merge in non-masked bits
+			 * \param b Value to merge in masked bits
+			 * \param mask Mask that uses 'a' bits when corresponding 'mask' bits are zeroes and 'b' bits when corresponding bits are ones.
+			 * \return Merged bits from 'a' and 'b' according to 'mask'.
 			 */
 			static constexpr storage_type merge(storage_type a, storage_type b, storage_type mask)
 			{
@@ -184,8 +184,8 @@ namespace ccm::support::fp
 			}
 
 			/**
-			 * @brief A strongly typed integer that prevents mixing and matching integers with different semantics.
-			 * @tparam T The type of the integer.
+			 * \brief A strongly typed integer that prevents mixing and matching integers with different semantics.
+			 * \tparam T The type of the integer.
 			 */
 			template <typename T> struct TypedInt // NOLINT(cppcoreguidelines-special-member-functions)
 			{
@@ -218,7 +218,7 @@ namespace ccm::support::fp
 			};
 
 			/**
-			 * @brief An opaque type for storing floating point exponents.
+			 * \brief An opaque type for storing floating point exponents.
 			 *
 			 * Inherits from TypedInt<std::int32_t> and defines special values like subnormal, min, zero, max, and inf.
 			 * Arbitrary values are valid within the range [min, max].
@@ -255,7 +255,7 @@ namespace ccm::support::fp
 			};
 
 			/**
-			 * @brief An opaque type for storing a floating point biased exponent.
+			 * \brief An opaque type for storing a floating point biased exponent.
 			 *
 			 * Inherits from TypedInt<std::uint32_t> and allows storage of biased exponents.
 			 * Provides conversion to and from the Exponent type and includes increment and decrement operators.
@@ -270,7 +270,7 @@ namespace ccm::support::fp
 				constexpr BiasedExponent(Exponent exp) : BASE(static_cast<std::uint32_t>(static_cast<std::int32_t>(exp) + exponent_bias)) {}
 
 				/**
-				 * @brief Cast operator to convert from BiasedExponent to Exponent.
+				 * \brief Cast operator to convert from BiasedExponent to Exponent.
 				 */
 				// NOLINTNEXTLINE(google-explicit-constructor)
 				constexpr operator Exponent() const
@@ -294,7 +294,7 @@ namespace ccm::support::fp
 			};
 
 			/**
-			 * @brief An opaque type for storing a floating point significand.
+			 * \brief An opaque type for storing a floating point significand.
 			 *
 			 * Inherits from TypedInt<storage_type> and allows storage of significand values.
 			 * Provides operators for bitwise OR, XOR, and right shift.
@@ -302,7 +302,7 @@ namespace ccm::support::fp
 			 * and all bits set to one. Arbitrary values are valid within the range [zero, bits_all_ones].
 			 * Values exceeding this range are truncated.
 			 *
-			 * @attention The semantics of the Significand are implementation dependent.
+			 * \attention The semantics of the Significand are implementation dependent.
 			 */
 			struct Significand : TypedInt<storage_type>
 			{
@@ -404,7 +404,7 @@ namespace ccm::support::fp
 			}
 
 			/**
-			 * @brief The bits of the floating point number represented as an unsigned integer.
+			 * \brief The bits of the floating point number represented as an unsigned integer.
 			 */
 			storage_type bits{};
 
@@ -423,7 +423,7 @@ namespace ccm::support::fp
 		};
 
 		/**
-		 * @brief This layer defines all func related to the encoding of the floating point type.
+		 * \brief This layer defines all func related to the encoding of the floating point type.
 		 *
 		 * It facilitates the construction, modification, and observation of values manipulated as 'storage_type'.
 		 */
@@ -544,8 +544,8 @@ namespace ccm::support::fp
 			}
 
 			/**
-			 * @brief Returns the mantissa with the implicit bit set if the current value is a valid normal number.
-			 * @return The explicit mantissa as a storage_type.
+			 * \brief Returns the mantissa with the implicit bit set if the current value is a valid normal number.
+			 * \return The explicit mantissa as a storage_type.
 			 *
 			 * This function checks if the current value is subnormal. If it is, it returns the significand bits.
 			 * Otherwise, it returns the mantissa with the implicit bit set.
@@ -561,7 +561,7 @@ namespace ccm::support::fp
 		};
 
 		/**
-		 * @brief Template specialization for the X86 Extended Precision floating point type.
+		 * \brief Template specialization for the X86 Extended Precision floating point type.
 		 */
 		template <typename RetT> struct FPRepSem<FPType::eBinary80, RetT> : FPStorage<FPType::eBinary80>
 		{
@@ -571,7 +571,7 @@ namespace ccm::support::fp
 			using BASE::storage_type;
 
 			/**
-			 * @brief Mask for the leading digit of the mantissa in the x86 80-bit float.
+			 * \brief Mask for the leading digit of the mantissa in the x86 80-bit float.
 			 *
 			 * The x86 80-bit float represents the leading digit of the mantissa explicitly.
 			 * This constant defines the mask for that bit.
@@ -740,13 +740,13 @@ namespace ccm::support::fp
 			}
 
 			/**
-			 * @brief Checks if the implicit bit is set.
+			 * \brief Checks if the implicit bit is set.
 			 *
-			 * @return True if the implicit bit is set, false otherwise.
+			 * \return True if the implicit bit is set, false otherwise.
 			 *
 			 * This function examines the bits and returns whether the implicit bit, as defined by EXPLICIT_BIT_MASK, is set.
 			 *
-			 * @attention This function is specific to FPRepSem<FPType::eBinary80>.
+			 * \attention This function is specific to FPRepSem<FPType::eBinary80>.
 			 */
 			[[nodiscard]] constexpr bool get_implicit_bit() const
 			{
@@ -754,14 +754,14 @@ namespace ccm::support::fp
 			}
 
 			/**
-			 * @brief Sets the implicit bit to the specified value.
+			 * \brief Sets the implicit bit to the specified value.
 			 *
-			 * @param implicitVal The value to set the implicit bit to (true or false).
+			 * \param implicitVal The value to set the implicit bit to (true or false).
 			 *
 			 * This function sets the implicit bit, defined by EXPLICIT_BIT_MASK, to the given value.
 			 * If the current state of the implicit bit differs from the specified value, it toggles the bit.
 			 *
-			 * @attention This function is specific to FPRepSem<FPType::eBinary80>.
+			 * \attention This function is specific to FPRepSem<FPType::eBinary80>.
 			 */
 			constexpr void set_implicit_bit(bool implicitVal)
 			{
@@ -773,7 +773,7 @@ namespace ccm::support::fp
 		};
 
 		/**
-		 * @brief 'FPRepImpl' is the base of the class hierarchy that handles 'FPType'.
+		 * \brief 'FPRepImpl' is the base of the class hierarchy that handles 'FPType'.
 		 *
 		 * Specific float semantics are implemented by 'FPRepSem' above and specialized as needed.
 		 *
@@ -902,9 +902,9 @@ namespace ccm::support::fp
 			}
 
 			/**
-			 * @brief Retrieves the explicit exponent value, adjusted for subnormal and zero values.
+			 * \brief Retrieves the explicit exponent value, adjusted for subnormal and zero values.
 			 *
-			 * @return The explicit exponent as an integer.
+			 * \return The explicit exponent as an integer.
 			 *
 			 * For subnormal numbers, the exponent is treated as the minimum exponent for a normal number
 			 * to maintain continuity between normal and subnormal ranges. This adjustment prevents slight
@@ -931,8 +931,8 @@ namespace ccm::support::fp
 			}
 
 			/**
-			 * @brief Sets the mantissa value of the internal bits.
-			 * @param mantVal The mantissa value to set.
+			 * \brief Sets the mantissa value of the internal bits.
+			 * \param mantVal The mantissa value to set.
 			 */
 			constexpr void set_mantissa(storage_type mantVal)
 			{
@@ -940,8 +940,8 @@ namespace ccm::support::fp
 			}
 
 			/**
-			 * @brief Sets the significand value of the internal bits.
-			 * @param sigVal The significand value to set.
+			 * \brief Sets the significand value of the internal bits.
+			 * \param sigVal The significand value to set.
 			 */
 			constexpr void set_significand(storage_type sigVal)
 			{
@@ -949,14 +949,14 @@ namespace ccm::support::fp
 			}
 
 			/**
-			 * @brief Unsafe function that creates a floating point representation that simply packs the sign, biased exponent, and mantissa values without
+			 * \brief Unsafe function that creates a floating point representation that simply packs the sign, biased exponent, and mantissa values without
 			 *checking bounds nor normalization.
-			 * @param sign Sign of the number.
-			 * @param biased_exp Biased exponent.
-			 * @param mantissa Mantissa value.
-			 * @return The created floating point representation.
+			 * \param sign Sign of the number.
+			 * \param biased_exp Biased exponent.
+			 * \param mantissa Mantissa value.
+			 * \return The created floating point representation.
 			 *
-			 * @warning For Binary80 Extended Precision, implicit bit needs to be set correctly in the 'mantissa' by the caller.
+			 * \warning For Binary80 Extended Precision, implicit bit needs to be set correctly in the 'mantissa' by the caller.
 			 *			This function will not check for its validity and assumes the caller has set it correctly.
 			 */
 			static constexpr RetT create_value(types::Sign sign, storage_type biased_exp, storage_type mantissa)
@@ -965,12 +965,12 @@ namespace ccm::support::fp
 			}
 
 			/**
-			 * @brief Converts an integer number and unbiased exponent to a proper float type.
-			 * @param number The number to convert.
-			 * @param expo The raw exponent value.
-			 * @return The converted number.
+			 * \brief Converts an integer number and unbiased exponent to a proper float type.
+			 * \param number The number to convert.
+			 * \param expo The raw exponent value.
+			 * \return The converted number.
 			 *
-			 * @attention Pay close attention to the following items about this function:
+			 * \attention Pay close attention to the following items about this function:
 			 *				1) "ep" is the raw exponent value.
 			 *				2) The function adds +1 to ep for a smooth normalized to denormalized transition.
 			 *				3) The function does not check exponent high limit.
@@ -1001,8 +1001,8 @@ namespace ccm::support::fp
 		};
 
 		/**
-		 * @brief A generic class to manipulate floating point formats.
-		 * @tparam fp_type The floating point type to manipulate.
+		 * \brief A generic class to manipulate floating point formats.
+		 * \tparam fp_type The floating point type to manipulate.
 		 */
 		template <FPType fp_type>
 		// TODO(IanP): Review whether FPRep is still needed or should fold into FPRepImpl.
@@ -1021,9 +1021,9 @@ namespace ccm::support::fp
 	} // namespace internal
 
 	/**
-	 * @brief Identifies what the FPType corresponding to C++ type T is on the host.
-	 * @tparam T The type to identify the FPType for.
-	 * @return The FPType corresponding to the C++ type T.
+	 * \brief Identifies what the FPType corresponding to C++ type T is on the host.
+	 * \tparam T The type to identify the FPType for.
+	 * \return The FPType corresponding to the C++ type T.
 	 */
 	template <typename T> static constexpr FPType get_fp_type()
 	{
@@ -1056,8 +1056,8 @@ namespace ccm::support::fp
 	}
 
 	/**
-	 * @brief A generic class to manipulate C++ floating point formats.
-	 * @tparam T The floating point type to manipulate.
+	 * \brief A generic class to manipulate C++ floating point formats.
+	 * \tparam T The floating point type to manipulate.
 	 */
 	template <typename T> struct FPBits final : internal::FPRepImpl<get_fp_type<T>(), FPBits<T>>
 	{
@@ -1084,8 +1084,8 @@ namespace ccm::support::fp
 		}
 
 		/**
-		 * @brief Converts the stored bits to a floating-point value.
-		 * @return The floating-point value of type T.
+		 * \brief Converts the stored bits to a floating-point value.
+		 * \return The floating-point value of type T.
 		 */
 		constexpr T get_val() const
 		{

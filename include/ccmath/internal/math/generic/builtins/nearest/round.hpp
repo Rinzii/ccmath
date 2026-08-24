@@ -74,7 +74,7 @@ namespace ccm::builtin
 {
 	// clang-format off
 	/**
-	 * @internal
+	 * \internal
 	 */
 	template <typename T>
 	inline constexpr bool has_constexpr_round =
@@ -85,7 +85,7 @@ namespace ccm::builtin
 		#endif
 
 	/**
-	 * @internal
+	 * \internal
 	 */
 	template <typename T>
 	inline constexpr bool has_constexpr_lround =
@@ -115,7 +115,7 @@ namespace ccm::builtin
 #endif
 
 	/**
-	 * @internal
+	 * \internal
 	 * Wrapper for constexpr __builtin_round functions.
 	 * This should be used internally and always be wrapped in an if constexpr statement.
 	 * It exists only to allow for usage of __builtin_round functions without triggering a compiler error
@@ -141,7 +141,7 @@ namespace ccm::builtin
 	}
 
 	/**
-	 * @internal
+	 * \internal
 	 * Wrapper for constexpr __builtin_lround functions.
 	 * This should be used internally and always be wrapped in an if constexpr statement.
 	 * It exists only to allow for usage of __builtin_lround functions without triggering a compiler error

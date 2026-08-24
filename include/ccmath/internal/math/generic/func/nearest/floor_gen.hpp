@@ -77,10 +77,10 @@ namespace ccm
 	} // namespace internal::impl
 
 	/**
-	 * @brief Computes the largest integer value not greater than num.
-	 * @tparam T The type of the number.
-	 * @param num A floating-point or integer value.
-	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
+	 * \brief Computes the largest integer value not greater than num.
+	 * \tparam T The type of the number.
+	 * \param num A floating-point or integer value.
+	 * \return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T floor(T num) noexcept
 	{
@@ -101,9 +101,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the largest integer value not greater than num.
-	 * @param num A integer value.
-	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
+	 * \brief Computes the largest integer value not greater than num.
+	 * \param num A integer value.
+	 * \return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double floor(Integer num) noexcept
 	{
@@ -111,9 +111,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the largest integer value not greater than num.
-	 * @param num A floating-point value.
-	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
+	 * \brief Computes the largest integer value not greater than num.
+	 * \param num A floating-point value.
+	 * \return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
 	 */
 	constexpr float floorf(float num) noexcept
 	{
@@ -121,9 +121,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the largest integer value not greater than num.
-	 * @param num A floating-point value.
-	 * @return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
+	 * \brief Computes the largest integer value not greater than num.
+	 * \param num A floating-point value.
+	 * \return If no errors occur, the largest integer value not greater than num, that is ⌊num⌋, is returned.
 	 */
 	constexpr double floorl(double num) noexcept
 	{
@@ -131,4 +131,4 @@ namespace ccm
 	}
 } // namespace ccm
 
-/// @ingroup nearest
+/// \ingroup nearest

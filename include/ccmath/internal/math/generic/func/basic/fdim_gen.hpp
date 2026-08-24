@@ -20,12 +20,12 @@
 namespace ccm::gen
 {
 	/**
-	 * @internal
-	 * @brief Computes the positive difference of two floating point values (max(0,x−y))
-	 * @tparam T A floating-point type.
-	 * @param x A floating-point or integer values
-	 * @param y A floating-point or integer values
-	 * @return If successful, returns the positive difference between x and y.
+	 * \internal
+	 * \brief Computes the positive difference of two floating point values (max(0,x−y))
+	 * \tparam T A floating-point type.
+	 * \param x A floating-point or integer values
+	 * \param y A floating-point or integer values
+	 * \return If successful, returns the positive difference between x and y.
 	 */
 	template <typename T> constexpr auto fdim(T x, T y) -> std::enable_if_t<std::is_floating_point_v<T>, T>
 	{

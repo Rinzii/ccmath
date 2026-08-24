@@ -20,11 +20,11 @@
 namespace ccm
 {
 	/**
-	 * @brief Computes the principal value of the arc tangent of y/x, using signs to determine quadrant.
-	 * @tparam T Floating-point type.
-	 * @param y Numerator component.
-	 * @param x Denominator component.
-	 * @return Angle in radians in the correct quadrant.
+	 * \brief Computes the principal value of the arc tangent of y/x, using signs to determine quadrant.
+	 * \tparam T Floating-point type.
+	 * \param y Numerator component.
+	 * \param x Denominator component.
+	 * \return Angle in radians in the correct quadrant.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T atan2(T y, T x)
 	{
@@ -50,10 +50,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes two-argument arc tangent for float inputs.
-	 * @param y Numerator component.
-	 * @param x Denominator component.
-	 * @return Angle in radians as float.
+	 * \brief Computes two-argument arc tangent for float inputs.
+	 * \param y Numerator component.
+	 * \param x Denominator component.
+	 * \return Angle in radians as float.
 	 */
 	constexpr float atan2f(float y, float x)
 	{
@@ -61,10 +61,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes two-argument arc tangent for long double inputs.
-	 * @param y Numerator component.
-	 * @param x Denominator component.
-	 * @return Angle in radians as long double.
+	 * \brief Computes two-argument arc tangent for long double inputs.
+	 * \param y Numerator component.
+	 * \param x Denominator component.
+	 * \return Angle in radians as long double.
 	 */
 	constexpr long double atan2l(long double y, long double x)
 	{
@@ -72,4 +72,4 @@ namespace ccm
 	}
 } // namespace ccm
 
-/// @ingroup trig
+/// \ingroup trig

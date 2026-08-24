@@ -160,6 +160,9 @@ Everything builds clean under `-Werror` with aggressive warnings.
 ## Comments
 
 Public entry points get Doxygen: `\brief`, `\param` or `\tparam`, and `\return`.
+Commands take the backslash form throughout. Doxygen accepts `@brief` as a synonym and
+warns about neither, so nothing in the toolchain catches a mixed file. Keeping one form is
+a review matter, and the tree is currently uniform.
 Implementation comments are for the why, not the what: the constraint, the tradeoff,
 the reason a builtin is or is not trusted. `pow.hpp` is a good model.
 

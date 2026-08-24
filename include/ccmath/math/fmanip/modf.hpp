@@ -20,11 +20,11 @@
 namespace ccm
 {
 	/**
-	 * @brief Decomposes a floating-point value into fractional and integral parts.
-	 * @tparam T Floating-point type.
-	 * @param x Floating-point value to split.
-	 * @param iptr Pointer that receives the integral part.
-	 * @return Fractional part of x, with the same sign as x.
+	 * \brief Decomposes a floating-point value into fractional and integral parts.
+	 * \tparam T Floating-point type.
+	 * \param x Floating-point value to split.
+	 * \param iptr Pointer that receives the integral part.
+	 * \return Fractional part of x, with the same sign as x.
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T modf(T x, T * iptr) noexcept
 	{
@@ -53,10 +53,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Decomposes a float into fractional and integral parts.
-	 * @param x Floating-point value to split.
-	 * @param iptr Pointer that receives the integral part.
-	 * @return Fractional part of x.
+	 * \brief Decomposes a float into fractional and integral parts.
+	 * \param x Floating-point value to split.
+	 * \param iptr Pointer that receives the integral part.
+	 * \return Fractional part of x.
 	 */
 	constexpr float modff(float x, float * iptr) noexcept
 	{
@@ -64,10 +64,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Decomposes a long double into fractional and integral parts.
-	 * @param x Floating-point value to split.
-	 * @param iptr Pointer that receives the integral part.
-	 * @return Fractional part of x.
+	 * \brief Decomposes a long double into fractional and integral parts.
+	 * \param x Floating-point value to split.
+	 * \param iptr Pointer that receives the integral part.
+	 * \return Fractional part of x.
 	 */
 	constexpr long double modfl(long double x, long double * iptr) noexcept
 	{

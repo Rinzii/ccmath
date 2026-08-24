@@ -34,7 +34,8 @@ A quick map of the repository:
 7. Mirror supported compiler behavior where the standard leaves details unspecified (for example `fpclassify` payload
    bits).
 8. Add tests in the same change. Cover standards-mandated edge cases and ULP checks on public APIs.
-9. Doxygen on exported entry points (`@brief`, `@param`, `@return`).
+9. Doxygen on exported entry points (`\brief`, `\param` or `\tparam`, `\return`). Use the backslash form, not the
+   at-sign form. See [CONVENTIONS.md](CONVENTIONS.md).
 10. Keep the public header layout and naming conventions aligned with [cppreference
     `<cmath>`](https://en.cppreference.com/w/cpp/header/cmath).
 

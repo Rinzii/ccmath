@@ -66,7 +66,7 @@ namespace ccm::builtin
 {
 	// clang-format off
 	/**
-	 * @internal
+	 * \internal
 	 */
 	template <typename T>
 	inline constexpr bool has_constexpr_fma =
@@ -76,7 +76,7 @@ namespace ccm::builtin
 			false;
 		#endif
 	/**
-	 * @internal
+	 * \internal
 	 */
 	template <typename T>
 	inline constexpr bool has_fma =
@@ -134,7 +134,7 @@ namespace ccm::builtin
 		runtime_builtin_fma_enabled && has_fma<T> && runtime_builtin_fma_validated_target && runtime_builtin_fma_long_double_supported<T>;
 
 	/**
-	 * @internal
+	 * \internal
 	 * Wrapper for constexpr __builtin_fma.
 	 * This should be used internally and always be wrapped in an if constexpr statement.
 	 * It exists only to allow for usage of __builtin_fma without triggering a compiler error
@@ -161,7 +161,7 @@ namespace ccm::builtin
 	}
 
 	/**
-	 * @internal
+	 * \internal
 	 * Wrapper for runtime __builtin_fma.
 	 * This should be used internally and always be wrapped in an if constexpr statement.
 	 * It exists only to allow for usage of __builtin_fma without triggering a compiler error

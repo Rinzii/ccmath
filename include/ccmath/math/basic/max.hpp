@@ -23,11 +23,11 @@
 namespace ccm
 {
 	/**
-	 * @brief Computes the larger of the two values.
-	 * @tparam T Type of the values to compare.
-	 * @param x Left-hand side of the comparison.
-	 * @param y Right-hand side of the comparison.
-	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
+	 * \brief Computes the larger of the two values.
+	 * \tparam T Type of the values to compare.
+	 * \param x Left-hand side of the comparison.
+	 * \param y Right-hand side of the comparison.
+	 * \return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename T> constexpr T max(T x, T y) noexcept
 	{
@@ -48,12 +48,12 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the larger of the two values.
-	 * @tparam T Type of left-hand side of the comparison.
-	 * @tparam U Type of right-hand side of the comparison.
-	 * @param x Left-hand side of the comparison.
-	 * @param y Right-hand side of the comparison.
-	 * @return Larger of x and y after converting both values to their common type.
+	 * \brief Computes the larger of the two values.
+	 * \tparam T Type of left-hand side of the comparison.
+	 * \tparam U Type of right-hand side of the comparison.
+	 * \param x Left-hand side of the comparison.
+	 * \param y Right-hand side of the comparison.
+	 * \return Larger of x and y after converting both values to their common type.
 	 */
 	template <typename T, typename U> constexpr auto max(T x, U y) noexcept
 	{
@@ -65,11 +65,11 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the larger of the two floating point values.
-	 * @tparam T Type of the values to compare.
-	 * @param x Left-hand side of the comparison.
-	 * @param y Right-hand side of the comparison.
-	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
+	 * \brief Computes the larger of the two floating point values.
+	 * \tparam T Type of the values to compare.
+	 * \param x Left-hand side of the comparison.
+	 * \param y Right-hand side of the comparison.
+	 * \return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename T> constexpr T fmax(T x, T y) noexcept
 	{
@@ -77,12 +77,12 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the larger of the two values.
-	 * @tparam T Type of left-hand side of the comparison.
-	 * @tparam U Type of right-hand side of the comparison.
-	 * @param x Left-hand side of the comparison.
-	 * @param y Right-hand side of the comparison.
-	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
+	 * \brief Computes the larger of the two values.
+	 * \tparam T Type of left-hand side of the comparison.
+	 * \tparam U Type of right-hand side of the comparison.
+	 * \param x Left-hand side of the comparison.
+	 * \param y Right-hand side of the comparison.
+	 * \return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename T, typename U> constexpr auto fmax(T x, U y) noexcept
 	{
@@ -94,10 +94,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the larger of the two floating point values.
-	 * @param x Left-hand side of the comparison.
-	 * @param y Right-hand side of the comparison.
-	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
+	 * \brief Computes the larger of the two floating point values.
+	 * \param x Left-hand side of the comparison.
+	 * \param y Right-hand side of the comparison.
+	 * \return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double fmax(Integer x, Integer y) noexcept
 	{
@@ -105,10 +105,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the larger of the two floating point values.
-	 * @param x Left-hand side of the comparison.
-	 * @param y Right-hand side of the comparison.
-	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
+	 * \brief Computes the larger of the two floating point values.
+	 * \param x Left-hand side of the comparison.
+	 * \param y Right-hand side of the comparison.
+	 * \return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
 	constexpr float fmaxf(float x, float y) noexcept
 	{
@@ -116,10 +116,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the larger of the two floating point values.
-	 * @param x Left-hand side of the comparison.
-	 * @param y Right-hand side of the comparison.
-	 * @return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
+	 * \brief Computes the larger of the two floating point values.
+	 * \param x Left-hand side of the comparison.
+	 * \param y Right-hand side of the comparison.
+	 * \return If successful, returns the larger of two floating point values. The value returned is exact and does not depend on any rounding modes.
 	 */
 	constexpr long double fmaxl(long double x, long double y) noexcept
 	{
@@ -127,4 +127,4 @@ namespace ccm
 	}
 } // namespace ccm
 
-/// @ingroup basic
+/// \ingroup basic

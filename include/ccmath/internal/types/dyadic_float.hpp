@@ -14,19 +14,19 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 /**
- * @internal
+ * \internal
  *
- * @file dyadic_float.hpp
- * @defgroup types
- * @brief Internal high-precision dyadic floating-point type for CCMath.
+ * \file dyadic_float.hpp
+ * \defgroup types
+ * \brief Internal high-precision dyadic floating-point type for CCMath.
  *
  * A high-precision floating-point type in dyadic form, that is a mantissa scaled by a
  * power of two. CCMath uses it internally for computations that do not fit inside the
  * standard floating-point types.
  *
- * @see ccmath/internal/support/fp/fp_bits.hpp
- * @see ccmath/internal/support/type_traits.hpp
- * @see ccmath/internal/types/big_int.hpp
+ * \see ccmath/internal/support/fp/fp_bits.hpp
+ * \see ccmath/internal/support/type_traits.hpp
+ * \see ccmath/internal/types/big_int.hpp
  */
 
 #pragma once
@@ -74,10 +74,10 @@ namespace ccm::types
 	}
 
 	/**
-	 * @internal
-	 * @ingroup types
+	 * \internal
+	 * \ingroup types
 	 *
-	 * @brief A class for high-precision floating point computations using a dyadic format.
+	 * \brief A class for high-precision floating point computations using a dyadic format.
 	 *
 	 * This class represents high-precision floating-point values in a dyadic format, consisting of three fields:
 	 * - <b>sign</b>: A boolean value where false indicates positive and true indicates negative.
@@ -85,22 +85,22 @@ namespace ccm::types
 	 * - <b>mantissa</b>: An unsigned integer of length Bits.
 	 *
 	 * The stored value is calculated as:
-	 * @code
+	 * \code
 	 * value = (-1)^sign * 2^exponent * (mantissa_as_unsigned_integer)
-	 * @endcode
+	 * \endcode
 	 *
 	 * The data is considered <em>normalized</em> if, for a non-zero mantissa, the leading bit is 1.
 	 * Constructors and most member functions ensure that their outputs are normalized.
 	 * To simplify and improve efficiency, many functions assume that the inputs are already normalized.
 	 *
-	 * @note <b>Edge Cases: </b>
+	 * \note <b>Edge Cases: </b>
 	 *  - <b>Zero mantissa</b>: A zero mantissa represents a signed zero (\c +0 or \c -0).
 	 *  - <b>Large exponents</b>: Extremely large exponents can lead to overflow behavior if converted to a standard
 	 *    floating-point type, potentially resulting in infinity.
 	 *  - <b>Small exponents</b>: Very small (negative) exponents can produce underflow or subnormal values when converted.
 	 *    Depending on rounding mode and whether exceptions are signaled, this can raise \c FE_UNDERFLOW or set \c errno.
 	 *
-	 * @tparam Bits The length of the mantissa in bits.
+	 * \tparam Bits The length of the mantissa in bits.
 	 */
 	template <size_t Bits> struct DyadicFloat
 	{
@@ -129,12 +129,12 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Normalizes the mantissa, bringing the leading 1 bit to the most significant bit.
+		 * \brief Normalizes the mantissa, bringing the leading 1 bit to the most significant bit.
 		 *
 		 * This function shifts the mantissa so that the leading 1 bit is in the most significant bit position.
 		 * It adjusts the exponent accordingly.
 		 *
-		 * @return A reference to the normalized DyadicFloat.
+		 * \return A reference to the normalized DyadicFloat.
 		 */
 		constexpr DyadicFloat & normalize()
 		{
@@ -148,13 +148,13 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Shifts the mantissa left to align exponents. Output might not be normalized.
+		 * \brief Shifts the mantissa left to align exponents. Output might not be normalized.
 		 *
 		 * This function shifts the mantissa left by the specified number of bits to help align exponents.
 		 * The exponent is adjusted accordingly. The result may not be normalized.
 		 *
-		 * @param shift_length The number of bits to shift left.
-		 * @return A reference to the DyadicFloat after shifting.
+		 * \param shift_length The number of bits to shift left.
+		 * \return A reference to the DyadicFloat after shifting.
 		 */
 		constexpr DyadicFloat & shift_left(unsigned shift_length)
 		{
@@ -171,13 +171,13 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Shifts the mantissa right to align exponents. Output might not be normalized.
+		 * \brief Shifts the mantissa right to align exponents. Output might not be normalized.
 		 *
 		 * This function shifts the mantissa right by the specified number of bits to help align exponents.
 		 * The exponent is adjusted accordingly. The result may not be normalized.
 		 *
-		 * @param shift_length The number of bits to shift right.
-		 * @return A reference to the DyadicFloat after shifting.
+		 * \param shift_length The number of bits to shift right.
+		 * \return A reference to the DyadicFloat after shifting.
 		 */
 		constexpr DyadicFloat & shift_right(unsigned shift_length)
 		{
@@ -194,9 +194,9 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Returns the unbiased exponent, assuming normalization.
+		 * \brief Returns the unbiased exponent, assuming normalization.
 		 *
-		 * @return The unbiased exponent.
+		 * \return The unbiased exponent.
 		 */
 		[[nodiscard]] constexpr int get_unbiased_exponent() const
 		{
@@ -347,7 +347,7 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Converts this DyadicFloat to the specified floating-point type \p T.
+		 * \brief Converts this DyadicFloat to the specified floating-point type \p T.
 		 *
 		 * This function treats the current DyadicFloat (with sign, exponent, and mantissa)
 		 * as a normalized number and constructs a floating-point value of type \p T.
@@ -362,11 +362,11 @@ namespace ccm::types
 		 *   resulting in a subnormal value. This may raise FE_UNDERFLOW if \p ShouldSignalExceptions
 		 *   is set.
 		 *
-		 * @tparam T A floating-point type (e.g., float, double) that satisfies
+		 * \tparam T A floating-point type (e.g., float, double) that satisfies
 		 *           \code std::is_floating_point_v<T> && (support::fp::FPBits<T>::fraction_length < Bits) \endcode.
-		 * @tparam ShouldSignalExceptions If true, overflow and underflow conditions may
+		 * \tparam ShouldSignalExceptions If true, overflow and underflow conditions may
 		 *                                raise floating-point exceptions or set \c errno.
-		 * @return A value of type \p T, which is the rounded result of converting
+		 * \return A value of type \p T, which is the rounded result of converting
 		 *         this DyadicFloat to \p T.
 		 */
 
@@ -488,20 +488,20 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Converts this normalized DyadicFloat to a floating-point type \p T.
+		 * \brief Converts this normalized DyadicFloat to a floating-point type \p T.
 		 *
 		 * This function is a thin wrapper around fast_as<T, ShouldSignalExceptions>(),
 		 * ensuring that the result is correctly rounded according to the current rounding mode.
 		 * It assumes that the internal representation (sign, exponent, mantissa) is already
 		 * normalized.
 		 *
-		 * @tparam T A floating-point type (e.g., float, double, etc.) satisfying
+		 * \tparam T A floating-point type (e.g., float, double, etc.) satisfying
 		 *           \code std::is_floating_point_v<T> && (support::fp::FPBits<T>::fraction_length < Bits) \endcode.
-		 * @tparam ShouldSignalExceptions If true, overflow or underflow conditions may
+		 * \tparam ShouldSignalExceptions If true, overflow or underflow conditions may
 		 *                                raise floating-point exceptions (e.g., FE_OVERFLOW, FE_UNDERFLOW)
 		 *                                and set \c errno if required.
 		 *
-		 * @return A floating-point value of type \p T that reflects the conversion.
+		 * \return A floating-point value of type \p T that reflects the conversion.
 		 */
 		template <typename T,
 				  bool ShouldSignalExceptions,
@@ -512,17 +512,17 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Explicitly converts this DyadicFloat to the floating-point type \p T,
+		 * \brief Explicitly converts this DyadicFloat to the floating-point type \p T,
 		 *        without signaling floating-point exceptions.
 		 *
 		 * This operator invokes as<T, false>(), meaning
 		 * it will not raise exceptions or set \c errno on overflow or underflow.
 		 * If you need to handle exceptions, use as<T, true>() instead.
 		 *
-		 * @tparam T A floating-point type (e.g., float, double, etc.) satisfying
+		 * \tparam T A floating-point type (e.g., float, double, etc.) satisfying
 		 *           \code std::is_floating_point_v<T> && (support::fp::FPBits<T>::fraction_length < Bits) \endcode.
 		 *
-		 * @return The resulting value of type \p T.
+		 * \return The resulting value of type \p T.
 		 */
 		template <typename T, typename = std::enable_if_t<std::is_floating_point_v<T> && (support::fp::FPBits<T>::fraction_length < Bits), void>>
 		explicit constexpr operator T() const
@@ -606,7 +606,7 @@ namespace ccm::types
 	};
 
 	/**
-	 * @brief Adds two DyadicFloat values with rounding toward zero, then normalizes
+	 * \brief Adds two DyadicFloat values with rounding toward zero, then normalizes
 	 * the result.
 	 *
 	 * The algorithm:
@@ -623,14 +623,14 @@ namespace ccm::types
 	 * \f]
 	 * which corresponds to up to 2 ULPs of error.
 	 *
-	 * @note
+	 * \note
 	 * It is assumed that both inputs are already normalized by their constructors
 	 * or other functions. If not, the results can lose precision significantly.
 	 *
-	 * @tparam Bits The number of bits used in the DyadicFloat.
-	 * @param a First DyadicFloat operand.
-	 * @param b Second DyadicFloat operand.
-	 * @return A DyadicFloat<Bits> representing the approximate sum of \p a and \p b.
+	 * \tparam Bits The number of bits used in the DyadicFloat.
+	 * \param a First DyadicFloat operand.
+	 * \param b Second DyadicFloat operand.
+	 * \return A DyadicFloat<Bits> representing the approximate sum of \p a and \p b.
 	 */
 	template <size_t Bits> constexpr DyadicFloat<Bits> quick_add(DyadicFloat<Bits> a, DyadicFloat<Bits> b)
 	{
@@ -688,7 +688,7 @@ namespace ccm::types
 	}
 
 	/**
-	 * @brief
+	 * \brief
 	 * Slightly less accurate but efficient multiplication of two dyadic floats with
 	 * rounding toward 0, followed by normalization of the output.
 	 *
@@ -697,19 +697,19 @@ namespace ccm::types
 	 *   - result.mantissa = quick_mul_hi(a.mantissa + b.mantissa)
 	 *                      ~ (full product a.mantissa * b.mantissa) >> Bits
 	 *
-	 * @note
+	 * \note
 	 * The error compared to the exact mathematical product is bounded by:
 	 *   2 * errors of quick_mul_hi = 2 * (UInt<Bits>::WORD_COUNT - 1) in ULPs.
 	 *
-	 * @warning
+	 * \warning
 	 * It is assumed that both inputs are normalized by their constructors or other functions.
 	 * If they are not normalized, this function's results may lose
 	 * precision significantly.
 	 *
-	 * @tparam Bits The number of bits used in the DyadicFloat.
-	 * @param a First dyadic float.
-	 * @param b Second dyadic float.
-	 * @return A new DyadicFloat<Bits> representing the approximate product.
+	 * \tparam Bits The number of bits used in the DyadicFloat.
+	 * \param a First dyadic float.
+	 * \param b Second dyadic float.
+	 * \return A new DyadicFloat<Bits> representing the approximate product.
 	 */
 	template <size_t Bits> constexpr DyadicFloat<Bits> quick_mul(DyadicFloat<Bits> a, DyadicFloat<Bits> b)
 	{
@@ -734,16 +734,16 @@ namespace ccm::types
 	}
 
 	/**
-	 * @brief Simple polynomial approximation using multiply-add.
+	 * \brief Simple polynomial approximation using multiply-add.
 	 *
-	 * This function computes the product of @p a and @p b via quick_mul(),
-	 * then adds @p c to the result using quick_add().
+	 * This function computes the product of \p a and \p b via quick_mul(),
+	 * then adds \p c to the result using quick_add().
 	 *
-	 * @tparam Bits The number of bits used in the DyadicFloat.
-	 * @param a First dyadic float.
-	 * @param b Second dyadic float.
-	 * @param c The dyadic float to be added to the product of \p a and \p b.
-	 * @return A new DyadicFloat<Bits> containing the result of \p c + (\p a * \p b).
+	 * \tparam Bits The number of bits used in the DyadicFloat.
+	 * \param a First dyadic float.
+	 * \param b Second dyadic float.
+	 * \param c The dyadic float to be added to the product of \p a and \p b.
+	 * \return A new DyadicFloat<Bits> containing the result of \p c + (\p a * \p b).
 	 */
 	template <size_t Bits> constexpr DyadicFloat<Bits> multiply_add(const DyadicFloat<Bits> & a, const DyadicFloat<Bits> & b, const DyadicFloat<Bits> & c)
 	{
@@ -751,17 +751,17 @@ namespace ccm::types
 	}
 
 	/**
-	 * @brief Simple exponentiation implementation for printing or other use.
+	 * \brief Simple exponentiation implementation for printing or other use.
 	 *
-	 * This function computes \f$a^\text{power}\f$ by repeatedly squaring @p a
-	 * (stored as @p cur_power) and multiplying it into @p result when the current
-	 * bit of @p power is set (using quick_mul()). Only positive exponents are
+	 * This function computes \f$a^\text{power}\f$ by repeatedly squaring \p a
+	 * (stored as \p cur_power) and multiplying it into \p result when the current
+	 * bit of \p power is set (using quick_mul()). Only positive exponents are
 	 * supported. Use rounded_div for general division.
 	 *
-	 * @tparam Bits The number of bits used in the DyadicFloat.
-	 * @param a The base DyadicFloat.
-	 * @param power The positive exponent.
-	 * @return A DyadicFloat<Bits> representing \f$a^\text{power}\f$.
+	 * \tparam Bits The number of bits used in the DyadicFloat.
+	 * \param a The base DyadicFloat.
+	 * \param power The positive exponent.
+	 * \return A DyadicFloat<Bits> representing \f$a^\text{power}\f$.
 	 */
 	template <size_t Bits> constexpr DyadicFloat<Bits> pow_n(DyadicFloat<Bits> a, uint32_t power)
 	{
@@ -781,17 +781,17 @@ namespace ccm::types
 	}
 
 	/**
-	 * @brief Multiplies a DyadicFloat by \f$2^{\text{pow\_2}}\f$.
+	 * \brief Multiplies a DyadicFloat by \f$2^{\text{pow\_2}}\f$.
 	 *
-	 * This function modifies the exponent of @p a by adding @p pow_2 to effectively
-	 * multiply @p a by \f$2^{\text{pow\_2}}\f$.
+	 * This function modifies the exponent of \p a by adding \p pow_2 to effectively
+	 * multiply \p a by \f$2^{\text{pow\_2}}\f$.
 	 *
-	 * @tparam Bits The number of bits used in the DyadicFloat.
-	 * @param a The DyadicFloat to be scaled.
-	 * @param pow_2 The exponent shift. A positive value means multiplying by
+	 * \tparam Bits The number of bits used in the DyadicFloat.
+	 * \param a The DyadicFloat to be scaled.
+	 * \param pow_2 The exponent shift. A positive value means multiplying by
 	 * \f$2^{\text{pow\_2}}\f$, while a negative value means dividing by
 	 * \f$2^{-\text{pow\_2}}\f$.
-	 * @return The result of \f$a \times 2^{\text{pow\_2}}\f$.
+	 * \return The result of \f$a \times 2^{\text{pow\_2}}\f$.
 	 */
 	template <size_t Bits> constexpr DyadicFloat<Bits> mul_pow_2(DyadicFloat<Bits> a, int32_t pow_2)
 	{

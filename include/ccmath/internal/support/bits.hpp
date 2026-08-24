@@ -123,9 +123,9 @@ namespace ccm::support
 	}
 
 	/**
-	 * @brief Helper function to get the top 16-bits of a double.
-	 * @param x Double to get the bits from.
-	 * @return
+	 * \brief Helper function to get the top 16-bits of a double.
+	 * \param x Double to get the bits from.
+	 * \return
 	 */
 	constexpr std::uint32_t top16_bits_of_double(double x) noexcept
 	{
@@ -183,7 +183,7 @@ namespace ccm::support
 	}
 
 	/**
-	 * @brief Rotates unsigned integer bits to the right.
+	 * \brief Rotates unsigned integer bits to the right.
 	 * https://en.cppreference.com/w/cpp/numeric/rotr
 	 */
 	template <class T, std::enable_if_t<traits::ccm_is_unsigned_v<T>, bool> = true> constexpr T rotr(T t, int cnt) noexcept
@@ -220,7 +220,7 @@ namespace ccm::support
 	}
 
 	/**
-	 * @brief Rotates unsigned integer bits to the left.
+	 * \brief Rotates unsigned integer bits to the left.
 	 * https://en.cppreference.com/w/cpp/numeric/rotl
 	 */
 	template <class T, std::enable_if_t<traits::ccm_is_unsigned_v<T>, bool> = true> constexpr T rotl(T t, int cnt) noexcept
@@ -254,7 +254,7 @@ namespace ccm::support
 
 #if CCM_HAS_BUILTIN(__builtin_ctzg)
 	/**
-	 * @brief Returns the number of consecutive 0 bits in the value of x, starting from the least significant bit ("right").
+	 * \brief Returns the number of consecutive 0 bits in the value of x, starting from the least significant bit ("right").
 	 * https://en.cppreference.com/w/cpp/numeric/countr_zero
 	 */
 	template <typename T> [[nodiscard]] constexpr std::enable_if_t<ccm::support::traits::ccm_is_unsigned_v<T>, int> countr_zero(T value)
@@ -263,7 +263,7 @@ namespace ccm::support
 	}
 #else  // !CCM_HAS_BUILTIN(__builtin_ctzg)
 	/**
-	 * @brief Returns the number of consecutive 0 bits in the value of x, starting from the least significant bit ("right").
+	 * \brief Returns the number of consecutive 0 bits in the value of x, starting from the least significant bit ("right").
 	 * https://en.cppreference.com/w/cpp/numeric/countr_zero
 	 */
 	template <typename T> [[nodiscard]] constexpr std::enable_if_t<traits::ccm_is_unsigned_v<T>, int> countr_zero(T value)
@@ -384,7 +384,7 @@ namespace ccm::support
 	}
 
 	/**
-	 * @brief Returns the smallest power of 2 that is greater than or equal to x.
+	 * \brief Returns the smallest power of 2 that is greater than or equal to x.
 	 */
 	template <typename T>
 	constexpr std::enable_if_t<std::is_same_v<T, unsigned char> || std::is_same_v<T, unsigned short> || std::is_same_v<T, unsigned int> ||

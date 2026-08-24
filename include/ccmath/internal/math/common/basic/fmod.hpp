@@ -18,7 +18,7 @@
 
 namespace ccm
 {
-	/// @cond CCMATH_INTERNAL
+	/// \cond CCMATH_INTERNAL
 	namespace internal::impl
 	{
 		template <typename T> constexpr T fmod_impl_check(T x, T y) noexcept
@@ -70,15 +70,15 @@ namespace ccm
 			return fmod_impl_check(static_cast<TC>(x), static_cast<TC>(y));
 		}
 	} // namespace internal::impl
-	/// @endcond
+	/// \endcond
 
 	/**
-	 * @brief Returns the floating-point remainder of the division operation x/y.
-	 * @note Some edge cases where NaN is returned are different from std::fmod due to the standard allowing implementation based returns.
-	 * @tparam T A floating-point type.
-	 * @param x A floating-point value.
-	 * @param y A floating-point value.
-	 * @return The floating-point remainder of the division operation x/y.
+	 * \brief Returns the floating-point remainder of the division operation x/y.
+	 * \note Some edge cases where NaN is returned are different from std::fmod due to the standard allowing implementation based returns.
+	 * \tparam T A floating-point type.
+	 * \param x A floating-point value.
+	 * \param y A floating-point value.
+	 * \return The floating-point remainder of the division operation x/y.
 	 */
 	template <typename Real, std::enable_if_t<std::is_floating_point_v<Real>, bool> = true> constexpr Real fmod(Real x, Real y)
 	{
@@ -86,11 +86,11 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Returns the floating-point remainder of the division operation x/y.
-	 * @tparam Integer An integral type.
-	 * @param x An integral value.
-	 * @param y An integral value.
-	 * @return The floating-point remainder of the division operation x/y.
+	 * \brief Returns the floating-point remainder of the division operation x/y.
+	 * \tparam Integer An integral type.
+	 * \param x An integral value.
+	 * \param y An integral value.
+	 * \return The floating-point remainder of the division operation x/y.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double fmod(Integer x, Integer y)
 	{
@@ -98,12 +98,12 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Returns the floating-point remainder of the division operation x/y.
-	 * @tparam T A floating-point or integral type.
-	 * @tparam U A floating-point or integral type.
-	 * @param x A floating-point or integral value.
-	 * @param y A floating-point or integral value.
-	 * @return The floating-point remainder of the division operation x/y.
+	 * \brief Returns the floating-point remainder of the division operation x/y.
+	 * \tparam T A floating-point or integral type.
+	 * \tparam U A floating-point or integral type.
+	 * \param x A floating-point or integral value.
+	 * \param y A floating-point or integral value.
+	 * \return The floating-point remainder of the division operation x/y.
 	 */
 	template <typename T, typename U> constexpr auto fmod(T x, T y)
 	{
@@ -111,10 +111,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Returns the floating-point remainder of the division operation x/y.
-	 * @param x A floating-point value.
-	 * @param y A floating-point value.
-	 * @return The floating-point remainder of the division operation x/y.
+	 * \brief Returns the floating-point remainder of the division operation x/y.
+	 * \param x A floating-point value.
+	 * \param y A floating-point value.
+	 * \return The floating-point remainder of the division operation x/y.
 	 */
 	constexpr float fmodf(float x, float y)
 	{
@@ -122,10 +122,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Returns the floating-point remainder of the division operation x/y.
-	 * @param x A floating-point value.
-	 * @param y A floating-point value.
-	 * @return The floating-point remainder of the division operation x/y.
+	 * \brief Returns the floating-point remainder of the division operation x/y.
+	 * \param x A floating-point value.
+	 * \param y A floating-point value.
+	 * \return The floating-point remainder of the division operation x/y.
 	 */
 	constexpr long double fmodl(long double x, long double y)
 	{
@@ -133,4 +133,4 @@ namespace ccm
 	}
 } // namespace ccm
 
-/// @ingroup basic
+/// \ingroup basic

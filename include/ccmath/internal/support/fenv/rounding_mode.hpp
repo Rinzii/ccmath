@@ -26,8 +26,8 @@
 namespace ccm::support::fenv
 {
 	/**
-	 * @brief The rounding mode ccmath assumes while a function is being constant-evaluated.
-	 * @return CCM_CONSTEXPR_ROUNDING_MODE, which defaults to FE_TONEAREST.
+	 * \brief The rounding mode ccmath assumes while a function is being constant-evaluated.
+	 * \return CCM_CONSTEXPR_ROUNDING_MODE, which defaults to FE_TONEAREST.
 	 */
 	constexpr int constant_eval_rounding_mode() noexcept
 	{
@@ -63,8 +63,8 @@ namespace ccm::support::fenv
 	} // namespace internal
 
 	/**
-	 * @brief Free-standing function that tests whether fegetround() == FE_UPWARD using common floating point observations.
-	 * @return True if the rounding mode is set to FE_UPWARD, false otherwise.
+	 * \brief Free-standing function that tests whether fegetround() == FE_UPWARD using common floating point observations.
+	 * \return True if the rounding mode is set to FE_UPWARD, false otherwise.
 	 */
 	constexpr bool rounding_mode_is_round_up()
 	{
@@ -76,8 +76,8 @@ namespace ccm::support::fenv
 	}
 
 	/**
-	 * @brief Free-standing function that tests whether fegetround() == FE_DOWNWARD using common floating point observations.
-	 * @return True if the rounding mode is set to FE_DOWNWARD, false otherwise.
+	 * \brief Free-standing function that tests whether fegetround() == FE_DOWNWARD using common floating point observations.
+	 * \return True if the rounding mode is set to FE_DOWNWARD, false otherwise.
 	 */
 	constexpr bool rounding_mode_is_round_down()
 	{
@@ -89,8 +89,8 @@ namespace ccm::support::fenv
 	}
 
 	/**
-	 * @brief Quick free-standing function that tests whether fegetround() == FE_TONEAREST using common floating point observations.
-	 * @return True if the rounding mode is set to FE_TONEAREST, false otherwise.
+	 * \brief Quick free-standing function that tests whether fegetround() == FE_TONEAREST using common floating point observations.
+	 * \return True if the rounding mode is set to FE_TONEAREST, false otherwise.
 	 */
 	constexpr bool rounding_mode_is_round_to_nearest()
 	{
@@ -102,8 +102,8 @@ namespace ccm::support::fenv
 	}
 
 	/**
-	 * @brief Free-standing function that tests whether fegetround() == FE_TOWARDZERO using common floating point observations.
-	 * @return True if the rounding mode is set to FE_TOWARDZERO, false otherwise.
+	 * \brief Free-standing function that tests whether fegetround() == FE_TOWARDZERO using common floating point observations.
+	 * \return True if the rounding mode is set to FE_TOWARDZERO, false otherwise.
 	 */
 	constexpr bool rounding_mode_is_round_to_zero()
 	{
@@ -115,8 +115,8 @@ namespace ccm::support::fenv
 	}
 
 	/**
-	 * @brief Free-standing function that identifies the current rounding mode.
-	 * @return The current rounding mode.
+	 * \brief Free-standing function that identifies the current rounding mode.
+	 * \return The current rounding mode.
 	 */
 	constexpr int get_rounding_mode()
 	{

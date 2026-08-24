@@ -16,12 +16,12 @@
 namespace ccm
 {
 	/**
-	 * @brief Performs linear interpolation between a and b using t.
-	 * @tparam T Arithmetic type.
-	 * @param a Start value.
-	 * @param b End value.
-	 * @param t Interpolation factor.
-	 * @return Interpolated value equivalent to a + t * (b - a) with stability handling for edge cases.
+	 * \brief Performs linear interpolation between a and b using t.
+	 * \tparam T Arithmetic type.
+	 * \param a Start value.
+	 * \param b End value.
+	 * \param t Interpolation factor.
+	 * \return Interpolated value equivalent to a + t * (b - a) with stability handling for edge cases.
 	 */
 	template <typename T> constexpr T lerp(T a, T b, T t) noexcept
 	{
@@ -50,14 +50,14 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Performs linear interpolation after promoting arguments to a common arithmetic type.
-	 * @tparam T Arithmetic type of a.
-	 * @tparam U Arithmetic type of b.
-	 * @tparam V Arithmetic type of t.
-	 * @param a Start value.
-	 * @param b End value.
-	 * @param t Interpolation factor.
-	 * @return Interpolated value in the common type of T, U, and V.
+	 * \brief Performs linear interpolation after promoting arguments to a common arithmetic type.
+	 * \tparam T Arithmetic type of a.
+	 * \tparam U Arithmetic type of b.
+	 * \tparam V Arithmetic type of t.
+	 * \param a Start value.
+	 * \param b End value.
+	 * \param t Interpolation factor.
+	 * \return Interpolated value in the common type of T, U, and V.
 	 */
 	template <typename T, typename U, typename V>
 	constexpr std::enable_if_t<std::is_arithmetic_v<T> && std::is_arithmetic_v<U> && std::is_arithmetic_v<V>, std::common_type_t<T, U, V>>
@@ -69,13 +69,13 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Deprecated fallback implementation of linear interpolation.
-	 * @tparam T Arithmetic type.
-	 * @param a Start value.
-	 * @param b End value.
-	 * @param t Interpolation factor.
-	 * @return Interpolated value from the previous implementation.
-	 * @deprecated Use ccm::lerp instead.
+	 * \brief Deprecated fallback implementation of linear interpolation.
+	 * \tparam T Arithmetic type.
+	 * \param a Start value.
+	 * \param b End value.
+	 * \param t Interpolation factor.
+	 * \return Interpolated value from the previous implementation.
+	 * \deprecated Use ccm::lerp instead.
 	 */
 	template <typename T>
 	[[maybe_unused]] [[deprecated(

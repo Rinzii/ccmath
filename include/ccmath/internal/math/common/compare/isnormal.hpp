@@ -18,10 +18,10 @@
 namespace ccm
 {
 	/**
-	 * @brief Checks if the given number has a normal value.
-	 * @tparam T The type of the number.
-	 * @param num A floating-point or integer value
-	 * @return true if the number has a normal value, false otherwise.
+	 * \brief Checks if the given number has a normal value.
+	 * \tparam T The type of the number.
+	 * \param num A floating-point or integer value
+	 * \return true if the number has a normal value, false otherwise.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr bool isnormal(T num) noexcept
 	{
@@ -35,10 +35,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Checks if the given number has a normal value.
-	 * @tparam Integer The type of the integer.
-	 * @param num A integer value to check.
-	 * @return true if the number has a normal value, false otherwise.
+	 * \brief Checks if the given number has a normal value.
+	 * \tparam Integer The type of the integer.
+	 * \param num A integer value to check.
+	 * \return true if the number has a normal value, false otherwise.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr bool isnormal(Integer num) noexcept
 	{

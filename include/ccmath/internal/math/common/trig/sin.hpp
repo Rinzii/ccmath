@@ -50,4 +50,4 @@ namespace ccm
 	}
 } // namespace ccm
 
-/// @ingroup trig
+/// \ingroup trig

@@ -20,10 +20,10 @@
 namespace ccm
 {
 	/**
-	 * @brief Computes the natural logarithm of the absolute value of the gamma function.
-	 * @tparam T floating-point or integer type
-	 * @param num floating-point or integer value
-	 * @return If no errors occur, the natural logarithm of the absolute value of the gamma function at num is returned.
+	 * \brief Computes the natural logarithm of the absolute value of the gamma function.
+	 * \tparam T floating-point or integer type
+	 * \param num floating-point or integer value
+	 * \return If no errors occur, the natural logarithm of the absolute value of the gamma function at num is returned.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T lgamma(T num)
 	{
@@ -48,10 +48,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes log-gamma after promoting an integer input to double.
-	 * @tparam Integer Integral type.
-	 * @param num Integer value.
-	 * @return Natural logarithm of |gamma(num)| as double.
+	 * \brief Computes log-gamma after promoting an integer input to double.
+	 * \tparam Integer Integral type.
+	 * \param num Integer value.
+	 * \return Natural logarithm of |gamma(num)| as double.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double lgamma(Integer num)
 	{
@@ -59,9 +59,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes log-gamma for float.
-	 * @param num Floating-point value.
-	 * @return Natural logarithm of |gamma(num)| as float.
+	 * \brief Computes log-gamma for float.
+	 * \param num Floating-point value.
+	 * \return Natural logarithm of |gamma(num)| as float.
 	 */
 	constexpr float lgammaf(float num)
 	{
@@ -69,9 +69,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes log-gamma for long double.
-	 * @param num Floating-point value.
-	 * @return Natural logarithm of |gamma(num)| as long double.
+	 * \brief Computes log-gamma for long double.
+	 * \param num Floating-point value.
+	 * \return Natural logarithm of |gamma(num)| as long double.
 	 */
 	constexpr long double lgammal(long double num)
 	{

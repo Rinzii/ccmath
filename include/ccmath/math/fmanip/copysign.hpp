@@ -20,11 +20,11 @@
 namespace ccm
 {
 	/**
-	 * @brief Copies the sign of a floating point or integer value.
-	 * @tparam T Type of the floating-point or integer value.
-	 * @param mag A floating-point or integer value
-	 * @param sgn A floating-point or integer value
-	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
+	 * \brief Copies the sign of a floating point or integer value.
+	 * \tparam T Type of the floating-point or integer value.
+	 * \param mag A floating-point or integer value
+	 * \param sgn A floating-point or integer value
+	 * \return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T copysign(T mag, T sgn)
 	{
@@ -53,11 +53,11 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Copies the sign of an integer value.
-	 * @tparam Integer Type of the integer value.
-	 * @param mag A integer value
-	 * @param sgn A integer value
-	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
+	 * \brief Copies the sign of an integer value.
+	 * \tparam Integer Type of the integer value.
+	 * \param mag A integer value
+	 * \param sgn A integer value
+	 * \return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double copysign(Integer mag, Integer sgn)
 	{
@@ -65,10 +65,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Copies the sign of a floating point value.
-	 * @param mag A floating-point.
-	 * @param sgn A floating-point.
-	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
+	 * \brief Copies the sign of a floating point value.
+	 * \param mag A floating-point.
+	 * \param sgn A floating-point.
+	 * \return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
 	 */
 	constexpr float copysignf(float mag, float sgn)
 	{
@@ -76,10 +76,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Copies the sign of a floating point value.
-	 * @param mag A floating-point.
-	 * @param sgn A floating-point.
-	 * @return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
+	 * \brief Copies the sign of a floating point value.
+	 * \param mag A floating-point.
+	 * \param sgn A floating-point.
+	 * \return If no errors occur, the floating point value with the magnitude of mag and the sign of sgn is returned.
 	 */
 	constexpr long double copysignl(long double mag, long double sgn)
 	{

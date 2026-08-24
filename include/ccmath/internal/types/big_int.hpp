@@ -42,7 +42,7 @@ namespace ccm::types
 	{
 
 		/**
-		 * @brief Type trait that maps unsigned integers to their corresponding half-width types.
+		 * \brief Type trait that maps unsigned integers to their corresponding half-width types.
 		 *
 		 * This struct provides a type alias for the half-width equivalent of the given unsigned integer type.
 		 * For example, std::uint32_t maps to std::uint16_t.
@@ -64,12 +64,12 @@ namespace ccm::types
 #endif
 
 		/**
-		 * @brief Alias for the half-width type of the given unsigned integer type.
+		 * \brief Alias for the half-width type of the given unsigned integer type.
 		 */
 		template <typename T> using half_width_t = typename half_width<T>::type;
 
 		/**
-		 * @brief An array of two elements for use in multiword operations.
+		 * \brief An array of two elements for use in multiword operations.
 		 *
 		 * This struct provides a two-element array, useful for operations that require handling multiword data.
 		 */
@@ -79,18 +79,18 @@ namespace ccm::types
 			using UP::UP;
 
 			/**
-			 * @brief Constructs a DoubleWide with the given low and high values.
-			 * @param lo The low part of the double-wide value.
-			 * @param hi The high part of the double-wide value.
+			 * \brief Constructs a DoubleWide with the given low and high values.
+			 * \param lo The low part of the double-wide value.
+			 * \param hi The high part of the double-wide value.
 			 */
 			constexpr DoubleWide(T lo, T hi) : UP({ lo, hi }) {}
 		};
 
 		/**
-		 * @brief Splits an unsigned value into a DoubleWide containing its half-width components.
-		 * @tparam T The type of the input value, which must be an unsigned integer.
-		 * @param value The unsigned integer value to be split.
-		 * @return A DoubleWide object containing the lower and upper half-width parts of the input value.
+		 * \brief Splits an unsigned value into a DoubleWide containing its half-width components.
+		 * \tparam T The type of the input value, which must be an unsigned integer.
+		 * \param value The unsigned integer value to be split.
+		 * \return A DoubleWide object containing the lower and upper half-width parts of the input value.
 		 */
 		template <typename T> constexpr auto split(T value)
 		{
@@ -100,10 +100,10 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Returns the lower half of a DoubleWide value.
-		 * @tparam T The type of the DoubleWide value.
-		 * @param value The DoubleWide value to split.
-		 * @return The lower half of the DoubleWide value.
+		 * \brief Returns the lower half of a DoubleWide value.
+		 * \tparam T The type of the DoubleWide value.
+		 * \param value The DoubleWide value to split.
+		 * \return The lower half of the DoubleWide value.
 		 */
 		template <typename T> constexpr T lo(const DoubleWide<T> & value)
 		{
@@ -111,10 +111,10 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Returns the upper half of a DoubleWide value.
-		 * @tparam T The type of the DoubleWide value.
-		 * @param value The DoubleWide value to split.
-		 * @return The upper half of the DoubleWide value.
+		 * \brief Returns the upper half of a DoubleWide value.
+		 * \tparam T The type of the DoubleWide value.
+		 * \param value The DoubleWide value to split.
+		 * \return The upper half of the DoubleWide value.
 		 */
 		template <typename T> constexpr T hi(const DoubleWide<T> & value)
 		{
@@ -122,10 +122,10 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Returns the lower half of a unsigned value
-		 * @tparam T The type of the input value, which must be an unsigned integer.
-		 * @param value The unsigned integer value to be split.
-		 * @return The lower half of the input value.
+		 * \brief Returns the lower half of a unsigned value
+		 * \tparam T The type of the input value, which must be an unsigned integer.
+		 * \param value The unsigned integer value to be split.
+		 * \return The lower half of the input value.
 		 */
 		template <typename T> constexpr half_width_t<T> lo(T value)
 		{
@@ -133,10 +133,10 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Returns the upper half of a unsigned value
-		 * @tparam T The type of the input value, which must be an unsigned integer.
-		 * @param value The unsigned integer value to be split.
-		 * @return The upper half of the input value.
+		 * \brief Returns the upper half of a unsigned value
+		 * \tparam T The type of the input value, which must be an unsigned integer.
+		 * \param value The unsigned integer value to be split.
+		 * \return The upper half of the input value.
 		 */
 		template <typename T> constexpr half_width_t<T> hi(T value)
 		{
@@ -144,15 +144,15 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Multiplies two words and returns the result as a DoubleWide containing the product.
+		 * \brief Multiplies two words and returns the result as a DoubleWide containing the product.
 		 *
 		 * This function performs multiplication of two words (unsigned integers) and returns the result
 		 * in a DoubleWide object, which stores the product in two parts (lower and upper half-width components).
 		 *
-		 * @tparam word The type of the input values, which must be an unsigned integer type.
-		 * @param lhs The left-hand side operand.
-		 * @param rhs The right-hand side operand.
-		 * @return A DoubleWide object containing the lower and upper parts of the product.
+		 * \tparam word The type of the input values, which must be an unsigned integer type.
+		 * \param lhs The left-hand side operand.
+		 * \param rhs The right-hand side operand.
+		 * \return A DoubleWide object containing the lower and upper parts of the product.
 		 *
 		 * This function uses different multiplication strategies based on the size of the input type:
 		 * - For 8-bit and 16-bit types, it performs a straightforward multiplication and splits the result.
@@ -219,19 +219,19 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Performs in-place binary operation 'dst op= rhs' with carry propagation.
+		 * \brief Performs in-place binary operation 'dst op= rhs' with carry propagation.
 		 *
 		 * This function applies the provided binary operation with carry propagation to each element in the 'dst' array,
 		 * using elements from the 'rhs' array. It returns the final carry value.
 		 *
-		 * @tparam Function The type of the binary operation with carry.
-		 * @tparam word The type of the elements in the arrays.
-		 * @tparam N The size of the 'dst' array.
-		 * @tparam M The size of the 'rhs' array.
-		 * @param op_with_carry The binary operation function that includes carry propagation.
-		 * @param dst The destination array to be modified.
-		 * @param rhs The source array for the operation.
-		 * @return The carry value after the operation completes.
+		 * \tparam Function The type of the binary operation with carry.
+		 * \tparam word The type of the elements in the arrays.
+		 * \tparam N The size of the 'dst' array.
+		 * \tparam M The size of the 'rhs' array.
+		 * \param op_with_carry The binary operation function that includes carry propagation.
+		 * \param dst The destination array to be modified.
+		 * \param rhs The source array for the operation.
+		 * \return The carry value after the operation completes.
 		 */
 		template <typename Function, typename word, std::size_t N, std::size_t M>
 		constexpr word inplace_binop(Function op_with_carry, std::array<word, N> & dst, const std::array<word, M> & rhs)
@@ -255,17 +255,17 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Performs in-place addition and returns the final carry.
+		 * \brief Performs in-place addition and returns the final carry.
 		 *
 		 * This function adds elements from the 'rhs' array to the 'dst' array with carry propagation,
 		 * using the 'add_with_carry' function. It returns the final carry value.
 		 *
-		 * @tparam word The type of the elements in the arrays.
-		 * @tparam N The size of the 'dst' array.
-		 * @tparam M The size of the 'rhs' array.
-		 * @param dst The destination array to be modified by the addition.
-		 * @param rhs The source array providing the values to add.
-		 * @return The carry value after the addition completes.
+		 * \tparam word The type of the elements in the arrays.
+		 * \tparam N The size of the 'dst' array.
+		 * \tparam M The size of the 'rhs' array.
+		 * \param dst The destination array to be modified by the addition.
+		 * \param rhs The source array providing the values to add.
+		 * \return The carry value after the addition completes.
 		 */
 		template <typename word, std::size_t N, std::size_t M> constexpr word add_with_carry(std::array<word, N> & dst, const std::array<word, M> & rhs)
 		{
@@ -273,17 +273,17 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Performs in-place subtraction and returns the final borrow.
+		 * \brief Performs in-place subtraction and returns the final borrow.
 		 *
 		 * This function subtracts elements from the 'rhs' array from the 'dst' array with borrow propagation.
 		 * It uses the 'sub_with_borrow' function to handle the subtraction with borrow. The final borrow value is returned.
 		 *
-		 * @tparam word The type of the elements in the arrays.
-		 * @tparam N The size of the 'dst' array.
-		 * @tparam M The size of the 'rhs' array.
-		 * @param dst The destination array to be modified by the subtraction.
-		 * @param rhs The source array providing the values to subtract.
-		 * @return The borrow value after the subtraction completes.
+		 * \tparam word The type of the elements in the arrays.
+		 * \tparam N The size of the 'dst' array.
+		 * \tparam M The size of the 'rhs' array.
+		 * \param dst The destination array to be modified by the subtraction.
+		 * \param rhs The source array providing the values to subtract.
+		 * \return The borrow value after the subtraction completes.
 		 */
 		template <typename word, std::size_t N, std::size_t M> constexpr word sub_with_borrow(std::array<word, N> & dst, const std::array<word, M> & rhs)
 		{
@@ -291,17 +291,17 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Performs in-place multiply-add and returns the final carry.
+		 * \brief Performs in-place multiply-add and returns the final carry.
 		 *
 		 * This function multiplies 'b' and 'c', adds the result to the 'dst' array with carry propagation,
 		 * and returns the final carry value.
 		 *
-		 * @tparam word The type of the elements in the arrays.
-		 * @tparam N The size of the 'dst' array.
-		 * @param dst The destination array to be modified by the multiply-add operation.
-		 * @param b The multiplier value.
-		 * @param c The multiplicand value.
-		 * @return The carry value after the multiply-add operation completes.
+		 * \tparam word The type of the elements in the arrays.
+		 * \tparam N The size of the 'dst' array.
+		 * \param dst The destination array to be modified by the multiply-add operation.
+		 * \param b The multiplier value.
+		 * \param c The multiplicand value.
+		 * \return The carry value after the multiply-add operation completes.
 		 */
 		template <typename word, std::size_t N> constexpr word mul_add_with_carry(std::array<word, N> & dst, word b, word c)
 		{
@@ -309,29 +309,29 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief An array of two elements used as an accumulator in multiword computations.
+		 * \brief An array of two elements used as an accumulator in multiword computations.
 		 *
 		 * This struct serves as an accumulator for multiword computations, featuring methods to manage carry propagation and summation.
 		 *
-		 * @tparam T The type of the elements in the array.
+		 * \tparam T The type of the elements in the array.
 		 */
 		template <typename T> struct Accumulator final : std::array<T, 2>
 		{
 			using UP = std::array<T, 2>;
 
 			/**
-			 * @brief Initializes the Accumulator with zero values.
+			 * \brief Initializes the Accumulator with zero values.
 			 */
 			constexpr Accumulator() : UP({ 0, 0 }) {}
 
 			/**
-			 * @brief Advances the accumulator with a new carry-in value.
+			 * \brief Advances the accumulator with a new carry-in value.
 			 *
 			 * Shifts the current values in the accumulator, moves the back value to the front,
 			 * and sets the back value to the new carry-in value.
 			 *
-			 * @param carry_in The new carry-in value.
-			 * @return The previous front value.
+			 * \param carry_in The new carry-in value.
+			 * \return The previous front value.
 			 */
 			constexpr T advance(T carry_in)
 			{
@@ -342,8 +342,8 @@ namespace ccm::types
 			}
 
 			/**
-			 * @brief Returns the sum (front value) of the accumulator.
-			 * @return The front value of the accumulator.
+			 * \brief Returns the sum (front value) of the accumulator.
+			 * \return The front value of the accumulator.
 			 */
 			constexpr T sum() const
 			{
@@ -351,8 +351,8 @@ namespace ccm::types
 			}
 
 			/**
-			 * @brief Returns the carry (back value) of the accumulator.
-			 * @return The back value of the accumulator.
+			 * \brief Returns the carry (back value) of the accumulator.
+			 * \return The back value of the accumulator.
 			 */
 			constexpr T carry() const
 			{
@@ -361,16 +361,16 @@ namespace ccm::types
 		};
 
 		/**
-		 * @brief Performs in-place multiplication by a single word and returns the final carry.
+		 * \brief Performs in-place multiplication by a single word and returns the final carry.
 		 *
 		 * This function multiplies each element in the 'dst' array by the given word 'x',
 		 * using an accumulator to manage carry propagation. It returns the final carry value.
 		 *
-		 * @tparam word The type of the elements in the array and the multiplier.
-		 * @tparam N The size of the 'dst' array.
-		 * @param dst The array to be modified by the multiplication.
-		 * @param x The word to multiply each element of the 'dst' array by.
-		 * @return The carry value after the multiplication completes.
+		 * \tparam word The type of the elements in the array and the multiplier.
+		 * \tparam N The size of the 'dst' array.
+		 * \param dst The array to be modified by the multiplication.
+		 * \param x The word to multiply each element of the 'dst' array by.
+		 * \return The carry value after the multiplication completes.
 		 */
 		template <typename word, std::size_t N> constexpr word scalar_multiply_with_carry(std::array<word, N> & dst, word x)
 		{
@@ -384,7 +384,7 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Multiplies 'lhs' by 'rhs' and stores the result in 'dst', returning the final carry.
+		 * \brief Multiplies 'lhs' by 'rhs' and stores the result in 'dst', returning the final carry.
 		 *
 		 * This function multiplies the elements of 'lhs' and 'rhs', storing the result in 'dst' and managing carry propagation.
 		 * It is safe to use for signed numbers.
@@ -393,12 +393,12 @@ namespace ccm::types
 		 * - https://stackoverflow.com/a/20793834
 		 * - https://pages.cs.wisc.edu/%7Emarkhill/cs354/Fall2008/beyond354/int.mult.html
 		 *
-		 * @tparam word The type of the elements in the arrays.
-		 * @tparam N The size of the 'dst' array.
-		 * @param dst The array to store the result of the multiplication.
-		 * @param lhs The left-hand side operand array.
-		 * @param rhs The right-hand side operand array.
-		 * @return The carry value after the multiplication completes.
+		 * \tparam word The type of the elements in the arrays.
+		 * \tparam N The size of the 'dst' array.
+		 * \param dst The array to store the result of the multiplication.
+		 * \param lhs The left-hand side operand array.
+		 * \param rhs The right-hand side operand array.
+		 * \return The carry value after the multiplication completes.
 		 */
 		template <typename word, size_t O, size_t M, size_t N>
 		constexpr word multiply_with_carry(std::array<word, O> & dst, const std::array<word, M> & lhs, const std::array<word, N> & rhs)
@@ -420,15 +420,15 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Multiplies 'lhs' by 'rhs' and stores the high part of the result in 'dst'.
+		 * \brief Multiplies 'lhs' by 'rhs' and stores the high part of the result in 'dst'.
 		 *
 		 * This function performs multiplication of 'lhs' and 'rhs' arrays, accumulating the high part of the product in 'dst'.
 		 *
-		 * @tparam word The type of the elements in the arrays.
-		 * @tparam N The size of the 'dst', 'lhs', and 'rhs' arrays.
-		 * @param dst The array to store the high part of the product.
-		 * @param lhs The left-hand side operand array.
-		 * @param rhs The right-hand side operand array.
+		 * \tparam word The type of the elements in the arrays.
+		 * \tparam N The size of the 'dst', 'lhs', and 'rhs' arrays.
+		 * \param dst The array to store the high part of the product.
+		 * \param lhs The left-hand side operand array.
+		 * \param rhs The right-hand side operand array.
 		 */
 		template <typename word, std::size_t N>
 		constexpr void quick_mul_hi(std::array<word, N> & dst, const std::array<word, N> & lhs, const std::array<word, N> & rhs)
@@ -457,12 +457,12 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Checks if the value represented by the array is negative.
+		 * \brief Checks if the value represented by the array is negative.
 		 *
-		 * @tparam word The type of the elements in the array.
-		 * @tparam N The size of the array.
-		 * @param array The array to check.
-		 * @return True if the value is negative, false otherwise.
+		 * \tparam word The type of the elements in the array.
+		 * \tparam N The size of the array.
+		 * \param array The array to check.
+		 * \return True if the value is negative, false otherwise.
 		 */
 		template <typename word, std::size_t N> constexpr bool is_negative(std::array<word, N> & array)
 		{
@@ -471,7 +471,7 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Internal representation of a multiword shift direction.
+		 * \brief Internal representation of a multiword shift direction.
 		 */
 		enum class Direction : std::uint8_t
 		{
@@ -480,17 +480,17 @@ namespace ccm::types
 		};
 
 		/**
-		 * @brief Performs a bitwise shift on an array of elements.
+		 * \brief Performs a bitwise shift on an array of elements.
 		 *
-		 * @tparam direction The direction of the shift (LEFT or RIGHT).
-		 * @tparam is_signed Whether the elements are signed.
-		 * @tparam word The type of the elements in the array.
-		 * @tparam N The size of the array.
-		 * @param array The array to be shifted.
-		 * @param offset The number of bits to shift.
-		 * @return The shifted array.
+		 * \tparam direction The direction of the shift (LEFT or RIGHT).
+		 * \tparam is_signed Whether the elements are signed.
+		 * \tparam word The type of the elements in the array.
+		 * \tparam N The size of the array.
+		 * \param array The array to be shifted.
+		 * \param offset The number of bits to shift.
+		 * \return The shifted array.
 		 *
-		 * @note 'offset' must be less than TOTAL_BITS (sizeof(word) * CHAR_BIT * N).
+		 * \note 'offset' must be less than TOTAL_BITS (sizeof(word) * CHAR_BIT * N).
 		 */
 		template <Direction direction, bool is_signed, typename word, std::size_t N>
 		constexpr std::array<word, N> shift(std::array<word, N> array, std::size_t offset)
@@ -622,15 +622,15 @@ namespace ccm::types
 		constexpr BigInt(const BigInt & other) = default;
 
 		/**
-		 * @brief Constructs a BigInt from another BigInt with potentially different size and signedness.
+		 * \brief Constructs a BigInt from another BigInt with potentially different size and signedness.
 		 *
 		 * This constructor initializes a BigInt from another BigInt of potentially different bit width and signedness.
 		 * If the source BigInt has more bits, it truncates the extra bits. Otherwise, it extends the value by either
 		 * zero or sign extension based on the signedness of the source BigInt.
 		 *
-		 * @tparam OtherBits The bit width of the source BigInt.
-		 * @tparam OtherSigned The signedness of the source BigInt.
-		 * @param other The source BigInt to construct from.
+		 * \tparam OtherBits The bit width of the source BigInt.
+		 * \tparam OtherSigned The signedness of the source BigInt.
+		 * \param other The source BigInt to construct from.
 		 */
 		template <size_t OtherBits, bool OtherSigned, typename OtherWordType = WordType>
 		constexpr BigInt(const BigInt<OtherBits, OtherSigned, OtherWordType> & other) // NOLINT(google-explicit-constructor)
@@ -720,9 +720,9 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Constructs a BigInt from a C-style array of words.
-		 * @tparam N The size of the input array, which must match the WORD_COUNT.
-		 * @param nums The input array of WordType values.
+		 * \brief Constructs a BigInt from a C-style array of words.
+		 * \tparam N The size of the input array, which must match the WORD_COUNT.
+		 * \param nums The input array of WordType values.
 		 */
 		template <std::size_t N>
 		// NOLINTNEXTLINE(google-explicit-constructor) - Cannot be marked explicit.
@@ -737,19 +737,19 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Constructs a BigInt from a std::array of words.
-		 * @param words The input std::array of WordType values.
+		 * \brief Constructs a BigInt from a std::array of words.
+		 * \param words The input std::array of WordType values.
 		 */
 		constexpr explicit BigInt(const std::array<WordType, WORD_COUNT> & words) : val(words) {}
 
 		/**
-		 * @brief Constructs a BigInt from an integral value.
+		 * \brief Constructs a BigInt from an integral value.
 		 *
 		 * This constructor initializes the BigInt with the given integral value. The first word is set to the value,
 		 * and the remaining words are initialized to zero, with sign extension if needed.
 		 *
-		 * @tparam T The type of the integral value.
-		 * @param v The integral value to initialize the BigInt with.
+		 * \tparam T The type of the integral value.
+		 * \param v The integral value to initialize the BigInt with.
 		 */
 		template <typename T, typename = std::enable_if_t<support::traits::ccm_is_integral_v<T>>>
 		// NOLINTNEXTLINE(google-explicit-constructor) - Cannot be marked explicit.
@@ -784,7 +784,7 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Creates a BigInt with the value zero.
+		 * \brief Creates a BigInt with the value zero.
 		 */
 		static constexpr BigInt zero()
 		{
@@ -792,7 +792,7 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Creates a BigInt with the value one.
+		 * \brief Creates a BigInt with the value one.
 		 */
 		static constexpr BigInt one()
 		{
@@ -800,7 +800,7 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Creates a BigInt with all bits set to one.
+		 * \brief Creates a BigInt with all bits set to one.
 		 */
 		static constexpr BigInt all_ones()
 		{
@@ -808,7 +808,7 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Creates a BigInt with the minimum value.
+		 * \brief Creates a BigInt with the minimum value.
 		 */
 		static constexpr BigInt min()
 		{
@@ -821,7 +821,7 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Creates a BigInt with the maximum value.
+		 * \brief Creates a BigInt with the maximum value.
 		 */
 		static constexpr BigInt max()
 		{
@@ -834,7 +834,7 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Determines if the value of the BigInt is negative.
+		 * \brief Determines if the value of the BigInt is negative.
 		 */
 		[[nodiscard]] constexpr bool is_neg() const
 		{
@@ -848,12 +848,12 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Converts the BigInt to another integral type.
+		 * \brief Converts the BigInt to another integral type.
 		 *
 		 * This operator converts the BigInt to the specified integral type.
 		 *
-		 * @tparam T The target integral type.
-		 * @return The BigInt value converted to type T.
+		 * \tparam T The target integral type.
+		 * \return The BigInt value converted to type T.
 		 */
 		template <typename T> constexpr explicit operator T() const
 		{
@@ -861,14 +861,14 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Converts the BigInt to another integral type.
+		 * \brief Converts the BigInt to another integral type.
 		 *
 		 * This function converts the BigInt to the specified integral type T.
 		 *
-		 * @tparam T The target integral type.
-		 * @return The BigInt value converted to type T.
+		 * \tparam T The target integral type.
+		 * \return The BigInt value converted to type T.
 		 *
-		 * @note This function is only enabled for integral types excluding bool.
+		 * \note This function is only enabled for integral types excluding bool.
 		 */
 		template <typename T> constexpr std::enable_if_t<ccm::support::traits::ccm_is_integral_v<T> && !std::is_same_v<T, bool>, T> to() const
 		{
@@ -905,9 +905,9 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Converts the BigInt to a boolean.
+		 * \brief Converts the BigInt to a boolean.
 		 *
-		 * @return True if the BigInt is non-zero, false otherwise.
+		 * \return True if the BigInt is non-zero, false otherwise.
 		 */
 		constexpr explicit operator bool() const
 		{
@@ -915,9 +915,9 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Checks if the BigInt is zero.
+		 * \brief Checks if the BigInt is zero.
 		 *
-		 * @return True if all parts of the BigInt are zero, false otherwise.
+		 * \return True if all parts of the BigInt are zero, false otherwise.
 		 */
 		constexpr bool is_zero() const
 		{
@@ -932,9 +932,9 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Adds 'rhs' to this BigInt and stores the result.
-		 * @param rhs The BigInt to add.
-		 * @return The carry value produced by the addition.
+		 * \brief Adds 'rhs' to this BigInt and stores the result.
+		 * \param rhs The BigInt to add.
+		 * \return The carry value produced by the addition.
 		 */
 		constexpr WordType add_overflow(const BigInt & rhs)
 		{
@@ -949,13 +949,13 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Adds this BigInt to another and returns the result.
+		 * \brief Adds this BigInt to another and returns the result.
 		 *
 		 * This operator adds the current BigInt to the given BigInt, using the constexpr version of add_with_carry.
 		 * It takes advantage of addition commutativity to modify and return the given BigInt, avoiding additional allocation.
 		 *
-		 * @param other The BigInt to add.
-		 * @return The result of the addition.
+		 * \param other The BigInt to add.
+		 * \return The result of the addition.
 		 */
 		constexpr BigInt operator+(BigInt && other) const
 		{
@@ -971,9 +971,9 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Subtracts 'rhs' from this BigInt and stores the result in this BigInt.
-		 * @param rhs The BigInt to subtract.
-		 * @return The carry value produced by the subtraction.
+		 * \brief Subtracts 'rhs' from this BigInt and stores the result in this BigInt.
+		 * \param rhs The BigInt to subtract.
+		 * \return The carry value produced by the subtraction.
 		 */
 		constexpr WordType sub_overflow(const BigInt & rhs)
 		{
@@ -1006,9 +1006,9 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Multiplies this BigInt by a scalar and stores the result in this BigInt.
-		 * @param x The scalar to multiply with.
-		 * @return The carry value produced by the multiplication.
+		 * \brief Multiplies this BigInt by a scalar and stores the result in this BigInt.
+		 * \param x The scalar to multiply with.
+		 * \return The carry value produced by the multiplication.
 		 */
 		constexpr WordType mul(WordType x)
 		{
@@ -1016,10 +1016,10 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Multiplies this BigInt with another and returns the full product.
-		 * @tparam OtherBits The bit width of the other BigInt.
-		 * @param other The BigInt to multiply with.
-		 * @return The full product as a new BigInt.
+		 * \brief Multiplies this BigInt with another and returns the full product.
+		 * \tparam OtherBits The bit width of the other BigInt.
+		 * \param other The BigInt to multiply with.
+		 * \return The full product as a new BigInt.
 		 */
 		template <std::size_t OtherBits> constexpr auto ful_mul(const BigInt<OtherBits, Signed, WordType> & other) const
 		{
@@ -1029,7 +1029,7 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Multiplies this BigInt with another and returns the full product tructated.
+		 * \brief Multiplies this BigInt with another and returns the full product tructated.
 		 */
 		constexpr BigInt operator*(const BigInt & other) const
 		{
@@ -1037,7 +1037,7 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Approximates the high bits of the full product of two BigInts.
+		 * \brief Approximates the high bits of the full product of two BigInts.
 		 *
 		 * This function computes an approximation of the high 'Bits' of the full product of two BigInts.
 		 * The error is bounded by: 0 <= (a.full_mul(b) >> Bits) - a.quick_mul_hi(b)) <= WORD_COUNT - 1.
@@ -1058,8 +1058,8 @@ namespace ccm::types
 		 * |  256 |           4 |      16 |           10 |           3 |
 		 * |  512 |           8 |      64 |           36 |           7 |
 		 *
-		 * @param other The BigInt to multiply with.
-		 * @return The approximate high bits of the product as a new BigInt.
+		 * \param other The BigInt to multiply with.
+		 * \return The approximate high bits of the product as a new BigInt.
 		 */
 		[[nodiscard]] constexpr BigInt quick_mul_hi(const BigInt & other) const
 		{
@@ -1069,8 +1069,8 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Computes this BigInt raised to the power of 'expo'.
-		 * @note 0 ^ 0 is equal to 1.
+		 * \brief Computes this BigInt raised to the power of 'expo'.
+		 * \note 0 ^ 0 is equal to 1.
 		 */
 		constexpr void pow_n(std::uint64_t expo)
 		{
@@ -1090,14 +1090,14 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Performs in-place signed or unsigned division and returns the remainder.
+		 * \brief Performs in-place signed or unsigned division and returns the remainder.
 		 *
 		 * This function divides the current BigInt by the given divisor and stores the quotient in the current BigInt.
 		 * It returns the remainder if the division is not by zero. For signed numbers, it behaves like C++ signed integer division,
 		 * truncating the fractional part.
 		 *
-		 * @param divider The BigInt to divide by.
-		 * @return An optional containing the remainder if the division is valid, or std::nullopt if dividing by zero.
+		 * \param divider The BigInt to divide by.
+		 * \return An optional containing the remainder if the division is valid, or std::nullopt if dividing by zero.
 		 * Reference used:
 		 * - https://stackoverflow.com/a/3602857
 		 */
@@ -1126,7 +1126,7 @@ namespace ccm::types
 		}
 
 		/**
-		 * @brief Efficiently performs BigInt / (x * 2^e), where x is a half-word-size unsigned integer, and returns the remainder.
+		 * \brief Efficiently performs BigInt / (x * 2^e), where x is a half-word-size unsigned integer, and returns the remainder.
 		 *
 		 * This function divides the BigInt by (x * 2^e) efficiently, using the following approach:
 		 * - Let q = y / (x * 2^e) be the quotient, and r = y % (x * 2^e) be the remainder.
@@ -1135,9 +1135,9 @@ namespace ccm::types
 		 * - Since the remainder of each division step is < x < 2^(WORD_SIZE / 2), the computation stays within WordType.
 		 * - Finally, extra alignment steps are performed for the remaining bits.
 		 *
-		 * @param x The half-word-size unsigned integer.
-		 * @param e The exponent for the power of 2.
-		 * @return An optional containing the remainder if the division is valid, or std::nullopt if x is zero.
+		 * \param x The half-word-size unsigned integer.
+		 * \param e The exponent for the power of 2.
+		 * \return An optional containing the remainder if the division is valid, or std::nullopt if x is zero.
 		 */
 		constexpr std::optional<BigInt> div_uint_half_times_pow_2(multiword::half_width_t<WordType> x, size_t e)
 		{
@@ -1589,8 +1589,8 @@ namespace ccm::types
 	{
 
 		/**
-		 * @brief Selects the appropriate default word type for the given bit width based on the available types.
-		 * @tparam Bits The bit width for which to select the word type.
+		 * \brief Selects the appropriate default word type for the given bit width based on the available types.
+		 * \tparam Bits The bit width for which to select the word type.
 		 */
 		template <std::size_t Bits>
 		struct WordTypeSelector : support::traits::type_identity<

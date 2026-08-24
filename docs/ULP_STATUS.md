@@ -1,13 +1,8 @@
 # ULP status
 
-The goal for ccmath is correctly rounded results in all four IEEE 754 rounding modes for every
-function. We are not there yet, and this page is meant to be an honest picture of where each
-function actually stands rather than a promise. It reports what was measured, how it was measured,
-and what is still left to do.
-
-The companion page ROUNDING_STATUS.md tracks which rounding modes each function handles at runtime.
-This page is about accuracy, the distance between the ccm result and the true correctly rounded
-value.
+ccmath aims for correctly rounded results in all four IEEE 754 rounding modes for every function.
+This page records how close each function is, measured in ULP. ROUNDING_STATUS.md covers which
+modes each function handles at runtime.
 
 ## How to read this
 
