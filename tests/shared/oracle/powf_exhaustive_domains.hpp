@@ -47,7 +47,7 @@ namespace ccm::test::oracle::powf_domains
 			return;
 		}
 
-		for (float exponent : { 2.0F, 0.5F, -1.0F, 3.14159265F })
+		for (float exponent : {2.0F, 0.5F, -1.0F, 3.14159265F})
 		{
 			const std::uint32_t step = (mode == campaign_mode::quick) ? (1u << 15) : (mode == campaign_mode::extended ? (1u << 8) : 1u);
 			for (std::uint32_t mantissa = 0; mantissa < (1u << 23); mantissa += step)
@@ -65,7 +65,7 @@ namespace ccm::test::oracle::powf_domains
 		}
 
 		const std::uint32_t step = (mode == campaign_mode::quick) ? (1u << 20) : (mode == campaign_mode::extended ? (1u << 12) : (1u << 8));
-		for (float exponent : { 2.0F, -1.0F, 0.5F })
+		for (float exponent : {2.0F, -1.0F, 0.5F})
 		{
 			for (std::uint32_t bits = 0; bits < 0x7f800000u; bits += step)
 			{
@@ -82,7 +82,7 @@ namespace ccm::test::oracle::powf_domains
 		}
 
 		const std::uint32_t step = (mode == campaign_mode::quick) ? (1u << 20) : (mode == campaign_mode::extended ? (1u << 12) : (1u << 8));
-		for (float base : { 1.25F, 2.0F, 0.5F, -2.0F })
+		for (float base : {1.25F, 2.0F, 0.5F, -2.0F})
 		{
 			for (std::uint32_t bits = 0; bits < 0x7f800000u; bits += step)
 			{
@@ -98,9 +98,9 @@ namespace ccm::test::oracle::powf_domains
 			return;
 		}
 
-		for (const float base : { 1.0F, -1.0F, 2.0F, -2.0F, 0x1.0p-126F, 0x1.0p-149F })
+		for (const float base : {1.0F, -1.0F, 2.0F, -2.0F, 0x1.0p-126F, 0x1.0p-149F})
 		{
-			for (const std::uint32_t raw_exponent : { 0x00000000u, 0x3f800000u, 0x40000000u, 0x40400000u, 0xbf800000u })
+			for (const std::uint32_t raw_exponent : {0x00000000u, 0x3f800000u, 0x40000000u, 0x40400000u, 0xbf800000u})
 			{
 				add_case(base, ccm::support::bit_cast<float>(raw_exponent), "selected-x sweep across exact exponent anchors");
 			}
@@ -137,7 +137,7 @@ namespace ccm::test::oracle::powf_domains
 		{
 			return;
 		}
-		add_mantissa_sweep(mode, add_case, { "mantissa-sweep" });
+		add_mantissa_sweep(mode, add_case, {"mantissa-sweep"});
 	}
 
 	template <typename AddCaseFn> void add_negative_base([[maybe_unused]] campaign_mode mode, AddCaseFn add_case, const std::set<std::string_view> & filter)
@@ -147,11 +147,11 @@ namespace ccm::test::oracle::powf_domains
 			return;
 		}
 
-		for (float exponent : { -3.0F, -2.0F, -1.0F, 1.0F, 2.0F, 3.0F, 8388607.0F, 8388608.0F, 8388609.0F, 16777216.0F })
+		for (float exponent : {-3.0F, -2.0F, -1.0F, 1.0F, 2.0F, 3.0F, 8388607.0F, 8388608.0F, 8388609.0F, 16777216.0F})
 		{
 			add_case(-1.0F, exponent, "integer-parity threshold campaign");
 		}
-		for (float exponent : { 0.5F, 1.5F, 3.5F, std::nextafter(1.0F, 2.0F) })
+		for (float exponent : {0.5F, 1.5F, 3.5F, std::nextafter(1.0F, 2.0F)})
 		{
 			add_case(-2.0F, exponent, "negative-base non-integer boundary campaign");
 		}
@@ -164,7 +164,7 @@ namespace ccm::test::oracle::powf_domains
 			return;
 		}
 
-		for (float exponent : { 126.0F, 127.0F, 128.0F, 129.0F })
+		for (float exponent : {126.0F, 127.0F, 128.0F, 129.0F})
 		{
 			add_case(2.0F, exponent, "overflow-threshold campaign");
 		}
@@ -177,7 +177,7 @@ namespace ccm::test::oracle::powf_domains
 			return;
 		}
 
-		for (float exponent : { -150.0F, -151.0F, -152.0F })
+		for (float exponent : {-150.0F, -151.0F, -152.0F})
 		{
 			add_case(2.0F, exponent, "underflow-threshold campaign");
 		}

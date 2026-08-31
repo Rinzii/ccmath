@@ -568,7 +568,7 @@ TEST(PpSimdTest, MaskIndexAndBits)
 TEST(PpSimdTest, CatSplit)
 {
 	using V4			   = basic_simd<float, VecAbi<4>>;
-	alignas(64) float a[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+	alignas(64) float a[8] = {1, 2, 3, 4, 5, 6, 7, 8};
 	V4 lo(a, element_aligned);
 	V4 hi(a + 4, element_aligned);
 
@@ -603,7 +603,7 @@ TEST(PpSimdTest, ResizeRebindConvert)
 	static_assert(std::is_same<resize_simd_t<1, V>, basic_simd<float, ScalarAbi>>::value, "");
 	static_assert(std::is_same<rebind_simd_t<std::int32_t, V>, basic_simd<std::int32_t, VecAbi<8>>>::value, "");
 
-	alignas(64) float a[8] = { 1.4F, 2.6F, -3.5F, 4.9F, 5.1F, -6.2F, 7.8F, 8.0F };
+	alignas(64) float a[8] = {1.4F, 2.6F, -3.5F, 4.9F, 5.1F, -6.2F, 7.8F, 8.0F};
 	V v(a, element_aligned);
 	basic_simd<std::int32_t, VecAbi<8>> iv(v); // converting ctor (truncation)
 	basic_simd<double, VecAbi<8>> dv(v);

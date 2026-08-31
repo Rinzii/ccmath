@@ -70,17 +70,17 @@ TEST(CcmathBasicTests, FmodLargeQuotientCompileTime)
 
 TEST(CcmathBasicTests, FmodBitExactVsStd)
 {
-	for (double y : { 3.0, -3.0, 2.5, 0.5, 1024.0, 1e-300 })
+	for (double y : {3.0, -3.0, 2.5, 0.5, 1024.0, 1e-300})
 	{
-		for (double x : { 10.0, -10.0, 7.5, -7.5, 0.0, -0.0, 1.5, 1e30, -1e30, 1e300 })
+		for (double x : {10.0, -10.0, 7.5, -7.5, 0.0, -0.0, 1.5, 1e30, -1e30, 1e300})
 		{
 			expect_public_exact(x, y);
 			expect_kernel_exact(x, y);
 		}
 	}
-	for (float y : { 3.0F, -3.0F, 2.5F, 0.5F })
+	for (float y : {3.0F, -3.0F, 2.5F, 0.5F})
 	{
-		for (float x : { 10.0F, -10.0F, 7.5F, 0.0F, -0.0F, 1e30F })
+		for (float x : {10.0F, -10.0F, 7.5F, 0.0F, -0.0F, 1e30F})
 		{
 			expect_public_exact_f(x, y);
 			expect_kernel_exact_f(x, y);

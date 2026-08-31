@@ -17,8 +17,8 @@ namespace
 		const auto report = ccm::test::pow_path::make_configuration_report<T>(path);
 		ccm::test::pow_path::print_configuration_banner(report);
 
-		const std::array<T, 3> bases	 = { static_cast<T>(2), static_cast<T>(0.5), static_cast<T>(1.25) };
-		const std::array<T, 3> exponents = { static_cast<T>(3), static_cast<T>(-2), static_cast<T>(0.5) };
+		const std::array<T, 3> bases	 = {static_cast<T>(2), static_cast<T>(0.5), static_cast<T>(1.25)};
+		const std::array<T, 3> exponents = {static_cast<T>(3), static_cast<T>(-2), static_cast<T>(0.5)};
 
 		for (T base : bases)
 		{

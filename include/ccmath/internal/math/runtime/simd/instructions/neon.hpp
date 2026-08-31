@@ -84,7 +84,7 @@ namespace ccm::intrin
 		CCM_ALWAYS_INLINE simd(float value) : m_value(vdupq_n_f32(value)) {}
 		CCM_ALWAYS_INLINE simd(float a, float b, float c, float d)
 		{
-			std::array<float, 4> values = { a, b, c, d };
+			std::array<float, 4> values = {a, b, c, d};
 			m_value						= vld1q_f32(values.data());
 		}
 		CCM_ALWAYS_INLINE simd(storage_type const & value)
@@ -280,8 +280,8 @@ namespace ccm::intrin
 		float64x2_t m_value;
 	};
 
-	CCM_ALWAYS_INLINE simd<double, abi::neon>
-	choose(simd_mask<double, abi::neon> const & a, simd<double, abi::neon> const & b, simd<double, abi::neon> const & c)
+	CCM_ALWAYS_INLINE simd<double, abi::neon> choose(simd_mask<double, abi::neon> const & a, simd<double, abi::neon> const & b,
+													 simd<double, abi::neon> const & c)
 	{
 		return simd<double, abi::neon>(vreinterpretq_f64_u64(vbslq_u64(a.get(), vreinterpretq_u64_f64(b.get()), vreinterpretq_u64_f64(c.get()))));
 	}

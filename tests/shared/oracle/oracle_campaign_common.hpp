@@ -226,19 +226,9 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T>
-	inline failure_record<T> make_failure_record(std::string_view function_name,
-												 std::string_view path_name,
-												 std::string_view provenance,
-												 T base,
-												 T exponent,
-												 T actual,
-												 T expected,
-												 std::uint64_t ulp_distance,
-												 std::string_view rounding_mode,
-												 unsigned long oracle_precision,
-												 std::uint64_t seed,
-												 std::string_view search_mode,
-												 std::string_view notes,
+	inline failure_record<T> make_failure_record(std::string_view function_name, std::string_view path_name, std::string_view provenance, T base, T exponent,
+												 T actual, T expected, std::uint64_t ulp_distance, std::string_view rounding_mode,
+												 unsigned long oracle_precision, std::uint64_t seed, std::string_view search_mode, std::string_view notes,
 												 std::string_view event_kind = {})
 	{
 		return failure_record<T>{
@@ -448,7 +438,7 @@ namespace ccm::test::oracle
 		const auto raw = option_value(argc, argv, "--rounding-modes=");
 		if (!raw.has_value() || *raw == "all")
 		{
-			return { FE_TONEAREST, FE_UPWARD, FE_DOWNWARD, FE_TOWARDZERO };
+			return {FE_TONEAREST, FE_UPWARD, FE_DOWNWARD, FE_TOWARDZERO};
 		}
 
 		std::vector<int> modes;
@@ -478,7 +468,7 @@ namespace ccm::test::oracle
 		}
 		if (modes.empty())
 		{
-			modes = { FE_TONEAREST, FE_UPWARD, FE_DOWNWARD, FE_TOWARDZERO };
+			modes = {FE_TONEAREST, FE_UPWARD, FE_DOWNWARD, FE_TOWARDZERO};
 		}
 		return modes;
 	}
@@ -535,14 +525,9 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T>
-	inline campaign_report<T> make_campaign_report(std::string_view path_name,
-												   ccm::test::pow_path::validation_path path,
-												   campaign_mode mode,
-												   const run_summary<T> & summary,
-												   std::uint64_t seed,
-												   std::uint64_t elapsed_ms,
-												   const std::vector<std::string> & domains_covered,
-												   const std::vector<std::string> & domains_skipped)
+	inline campaign_report<T> make_campaign_report(std::string_view path_name, ccm::test::pow_path::validation_path path, campaign_mode mode,
+												   const run_summary<T> & summary, std::uint64_t seed, std::uint64_t elapsed_ms,
+												   const std::vector<std::string> & domains_covered, const std::vector<std::string> & domains_skipped)
 	{
 		return campaign_report<T>{
 			configuration_name(),
@@ -575,12 +560,8 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T>
-	inline campaign_report<T> make_coremath_campaign_report(std::string_view path_name,
-															campaign_mode mode,
-															const run_summary<T> & summary,
-															std::uint64_t seed,
-															std::uint64_t elapsed_ms,
-															const std::vector<std::string> & domains_covered,
+	inline campaign_report<T> make_coremath_campaign_report(std::string_view path_name, campaign_mode mode, const run_summary<T> & summary, std::uint64_t seed,
+															std::uint64_t elapsed_ms, const std::vector<std::string> & domains_covered,
 															const std::vector<std::string> & domains_skipped)
 	{
 		return campaign_report<T>{
@@ -614,12 +595,8 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T, typename ExecuteFn, typename ReportFn, typename PrintFn>
-	inline void run_path_campaign(ccm::test::pow_path::validation_path path,
-								  run_summary<T> & summary,
-								  std::string_view summary_prefix,
-								  ExecuteFn execute_cases,
-								  ReportFn build_report,
-								  PrintFn print_report)
+	inline void run_path_campaign(ccm::test::pow_path::validation_path path, run_summary<T> & summary, std::string_view summary_prefix, ExecuteFn execute_cases,
+								  ReportFn build_report, PrintFn print_report)
 	{
 		const auto support = ccm::test::pow_path::path_is_supported<T>(path);
 		if (!support.supported)
@@ -681,7 +658,7 @@ namespace ccm::test::oracle
 		std::uniform_real_distribution<double> unit(1.0, 2.0);
 		std::uniform_int_distribution<int> base_exp(-(max_exp / 4), max_exp / 4);
 
-		auto add = [&](T base, T exponent) { cases.push_back(pow_case<T>{ base, exponent, provenance }); };
+		auto add = [&](T base, T exponent) { cases.push_back(pow_case<T>{base, exponent, provenance}); };
 
 		const std::size_t per = count / 4 + 1;
 

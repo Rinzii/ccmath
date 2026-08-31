@@ -168,7 +168,7 @@ namespace
 				out.limbs[i]			= static_cast<std::uint32_t>(sum);
 				carry					= sum >> limb_bits;
 			}
-			return { out, carry != 0 };
+			return {out, carry != 0};
 		}
 
 		[[nodiscard]] std::pair<RefUint, bool> sub(const RefUint & other) const
@@ -182,7 +182,7 @@ namespace
 				out.limbs[i]			= static_cast<std::uint32_t>(lhs - rhs);
 				borrow					= lhs < rhs ? 1U : 0U;
 			}
-			return { out, borrow != 0 };
+			return {out, borrow != 0};
 		}
 
 		template <std::size_t OtherBits> [[nodiscard]] RefUint<Bits + OtherBits> full_mul(const RefUint<OtherBits> & other) const
@@ -282,7 +282,7 @@ namespace
 			RefUint remainder;
 			if (divider.is_zero())
 			{
-				return { quotient, remainder };
+				return {quotient, remainder};
 			}
 
 			for (std::size_t bit = Bits; bit-- > 0;)
@@ -298,7 +298,7 @@ namespace
 					quotient.set_bit(bit);
 				}
 			}
-			return { quotient, remainder };
+			return {quotient, remainder};
 		}
 
 		template <std::size_t NewBits> [[nodiscard]] RefUint<NewBits> truncate_low() const
@@ -466,15 +466,15 @@ namespace
 
 		[[nodiscard]] RefInt add(const RefInt & other) const
 		{
-			return RefInt{ raw.add(other.raw).first };
+			return RefInt{raw.add(other.raw).first};
 		}
 		[[nodiscard]] RefInt sub(const RefInt & other) const
 		{
-			return RefInt{ raw.sub(other.raw).first };
+			return RefInt{raw.sub(other.raw).first};
 		}
 		[[nodiscard]] RefInt mul(const RefInt & other) const
 		{
-			return RefInt{ raw.full_mul(other.raw).template truncate_low<Bits>() };
+			return RefInt{raw.full_mul(other.raw).template truncate_low<Bits>()};
 		}
 
 		[[nodiscard]] RefUint<Bits> abs_unsigned() const
@@ -507,7 +507,7 @@ namespace
 			RefInt remainder;
 			if (divider.raw.is_zero())
 			{
-				return { quotient, remainder };
+				return {quotient, remainder};
 			}
 
 			const RefUint<Bits> lhs_mag = abs_unsigned();
@@ -525,7 +525,7 @@ namespace
 			{
 				remainder = remainder.negated();
 			}
-			return { quotient, remainder };
+			return {quotient, remainder};
 		}
 
 		[[nodiscard]] std::string hex_string() const
@@ -568,7 +568,7 @@ namespace
 
 	template <std::size_t Bits, typename WordType> [[nodiscard]] RefInt<Bits> to_ref_signed(const ccm::types::BigInt<Bits, true, WordType> & value)
 	{
-		return RefInt<Bits>{ to_ref_unsigned(value) };
+		return RefInt<Bits>{to_ref_unsigned(value)};
 	}
 
 	template <std::size_t Bits> [[nodiscard]] RefUint<Bits> repeat_limb(std::uint32_t value)
@@ -620,14 +620,14 @@ namespace
 		out.push_back(carry_chain);
 
 		RefUint<Bits> sparse = RefUint<Bits>::zero();
-		for (std::size_t bit : { static_cast<std::size_t>(0),
-								 static_cast<std::size_t>(1),
-								 static_cast<std::size_t>(31),
-								 static_cast<std::size_t>(32),
-								 Bits / 2 - 1,
-								 Bits / 2,
-								 Bits - 2,
-								 Bits - 1 })
+		for (std::size_t bit : {static_cast<std::size_t>(0),
+								static_cast<std::size_t>(1),
+								static_cast<std::size_t>(31),
+								static_cast<std::size_t>(32),
+								Bits / 2 - 1,
+								Bits / 2,
+								Bits - 2,
+								Bits - 1})
 		{
 			sparse.set_bit(bit);
 		}
@@ -641,7 +641,7 @@ namespace
 		out.push_back(descending);
 
 		for (std::uint64_t seed :
-			 { 0x0123456789ABCDEFULL, 0xFEDCBA9876543210ULL, 0x9E3779B97F4A7C15ULL, 0xD1B54A32D192ED03ULL, 0x94D049BB133111EBULL, 0x2545F4914F6CDD1DULL })
+			 {0x0123456789ABCDEFULL, 0xFEDCBA9876543210ULL, 0x9E3779B97F4A7C15ULL, 0xD1B54A32D192ED03ULL, 0x94D049BB133111EBULL, 0x2545F4914F6CDD1DULL})
 		{
 			out.push_back(generated_case<Bits>(seed));
 		}
@@ -666,7 +666,7 @@ namespace
 		const auto unsigned_cases = build_unsigned_cases<Bits>();
 		for (std::size_t i = 0; i < unsigned_cases.size() && i < 8; ++i)
 		{
-			RefInt<Bits> value{ unsigned_cases[i] };
+			RefInt<Bits> value{unsigned_cases[i]};
 			value.raw.set_bit(Bits - 1);
 			out.push_back(value);
 		}
@@ -805,15 +805,15 @@ TEST(CcmathInternalTypesTests, BigIntFullMultiplyPreservesLowWordCarries)
 
 TEST(CcmathInternalTypesTests, BigIntMultiwordMul2MatchesReference)
 {
-	const std::array<std::pair<std::uint64_t, std::uint64_t>, 7> cases = { {
-		{ 0ULL, 0ULL },
-		{ 1ULL, std::numeric_limits<std::uint64_t>::max() },
-		{ std::numeric_limits<std::uint64_t>::max(), std::numeric_limits<std::uint64_t>::max() },
-		{ 0x001FFFFFFFFFFFFEULL, 0x001FFFFFFFFFFFFEULL },
-		{ 0x001FFFFFFFFFF000ULL, 0x001FFFFFFFFFF000ULL },
-		{ 0x8000000000000005ULL, 0x8000000000000007ULL },
-		{ 0xFEDCBA9876543210ULL, 0x0123456789ABCDEFULL },
-	} };
+	const std::array<std::pair<std::uint64_t, std::uint64_t>, 7> cases = {{
+		{0ULL, 0ULL},
+		{1ULL, std::numeric_limits<std::uint64_t>::max()},
+		{std::numeric_limits<std::uint64_t>::max(), std::numeric_limits<std::uint64_t>::max()},
+		{0x001FFFFFFFFFFFFEULL, 0x001FFFFFFFFFFFFEULL},
+		{0x001FFFFFFFFFF000ULL, 0x001FFFFFFFFFF000ULL},
+		{0x8000000000000005ULL, 0x8000000000000007ULL},
+		{0xFEDCBA9876543210ULL, 0x0123456789ABCDEFULL},
+	}};
 
 	for (const auto & [lhs, rhs] : cases)
 	{
@@ -833,7 +833,7 @@ TEST(CcmathInternalTypesTests, BigIntUnsignedShiftsAndCountHelpersMatchReference
 	using Big = ccm::types::BigInt<256, false, std::uint64_t>;
 
 	const auto cases						 = build_unsigned_cases<256>();
-	const std::array<std::size_t, 15> shifts = { 0, 1, 7, 31, 32, 33, 63, 64, 65, 95, 127, 128, 129, 191, 255 };
+	const std::array<std::size_t, 15> shifts = {0, 1, 7, 31, 32, 33, 63, 64, 65, 95, 127, 128, 129, 191, 255};
 
 	for (const auto & value : cases)
 	{
@@ -922,7 +922,7 @@ TEST(CcmathInternalTypesTests, BigIntPowNMatchesReference)
 	const auto cases = build_unsigned_cases<128>();
 	for (std::size_t i = 0; i < std::min<std::size_t>(cases.size(), 10); ++i)
 	{
-		for (std::uint64_t exponent : { 0ULL, 1ULL, 2ULL, 3ULL, 5ULL, 8ULL, 13ULL })
+		for (std::uint64_t exponent : {0ULL, 1ULL, 2ULL, 3ULL, 5ULL, 8ULL, 13ULL})
 		{
 			RefUint<128> expected = RefUint<128>::one();
 			RefUint<128> power	  = cases[i];
@@ -954,8 +954,8 @@ TEST(CcmathInternalTypesTests, BigIntDivHalfWordTimesPowerOfTwoMatchesReference)
 	using HalfWord = ccm::types::multiword::half_width_t<std::uint64_t>;
 
 	const auto cases						 = build_unsigned_cases<256>();
-	const std::array<HalfWord, 6> divisors	 = { 1U, 3U, 5U, 0x7FFFFFFFU, 0x80000001U, 0xFFFFFFFFU };
-	const std::array<std::size_t, 12> shifts = { 0, 1, 7, 31, 32, 33, 63, 64, 95, 127, 191, 320 };
+	const std::array<HalfWord, 6> divisors	 = {1U, 3U, 5U, 0x7FFFFFFFU, 0x80000001U, 0xFFFFFFFFU};
+	const std::array<std::size_t, 12> shifts = {0, 1, 7, 31, 32, 33, 63, 64, 95, 127, 191, 320};
 
 	for (const auto & numerator_ref : cases)
 	{
@@ -989,7 +989,7 @@ TEST(CcmathInternalTypesTests, BigIntSignedArithmeticAndDivisionMatchReference)
 	using Big = ccm::types::BigInt<128, true, std::uint64_t>;
 
 	const auto cases						 = build_signed_cases<128>();
-	const std::array<std::size_t, 10> shifts = { 0, 1, 2, 31, 32, 33, 63, 64, 65, 127 };
+	const std::array<std::size_t, 10> shifts = {0, 1, 2, 31, 32, 33, 63, 64, 65, 127};
 
 	for (const auto & lhs_ref : cases)
 	{
@@ -1000,7 +1000,7 @@ TEST(CcmathInternalTypesTests, BigIntSignedArithmeticAndDivisionMatchReference)
 		{
 			SCOPED_TRACE(shift);
 			expect_signed_bigint_equals_ref(lhs >> shift, lhs_ref.arithmetic_shift_right(shift));
-			expect_signed_bigint_equals_ref(lhs << shift, RefInt<128>{ lhs_ref.raw.shift_left(shift) });
+			expect_signed_bigint_equals_ref(lhs << shift, RefInt<128>{lhs_ref.raw.shift_left(shift)});
 		}
 
 		for (const auto & rhs_ref : cases)
@@ -1077,9 +1077,9 @@ TEST(CcmathInternalTypesTests, BigIntCrossWordSignedAndUnsignedConversionsPreser
 	expect_bigint_equals_ref(wide_u, wide_unsigned_expected);
 	expect_bigint_equals_ref(narrow_u, unsigned_ref);
 
-	RefInt<96> signed_ref{ generated_case<96>(0x94D049BB133111EBULL) };
+	RefInt<96> signed_ref{generated_case<96>(0x94D049BB133111EBULL)};
 	signed_ref.raw.set_bit(95);
-	RefInt<192> wide_signed_expected{ signed_ref.raw.template slice<192>(0) };
+	RefInt<192> wide_signed_expected{signed_ref.raw.template slice<192>(0)};
 	if (signed_ref.is_negative())
 	{
 		for (std::size_t bit = 96; bit < 192; ++bit)

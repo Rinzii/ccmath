@@ -41,22 +41,22 @@ namespace ccm::test::oracle::cross_libm
 	inline std::vector<backend_info> detect_backends()
 	{
 		std::vector<backend_info> backends;
-		backends.push_back({ "std_pow", "std::pow", true });
-		backends.push_back({ "platform_libm", platform_libm_label(), true });
+		backends.push_back({"std_pow", "std::pow", true});
+		backends.push_back({"platform_libm", platform_libm_label(), true});
 #ifdef CCMATH_CROSS_LIBM_OPENLIBM
-		backends.push_back({ "openlibm", "OpenLibm", true });
+		backends.push_back({"openlibm", "OpenLibm", true});
 #else
-		backends.push_back({ "openlibm", "OpenLibm", false });
+		backends.push_back({"openlibm", "OpenLibm", false});
 #endif
 #ifdef CCMATH_CROSS_LIBM_SLEEF
-		backends.push_back({ "sleef", "SLEEF", true });
+		backends.push_back({"sleef", "SLEEF", true});
 #else
-		backends.push_back({ "sleef", "SLEEF", false });
+		backends.push_back({"sleef", "SLEEF", false});
 #endif
 #ifdef CCMATH_CROSS_LIBM_LLVM_LIBC
-		backends.push_back({ "llvm_libc", "LLVM libc", true });
+		backends.push_back({"llvm_libc", "LLVM libc", true});
 #else
-		backends.push_back({ "llvm_libc", "LLVM libc", false });
+		backends.push_back({"llvm_libc", "LLVM libc", false});
 #endif
 		return backends;
 	}

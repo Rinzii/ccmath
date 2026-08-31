@@ -39,22 +39,22 @@ namespace
 	template <typename T, T (*StdFn)(T)> const std::vector<NearestUnaryParams<T>> & BasicNearestParams()
 	{
 		static const std::vector<NearestUnaryParams<T>> params{
-			{ static_cast<T>(1.0), StdFn(static_cast<T>(1.0)) },
-			{ static_cast<T>(1.5), StdFn(static_cast<T>(1.5)) },
-			{ static_cast<T>(1.9), StdFn(static_cast<T>(1.9)) },
-			{ static_cast<T>(-1.0), StdFn(static_cast<T>(-1.0)) },
-			{ static_cast<T>(-1.5), StdFn(static_cast<T>(-1.5)) },
-			{ static_cast<T>(-1.9), StdFn(static_cast<T>(-1.9)) },
-			{ static_cast<T>(0.0), StdFn(static_cast<T>(0.0)) },
-			{ static_cast<T>(-0.0), StdFn(static_cast<T>(-0.0)) },
-			{ static_cast<T>(0.5), StdFn(static_cast<T>(0.5)) },
-			{ static_cast<T>(-0.5), StdFn(static_cast<T>(-0.5)) },
-			{ static_cast<T>(0.9999999999999999), StdFn(static_cast<T>(0.9999999999999999)) },
-			{ static_cast<T>(-0.9999999999999999), StdFn(static_cast<T>(-0.9999999999999999)) },
-			{ std::numeric_limits<T>::infinity(), StdFn(std::numeric_limits<T>::infinity()) },
-			{ -std::numeric_limits<T>::infinity(), StdFn(-std::numeric_limits<T>::infinity()) },
-			{ std::numeric_limits<T>::denorm_min(), StdFn(std::numeric_limits<T>::denorm_min()) },
-			{ -std::numeric_limits<T>::denorm_min(), StdFn(-std::numeric_limits<T>::denorm_min()) },
+			{static_cast<T>(1.0), StdFn(static_cast<T>(1.0))},
+			{static_cast<T>(1.5), StdFn(static_cast<T>(1.5))},
+			{static_cast<T>(1.9), StdFn(static_cast<T>(1.9))},
+			{static_cast<T>(-1.0), StdFn(static_cast<T>(-1.0))},
+			{static_cast<T>(-1.5), StdFn(static_cast<T>(-1.5))},
+			{static_cast<T>(-1.9), StdFn(static_cast<T>(-1.9))},
+			{static_cast<T>(0.0), StdFn(static_cast<T>(0.0))},
+			{static_cast<T>(-0.0), StdFn(static_cast<T>(-0.0))},
+			{static_cast<T>(0.5), StdFn(static_cast<T>(0.5))},
+			{static_cast<T>(-0.5), StdFn(static_cast<T>(-0.5))},
+			{static_cast<T>(0.9999999999999999), StdFn(static_cast<T>(0.9999999999999999))},
+			{static_cast<T>(-0.9999999999999999), StdFn(static_cast<T>(-0.9999999999999999))},
+			{std::numeric_limits<T>::infinity(), StdFn(std::numeric_limits<T>::infinity())},
+			{-std::numeric_limits<T>::infinity(), StdFn(-std::numeric_limits<T>::infinity())},
+			{std::numeric_limits<T>::denorm_min(), StdFn(std::numeric_limits<T>::denorm_min())},
+			{-std::numeric_limits<T>::denorm_min(), StdFn(-std::numeric_limits<T>::denorm_min())},
 		};
 		return params;
 	}

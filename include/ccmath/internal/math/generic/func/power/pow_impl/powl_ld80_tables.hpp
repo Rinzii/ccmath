@@ -25,8 +25,14 @@ namespace ccm::gen::impl::internal::impl::powl_ld80_tables
 {
 
 	inline constexpr std::array<long double, 8> POW_LOG2_COEFFS = {
-		0x1.71547652b82fe178p0L,  -0x1.71547652b82fe144p-1L, 0x1.ec709dc3a03558dep-2L, -0x1.71547652b7385bf8p-2L,
-		0x1.2776c51d878b842ep-2L, -0x1.ec70a8a71c0b750ap-3L, 0x1.a60c087e7df298fap-3L, -0x1.6987a26ef5e05516p-3L,
+		0x1.71547652b82fe178p0L,
+		-0x1.71547652b82fe144p-1L,
+		0x1.ec709dc3a03558dep-2L,
+		-0x1.71547652b7385bf8p-2L,
+		0x1.2776c51d878b842ep-2L,
+		-0x1.ec70a8a71c0b750ap-3L,
+		0x1.a60c087e7df298fap-3L,
+		-0x1.6987a26ef5e05516p-3L,
 	};
 
 	inline constexpr std::array<long double, 7> POW_EXP2_COEFFS = {

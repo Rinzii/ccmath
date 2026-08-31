@@ -26,8 +26,8 @@ TEST(PowlPlatform, CharacterizationSmoke)
 
 TEST(PowlPlatform, StdPowRegressionCorpus)
 {
-	const std::array<long double, 4> bases	   = { 0.5L, 1.0L, 2.0L, 3.0L };
-	const std::array<long double, 4> exponents = { -1.0L, 0.5L, 2.0L, 3.0L };
+	const std::array<long double, 4> bases	   = {0.5L, 1.0L, 2.0L, 3.0L};
+	const std::array<long double, 4> exponents = {-1.0L, 0.5L, 2.0L, 3.0L};
 	for (long double base : bases)
 	{
 		for (long double exponent : exponents)

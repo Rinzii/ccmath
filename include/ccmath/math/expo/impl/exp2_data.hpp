@@ -27,9 +27,9 @@ namespace ccm::internal
 		static constexpr std::size_t poly_order			  = 3;
 		static constexpr std::uint64_t shifted_table_bits = (1 << table_bits);
 
-		double shift_scaled{ 0x1.8p+52 / shifted_table_bits };
+		double shift_scaled{0x1.8p+52 / shifted_table_bits};
 
-		std::array<double, poly_order> poly = { 0x1.c6af84b912394p-5, 0x1.ebfce50fac4f3p-3, 0x1.62e42ff0c52d6p-1 };
+		std::array<double, poly_order> poly = {0x1.c6af84b912394p-5, 0x1.ebfce50fac4f3p-3, 0x1.62e42ff0c52d6p-1};
 
 		// tab[i] = uint(2^(i/N)) - (i << 52-BITS) // N = (1 << BITS)
 		// used for computing 2^(k/N) for an int |k| < 150 N as
@@ -53,7 +53,7 @@ namespace ccm::internal
 		static constexpr std::size_t internal_table_size = static_cast<std::size_t>(2 * shifted_table_bits);
 
 	public:
-		double shift{ 0x1.8p52 / shifted_table_bits };
+		double shift{0x1.8p52 / shifted_table_bits};
 
 		// exp2 polynomial coefficients
 		// abs error: 1.2195*2^-65
@@ -61,7 +61,11 @@ namespace ccm::internal
 		// if |x| < 1/256
 		// abs error if |x| < 1/128: 1.9941*2^-56
 		std::array<double, poly_order> poly = {
-			0x1.62e42fefa39efp-1, 0x1.ebfbdff82c424p-3, 0x1.c6b08d70cf4b5p-5, 0x1.3b2abd24650ccp-7, 0x1.5d7e09b4e3a84p-10,
+			0x1.62e42fefa39efp-1,
+			0x1.ebfbdff82c424p-3,
+			0x1.c6b08d70cf4b5p-5,
+			0x1.3b2abd24650ccp-7,
+			0x1.5d7e09b4e3a84p-10,
 		};
 
 		std::array<std::uint64_t, internal_table_size> tab = {

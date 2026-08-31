@@ -64,9 +64,7 @@ namespace ccm
 		return ccm::hypot(ccm::hypot(x, y), z);
 	}
 
-	template <typename Arithmetic1,
-			  typename Arithmetic2,
-			  typename Arithmetic3,
+	template <typename Arithmetic1, typename Arithmetic2, typename Arithmetic3,
 			  std::enable_if_t<std::is_arithmetic_v<Arithmetic1> && std::is_arithmetic_v<Arithmetic2> && std::is_arithmetic_v<Arithmetic3>, bool> = true>
 	constexpr auto hypot(Arithmetic1 x, Arithmetic2 y, Arithmetic3 z) noexcept
 	{

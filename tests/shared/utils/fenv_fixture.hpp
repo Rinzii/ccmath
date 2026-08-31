@@ -26,7 +26,7 @@ namespace ccm::test
 		TowardZero,
 	};
 
-	inline constexpr std::array<int, 4> kStdRoundingModes = { FE_TONEAREST, FE_UPWARD, FE_DOWNWARD, FE_TOWARDZERO };
+	inline constexpr std::array<int, 4> kStdRoundingModes = {FE_TONEAREST, FE_UPWARD, FE_DOWNWARD, FE_TOWARDZERO};
 
 	inline constexpr const char * RoundingModeName(int rounding_mode)
 	{

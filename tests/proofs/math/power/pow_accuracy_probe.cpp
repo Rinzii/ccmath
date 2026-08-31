@@ -207,8 +207,8 @@ int main()
 	print_stats<double>("pow_gen<double> random", double_generic);
 
 	const auto long_double_suite = measure_grid<long double>(
-		std::array<long double, 8>{ 0.25L, 0.5L, 1.0L, 2.0L, 3.0L, 4.0L, 10.0L, 14.0L },
-		std::array<long double, 9>{ -2.0L, -1.0L, -0.5L, 0.0L, 0.5L, 1.0L, 2.0L, 3.0L, 4.0L },
+		std::array<long double, 8>{0.25L, 0.5L, 1.0L, 2.0L, 3.0L, 4.0L, 10.0L, 14.0L},
+		std::array<long double, 9>{-2.0L, -1.0L, -0.5L, 0.0L, 0.5L, 1.0L, 2.0L, 3.0L, 4.0L},
 		[](long double base, long double exponent) { return ccm::powl(base, exponent); },
 		[](long double base, long double exponent) { return std::pow(base, exponent); });
 	print_stats<long double>("powl suite", long_double_suite);

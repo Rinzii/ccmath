@@ -81,28 +81,28 @@ namespace
 	[[nodiscard]] std::vector<U256> build_unsigned_cases()
 	{
 		std::vector<U256> out;
-		const std::array<std::array<std::uint64_t, 4>, 11> patterns = { {
-			{ 0ULL, 0ULL, 0ULL, 0ULL },
-			{ 1ULL, 0ULL, 0ULL, 0ULL },
-			{ std::numeric_limits<std::uint64_t>::max(),
-			  std::numeric_limits<std::uint64_t>::max(),
-			  std::numeric_limits<std::uint64_t>::max(),
-			  std::numeric_limits<std::uint64_t>::max() },
-			{ std::numeric_limits<std::uint64_t>::max(), 0ULL, 0ULL, 0ULL },
-			{ 0ULL, 0ULL, 0ULL, 0x8000000000000000ULL },
-			{ 0xAAAAAAAAAAAAAAAAULL, 0xAAAAAAAAAAAAAAAAULL, 0xAAAAAAAAAAAAAAAAULL, 0xAAAAAAAAAAAAAAAAULL },
-			{ 0x5555555555555555ULL, 0x5555555555555555ULL, 0x5555555555555555ULL, 0x5555555555555555ULL },
-			{ 0x001FFFFFFFFFFFFEULL, 0ULL, 0ULL, 0ULL },
-			{ 0x001FFFFFFFFFF000ULL, 0ULL, 0ULL, 0ULL },
-			{ 0xFEDCBA9876543210ULL, 0x0123456789ABCDEFULL, 0x0F0E0D0C0B0A0908ULL, 0x8070605040302010ULL },
-			{ 0xFFFFFFFF00000000ULL, 0x00000000FFFFFFFFULL, 0x7FFFFFFF80000000ULL, 0x800000007FFFFFFFULL },
-		} };
+		const std::array<std::array<std::uint64_t, 4>, 11> patterns = {{
+			{0ULL, 0ULL, 0ULL, 0ULL},
+			{1ULL, 0ULL, 0ULL, 0ULL},
+			{std::numeric_limits<std::uint64_t>::max(),
+			 std::numeric_limits<std::uint64_t>::max(),
+			 std::numeric_limits<std::uint64_t>::max(),
+			 std::numeric_limits<std::uint64_t>::max()},
+			{std::numeric_limits<std::uint64_t>::max(), 0ULL, 0ULL, 0ULL},
+			{0ULL, 0ULL, 0ULL, 0x8000000000000000ULL},
+			{0xAAAAAAAAAAAAAAAAULL, 0xAAAAAAAAAAAAAAAAULL, 0xAAAAAAAAAAAAAAAAULL, 0xAAAAAAAAAAAAAAAAULL},
+			{0x5555555555555555ULL, 0x5555555555555555ULL, 0x5555555555555555ULL, 0x5555555555555555ULL},
+			{0x001FFFFFFFFFFFFEULL, 0ULL, 0ULL, 0ULL},
+			{0x001FFFFFFFFFF000ULL, 0ULL, 0ULL, 0ULL},
+			{0xFEDCBA9876543210ULL, 0x0123456789ABCDEFULL, 0x0F0E0D0C0B0A0908ULL, 0x8070605040302010ULL},
+			{0xFFFFFFFF00000000ULL, 0x00000000FFFFFFFFULL, 0x7FFFFFFF80000000ULL, 0x800000007FFFFFFFULL},
+		}};
 
 		for (const auto & pattern : patterns)
 		{
 			out.push_back(make_big<U256>(pattern));
 		}
-		for (std::uint64_t seed : { 0x0123456789ABCDEFULL, 0xFEDCBA9876543210ULL, 0x9E3779B97F4A7C15ULL, 0xD1B54A32D192ED03ULL, 0x94D049BB133111EBULL })
+		for (std::uint64_t seed : {0x0123456789ABCDEFULL, 0xFEDCBA9876543210ULL, 0x9E3779B97F4A7C15ULL, 0xD1B54A32D192ED03ULL, 0x94D049BB133111EBULL})
 		{
 			out.push_back(make_big<U256>(generated_words(seed)));
 		}
@@ -112,29 +112,29 @@ namespace
 	[[nodiscard]] std::vector<S256> build_signed_cases()
 	{
 		std::vector<S256> out;
-		const std::array<std::array<std::uint64_t, 4>, 9> patterns = { {
-			{ 0ULL, 0ULL, 0ULL, 0ULL },
-			{ 1ULL, 0ULL, 0ULL, 0ULL },
-			{ std::numeric_limits<std::uint64_t>::max(),
-			  std::numeric_limits<std::uint64_t>::max(),
-			  std::numeric_limits<std::uint64_t>::max(),
-			  std::numeric_limits<std::uint64_t>::max() },
-			{ 0ULL, 0ULL, 0ULL, 0x8000000000000000ULL },
-			{ 0xFFFFFFFFFFFFFFFEULL,
-			  std::numeric_limits<std::uint64_t>::max(),
-			  std::numeric_limits<std::uint64_t>::max(),
-			  std::numeric_limits<std::uint64_t>::max() },
-			{ 0x0123456789ABCDEFULL, 0x0FEDCBA987654321ULL, 0ULL, 0ULL },
-			{ 0x0123456789ABCDEFULL, 0x0FEDCBA987654321ULL, 0ULL, 0x8000000000000000ULL },
-			{ 0xAAAAAAAAAAAAAAAAULL, 0x5555555555555555ULL, 0xAAAAAAAAAAAAAAAAULL, 0xD555555555555555ULL },
-			{ 0x001FFFFFFFFFFFFEULL, 0x001FFFFFFFFFFFFEULL, 0ULL, 0x8000000000000000ULL },
-		} };
+		const std::array<std::array<std::uint64_t, 4>, 9> patterns = {{
+			{0ULL, 0ULL, 0ULL, 0ULL},
+			{1ULL, 0ULL, 0ULL, 0ULL},
+			{std::numeric_limits<std::uint64_t>::max(),
+			 std::numeric_limits<std::uint64_t>::max(),
+			 std::numeric_limits<std::uint64_t>::max(),
+			 std::numeric_limits<std::uint64_t>::max()},
+			{0ULL, 0ULL, 0ULL, 0x8000000000000000ULL},
+			{0xFFFFFFFFFFFFFFFEULL,
+			 std::numeric_limits<std::uint64_t>::max(),
+			 std::numeric_limits<std::uint64_t>::max(),
+			 std::numeric_limits<std::uint64_t>::max()},
+			{0x0123456789ABCDEFULL, 0x0FEDCBA987654321ULL, 0ULL, 0ULL},
+			{0x0123456789ABCDEFULL, 0x0FEDCBA987654321ULL, 0ULL, 0x8000000000000000ULL},
+			{0xAAAAAAAAAAAAAAAAULL, 0x5555555555555555ULL, 0xAAAAAAAAAAAAAAAAULL, 0xD555555555555555ULL},
+			{0x001FFFFFFFFFFFFEULL, 0x001FFFFFFFFFFFFEULL, 0ULL, 0x8000000000000000ULL},
+		}};
 
 		for (const auto & pattern : patterns)
 		{
 			out.push_back(make_big<S256>(pattern));
 		}
-		for (std::uint64_t seed : { 0x2545F4914F6CDD1DULL, 0x94D049BB133111EBULL, 0xD1B54A32D192ED03ULL })
+		for (std::uint64_t seed : {0x2545F4914F6CDD1DULL, 0x94D049BB133111EBULL, 0xD1B54A32D192ED03ULL})
 		{
 			auto words = generated_words(seed);
 			words.back() |= 0x8000000000000000ULL;
@@ -254,19 +254,19 @@ int main()
 	for (const auto & numerator : unsigned_cases)
 	{
 		const mpz_holder numerator_mpz = mpz_from_unsigned_big(numerator);
-		for (std::uint32_t divisor : { 1U, 3U, 5U, 0x7FFFFFFFU, 0x80000001U, 0xFFFFFFFFU })
+		for (std::uint32_t divisor : {1U, 3U, 5U, 0x7FFFFFFFU, 0x80000001U, 0xFFFFFFFFU})
 		{
-			for (std::size_t shift : { std::size_t(0),
-									   std::size_t(1),
-									   std::size_t(31),
-									   std::size_t(32),
-									   std::size_t(63),
-									   std::size_t(64),
-									   std::size_t(95),
-									   std::size_t(127),
-									   std::size_t(191),
-									   std::size_t(255),
-									   std::size_t(320) })
+			for (std::size_t shift : {std::size_t(0),
+									  std::size_t(1),
+									  std::size_t(31),
+									  std::size_t(32),
+									  std::size_t(63),
+									  std::size_t(64),
+									  std::size_t(95),
+									  std::size_t(127),
+									  std::size_t(191),
+									  std::size_t(255),
+									  std::size_t(320)})
 			{
 				U256 quotient		 = numerator;
 				const auto remainder = quotient.div_uint_half_times_pow_2(divisor, shift);

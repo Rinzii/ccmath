@@ -74,7 +74,7 @@ namespace ccm::fuzz
 		}
 
 		using uint_type				  = typename fp_bits_t::storage_type;
-		constexpr uint_type sign_mask = uint_type{ 1 } << (sizeof(uint_type) * 8 - 1);
+		constexpr uint_type sign_mask = uint_type{1} << (sizeof(uint_type) * 8 - 1);
 
 		auto ordered_bits = [=](fp_bits_t bits) {
 			uint_type const raw = bits.uintval();

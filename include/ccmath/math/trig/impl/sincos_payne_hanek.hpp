@@ -60,7 +60,7 @@ namespace ccm::internal::impl::sincos_ph
 		const std::uint64_t mid	 = (ll >> 32) + (lh & 0xffffffffULL) + (hl & 0xffffffffULL);
 		const std::uint64_t lo	 = (ll & 0xffffffffULL) | (mid << 32);
 		const std::uint64_t hi	 = hh + (lh >> 32) + (hl >> 32) + (mid >> 32);
-		return U128{ hi, lo };
+		return U128{hi, lo};
 	}
 
 	// Add a 64-bit word into the 256-bit accumulator (acc[0] low .. acc[3] high) at limb word,
@@ -127,7 +127,7 @@ namespace ccm::internal::impl::sincos_ph
 
 		// acc holds (x * 8/pi) mod 16 scaled by 2^252: top 4 bits (255..252) are the integer mod 16,
 		// the rest is the fraction. 8/pi = 2 + frac(8/pi). The integer part 2 contributes 2*x.
-		std::array<std::uint64_t, 4> acc = { 0ULL, 0ULL, 0ULL, 0ULL };
+		std::array<std::uint64_t, 4> acc = {0ULL, 0ULL, 0ULL, 0ULL};
 		add_word_at(acc, mantissa, binary_exp + 1 + 252);
 		for (int i = 0; i < 32; ++i)
 		{

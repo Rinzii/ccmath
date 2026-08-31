@@ -26,8 +26,7 @@ namespace ccm::detail
 		using left_type	 = cmath_pow_argument_t<T>;
 		using right_type = cmath_pow_argument_t<U>;
 
-		using type = std::conditional_t<std::is_same_v<left_type, long double> || std::is_same_v<right_type, long double>,
-										long double,
+		using type = std::conditional_t<std::is_same_v<left_type, long double> || std::is_same_v<right_type, long double>, long double,
 										std::conditional_t<std::is_same_v<left_type, double> || std::is_same_v<right_type, double>, double, float>>;
 	};
 
@@ -83,8 +82,7 @@ namespace ccm
 	 * \param exp Exponent value.
 	 * \return base raised to exp in the promoted floating-point type.
 	 */
-	template <typename Arithmetic1,
-			  typename Arithmetic2,
+	template <typename Arithmetic1, typename Arithmetic2,
 			  std::enable_if_t<std::is_arithmetic_v<Arithmetic1> && std::is_arithmetic_v<Arithmetic2> &&
 								   !(std::is_floating_point_v<Arithmetic1> && std::is_same_v<std::remove_cv_t<Arithmetic1>, std::remove_cv_t<Arithmetic2>>),
 							   bool> = true>

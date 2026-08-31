@@ -21,14 +21,28 @@ namespace ccm::internal::sincos_double_data
 
 	// sin(k * pi/8) for k = 0..15, correctly rounded to double.
 	constexpr std::array<double, 16> SIN_K_PI_OVER_8 = {
-		0.0, 0x1.87de2a6aea963p-2,	0x1.6a09e667f3bcdp-1,  0x1.d906bcf328d46p-1,  1.0,	0x1.d906bcf328d46p-1,  0x1.6a09e667f3bcdp-1,  0x1.87de2a6aea963p-2,
-		0.0, -0x1.87de2a6aea963p-2, -0x1.6a09e667f3bcdp-1, -0x1.d906bcf328d46p-1, -1.0, -0x1.d906bcf328d46p-1, -0x1.6a09e667f3bcdp-1, -0x1.87de2a6aea963p-2,
+		0.0,
+		0x1.87de2a6aea963p-2,
+		0x1.6a09e667f3bcdp-1,
+		0x1.d906bcf328d46p-1,
+		1.0,
+		0x1.d906bcf328d46p-1,
+		0x1.6a09e667f3bcdp-1,
+		0x1.87de2a6aea963p-2,
+		0.0,
+		-0x1.87de2a6aea963p-2,
+		-0x1.6a09e667f3bcdp-1,
+		-0x1.d906bcf328d46p-1,
+		-1.0,
+		-0x1.d906bcf328d46p-1,
+		-0x1.6a09e667f3bcdp-1,
+		-0x1.87de2a6aea963p-2,
 	};
 
 	// Cody-Waite three-part -pi/8 for the small-range reduction. The high part has 31 significant
 	// bits so k * MPI[0] is exact for |k| < 2^22, which covers the small-range threshold (|x| < 2^20,
 	// |k| < 2^21.4). The lower parts carry pi/8 to ~115 bits total.
-	constexpr std::array<double, 3> MPI = { -0x1.921fb544p-2, -0x1.0b4611a8p-36, 0x1.d9cceba3f91f2p-68 };
+	constexpr std::array<double, 3> MPI = {-0x1.921fb544p-2, -0x1.0b4611a8p-36, 0x1.d9cceba3f91f2p-68};
 
 	// Reciprocal of pi/8. The reduction computes k = round(x * 8/pi) from it.
 	constexpr double EIGHT_OVER_PI = 0x1.45f306dc9c883p+1;
@@ -46,7 +60,12 @@ namespace ccm::internal::sincos_double_data
 
 	// cos(y) on [-pi/16, pi/16] = COS_POLY[0] + y^2 (COS_POLY[1] + ...). Sollya minimax, error ~2^-68.
 	constexpr std::array<double, 6> COS_POLY = {
-		0x1.0p0, -0x1.0p-1, 0x1.55555555554fp-5, -0x1.6c16c16b84c68p-10, 0x1.a019f88d4441ep-16, -0x1.27a8a5f9090d7p-22,
+		0x1.0p0,
+		-0x1.0p-1,
+		0x1.55555555554fp-5,
+		-0x1.6c16c16b84c68p-10,
+		0x1.a019f88d4441ep-16,
+		-0x1.27a8a5f9090d7p-22,
 	};
 
 	// Large-|x| reduction is handled by the shared Payne-Hanek path in sincos_payne_hanek.hpp.

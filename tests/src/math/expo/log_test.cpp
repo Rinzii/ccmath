@@ -24,8 +24,8 @@ TEST(CcmathExponentialTests, Log)
 	// 1.3862943611198906 was generated with std::log(4.0)
 	static_assert(ccm::log(4.0) == 1.3862943611198906, "log has failed testing that it is static_assert-able!");
 
-	constexpr double inputs[] = { 1.0,	  2.0,	  4.0,	  8.0,	   16.0,	32.0,	 64.0,	   128.0,	 256.0,	   512.0,	 1024.0,
-								  2048.0, 4096.0, 8192.0, 16384.0, 32768.0, 65536.0, 131072.0, 262144.0, 524288.0, 1048576.0 };
+	constexpr double inputs[] = {1.0,	 2.0,	 4.0,	 8.0,	  16.0,	   32.0,	64.0,	  128.0,	256.0,	  512.0,	1024.0,
+								 2048.0, 4096.0, 8192.0, 16384.0, 32768.0, 65536.0, 131072.0, 262144.0, 524288.0, 1048576.0};
 	for (double input : inputs)
 	{
 		ccm::test::ExpectUnaryMatchesStd(input, ccm::log<double>, static_cast<double (*)(double)>(std::log));
@@ -49,8 +49,16 @@ TEST(CcmathExponentialTests, LogDoubleLastTableBucket)
 
 	// Same patterns plus the bucket boundaries through the runtime generic kernel.
 	constexpr double inputs[] = {
-		0x1.5fdffffffff32p-1011, 0x1.5fdffffffff32p-1, 0x1.5fdffffffff32p+0,   0x1.5fdffffffff32p+1, 0x1.5ep+0,
-		0x1.5ffffffffffffp+0,	 0x1.5ep-512,		   0x1.5ffffffffffffp+512, 0x1.5dfffffffffffp+0, 0x1.6p+0,
+		0x1.5fdffffffff32p-1011,
+		0x1.5fdffffffff32p-1,
+		0x1.5fdffffffff32p+0,
+		0x1.5fdffffffff32p+1,
+		0x1.5ep+0,
+		0x1.5ffffffffffffp+0,
+		0x1.5ep-512,
+		0x1.5ffffffffffffp+512,
+		0x1.5dfffffffffffp+0,
+		0x1.6p+0,
 	};
 	for (double input : inputs)
 	{

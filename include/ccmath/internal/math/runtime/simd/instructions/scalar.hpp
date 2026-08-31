@@ -190,8 +190,8 @@ namespace ccm::intrin
 	};
 
 	template <class T>
-	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, abi::scalar>
-	choose(simd_mask<T, abi::scalar> const & a, simd<T, abi::scalar> const & b, simd<T, abi::scalar> const & c)
+	CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd<T, abi::scalar> choose(simd_mask<T, abi::scalar> const & a, simd<T, abi::scalar> const & b,
+																	  simd<T, abi::scalar> const & c)
 	{
 		return simd<T, abi::scalar>(choose(a.get(), b.get(), c.get()));
 	}

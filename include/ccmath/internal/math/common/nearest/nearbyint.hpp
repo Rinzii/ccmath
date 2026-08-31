@@ -35,7 +35,7 @@ namespace ccm
 			return ccm::support::fp::directional_round(num, ccm::support::fenv::get_rounding_mode());
 		}
 
-		constexpr auto rounding_mode{ ccm::support::fenv::get_rounding_mode() };
+		constexpr auto rounding_mode{ccm::support::fenv::get_rounding_mode()};
 		return ccm::support::fp::directional_round(num, rounding_mode);
 	}
 

@@ -18,8 +18,16 @@ namespace ccm::test::oracle::pow_cases
 	inline std::vector<std::string> all_powf_domains()
 	{
 		return {
-			"mantissa-sweep", "all-x-for-y",   "all-y-for-x",		 "exponent-field-sweep", "subnormal-x",
-			"unit-interval",  "negative-base", "overflow-threshold", "underflow-threshold",	 "structured-corpus",
+			"mantissa-sweep",
+			"all-x-for-y",
+			"all-y-for-x",
+			"exponent-field-sweep",
+			"subnormal-x",
+			"unit-interval",
+			"negative-base",
+			"overflow-threshold",
+			"underflow-threshold",
+			"structured-corpus",
 		};
 	}
 
@@ -29,7 +37,7 @@ namespace ccm::test::oracle::pow_cases
 		auto maybe_add = [&](double base, double exponent, const char * provenance) {
 			if (eligible(base, exponent))
 			{
-				cases.push_back({ base, exponent, provenance });
+				cases.push_back({base, exponent, provenance});
 			}
 		};
 
@@ -51,7 +59,15 @@ namespace ccm::test::oracle::pow_cases
 			std::numeric_limits<double>::infinity(),
 		};
 		constexpr std::array special_exponents = {
-			-std::numeric_limits<double>::infinity(), -3.0, -1.0, -0.0, 0.0, 0.5, 2.0, 3.0, std::numeric_limits<double>::infinity(),
+			-std::numeric_limits<double>::infinity(),
+			-3.0,
+			-1.0,
+			-0.0,
+			0.0,
+			0.5,
+			2.0,
+			3.0,
+			std::numeric_limits<double>::infinity(),
 		};
 		for (double base : special_bases)
 		{
@@ -70,7 +86,7 @@ namespace ccm::test::oracle::pow_cases
 				 std::nextafter(-1.0, 0.0),
 			 })
 		{
-			for (double exponent : { -3.5, -1.5, -0.5, 0.5, 1.5, 3.5, 0x1.fffffffffffffp52, 0x1.0p53 })
+			for (double exponent : {-3.5, -1.5, -0.5, 0.5, 1.5, 3.5, 0x1.fffffffffffffp52, 0x1.0p53})
 			{
 				maybe_add(base, exponent, "near +/-1 boundary campaign");
 			}
@@ -85,10 +101,10 @@ namespace ccm::test::oracle::pow_cases
 			maybe_add(std::nextafter(boundary, std::numeric_limits<double>::infinity()), 10.0, "range-reduction boundary: next representable");
 		}
 
-		for (const int exp2_exponent : { -1022, -10, -1, 0, 1, 10, 1023 })
+		for (const int exp2_exponent : {-1022, -10, -1, 0, 1, 10, 1023})
 		{
 			const double base = std::ldexp(1.0, exp2_exponent);
-			for (double exponent : { -1.0, -0.5, 2.0, 3.0 })
+			for (double exponent : {-1.0, -0.5, 2.0, 3.0})
 			{
 				maybe_add(base, exponent, "power-of-two campaign");
 				maybe_add(std::nextafter(base, 0.0), exponent, "nextafter neighborhood below power-of-two");
@@ -96,20 +112,20 @@ namespace ccm::test::oracle::pow_cases
 			}
 		}
 
-		for (double exponent : { -3.0, -2.0, -1.0, 1.0, 2.0, 3.0, 0x1.fffffffffffffp52, 0x1.0p53 })
+		for (double exponent : {-3.0, -2.0, -1.0, 1.0, 2.0, 3.0, 0x1.fffffffffffffp52, 0x1.0p53})
 		{
 			maybe_add(-2.0, exponent, "negative base with integer exponent campaign");
 		}
-		for (double exponent : { 0.5, 1.5, 3.5, std::nextafter(1.0, 2.0), std::nextafter(2.0, 1.0) })
+		for (double exponent : {0.5, 1.5, 3.5, std::nextafter(1.0, 2.0), std::nextafter(2.0, 1.0)})
 		{
 			maybe_add(-2.0, exponent, "negative base near non-integer exponent boundary");
 		}
 
-		for (const auto exponent : { 1023.0, std::nextafter(1024.0, 0.0), 1024.0, 1025.0 })
+		for (const auto exponent : {1023.0, std::nextafter(1024.0, 0.0), 1024.0, 1025.0})
 		{
 			maybe_add(2.0, exponent, "overflow-threshold campaign");
 		}
-		for (const auto exponent : { -1074.0, -1075.0, -1076.0 })
+		for (const auto exponent : {-1074.0, -1075.0, -1076.0})
 		{
 			maybe_add(2.0, exponent, "underflow-threshold campaign");
 		}
@@ -144,11 +160,8 @@ namespace ccm::test::oracle::pow_cases
 	}
 
 	template <typename EligibilityFn>
-	std::vector<pow_case<float>> build_float_cases(campaign_mode mode,
-												   const std::set<std::string_view> & domain_filter,
-												   std::uint64_t seed,
-												   std::vector<std::string> & domains_covered,
-												   std::vector<std::string> & domains_skipped,
+	std::vector<pow_case<float>> build_float_cases(campaign_mode mode, const std::set<std::string_view> & domain_filter, std::uint64_t seed,
+												   std::vector<std::string> & domains_covered, std::vector<std::string> & domains_skipped,
 												   EligibilityFn eligible)
 	{
 		namespace powf_domains = ccm::test::oracle::powf_domains;
@@ -170,7 +183,7 @@ namespace ccm::test::oracle::pow_cases
 		auto maybe_add = [&](float base, float exponent, const char * provenance) {
 			if (eligible(base, exponent))
 			{
-				cases.push_back({ base, exponent, provenance });
+				cases.push_back({base, exponent, provenance});
 			}
 		};
 
@@ -195,7 +208,15 @@ namespace ccm::test::oracle::pow_cases
 				std::numeric_limits<float>::infinity(),
 			};
 			constexpr std::array special_exponents = {
-				-std::numeric_limits<float>::infinity(), -3.0F, -1.0F, -0.0F, 0.0F, 0.5F, 2.0F, 3.0F, std::numeric_limits<float>::infinity(),
+				-std::numeric_limits<float>::infinity(),
+				-3.0F,
+				-1.0F,
+				-0.0F,
+				0.0F,
+				0.5F,
+				2.0F,
+				3.0F,
+				std::numeric_limits<float>::infinity(),
 			};
 			for (float base : special_bases)
 			{
@@ -252,7 +273,7 @@ namespace ccm::test::oracle::pow_cases
 		if (domain_enabled("unit-interval"))
 		{
 			mark_domain("unit-interval", true);
-			powf_domains::add_unit_interval(mode, add_case, { "mantissa-sweep" });
+			powf_domains::add_unit_interval(mode, add_case, {"mantissa-sweep"});
 		} else
 		{
 			mark_domain("unit-interval", false);
@@ -286,11 +307,8 @@ namespace ccm::test::oracle::pow_cases
 		return cases;
 	}
 
-	inline std::vector<pow_case<float>> build_float_cases(campaign_mode mode,
-														  const std::set<std::string_view> & domain_filter,
-														  std::uint64_t seed,
-														  std::vector<std::string> & domains_covered,
-														  std::vector<std::string> & domains_skipped)
+	inline std::vector<pow_case<float>> build_float_cases(campaign_mode mode, const std::set<std::string_view> & domain_filter, std::uint64_t seed,
+														  std::vector<std::string> & domains_covered, std::vector<std::string> & domains_skipped)
 	{
 		return build_float_cases(mode, domain_filter, seed, domains_covered, domains_skipped, [](float, float) { return true; });
 	}

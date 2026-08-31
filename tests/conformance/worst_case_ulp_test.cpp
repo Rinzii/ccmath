@@ -160,11 +160,11 @@ TEST(CcmathWorstCaseUlpTests, PowFloatHard)
 
 TEST(CcmathWorstCaseUlpTests, PowLongDoubleHard)
 {
-	constexpr std::array<ccm::test::worst_case::PowCase<long double>, 3> kPowLongDoubleHard = { {
-		{ 0x1.0p-50L, 0x1.0p+50L, "long-double-shaped alias of the legacy tiny-base / huge-exponent case" },
-		{ -1.0L, 3.0L, "long-double-shaped odd-integer sign regression anchor" },
-		{ -1.0L, 1.5L, "long-double-shaped non-integer domain regression anchor" },
-	} };
+	constexpr std::array<ccm::test::worst_case::PowCase<long double>, 3> kPowLongDoubleHard = {{
+		{0x1.0p-50L, 0x1.0p+50L, "long-double-shaped alias of the legacy tiny-base / huge-exponent case"},
+		{-1.0L, 3.0L, "long-double-shaped odd-integer sign regression anchor"},
+		{-1.0L, 1.5L, "long-double-shaped non-integer domain regression anchor"},
+	}};
 
 	ExpectWorstCaseBinaryPairsOver(kPowLongDoubleHard, ccm::powl, static_cast<long double (*)(long double, long double)>(std::pow));
 }

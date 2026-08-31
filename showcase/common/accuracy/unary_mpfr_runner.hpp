@@ -79,7 +79,7 @@ namespace ccm::showcase::accuracy
 		case unary_function::sqrt_fn: return ccm::showcase::ccmath_path::sqrt_is_supported(path);
 		case unary_function::sin_fn : return ccm::showcase::ccmath_path::sin_is_supported(path);
 		}
-		return { false, "unknown function" };
+		return {false, "unknown function"};
 	}
 
 	inline double invoke_ccmath_path(unary_function fn, ccm::showcase::ccmath_path::path path, double x)
@@ -100,8 +100,8 @@ namespace ccm::showcase::accuracy
 		std::uint64_t max_observed_ulp = 0;
 	};
 
-	inline int run_ccmath_path_campaign(
-		unary_function fn, ccm::showcase::ccmath_path::path path, mpfr_prec_t precision, std::uint64_t max_ulp, const std::optional<std::string> & output_path)
+	inline int run_ccmath_path_campaign(unary_function fn, ccm::showcase::ccmath_path::path path, mpfr_prec_t precision, std::uint64_t max_ulp,
+										const std::optional<std::string> & output_path)
 	{
 		const auto support = path_is_supported(fn, path);
 		if (!support.supported)
@@ -117,7 +117,7 @@ namespace ccm::showcase::accuracy
 
 		for (const double input : cases)
 		{
-			ccm::test::oracle::unary_case<double> test_case{ input, "showcase corpus" };
+			ccm::test::oracle::unary_case<double> test_case{input, "showcase corpus"};
 			(void)ccm::test::oracle::evaluate_unary_mpfr_case(
 				test_case,
 				fn_label,
@@ -167,7 +167,7 @@ namespace ccm::showcase::accuracy
 
 		for (const double input : cases)
 		{
-			ccm::test::oracle::unary_case<double> test_case{ input, "showcase corpus" };
+			ccm::test::oracle::unary_case<double> test_case{input, "showcase corpus"};
 			(void)ccm::test::oracle::evaluate_unary_mpfr_case(
 				test_case,
 				fn_label,

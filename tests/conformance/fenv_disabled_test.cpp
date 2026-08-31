@@ -44,7 +44,7 @@ TEST(CcmathFenvDisabledTests, RoundingModeIsPinnedToNearest)
 
 TEST(CcmathFenvDisabledTests, ExplicitExceptionSignalingIsNoOp)
 {
-    // The explicit ccmath entry points do nothing when the host fenv is unavailable.
+	// The explicit ccmath entry points do nothing when the host fenv is unavailable.
 	EXPECT_EQ(fenv::raise_except_if_required(FE_OVERFLOW | FE_INVALID), 0);
 	EXPECT_EQ(fenv::set_except_if_required(FE_INEXACT), 0);
 	EXPECT_EQ(fenv::ccm_math_err_handling() & fenv::get_mode(fenv::ccm_math_err_mode::eErrnoExcept), 0);

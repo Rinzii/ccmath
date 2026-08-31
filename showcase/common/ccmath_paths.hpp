@@ -77,21 +77,21 @@ namespace ccm::showcase::ccmath_path
 		{
 		case path::public_default:
 		case path::generic_gen:
-		case path::runtime_rt	 : return { true, {} };
+		case path::runtime_rt	 : return {true, {}};
 		case path::runtime_simd:
 #if defined(CCMATH_HAS_SIMD)
-			return { true, {} };
+			return {true, {}};
 #else
-			return { false, "runtime_simd requires CCMATH_HAS_SIMD" };
+			return {false, "runtime_simd requires CCMATH_HAS_SIMD"};
 #endif
 		case path::runtime_builtin:
 #if CCM_HAS_BUILTIN(__builtin_sqrt) || defined(__builtin_sqrt)
-			return { true, {} };
+			return {true, {}};
 #else
-			return { false, "runtime_builtin requires __builtin_sqrt" };
+			return {false, "runtime_builtin requires __builtin_sqrt"};
 #endif
 		}
-		return { false, "unknown path" };
+		return {false, "unknown path"};
 	}
 
 	inline path_support sin_is_supported(path value)
@@ -100,21 +100,21 @@ namespace ccm::showcase::ccmath_path
 		{
 		case path::public_default:
 		case path::generic_gen:
-		case path::runtime_rt	 : return { true, {} };
+		case path::runtime_rt	 : return {true, {}};
 		case path::runtime_simd:
 #if defined(CCMATH_HAS_SIMD) && !(CCM_HAS_BUILTIN(__builtin_sin) || defined(__builtin_sin))
-			return { true, {} };
+			return {true, {}};
 #else
-			return { false, "runtime_simd sin requires SIMD without a trusted sin builtin" };
+			return {false, "runtime_simd sin requires SIMD without a trusted sin builtin"};
 #endif
 		case path::runtime_builtin:
 #if CCM_HAS_BUILTIN(__builtin_sin) || defined(__builtin_sin)
-			return { true, {} };
+			return {true, {}};
 #else
-			return { false, "runtime_builtin requires __builtin_sin" };
+			return {false, "runtime_builtin requires __builtin_sin"};
 #endif
 		}
-		return { false, "unknown path" };
+		return {false, "unknown path"};
 	}
 
 	inline double invoke_sqrt(path value, double x)

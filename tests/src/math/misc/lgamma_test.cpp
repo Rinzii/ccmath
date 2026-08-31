@@ -77,7 +77,7 @@ TEST(CcmathMiscTests, LgammaMatchesLibmFloat)
 TEST(CcmathMiscTests, LgammaSignAgreement)
 {
 	// std::lgamma stores sign in signgam on some platforms. Compare magnitude only for negative non-integers.
-	const double samples[] = { -0.25, -1.5, -2.5, -3.25, -10.5 };
+	const double samples[] = {-0.25, -1.5, -2.5, -3.25, -10.5};
 	for (double x : samples)
 	{
 		SCOPED_TRACE(x);

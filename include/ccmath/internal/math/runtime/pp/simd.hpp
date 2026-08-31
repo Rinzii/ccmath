@@ -49,10 +49,9 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE basic_simd(T value) : data_(Traits::broadcast(value)) {} // NOLINT(google-explicit-constructor)
 
 		// Generator: gen(integral_constant<i>) supplies lane i.
-		template <typename G,
-				  std::enable_if_t<!std::is_convertible_v<G, T> &&
-									   std::is_convertible_v<decltype(std::declval<G &>()(std::integral_constant<detail::SimdSizeType, 0>{})), T>,
-								   int> = 0>
+		template <typename G, std::enable_if_t<!std::is_convertible_v<G, T> &&
+												   std::is_convertible_v<decltype(std::declval<G &>()(std::integral_constant<detail::SimdSizeType, 0>{})), T>,
+											   int> = 0>
 		CCM_ALWAYS_INLINE explicit basic_simd(G && gen) // NOLINT(cppcoreguidelines-missing-std-forward)
 		{
 			detail::unroll_ic<size()>([&](auto i) { Traits::set(data_, i, static_cast<T>(gen(i))); });
@@ -104,7 +103,7 @@ namespace ccm::pp
 		}
 		CCM_ALWAYS_INLINE detail::SimdReference<T, Abi> operator[](detail::SimdSizeType i)
 		{
-			return { &data_, i };
+			return {&data_, i};
 		}
 
 		CCM_ALWAYS_INLINE static basic_simd from_member(member_type const & m)

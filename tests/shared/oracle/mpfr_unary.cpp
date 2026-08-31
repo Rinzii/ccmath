@@ -72,15 +72,8 @@ namespace
 	// measured: the generic kernel (default), the public ccmath path, or the system libm. The MPFR
 	// reference and the exceptional libm cross-check are unaffected by the choice.
 	template <typename T, typename GenFn, typename PublicFn, typename StdFn>
-	int run_standard(int argc,
-					 char ** argv,
-					 std::string_view name,
-					 GenFn gen_scalar,
-					 PublicFn public_scalar,
-					 oracle::mpfr_unary_op op,
-					 StdFn std_scalar,
-					 domain dom,
-					 oracle::function_family family)
+	int run_standard(int argc, char ** argv, std::string_view name, GenFn gen_scalar, PublicFn public_scalar, oracle::mpfr_unary_op op, StdFn std_scalar,
+					 domain dom, oracle::function_family family)
 	{
 		const oracle::impl_kind impl = oracle::parse_impl(argc, argv);
 		return oracle::run_campaign<T, 1>(
@@ -99,7 +92,7 @@ namespace
 			oracle::make_unary_ref<T>(op),
 			[std_scalar](const std::array<T, 1> & inputs) { return std_scalar(inputs[0]); },
 			[dom](std::uint64_t seed, std::size_t count) { return oracle::build_unary_corpus<T>(dom, seed, count); },
-			std::array<domain, 1>{ dom },
+			std::array<domain, 1>{dom},
 			oracle::unary_structured_seed<T>(std_scalar, family),
 			oracle::impl_token(impl));
 	}
@@ -116,7 +109,7 @@ namespace
 				[](T x) { return ccm::exp(ccm::test::runtime_value(x)); },
 				mpfr_exp,
 				[](T x) { return std::exp(x); },
-				domain{ -745.0, 710.0 },
+				domain{-745.0, 710.0},
 				oracle::function_family::exp);
 		}
 		if (function == "exp2")
@@ -129,7 +122,7 @@ namespace
 				[](T x) { return ccm::exp2(ccm::test::runtime_value(x)); },
 				mpfr_exp2,
 				[](T x) { return std::exp2(x); },
-				domain{ -1100.0, 1030.0 },
+				domain{-1100.0, 1030.0},
 				oracle::function_family::exp);
 		}
 		if (function == "expm1")
@@ -142,7 +135,7 @@ namespace
 				[](T x) { return ccm::expm1(ccm::test::runtime_value(x)); },
 				mpfr_expm1,
 				[](T x) { return std::expm1(x); },
-				domain{ -50.0, 710.0 },
+				domain{-50.0, 710.0},
 				oracle::function_family::exp);
 		}
 		if (function == "log")
@@ -155,7 +148,7 @@ namespace
 				[](T x) { return ccm::log(ccm::test::runtime_value(x)); },
 				mpfr_log,
 				[](T x) { return std::log(x); },
-				domain{ 0.0, kInf, true },
+				domain{0.0, kInf, true},
 				oracle::function_family::logarithm);
 		}
 		if (function == "log1p")
@@ -168,7 +161,7 @@ namespace
 				[](T x) { return ccm::log1p(ccm::test::runtime_value(x)); },
 				mpfr_log1p,
 				[](T x) { return std::log1p(x); },
-				domain{ -1.0, kInf, true },
+				domain{-1.0, kInf, true},
 				oracle::function_family::logarithm);
 		}
 		if (function == "log2")
@@ -181,7 +174,7 @@ namespace
 				[](T x) { return ccm::log2(ccm::test::runtime_value(x)); },
 				mpfr_log2,
 				[](T x) { return std::log2(x); },
-				domain{ 0.0, kInf, true },
+				domain{0.0, kInf, true},
 				oracle::function_family::logarithm);
 		}
 		if (function == "log10")
@@ -194,7 +187,7 @@ namespace
 				[](T x) { return ccm::log10(ccm::test::runtime_value(x)); },
 				mpfr_log10,
 				[](T x) { return std::log10(x); },
-				domain{ 0.0, kInf, true },
+				domain{0.0, kInf, true},
 				oracle::function_family::logarithm);
 		}
 		if (function == "sin")
@@ -207,7 +200,7 @@ namespace
 				[](T x) { return ccm::sin(ccm::test::runtime_value(x)); },
 				mpfr_sin,
 				[](T x) { return std::sin(x); },
-				domain{ -kInf, kInf, true },
+				domain{-kInf, kInf, true},
 				oracle::function_family::trig);
 		}
 		if (function == "cos")
@@ -220,7 +213,7 @@ namespace
 				[](T x) { return ccm::cos(ccm::test::runtime_value(x)); },
 				mpfr_cos,
 				[](T x) { return std::cos(x); },
-				domain{ -kInf, kInf, true },
+				domain{-kInf, kInf, true},
 				oracle::function_family::trig);
 		}
 		if (function == "tan")
@@ -233,7 +226,7 @@ namespace
 				[](T x) { return ccm::tan(ccm::test::runtime_value(x)); },
 				mpfr_tan,
 				[](T x) { return std::tan(x); },
-				domain{ -kInf, kInf, true },
+				domain{-kInf, kInf, true},
 				oracle::function_family::trig);
 		}
 		if (function == "asin")
@@ -254,7 +247,7 @@ namespace
 				[](T x) { return ccm::asin(ccm::test::runtime_value(x)); },
 				mpfr_asin,
 				[](T x) { return std::asin(x); },
-				domain{ -1.0, 1.0 },
+				domain{-1.0, 1.0},
 				oracle::function_family::inverse_trig);
 		}
 		if (function == "acos")
@@ -275,7 +268,7 @@ namespace
 				[](T x) { return ccm::acos(ccm::test::runtime_value(x)); },
 				mpfr_acos,
 				[](T x) { return std::acos(x); },
-				domain{ -1.0, 1.0 },
+				domain{-1.0, 1.0},
 				oracle::function_family::inverse_trig);
 		}
 		if (function == "atan")
@@ -296,7 +289,7 @@ namespace
 				[](T x) { return ccm::atan(ccm::test::runtime_value(x)); },
 				mpfr_atan,
 				[](T x) { return std::atan(x); },
-				domain{ -kInf, kInf, true },
+				domain{-kInf, kInf, true},
 				oracle::function_family::inverse_trig);
 		}
 		if (function == "cbrt")
@@ -309,7 +302,7 @@ namespace
 				[](T x) { return ccm::cbrt(ccm::test::runtime_value(x)); },
 				mpfr_cbrt,
 				[](T x) { return std::cbrt(x); },
-				domain{ -kInf, kInf, true },
+				domain{-kInf, kInf, true},
 				oracle::function_family::power);
 		}
 		if (function == "sqrt")
@@ -322,7 +315,7 @@ namespace
 				[](T x) { return ccm::sqrt(ccm::test::runtime_value(x)); },
 				mpfr_sqrt,
 				[](T x) { return std::sqrt(x); },
-				domain{ 0.0, kInf, true },
+				domain{0.0, kInf, true},
 				oracle::function_family::power);
 		}
 		if (function == "tgamma")
@@ -343,7 +336,7 @@ namespace
 				[](T x) { return ccm::tgamma(ccm::test::runtime_value(x)); },
 				mpfr_gamma,
 				[](T x) { return std::tgamma(x); },
-				domain{ -20.0, 171.0 },
+				domain{-20.0, 171.0},
 				oracle::function_family::gamma);
 		}
 		if (function == "lgamma")
@@ -370,8 +363,8 @@ namespace
 				},
 				oracle::make_lgamma_ref<T>(),
 				[](const std::array<T, 1> & inputs) { return std::lgamma(inputs[0]); },
-				[](std::uint64_t seed, std::size_t count) { return oracle::build_unary_corpus<T>(domain{ -50.0, kInf, true }, seed, count); },
-				std::array<domain, 1>{ domain{ -50.0, kInf, true } },
+				[](std::uint64_t seed, std::size_t count) { return oracle::build_unary_corpus<T>(domain{-50.0, kInf, true}, seed, count); },
+				std::array<domain, 1>{domain{-50.0, kInf, true}},
 				oracle::unary_structured_seed<T>([](T x) { return std::lgamma(x); }, oracle::function_family::gamma),
 				oracle::impl_token(impl));
 		}
@@ -394,7 +387,7 @@ namespace
 				oracle::make_pow_ref<T>(),
 				[](const std::array<T, 2> & inputs) { return std::pow(inputs[0], inputs[1]); },
 				[](std::uint64_t seed, std::size_t count) { return oracle::build_pow_corpus<T>(seed, count); },
-				std::array<domain, 2>{ domain{ -kInf, kInf, true }, domain{ -kInf, kInf, true } },
+				std::array<domain, 2>{domain{-kInf, kInf, true}, domain{-kInf, kInf, true}},
 				oracle::pow_special_matrix<T>(),
 				oracle::impl_token(impl));
 		}

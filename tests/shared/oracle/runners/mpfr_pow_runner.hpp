@@ -25,8 +25,8 @@ namespace ccm::test::oracle::pow_mpfr
 		static constexpr mpfr_prec_t default_precision	 = 256;
 		static constexpr std::string_view corpus_label	 = "structured-binary64-corpus";
 
-		static std::vector<pow_case<double>>
-		build_cases(campaign_mode mode, std::set<std::string_view> const &, std::uint64_t seed, std::vector<std::string> &, std::vector<std::string> &)
+		static std::vector<pow_case<double>> build_cases(campaign_mode mode, std::set<std::string_view> const &, std::uint64_t seed, std::vector<std::string> &,
+														 std::vector<std::string> &)
 		{
 			return pow_cases::build_double_cases(mode, seed);
 		}
@@ -40,29 +40,18 @@ namespace ccm::test::oracle::pow_mpfr
 		static constexpr mpfr_prec_t default_precision	 = 192;
 		static constexpr std::string_view corpus_label	 = "structured-binary32-corpus";
 
-		static std::vector<pow_case<float>> build_cases(campaign_mode mode,
-														std::set<std::string_view> const & domain_filter,
-														std::uint64_t seed,
-														std::vector<std::string> & domains_covered,
-														std::vector<std::string> & domains_skipped)
+		static std::vector<pow_case<float>> build_cases(campaign_mode mode, std::set<std::string_view> const & domain_filter, std::uint64_t seed,
+														std::vector<std::string> & domains_covered, std::vector<std::string> & domains_skipped)
 		{
 			return pow_cases::build_float_cases(mode, domain_filter, seed, domains_covered, domains_skipped);
 		}
 	};
 
 	template <typename T>
-	inline void run_path(validation_path path,
-						 std::vector<pow_case<T>> const & cases,
-						 std::vector<int> const & rounding_modes,
-						 mpfr_prec_t precision,
-						 std::uint64_t max_ulp,
-						 std::uint64_t target_ulp,
-						 std::uint64_t seed,
-						 campaign_mode mode,
-						 std::vector<std::string> const & domains_covered,
-						 std::vector<std::string> const & domains_skipped,
-						 std::vector<failure_record<T>> & events,
-						 run_summary<T> & summary)
+	inline void run_path(validation_path path, std::vector<pow_case<T>> const & cases, std::vector<int> const & rounding_modes, mpfr_prec_t precision,
+						 std::uint64_t max_ulp, std::uint64_t target_ulp, std::uint64_t seed, campaign_mode mode,
+						 std::vector<std::string> const & domains_covered, std::vector<std::string> const & domains_skipped,
+						 std::vector<failure_record<T>> & events, run_summary<T> & summary)
 	{
 		run_path_campaign<T>(
 			path,
@@ -141,7 +130,7 @@ namespace ccm::test::oracle::pow_mpfr
 		std::vector<std::string> domains_skipped;
 		if constexpr (std::is_same_v<T, double>)
 		{
-			domains_covered = { std::string(traits<T>::corpus_label) };
+			domains_covered = {std::string(traits<T>::corpus_label)};
 		}
 		auto const cases = traits<T>::build_cases(mode, domain_filter, seed, domains_covered, domains_skipped);
 		std::vector<failure_record<T>> events;

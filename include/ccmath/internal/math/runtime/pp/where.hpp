@@ -120,13 +120,13 @@ namespace ccm::pp
 	CCM_ALWAYS_INLINE where_expression<basic_simd_mask<sizeof(T), Abi>, basic_simd<T, Abi>> where(basic_simd_mask<sizeof(T), Abi> const & mask,
 																								  basic_simd<T, Abi> & value)
 	{
-		return { mask, value };
+		return {mask, value};
 	}
 
 	template <typename T, typename Abi>
 	CCM_ALWAYS_INLINE const_where_expression<basic_simd_mask<sizeof(T), Abi>, basic_simd<T, Abi>> where(basic_simd_mask<sizeof(T), Abi> const & mask,
 																										basic_simd<T, Abi> const & value)
 	{
-		return { mask, value };
+		return {mask, value};
 	}
 } // namespace ccm::pp

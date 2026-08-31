@@ -76,18 +76,18 @@ TEST(CcmathPowerUlpTests, PowGenDoubleRegressionCases)
 		double exp;
 	};
 
-	constexpr std::array<PowCase, 6> kCases = { {
-		{ 10.0, 4.0 },
-		{ 30.637028068178267, -7.702539522452998 },
-		{ 945971881662.053466796875, 15.38309228199631562 },
+	constexpr std::array<PowCase, 6> kCases = {{
+		{10.0, 4.0},
+		{30.637028068178267, -7.702539522452998},
+		{945971881662.053466796875, 15.38309228199631562},
 		// Base just above 1 with a huge exponent lands the result deep in the over/underflow
 		// scaled band (here ~2^-735). That region used to drop to the fast single-double path
 		// and lost ~38 ULP. It must now ride the accurate double-double reconstruction.
-		{ 0x1.00000000000ffp+0, -0x1.0p53 },
-		{ 0x1.000000000010p+0, -0x1.0p53 },
+		{0x1.00000000000ffp+0, -0x1.0p53},
+		{0x1.000000000010p+0, -0x1.0p53},
 		// Symmetric overflow-adjacent band (~2^+735).
-		{ 0x1.00000000000ffp+0, 0x1.0p53 },
-	} };
+		{0x1.00000000000ffp+0, 0x1.0p53},
+	}};
 
 	for (const PowCase & test_case : kCases)
 	{
@@ -186,7 +186,7 @@ TEST(CcmathPowerUlpTests, PowGenFloatAllMantissaBuckets)
 // overhead. Only the first failure and the total count are reported.
 TEST(CcmathPowerUlpTests, DISABLED_PowGenFloatExhaustiveMantissa)
 {
-	constexpr std::array<float, 4> exponents = { 2.0F, 0.5F, -1.0F, 3.14159265F };
+	constexpr std::array<float, 4> exponents = {2.0F, 0.5F, -1.0F, 3.14159265F};
 
 	int64_t fail_count		= 0;
 	float first_fail_base	= 0.0F;
@@ -228,8 +228,8 @@ TEST(CcmathPowerUlpTests, DISABLED_PowGenFloatExhaustiveMantissa)
 // Covers positive and negative k out to the |2 exp| <= 2048 bound, including saturation parity.
 TEST(CcmathPowerUlpTests, PowHalfIntegerExponentAccuracy)
 {
-	constexpr std::array<double, 4> kBases	   = { 3.7, 0.083, 1.001, 17.5 };
-	constexpr std::array<double, 12> kHalfExps = { 1.5, -1.5, 2.5, -2.5, 7.5, -7.5, 99.5, -99.5, 501.5, -501.5, 1023.5, -1023.5 };
+	constexpr std::array<double, 4> kBases	   = {3.7, 0.083, 1.001, 17.5};
+	constexpr std::array<double, 12> kHalfExps = {1.5, -1.5, 2.5, -2.5, 7.5, -7.5, 99.5, -99.5, 501.5, -501.5, 1023.5, -1023.5};
 
 	for (double base : kBases)
 	{
@@ -248,7 +248,7 @@ TEST(CcmathPowerUlpTests, PowHalfIntegerExponentAccuracy)
 // including a subnormal base.
 TEST(CcmathPowerUlpTests, PowHalfIntegerTinySqrtBranch)
 {
-	constexpr std::array<double, 4> kTinyBases = { 0x1.0p-1010, 0x1.b333333333333p-1005, 0x1.0p-1040, 0x1.8p-1060 };
+	constexpr std::array<double, 4> kTinyBases = {0x1.0p-1010, 0x1.b333333333333p-1005, 0x1.0p-1040, 0x1.8p-1060};
 
 	for (double base : kTinyBases)
 	{
@@ -265,9 +265,8 @@ TEST(CcmathPowerUlpTests, PowHugeExponentClampThreshold)
 {
 	const double threshold			  = ccm::support::bit_cast<double>(0x43d7'4910'd52d'3052ULL);
 	const std::array<double, 5> kExps = {
-		std::nextafter(threshold, 0.0), threshold, std::nextafter(threshold, std::numeric_limits<double>::infinity()), 1.0e19, 1.0e300
-	};
-	constexpr std::array<double, 4> kBases = { 1.0000000000000002, 0.9999999999999999, 2.0, 0.5 };
+		std::nextafter(threshold, 0.0), threshold, std::nextafter(threshold, std::numeric_limits<double>::infinity()), 1.0e19, 1.0e300};
+	constexpr std::array<double, 4> kBases = {1.0000000000000002, 0.9999999999999999, 2.0, 0.5};
 
 	for (double base : kBases)
 	{
@@ -289,7 +288,7 @@ TEST(CcmathPowerUlpTests, PowHugeExponentClampThreshold)
 // larger exponents are what actually reach the shortcuts.
 TEST(CcmathPowerUlpTests, PowfBaseTwoAndTenShortcutAccuracy)
 {
-	constexpr std::array<float, 9> kExps = { 0.4F, 2.5F, -3.3F, 7.7F, -11.25F, 19.9F, 25.0F, 30.5F, -35.5F };
+	constexpr std::array<float, 9> kExps = {0.4F, 2.5F, -3.3F, 7.7F, -11.25F, 19.9F, 25.0F, 30.5F, -35.5F};
 
 	for (float exp : kExps)
 	{
@@ -319,8 +318,8 @@ TEST(CcmathPowerUlpTests, PowfBaseTenIntegerExponentAccuracy)
 TEST(CcmathPowerUlpTests, PowfSmallIntegerLoopBoundary)
 {
 	// Mantissa widths: 1.5 -> 0 extra bits, 1.25 -> 1, 1 + 2^-8 -> 7, 1 + 2^-16 -> 15.
-	constexpr std::array<float, 4> kBases = { 1.5F, 1.25F, 1.00390625F, 1.0000152587890625F };
-	constexpr std::array<float, 6> kExps  = { 3.0F, 4.0F, 5.0F, 8.0F, 12.0F, 24.0F };
+	constexpr std::array<float, 4> kBases = {1.5F, 1.25F, 1.00390625F, 1.0000152587890625F};
+	constexpr std::array<float, 6> kExps  = {3.0F, 4.0F, 5.0F, 8.0F, 12.0F, 24.0F};
 
 	for (float base : kBases)
 	{
@@ -345,18 +344,18 @@ TEST(CcmathPowerUlpTests, PowfZivFallbackRegressionCases)
 		std::uint32_t expected_bits;
 	};
 
-	constexpr std::array<ZivCase, 10> kCases = { {
-		{ 0x42520505U, 0xc13230f3U, 0x1fa430e0U }, // powf(52.5049019, -11.1369505)
-		{ 0x4206bdd9U, 0x3fc4629cU, 0x435c8acbU }, // powf(33.6853981, 1.53425932)
-		{ 0x418d5c87U, 0xc164ebccU, 0x21d2e009U }, // powf(17.6701794, -14.3075676)
-		{ 0x3ea17657U, 0x40375250U, 0x3d163830U }, // powf(0.315355986, 2.86439896)
-		{ 0x3fa1f87aU, 0xc1a6e303U, 0x3bf180f6U }, // powf(1.2653954, -20.8608456)
-		{ 0x3f36eccdU, 0xc36ee3bbU, 0x79646ae2U }, // powf(0.714550793, -238.889572)
-		{ 0x3f7c682cU, 0xc2bee724U, 0x4076ad42U }, // powf(0.985964537, -95.4514465)
-		{ 0x3f7f61dbU, 0xc33977a4U, 0x3fc85c71U }, // powf(0.997586906, -185.467346)
-		{ 0x3faf9dddU, 0xc2d92ea4U, 0x26af067cU }, // powf(1.37200511, -108.591095)
-		{ 0x3f6aeda8U, 0x4390d2efU, 0x2d89c122U }, // powf(0.917688847, 289.647919)
-	} };
+	constexpr std::array<ZivCase, 10> kCases = {{
+		{0x42520505U, 0xc13230f3U, 0x1fa430e0U}, // powf(52.5049019, -11.1369505)
+		{0x4206bdd9U, 0x3fc4629cU, 0x435c8acbU}, // powf(33.6853981, 1.53425932)
+		{0x418d5c87U, 0xc164ebccU, 0x21d2e009U}, // powf(17.6701794, -14.3075676)
+		{0x3ea17657U, 0x40375250U, 0x3d163830U}, // powf(0.315355986, 2.86439896)
+		{0x3fa1f87aU, 0xc1a6e303U, 0x3bf180f6U}, // powf(1.2653954, -20.8608456)
+		{0x3f36eccdU, 0xc36ee3bbU, 0x79646ae2U}, // powf(0.714550793, -238.889572)
+		{0x3f7c682cU, 0xc2bee724U, 0x4076ad42U}, // powf(0.985964537, -95.4514465)
+		{0x3f7f61dbU, 0xc33977a4U, 0x3fc85c71U}, // powf(0.997586906, -185.467346)
+		{0x3faf9dddU, 0xc2d92ea4U, 0x26af067cU}, // powf(1.37200511, -108.591095)
+		{0x3f6aeda8U, 0x4390d2efU, 0x2d89c122U}, // powf(0.917688847, 289.647919)
+	}};
 
 	for (const ZivCase & test_case : kCases)
 	{

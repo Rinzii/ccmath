@@ -78,18 +78,10 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T, typename Fn>
-	inline std::optional<failure_record<T>> evaluate_case(const pow_case<T> & test_case,
-														  std::string_view function_name,
-														  std::string_view path_name,
-														  ccm::test::pow_path::validation_path path,
-														  Fn fn,
-														  mpfr_prec_t oracle_precision,
-														  std::uint64_t max_ulp,
-														  run_summary<T> & summary,
-														  std::uint64_t target_ulp					 = 0,
-														  std::uint64_t seed						 = 0,
-														  std::string_view search_mode				 = {},
-														  std::vector<failure_record<T>> * event_log = nullptr)
+	inline std::optional<failure_record<T>> evaluate_case(const pow_case<T> & test_case, std::string_view function_name, std::string_view path_name,
+														  ccm::test::pow_path::validation_path path, Fn fn, mpfr_prec_t oracle_precision, std::uint64_t max_ulp,
+														  run_summary<T> & summary, std::uint64_t target_ulp = 0, std::uint64_t seed = 0,
+														  std::string_view search_mode = {}, std::vector<failure_record<T>> * event_log = nullptr)
 	{
 		return evaluate_binary_mpfr_case(
 			test_case,

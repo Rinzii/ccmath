@@ -43,7 +43,7 @@ namespace ccm::gen::internal::impl::bit80
 
 		constexpr LongDoublePair exact_add(long double a, long double b) noexcept
 		{
-			LongDoublePair r{ 0.0L, 0.0L };
+			LongDoublePair r{0.0L, 0.0L};
 			r.hi				= a + b;
 			const long double t = r.hi - a;
 			r.lo				= b - t;
@@ -56,12 +56,12 @@ namespace ccm::gen::internal::impl::bit80
 			constexpr long double split_c = 0x1.0p33L + 1.0L;
 			const long double t1		  = split_c * a;
 			const long double t2		  = a - t1;
-			return LongDoublePair{ t1 + t2, a - (t1 + t2) };
+			return LongDoublePair{t1 + t2, a - (t1 + t2)};
 		}
 
 		constexpr LongDoublePair exact_mult(long double a, long double b) noexcept
 		{
-			LongDoublePair r{ 0.0L, 0.0L };
+			LongDoublePair r{0.0L, 0.0L};
 			const LongDoublePair as = split(a);
 			const LongDoublePair bs = split(b);
 			r.hi					= a * b;
@@ -119,7 +119,7 @@ namespace ccm::gen::internal::impl::bit80
 			const long double m_x = FPBits_t::create_value(types::Sign::POS, FPBits_t::exponent_bias, m_sig | FPBits_t::EXPLICIT_BIT_MASK).get_val();
 
 			long double dx = 0.0L;
-			LongDoublePair dx_c0{ 0.0L, 0.0L };
+			LongDoublePair dx_c0{0.0L, 0.0L};
 
 			const typename FPBits_t::storage_type frac_mask_high =
 				FPBits_t::fraction_mask & ~((static_cast<typename FPBits_t::storage_type>(1) << (FPBits_t::fraction_length - 7)) - 1);

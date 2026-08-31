@@ -253,15 +253,8 @@ namespace ccm::test::oracle::unary_oracle
 	// Exceptional and zero results are matched against libm or MPFR rather than scored as a ULP
 	// distance, exactly as the per-arity evaluators in the shared harness do.
 	template <typename T, std::size_t N, typename KernelFn, typename RefFn, typename StdFn>
-	inline void evaluate_case(const std::array<T, N> & inputs,
-							  KernelFn kernel,
-							  RefFn reference,
-							  StdFn std_reference,
-							  mpfr_prec_t precision,
-							  mpfr_rnd_t rounding,
-							  std::uint64_t max_ulp,
-							  campaign_summary<T, N> & summary,
-							  threshold_recorder * recorder)
+	inline void evaluate_case(const std::array<T, N> & inputs, KernelFn kernel, RefFn reference, StdFn std_reference, mpfr_prec_t precision,
+							  mpfr_rnd_t rounding, std::uint64_t max_ulp, campaign_summary<T, N> & summary, threshold_recorder * recorder)
 	{
 		++summary.case_count;
 		const T actual = kernel(inputs);
@@ -587,7 +580,7 @@ namespace ccm::test::oracle::unary_oracle
 				add(static_cast<double>(k) * 1.57079632679489661923);
 				add(-static_cast<double>(k) * 1.57079632679489661923);
 			}
-			for (int e : { 10, 16, 20, 23, 30, 40, 50, 60, 80, 100 })
+			for (int e : {10, 16, 20, 23, 30, 40, 50, 60, 80, 100})
 			{
 				add(std::ldexp(1.57079632679489661923, e));
 				add(std::ldexp(1.0, e));
@@ -657,43 +650,43 @@ namespace ccm::test::oracle::unary_oracle
 		const T nan = std::numeric_limits<T>::quiet_NaN();
 		const T one = static_cast<T>(1);
 
-		const std::vector<T> bases	   = { static_cast<T>(0),
-										   -static_cast<T>(0),
-										   one,
-										   -one,
-										   static_cast<T>(2),
-										   -static_cast<T>(2),
-										   static_cast<T>(0.5),
-										   -static_cast<T>(0.5),
-										   static_cast<T>(3),
-										   -static_cast<T>(3),
-										   std::nextafter(one, static_cast<T>(2)),
-										   std::nextafter(one, static_cast<T>(0)),
-										   static_cast<T>(1.0e30),
-										   static_cast<T>(-1.0e30),
-										   static_cast<T>(1.0e-30),
-										   inf,
-										   -inf,
-										   nan };
-		const std::vector<T> exponents = { static_cast<T>(0),
-										   -static_cast<T>(0),
-										   one,
-										   -one,
-										   static_cast<T>(2),
-										   -static_cast<T>(2),
-										   static_cast<T>(3),
-										   -static_cast<T>(3),
-										   static_cast<T>(0.5),
-										   -static_cast<T>(0.5),
-										   static_cast<T>(2.5),
-										   -static_cast<T>(2.5),
-										   static_cast<T>(100),
-										   -static_cast<T>(100),
-										   static_cast<T>(1.0e30),
-										   -static_cast<T>(1.0e30),
-										   inf,
-										   -inf,
-										   nan };
+		const std::vector<T> bases	   = {static_cast<T>(0),
+										  -static_cast<T>(0),
+										  one,
+										  -one,
+										  static_cast<T>(2),
+										  -static_cast<T>(2),
+										  static_cast<T>(0.5),
+										  -static_cast<T>(0.5),
+										  static_cast<T>(3),
+										  -static_cast<T>(3),
+										  std::nextafter(one, static_cast<T>(2)),
+										  std::nextafter(one, static_cast<T>(0)),
+										  static_cast<T>(1.0e30),
+										  static_cast<T>(-1.0e30),
+										  static_cast<T>(1.0e-30),
+										  inf,
+										  -inf,
+										  nan};
+		const std::vector<T> exponents = {static_cast<T>(0),
+										  -static_cast<T>(0),
+										  one,
+										  -one,
+										  static_cast<T>(2),
+										  -static_cast<T>(2),
+										  static_cast<T>(3),
+										  -static_cast<T>(3),
+										  static_cast<T>(0.5),
+										  -static_cast<T>(0.5),
+										  static_cast<T>(2.5),
+										  -static_cast<T>(2.5),
+										  static_cast<T>(100),
+										  -static_cast<T>(100),
+										  static_cast<T>(1.0e30),
+										  -static_cast<T>(1.0e30),
+										  inf,
+										  -inf,
+										  nan};
 
 		std::vector<std::array<T, 2>> cases;
 		cases.reserve(bases.size() * exponents.size());
@@ -701,7 +694,7 @@ namespace ccm::test::oracle::unary_oracle
 		{
 			for (const T exponent : exponents)
 			{
-				cases.push_back({ base, exponent });
+				cases.push_back({base, exponent});
 			}
 		}
 		return cases;
@@ -734,8 +727,8 @@ namespace ccm::test::oracle::unary_oracle
 					finite_pt = mid;
 				}
 			}
-			out.push_back({ finite_pt });
-			out.push_back({ special_pt });
+			out.push_back({finite_pt});
+			out.push_back({special_pt});
 		};
 
 		const bool has_overflow	 = family == function_family::exp || family == function_family::gamma;
@@ -761,7 +754,7 @@ namespace ccm::test::oracle::unary_oracle
 		std::vector<std::array<T, 1>> out;
 		for (const T value : unary_extra_inputs<T>(family))
 		{
-			out.push_back({ value });
+			out.push_back({value});
 		}
 		const auto boundary = unary_boundary_cases<T>(std_fn, family);
 		out.insert(out.end(), boundary.begin(), boundary.end());
@@ -786,7 +779,7 @@ namespace ccm::test::oracle::unary_oracle
 		std::vector<std::array<T, 1>> cases;
 		for (const T value : structured_inputs<T>())
 		{
-			cases.push_back({ value });
+			cases.push_back({value});
 		}
 
 		std::mt19937_64 rng(seed);
@@ -804,7 +797,7 @@ namespace ccm::test::oracle::unary_oracle
 				}
 				if (value >= dom.lo && value <= dom.hi)
 				{
-					cases.push_back({ static_cast<T>(value) });
+					cases.push_back({static_cast<T>(value)});
 				}
 			}
 		} else
@@ -814,7 +807,7 @@ namespace ccm::test::oracle::unary_oracle
 			std::uniform_real_distribution<double> uniform(lo, hi);
 			for (std::size_t i = 0; i < count; ++i)
 			{
-				cases.push_back({ static_cast<T>(uniform(rng)) });
+				cases.push_back({static_cast<T>(uniform(rng))});
 			}
 		}
 
@@ -824,10 +817,10 @@ namespace ccm::test::oracle::unary_oracle
 		{
 			if constexpr (std::is_same_v<T, float>)
 			{
-				cases.push_back({ ccm::support::bit_cast<float>(static_cast<std::uint32_t>(bits())) });
+				cases.push_back({ccm::support::bit_cast<float>(static_cast<std::uint32_t>(bits()))});
 			} else
 			{
-				cases.push_back({ ccm::support::bit_cast<double>(bits()) });
+				cases.push_back({ccm::support::bit_cast<double>(bits())});
 			}
 		}
 		return cases;
@@ -841,7 +834,7 @@ namespace ccm::test::oracle::unary_oracle
 		// never fully materialized at once. Only the compact array<T, 2> corpus is kept, which keeps
 		// the per-case cost near 8 bytes and lets a very large sample fit in memory.
 		const std::size_t random_count	 = count / 4 + 1;
-		constexpr std::size_t chunk_size = std::size_t{ 1 } << 22;
+		constexpr std::size_t chunk_size = std::size_t{1} << 22;
 
 		std::vector<std::array<T, 2>> cases;
 		cases.reserve(count + random_count);
@@ -854,7 +847,7 @@ namespace ccm::test::oracle::unary_oracle
 			add_targeted_random_cases(chunk, seed + done, n, "pow targeted finite band");
 			for (const auto & test_case : chunk)
 			{
-				cases.push_back({ test_case.base, test_case.exponent });
+				cases.push_back({test_case.base, test_case.exponent});
 			}
 		}
 		for (std::size_t done = 0; done < random_count; done += chunk_size)
@@ -864,7 +857,7 @@ namespace ccm::test::oracle::unary_oracle
 			add_random_cases(chunk, (seed ^ 0x9E3779B97F4A7C15ULL) + done, n, "pow whole-range bit pattern");
 			for (const auto & test_case : chunk)
 			{
-				cases.push_back({ test_case.base, test_case.exponent });
+				cases.push_back({test_case.base, test_case.exponent});
 			}
 		}
 		return cases;
@@ -930,7 +923,7 @@ namespace ccm::test::oracle::unary_oracle
 				{
 					if (in_domain(domains[0], value))
 					{
-						cases.push_back({ value });
+						cases.push_back({value});
 					}
 				}
 			}
@@ -1106,7 +1099,7 @@ namespace ccm::test::oracle::unary_oracle
 	// builder over to the confined region builder.
 	inline bool domain_flags_present(int argc, char ** argv, std::size_t arity)
 	{
-		static const char * const bases[] = { "--lo", "--hi", "--min-exp", "--max-exp", "--scale" };
+		static const char * const bases[] = {"--lo", "--hi", "--min-exp", "--max-exp", "--scale"};
 		for (const char * base : bases)
 		{
 			if (option_value(argc, argv, std::string(base) + "="))
@@ -1144,7 +1137,7 @@ namespace ccm::test::oracle::unary_oracle
 			const std::size_t colon = raw->find(':');
 			const std::uint64_t lo	= std::stoull(raw->substr(0, colon), nullptr, 0);
 			const std::uint64_t hi	= colon == std::string::npos ? lo : std::stoull(raw->substr(colon + 1), nullptr, 0);
-			return { bit_interval{ lo, hi + 1 } };
+			return {bit_interval{lo, hi + 1}};
 		}
 
 		const auto to_bits = [](float value) { return static_cast<std::uint64_t>(ccm::support::bit_cast<std::uint32_t>(value)); };
@@ -1154,16 +1147,16 @@ namespace ccm::test::oracle::unary_oracle
 			const float hi = static_cast<float>(axis0.hi);
 			if (lo >= 0.0F)
 			{
-				return { bit_interval{ to_bits(lo), to_bits(hi) + 1 } };
+				return {bit_interval{to_bits(lo), to_bits(hi) + 1}};
 			}
 			if (hi <= 0.0F)
 			{
-				return { bit_interval{ to_bits(hi), to_bits(lo) + 1 } };
+				return {bit_interval{to_bits(hi), to_bits(lo) + 1}};
 			}
-			return { bit_interval{ to_bits(-0.0F), to_bits(lo) + 1 }, bit_interval{ to_bits(0.0F), to_bits(hi) + 1 } };
+			return {bit_interval{to_bits(-0.0F), to_bits(lo) + 1}, bit_interval{to_bits(0.0F), to_bits(hi) + 1}};
 		}
 
-		return { bit_interval{ 0, std::uint64_t{ 1 } << 32 } };
+		return {bit_interval{0, std::uint64_t{1} << 32}};
 	}
 
 	inline std::string format_magnitude(std::uint64_t value)
@@ -1172,7 +1165,7 @@ namespace ccm::test::oracle::unary_oracle
 		{
 			return std::to_string(value);
 		}
-		static const char * const suffix[] = { "", "K", "M", "B", "T" };
+		static const char * const suffix[] = {"", "K", "M", "B", "T"};
 		double scaled					   = static_cast<double>(value);
 		std::size_t step				   = 0;
 		while (scaled >= 1000.0 && step + 1 < std::size(suffix))
@@ -1265,7 +1258,7 @@ namespace ccm::test::oracle::unary_oracle
 		std::uint64_t chunk_;
 		std::uint64_t total_;
 		std::string label_;
-		std::atomic<bool> stop_{ false };
+		std::atomic<bool> stop_{false};
 		std::thread worker_;
 	};
 
@@ -1274,22 +1267,15 @@ namespace ccm::test::oracle::unary_oracle
 	// the exhaustive sweep uses. The MPFR default rounding mode is set once per pass and only read by
 	// the workers, and each worker sets its own hardware rounding mode.
 	template <typename T, std::size_t N, typename KernelFn, typename RefFn, typename StdFn>
-	inline campaign_summary<T, N> run_sampled(const std::vector<std::array<T, N>> & cases,
-											  const std::vector<int> & rounding_modes,
-											  mpfr_prec_t precision,
-											  std::uint64_t max_ulp,
-											  unsigned int thread_count,
-											  KernelFn kernel,
-											  RefFn reference,
-											  StdFn std_reference,
-											  threshold_recorder * recorder,
-											  bool show_progress)
+	inline campaign_summary<T, N> run_sampled(const std::vector<std::array<T, N>> & cases, const std::vector<int> & rounding_modes, mpfr_prec_t precision,
+											  std::uint64_t max_ulp, unsigned int thread_count, KernelFn kernel, RefFn reference, StdFn std_reference,
+											  threshold_recorder * recorder, bool show_progress)
 	{
 		if (thread_count == 0U)
 		{
 			thread_count = 1U;
 		}
-		constexpr std::size_t chunk_size = std::size_t{ 1 } << 14;
+		constexpr std::size_t chunk_size = std::size_t{1} << 14;
 		const std::size_t total_cases	 = cases.size();
 
 		const mpfr_rnd_t saved_default = mpfr_get_default_rounding_mode();
@@ -1302,7 +1288,7 @@ namespace ccm::test::oracle::unary_oracle
 			std::vector<campaign_summary<T, N>> partials(thread_count);
 			std::vector<std::thread> workers;
 			workers.reserve(thread_count);
-			std::atomic<std::size_t> next_chunk{ 0 };
+			std::atomic<std::size_t> next_chunk{0};
 
 			std::unique_ptr<progress_ticker<std::size_t>> ticker;
 			if (show_progress)
@@ -1356,22 +1342,15 @@ namespace ccm::test::oracle::unary_oracle
 	// shared counter, so every core stays busy on the expensive band whether the sweep is the whole
 	// 2^32 or a single targeted sub-range.
 	template <typename KernelFn, typename RefFn, typename StdFn>
-	inline campaign_summary<float, 1> run_exhaustive_float(const std::vector<bit_interval> & intervals,
-														   const std::vector<int> & rounding_modes,
-														   mpfr_prec_t precision,
-														   std::uint64_t max_ulp,
-														   unsigned int thread_count,
-														   KernelFn kernel,
-														   RefFn reference,
-														   StdFn std_reference,
-														   threshold_recorder * recorder,
-														   bool show_progress)
+	inline campaign_summary<float, 1> run_exhaustive_float(const std::vector<bit_interval> & intervals, const std::vector<int> & rounding_modes,
+														   mpfr_prec_t precision, std::uint64_t max_ulp, unsigned int thread_count, KernelFn kernel,
+														   RefFn reference, StdFn std_reference, threshold_recorder * recorder, bool show_progress)
 	{
 		if (thread_count == 0U)
 		{
 			thread_count = 1U;
 		}
-		constexpr std::uint64_t chunk_size = std::uint64_t{ 1 } << 20;
+		constexpr std::uint64_t chunk_size = std::uint64_t{1} << 20;
 
 		std::uint64_t total_patterns = 0;
 		for (const bit_interval & interval : intervals)
@@ -1404,7 +1383,7 @@ namespace ccm::test::oracle::unary_oracle
 			std::vector<campaign_summary<float, 1>> partials(thread_count);
 			std::vector<std::thread> workers;
 			workers.reserve(thread_count);
-			std::atomic<std::uint64_t> next_chunk{ 0 };
+			std::atomic<std::uint64_t> next_chunk{0};
 
 			std::unique_ptr<progress_ticker<std::uint64_t>> ticker;
 			if (show_progress)
@@ -1439,7 +1418,7 @@ namespace ccm::test::oracle::unary_oracle
 								continue;
 							}
 							evaluate_case<float, 1>(
-								std::array<float, 1>{ input }, kernel, reference, std_reference, precision, rounding, max_ulp, summary, recorder);
+								std::array<float, 1>{input}, kernel, reference, std_reference, precision, rounding, max_ulp, summary, recorder);
 						}
 					}
 				});
@@ -1460,15 +1439,8 @@ namespace ccm::test::oracle::unary_oracle
 	}
 
 	template <typename T, std::size_t N, typename KernelFn, typename RefFn, typename StdFn, typename CorpusFn>
-	inline int run_campaign(int argc,
-							char ** argv,
-							std::string_view function_name,
-							KernelFn kernel,
-							RefFn reference,
-							StdFn std_reference,
-							CorpusFn build_corpus,
-							const std::array<domain, N> & default_domains,
-							std::vector<std::array<T, N>> structured_seed,
+	inline int run_campaign(int argc, char ** argv, std::string_view function_name, KernelFn kernel, RefFn reference, StdFn std_reference,
+							CorpusFn build_corpus, const std::array<domain, N> & default_domains, std::vector<std::array<T, N>> structured_seed,
 							std::string_view implementation = "gen")
 	{
 		const auto mode				= parse_mode(option_value(argc, argv, "--mode="));
@@ -1544,7 +1516,7 @@ namespace ccm::test::oracle::unary_oracle
 		if (run_exhaustive)
 		{
 			intervals			  = float_exhaustive_intervals(argc, argv, domains[0]);
-			const bool full_space = intervals.size() == 1 && intervals[0].begin == 0 && intervals[0].end == (std::uint64_t{ 1 } << 32);
+			const bool full_space = intervals.size() == 1 && intervals[0].begin == 0 && intervals[0].end == (std::uint64_t{1} << 32);
 			corpus				  = full_space ? "exhaustive binary32" : "exhaustive binary32 sub-range";
 		}
 

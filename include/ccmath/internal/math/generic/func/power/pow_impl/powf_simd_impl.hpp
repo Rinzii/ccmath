@@ -34,13 +34,12 @@ namespace ccm::gen::impl
 	namespace simd_detail
 	{
 		// log2(1 + dx)/dx degree-5 approximation, identical to the scalar powf kernel.
-		inline constexpr std::array<double, 6> kLog2Coeffs = { 0x1.71547652b82fep0,	  -0x1.71547652b7a07p-1, 0x1.ec709dc458db1p-2,
-															   -0x1.715479c2266c9p-2, 0x1.2776ae1ddf8fp-2,	 -0x1.e7b2178870157p-3 };
+		inline constexpr std::array<double, 6> kLog2Coeffs = {
+			0x1.71547652b82fep0, -0x1.71547652b7a07p-1, 0x1.ec709dc458db1p-2, -0x1.715479c2266c9p-2, 0x1.2776ae1ddf8fp-2, -0x1.e7b2178870157p-3};
 
 		// 2^(x/64) degree-5 approximation, identical to the scalar powf kernel.
 		inline constexpr std::array<double, 6> kExp2Coeffs = {
-			0x1p0, 0x1.62e42fefa39efp-7, 0x1.ebfbdff82a23ap-15, 0x1.c6b08d7076268p-23, 0x1.3b2ad33f8b48bp-31, 0x1.5d870c4d84445p-40
-		};
+			0x1p0, 0x1.62e42fefa39efp-7, 0x1.ebfbdff82a23ap-15, 0x1.c6b08d7076268p-23, 0x1.3b2ad33f8b48bp-31, 0x1.5d870c4d84445p-40};
 
 		template <typename Abi> [[nodiscard]] CCM_ALWAYS_INLINE pp::basic_simd<double, Abi> v_nearest_integer(pp::basic_simd<double, Abi> const & x) noexcept
 		{

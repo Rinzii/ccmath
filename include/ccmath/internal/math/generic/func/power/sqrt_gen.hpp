@@ -133,7 +133,7 @@ namespace ccm::gen
 					}
 
 					// We perform one more iteration to ensure that the result is correctly rounded.
-					bool round_bit{ false };
+					bool round_bit{false};
 					r <<= 2;
 					if (const storage_type tmp = (y << 2) + 1; r >= tmp)
 					{
@@ -217,7 +217,7 @@ namespace ccm::gen
 				}
 
 				// We perform one more iteration to ensure that the result is correctly rounded.
-				bool round_bit{ false };
+				bool round_bit{false};
 
 				r <<= 2;
 

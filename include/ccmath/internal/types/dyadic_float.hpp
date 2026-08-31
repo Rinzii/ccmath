@@ -370,8 +370,7 @@ namespace ccm::types
 		 *         this DyadicFloat to \p T.
 		 */
 
-		template <typename T,
-				  bool ShouldSignalExceptions,
+		template <typename T, bool ShouldSignalExceptions,
 				  typename = std::enable_if_t<std::is_floating_point_v<T> && (support::fp::FPBits<T>::fraction_length < Bits), void>>
 		constexpr T fast_as() const
 		{
@@ -503,8 +502,7 @@ namespace ccm::types
 		 *
 		 * \return A floating-point value of type \p T that reflects the conversion.
 		 */
-		template <typename T,
-				  bool ShouldSignalExceptions,
+		template <typename T, bool ShouldSignalExceptions,
 				  typename = std::enable_if_t<std::is_floating_point_v<T> && (support::fp::FPBits<T>::fraction_length < Bits), void>>
 		constexpr T as() const
 		{
