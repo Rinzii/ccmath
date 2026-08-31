@@ -15,11 +15,11 @@
 namespace ccm::ext
 {
 	/**
-	 * @brief Compute the absolute difference between two integral values.
-	 * @tparam T Integral type of both inputs.
-	 * @param lhs The first value.
-	 * @param rhs The second value.
-	 * @return The absolute difference between lhs and rhs as the matching unsigned type.
+	 * \brief Compute the absolute difference between two integral values.
+	 * \tparam T Integral type of both inputs.
+	 * \param lhs The first value.
+	 * \param rhs The second value.
+	 * \return The absolute difference between lhs and rhs as the matching unsigned type.
 	 */
 	template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<std::remove_cv_t<T>, bool>, bool> = true>
 	constexpr std::make_unsigned_t<T> abs_diff(T lhs, T rhs) noexcept

@@ -15,13 +15,13 @@
 namespace ccm::ext
 {
 	/**
-	 * @brief Frame rate independent linear interpolation smoothing.
-	 * @tparam T Type of the input and output.
-	 * @param a Current value.
-	 * @param b Target value.
-	 * @param t Delta time, in seconds.
-	 * @param h Half-life, time until halfway, in seconds.
-	 * @return The smoothed value.
+	 * \brief Frame rate independent linear interpolation smoothing.
+	 * \tparam T Type of the input and output.
+	 * \param a Current value.
+	 * \param b Target value.
+	 * \param t Delta time, in seconds.
+	 * \param h Half-life, time until halfway, in seconds.
+	 * \return The smoothed value.
 	 */
 	template <typename T> constexpr T lerp_smooth(T a, T b, T t, T h)
 	{

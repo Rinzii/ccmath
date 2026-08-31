@@ -16,18 +16,18 @@
 namespace ccm
 {
 	/**
-	 * @brief Signed remainder as well as the three last bits of the division operation
-	 * @tparam T The type of the arguments
-	 * @param x Floating-point or integer value
-	 * @param y Floating-point or integer value
-	 * @param quo Pointer to int to store the sign and some bits of x / y
-	 * @return If successful, returns the floating-point remainder of the division x / y as defined in ccm::remainder, and stores, in *quo, the sign and at
+	 * \brief Signed remainder as well as the three last bits of the division operation
+	 * \tparam T The type of the arguments
+	 * \param x Floating-point or integer value
+	 * \param y Floating-point or integer value
+	 * \param quo Pointer to int to store the sign and some bits of x / y
+	 * \return If successful, returns the floating-point remainder of the division x / y as defined in ccm::remainder, and stores, in *quo, the sign and at
 	 * least three of the least significant bits of x / y
 	 *
-	 * @attention If you want the quotient pointer to work within a constant context you must perform something like as follows: (The below code will work with
+	 * \attention If you want the quotient pointer to work within a constant context you must perform something like as follows: (The below code will work with
 	 * constexpr and static_assert)
 	 *
-	 * @code
+	 * \code
 	 * constexpr double get_remainder(double x, double y)
 	 * {
 	 *      int quotient {0};
@@ -41,7 +41,7 @@ namespace ccm
 	 *      ccm::remquo(x, y, &quotient);
 	 *      return quotient;
 	 *  }
-	 *  @endcode
+	 *  \endcode
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T remquo(T x, T y, int * quo)
 	{
@@ -55,19 +55,19 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Signed remainder as well as the three last bits of the division operation
-	 * @tparam Arithmetic1 The type of the first argument
-	 * @tparam Arithmetic2 The type of the second argument
-	 * @param x Floating-point or integer values
-	 * @param y Floating-point or integer values
-	 * @param quo Pointer to int to store the sign and some bits of x / y
-	 * @return If successful, returns the floating-point remainder of the division x / y as defined in ccm::remainder, and stores, in *quo, the sign and at
+	 * \brief Signed remainder as well as the three last bits of the division operation
+	 * \tparam Arithmetic1 The type of the first argument
+	 * \tparam Arithmetic2 The type of the second argument
+	 * \param x Floating-point or integer values
+	 * \param y Floating-point or integer values
+	 * \param quo Pointer to int to store the sign and some bits of x / y
+	 * \return If successful, returns the floating-point remainder of the division x / y as defined in ccm::remainder, and stores, in *quo, the sign and at
 	 * least three of the least significant bits of x / y
 	 *
-	 * @attention If you want the quotient pointer to work within a constant context you must perform something like as follows: (The below code will work with
+	 * \attention If you want the quotient pointer to work within a constant context you must perform something like as follows: (The below code will work with
 	 * constexpr and static_assert)
 	 *
-	 * @code
+	 * \code
 	 * constexpr double get_remainder(double x, double y)
 	 * {
 	 *      int quotient {0};
@@ -81,7 +81,7 @@ namespace ccm
 	 *      ccm::remquo(x, y, &quotient);
 	 *      return quotient;
 	 *  }
-	 *  @endcode
+	 *  \endcode
 	 */
 	template <class Arithmetic1, class Arithmetic2, std::enable_if_t<std::is_arithmetic_v<Arithmetic1> && std::is_arithmetic_v<Arithmetic2>, bool> = true>
 	constexpr std::common_type_t<Arithmetic1, Arithmetic2> remquo(Arithmetic1 x, Arithmetic2 y, int * quo)
@@ -91,17 +91,17 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Signed remainder as well as the three last bits of the division operation
-	 * @param x Floating-point value
-	 * @param y Floating-point value
-	 * @param quo Pointer to int to store the sign and some bits of x / y
-	 * @return If successful, returns the floating-point remainder of the division x / y as defined in ccm::remainder, and stores, in *quo, the sign and at
+	 * \brief Signed remainder as well as the three last bits of the division operation
+	 * \param x Floating-point value
+	 * \param y Floating-point value
+	 * \param quo Pointer to int to store the sign and some bits of x / y
+	 * \return If successful, returns the floating-point remainder of the division x / y as defined in ccm::remainder, and stores, in *quo, the sign and at
 	 * least three of the least significant bits of x / y
 	 *
-	 * @attention If you want the quotient pointer to work within a constant context you must perform something like as follows: (The below code will work with
+	 * \attention If you want the quotient pointer to work within a constant context you must perform something like as follows: (The below code will work with
 	 * constexpr and static_assert)
 	 *
-	 * @code
+	 * \code
 	 * constexpr double get_remainder(double x, double y)
 	 * {
 	 *      int quotient {0};
@@ -115,7 +115,7 @@ namespace ccm
 	 *      ccm::remquo(x, y, &quotient);
 	 *      return quotient;
 	 *  }
-	 *  @endcode
+	 *  \endcode
 	 */
 	constexpr float remquof(float x, float y, int * quo)
 	{
@@ -123,17 +123,17 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Signed remainder as well as the three last bits of the division operation
-	 * @param x Floating-point value
-	 * @param y Floating-point value
-	 * @param quo Pointer to int to store the sign and some bits of x / y
-	 * @return If successful, returns the floating-point remainder of the division x / y as defined in ccm::remainder, and stores, in *quo, the sign and at
+	 * \brief Signed remainder as well as the three last bits of the division operation
+	 * \param x Floating-point value
+	 * \param y Floating-point value
+	 * \param quo Pointer to int to store the sign and some bits of x / y
+	 * \return If successful, returns the floating-point remainder of the division x / y as defined in ccm::remainder, and stores, in *quo, the sign and at
 	 * least three of the least significant bits of x / y
 	 *
-	 * @attention If you want the quotient pointer to work within a constant context you must perform something like as follows: (The below code will work with
+	 * \attention If you want the quotient pointer to work within a constant context you must perform something like as follows: (The below code will work with
 	 * constexpr and static_assert)
 	 *
-	 * @code
+	 * \code
 	 * constexpr double get_remainder(double x, double y)
 	 * {
 	 *      int quotient {0};
@@ -147,7 +147,7 @@ namespace ccm
 	 *      ccm::remquo(x, y, &quotient);
 	 *      return quotient;
 	 *  }
-	 *  @endcode
+	 *  \endcode
 	 */
 	constexpr long double remquol(long double x, long double y, int * quo)
 	{
@@ -157,4 +157,4 @@ namespace ccm
 	}
 } // namespace ccm
 
-/// @ingroup basic
+/// \ingroup basic

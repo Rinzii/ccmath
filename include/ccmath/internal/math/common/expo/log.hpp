@@ -22,10 +22,10 @@ CCM_DISABLE_MSVC_WARNING(4702)
 namespace ccm
 {
 	/**
-	 * @brief Computes the natural (base e) logarithm (lnx) of a number.
-	 * @tparam T The type of the number.
-	 * @param num A floating-point or integer value to find the natural logarithm of.
-	 * @return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
+	 * \brief Computes the natural (base e) logarithm (lnx) of a number.
+	 * \tparam T The type of the number.
+	 * \param num A floating-point or integer value to find the natural logarithm of.
+	 * \return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T log(const T num) noexcept
 	{
@@ -73,10 +73,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the natural (base e) logarithm (lnx) of a number.
-	 * @tparam Integer The type of the integer.
-	 * @param num An integer value to find the natural logarithm of.
-	 * @return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
+	 * \brief Computes the natural (base e) logarithm (lnx) of a number.
+	 * \tparam Integer The type of the integer.
+	 * \param num An integer value to find the natural logarithm of.
+	 * \return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double log(const Integer num) noexcept
 	{
@@ -84,9 +84,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the natural (base e) logarithm (lnx) of a number.
-	 * @param num A floating-point value to find the natural logarithm of.
-	 * @return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
+	 * \brief Computes the natural (base e) logarithm (lnx) of a number.
+	 * \param num A floating-point value to find the natural logarithm of.
+	 * \return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
 	 */
 	constexpr float logf(const float num) noexcept
 	{
@@ -94,9 +94,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the natural (base e) logarithm (lnx) of a number.
-	 * @param num A floating-point value to find the natural logarithm of.
-	 * @return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
+	 * \brief Computes the natural (base e) logarithm (lnx) of a number.
+	 * \param num A floating-point value to find the natural logarithm of.
+	 * \return If no errors occur, the natural (base-e) logarithm of num (ln(num) or loge(num)) is returned.
 	 */
 	constexpr long double logl(long double num) noexcept
 	{

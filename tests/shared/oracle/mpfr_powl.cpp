@@ -16,14 +16,14 @@ namespace
 
 	std::vector<pow_case<long double>> build_ld64_cases()
 	{
-		const std::array<long double, 6> bases	   = { 0.25L, 0.5L, 1.0L, 2.0L, 3.0L, 10.0L };
-		const std::array<long double, 6> exponents = { -2.0L, -0.5L, 0.0L, 0.5L, 2.0L, 3.0L };
+		const std::array<long double, 6> bases	   = {0.25L, 0.5L, 1.0L, 2.0L, 3.0L, 10.0L};
+		const std::array<long double, 6> exponents = {-2.0L, -0.5L, 0.0L, 0.5L, 2.0L, 3.0L};
 		std::vector<pow_case<long double>> cases;
 		for (long double base : bases)
 		{
 			for (long double exponent : exponents)
 			{
-				cases.push_back({ base, exponent, "ld64 conservative oracle grid" });
+				cases.push_back({base, exponent, "ld64 conservative oracle grid"});
 			}
 		}
 		return cases;
@@ -34,17 +34,33 @@ namespace
 	{
 		std::vector<pow_case<long double>> cases;
 		const std::array<long double, 10> special_bases = {
-			-std::numeric_limits<long double>::infinity(), -2.0L, -1.0L, -0.0L, 0.0L, 1.0L, 2.0L, 10.0L, std::numeric_limits<long double>::max(),
+			-std::numeric_limits<long double>::infinity(),
+			-2.0L,
+			-1.0L,
+			-0.0L,
+			0.0L,
+			1.0L,
+			2.0L,
+			10.0L,
+			std::numeric_limits<long double>::max(),
 			std::numeric_limits<long double>::infinity(),
 		};
 		const std::array<long double, 9> special_exponents = {
-			-std::numeric_limits<long double>::infinity(), -3.0L, -1.0L, -0.0L, 0.0L, 0.5L, 2.0L, 3.0L, std::numeric_limits<long double>::infinity(),
+			-std::numeric_limits<long double>::infinity(),
+			-3.0L,
+			-1.0L,
+			-0.0L,
+			0.0L,
+			0.5L,
+			2.0L,
+			3.0L,
+			std::numeric_limits<long double>::infinity(),
 		};
 		for (long double base : special_bases)
 		{
 			for (long double exponent : special_exponents)
 			{
-				cases.push_back({ base, exponent, "ld80 special-value matrix" });
+				cases.push_back({base, exponent, "ld80 special-value matrix"});
 			}
 		}
 		return cases;
@@ -53,16 +69,16 @@ namespace
 	std::vector<pow_case<long double>> build_ld80_bounded_integer_cases()
 	{
 		std::vector<pow_case<long double>> cases;
-		for (long double base : { 0.5L, 1.0001L, 2.0L, -2.0L, 10.0L })
+		for (long double base : {0.5L, 1.0001L, 2.0L, -2.0L, 10.0L})
 		{
-			for (long double exponent : { -1000.0L, -3.0L, -1.0L, 0.0L, 1.0L, 3.0L, 10.0L, 1000.0L, 0x1.0p40L })
+			for (long double exponent : {-1000.0L, -3.0L, -1.0L, 0.0L, 1.0L, 3.0L, 10.0L, 1000.0L, 0x1.0p40L})
 			{
-				cases.push_back({ base, exponent, "ld80 bounded integer exponent corpus" });
+				cases.push_back({base, exponent, "ld80 bounded integer exponent corpus"});
 			}
 		}
-		for (long double exponent : { 0x1.0p62L, 0x1.0000000000001p62L, 0x1.0p63L })
+		for (long double exponent : {0x1.0p62L, 0x1.0000000000001p62L, 0x1.0p63L})
 		{
-			cases.push_back({ -1.0L, exponent, "ld80 parity threshold corpus" });
+			cases.push_back({-1.0L, exponent, "ld80 parity threshold corpus"});
 		}
 		return cases;
 	}
@@ -70,20 +86,20 @@ namespace
 	std::vector<pow_case<long double>> build_ld80_general_finite_cases()
 	{
 		std::vector<pow_case<long double>> cases;
-		for (long double base : { 0.999L, 1.001L, 0.5L, 2.0L, 8.0L, 0x1.0p-20L, 0x1.0p20L })
+		for (long double base : {0.999L, 1.001L, 0.5L, 2.0L, 8.0L, 0x1.0p-20L, 0x1.0p20L})
 		{
-			for (long double exponent : { -1000.0L, -0.5L, 0.25L, 2.0L, 1000.0L })
+			for (long double exponent : {-1000.0L, -0.5L, 0.25L, 2.0L, 1000.0L})
 			{
 				if (base == 1.0L)
 				{
 					continue;
 				}
-				cases.push_back({ base, exponent, "ld80 general finite structured grid" });
+				cases.push_back({base, exponent, "ld80 general finite structured grid"});
 			}
 		}
-		for (long double exponent : { 0x1.0p40L, 0x1.0p-40L, 16300.0L, -16300.0L })
+		for (long double exponent : {0x1.0p40L, 0x1.0p-40L, 16300.0L, -16300.0L})
 		{
-			cases.push_back({ 1.0000001L, exponent, "ld80 general finite exponent stress" });
+			cases.push_back({1.0000001L, exponent, "ld80 general finite exponent stress"});
 		}
 		return cases;
 	}
@@ -267,13 +283,8 @@ namespace
 		out << "}\n";
 	}
 
-	powl_campaign_report run_corpus(const std::string & corpus_name,
-									const std::vector<pow_case<long double>> & cases,
-									const std::vector<int> & rounding_modes,
-									ccm::config::LongDoubleFormat format,
-									mpfr_prec_t precision,
-									std::uint64_t max_ulp,
-									std::uint64_t target_ulp)
+	powl_campaign_report run_corpus(const std::string & corpus_name, const std::vector<pow_case<long double>> & cases, const std::vector<int> & rounding_modes,
+									ccm::config::LongDoubleFormat format, mpfr_prec_t precision, std::uint64_t max_ulp, std::uint64_t target_ulp)
 	{
 		powl_campaign_report report;
 		report.format			= format;

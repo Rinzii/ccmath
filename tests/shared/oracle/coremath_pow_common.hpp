@@ -114,15 +114,9 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T, typename Fn>
-	inline std::optional<failure_record<T>> evaluate_case_in_mode(const pow_case<T> & test_case,
-																  std::string_view function_name,
-																  std::string_view path_name,
-																  int rounding_mode,
-																  Fn fn,
-																  run_summary<T> & summary,
-																  std::uint64_t seed						 = 0,
-																  std::string_view search_mode				 = {},
-																  std::vector<failure_record<T>> * event_log = nullptr)
+	inline std::optional<failure_record<T>> evaluate_case_in_mode(const pow_case<T> & test_case, std::string_view function_name, std::string_view path_name,
+																  int rounding_mode, Fn fn, run_summary<T> & summary, std::uint64_t seed = 0,
+																  std::string_view search_mode = {}, std::vector<failure_record<T>> * event_log = nullptr)
 	{
 		return evaluate_binary_coremath_case_in_mode(
 			test_case,
@@ -141,16 +135,9 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T, typename Fn>
-	inline void evaluate_case_all_modes(const pow_case<T> & test_case,
-										std::string_view function_name,
-										std::string_view path_name,
-										const std::vector<int> & rounding_modes,
-										Fn fn,
-										run_summary<T> & summary,
-										std::vector<failure_record<T>> & failures,
-										std::uint64_t seed						   = 0,
-										std::string_view search_mode			   = {},
-										std::vector<failure_record<T>> * event_log = nullptr)
+	inline void evaluate_case_all_modes(const pow_case<T> & test_case, std::string_view function_name, std::string_view path_name,
+										const std::vector<int> & rounding_modes, Fn fn, run_summary<T> & summary, std::vector<failure_record<T>> & failures,
+										std::uint64_t seed = 0, std::string_view search_mode = {}, std::vector<failure_record<T>> * event_log = nullptr)
 	{
 		evaluate_binary_coremath_case_all_modes(
 			test_case,

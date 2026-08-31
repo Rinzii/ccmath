@@ -46,15 +46,15 @@ namespace ccm::intrin
 		}
 		CCM_ALWAYS_INLINE simd_mask operator||(simd_mask const & other) const
 		{
-			return { _mm256_or_ps(m_value, other.m_value) };
+			return {_mm256_or_ps(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE simd_mask operator&&(simd_mask const & other) const
 		{
-			return { _mm256_and_ps(m_value, other.m_value) };
+			return {_mm256_and_ps(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE simd_mask operator!() const
 		{
-			return { _mm256_andnot_ps(m_value, simd_mask(true).get()) };
+			return {_mm256_andnot_ps(m_value, simd_mask(true).get())};
 		}
 
 	private:
@@ -101,23 +101,23 @@ namespace ccm::intrin
 		CCM_ALWAYS_INLINE constexpr simd(__m256 const & value_in) : m_value(value_in) {} // NOLINT
 		CCM_ALWAYS_INLINE simd operator*(simd const & other) const
 		{
-			return { _mm256_mul_ps(m_value, other.m_value) };
+			return {_mm256_mul_ps(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE simd operator/(simd const & other) const
 		{
-			return { _mm256_div_ps(m_value, other.m_value) };
+			return {_mm256_div_ps(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE simd operator+(simd const & other) const
 		{
-			return { _mm256_add_ps(m_value, other.m_value) };
+			return {_mm256_add_ps(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE simd operator-(simd const & other) const
 		{
-			return { _mm256_sub_ps(m_value, other.m_value) };
+			return {_mm256_sub_ps(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd operator-() const
 		{
-			return { _mm256_sub_ps(_mm256_set1_ps(0.0F), m_value) };
+			return {_mm256_sub_ps(_mm256_set1_ps(0.0F), m_value)};
 		}
 		CCM_ALWAYS_INLINE void copy_from(float const * ptr, element_aligned_tag /*unused*/)
 		{
@@ -137,11 +137,11 @@ namespace ccm::intrin
 		}
 		CCM_ALWAYS_INLINE simd_mask<float, abi::avx2> operator<(simd const & other) const
 		{
-			return { _mm256_cmp_ps(m_value, other.m_value, _CMP_LT_OS) };
+			return {_mm256_cmp_ps(m_value, other.m_value, _CMP_LT_OS)};
 		}
 		CCM_ALWAYS_INLINE simd_mask<float, abi::avx2> operator==(simd const & other) const
 		{
-			return { _mm256_cmp_ps(m_value, other.m_value, _CMP_EQ_OS) };
+			return {_mm256_cmp_ps(m_value, other.m_value, _CMP_EQ_OS)};
 		}
 
 	private:
@@ -150,7 +150,7 @@ namespace ccm::intrin
 
 	CCM_ALWAYS_INLINE simd<float, abi::avx2> choose(simd_mask<float, abi::avx2> const & a, simd<float, abi::avx2> const & b, simd<float, abi::avx2> const & c)
 	{
-		return { _mm256_blendv_ps(c.get(), b.get(), a.get()) };
+		return {_mm256_blendv_ps(c.get(), b.get(), a.get())};
 	}
 
 	template <> struct simd_mask<double, abi::avx2>
@@ -171,15 +171,15 @@ namespace ccm::intrin
 		}
 		CCM_ALWAYS_INLINE simd_mask operator||(simd_mask const & other) const
 		{
-			return { _mm256_or_pd(m_value, other.m_value) };
+			return {_mm256_or_pd(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE simd_mask operator&&(simd_mask const & other) const
 		{
-			return { _mm256_and_pd(m_value, other.m_value) };
+			return {_mm256_and_pd(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE simd_mask operator!() const
 		{
-			return { _mm256_andnot_pd(m_value, simd_mask(true).get()) };
+			return {_mm256_andnot_pd(m_value, simd_mask(true).get())};
 		}
 
 	private:
@@ -229,23 +229,23 @@ namespace ccm::intrin
 		CCM_ALWAYS_INLINE constexpr simd(__m256d const & value_in) : m_value(value_in) {}										// NOLINT
 		CCM_ALWAYS_INLINE simd operator*(simd const & other) const
 		{
-			return { _mm256_mul_pd(m_value, other.m_value) };
+			return {_mm256_mul_pd(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE simd operator/(simd const & other) const
 		{
-			return { _mm256_div_pd(m_value, other.m_value) };
+			return {_mm256_div_pd(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE simd operator+(simd const & other) const
 		{
-			return { _mm256_add_pd(m_value, other.m_value) };
+			return {_mm256_add_pd(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE simd operator-(simd const & other) const
 		{
-			return { _mm256_sub_pd(m_value, other.m_value) };
+			return {_mm256_sub_pd(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE CCM_GPU_HOST_DEVICE simd operator-() const
 		{
-			return { _mm256_sub_pd(_mm256_set1_pd(0.0), m_value) };
+			return {_mm256_sub_pd(_mm256_set1_pd(0.0), m_value)};
 		}
 		CCM_ALWAYS_INLINE void copy_from(double const * ptr, element_aligned_tag /*unused*/)
 		{
@@ -265,21 +265,21 @@ namespace ccm::intrin
 		}
 		CCM_ALWAYS_INLINE simd_mask<double, abi::avx2> operator<(simd const & other) const
 		{
-			return { _mm256_cmp_pd(m_value, other.m_value, _CMP_LT_OS) };
+			return {_mm256_cmp_pd(m_value, other.m_value, _CMP_LT_OS)};
 		}
 		CCM_ALWAYS_INLINE simd_mask<double, abi::avx2> operator==(simd const & other) const
 		{
-			return { _mm256_cmp_pd(m_value, other.m_value, _CMP_EQ_OS) };
+			return {_mm256_cmp_pd(m_value, other.m_value, _CMP_EQ_OS)};
 		}
 
 	private:
 		__m256d m_value;
 	};
 
-	CCM_ALWAYS_INLINE simd<double, abi::avx2>
-	choose(simd_mask<double, abi::avx2> const & a, simd<double, abi::avx2> const & b, simd<double, abi::avx2> const & c)
+	CCM_ALWAYS_INLINE simd<double, abi::avx2> choose(simd_mask<double, abi::avx2> const & a, simd<double, abi::avx2> const & b,
+													 simd<double, abi::avx2> const & c)
 	{
-		return { _mm256_blendv_pd(c.get(), b.get(), a.get()) };
+		return {_mm256_blendv_pd(c.get(), b.get(), a.get())};
 	}
 } // namespace ccm::intrin
 

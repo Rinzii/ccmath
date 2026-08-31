@@ -23,10 +23,10 @@ CCM_DISABLE_MSVC_WARNING(4702) // 4702: unreachable code
 namespace ccm
 {
 	/**
-	 * @brief Computes e raised to the given power
-	 * @tparam T floating-point or integer type
-	 * @param num floating-point or integer value
-	 * @return If no errors occur, the base-e exponential of num (e^num) is returned.
+	 * \brief Computes e raised to the given power
+	 * \tparam T floating-point or integer type
+	 * \param num floating-point or integer value
+	 * \return If no errors occur, the base-e exponential of num (e^num) is returned.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T exp(T num)
 	{
@@ -45,10 +45,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes e raised to the given power
-	 * @tparam Integer integer type
-	 * @param num integer value
-	 * @return If no errors occur, the base-e exponential of num (e^num) is returned as double.
+	 * \brief Computes e raised to the given power
+	 * \tparam Integer integer type
+	 * \param num integer value
+	 * \return If no errors occur, the base-e exponential of num (e^num) is returned as double.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double exp(Integer num)
 	{
@@ -56,9 +56,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes e raised to the given power
-	 * @param num floating-point value
-	 * @return If no errors occur, the base-e exponential of num (e^num) is returned as float.
+	 * \brief Computes e raised to the given power
+	 * \param num floating-point value
+	 * \return If no errors occur, the base-e exponential of num (e^num) is returned as float.
 	 */
 	constexpr float expf(float num)
 	{
@@ -66,9 +66,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes e raised to the given power
-	 * @param num floating-point value
-	 * @return If no errors occur, the base-e exponential of num (e^num) is returned as double.
+	 * \brief Computes e raised to the given power
+	 * \param num floating-point value
+	 * \return If no errors occur, the base-e exponential of num (e^num) is returned as double.
 	 */
 	constexpr long double expl(long double num)
 	{

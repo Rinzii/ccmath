@@ -82,31 +82,31 @@ namespace ccm::test::pow_path
 		{
 		case validation_path::public_default:
 		case validation_path::generic_runtime:
-		case validation_path::generic_modeled_domain: return { true, {} };
+		case validation_path::generic_modeled_domain: return {true, {}};
 		case validation_path::runtime_no_builtin:
 #if defined(CCM_CONFIG_TEST_DISABLE_RUNTIME_BUILTIN_POW)
-			return { true, {} };
+			return {true, {}};
 #else
-			return { false, "runtime_no_builtin requires CCMATH_TEST_DISABLE_RUNTIME_BUILTIN=ON at configure time" };
+			return {false, "runtime_no_builtin requires CCMATH_TEST_DISABLE_RUNTIME_BUILTIN=ON at configure time"};
 #endif
 		case validation_path::runtime_simd:
 #if defined(CCMATH_HAS_SIMD)
 			if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>)
 			{
-				return { true, {} };
+				return {true, {}};
 			}
-			return { false, "runtime_simd is only supported for float and double" };
+			return {false, "runtime_simd is only supported for float and double"};
 #else
-			return { false, "runtime_simd requires runtime SIMD to be compiled in" };
+			return {false, "runtime_simd requires runtime SIMD to be compiled in"};
 #endif
 		case validation_path::runtime_builtin:
 			if constexpr (ccm::builtin::has_runtime_pow<T>)
 			{
-				return { true, {} };
+				return {true, {}};
 			}
-			return { false, "runtime_builtin is unavailable on this toolchain" };
+			return {false, "runtime_builtin is unavailable on this toolchain"};
 		}
-		return { false, "unknown path" };
+		return {false, "unknown path"};
 	}
 
 	template <typename T> inline T invoke(validation_path path, T base, T exponent)
@@ -163,8 +163,14 @@ namespace ccm::test::pow_path
 	template <typename T> inline configuration_report make_configuration_report(validation_path path)
 	{
 		return configuration_report{
-			ccm::test::pow_configuration_name(), path_name(path),		  ccm::test::compiler_id(),			  ccm::test::platform_id(),
-			ccm::test::optimization_mode(),		 ccm::test::fma_status(), ccm::test::pow_builtin_status<T>(), ccm::test::simd_status(),
+			ccm::test::pow_configuration_name(),
+			path_name(path),
+			ccm::test::compiler_id(),
+			ccm::test::platform_id(),
+			ccm::test::optimization_mode(),
+			ccm::test::fma_status(),
+			ccm::test::pow_builtin_status<T>(),
+			ccm::test::simd_status(),
 		};
 	}
 

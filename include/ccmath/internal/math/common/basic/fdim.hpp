@@ -18,7 +18,7 @@ namespace ccm::func
 {
 
 	/**
-	 * @internal
+	 * \internal
 	 * Internal implementation that switches between compile time and runtime implementations.
 	 */
 	template <typename T> constexpr auto fdim(T x, T y) -> std::enable_if_t<std::is_floating_point_v<T>, T>

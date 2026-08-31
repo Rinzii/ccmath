@@ -67,28 +67,28 @@ namespace ccm::test::ulp
 
 		if (lhs_bits.is_nan() && rhs_bits.is_nan())
 		{
-			return distance_result<T>{ relation::both_nan, exact_bitwise_equal, false, 0 };
+			return distance_result<T>{relation::both_nan, exact_bitwise_equal, false, 0};
 		}
 		if (lhs_bits.is_nan() || rhs_bits.is_nan())
 		{
-			return distance_result<T>{ relation::nan_mismatch, exact_bitwise_equal, false, 0 };
+			return distance_result<T>{relation::nan_mismatch, exact_bitwise_equal, false, 0};
 		}
 		if (lhs_bits.is_inf() && rhs_bits.is_inf())
 		{
 			if (lhs_bits.sign() == rhs_bits.sign())
 			{
-				return distance_result<T>{ relation::both_infinity_same_sign, exact_bitwise_equal, numerically_equal, 0 };
+				return distance_result<T>{relation::both_infinity_same_sign, exact_bitwise_equal, numerically_equal, 0};
 			}
-			return distance_result<T>{ relation::infinity_mismatch, exact_bitwise_equal, false, 0 };
+			return distance_result<T>{relation::infinity_mismatch, exact_bitwise_equal, false, 0};
 		}
 		if (lhs_bits.is_inf() || rhs_bits.is_inf())
 		{
-			return distance_result<T>{ relation::infinity_mismatch, exact_bitwise_equal, false, 0 };
+			return distance_result<T>{relation::infinity_mismatch, exact_bitwise_equal, false, 0};
 		}
 		if (lhs_bits.is_zero() && rhs_bits.is_zero())
 		{
 			// Signed zero is numerically equal but still exposed through exact_bitwise_equal.
-			return distance_result<T>{ relation::finite, exact_bitwise_equal, true, 0 };
+			return distance_result<T>{relation::finite, exact_bitwise_equal, true, 0};
 		}
 
 		return distance_result<T>{

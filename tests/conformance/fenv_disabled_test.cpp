@@ -11,8 +11,8 @@
 // Built with CCM_CONFIG_DISABLE_FENV so that host_fenv.hpp resolves to its no-fenv tier, the same
 // state a host with no <cfenv> and no <fenv.h> (such as the PS5 toolchain) ends up in. The suite
 // confirms that the headers compile without the host fenv and that the documented fallback contract
-// holds: runtime rounding pinned to round-to-nearest, fp-exception signaling reduced to a no-op, and
-// errno handling still compilable.
+// holds: runtime routing pinned to round-to-nearest, explicit ccmath exception signaling disabled,
+// and errno handling still compilable. Ordinary arithmetic may still set hardware flags.
 
 #include "ccmath/internal/support/fenv/fenv_support.hpp"
 #include "ccmath/internal/support/fenv/host_fenv.hpp"
@@ -42,10 +42,9 @@ TEST(CcmathFenvDisabledTests, RoundingModeIsPinnedToNearest)
 	EXPECT_FALSE(fenv::rounding_mode_is_round_to_zero());
 }
 
-TEST(CcmathFenvDisabledTests, ExceptionSignalingIsNoOp)
+TEST(CcmathFenvDisabledTests, ExplicitExceptionSignalingIsNoOp)
 {
-	// The fp-exception entry points still exist and compile, but they do nothing, and the error
-	// handling mask does not carry the exception bit when the host fenv is unavailable.
+	// The explicit ccmath entry points do nothing when the host fenv is unavailable.
 	EXPECT_EQ(fenv::raise_except_if_required(FE_OVERFLOW | FE_INVALID), 0);
 	EXPECT_EQ(fenv::set_except_if_required(FE_INEXACT), 0);
 	EXPECT_EQ(fenv::ccm_math_err_handling() & fenv::get_mode(fenv::ccm_math_err_mode::eErrnoExcept), 0);

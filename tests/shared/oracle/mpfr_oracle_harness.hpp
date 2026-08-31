@@ -163,23 +163,13 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T, typename ActualFn, typename ReferenceFn, typename ExceptionalReferenceFn, typename UsesFullOracleFn, typename SkipReasonFn>
-	inline std::optional<failure_record<T>> evaluate_binary_mpfr_case(const pow_case<T> & test_case,
-																	  std::string_view function_name,
-																	  std::string_view path_name,
-																	  ccm::test::pow_path::validation_path path,
-																	  ActualFn actual_fn,
-																	  ReferenceFn reference_fn,
-																	  ExceptionalReferenceFn exceptional_reference_fn,
-																	  UsesFullOracleFn uses_full_oracle_fn,
-																	  SkipReasonFn skip_reason_fn,
-																	  mpfr_prec_t oracle_precision,
-																	  std::uint64_t max_ulp,
-																	  run_summary<T> & summary,
-																	  std::uint64_t target_ulp					 = 0,
-																	  std::uint64_t seed						 = 0,
-																	  std::string_view search_mode				 = {},
-																	  std::string_view mismatch_note			 = "exceptional mismatch vs std reference",
-																	  std::vector<failure_record<T>> * event_log = nullptr)
+	inline std::optional<failure_record<T>>
+	evaluate_binary_mpfr_case(const pow_case<T> & test_case, std::string_view function_name, std::string_view path_name,
+							  ccm::test::pow_path::validation_path path, ActualFn actual_fn, ReferenceFn reference_fn,
+							  ExceptionalReferenceFn exceptional_reference_fn, UsesFullOracleFn uses_full_oracle_fn, SkipReasonFn skip_reason_fn,
+							  mpfr_prec_t oracle_precision, std::uint64_t max_ulp, run_summary<T> & summary, std::uint64_t target_ulp = 0,
+							  std::uint64_t seed = 0, std::string_view search_mode = {},
+							  std::string_view mismatch_note = "exceptional mismatch vs std reference", std::vector<failure_record<T>> * event_log = nullptr)
 	{
 		if (const auto skip = skip_reason_fn(path, test_case.base, test_case.exponent))
 		{
@@ -363,19 +353,9 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T>
-	inline ternary_failure_record<T> make_ternary_failure_record(std::string_view function_name,
-																 std::string_view path,
-																 std::string_view provenance,
-																 T x,
-																 T y,
-																 T z,
-																 T actual,
-																 T expected,
-																 std::uint64_t ulp_distance,
-																 unsigned long oracle_precision,
-																 std::uint64_t seed,
-																 std::string_view notes,
-																 std::string_view event_kind = "mpfr_hard_failure")
+	inline ternary_failure_record<T> make_ternary_failure_record(std::string_view function_name, std::string_view path, std::string_view provenance, T x, T y,
+																 T z, T actual, T expected, std::uint64_t ulp_distance, unsigned long oracle_precision,
+																 std::uint64_t seed, std::string_view notes, std::string_view event_kind = "mpfr_hard_failure")
 	{
 		return ternary_failure_record<T>{
 			std::string(function_name),
@@ -409,17 +389,10 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T, typename ActualFn, typename ReferenceFn, typename ExceptionalReferenceFn>
-	inline std::optional<ternary_failure_record<T>> evaluate_ternary_mpfr_case(const ternary_case<T> & test_case,
-																			   std::string_view function_name,
-																			   std::string_view path_name,
-																			   ActualFn actual_fn,
-																			   ReferenceFn reference_fn,
-																			   ExceptionalReferenceFn exceptional_reference_fn,
-																			   mpfr_prec_t oracle_precision,
-																			   std::uint64_t max_ulp,
-																			   std::uint64_t seed,
-																			   ternary_run_summary<T> & summary,
-																			   std::string_view mismatch_note = "exceptional mismatch vs std reference")
+	inline std::optional<ternary_failure_record<T>>
+	evaluate_ternary_mpfr_case(const ternary_case<T> & test_case, std::string_view function_name, std::string_view path_name, ActualFn actual_fn,
+							   ReferenceFn reference_fn, ExceptionalReferenceFn exceptional_reference_fn, mpfr_prec_t oracle_precision, std::uint64_t max_ulp,
+							   std::uint64_t seed, ternary_run_summary<T> & summary, std::string_view mismatch_note = "exceptional mismatch vs std reference")
 	{
 		++summary.case_count;
 
@@ -537,17 +510,9 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T>
-	inline unary_failure_record<T> make_unary_failure_record(std::string_view function_name,
-															 std::string_view path,
-															 std::string_view provenance,
-															 T input,
-															 T actual,
-															 T expected,
-															 std::uint64_t ulp_distance,
-															 unsigned long oracle_precision,
-															 std::uint64_t seed,
-															 std::string_view notes,
-															 std::string_view event_kind = "mpfr_hard_failure")
+	inline unary_failure_record<T> make_unary_failure_record(std::string_view function_name, std::string_view path, std::string_view provenance, T input,
+															 T actual, T expected, std::uint64_t ulp_distance, unsigned long oracle_precision,
+															 std::uint64_t seed, std::string_view notes, std::string_view event_kind = "mpfr_hard_failure")
 	{
 		return unary_failure_record<T>{
 			std::string(function_name),
@@ -576,19 +541,12 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T, typename ActualFn, typename ReferenceFn, typename ExceptionalReferenceFn>
-	inline std::optional<unary_failure_record<T>> evaluate_unary_mpfr_case(const unary_case<T> & test_case,
-																		   std::string_view function_name,
-																		   std::string_view path_name,
-																		   ActualFn actual_fn,
-																		   ReferenceFn reference_fn,
-																		   ExceptionalReferenceFn exceptional_reference_fn,
-																		   mpfr_prec_t oracle_precision,
-																		   std::uint64_t max_ulp,
-																		   std::uint64_t seed,
-																		   unary_run_summary<T> & summary,
-																		   std::uint64_t target_ulp		  = 0,
-																		   std::string_view mismatch_note = "exceptional mismatch vs std reference",
-																		   std::vector<unary_failure_record<T>> * event_log = nullptr)
+	inline std::optional<unary_failure_record<T>>
+	evaluate_unary_mpfr_case(const unary_case<T> & test_case, std::string_view function_name, std::string_view path_name, ActualFn actual_fn,
+							 ReferenceFn reference_fn, ExceptionalReferenceFn exceptional_reference_fn, mpfr_prec_t oracle_precision, std::uint64_t max_ulp,
+							 std::uint64_t seed, unary_run_summary<T> & summary, std::uint64_t target_ulp = 0,
+							 std::string_view mismatch_note					  = "exceptional mismatch vs std reference",
+							 std::vector<unary_failure_record<T>> * event_log = nullptr)
 	{
 		++summary.case_count;
 

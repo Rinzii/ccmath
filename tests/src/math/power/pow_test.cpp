@@ -477,7 +477,7 @@ TEST(CcmathPowerTests, PowNegInfBaseNegativeNonIntegerExponent)
 // (e.g. glibc) return a pow(x, -1) that is one ULP off the IEEE reciprocal.
 TEST(CcmathPowerTests, PowNegativeOneExponentMatchesDivision)
 {
-	for (const std::uint64_t base_bits : { 0x3f4fffffffffffffULL, 0x3fdfffffffffffffULL, 0x3fefffffffffffffULL, 0x3fffffffffffffffULL, 0x408fffffffffffffULL })
+	for (const std::uint64_t base_bits : {0x3f4fffffffffffffULL, 0x3fdfffffffffffffULL, 0x3fefffffffffffffULL, 0x3fffffffffffffffULL, 0x408fffffffffffffULL})
 	{
 		const double base = ccm::support::bit_cast<double>(base_bits);
 		EXPECT_EQ(ccm::support::bit_cast<std::uint64_t>(ccm::gen::pow_gen(base, -1.0)), ccm::support::bit_cast<std::uint64_t>(1.0 / base));
@@ -555,8 +555,7 @@ TEST(CcmathPowerTests, PowLargeExponents)
 TEST(CcmathPowerTests, PowIdentityExponent)
 {
 	const double values[] = {
-		-100.0, -1.0, -0.0, 0.0, 1.0, 100.0, std::numeric_limits<double>::min(), std::numeric_limits<double>::max(), std::numeric_limits<double>::denorm_min()
-	};
+		-100.0, -1.0, -0.0, 0.0, 1.0, 100.0, std::numeric_limits<double>::min(), std::numeric_limits<double>::max(), std::numeric_limits<double>::denorm_min()};
 
 	for (double x : values)
 	{
@@ -569,7 +568,7 @@ TEST(CcmathPowerTests, PowIdentityExponent)
 
 TEST(CcmathPowerTests, PowReciprocalExponent)
 {
-	const double values[] = { 0.5, 1.0, 2.0, 3.0, 10.0, 100.0, std::numeric_limits<double>::min() };
+	const double values[] = {0.5, 1.0, 2.0, 3.0, 10.0, 100.0, std::numeric_limits<double>::min()};
 
 	for (double x : values)
 	{

@@ -43,7 +43,7 @@ namespace ccm::gen::impl
 			using DVec	  = pp::basic_simd<double, Abi>;
 			const DVec hi = a + b;
 			const DVec t  = hi - a;
-			return { hi, b - t };
+			return {hi, b - t};
 		}
 
 		// types::add(DoubleDouble, DoubleDouble). Assumption: |a.hi| >= |b.hi|.
@@ -61,7 +61,7 @@ namespace ccm::gen::impl
 			const DVec t1 = c * a;
 			const DVec t2 = a - t1;
 			const DVec hi = t1 + t2;
-			return { hi, a - hi };
+			return {hi, a - hi};
 		}
 
 		// Dekker's product, mirroring types::exact_mult.
@@ -74,7 +74,7 @@ namespace ccm::gen::impl
 			const DVec t1	  = (as.hi * bs.hi) - hi;
 			const DVec t2	  = (as.hi * bs.lo) + t1;
 			const DVec t3	  = (as.lo * bs.hi) + t2;
-			return { hi, (as.lo * bs.lo) + t3 };
+			return {hi, (as.lo * bs.lo) + t3};
 		}
 
 		// types::quick_mult(double, DoubleDouble).
@@ -109,13 +109,13 @@ namespace ccm::gen::impl
 
 		template <typename Abi> CCM_ALWAYS_INLINE VDD<Abi> v_select(pp::basic_simd_mask<8, Abi> const & mask, VDD<Abi> const & a, VDD<Abi> const & b) noexcept
 		{
-			return { pp::simd_select(mask, a.hi, b.hi), pp::simd_select(mask, a.lo, b.lo) };
+			return {pp::simd_select(mask, a.hi, b.hi), pp::simd_select(mask, a.lo, b.lo)};
 		}
 
 		template <typename Abi> CCM_ALWAYS_INLINE VDD<Abi> v_broadcast(types::DoubleDouble const & c) noexcept
 		{
 			using DVec = pp::basic_simd<double, Abi>;
-			return { DVec(c.hi), DVec(c.lo) };
+			return {DVec(c.hi), DVec(c.lo)};
 		}
 	} // namespace simd_detail
 
@@ -230,10 +230,10 @@ namespace ccm::gen::impl
 			const VDD log2_1p = sd::v_quick_mult(dx2_dd, p_dd);
 
 			// Lower-order parts of (e_x - log2(r1)) and -log2(r2). LOG2_R2_DD is stored {lo, hi}.
-			const VDD log2_x_mid{ lr_mid, lr_lo };
+			const VDD log2_x_mid{lr_mid, lr_lo};
 			const DVec lr2_lo([&](auto i) { return LOG2_R2_DD[static_cast<std::size_t>(idx2_i[i])].lo; });
 			const DVec lr2_hi([&](auto i) { return LOG2_R2_DD[static_cast<std::size_t>(idx2_i[i])].hi; });
-			const VDD log2_r2_dd{ lr2_lo, lr2_hi };
+			const VDD log2_r2_dd{lr2_lo, lr2_hi};
 			const VDD log2_x_m = sd::v_add(log2_r2_dd, log2_x_mid);
 
 			// The two Fast2Sum orderings the scalar resolves with larger_exponent branches.
@@ -261,7 +261,7 @@ namespace ccm::gen::impl
 
 			const DVec exp2_hm_hi = pp::simd_bit_cast<double>(exp2_hi_i + mid_hi_i);
 			const DVec exp2_hm_lo = pp::simd_bit_cast<double>(pp::simd_select(idx_y != I64(0), exp2_hi_i + mid_lo_i, I64(0)));
-			const VDD exp2_hm{ exp2_hm_hi, exp2_hm_lo };
+			const VDD exp2_hm{exp2_hm_hi, exp2_hm_lo};
 
 			VDD exp2_poly = sd::v_broadcast<Abi>(POW_DD_EXP2_COEFFS[9]);
 			exp2_poly	  = sd::v_multiply_add(lo6, exp2_poly, sd::v_broadcast<Abi>(POW_DD_EXP2_COEFFS[8]));

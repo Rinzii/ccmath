@@ -28,10 +28,10 @@ CCM_DISABLE_MSVC_WARNING(4702)
 namespace ccm
 {
 	/**
-	 * @brief Returns the base 2 logarithm of a number.
-	 * @tparam T The type of the number.
-	 * @param num The number to calculate the base 2 logarithm of.
-	 * @return The base 2 logarithm of the number.
+	 * \brief Returns the base 2 logarithm of a number.
+	 * \tparam T The type of the number.
+	 * \param num The number to calculate the base 2 logarithm of.
+	 * \return The base 2 logarithm of the number.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T log2(T num) noexcept
 	{
@@ -82,10 +82,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Returns the base 2 logarithm of a number.
-	 * @tparam Integer The type of the integer.
-	 * @param num The number to calculate the base 2 logarithm of.
-	 * @return The base 2 logarithm of the number as a double.
+	 * \brief Returns the base 2 logarithm of a number.
+	 * \tparam Integer The type of the integer.
+	 * \param num The number to calculate the base 2 logarithm of.
+	 * \return The base 2 logarithm of the number as a double.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double log2(Integer num) noexcept
 	{
@@ -93,9 +93,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Returns the base 2 logarithm of a number.
-	 * @param num The number to calculate the base 2 logarithm of.
-	 * @return The base 2 logarithm of the number as a float.
+	 * \brief Returns the base 2 logarithm of a number.
+	 * \param num The number to calculate the base 2 logarithm of.
+	 * \return The base 2 logarithm of the number as a float.
 	 */
 	constexpr float log2f(float num)
 	{
@@ -103,9 +103,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Returns the base 2 logarithm of a number.
-	 * @param num The number to calculate the base 2 logarithm of.
-	 * @return The base 2 logarithm of the number as a double.
+	 * \brief Returns the base 2 logarithm of a number.
+	 * \param num The number to calculate the base 2 logarithm of.
+	 * \return The base 2 logarithm of the number as a double.
 	 */
 	constexpr long double log2l(long double num)
 	{

@@ -14,7 +14,7 @@
 
 namespace ccm::support
 {
-	/// @cond HIDDEN
+	/// \cond HIDDEN
 	namespace detail
 	{
 		// A variadic alias template that resolves to its first argument.
@@ -38,7 +38,7 @@ namespace ccm::support
 
 	template <typename Pp> struct not_ : std::bool_constant<!static_cast<bool>(Pp::value)>
 	{};
-	/// @endcond
+	/// \endcond
 
 	template <typename... Bn> inline constexpr bool or_v  = or_<Bn...>::value;
 	template <typename... Bn> inline constexpr bool and_v = and_<Bn...>::value;

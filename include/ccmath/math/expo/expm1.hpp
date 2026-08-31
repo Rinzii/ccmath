@@ -25,10 +25,10 @@ CCM_DISABLE_MSVC_WARNING(4702)
 namespace ccm
 {
 	/**
-	 * @brief Computes exp(num) - 1 with improved accuracy near zero.
-	 * @tparam T Floating-point type.
-	 * @param num Floating-point value.
-	 * @return exp(num) - 1.
+	 * \brief Computes exp(num) - 1 with improved accuracy near zero.
+	 * \tparam T Floating-point type.
+	 * \param num Floating-point value.
+	 * \return exp(num) - 1.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T expm1(T num)
 	{
@@ -47,10 +47,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes exp(num) - 1 after promoting an integer input to double.
-	 * @tparam Integer Integral type.
-	 * @param num Integer value.
-	 * @return exp(num) - 1 as double.
+	 * \brief Computes exp(num) - 1 after promoting an integer input to double.
+	 * \tparam Integer Integral type.
+	 * \param num Integer value.
+	 * \return exp(num) - 1 as double.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double expm1(Integer num)
 	{
@@ -58,9 +58,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes exp(num) - 1 for float.
-	 * @param num Floating-point value.
-	 * @return exp(num) - 1 as float.
+	 * \brief Computes exp(num) - 1 for float.
+	 * \param num Floating-point value.
+	 * \return exp(num) - 1 as float.
 	 */
 	constexpr float expm1f(float num)
 	{
@@ -68,9 +68,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes exp(num) - 1 for long double.
-	 * @param num Floating-point value.
-	 * @return exp(num) - 1 as long double.
+	 * \brief Computes exp(num) - 1 for long double.
+	 * \param num Floating-point value.
+	 * \return exp(num) - 1 as long double.
 	 */
 	constexpr long double expm1l(long double num)
 	{

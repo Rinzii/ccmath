@@ -16,10 +16,10 @@
 namespace ccm
 {
 	/**
-	 * @brief Checks if the given number has a finite value.
-	 * @tparam T The type of the number.
-	 * @param num A floating-point or integer value
-	 * @return true if the number has a finite value, false otherwise.
+	 * \brief Checks if the given number has a finite value.
+	 * \tparam T The type of the number.
+	 * \param num A floating-point or integer value
+	 * \return true if the number has a finite value, false otherwise.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr bool isfinite(T num)
 	{
@@ -35,9 +35,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Checks if the given number has a finite value.
-	 * @tparam Integer The type of the integer.
-	 * @return true if the number has a finite value, false otherwise.
+	 * \brief Checks if the given number has a finite value.
+	 * \tparam Integer The type of the integer.
+	 * \return true if the number has a finite value, false otherwise.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr bool isfinite(Integer /* x */)
 	{

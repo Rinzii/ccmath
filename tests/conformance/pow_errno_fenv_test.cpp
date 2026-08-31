@@ -121,13 +121,13 @@ TEST(CcmathPowFenvTests, GenericPowfBaseTwoCorrectlyRoundedAtRangeThresholdsAllM
 	constexpr float kMinSub = std::numeric_limits<float>::denorm_min();
 
 	// 2^128 and 2^129 overflow. 2^-150 and below sit beneath the smallest subnormal 2^-149.
-	constexpr std::array<ThresholdCase, 5> kCases = { {
-		{ 128.0F, kInf, kInf, kMax, kMax },
-		{ 129.0F, kInf, kInf, kMax, kMax },
-		{ -150.0F, 0.0F, kMinSub, 0.0F, 0.0F },
-		{ -151.0F, 0.0F, kMinSub, 0.0F, 0.0F },
-		{ -152.0F, 0.0F, kMinSub, 0.0F, 0.0F },
-	} };
+	constexpr std::array<ThresholdCase, 5> kCases = {{
+		{128.0F, kInf, kInf, kMax, kMax},
+		{129.0F, kInf, kInf, kMax, kMax},
+		{-150.0F, 0.0F, kMinSub, 0.0F, 0.0F},
+		{-151.0F, 0.0F, kMinSub, 0.0F, 0.0F},
+		{-152.0F, 0.0F, kMinSub, 0.0F, 0.0F},
+	}};
 
 	ccm::test::ForEachRoundingModeOrSkip([&](int mode) {
 		for (const ThresholdCase & threshold : kCases)

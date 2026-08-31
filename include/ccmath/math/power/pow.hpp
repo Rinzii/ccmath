@@ -26,8 +26,7 @@ namespace ccm::detail
 		using left_type	 = cmath_pow_argument_t<T>;
 		using right_type = cmath_pow_argument_t<U>;
 
-		using type = std::conditional_t<std::is_same_v<left_type, long double> || std::is_same_v<right_type, long double>,
-										long double,
+		using type = std::conditional_t<std::is_same_v<left_type, long double> || std::is_same_v<right_type, long double>, long double,
 										std::conditional_t<std::is_same_v<left_type, double> || std::is_same_v<right_type, double>, double, float>>;
 	};
 
@@ -37,11 +36,11 @@ namespace ccm::detail
 namespace ccm
 {
 	/**
-	 * @brief Raises a floating-point base to a floating-point exponent.
-	 * @tparam T Floating-point type.
-	 * @param base Base value.
-	 * @param exp Exponent value.
-	 * @return base raised to exp.
+	 * \brief Raises a floating-point base to a floating-point exponent.
+	 * \tparam T Floating-point type.
+	 * \param base Base value.
+	 * \param exp Exponent value.
+	 * \return base raised to exp.
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T pow(T base, T exp)
 	{
@@ -76,15 +75,14 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Raises arithmetic inputs to a power after applying the [c.math]/3 promotion rule.
-	 * @tparam Arithmetic1 Arithmetic type of the base.
-	 * @tparam Arithmetic2 Arithmetic type of the exponent.
-	 * @param base Base value.
-	 * @param exp Exponent value.
-	 * @return base raised to exp in the promoted floating-point type.
+	 * \brief Raises arithmetic inputs to a power after applying the [c.math]/3 promotion rule.
+	 * \tparam Arithmetic1 Arithmetic type of the base.
+	 * \tparam Arithmetic2 Arithmetic type of the exponent.
+	 * \param base Base value.
+	 * \param exp Exponent value.
+	 * \return base raised to exp in the promoted floating-point type.
 	 */
-	template <typename Arithmetic1,
-			  typename Arithmetic2,
+	template <typename Arithmetic1, typename Arithmetic2,
 			  std::enable_if_t<std::is_arithmetic_v<Arithmetic1> && std::is_arithmetic_v<Arithmetic2> &&
 								   !(std::is_floating_point_v<Arithmetic1> && std::is_same_v<std::remove_cv_t<Arithmetic1>, std::remove_cv_t<Arithmetic2>>),
 							   bool> = true>
@@ -95,10 +93,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Raises float inputs to a power.
-	 * @param base Base value.
-	 * @param exp Exponent value.
-	 * @return base raised to exp as float.
+	 * \brief Raises float inputs to a power.
+	 * \param base Base value.
+	 * \param exp Exponent value.
+	 * \return base raised to exp as float.
 	 */
 	constexpr float powf(float base, float exp)
 	{
@@ -106,11 +104,11 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Raises long double inputs to a power.
-	 * @param base Base value.
-	 * @param exp Exponent value.
-	 * @return base raised to exp as long double.
-	 * @note Native long-double precision is available only when long double is x87 binary80.
+	 * \brief Raises long double inputs to a power.
+	 * \param base Base value.
+	 * \param exp Exponent value.
+	 * \return base raised to exp as long double.
+	 * \note Native long-double precision is available only when long double is x87 binary80.
 	 *       On other platforms the default path evaluates pow in double precision and casts
 	 *       the result to long double. That fallback is not native long-double accuracy yet.
 	 */

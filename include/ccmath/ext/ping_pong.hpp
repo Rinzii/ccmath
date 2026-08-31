@@ -18,11 +18,11 @@
 namespace ccm::ext
 {
 	/**
-	 * @brief Ping-pong a value between 0 and a specified range.
-	 * @tparam T Type of the input.
-	 * @param a Value to ping-pong.
-	 * @param b Range to ping-pong within.
-	 * @return The ping-ponged value.
+	 * \brief Ping-pong a value between 0 and a specified range.
+	 * \tparam T Type of the input.
+	 * \param a Value to ping-pong.
+	 * \param b Range to ping-pong within.
+	 * \return The ping-ponged value.
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T ping_pong(T a, T b) noexcept
 	{

@@ -67,7 +67,7 @@ namespace ccm::builtin
 {
 	// clang-format off
 	/**
-	 * @internal
+	 * \internal
 	 */
 	template <typename T>
 	inline constexpr bool has_constexpr_isinf =
@@ -88,7 +88,7 @@ namespace ccm::builtin
 #endif
 
 	/**
-	 * @internal
+	 * \internal
 	 * Wrapper for constexpr __builtin_isinf functions.
 	 * This should be used internally and always be wrapped in an if constexpr statement.
 	 * It exists only to allow for usage of __builtin_isinf functions without triggering a compiler error

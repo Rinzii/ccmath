@@ -16,7 +16,7 @@ namespace asmlab::golden::poly_estrin
 
 	inline float coeff(unsigned index)
 	{
-		static volatile float table[6] = { 1.125f, -0.25f, 0.03125f, -0.0078125f, 0.00390625f, -0.001953125f };
+		static volatile float table[6] = {1.125f, -0.25f, 0.03125f, -0.0078125f, 0.00390625f, -0.001953125f};
 		return table[index];
 	}
 

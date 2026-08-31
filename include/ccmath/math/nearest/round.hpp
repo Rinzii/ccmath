@@ -22,10 +22,10 @@
 namespace ccm
 {
 	/**
-	 * @brief Rounds num to the nearest integer, with halfway cases away from zero.
-	 * @tparam T The type of the number.
-	 * @param num A floating-point or integer value.
-	 * @return The rounded value.
+	 * \brief Rounds num to the nearest integer, with halfway cases away from zero.
+	 * \tparam T The type of the number.
+	 * \param num A floating-point or integer value.
+	 * \return The rounded value.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T round(T num) noexcept
 	{
@@ -55,10 +55,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Returns the rounded value of an integer input after conversion to double.
-	 * @tparam Integer Integral type.
-	 * @param num Integer value.
-	 * @return num converted to double.
+	 * \brief Returns the rounded value of an integer input after conversion to double.
+	 * \tparam Integer Integral type.
+	 * \param num Integer value.
+	 * \return num converted to double.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double round(Integer num) noexcept
 	{
@@ -66,9 +66,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Rounds a float to the nearest integer value, halfway cases away from zero.
-	 * @param num Floating-point value.
-	 * @return Rounded value as float.
+	 * \brief Rounds a float to the nearest integer value, halfway cases away from zero.
+	 * \param num Floating-point value.
+	 * \return Rounded value as float.
 	 */
 	constexpr float roundf(float num) noexcept
 	{
@@ -76,9 +76,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Rounds a double to the nearest integer value, halfway cases away from zero.
-	 * @param num Floating-point value.
-	 * @return Rounded value as double.
+	 * \brief Rounds a double to the nearest integer value, halfway cases away from zero.
+	 * \param num Floating-point value.
+	 * \return Rounded value as double.
 	 */
 	constexpr long double roundl(long double num) noexcept
 	{
@@ -86,4 +86,4 @@ namespace ccm
 	}
 } // namespace ccm
 
-/// @ingroup nearest
+/// \ingroup nearest

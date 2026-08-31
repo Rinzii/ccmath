@@ -69,11 +69,9 @@ namespace
 
 		// Exceptional grid: zeros, ones, infinities, NaN, denormals, extremes, negative bases.
 		const double special_bases[] = {
-			0.0, -0.0, 1.0, -1.0, 2.0, -2.0, 10.0, 0.5, inf, -inf, qnan, denorm, -denorm, minn, maxd, -maxd, 1.0000000000000002, 0.9999999999999999, 1.5, -1.5
-		};
+			0.0, -0.0, 1.0, -1.0, 2.0, -2.0, 10.0, 0.5, inf, -inf, qnan, denorm, -denorm, minn, maxd, -maxd, 1.0000000000000002, 0.9999999999999999, 1.5, -1.5};
 		const double special_exps[] = {
-			0.0, -0.0, 1.0, -1.0, 2.0, 3.0, -3.0, 0.5, -0.5, 2.5, 1023.0, -1074.0, 1025.0, inf, -inf, qnan, 1e300, -1e300, 0.3333333333333333, 5.5e18
-		};
+			0.0, -0.0, 1.0, -1.0, 2.0, 3.0, -3.0, 0.5, -0.5, 2.5, 1023.0, -1074.0, 1025.0, inf, -inf, qnan, 1e300, -1e300, 0.3333333333333333, 5.5e18};
 		for (double b : special_bases)
 		{
 			for (double e : special_exps)
@@ -94,7 +92,7 @@ namespace
 		// Hard near-one region with large exponents (stresses the double-double pipeline).
 		for (double b = 0.95; b <= 1.05; b += 0.00037)
 		{
-			for (double e : { -4000.1, -750.3, -13.7, 13.7, 750.3, 4000.1 })
+			for (double e : {-4000.1, -750.3, -13.7, 13.7, 750.3, 4000.1})
 			{
 				add(b, e);
 			}
@@ -125,7 +123,7 @@ namespace
 		for (double b = 2.0; b <= 500.0; b *= 1.6)
 		{
 			const double k = std::log(1.7e308) / std::log(b);
-			for (double d : { -2.0, -0.5, 0.0, 0.5, 2.0 })
+			for (double d : {-2.0, -0.5, 0.0, 0.5, 2.0})
 			{
 				add(b, k + d);
 				add(b, -(k + d));
@@ -135,14 +133,14 @@ namespace
 		// Subnormal bases.
 		for (int e2 = -1074; e2 <= -1000; e2 += 7)
 		{
-			for (double e : { -2.5, -1.1, 0.7, 1.3, 2.9 })
+			for (double e : {-2.5, -1.1, 0.7, 1.3, 2.9})
 			{
 				add(std::ldexp(1.2345, e2), e);
 			}
 		}
 
 		// Huge exponents straddling the clamp threshold 0x43d74910d52d3052.
-		for (double b : { 0.97, 0.9999999, 1.0000001, 1.03 })
+		for (double b : {0.97, 0.9999999, 1.0000001, 1.03})
 		{
 			for (int e2 = 55; e2 <= 70; ++e2)
 			{
@@ -160,7 +158,7 @@ namespace
 			add(base_dist(rng), exp_dist(rng));
 		}
 
-		return { std::move(xs), std::move(ys) };
+		return {std::move(xs), std::move(ys)};
 	}
 
 	template <typename V> void expect_matches_scalar(const std::vector<double> & xs, const std::vector<double> & ys, const char * tag)
@@ -213,11 +211,11 @@ namespace
 		std::feclearexcept(FE_ALL_EXCEPT);
 		errno = 0;
 		run();
-		return { std::fetestexcept(FE_OVERFLOW) != 0,
-				 std::fetestexcept(FE_UNDERFLOW) != 0,
-				 std::fetestexcept(FE_INVALID) != 0,
-				 std::fetestexcept(FE_DIVBYZERO) != 0,
-				 errno };
+		return {std::fetestexcept(FE_OVERFLOW) != 0,
+				std::fetestexcept(FE_UNDERFLOW) != 0,
+				std::fetestexcept(FE_INVALID) != 0,
+				std::fetestexcept(FE_DIVBYZERO) != 0,
+				errno};
 	}
 } // namespace
 
@@ -297,17 +295,17 @@ TEST(CcmathPowSimd, FenvAndErrnoParityWithScalarKernel)
 	using V = native_simd<double>;
 
 	const double cases[][2] = {
-		{ 1e300, 3.0 },		 // overflow
-		{ 1e-300, 3.0 },	 // underflow
-		{ 2.0, 2000.0 },	 // overflow through the scale path
-		{ 2.0, -2000.0 },	 // underflow through the scale path
-		{ 0.0, 2.0 },		 // exact zero, no flags
-		{ 0.0, -2.0 },		 // pole, divide by zero
-		{ -2.0, 0.5 },		 // domain error, invalid
-		{ 2.0, 3.0 },		 // clean exact
-		{ 1.5, 7.25 },		 // clean inexact fast path
-		{ 0.5, 2000.0 },	 // underflow
-		{ 1.0000001, 1e15 }, // overflow from a near-one base
+		{1e300, 3.0},	   // overflow
+		{1e-300, 3.0},	   // underflow
+		{2.0, 2000.0},	   // overflow through the scale path
+		{2.0, -2000.0},	   // underflow through the scale path
+		{0.0, 2.0},		   // exact zero, no flags
+		{0.0, -2.0},	   // pole, divide by zero
+		{-2.0, 0.5},	   // domain error, invalid
+		{2.0, 3.0},		   // clean exact
+		{1.5, 7.25},	   // clean inexact fast path
+		{0.5, 2000.0},	   // underflow
+		{1.0000001, 1e15}, // overflow from a near-one base
 	};
 
 	for (const auto & c : cases)

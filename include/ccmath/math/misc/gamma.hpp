@@ -20,10 +20,10 @@
 namespace ccm
 {
 	/**
-	 * @brief Computes the gamma function using the standard std::tgamma entry point.
-	 * @tparam T floating-point or integer type
-	 * @param num floating-point or integer value
-	 * @return If no errors occur, the gamma function value of num is returned.
+	 * \brief Computes the gamma function using the standard std::tgamma entry point.
+	 * \tparam T floating-point or integer type
+	 * \param num floating-point or integer value
+	 * \return If no errors occur, the gamma function value of num is returned.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T tgamma(T num)
 	{
@@ -54,10 +54,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the gamma function after promoting an integer input to double.
-	 * @tparam Integer Integral type.
-	 * @param num Integer value.
-	 * @return Gamma function value of num as double.
+	 * \brief Computes the gamma function after promoting an integer input to double.
+	 * \tparam Integer Integral type.
+	 * \param num Integer value.
+	 * \return Gamma function value of num as double.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double tgamma(Integer num)
 	{
@@ -75,9 +75,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the gamma function for float.
-	 * @param num Floating-point value.
-	 * @return Gamma function value of num as float.
+	 * \brief Computes the gamma function for float.
+	 * \param num Floating-point value.
+	 * \return Gamma function value of num as float.
 	 */
 	constexpr float tgammaf(float num)
 	{
@@ -85,9 +85,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the gamma function for long double.
-	 * @param num Floating-point value.
-	 * @return Gamma function value of num as long double.
+	 * \brief Computes the gamma function for long double.
+	 * \param num Floating-point value.
+	 * \return Gamma function value of num as long double.
 	 */
 	constexpr long double tgammal(long double num)
 	{

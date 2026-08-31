@@ -17,10 +17,10 @@
 namespace ccm::ext
 {
 	/**
-	 * @brief Converts an angle in degrees to radians.
-	 * @tparam T Floating-point type.
-	 * @param degrees Angle in degrees.
-	 * @return The angle in radians.
+	 * \brief Converts an angle in degrees to radians.
+	 * \tparam T Floating-point type.
+	 * \param degrees Angle in degrees.
+	 * \return The angle in radians.
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T radians(T degrees) noexcept
 	{

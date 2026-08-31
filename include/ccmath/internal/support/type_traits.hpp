@@ -30,7 +30,7 @@ namespace ccm::support::traits
 
 	/// is_char specialization
 
-	/// @cond internal
+	/// \cond internal
 	template <typename T> struct internal_is_char : std::false_type {};
 	template <> struct internal_is_char<char> : std::true_type {};
 	template <> struct internal_is_char<wchar_t> : std::true_type {};
@@ -41,14 +41,14 @@ namespace ccm::support::traits
 	template <> struct internal_is_char<char32_t> : std::true_type {};
 	template <> struct internal_is_char<signed char> : std::true_type {};
 	template <> struct internal_is_char<unsigned char> : std::true_type {};
-	/// @endcond
+	/// \endcond
 	
 	template <typename T> constexpr bool is_char_v = internal_is_char<T>::value;
 
 	
 	/// is_integral with additional specializations - for internal use only. Prefer std::is_integral.
 
-	/// @cond internal
+	/// \cond internal
 	template<typename> struct internal_is_integral_helper : std::false_type {};
 	template<> struct internal_is_integral_helper<bool> : std::true_type {};
 	template<> struct internal_is_integral_helper<char> : std::true_type {};
@@ -72,14 +72,14 @@ namespace ccm::support::traits
 	template<> struct internal_is_integral_helper<__uint128_t> : std::true_type {};
 	template<> struct internal_is_integral_helper<__int128_t> : std::true_type {};
 	#endif
-	/// @endcond
+	/// \endcond
 	
 	template<typename T> struct ccm_is_integral : internal_is_integral_helper<std::remove_cv_t<T>>::type {};
 	template<typename T> constexpr bool ccm_is_integral_v = ccm_is_integral<T>::value;
 
 	/// is_floating_point
 
-	/// @cond internal
+	/// \cond internal
 	template <typename> struct internal_is_floating_point_helper : std::false_type{};
 	template <> struct internal_is_floating_point_helper<float> : std::true_type{};
 	template <> struct internal_is_floating_point_helper<double> : std::true_type{};
@@ -102,7 +102,7 @@ namespace ccm::support::traits
 #ifdef CCM_TYPES_HAS_FLOAT128
 	template <> struct internal_is_floating_point_helper<types::float128> : std::true_type{};
 #endif
-	/// @endcond
+	/// \endcond
 
 	template <typename T> struct ccm_is_floating_point : internal_is_floating_point_helper<std::remove_cv_t<T>>::type{};
 	template <typename T> constexpr bool ccm_is_floating_point_v = ccm_is_floating_point<T>::value;
@@ -116,10 +116,10 @@ namespace ccm::support::traits
 
 	/// is_signed
 
-	/// @cond internal
+	/// \cond internal
 	template <typename T, bool = ccm_is_arithmetic<T>::value> struct internal_is_signed_helper : std::false_type {};
 	template <typename T> struct internal_is_signed_helper<T, true> : std::integral_constant<bool, T(-1) < T(0)> {};
-	/// @endcond
+	/// \endcond
 
 	template <typename T> struct ccm_is_signed : internal_is_signed_helper<T>::type {};
 	template <typename T> constexpr bool ccm_is_signed_v = ccm_is_signed<T>::value;

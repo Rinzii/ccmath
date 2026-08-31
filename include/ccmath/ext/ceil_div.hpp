@@ -15,17 +15,17 @@
 namespace ccm::ext
 {
 	/**
-	 * @brief Divide two integral values and round the quotient toward positive infinity.
+	 * \brief Divide two integral values and round the quotient toward positive infinity.
 	 *
 	 * If divisor is zero, this function returns 0. Otherwise it works for signed
 	 * and unsigned types and rounds correctly for negative operands. The behavior
 	 * is still undefined if the exact quotient is not representable in T, for
 	 * example the most negative value divided by minus one.
 	 *
-	 * @tparam T Integral type of the inputs and output.
-	 * @param value The dividend.
-	 * @param divisor The divisor.
-	 * @return The ceiling of value divided by divisor.
+	 * \tparam T Integral type of the inputs and output.
+	 * \param value The dividend.
+	 * \param divisor The divisor.
+	 * \return The ceiling of value divided by divisor.
 	 */
 	template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<std::remove_cv_t<T>, bool>, bool> = true>
 	constexpr T ceil_div(T value, T divisor) noexcept

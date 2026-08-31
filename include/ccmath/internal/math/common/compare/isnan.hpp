@@ -18,10 +18,10 @@
 namespace ccm
 {
 	/**
-	 * @brief Check if the given number is NaN.
-	 * @tparam T The type of the number to check.
-	 * @param num The number to check.
-	 * @return True if the number is NaN, false otherwise.
+	 * \brief Check if the given number is NaN.
+	 * \tparam T The type of the number to check.
+	 * \param num The number to check.
+	 * \return True if the number is NaN, false otherwise.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> [[nodiscard]] constexpr bool isnan(T num) noexcept
 	{
@@ -38,9 +38,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Check if the given number is NaN.
-	 * @tparam Integer The type of the number to check.
-	 * @return False, as integers can never be NaN.
+	 * \brief Check if the given number is NaN.
+	 * \tparam Integer The type of the number to check.
+	 * \return False, as integers can never be NaN.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> [[nodiscard]] constexpr bool isnan(Integer /* num */)
 	{
@@ -48,4 +48,4 @@ namespace ccm
 	}
 } // namespace ccm
 
-/// @ingroup compare
+/// \ingroup compare

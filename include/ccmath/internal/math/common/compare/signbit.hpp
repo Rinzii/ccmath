@@ -18,16 +18,16 @@
 namespace ccm
 {
 	/**
-	 * @brief Detects the sign bit of zeroes, infinities, and NaNs.
-	 * @tparam T A floating-point type.
-	 * @param num A floating-point number.
-	 * @return true if \p x is negative, false otherwise.
+	 * \brief Detects the sign bit of zeroes, infinities, and NaNs.
+	 * \tparam T A floating-point type.
+	 * \param num A floating-point number.
+	 * \return true if \p x is negative, false otherwise.
 	 *
-	 * @note This function has multiple implementations based on the compiler and the version of the compiler used.
+	 * \note This function has multiple implementations based on the compiler and the version of the compiler used.
 	 * With nearly all implementations, this function is fully constexpr and will return
 	 * the same values as std::signbit along with being static_assert-able.
 	 *
-	 * @warning ccm::signbit may fail
+	 * \warning ccm::signbit may fail
 	 * to compile if you are not using the cmake build for ccmath or do not have access to __builtin_bit_cast.
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> [[nodiscard]] constexpr bool signbit(T num) noexcept
@@ -49,12 +49,12 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Detects the sign bit of a number.
-	 * @tparam Integer An integral type.
-	 * @param num An integral number.
-	 * @return true if \p x is negative, false otherwise.
+	 * \brief Detects the sign bit of a number.
+	 * \tparam Integer An integral type.
+	 * \param num An integral number.
+	 * \return true if \p x is negative, false otherwise.
 	 *
-	 * @note This function is constexpr and will return the same values as std::signbit along with being static_assert-able.
+	 * \note This function is constexpr and will return the same values as std::signbit along with being static_assert-able.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer> && std::is_signed_v<Integer>, bool> = true>
 	[[nodiscard]] constexpr bool signbit(Integer num) noexcept
@@ -64,11 +64,11 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Detects the sign bit of a number.
-	 * @tparam Integer An integral type.
-	 * @return false as an unsigned number can't be negative.
+	 * \brief Detects the sign bit of a number.
+	 * \tparam Integer An integral type.
+	 * \return false as an unsigned number can't be negative.
 	 *
-	 * @note This function is constexpr and will return the same values as std::signbit along with being static_assert-able.
+	 * \note This function is constexpr and will return the same values as std::signbit along with being static_assert-able.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer> && !std::is_signed_v<Integer>, bool> = true>
 	[[nodiscard]] constexpr bool signbit(Integer /* num */) noexcept

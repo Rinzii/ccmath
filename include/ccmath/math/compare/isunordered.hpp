@@ -18,11 +18,11 @@
 namespace ccm
 {
 	/**
-	 * @brief Checks if the given number is unordered, that is, one or both are NaN and thus cannot be meaningfully compared with each other.
-	 * @tparam T The type of the number.
-	 * @param x A floating-point or integer value
-	 * @param y A floating-point or integer value
-	 * @return true if either x or y is NaN, false otherwise.
+	 * \brief Checks if the given number is unordered, that is, one or both are NaN and thus cannot be meaningfully compared with each other.
+	 * \tparam T The type of the number.
+	 * \param x A floating-point or integer value
+	 * \param y A floating-point or integer value
+	 * \return true if either x or y is NaN, false otherwise.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr bool isunordered(T x, T y) noexcept
 	{
@@ -36,9 +36,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Checks if the given number is unordered, that is, one or both are NaN and thus cannot be meaningfully compared with each other.
-	 * @tparam Integer The type of the integer.
-	 * @return false, as all integers are ordered.
+	 * \brief Checks if the given number is unordered, that is, one or both are NaN and thus cannot be meaningfully compared with each other.
+	 * \tparam Integer The type of the integer.
+	 * \return false, as all integers are ordered.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
 	constexpr bool isunordered(Integer /* x */, Integer /* y */) noexcept
@@ -47,12 +47,12 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Checks if the given number is unordered, that is, one or both are NaN and thus cannot be meaningfully compared with each other.
-	 * @tparam T Type of the left-hand side.
-	 * @tparam U Type of the right-hand side.
-	 * @param x Value of the left-hand side of the comparison.
-	 * @param y Value of the right-hand side of the comparison.
-	 * @return true if either x or y is NaN, false otherwise.
+	 * \brief Checks if the given number is unordered, that is, one or both are NaN and thus cannot be meaningfully compared with each other.
+	 * \tparam T Type of the left-hand side.
+	 * \tparam U Type of the right-hand side.
+	 * \param x Value of the left-hand side of the comparison.
+	 * \param y Value of the right-hand side of the comparison.
+	 * \return true if either x or y is NaN, false otherwise.
 	 */
 	template <typename T, typename U> constexpr bool isunordered(T x, U y) noexcept
 	{
@@ -61,4 +61,4 @@ namespace ccm
 	}
 } // namespace ccm
 
-/// @ingroup compare
+/// \ingroup compare

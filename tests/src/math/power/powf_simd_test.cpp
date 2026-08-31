@@ -63,8 +63,8 @@ namespace
 		const float denorm = std::numeric_limits<float>::denorm_min();
 
 		// Exceptional grid: zeros, ones, powers of two, infinities, NaN, denormals, negative bases.
-		const float special_bases[] = { 0.0f, -0.0f, 1.0f, -1.0f, 2.0f, -2.0f, 4.0f, 10.0f, 0.5f, inf, -inf, qnan, denorm, -denorm, 3.4e38f, -3.4e38f };
-		const float special_exps[]	= { 0.0f, -0.0f, 1.0f, -1.0f, 2.0f, 3.0f, -3.0f, 0.5f, -0.5f, 2.5f, inf, -inf, qnan, 127.0f, -149.0f, 0.3333333f };
+		const float special_bases[] = {0.0f, -0.0f, 1.0f, -1.0f, 2.0f, -2.0f, 4.0f, 10.0f, 0.5f, inf, -inf, qnan, denorm, -denorm, 3.4e38f, -3.4e38f};
+		const float special_exps[]	= {0.0f, -0.0f, 1.0f, -1.0f, 2.0f, 3.0f, -3.0f, 0.5f, -0.5f, 2.5f, inf, -inf, qnan, 127.0f, -149.0f, 0.3333333f};
 		for (float b : special_bases)
 		{
 			for (float e : special_exps)
@@ -85,7 +85,7 @@ namespace
 		// Hard near-one region with large exponents (stresses the Ziv resolution).
 		for (float b = 0.9f; b <= 1.1f; b += 0.0007f)
 		{
-			for (float e : { -240.0f, -50.0f, -7.5f, 7.5f, 50.0f, 240.0f })
+			for (float e : {-240.0f, -50.0f, -7.5f, 7.5f, 50.0f, 240.0f})
 			{
 				add(b, e);
 			}
@@ -104,7 +104,7 @@ namespace
 		for (float b = 2.0f; b <= 100.0f; b += 1.5f)
 		{
 			const float k = std::log(3.0e38f) / std::log(b);
-			for (float d : { -1.5f, -0.25f, 0.0f, 0.25f, 1.5f })
+			for (float d : {-1.5f, -0.25f, 0.0f, 0.25f, 1.5f})
 			{
 				add(b, k + d);
 				add(b, -(k + d));
@@ -120,7 +120,7 @@ namespace
 			add(base_dist(rng), exp_dist(rng));
 		}
 
-		return { std::move(xs), std::move(ys) };
+		return {std::move(xs), std::move(ys)};
 	}
 
 	template <typename V> void expect_matches_scalar(const std::vector<float> & xs, const std::vector<float> & ys, const char * tag)

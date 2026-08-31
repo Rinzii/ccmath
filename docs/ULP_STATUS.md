@@ -1,13 +1,8 @@
 # ULP status
 
-The goal for ccmath is correctly rounded results in all four IEEE 754 rounding modes for every
-function. We are not there yet, and this page is meant to be an honest picture of where each
-function actually stands rather than a promise. It reports what was measured, how it was measured,
-and what is still left to do.
-
-The companion page ROUNDING_STATUS.md tracks which rounding modes each function handles at runtime.
-This page is about accuracy, the distance between the ccm result and the true correctly rounded
-value.
+ccmath aims for correctly rounded results in all four IEEE 754 rounding modes for every function.
+This page records how close each function is, measured in ULP. ROUNDING_STATUS.md covers which
+modes each function handles at runtime.
 
 ## How to read this
 
@@ -21,52 +16,31 @@ Every function falls into one of five classes.
 | Not a rounding function | Returns a bool, an int, or a classification, so ULP does not apply. The comparison family is here.                                                         |
 | Not implemented         | The header exists but there is no implementation yet. The hyperbolic and special-function families are here.                                               |
 
-A few notes on the numbers in the tables below.
+The numbers measure ccmath's generic kernels (--impl=gen) in round-to-nearest, not the public function. On clang and gcc the public function hands runtime
+round-to-nearest to a compiler builtin, the system libm, which is often more accurate than the figures here. The generic kernel is what runs at compile time, in
+the directed modes, in deterministic mode and anywhere no builtin is available. These are the portable worst case. The harness can also measure --impl=public or
+--impl=libm, but this page does not report those.
 
-These numbers are for ccmath's own generic kernels, not for whatever the public function lowers to
-at runtime. On a clang or gcc build the public functions hand the runtime round-to-nearest case to
-a compiler builtin, which is the system libm and is often more accurate than the figures here. We
-measure the generic kernel on purpose, because it is ccmath's own code and it is what runs at
-compile time, in the directed rounding modes, in deterministic mode, and anywhere a builtin is not
-available. So treat these as the portable worst case ccmath is responsible for, not as what a clang
-or gcc runtime build delivers in round-to-nearest.
+Max ULP is the largest error observed between the kernel result and the correctly rounded value over the measured corpus. 0 means every result was the nearest
+representable value. The reference is MPFR at high precision, rounded once to the target type. That is the true answer and not another library's result.
 
-Max ULP is the largest error observed between the kernel result and the correctly rounded value
-over the measured corpus. A value of 0 means every result was the nearest representable value. The
-reference is MPFR evaluated at high precision and rounded once to the target type, so it is the
-true correctly rounded answer and not another library's result.
+The Exponential, Power, Trigonometric and Miscellaneous families split each function into its float, double and long double variant (expf, exp, expl). The rest
+are exact or not implemented at every type so they stay one row each.
 
-The accuracy families, which are Exponential, Power, Trigonometric, and Miscellaneous, break each
-function into its three type variants: the float f-suffix variant (expf, powf, sinf), the plain double
-variant (exp, pow, sin), and the long double variant (expl, powl, sinl). The other families are exact
-or not implemented, which holds for every type, so they stay one row each.
+Only binary32 is measured. Its sweep is exhaustive over all bit patterns so the max is a proven worst case. binary64 and long double are pending.
 
-Only binary32 is measured so far. Every binary32 number comes from an exhaustive sweep over all bit
-patterns, which makes its max a proven worst case in round-to-nearest. binary64 is a larger job and is
-measured next, and long double after that, so both show up as pending until then.
+The Tested kernel column names the symbol that runs. Generic kernels are templates so one symbol instantiates at each type (ccm::gen::pow_gen<float>, ccm::gen::
+pow_gen<double>). asin, acos, atan, tgamma and lgamma have separate float and double functions with no long double kernel so their long double variant uses the
+double one.
 
-Each variant row names the exact kernel it runs in the Tested kernel column. The gen kernels are
-templates, so the same symbol instantiates at each type, for example ccm::gen::pow_gen<float> and
-ccm::gen::pow_gen<double>. The asin, acos, atan, tgamma, and lgamma kernels come as a separate float
-and double function with no dedicated long double kernel, so their long double variant uses the double
-kernel. These are ccmath's own generic kernels under --impl=gen, the implementation the public function
-falls back to in the directed modes, at compile time, and in deterministic mode. The same harness can
-point at the public path or the system libm with --impl=public or --impl=libm, but those are not what
-this page reports.
-
-The numbers are measured in round-to-nearest, the default mode. Which rounding modes each function
-handles at runtime is tracked separately in ROUNDING_STATUS.md.
-
-To refresh these tables, run the sweep and then the generator.
+To refresh the tables, run the sweep and then the generator.
 
 ```
 tools/measure_ulp.sh --exhaustive-float
 python3 tools/ulp_status.py
 ```
 
-The function classes and the list of measured functions live in tools/ulp_status_registry.json.
-A function with no completed campaign summary shows up as pending, so the tables never claim a
-number that was not actually measured.
+Function classes and the measured-function list live in tools/ulp_status_registry.json. A function with no completed campaign summary shows up as pending.
 
 ## Accuracy by function
 
@@ -260,18 +234,12 @@ number that was not actually measured.
 
 ## Scope and caveats
 
-This pass measures binary32. binary64 is the next job, and long double after that, so both show up as
-pending. The accuracy families list all three variants so the gaps are explicit rather than implied.
+atan2, hypot and lerp take more than one argument so they wait on a binary and ternary sweep and are marked pending. pow is measured separately, with its
+campaign in the appendix.
 
-The atan2, hypot, and lerp functions take more than one argument, so they wait on a binary and
-ternary sweep and are marked pending. pow is measured separately, and its detailed campaign is in
-the appendix below.
-
-Near a zero or a pole, ULP error is governed by conditioning rather than by rounding, because a
-tiny absolute error sits across many representable values when the result itself is near zero or
-very large. Functions with poles or zeros in range, such as tan near its poles and lgamma near its
-zeros at 1 and 2, can show a large max and average that reflect how close the corpus landed to
-those spots rather than the kernel's typical accuracy.
+Near a zero or a pole, conditioning governs ULP error, not rounding, because a tiny absolute error spans many representable values when the result is near zero
+or very large. Functions with poles or zeros in range, such as tan at its poles and lgamma at its zeros at 1 and 2, can show a large max and average that
+reflect where the corpus landed, not the kernel's typical accuracy.
 
 ## Appendix: pow campaign detail
 
@@ -285,9 +253,8 @@ same in all four IEEE rounding modes on the corpora below.
 | MPFR hard failures | Cases that exceed the campaign 4 ULP ceiling, or disagree with MPFR on NaN, infinity, or signed zero. Within-ceiling results that miss the 0.5 ULP correctly-rounded target are tracked separately and are not counted here. |
 | CORE-MATH bit mismatches | Cases where ccm bits differ from the CORE-MATH cr_* reference in the active rounding mode. This is not a ULP threshold. Cases where a higher-precision cross-check shows ccm is correct and the CORE-MATH oracle is wrong are excluded. |
 
-Per-case logs with base, exponent, actual, and expected bit patterns live under
-[tests/rigorous/oracle_logs/README.md](../tests/rigorous/oracle_logs/README.md). Re-run the
-rigorous oracle ctest targets to refresh them.
+Per-case logs (base, exponent, actual and expected bit patterns) live under
+[tests/rigorous/oracle_logs/README.md](../tests/rigorous/oracle_logs/README.md). Re-run the rigorous oracle ctest targets to refresh them.
 
 | Function  | Configuration                               | MPFR cases | MPFR Max ULP | MPFR hard failures | CORE-MATH cases | CORE-MATH Max ULP | CORE-MATH bit mismatches | Notes                                                                             |
 |-----------|---------------------------------------------|------------|--------------|--------------------|-----------------|-------------------|--------------------------|-----------------------------------------------------------------------------------|

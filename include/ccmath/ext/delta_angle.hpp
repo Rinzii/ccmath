@@ -18,11 +18,11 @@
 namespace ccm::ext
 {
 	/**
-	 * @brief Compute the shortest signed difference between two angles in radians.
-	 * @tparam T Type of the input and output.
-	 * @param current The current angle, in radians.
-	 * @param target The target angle, in radians.
-	 * @return The shortest signed angular difference in the range [-pi, pi].
+	 * \brief Compute the shortest signed difference between two angles in radians.
+	 * \tparam T Type of the input and output.
+	 * \param current The current angle, in radians.
+	 * \param target The target angle, in radians.
+	 * \return The shortest signed angular difference in the range [-pi, pi].
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T delta_angle(T current, T target) noexcept
 	{

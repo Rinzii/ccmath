@@ -193,7 +193,7 @@ namespace ccm::support
 
 	// TODO(IanP): Review whether these helpers should replace or merge with exact_add and split in double_double.hpp.
 	/**
-	 * @brief Add a + b, such that &hi + &lo approximates a + b.
+	 * \brief Add a + b, such that &hi + &lo approximates a + b.
 	 *
 	 * Add a + b, such that *hi + *lo approximates a + b.
 	 *  Assumes |a| >= |b|.
@@ -207,10 +207,10 @@ namespace ccm::support
 	 *	Algorithm Reference:
 	 *	- https://hal.inria.fr/hal-03798376
 	 *
-	 * @param hi
-	 * @param lo
-	 * @param a
-	 * @param b
+	 * \param hi
+	 * \param lo
+	 * \param a
+	 * \param b
 	 */
 
 	template <typename T, std::enable_if_t<traits::ccm_is_floating_point_v<T>, bool> = true> static constexpr void fast_two_sum(T & hi, T & lo, T a, T b)

@@ -137,7 +137,7 @@ TEST(CcmathInternalSupportTests, AddWithCarryUint8MatchesReferenceExhaustively)
 	{
 		for (int rhs = 0; rhs <= 0xFF; ++rhs)
 		{
-			for (std::uint8_t carry_in : { static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1) })
+			for (std::uint8_t carry_in : {static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1)})
 			{
 				std::uint8_t carry_out = 0;
 				const std::uint8_t actual =
@@ -157,7 +157,7 @@ TEST(CcmathInternalSupportTests, SubWithBorrowUint8MatchesReferenceExhaustively)
 	{
 		for (int rhs = 0; rhs <= 0xFF; ++rhs)
 		{
-			for (std::uint8_t borrow_in : { static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1) })
+			for (std::uint8_t borrow_in : {static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1)})
 			{
 				std::uint8_t borrow_out = 0;
 				const std::uint8_t actual =
@@ -182,16 +182,16 @@ TEST(CcmathInternalSupportTests, AddWithCarryUint64MatchesBoundaryCases)
 		std::uint64_t expected_carry;
 	};
 
-	const std::array<case_data, 8> cases = { {
-		{ 0ULL, 0ULL, 0ULL, 0ULL, 0ULL },
-		{ 0ULL, 0ULL, 1ULL, 1ULL, 0ULL },
-		{ std::numeric_limits<std::uint64_t>::max(), 0ULL, 1ULL, 0ULL, 1ULL },
-		{ std::numeric_limits<std::uint64_t>::max(), 1ULL, 0ULL, 0ULL, 1ULL },
-		{ std::numeric_limits<std::uint64_t>::max(), std::numeric_limits<std::uint64_t>::max(), 0ULL, std::numeric_limits<std::uint64_t>::max() - 1ULL, 1ULL },
-		{ std::numeric_limits<std::uint64_t>::max() - 1ULL, 1ULL, 1ULL, 0ULL, 1ULL },
-		{ 0xFFFFFFFF00000000ULL, 0x00000000FFFFFFFFULL, 1ULL, 0ULL, 1ULL },
-		{ 0x8000000000000000ULL, 0x8000000000000000ULL, 0ULL, 0ULL, 1ULL },
-	} };
+	const std::array<case_data, 8> cases = {{
+		{0ULL, 0ULL, 0ULL, 0ULL, 0ULL},
+		{0ULL, 0ULL, 1ULL, 1ULL, 0ULL},
+		{std::numeric_limits<std::uint64_t>::max(), 0ULL, 1ULL, 0ULL, 1ULL},
+		{std::numeric_limits<std::uint64_t>::max(), 1ULL, 0ULL, 0ULL, 1ULL},
+		{std::numeric_limits<std::uint64_t>::max(), std::numeric_limits<std::uint64_t>::max(), 0ULL, std::numeric_limits<std::uint64_t>::max() - 1ULL, 1ULL},
+		{std::numeric_limits<std::uint64_t>::max() - 1ULL, 1ULL, 1ULL, 0ULL, 1ULL},
+		{0xFFFFFFFF00000000ULL, 0x00000000FFFFFFFFULL, 1ULL, 0ULL, 1ULL},
+		{0x8000000000000000ULL, 0x8000000000000000ULL, 0ULL, 0ULL, 1ULL},
+	}};
 
 	for (const auto & test_case : cases)
 	{
@@ -214,16 +214,16 @@ TEST(CcmathInternalSupportTests, SubWithBorrowUint64MatchesBoundaryCases)
 		std::uint64_t expected_borrow;
 	};
 
-	const std::array<case_data, 8> cases = { {
-		{ 0ULL, 0ULL, 0ULL, 0ULL, 0ULL },
-		{ 0ULL, 0ULL, 1ULL, std::numeric_limits<std::uint64_t>::max(), 1ULL },
-		{ 0ULL, 1ULL, 0ULL, std::numeric_limits<std::uint64_t>::max(), 1ULL },
-		{ 5ULL, 3ULL, 1ULL, 1ULL, 0ULL },
-		{ std::numeric_limits<std::uint64_t>::max(), std::numeric_limits<std::uint64_t>::max(), 1ULL, std::numeric_limits<std::uint64_t>::max(), 1ULL },
-		{ 0x100000000ULL, 1ULL, 1ULL, 0xFFFFFFFEULL, 0ULL },
-		{ 0x8000000000000000ULL, 0x7FFFFFFFFFFFFFFFULL, 1ULL, 0ULL, 0ULL },
-		{ 0x7FFFFFFFFFFFFFFFULL, 0x8000000000000000ULL, 0ULL, std::numeric_limits<std::uint64_t>::max(), 1ULL },
-	} };
+	const std::array<case_data, 8> cases = {{
+		{0ULL, 0ULL, 0ULL, 0ULL, 0ULL},
+		{0ULL, 0ULL, 1ULL, std::numeric_limits<std::uint64_t>::max(), 1ULL},
+		{0ULL, 1ULL, 0ULL, std::numeric_limits<std::uint64_t>::max(), 1ULL},
+		{5ULL, 3ULL, 1ULL, 1ULL, 0ULL},
+		{std::numeric_limits<std::uint64_t>::max(), std::numeric_limits<std::uint64_t>::max(), 1ULL, std::numeric_limits<std::uint64_t>::max(), 1ULL},
+		{0x100000000ULL, 1ULL, 1ULL, 0xFFFFFFFEULL, 0ULL},
+		{0x8000000000000000ULL, 0x7FFFFFFFFFFFFFFFULL, 1ULL, 0ULL, 0ULL},
+		{0x7FFFFFFFFFFFFFFFULL, 0x8000000000000000ULL, 0ULL, std::numeric_limits<std::uint64_t>::max(), 1ULL},
+	}};
 
 	for (const auto & test_case : cases)
 	{
@@ -284,7 +284,7 @@ TEST(CcmathInternalSupportTests, VeltkampSplitReconstructsInput)
 	long double xh = 0.0L;
 	long double xl = 0.0L;
 
-	for (long double input : { 0.0L, 1.0L, -1.0L, 0x1.12345678p+40L, -0x1.98765432p-20L, 0x1.ffffffffp+12L })
+	for (long double input : {0.0L, 1.0L, -1.0L, 0x1.12345678p+40L, -0x1.98765432p-20L, 0x1.ffffffffp+12L})
 	{
 		ccm::support::veltkamp_split(xh, xl, input);
 		EXPECT_EQ(xh + xl, input);

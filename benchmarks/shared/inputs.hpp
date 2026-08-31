@@ -10,7 +10,7 @@ namespace ccm::bench
 {
 	struct Randomizer
 	{
-		explicit Randomizer(std::uint_fast32_t seed = 937162211) : m_gen{ seed } {}
+		explicit Randomizer(std::uint_fast32_t seed = 937162211) : m_gen{seed} {}
 
 		std::vector<int> integers(std::int64_t count, int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max())
 		{

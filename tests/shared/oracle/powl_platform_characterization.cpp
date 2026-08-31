@@ -58,8 +58,8 @@ namespace
 			// ReSharper enable CppDFAUnreachableCode
 		}
 
-		const std::array bases	   = { 0.25L, 0.5L, 1.0L, 2.0L, 3.0L, 10.0L };
-		const std::array exponents = { -2.0L, -0.5L, 0.0L, 0.5L, 2.0L, 3.0L };
+		const std::array bases	   = {0.25L, 0.5L, 1.0L, 2.0L, 3.0L, 10.0L};
+		const std::array exponents = {-2.0L, -0.5L, 0.0L, 0.5L, 2.0L, 3.0L};
 		ccm::test::oracle::run_summary<long double> summary;
 
 		for (long double base : bases)

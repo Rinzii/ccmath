@@ -177,7 +177,7 @@ namespace ccm::gen
 #endif
 			}
 
-			inline constexpr std::int64_t kBoundedExponentMax = (std::int64_t{ 1 } << 62) - 1;
+			inline constexpr std::int64_t kBoundedExponentMax = (std::int64_t{1} << 62) - 1;
 
 			constexpr bool try_extract_int64(const PowlFPBits_t & bits, std::int64_t & out) noexcept
 			{
@@ -290,11 +290,11 @@ namespace ccm::gen
 					// produce inf - inf = NaN, so propagate a clean infinity instead.
 					if (ccm::isinf(hi) || ccm::isnan(hi))
 					{
-						return Pair{ hi, 0.0L };
+						return Pair{hi, 0.0L};
 					}
 					if (abs_ld(a.hi) >= kSplitSafe || abs_ld(b.hi) >= kSplitSafe)
 					{
-						return Pair{ hi, 0.0L };
+						return Pair{hi, 0.0L};
 					}
 					Pair p = bit80::powl_ld80_detail::exact_mult(a.hi, b.hi);
 					p.lo += a.hi * b.lo + a.lo * b.hi;
@@ -304,8 +304,8 @@ namespace ccm::gen
 				// base^e for e > 0, accumulated as a double-double.
 				constexpr Pair ipow(long double base, std::uint64_t e) noexcept
 				{
-					Pair result{ 1.0L, 0.0L };
-					Pair factor{ base, 0.0L };
+					Pair result{1.0L, 0.0L};
+					Pair factor{base, 0.0L};
 					while (e > 0U)
 					{
 						if ((e & 1U) != 0U)

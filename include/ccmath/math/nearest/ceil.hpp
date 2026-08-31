@@ -23,10 +23,10 @@
 namespace ccm
 {
 	/**
-	 * @brief Computes the smallest integer value not less than num.
-	 * @tparam T The type of the number.
-	 * @param num A floating-point or integer value.
-	 * @return The smallest integer value not less than num.
+	 * \brief Computes the smallest integer value not less than num.
+	 * \tparam T The type of the number.
+	 * \param num A floating-point or integer value.
+	 * \return The smallest integer value not less than num.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T ceil(T num) noexcept
 	{
@@ -60,10 +60,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Returns the ceiling of an integer input after conversion to double.
-	 * @tparam Integer Integral type.
-	 * @param num Integer value.
-	 * @return num converted to double.
+	 * \brief Returns the ceiling of an integer input after conversion to double.
+	 * \tparam Integer Integral type.
+	 * \param num Integer value.
+	 * \return num converted to double.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double ceil(Integer num) noexcept
 	{
@@ -71,9 +71,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the ceiling of a float value.
-	 * @param num Floating-point value.
-	 * @return Smallest integer value not less than num, as float.
+	 * \brief Computes the ceiling of a float value.
+	 * \param num Floating-point value.
+	 * \return Smallest integer value not less than num, as float.
 	 */
 	constexpr float ceilf(float num) noexcept
 	{
@@ -81,9 +81,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the ceiling of a double value.
-	 * @param num Floating-point value.
-	 * @return Smallest integer value not less than num, as double.
+	 * \brief Computes the ceiling of a double value.
+	 * \param num Floating-point value.
+	 * \return Smallest integer value not less than num, as double.
 	 */
 	constexpr long double ceill(long double num) noexcept
 	{
@@ -91,4 +91,4 @@ namespace ccm
 	}
 } // namespace ccm
 
-/// @ingroup nearest
+/// \ingroup nearest

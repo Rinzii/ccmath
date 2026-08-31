@@ -57,5 +57,5 @@ TEST(PowlFormatDetection, StableFormatNameIsNonEmpty)
 {
 	const char * name = ccm::config::long_double_format_name(ccm::config::detect_long_double_format());
 	ASSERT_NE(name, nullptr);
-	EXPECT_GT(std::string_view{ name }.size(), 0u);
+	EXPECT_GT(std::string_view{name}.size(), 0u);
 }

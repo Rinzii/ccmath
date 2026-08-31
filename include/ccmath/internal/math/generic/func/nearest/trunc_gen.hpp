@@ -16,10 +16,10 @@
 namespace ccm
 {
 	/**
-	 * @brief Returns the integral value nearest to x with the magnitude of the integral value always less than or equal to x.
-	 * @tparam T The type of the input.
-	 * @param num The value to truncate.
-	 * @return Returns a truncated value.
+	 * \brief Returns the integral value nearest to x with the magnitude of the integral value always less than or equal to x.
+	 * \tparam T The type of the input.
+	 * \param num The value to truncate.
+	 * \return Returns a truncated value.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T trunc(T num) noexcept
 	{
@@ -63,10 +63,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Returns the integral value nearest to x with the magnitude of the integral value always less than or equal to x.
-	 * @tparam Integer The type of the input.
-	 * @param num The value to truncate.
-	 * @return Returns a truncated value.
+	 * \brief Returns the integral value nearest to x with the magnitude of the integral value always less than or equal to x.
+	 * \tparam Integer The type of the input.
+	 * \param num The value to truncate.
+	 * \return Returns a truncated value.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double trunc(Integer num) noexcept
 	{
@@ -74,9 +74,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Specialization for float that returns the integral value nearest to x with the magnitude of the integral value always less than or equal to x.
-	 * @param num The float to truncate.
-	 * @return Returns a truncated float.
+	 * \brief Specialization for float that returns the integral value nearest to x with the magnitude of the integral value always less than or equal to x.
+	 * \param num The float to truncate.
+	 * \return Returns a truncated float.
 	 */
 	constexpr float truncf(float num) noexcept
 	{
@@ -84,10 +84,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Specialization for long double that returns the integral value nearest to x with the magnitude of the integral value always less than or equal to
+	 * \brief Specialization for long double that returns the integral value nearest to x with the magnitude of the integral value always less than or equal to
 	 * x.
-	 * @param num The long double to truncate.
-	 * @return Returns a truncated long double.
+	 * \param num The long double to truncate.
+	 * \return Returns a truncated long double.
 	 */
 	constexpr long double truncl(long double num) noexcept
 	{

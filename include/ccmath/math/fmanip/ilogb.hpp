@@ -20,10 +20,10 @@
 namespace ccm
 {
 	/**
-	 * @brief Extracts the unbiased integer exponent of a floating-point value.
-	 * @tparam T Floating-point type.
-	 * @param num Floating-point value.
-	 * @return Unbiased base-2 exponent as int (or implementation-defined special values for zero/NaN).
+	 * \brief Extracts the unbiased integer exponent of a floating-point value.
+	 * \tparam T Floating-point type.
+	 * \param num Floating-point value.
+	 * \return Unbiased base-2 exponent as int (or implementation-defined special values for zero/NaN).
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr int ilogb(T num) noexcept
 	{
@@ -41,9 +41,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Extracts the unbiased integer exponent of a float.
-	 * @param num Floating-point value.
-	 * @return Unbiased base-2 exponent as int.
+	 * \brief Extracts the unbiased integer exponent of a float.
+	 * \param num Floating-point value.
+	 * \return Unbiased base-2 exponent as int.
 	 */
 	constexpr int ilogbf(float num) noexcept
 	{
@@ -51,9 +51,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Extracts the unbiased integer exponent of a long double.
-	 * @param num Floating-point value.
-	 * @return Unbiased base-2 exponent as int.
+	 * \brief Extracts the unbiased integer exponent of a long double.
+	 * \param num Floating-point value.
+	 * \return Unbiased base-2 exponent as int.
 	 */
 	constexpr int ilogbl(long double num) noexcept
 	{

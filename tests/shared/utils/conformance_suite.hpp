@@ -85,8 +85,8 @@ namespace ccm::test
 	}
 
 	template <typename T, typename CcmFn, typename StdFn, std::size_t N>
-	void ExpectUlpBinaryOverAllRoundingModes(
-		const std::array<T, N> & bases, const std::array<T, N> & exponents, CcmFn ccm_fn, StdFn std_fn, int64_t max_ulp = kMaxAllowedUlp)
+	void ExpectUlpBinaryOverAllRoundingModes(const std::array<T, N> & bases, const std::array<T, N> & exponents, CcmFn ccm_fn, StdFn std_fn,
+											 int64_t max_ulp = kMaxAllowedUlp)
 	{
 		static_assert(N > 0, "need at least one (base, exponent) pair");
 		ForEachRoundingModeOrSkip([&](int mode) {

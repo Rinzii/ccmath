@@ -15,14 +15,14 @@
 namespace ccm::ext
 {
 	/**
-	 * @brief Cubic interpolation.
-	 * @tparam T Type of the input and output.
-	 * @param y0 The first value.
-	 * @param y1 The second value.
-	 * @param y2 The third value.
-	 * @param y3 The fourth value.
-	 * @param t The interpolation value.
-	 * @return The interpolated value.
+	 * \brief Cubic interpolation.
+	 * \tparam T Type of the input and output.
+	 * \param y0 The first value.
+	 * \param y1 The second value.
+	 * \param y2 The third value.
+	 * \param y3 The fourth value.
+	 * \param t The interpolation value.
+	 * \return The interpolated value.
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T cubic(T y0, T y1, T y2, T y3, T t)
 	{

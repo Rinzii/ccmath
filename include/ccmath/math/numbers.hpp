@@ -13,7 +13,7 @@
 #include <type_traits>
 
 /*
- * @brief This namespace contains a set of constants that are useful for mathematical operations.
+ * \brief This namespace contains a set of constants that are useful for mathematical operations.
  */
 namespace ccm::numbers
 {

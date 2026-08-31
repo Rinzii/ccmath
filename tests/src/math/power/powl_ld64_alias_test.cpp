@@ -47,8 +47,8 @@ TEST(PowlLd64Alias, PublicPowlMatchesGenPath)
 		GTEST_SKIP() << "long double is not double-shaped on this platform";
 	}
 
-	const std::array<long double, 4> bases	   = { 0.25L, 1.0L, 2.0L, 3.0L };
-	const std::array<long double, 4> exponents = { -2.0L, 0.5L, 2.0L, 3.0L };
+	const std::array<long double, 4> bases	   = {0.25L, 1.0L, 2.0L, 3.0L};
+	const std::array<long double, 4> exponents = {-2.0L, 0.5L, 2.0L, 3.0L};
 	for (long double base : bases)
 	{
 		for (long double exponent : exponents)

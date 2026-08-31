@@ -20,10 +20,10 @@
 namespace ccm
 {
 	/**
-	 * @brief Computes the cube root of a floating-point value.
-	 * @tparam T Floating-point type.
-	 * @param num Floating-point value.
-	 * @return Cube root of num.
+	 * \brief Computes the cube root of a floating-point value.
+	 * \tparam T Floating-point type.
+	 * \param num Floating-point value.
+	 * \return Cube root of num.
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T cbrt(T num) noexcept
 	{
@@ -41,9 +41,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the cube root of a float.
-	 * @param num Floating-point value.
-	 * @return Cube root of num as float.
+	 * \brief Computes the cube root of a float.
+	 * \param num Floating-point value.
+	 * \return Cube root of num as float.
 	 */
 	constexpr float cbrtf(float num) noexcept
 	{
@@ -51,9 +51,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the cube root of a long double.
-	 * @param num Floating-point value.
-	 * @return Cube root of num as long double.
+	 * \brief Computes the cube root of a long double.
+	 * \param num Floating-point value.
+	 * \return Cube root of num as long double.
 	 */
 	constexpr long double cbrtl(long double num) noexcept
 	{
@@ -61,4 +61,4 @@ namespace ccm
 	}
 } // namespace ccm
 
-/// @ingroup power
+/// \ingroup power

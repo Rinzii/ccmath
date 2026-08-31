@@ -144,33 +144,33 @@ namespace ccm::test::oracle::fma_oracle
 		{
 			for (const auto & input : ccm::test::samples::kFmaFloatCases)
 			{
-				cases.push_back({ input.x, input.y, input.z, "structured regression corpus" });
+				cases.push_back({input.x, input.y, input.z, "structured regression corpus"});
 			}
 		} else
 		{
 			for (const auto & input : ccm::test::samples::kFmaDoubleCases)
 			{
-				cases.push_back({ input.x, input.y, input.z, "structured regression corpus" });
+				cases.push_back({input.x, input.y, input.z, "structured regression corpus"});
 			}
 		}
 
 		const T one		  = static_cast<T>(1);
 		const T next_up	  = std::nextafter(one, std::numeric_limits<T>::infinity());
 		const T next_down = std::nextafter(one, static_cast<T>(0));
-		cases.push_back({ next_up, next_up, -one, "near-unity cancellation above 1" });
-		cases.push_back({ next_down, next_down, -one, "near-unity cancellation below 1" });
-		cases.push_back({ next_down, next_up, -one, "mixed-neighbor near-unity cancellation" });
+		cases.push_back({next_up, next_up, -one, "near-unity cancellation above 1"});
+		cases.push_back({next_down, next_down, -one, "near-unity cancellation below 1"});
+		cases.push_back({next_down, next_up, -one, "mixed-neighbor near-unity cancellation"});
 
 		const T min_normal	  = std::numeric_limits<T>::min();
 		const T min_subnormal = std::numeric_limits<T>::denorm_min();
 		if constexpr (std::is_same_v<T, float>)
 		{
-			cases.push_back({ min_normal, 0x1.0p-23F, -min_subnormal, "float exact subnormal cancellation" });
-			cases.push_back({ min_normal, 0x1.0p-24F, -min_subnormal, "float sticky-bit underflow boundary" });
+			cases.push_back({min_normal, 0x1.0p-23F, -min_subnormal, "float exact subnormal cancellation"});
+			cases.push_back({min_normal, 0x1.0p-24F, -min_subnormal, "float sticky-bit underflow boundary"});
 		} else
 		{
-			cases.push_back({ min_normal, 0x1.0p-52, -min_subnormal, "double exact subnormal cancellation" });
-			cases.push_back({ min_normal, 0x1.0p-53, -min_subnormal, "double sticky-bit underflow boundary" });
+			cases.push_back({min_normal, 0x1.0p-52, -min_subnormal, "double exact subnormal cancellation"});
+			cases.push_back({min_normal, 0x1.0p-53, -min_subnormal, "double sticky-bit underflow boundary"});
 		}
 	}
 
@@ -195,14 +195,14 @@ namespace ccm::test::oracle::fma_oracle
 			{
 				for (T z : values)
 				{
-					cases.push_back({ x, y, z, "special-value matrix" });
+					cases.push_back({x, y, z, "special-value matrix"});
 				}
 			}
 		}
 
-		cases.push_back({ std::numeric_limits<T>::quiet_NaN(), static_cast<T>(1), static_cast<T>(1), "quiet NaN multiplicand" });
-		cases.push_back({ static_cast<T>(1), std::numeric_limits<T>::quiet_NaN(), static_cast<T>(1), "quiet NaN multiplier" });
-		cases.push_back({ static_cast<T>(1), static_cast<T>(1), std::numeric_limits<T>::quiet_NaN(), "quiet NaN addend" });
+		cases.push_back({std::numeric_limits<T>::quiet_NaN(), static_cast<T>(1), static_cast<T>(1), "quiet NaN multiplicand"});
+		cases.push_back({static_cast<T>(1), std::numeric_limits<T>::quiet_NaN(), static_cast<T>(1), "quiet NaN multiplier"});
+		cases.push_back({static_cast<T>(1), static_cast<T>(1), std::numeric_limits<T>::quiet_NaN(), "quiet NaN addend"});
 	}
 
 	template <typename T> inline void append_random_cases(std::vector<ternary_case<T>> & cases, campaign_mode mode, std::uint64_t seed)

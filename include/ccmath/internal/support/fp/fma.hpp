@@ -80,8 +80,8 @@ namespace ccm::support::fp
 
 			if constexpr (std::is_integral_v<Int>)
 			{
-				const Int mask = (Int{ 1 } << bit_count) - Int{ 1 };
-				return (value & mask) != Int{ 0 };
+				const Int mask = (Int{1} << bit_count) - Int{1};
+				return (value & mask) != Int{0};
 			} else
 			{
 				for (int bit = 0; bit < bit_count; ++bit)
@@ -105,7 +105,7 @@ namespace ccm::support::fp
 			constexpr int DIGITS = std::numeric_limits<Int>::digits;
 			if (shift_length >= DIGITS)
 			{
-				value = Int{ 0 };
+				value = Int{0};
 				return true;
 			}
 
@@ -452,7 +452,7 @@ namespace ccm::support::fp
 				base_exponent  = z_value.top_exponent - (Traits::accumulator_bits - 1);
 			}
 
-			AccInt result_mantissa{ 0 };
+			AccInt result_mantissa{0};
 			bool sticky_tail = false;
 			Sign result_sign = product_sign;
 
@@ -492,7 +492,7 @@ namespace ccm::support::fp
 					result_sign = product_sign;
 					if (z_sticky)
 					{
-						result_mantissa = product_acc - z_acc - AccInt{ 1 };
+						result_mantissa = product_acc - z_acc - AccInt{1};
 						sticky_tail		= true;
 					} else
 					{
@@ -504,7 +504,7 @@ namespace ccm::support::fp
 					result_sign = z_value.sign;
 					if (product_sticky)
 					{
-						result_mantissa = z_acc - product_acc - AccInt{ 1 };
+						result_mantissa = z_acc - product_acc - AccInt{1};
 						sticky_tail		= true;
 					} else
 					{

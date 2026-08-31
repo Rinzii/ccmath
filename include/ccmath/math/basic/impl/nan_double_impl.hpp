@@ -35,8 +35,8 @@ namespace ccm::internal::impl
 		return std::numeric_limits<double>::quiet_NaN();
 #endif
 
-		std::uint64_t dbl_bits{ 0 };
-		bool has_hex_been_detected{ false };
+		std::uint64_t dbl_bits{0};
+		bool has_hex_been_detected{false};
 
 		if (arg == nullptr)
 		{

@@ -10,19 +10,12 @@
 namespace ccm::test::oracle
 {
 	template <typename T, typename ActualFn, typename ReferenceFn, typename EligibilityFn, typename TruthFn>
-	inline std::optional<failure_record<T>> evaluate_binary_coremath_case_in_mode(const pow_case<T> & test_case,
-																				  std::string_view function_name,
-																				  std::string_view path_name,
-																				  int rounding_mode,
-																				  ActualFn actual_fn,
-																				  ReferenceFn reference_fn,
-																				  EligibilityFn is_reference_case_fn,
-																				  TruthFn matches_truth_fn,
-																				  run_summary<T> & summary,
-																				  std::uint64_t seed			 = 0,
-																				  std::string_view search_mode	 = {},
-																				  std::string_view mismatch_note = "bit-exact mismatch vs CORE-MATH reference",
-																				  std::vector<failure_record<T>> * event_log = nullptr)
+	inline std::optional<failure_record<T>>
+	evaluate_binary_coremath_case_in_mode(const pow_case<T> & test_case, std::string_view function_name, std::string_view path_name, int rounding_mode,
+										  ActualFn actual_fn, ReferenceFn reference_fn, EligibilityFn is_reference_case_fn, TruthFn matches_truth_fn,
+										  run_summary<T> & summary, std::uint64_t seed = 0, std::string_view search_mode = {},
+										  std::string_view mismatch_note			 = "bit-exact mismatch vs CORE-MATH reference",
+										  std::vector<failure_record<T>> * event_log = nullptr)
 	{
 		if (!is_reference_case_fn(test_case.base, test_case.exponent))
 		{
@@ -99,18 +92,10 @@ namespace ccm::test::oracle
 	}
 
 	template <typename T, typename ActualFn, typename ReferenceFn, typename EligibilityFn, typename TruthFn>
-	inline void evaluate_binary_coremath_case_all_modes(const pow_case<T> & test_case,
-														std::string_view function_name,
-														std::string_view path_name,
-														const std::vector<int> & rounding_modes,
-														ActualFn actual_fn,
-														ReferenceFn reference_fn,
-														EligibilityFn is_reference_case_fn,
-														TruthFn matches_truth_fn,
-														run_summary<T> & summary,
-														std::vector<failure_record<T>> & failures,
-														std::uint64_t seed						   = 0,
-														std::string_view search_mode			   = {},
+	inline void evaluate_binary_coremath_case_all_modes(const pow_case<T> & test_case, std::string_view function_name, std::string_view path_name,
+														const std::vector<int> & rounding_modes, ActualFn actual_fn, ReferenceFn reference_fn,
+														EligibilityFn is_reference_case_fn, TruthFn matches_truth_fn, run_summary<T> & summary,
+														std::vector<failure_record<T>> & failures, std::uint64_t seed = 0, std::string_view search_mode = {},
 														std::string_view mismatch_note			   = "bit-exact mismatch vs CORE-MATH reference",
 														std::vector<failure_record<T>> * event_log = nullptr)
 	{

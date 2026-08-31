@@ -40,7 +40,7 @@ set(CCMATH_LIBRARY_MANIFEST_OPTION_disable_fenv_CMAKE_INVERT FALSE)
 set(CCMATH_LIBRARY_MANIFEST_OPTION_disable_fenv_MESON_OPTION disable_fenv)
 set(CCMATH_LIBRARY_MANIFEST_OPTION_disable_fenv_DEFINE CCM_CONFIG_DISABLE_FENV)
 set(CCMATH_LIBRARY_MANIFEST_OPTION_disable_fenv_DESCRIPTION
-        "Completely disable the host floating-point environment: drop every <cfenv> and <fenv.h> include, assume round-to-nearest at runtime, and signal no fp-exceptions (auto-enabled when no host fenv header exists)")
+        "Disable explicit ccmath host-fenv access: drop every <cfenv> and <fenv.h> include, assume round-to-nearest for ccmath routing, and perform no explicit ccmath fp-exception signaling (ordinary arithmetic may still set hardware flags)")
 
 set(CCMATH_LIBRARY_MANIFEST_OPTION_freestanding_CMAKE_VAR CCMATH_FREESTANDING)
 set(CCMATH_LIBRARY_MANIFEST_OPTION_freestanding_CMAKE_DEFAULT OFF)
@@ -64,7 +64,7 @@ set(CCMATH_LIBRARY_MANIFEST_OPTION_deterministic_CMAKE_INVERT FALSE)
 set(CCMATH_LIBRARY_MANIFEST_OPTION_deterministic_MESON_OPTION deterministic)
 set(CCMATH_LIBRARY_MANIFEST_OPTION_deterministic_DEFINE CCM_CONFIG_DETERMINISTIC)
 set(CCMATH_LIBRARY_MANIFEST_OPTION_deterministic_DESCRIPTION
-        "Produce bit-identical cross-hardware math: route transcendentals through the generic kernels (no libm), force the correctly-rounded FMA path, disable runtime SIMD, and evaluate long double in double precision (GCC/Clang)")
+        "Select deterministic source routing: use generic transcendental kernels instead of libm, force the correctly-rounded FMA path, disable runtime SIMD, and evaluate long double in double precision (GCC/Clang); this option alone does not guarantee cross-hardware bit identity")
 
 function(ccmath_manifest_declare_library_options)
     foreach (_ccmath_manifest_key IN LISTS CCMATH_LIBRARY_MANIFEST_OPTION_KEYS)

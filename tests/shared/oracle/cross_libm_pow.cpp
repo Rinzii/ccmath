@@ -26,15 +26,15 @@ namespace
 		std::vector<case_record> cases;
 		for (const auto & hard : ccm::test::worst_case::kPowDoubleHard)
 		{
-			cases.push_back({ hard.base, hard.exponent, {} });
+			cases.push_back({hard.base, hard.exponent, {}});
 		}
 		if (corpus == "extended")
 		{
-			for (double base : { 0.5, 1.0, 2.0, -2.0, 1e-300, 1e300 })
+			for (double base : {0.5, 1.0, 2.0, -2.0, 1e-300, 1e300})
 			{
-				for (double exponent : { -3.0, -0.5, 0.0, 0.5, 2.0, 10.0 })
+				for (double exponent : {-3.0, -0.5, 0.0, 0.5, 2.0, 10.0})
 				{
-					cases.push_back({ base, exponent, {} });
+					cases.push_back({base, exponent, {}});
 				}
 			}
 		}

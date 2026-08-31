@@ -162,7 +162,7 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static MaskMember mbroadcast(bool b)
 		{
 			MaskMember r;
-			MaskInt const v = b ? static_cast<MaskInt>(-1) : MaskInt{ 0 };
+			MaskInt const v = b ? static_cast<MaskInt>(-1) : MaskInt{0};
 			detail::unroll<N>([&](auto i) { r[i] = v; });
 			return r;
 		}
@@ -172,7 +172,7 @@ namespace ccm::pp
 		}
 		CCM_ALWAYS_INLINE static void mset(MaskMember & m, detail::SimdSizeType i, bool b)
 		{
-			m[i] = b ? static_cast<MaskInt>(-1) : MaskInt{ 0 };
+			m[i] = b ? static_cast<MaskInt>(-1) : MaskInt{0};
 		}
 		CCM_ALWAYS_INLINE static MaskMember mand(MaskMember a, MaskMember b)
 		{
@@ -462,7 +462,7 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static MaskMember NAME(SimdMember a, SimdMember b)                                                                                   \
 		{                                                                                                                                                      \
 			MaskMember r;                                                                                                                                      \
-			detail::unroll<N>([&](auto i) { r[i] = (a[i] OP b[i]) ? static_cast<MaskInt>(-1) : MaskInt{ 0 }; });                                               \
+			detail::unroll<N>([&](auto i) { r[i] = (a[i] OP b[i]) ? static_cast<MaskInt>(-1) : MaskInt{0}; });                                                 \
 			return r;                                                                                                                                          \
 		}
 		CCM_PP_ARRAY_CMP(eq, ==)
@@ -476,7 +476,7 @@ namespace ccm::pp
 		CCM_ALWAYS_INLINE static MaskMember mbroadcast(bool b)
 		{
 			MaskMember r;
-			MaskInt const v = b ? static_cast<MaskInt>(-1) : MaskInt{ 0 };
+			MaskInt const v = b ? static_cast<MaskInt>(-1) : MaskInt{0};
 			detail::unroll<N>([&](auto i) { r[i] = v; });
 			return r;
 		}
@@ -486,7 +486,7 @@ namespace ccm::pp
 		}
 		CCM_ALWAYS_INLINE static void mset(MaskMember & m, detail::SimdSizeType i, bool b)
 		{
-			m[i] = b ? static_cast<MaskInt>(-1) : MaskInt{ 0 };
+			m[i] = b ? static_cast<MaskInt>(-1) : MaskInt{0};
 		}
 		CCM_ALWAYS_INLINE static MaskMember mand(MaskMember a, MaskMember b)
 		{

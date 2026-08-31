@@ -20,7 +20,11 @@ namespace
 	};
 
 	constexpr AngleCase kAngles[] = {
-		{ 0.0, 0.0 }, { 30.0, kPi / 6.0 }, { 45.0, kPi / 4.0 }, { 60.0, kPi / 3.0 }, { 90.0, kPi / 2.0 },
+		{0.0, 0.0},
+		{30.0, kPi / 6.0},
+		{45.0, kPi / 4.0},
+		{60.0, kPi / 3.0},
+		{90.0, kPi / 2.0},
 	};
 } // namespace
 

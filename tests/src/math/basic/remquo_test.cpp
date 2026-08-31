@@ -19,28 +19,28 @@
 
 constexpr double get_ccm_rem(double x, double y)
 {
-	int quotient{ 0 };
+	int quotient{0};
 	double remainder = ccm::remquo(x, y, &quotient);
 	return remainder;
 }
 
 constexpr int get_ccm_quo(double x, double y)
 {
-	int quotient{ 0 };
+	int quotient{0};
 	ccm::remquo(x, y, &quotient); // remainder = 1
 	return quotient;
 }
 
 double get_std_rem(double x, double y)
 {
-	int quotient{ 0 };
+	int quotient{0};
 	double remainder = std::remquo(x, y, &quotient);
 	return remainder;
 }
 
 int get_std_quo(double x, double y)
 {
-	int quotient{ 0 };
+	int quotient{0};
 	std::remquo(x, y, &quotient);
 	return quotient;
 }

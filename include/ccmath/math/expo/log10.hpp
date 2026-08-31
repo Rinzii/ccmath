@@ -31,10 +31,10 @@ CCM_DISABLE_MSVC_WARNING(4702)
 namespace ccm
 {
 	/**
-	 * @brief Computes the base-10 logarithm of a floating-point value.
-	 * @tparam T Floating-point type.
-	 * @param num Floating-point value.
-	 * @return Base-10 logarithm of num. Returns -inf for zero and NaN for negative inputs.
+	 * \brief Computes the base-10 logarithm of a floating-point value.
+	 * \tparam T Floating-point type.
+	 * \param num Floating-point value.
+	 * \return Base-10 logarithm of num. Returns -inf for zero and NaN for negative inputs.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr T log10(T num)
 	{
@@ -89,10 +89,10 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes base-10 logarithm after promoting an integer input to double.
-	 * @tparam Integer Integral type.
-	 * @param num Integer value.
-	 * @return Base-10 logarithm of num as double.
+	 * \brief Computes base-10 logarithm after promoting an integer input to double.
+	 * \tparam Integer Integral type.
+	 * \param num Integer value.
+	 * \return Base-10 logarithm of num as double.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double log10(Integer num)
 	{
@@ -100,9 +100,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the base-10 logarithm of a float.
-	 * @param num Floating-point value.
-	 * @return Base-10 logarithm as float.
+	 * \brief Computes the base-10 logarithm of a float.
+	 * \param num Floating-point value.
+	 * \return Base-10 logarithm as float.
 	 */
 	constexpr float log10f(float num)
 	{
@@ -110,9 +110,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Computes the base-10 logarithm of a long double.
-	 * @param num Floating-point value.
-	 * @return Base-10 logarithm as long double.
+	 * \brief Computes the base-10 logarithm of a long double.
+	 * \param num Floating-point value.
+	 * \return Base-10 logarithm as long double.
 	 */
 	constexpr long double log10l(long double num)
 	{

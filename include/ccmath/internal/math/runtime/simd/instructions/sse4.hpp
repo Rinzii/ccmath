@@ -101,23 +101,23 @@ namespace ccm::intrin
 		CCM_ALWAYS_INLINE constexpr simd(__m128 const & value_in) : m_value(value_in) {}
 		CCM_ALWAYS_INLINE simd operator*(simd const & other) const
 		{
-			return { _mm_mul_ps(m_value, other.m_value) };
+			return {_mm_mul_ps(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE simd operator/(simd const & other) const
 		{
-			return { _mm_div_ps(m_value, other.m_value) };
+			return {_mm_div_ps(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE simd operator+(simd const & other) const
 		{
-			return { _mm_add_ps(m_value, other.m_value) };
+			return {_mm_add_ps(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE simd operator-(simd const & other) const
 		{
-			return { _mm_sub_ps(m_value, other.m_value) };
+			return {_mm_sub_ps(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE simd operator-() const
 		{
-			return { _mm_sub_ps(_mm_set1_ps(0.0F), m_value) };
+			return {_mm_sub_ps(_mm_set1_ps(0.0F), m_value)};
 		}
 		CCM_ALWAYS_INLINE void copy_from(float const * ptr, element_aligned_tag /*unused*/)
 		{
@@ -228,23 +228,23 @@ namespace ccm::intrin
 		CCM_ALWAYS_INLINE constexpr simd(__m128d const & value_in) : m_value(value_in) {}
 		CCM_ALWAYS_INLINE simd operator*(simd const & other) const
 		{
-			return { _mm_mul_pd(m_value, other.m_value) };
+			return {_mm_mul_pd(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE simd operator/(simd const & other) const
 		{
-			return { _mm_div_pd(m_value, other.m_value) };
+			return {_mm_div_pd(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE simd operator+(simd const & other) const
 		{
-			return { _mm_add_pd(m_value, other.m_value) };
+			return {_mm_add_pd(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE simd operator-(simd const & other) const
 		{
-			return { _mm_sub_pd(m_value, other.m_value) };
+			return {_mm_sub_pd(m_value, other.m_value)};
 		}
 		CCM_ALWAYS_INLINE simd operator-() const
 		{
-			return { _mm_sub_pd(_mm_set1_pd(0.0), m_value) };
+			return {_mm_sub_pd(_mm_set1_pd(0.0), m_value)};
 		}
 		CCM_ALWAYS_INLINE void copy_from(double const * ptr, element_aligned_tag /*unused*/)
 		{
@@ -276,8 +276,8 @@ namespace ccm::intrin
 		__m128d m_value;
 	};
 
-	CCM_ALWAYS_INLINE simd<double, abi::sse4>
-	choose(simd_mask<double, abi::sse4> const & a, simd<double, abi::sse4> const & b, simd<double, abi::sse4> const & c)
+	CCM_ALWAYS_INLINE simd<double, abi::sse4> choose(simd_mask<double, abi::sse4> const & a, simd<double, abi::sse4> const & b,
+													 simd<double, abi::sse4> const & c)
 	{
 		// NOLINTNEXTLINE(modernize-return-braced-init-list)
 		return simd<double, abi::sse4>(_mm_add_pd(_mm_and_pd(a.get(), b.get()), _mm_andnot_pd(a.get(), c.get())));

@@ -182,7 +182,7 @@ template <std::size_t N> void removePaddingBits(std::array<std::byte, N> & byteA
 	// Zero out everything after the 10th element
 	for (std::size_t i = 10; i < N; ++i)
 	{
-		byteArray.at(i) = std::byte{ 0 };
+		byteArray.at(i) = std::byte{0};
 	}
 }
 

@@ -16,7 +16,7 @@ namespace
 		double x;
 	};
 
-	constexpr Sample kSamples[] = { { 2.5 }, { 3.5 }, { -2.5 }, { 1e8 + 0.5 } };
+	constexpr Sample kSamples[] = {{2.5}, {3.5}, {-2.5}, {1e8 + 0.5}};
 } // namespace
 
 int main()

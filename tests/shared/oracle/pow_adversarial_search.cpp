@@ -10,15 +10,9 @@
 namespace
 {
 	template <typename T, typename Fn>
-	std::vector<ccm::test::oracle::failure_record<T>> run_search(std::string_view function_name,
-																 std::string_view path_name,
-																 ccm::test::pow_path::validation_path path,
-																 std::string_view search_mode,
-																 Fn fn,
-																 const std::vector<ccm::test::oracle::pow_case<T>> & cases,
-																 mpfr_prec_t precision,
-																 std::uint64_t max_ulp,
-																 std::uint64_t seed)
+	std::vector<ccm::test::oracle::failure_record<T>>
+	run_search(std::string_view function_name, std::string_view path_name, ccm::test::pow_path::validation_path path, std::string_view search_mode, Fn fn,
+			   const std::vector<ccm::test::oracle::pow_case<T>> & cases, mpfr_prec_t precision, std::uint64_t max_ulp, std::uint64_t seed)
 	{
 		std::vector<ccm::test::oracle::failure_record<T>> failures;
 		ccm::test::oracle::run_summary<T> summary;

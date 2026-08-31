@@ -15,10 +15,10 @@
 namespace ccm::ext
 {
 	/**
-	 * @brief Calculates a fast, approximate, reciprocal.
-	 * @tparam T Type of the input and output.
-	 * @param x Value to get the reciprocal of.
-	 * @return The reciprocal of the input.
+	 * \brief Calculates a fast, approximate, reciprocal.
+	 * \tparam T Type of the input and output.
+	 * \param x Value to get the reciprocal of.
+	 * \return The reciprocal of the input.
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T rcp(T x) noexcept
 	{

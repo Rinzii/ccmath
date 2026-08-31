@@ -25,10 +25,10 @@
 namespace ccm
 {
 	/**
-	 * @brief Rounds num to an integer using the current rounding mode.
-	 * @tparam T The type of the number.
-	 * @param num A floating-point or integer value.
-	 * @return The rounded value.
+	 * \brief Rounds num to an integer using the current rounding mode.
+	 * \tparam T The type of the number.
+	 * \param num A floating-point or integer value.
+	 * \return The rounded value.
 	 */
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true> constexpr T rint(T num) noexcept
 	{
@@ -37,15 +37,15 @@ namespace ccm
 			return ccm::rt::rint_rt(num);
 		}
 
-		constexpr auto rounding_mode{ ccm::support::fenv::get_rounding_mode() };
+		constexpr auto rounding_mode{ccm::support::fenv::get_rounding_mode()};
 		return ccm::support::fp::directional_round(num, rounding_mode);
 	}
 
 	/**
-	 * @brief Returns the rounded value of an integer input after conversion to double.
-	 * @tparam Integer Integral type.
-	 * @param num Integer value.
-	 * @return num converted to double.
+	 * \brief Returns the rounded value of an integer input after conversion to double.
+	 * \tparam Integer Integral type.
+	 * \param num Integer value.
+	 * \return num converted to double.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr double rint(Integer num) noexcept
 	{
@@ -53,9 +53,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Rounds a float to an integer value using the current rounding mode.
-	 * @param num Floating-point value.
-	 * @return Rounded value as float.
+	 * \brief Rounds a float to an integer value using the current rounding mode.
+	 * \param num Floating-point value.
+	 * \return Rounded value as float.
 	 */
 	constexpr float rintf(float num) noexcept
 	{
@@ -63,9 +63,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Rounds a long double to an integer value using the current rounding mode.
-	 * @param num Floating-point value.
-	 * @return Rounded value as long double.
+	 * \brief Rounds a long double to an integer value using the current rounding mode.
+	 * \param num Floating-point value.
+	 * \return Rounded value as long double.
 	 */
 	constexpr long double rintl(long double num) noexcept
 	{
@@ -73,4 +73,4 @@ namespace ccm
 	}
 } // namespace ccm
 
-/// @ingroup nearest
+/// \ingroup nearest

@@ -19,11 +19,11 @@
 namespace ccm::gen
 {
 	/**
-	 * @internal
-	 * @brief Computes the absolute value of a number.
-	 * @tparam T Numeric type.
-	 * @param num Floating-point or integer value.
-	 * @return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
+	 * \internal
+	 * \brief Computes the absolute value of a number.
+	 * \tparam T Numeric type.
+	 * \param num Floating-point or integer value.
+	 * \return If successful, returns the absolute value of arg (|arg|). The value returned is exact and does not depend on any rounding modes.
 	 */
 	template <typename T> constexpr auto abs(T num) -> std::enable_if_t<std::is_floating_point_v<T> && std::is_signed_v<T>, T>
 	{

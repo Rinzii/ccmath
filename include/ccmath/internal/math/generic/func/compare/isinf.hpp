@@ -19,10 +19,10 @@
 namespace ccm
 {
 	/**
-	 * @brief Checks if the given number is infinite.
-	 * @tparam T The type of the number to check.
-	 * @param num The number to check.
-	 * @return True if the number is infinite, false otherwise.
+	 * \brief Checks if the given number is infinite.
+	 * \tparam T The type of the number to check.
+	 * \param num The number to check.
+	 * \return True if the number is infinite, false otherwise.
 	 */
 	template <typename T, std::enable_if_t<!std::is_integral_v<T>, bool> = true> constexpr bool isinf(T num) noexcept
 	{
@@ -39,9 +39,9 @@ namespace ccm
 	}
 
 	/**
-	 * @brief Checks if the given number is infinite.
-	 * @tparam Integer The type of the integer to check.
-	 * @return True if the number is infinite, false otherwise.
+	 * \brief Checks if the given number is infinite.
+	 * \tparam Integer The type of the integer to check.
+	 * \return True if the number is infinite, false otherwise.
 	 */
 	template <typename Integer, std::enable_if_t<std::is_integral_v<Integer>, bool> = true> constexpr bool isinf(Integer /* num */) noexcept
 	{

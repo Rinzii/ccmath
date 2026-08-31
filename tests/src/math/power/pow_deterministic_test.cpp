@@ -29,8 +29,8 @@ namespace
 		return ccm::support::bit_cast<U>(a) == ccm::support::bit_cast<U>(b);
 	}
 
-	constexpr std::array<double, 6> kBases	   = { 2.0, 0.5, 1.25, 3.0, 10.0, 0.1 };
-	constexpr std::array<double, 6> kExponents = { 3.0, -2.0, 0.5, 7.25, -0.75, 100.0 };
+	constexpr std::array<double, 6> kBases	   = {2.0, 0.5, 1.25, 3.0, 10.0, 0.1};
+	constexpr std::array<double, 6> kExponents = {3.0, -2.0, 0.5, 7.25, -0.75, 100.0};
 } // namespace
 
 // Deterministic mode must route the public runtime entry point through the generic kernel rather
