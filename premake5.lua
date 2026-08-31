@@ -30,7 +30,7 @@ newoption {
 
 newoption {
     trigger = "ccmath-disable-fenv",
-    description = "Completely disable the host floating-point environment: drop every <cfenv> and <fenv.h> include, assume round-to-nearest at runtime, and signal no fp-exceptions (auto-enabled when no host fenv header exists)",
+    description = "Disable explicit ccmath host-fenv access: drop every <cfenv> and <fenv.h> include, assume round-to-nearest for ccmath routing, and perform no explicit ccmath fp-exception signaling (ordinary arithmetic may still set hardware flags)",
     allowed = { { "true", "Enable" }, { "false", "Disable" } },
     default = "false",
 }
@@ -51,7 +51,7 @@ newoption {
 
 newoption {
     trigger = "ccmath-deterministic",
-    description = "Produce bit-identical cross-hardware math: route transcendentals through the generic kernels (no libm), force the correctly-rounded FMA path, disable runtime SIMD, and evaluate long double in double precision (GCC/Clang)",
+    description = "Select deterministic source routing: use generic transcendental kernels instead of libm, force the correctly-rounded FMA path, disable runtime SIMD, and evaluate long double in double precision (GCC/Clang); this option alone does not guarantee cross-hardware bit identity",
     allowed = { { "true", "Enable" }, { "false", "Disable" } },
     default = "false",
 }
